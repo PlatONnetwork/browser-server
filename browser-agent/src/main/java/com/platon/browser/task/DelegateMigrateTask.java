@@ -35,12 +35,13 @@ public class DelegateMigrateTask {
 
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         start();
     }
 
     protected void start () throws InterruptedException {
-        // 只有程序正常运行才执行任务
-        if(!AppStatusUtil.isRunning()) return;
+
         try {
             DelegationExample delegationExample = new DelegationExample();
             delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());

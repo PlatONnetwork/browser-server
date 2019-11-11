@@ -40,13 +40,17 @@ public class NetworkStatUpdateTask {
 	
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
+		start();
 		// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
+
+    }
+	protected void start () throws InterruptedException {
 		try {
 			Long curNumber = networkStatCache.getNetworkStat().getCurNumber();
-			
+
 			BigInteger issueEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(curNumber),chainConfig.getAddIssuePeriodBlockCount());
-	        //获取激励池余额
+			//获取激励池余额
 			BigInteger inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(curNumber));
 			//获取质押余额
 			BigInteger stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(curNumber));
@@ -64,11 +68,11 @@ public class NetworkStatUpdateTask {
 			int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
 			//获得进行中的提案
 			int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-			
+
 			networkStatCache.updateByTask(issueValue,turnValue,totalValue,stakingValue,addressQty,doingProposalQty);
-		
+
 		} catch (BlockNumberException e) {
-            log.error("on NetworkStatUpdateTask error",e);
+			log.error("on NetworkStatUpdateTask error",e);
 		}
-    }
+	}
 }

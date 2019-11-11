@@ -39,12 +39,13 @@ public class ProposalDetailTask {
      */
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron () {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         start();
     }
 
     private void start () {
-        // 只有程序正常运行才执行任务
-        if(!AppStatusUtil.isRunning()) return;
+
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andCompletionFlagEqualTo(CustomProposal.FlagEnum.INCOMPLETE.getCode());
