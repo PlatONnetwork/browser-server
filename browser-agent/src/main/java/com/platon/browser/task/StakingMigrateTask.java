@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * @Auther: dongqile
  * @Date: 2019/11/6
- * @Description: 质押表中的历史数据迁移至ES任务
+ * @Description: 质押表中的历史数据迁移至数据库任务
  */
 @Component
 @Slf4j

@@ -5,6 +5,7 @@ import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,6 @@ public class DelegateMigrateTask {
     @Autowired
     private EsDelegationService esDelegationService;
 
-    //只查询委托历史列表
-    private static final int isHistory = 1;
 
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
@@ -44,7 +43,7 @@ public class DelegateMigrateTask {
         if(!AppStatusUtil.isRunning()) return;
         try {
             DelegationExample delegationExample = new DelegationExample();
-            delegationExample.createCriteria().andIsHistoryEqualTo(isHistory);
+            delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
             List <Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
             if (delegationList.size() > 0 && null != delegationList) {
                 Syn(delegationList);
@@ -64,7 +63,7 @@ public class DelegateMigrateTask {
         Set <Delegation> delegationSet = new HashSet <>(list);
         esDelegationService.save(delegationSet);
         DelegationExample delegationExample = new DelegationExample();
-        delegationExample.createCriteria().andIsHistoryEqualTo(isHistory);
+        delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
         delegationMapper.deleteByExample(delegationExample);
         log.debug("[DelegateHistorySyn Syn()] Syn transactional finish!!");
     }
