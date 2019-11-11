@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.ProposalBusinessMapper">
     <update id="cancel" parameterType="com.platon.browser.complement.dao.param.proposal.ProposalCancel">
+    set @canceledTopic = (select `topic` from `proposal` where `pip_id`=#{canceledId});
     insert into `proposal`
     (
         `hash`,
@@ -15,7 +16,9 @@
         `pip_id`,
         `topic`,
         `description`,
-        `block_number`
+        `block_number`,
+        `canceled_pip_id`,
+        `canceled_topic`
     )
     values
     (
@@ -30,9 +33,9 @@
         #{pIDID},
         #{topic},
         #{description},
-        #{blockNumber}
+        #{blockNumber},
+        #{canceledId},
+        @canceledTopic
     );
-
-
 </update>
 </mapper>

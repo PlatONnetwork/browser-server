@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
@@ -19,7 +20,7 @@ import java.util.Set;
 /**
  * @Auther: dongqile
  * @Date: 2019/11/6
- * @Description: 质押表中的历史数据迁移至ES任务
+ * @Description: 质押表中的历史数据迁移至数据库任务
  */
 @Component
 @Slf4j
@@ -33,6 +34,8 @@ public class StakingMigrateTask {
 
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         start();
     }
 
@@ -42,7 +45,7 @@ public class StakingMigrateTask {
             stakingExample.createCriteria().andStatusEqualTo(3);
             List <Staking> stakingList = stakingMapper.selectByExample(stakingExample);
             Set <StakingHistory> stakingHistoryList = new HashSet <>();
-            if(stakingList.size() > 0){
+            if(!stakingList.isEmpty()){
                 stakingList.forEach(staking -> {
                    StakingHistory stakingHistory = new StakingHistory();
                    BeanUtils.copyProperties(staking,stakingHistory);
@@ -51,9 +54,7 @@ public class StakingMigrateTask {
                 customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
             log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
-            return;
         }catch (Exception e){
-            e.printStackTrace();
             String error = e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);

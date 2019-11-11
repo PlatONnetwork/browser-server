@@ -1,9 +1,5 @@
 package com.platon.browser.common.utils;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -15,9 +11,6 @@ public class BakDataDeleteUtil {
     private BakDataDeleteUtil(){}
     private static final ReentrantReadWriteLock N_OPT_BAK_LOCK = new ReentrantReadWriteLock();
     private static final ReentrantReadWriteLock TX_BAK_LOK = new ReentrantReadWriteLock();
-    @Setter
-    @Getter
-    private static boolean bootstrapDone = false;
     private static volatile long nOptBakMaxId = 0L;
     private static volatile long txBakMaxId = 0L;
 

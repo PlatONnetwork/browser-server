@@ -4,7 +4,7 @@ import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
-import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
+import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class StatisticBusinessTest extends TestBase {
      */
     @Test
     public void netWorkChangeMapper(){
-        NetworkStatChange networkStatChange = networkStatChangeParam();
+        NetworkStat networkStatChange = networkStatChangeParam();
         statisticBusinessMapper.networkChange(networkStatChange);
     }
 

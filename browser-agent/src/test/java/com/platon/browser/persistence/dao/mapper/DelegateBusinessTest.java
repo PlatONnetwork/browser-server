@@ -22,6 +22,7 @@ import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,7 @@ public class DelegateBusinessTest extends TestBase {
     private RestrictingBusinessMapper restrictingBusinessMapper;
 
     @Autowired
-    private NodeOptMapper nodeOptMapper;
+    private NOptBakMapper nOptBakMapper;
 
     @Autowired
     private StakingMapper stakingMapper;
@@ -105,10 +106,10 @@ public class DelegateBusinessTest extends TestBase {
         Node node = nodeMapper.selectByPrimaryKey(createStakingParam.getNodeId());
         assertEquals(createStakingParam.getStakingBlockNum(), new BigInteger(node.getStakingBlockNum().toString()));
         //opt数据插入验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(createStakingParam.getNodeId())
                 .andBNumEqualTo(createStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(nodeOptList.get(0).getNodeId(), createStakingParam.getNodeId());
     }
 
@@ -121,9 +122,9 @@ public class DelegateBusinessTest extends TestBase {
         //删除node数据
         nodeMapper.deleteByPrimaryKey(param.getNodeId());
         //删除opt数据
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(param.getNodeId()).andBNumEqualTo(param.getStakingBlockNum().longValue());
-        nodeOptMapper.deleteByExample(nodeOptExample);
+        nOptBakMapper.deleteByExample(nodeOptExample);
     }
 
     @Test
@@ -147,10 +148,10 @@ public class DelegateBusinessTest extends TestBase {
         assertEquals(modifyStakingParam.getWebSite(), node.getWebSite());
         assertEquals(modifyStakingParam.getIsInit(), node.getIsInit().intValue());
         //opt插入数据验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(modifyStakingParam.getNodeId())
                 .andBNumEqualTo(modifyStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(modifyStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -171,10 +172,10 @@ public class DelegateBusinessTest extends TestBase {
         assertEquals(nodeAfter.getStakingHes().longValue(), nodeBefore.getStakingHes().subtract(addStakingParam.getAmount()).longValue());
 
         //opt插入数据验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(addStakingParam.getNodeId())
                 .andBNumEqualTo(addStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(addStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -197,10 +198,10 @@ public class DelegateBusinessTest extends TestBase {
         Staking staking = getStaking(withdrewStakingParam.getNodeId(), withdrewStakingParam.getStakingBlockNum().longValue());
         assertEquals(withdrewStakingParam.getStakingReductionEpoch(), staking.getStakingReductionEpoch().intValue());
         //opt数据验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(withdrewStakingParam.getNodeId())
                 .andBNumEqualTo(withdrewStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(withdrewStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -222,10 +223,10 @@ public class DelegateBusinessTest extends TestBase {
         Slash slash = slashMapper.selectByPrimaryKey(reportDuplicateSignParam.getTxHash());
         assertTrue(!StringUtils.isEmpty(slash));
         //opt插入验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(reportDuplicateSignParam.getNodeId())
                 .andBNumEqualTo(reportDuplicateSignParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(reportDuplicateSignParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -379,11 +380,11 @@ public class DelegateBusinessTest extends TestBase {
      */
     @Test
     public void netWorkChangeMapper(){
-        NetworkStatChange networkStatChange = networkStatChangeParam();
+        NetworkStat networkStatChange = networkStatChangeParam();
         statisticBusinessMapper.networkChange(networkStatChange);
     }
 
-    @Test
+   /* @Test
     public void test(){
         List<Proposal> list = new ArrayList <>();
         Proposal proposal = new Proposal();
@@ -395,5 +396,5 @@ public class DelegateBusinessTest extends TestBase {
         proposal2.setNays(1l);
         list.add(proposal2);
         customProposalMapper.updateProposalList(list);
-    }
+    }*/
 }

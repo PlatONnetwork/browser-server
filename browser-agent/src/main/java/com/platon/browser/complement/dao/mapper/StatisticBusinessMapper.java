@@ -1,7 +1,11 @@
 package com.platon.browser.complement.dao.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.platon.browser.complement.dao.entity.AddressStatistics;
 import com.platon.browser.complement.dao.entity.NetworkStatistics;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.dao.entity.Address;
@@ -44,12 +48,13 @@ public interface StatisticBusinessMapper {
      * @return
      */
 	Integer getNetworkStatisticsFromProposal();
+		
+	List<AddressStatistics> getAddressStatisticsFromStaking(@Param("list") List<String> list);
+
+	List<AddressStatistics> getAddressStatisticsFromDelegation(@Param("list") List<String> list);
 	
-    /**
-     * 获得地址数
-     * @return
-     */
-	Address getAddressStatisticsFromStaking();
+	@Transactional
+	int batchUpdateFromTask(@Param("list") List<Address> list);
 
 
 }

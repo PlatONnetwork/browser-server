@@ -1,6 +1,7 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
@@ -21,6 +22,7 @@ import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
 import com.platon.browser.common.enums.AppStatus;
+import com.platon.browser.dao.entity.NetworkStat;
 
 
 import java.math.BigDecimal;
@@ -37,7 +39,7 @@ import java.util.List;
 public class TestBase {
 
     static {
-        System.setProperty(AppStatus.class.getName(), AppStatus.STOP.name());
+        AppStatusUtil.setStatus(AppStatus.STOPPED);
     }
 
     public StakeCreate stakingParam () {
@@ -293,23 +295,22 @@ public class TestBase {
         return restrictingCreate;
     }
 
-    public NetworkStatChange networkStatChangeParam () {
-        NetworkStatChange networkStatChange = NetworkStatChange.builder()
-                .id(1)
-                .addIssueBegin(1L)
-                .addIssueEnd(2L)
-                .blockReward(new BigDecimal("100000000000000"))
-                .curNumber(100L)
-                .curTps(100)
-                .nextSettle(10L)
-                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
-                .nodeName("testNode01")
-                .proposalQty(1)
-                .stakingReward(new BigDecimal("100000000000000"))
-                .txQty(1)
-                .maxTps(1)
-                .build();
-        return networkStatChange;
+    public NetworkStat networkStatChangeParam () {
+        NetworkStat networkStat = new NetworkStat();
+               networkStat.setId(1);
+               networkStat.setAddIssueBegin(1L);
+               networkStat.setAddIssueEnd(2L);
+               networkStat.setBlockReward(new BigDecimal("100000000000000"));
+               networkStat.setCurNumber(100L);
+               networkStat.setCurTps(100);
+               networkStat.setNextSettle(10L);
+               networkStat.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
+               networkStat.setNodeName("testNode01");
+               networkStat.setProposalQty(1);
+               networkStat.setStakingReward(new BigDecimal("100000000000000"));
+               networkStat.setTxQty(1);
+               networkStat.setMaxTps(1);
+        return networkStat;
     }
 
 

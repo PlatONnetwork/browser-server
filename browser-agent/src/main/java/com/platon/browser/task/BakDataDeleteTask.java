@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.common.utils.BakDataDeleteUtil;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBakExample;
@@ -26,12 +27,13 @@ public class BakDataDeleteTask {
 
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron () {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         start();
     }
 
     private void start () {
-        // 如果自检还未完成,则不做任何删除操作
-        if(!BakDataDeleteUtil.isBootstrapDone()) return;
+
         try {
             // 删除小于最高ID的交易备份
             TxBakExample txBakExample = new TxBakExample();
