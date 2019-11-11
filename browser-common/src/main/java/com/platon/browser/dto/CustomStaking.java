@@ -71,33 +71,63 @@ public class CustomStaking extends Staking {
 
     /**
      * 使用节点信息更新质押信息
-     * @param node
+     * @param verifier
      */
-    public void updateWithNode(org.web3j.platon.bean.Node node){
+    public void updateWithVerifier(org.web3j.platon.bean.Node verifier){
         // 质押区块高度
-        if(node.getStakingBlockNum()!=null) this.setStakingBlockNum(node.getStakingBlockNum().longValue());
+        if(verifier.getStakingBlockNum()!=null) this.setStakingBlockNum(verifier.getStakingBlockNum().longValue());
         // 质押节点地址
-        this.setNodeId(HexTool.prefix(node.getNodeId()));
+        this.setNodeId(HexTool.prefix(verifier.getNodeId()));
         // 发起质押交易的索引
-        if(node.getStakingTxIndex()!=null) this.setStakingTxIndex(node.getStakingTxIndex().intValue());
+        if(verifier.getStakingTxIndex()!=null) this.setStakingTxIndex(verifier.getStakingTxIndex().intValue());
         // 发起质押的账户地址
-        this.setStakingAddr(node.getStakingAddress());
+        this.setStakingAddr(verifier.getStakingAddress());
         // 第三方社交软件关联id
-        this.setExternalId(node.getExternalId());
+        this.setExternalId(verifier.getExternalId());
         // 收益地址
-        this.setBenefitAddr(node.getBenifitAddress());
+        this.setBenefitAddr(verifier.getBenifitAddress());
 //        // 节点状态 1：候选中 2：退出中 3：已退出
-//        if(node.getStatus()!=null) this.setStatus(node.getStatus().intValue());
+        if(verifier.getStatus()!=null) this.setStatus(verifier.getStatus().intValue());
 //        // 节点名称(质押节点名称)
-        this.setNodeIcon(StringUtils.isBlank(node.getNodeName())?this.getNodeName():node.getNodeName());
+        this.setNodeName(StringUtils.isBlank(verifier.getNodeName())?this.getNodeName():verifier.getNodeName());
         // 节点的第三方主页
-        this.setWebSite(node.getWebsite());
-        this.setDetails(node.getDetails());
+        this.setWebSite(verifier.getWebsite());
+        this.setDetails(verifier.getDetails());
 
-        BigInteger programVersion=node.getProgramVersion();
+        // 程序版本号
+        BigInteger programVersion=verifier.getProgramVersion();
         BigInteger bigVersion = VerUtil.transferBigVersion(programVersion);
         this.setProgramVersion(programVersion.toString());
         this.setBigVersion(bigVersion.toString());
+    }
+
+    /**
+     * 使用节点信息更新质押信息
+     * @param candidate
+     */
+    public void updateWithCandidate(org.web3j.platon.bean.Node candidate){
+        // 设置节点名称
+        String nodeName = candidate.getNodeName();
+        if(StringUtils.isNotBlank(nodeName)) setNodeName(nodeName);
+        // 设置程序版本号
+        String programVersion=candidate.getProgramVersion().toString();
+        if(StringUtils.isNotBlank(programVersion)){
+            setProgramVersion(programVersion);
+            BigInteger bigVersion = VerUtil.transferBigVersion(candidate.getProgramVersion());
+            setBigVersion(bigVersion.toString());
+        }
+        // 设置外部ID
+        String externalId = candidate.getExternalId();
+        if(StringUtils.isNotBlank(externalId)) setExternalId(externalId);
+        // 设置收益地址
+        String benefitAddr = candidate.getBenifitAddress();
+        if(StringUtils.isNotBlank(benefitAddr)) setBenefitAddr(benefitAddr);
+        // 设置详情
+        String details = candidate.getDetails();
+        if(StringUtils.isNotBlank(details)) setDetails(details);
+        // 设置官网
+        String website = candidate.getWebsite();
+        if(StringUtils.isNotBlank(website)) setWebSite(website);
     }
 
     /**

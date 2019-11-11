@@ -38,13 +38,12 @@ public class ProposalDetailTask {
      * 3.查询到的信息更新并修改数据库
      */
     @Scheduled(cron = "0/5  * * * * ?")
-    private void cron () {
+    private void cron() {
         // 只有程序正常运行才执行任务
-        if(!AppStatusUtil.isRunning()) return;
-        start();
+        if(AppStatusUtil.isRunning()) start();
     }
 
-    protected void start () {
+    protected void start() {
 
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();

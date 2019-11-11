@@ -1,7 +1,10 @@
 package com.platon.browser.task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +12,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.Node.Column;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.keybase.KeyBaseUser;
@@ -36,6 +39,8 @@ public class NodeUpdateTask {
     private BlockChainConfig chainConfig;
     @Autowired
     private NodeMapper nodeMapper;
+    @Autowired
+    private StakeBusinessMapper stakeBusinessMapper;
 	
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron () throws InterruptedException {
@@ -49,12 +54,23 @@ public class NodeUpdateTask {
 			nodeExample.createCriteria().andExternalIdNotEqualTo("");
 			List<Node> nodeList = nodeMapper.selectByExample(nodeExample);
 			
+			Map<String, Optional<KeyBaseUser>> cache = new HashMap<>();
 			List<Node> updateNodeList = new ArrayList<Node>();
-			
+
 			nodeList.forEach(node -> {
-				try {
-					String url = keyBaseUrl.concat(keyBaseApi.concat(node.getExternalId()));
-					KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
+				Optional<KeyBaseUser> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
+					String url = keyBaseUrl.concat(keyBaseApi.concat(key));
+					try {
+						KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
+						return Optional.of(keyBaseUser);
+					} catch (HttpRequestException e) {
+						log.error("get keybase error",key,e);
+						return Optional.ofNullable(null);
+					}
+				});
+				
+				
+				optional.ifPresent(keyBaseUser ->{
 					String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
 					String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
 					boolean hasChange = false;
@@ -70,14 +86,11 @@ public class NodeUpdateTask {
 					if(hasChange) {
 						updateNodeList.add(node);
 					}
-				} catch (HttpRequestException e) {
-					log.error("get keybase error",node.getNodeId(),e);
-				}
-			
+				});	
 			});
 			
-			if(updateNodeList.size() > 0) {
-				nodeMapper.batchInsertSelective(updateNodeList, Column.externalName, Column.nodeIcon);
+			if(updateNodeList.size()>0) {				
+				stakeBusinessMapper.updateNodeForTask(updateNodeList);
 			}
 			
 		} catch (Exception e) {

@@ -102,15 +102,21 @@ public class TransactionParameterService {
                         break;
                     case PROPOSAL_TEXT: // 2000
                     	nodeOpt = proposalTextConverter.convert(event,tx);
-                        proposalQty++;
+                    	if( Transaction.StatusEnum.SUCCESS.getCode()==tx.getStatus()) {
+                    		proposalQty++;
+                    	} 
                         break;
                     case PROPOSAL_UPGRADE: // 2001
                     	nodeOpt = proposalUpgradeConverter.convert(event,tx);
-                        proposalQty++;
+                     	if( Transaction.StatusEnum.SUCCESS.getCode()==tx.getStatus()) {
+                    		proposalQty++;
+                    	} 
                         break;
                     case PROPOSAL_CANCEL: // 2005
                     	nodeOpt = proposalCancelConverter.convert(event,tx);
-                        proposalQty++;
+                     	if( Transaction.StatusEnum.SUCCESS.getCode()==tx.getStatus()) {
+                    		proposalQty++;
+                    	} 
                         break;
                     case PROPOSAL_VOTE: // 2003
                      	nodeOpt = proposalVoteConverter.convert(event,tx);

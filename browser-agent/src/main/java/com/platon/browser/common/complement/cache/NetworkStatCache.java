@@ -29,8 +29,8 @@ public class NetworkStatCache {
     public void updateByBlock(int txQty, int proposalQty, Date time, String bHash) {
     	tpsCalcCache.update(txQty, time.getTime());
     	int tps = tpsCalcCache.getTps();
-    	networkStat.setTxQty(txQty);
-    	networkStat.setProposalQty(proposalQty);
+    	networkStat.setTxQty(txQty+networkStat.getTxQty());
+    	networkStat.setProposalQty(proposalQty+networkStat.getProposalQty());
     	networkStat.setCurTps(tps);
     	networkStat.setCurBlockHash(bHash);
     	if(tps > networkStat.getMaxTps()) {

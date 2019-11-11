@@ -39,10 +39,6 @@ import java.util.concurrent.CompletableFuture;
 @EnableEncryptableProperties
 @MapperScan(basePackages = {"com.platon.browser.dao.mapper","com.platon.browser.complement.dao.mapper"})
 public class AgentApplication implements ApplicationRunner {
-	public static void main(String[] args) {
-		SpringApplication.run(AgentApplication.class, args);
-	}
-
 	// 区块服务
 	@Autowired
 	private BlockService blockService;
@@ -52,34 +48,48 @@ public class AgentApplication implements ApplicationRunner {
 	// 区块事件发布服务
 	@Autowired
 	private BlockEventPublisher blockEventPublisher;
+	// 周期服务
 	@Autowired
 	private EpochService epochService;
+	// 启动一致性检查服务
     @Autowired
     private ConsistencyService consistencyService;
+    // 启动初始化服务
     @Autowired
 	private InitializationService initializationService;
+	// 整合各模块事件处理器
+	@Bean
+	public ICollectionEventHandler collectionEventHandler(){
+		return new CollectionEventHandler();
+	}
+	@Bean
+	public IComplementEventHandler complementEventHandler(){
+		return new ComplementEventHandler();
+	}
 
-	// 已采集的最高块号
-	private Long collectedNumber = 0L;
+	public static void main(String[] args) {
+		SpringApplication.run(AgentApplication.class, args);
+	}
 
-	private Long preBlockNum=0L;
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		if(AppStatusUtil.isStopped()) return;
 		// 把应用置为BOOTING开机状态
 		AppStatusUtil.setStatus(AppStatus.BOOTING);
-        // 进入一致性自检子流程
-        consistencyService.synchronize();
+        // 进入一致性开机自检子流程
+        consistencyService.post();
 		// 进入应用初始化子流程
 		InitializationResult initialResult = initializationService.init();
 		// 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
 		AppStatusUtil.setStatus(AppStatus.RUNNING);
-		collectedNumber = initialResult.getCollectedBlockNumber();
+		// 已采最高块号
+		long collectedNumber = initialResult.getCollectedBlockNumber();
+		// 前一个块号
+		long preBlockNum;
 		// 进入区块采集主流程
 		while (true) {
 			try {
-				preBlockNum=collectedNumber;
-				collectedNumber++;
+				preBlockNum=collectedNumber++;
 				// 检查区块号是否合法
 				blockService.checkBlockNumber(collectedNumber);
 				// 异步获取区块
@@ -96,15 +106,5 @@ public class AgentApplication implements ApplicationRunner {
 				break;
 			}
 		}
-	}
-
-	// 整合各模块事件处理器
-	@Bean
-	public ICollectionEventHandler collectionEventHandler(){
-		return new CollectionEventHandler();
-	}
-	@Bean
-	public IComplementEventHandler complementEventHandler(){
-		return new ComplementEventHandler();
 	}
 }

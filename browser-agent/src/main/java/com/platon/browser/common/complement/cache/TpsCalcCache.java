@@ -56,7 +56,7 @@ public class TpsCalcCache {
             }
             if(totalTxCount==0||maxSecond<minSecond) return 0;
             if (maxSecond==minSecond) return totalTxCount;
-            BigDecimal tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond),0,RoundingMode.FLOOR);
+            BigDecimal tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond),0,RoundingMode.CEILING);
             return tps.intValue();
         }finally {
             LOCK.readLock().unlock();

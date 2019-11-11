@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -30,13 +29,15 @@ public class RedisImportService {
     @Autowired
     private RedisStatisticService statisticService;
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
+    private static final int SERVICE_COUNT = 3;
 
-    private <T> void submit(RedisService<T> service,Set<T> data,CountDownLatch latch){
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
+
+    private <T> void submit(RedisService<T> service,Set<T> data,boolean serialOverride,CountDownLatch latch){
         EXECUTOR.submit(()->{
             try {
-                service.save(data);
-            } catch (IOException e) {
+                service.save(data,serialOverride);
+            } catch (Exception e) {
                 log.error("{}",e);
             }finally {
                 latch.countDown();
@@ -48,10 +49,10 @@ public class RedisImportService {
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NetworkStat> statistics) throws InterruptedException {
         log.debug("Redis批量导入:{}(blocks({}),transactions({}),statistics({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),statistics.size());
         try{
-            CountDownLatch latch = new CountDownLatch(3);
-            submit(blockService,blocks,latch);
-            submit(transactionService,transactions,latch);
-            submit(statisticService,statistics,latch);
+            CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
+            submit(blockService,blocks,false,latch);
+            submit(transactionService,transactions,false,latch);
+            submit(statisticService,statistics,true,latch);
             latch.await();
         }catch (Exception e){
             log.error("",e);

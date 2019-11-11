@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -113,36 +114,67 @@ public class AddressUpdateTask {
 			return v1;
 		}));
 		
+		List<Address> updateAddressList = new ArrayList<>();
+		
 		addressList.stream().forEach(item ->{
-			AddressStatistics staking= stakingMap.get(item.getAddress());
-			AddressStatistics delegation= delegationMap.get(item.getAddress());
-			if(staking != null ) {
-				item.setStakingValue(staking.getStakingHes().add(staking.getStakingLocked()));
-				item.setRedeemedValue(staking.getStakingReduction());
-			}else {
-				item.setStakingValue(BigDecimal.ZERO);
-				item.setRedeemedValue(BigDecimal.ZERO);
+			AddressStatistics staking = stakingMap.get(item.getAddress());
+			AddressStatistics delegation = delegationMap.get(item.getAddress());
+			boolean hasChange = false;
+			
+			BigDecimal stakingValue = staking == null ? BigDecimal.ZERO : staking.getStakingHes().add(staking.getStakingLocked());
+			if(stakingValue.compareTo(item.getStakingValue())!=0) {
+				item.setStakingValue(stakingValue);
+				hasChange = true;
 			}
 			
-			if(delegation != null ) {
-				item.setDelegateHes(delegation.getDelegateHes());
-				item.setDelegateLocked(delegation.getDelegateLocked());
-				item.setDelegateValue(delegation.getDelegateLocked().add(delegation.getDelegateHes()));
-				item.setDelegateReleased(delegation.getDelegateReleased());
-				delegation.getNodeIdSet().add(delegation.getNodeId());
-				item.setCandidateCount(delegation.getNodeIdSet().size());
-			}else {
-				item.setDelegateHes(BigDecimal.ZERO);
-				item.setDelegateLocked(BigDecimal.ZERO);
-				item.setDelegateValue(BigDecimal.ZERO);
-				item.setDelegateReleased(BigDecimal.ZERO);
-				item.setCandidateCount(0);
+			BigDecimal stakingReduction = staking == null ? BigDecimal.ZERO : staking.getStakingReduction();
+			if(stakingReduction.compareTo(item.getRedeemedValue()) !=0) {
+				item.setRedeemedValue(stakingReduction);
+				hasChange = true;
+			}
+			
+			BigDecimal delegateHes = delegation == null ? BigDecimal.ZERO : delegation.getDelegateHes();
+			if(delegateHes.compareTo(item.getDelegateHes()) !=0) {
+				item.setDelegateHes(delegateHes);
+				hasChange = true;
+			}
+			
+			BigDecimal delegateLocked = delegation == null ? BigDecimal.ZERO : delegation.getDelegateLocked();
+			if(delegateLocked.compareTo(item.getDelegateLocked()) !=0) {
+				item.setDelegateLocked(delegateLocked);
+				hasChange = true;
+			}
+			
+			BigDecimal delegateValue = delegation == null ? BigDecimal.ZERO : delegation.getDelegateLocked().add(delegation.getDelegateHes()) ;
+			if(delegateValue.compareTo(item.getDelegateValue()) !=0) {
+				item.setDelegateValue(delegateValue);
+				hasChange = true;
+			}
+			
+			BigDecimal delegateReleased = delegation == null ? BigDecimal.ZERO : delegation.getDelegateReleased();
+			if(delegateReleased.compareTo(item.getDelegateReleased()) !=0) {
+				item.setDelegateReleased(delegateReleased);
+				hasChange = true;
+			}
+			
+			if(delegation != null) {
+				delegation.getNodeIdSet().add(delegation.getNodeId());	
+			}
+			Integer candidateCount = delegation == null ? 0 : delegation.getNodeIdSet().size();
+			if(candidateCount != item.getCandidateCount()) {
+				item.setCandidateCount(candidateCount);
+				hasChange = true;
+			}
+			
+			if(hasChange) {
+				updateAddressList.add(item);
 			}
 		});
 		
-		statisticBusinessMapper.batchUpdateFromTask(addressList);
+		if(updateAddressList.size() > 0) {
+			statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
+		}
 		return stop;
-    }
-    
-    
+    } 
+   
 }
