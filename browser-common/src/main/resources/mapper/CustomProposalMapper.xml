@@ -6,7 +6,8 @@
             update `proposal` set
             `topic`= #{item.topic},
             `description`= #{item.description},
-            `canceled_topic`=#{item.canceledTopic}
+            `canceled_topic`=#{item.canceledTopic},
+            `completion_flag`=#{item.completionFlag}
             where
             `hash` = #{item.hash}
         </foreach>
