@@ -36,7 +36,7 @@ import java.util.Map.Entry;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-//@Component
+@Component
 public class StompPushJob {
 
 	private static Logger logger = LoggerFactory.getLogger(StompPushJob.class);
@@ -73,7 +73,7 @@ public class StompPushJob {
     /**
      *	 推送首页区块相关信息
      */
-    @Scheduled(cron="0/3 * * * * ?")
+//    @Scheduled(cron="0/3 * * * * ?")
     public void pushBlockListNew() {
     	List<BlockListNewResp> lists = homeService.blockListNew();
 		BaseResp<List<BlockListNewResp>> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);
