@@ -17,7 +17,6 @@ import com.platon.browser.complement.handler.CollectionEventHandler;
 import com.platon.browser.persistence.handler.ComplementEventHandler;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
