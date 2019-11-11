@@ -1,6 +1,5 @@
 package com.platon.browser.task;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
@@ -10,12 +9,8 @@ import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.ProposalMarkDownDto;
 import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.MarkDownParserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.TallyResult;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
