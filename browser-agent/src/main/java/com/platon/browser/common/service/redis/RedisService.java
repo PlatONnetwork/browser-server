@@ -66,7 +66,7 @@ public abstract class RedisService<T> {
         if(serialOverride) {
             data.forEach(item -> redisTemplate.opsForValue().set(getCacheKey(), JSON.toJSONString(item)));
         }else{
-            // 取出缓存中的区块总数
+            // 取出缓存中的记录总数
             Long cacheItemCount = redisTemplate.opsForZSet().size(getCacheKey());
             // 更新MinMax最大分数和最小分数
             updateMinMaxScore(data);

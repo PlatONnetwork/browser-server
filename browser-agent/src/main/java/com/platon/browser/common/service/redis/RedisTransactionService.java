@@ -1,7 +1,6 @@
 package com.platon.browser.common.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
