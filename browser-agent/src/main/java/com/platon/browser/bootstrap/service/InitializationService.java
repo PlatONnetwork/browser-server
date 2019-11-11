@@ -11,15 +11,12 @@ import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.utils.HexTool;
-import com.platon.browser.utils.VerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,16 +63,16 @@ public class InitializationService {
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
             networkStat.setId(1);
-            networkStat.setCurNumber(1L);
+            networkStat.setCurNumber(0L);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(0L);
             // 删除节点表和质押表数据
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
             // 初始化内置节点
-            List<Staking> stakings = initInnerStake();
+            List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
-            initNodeCache(stakings);
+            initNodeCache(nodeList);
             // 初始化网络缓存
             networkStatCache.setNetworkStat(networkStat);
             return initialResult;
@@ -83,18 +80,16 @@ public class InitializationService {
 
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
 
-        // 初始化内置节点
-        StakingExample stakingExample = new StakingExample();
-        stakingExample.createCriteria().andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode());
-        List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-        initNodeCache(stakings);
+        // 初始化节点缓存
+        List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
+        initNodeCache(nodeList);
         // 初始化网络缓存
         networkStatCache.setNetworkStat(networkStat);
         return initialResult;
     }
 
-    private void initNodeCache(List<Staking> stakings){
-        stakings.forEach(s->{
+    private void initNodeCache(List<com.platon.browser.dao.entity.Node> nodeList){
+        nodeList.forEach(s->{
             NodeItem node = NodeItem.builder()
                     .nodeId(s.getNodeId())
                     .nodeName(s.getNodeName())
@@ -108,11 +103,11 @@ public class InitializationService {
      * 初始化入库内部质押节点
      * @throws Exception
      */
-    private List<Staking> initInnerStake() throws Exception {
+    private List<com.platon.browser.dao.entity.Node> initInnerStake() throws Exception {
         epochRetryService.issueChange(BigInteger.ZERO);
 
         List<CustomNode> nodes = new ArrayList<>();
-        List<CustomStaking> stakings = new ArrayList<>();
+        List<CustomStaking> stakingList = new ArrayList<>();
 
         List<Node> validators = epochRetryService.getPreValidators();
         Set<String> validatorSet = new HashSet<>();
@@ -128,42 +123,20 @@ public class InitializationService {
         chainConfig.getDefaultStakings().forEach(staking -> defaultStakingMap.put(staking.getNodeId(),staking));
 
         epochRetryService.getPreVerifiers().forEach(v->{
-            Node candidate = candidateMap.get(v.getNodeId());
-
             CustomStaking staking = new CustomStaking();
-            staking.updateWithNode(v);
+            staking.updateWithVerifier(v);
             staking.setStakingReductionEpoch(BigInteger.ONE.intValue()); // 提前设置验证轮数
+            staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
             staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
-            staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
             staking.setStakingLocked(Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT));
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
             if(validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 
             // 使用实时候选人信息更新质押
+            Node candidate = candidateMap.get(v.getNodeId());
             if(candidate!=null) {
-                // 设置节点名称
-                String nodeName = candidate.getNodeName();
-                if(StringUtils.isNotBlank(nodeName)) staking.setNodeName(nodeName);
-                // 设置程序版本号
-                String programVersion=candidate.getProgramVersion().toString();
-                if(StringUtils.isNotBlank(programVersion)){
-                    staking.setProgramVersion(programVersion);
-                    BigInteger bigVersion = VerUtil.transferBigVersion(candidate.getProgramVersion());
-                    staking.setBigVersion(bigVersion.toString());
-                }
-                // 设置外部ID
-                String externalId = candidate.getExternalId();
-                if(StringUtils.isNotBlank(externalId)) staking.setExternalId(externalId);
-                // 设置收益地址
-                String benefitAddr = candidate.getBenifitAddress();
-                if(StringUtils.isNotBlank(benefitAddr)) staking.setBenefitAddr(benefitAddr);
-                // 设置详情
-                String details = candidate.getDetails();
-                if(StringUtils.isNotBlank(details)) staking.setDetails(details);
-                // 设置官网
-                String website = candidate.getWebsite();
-                if(StringUtils.isNotBlank(website)) staking.setWebSite(website);
+                staking.updateWithCandidate(candidate);
             }
 
             // 使用配置文件中的信息更新质押
@@ -191,13 +164,13 @@ public class InitializationService {
             node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
 
             nodes.add(node);
-            stakings.add(staking);
+            stakingList.add(staking);
         });
 
         // 入库
-        if(!nodes.isEmpty()) nodeMapper.batchInsert(new ArrayList<>(nodes));
-        List<Staking> returnData = new ArrayList<>(stakings);
-        if(!stakings.isEmpty()) stakingMapper.batchInsert(returnData);
-        return new ArrayList<>(stakings);
+        List<com.platon.browser.dao.entity.Node> returnData = new ArrayList<>(nodes);
+        if(!nodes.isEmpty()) nodeMapper.batchInsert(returnData);
+        if(!stakingList.isEmpty()) stakingMapper.batchInsert(new ArrayList<>(stakingList));
+        return returnData;
     }
 }
