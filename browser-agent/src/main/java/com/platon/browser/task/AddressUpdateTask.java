@@ -71,7 +71,7 @@ public class AddressUpdateTask {
      * @param size 执行的批次
      * @return
      */
-    private boolean batchUpdate(int start, int size) {
+    protected boolean batchUpdate(int start, int size) {
     	boolean stop = false;
     	
     	//查询待补充的地址

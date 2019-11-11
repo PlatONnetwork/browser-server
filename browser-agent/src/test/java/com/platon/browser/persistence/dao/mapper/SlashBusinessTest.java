@@ -4,12 +4,13 @@ import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.complement.dao.param.slash.Report;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.NOptBakMapper;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Slash;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -38,8 +37,6 @@ public class SlashBusinessTest extends TestBase {
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
 
-    @Autowired
-    private NOptBakMapper nOptBakMapper;
 
     @Autowired
     private StakingMapper stakingMapper;
@@ -69,12 +66,7 @@ public class SlashBusinessTest extends TestBase {
         //slash插入数据验证
         Slash slash = slashMapper.selectByPrimaryKey(reportDuplicateSignParam.getTxHash());
         assertTrue(!StringUtils.isEmpty(slash));
-        //opt插入验证
-        NOptBakExample nodeOptExample = new NOptBakExample();
-        nodeOptExample.createCriteria().andNodeIdEqualTo(reportDuplicateSignParam.getNodeId())
-                .andBNumEqualTo(reportDuplicateSignParam.getStakingBlockNum().longValue());
-        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
-        assertEquals(reportDuplicateSignParam.getNodeId(), nodeOptList.get(0).getNodeId());
+
     }
 
 

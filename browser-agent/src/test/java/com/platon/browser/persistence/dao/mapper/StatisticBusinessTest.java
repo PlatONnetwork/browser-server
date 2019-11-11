@@ -4,6 +4,7 @@ import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
+import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
 import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,11 +42,11 @@ public class StatisticBusinessTest extends TestBase {
      /**
      *  其他数据统计
      */
-    @Test
-    public void netWorkChangeMapper(){
-        NetworkStat networkStatChange = networkStatChangeParam();
-        statisticBusinessMapper.networkChange(networkStatChange);
-    }
+//    @Test
+//    public void netWorkChangeMapper(){
+//        NetworkStat networkStatChange = networkStatChangeParam();
+//        statisticBusinessMapper.networkChange(networkStatChange);
+//    }
 
 
 }

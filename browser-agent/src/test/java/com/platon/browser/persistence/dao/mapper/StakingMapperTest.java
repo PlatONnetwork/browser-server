@@ -2,39 +2,27 @@ package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
-import com.platon.browser.complement.dao.mapper.*;
-import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
-import com.platon.browser.complement.dao.param.delegate.DelegateExit;
-import com.platon.browser.complement.dao.param.epoch.Consensus;
-import com.platon.browser.complement.dao.param.epoch.Election;
-import com.platon.browser.complement.dao.param.epoch.NewBlock;
-import com.platon.browser.complement.dao.param.epoch.Settle;
-import com.platon.browser.complement.dao.param.proposal.ProposalText;
-import com.platon.browser.complement.dao.param.proposal.ProposalUpgrade;
-import com.platon.browser.complement.dao.param.proposal.ProposalVote;
-import com.platon.browser.complement.dao.param.restricting.RestrictingCreate;
-import com.platon.browser.complement.dao.param.slash.Report;
+import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.complement.dao.param.stake.StakeExit;
 import com.platon.browser.complement.dao.param.stake.StakeIncrease;
 import com.platon.browser.complement.dao.param.stake.StakeModify;
-import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
-import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.NOptBakMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @Auther: dongqile
@@ -51,27 +39,6 @@ public class StakingMapperTest extends TestBase {
     private StakeBusinessMapper stakeBusinessMapper;
 
     @Autowired
-    private SlashBusinessMapper slashBusinessMapper;
-
-    @Autowired
-    private NewBlockMapper newBlockMapper;
-
-    @Autowired
-    private EpochBusinessMapper epochBusinessMapper;
-
-    @Autowired
-    private DelegateBusinessMapper delegateBusinessMapper;
-
-    @Autowired
-    private ProposalBusinessMapper proposalBusinessMapper;
-
-    @Autowired
-    private StatisticBusinessMapper statisticBusinessMapper;
-
-    @Autowired
-    private RestrictingBusinessMapper restrictingBusinessMapper;
-
-    @Autowired
     private NOptBakMapper nOptBakMapper;
 
     @Autowired
@@ -82,9 +49,6 @@ public class StakingMapperTest extends TestBase {
 
     @Autowired
     private DelegationMapper delegationMapper;
-
-    @Autowired
-    private SlashMapper slashMapper;
 
 
     @Test
@@ -200,112 +164,6 @@ public class StakingMapperTest extends TestBase {
         assertEquals(withdrewStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
-    @Test
-    public void reportDuplicateSignMapper () {
-        Report reportDuplicateSignParam = reportDuplicateSignParam();
-        slashBusinessMapper.report(reportDuplicateSignParam);
-        //node更新数据验证
-        Node node = nodeMapper.selectByPrimaryKey(reportDuplicateSignParam.getNodeId());
-        assertEquals(node.getStatus().intValue(), reportDuplicateSignParam.getCodeStatus());
-        assertEquals(node.getStakingReductionEpoch().intValue(), reportDuplicateSignParam.getSettingEpoch());
-        assertEquals(node.getStakingReduction(), reportDuplicateSignParam.getCodeCurStakingLocked());
-        //staking更新数据验证
-        Staking staking = getStaking(reportDuplicateSignParam.getNodeId(), reportDuplicateSignParam.getStakingBlockNum().longValue());
-        assertEquals(staking.getStatus().intValue(), reportDuplicateSignParam.getCodeStatus());
-        assertEquals(staking.getStakingReductionEpoch().intValue(), reportDuplicateSignParam.getSettingEpoch());
-        assertEquals(staking.getStakingReduction(), reportDuplicateSignParam.getCodeCurStakingLocked());
-        //slash插入数据验证
-        Slash slash = slashMapper.selectByPrimaryKey(reportDuplicateSignParam.getTxHash());
-        assertTrue(!StringUtils.isEmpty(slash));
-        //opt插入验证
-        NOptBakExample nodeOptExample = new NOptBakExample();
-        nodeOptExample.createCriteria().andNodeIdEqualTo(reportDuplicateSignParam.getNodeId())
-                .andBNumEqualTo(reportDuplicateSignParam.getStakingBlockNum().longValue());
-        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
-        assertEquals(reportDuplicateSignParam.getNodeId(), nodeOptList.get(0).getNodeId());
-    }
-
-    /**
-     * 新增区块
-     */
-    @Test
-    public void newBlockMapper () {
-        NewBlock blockParam = blockParam();
-        Staking stakingBefore = getStaking(blockParam.getNodeId(), blockParam.getStakingBlockNum().longValue());
-        Node nodeBefore = nodeMapper.selectByPrimaryKey(blockParam.getNodeId());
-        newBlockMapper.newBlock(blockParam);
-        Staking stakingAfter = getStaking(blockParam.getNodeId(), blockParam.getStakingBlockNum().longValue());
-        //staking更新数据验证
-        assertEquals(stakingBefore.getBlockRewardValue(), stakingAfter.getBlockRewardValue().subtract(blockParam.getBlockRewardValue()));
-        assertEquals(stakingBefore.getFeeRewardValue(), stakingAfter.getFeeRewardValue().subtract(blockParam.getFeeRewardValue()));
-        //node更新数据验证
-        Node nodeAfter = nodeMapper.selectByPrimaryKey(blockParam.getNodeId());
-        assertEquals(nodeBefore.getStatBlockRewardValue(), nodeAfter.getStatBlockRewardValue().subtract(blockParam.getBlockRewardValue()));
-        assertEquals(nodeBefore.getStatFeeRewardValue(), nodeAfter.getStatFeeRewardValue().subtract(blockParam.getFeeRewardValue()));
-    }
-
-
-    /**
-     * 共识周期切换
-     */
-    @Test
-    public void newConsensusEpochMapper () {
-        Consensus newConsensusParam = consensusParam();
-        epochBusinessMapper.consensus(newConsensusParam);
-        StakingExample stakingExample = new StakingExample();
-        stakingExample.createCriteria()
-                .andStatusEqualTo(1);
-        List <Staking> stakingList = stakingMapper.selectByExample(stakingExample);
-        //staking更新数据验证
-        assertEquals(0, stakingList.get(0).getCurConsBlockQty().longValue());
-    }
-
-    /**
-     * 结算周期切换
-     */
-    @Test
-    public void newReductionEpochMapper () {
-        Settle settleParam = settleParam();
-        epochBusinessMapper.settle(settleParam);
-    }
-
-
-    /**
-     * 选举周期切换-查询待踢出验证人
-     */
-    @Test
-    public void newElectionEpochMapperQuerySlashNode() {
-        List<String> nodeList = electionQuerySlashNodeParam();
-        epochBusinessMapper.querySlashNode(nodeList);
-        
-    }
-    
-    /**
-     * 选举周期切换
-     */
-    @Test
-    public void newElectionEpochMapper () {
-        Election electionParam = electionSlashNodeParam();
-        epochBusinessMapper.slashNode(electionParam);
-    }
-
-    /**
-     * 创建委托
-     */
-    @Test
-    public void delegationCreateMapper(){
-        DelegateCreate delegateCreate = delegateCreateParam();
-        delegateBusinessMapper.create(delegateCreate);
-    }
-
-    /**
-     * 退出委托
-     */
-    @Test
-    public void delegationExitMapper(){
-        DelegateExit delegateExit = delegateExitParam();
-        delegateBusinessMapper.exit(delegateExit);
-    }
 
     public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
         StakingKey stakingKey = new StakingKey();
@@ -315,67 +173,5 @@ public class StakingMapperTest extends TestBase {
         return staking;
     }
 
-    /**
-     * 创建文本提案
-     */
-    @Test
-    public void proposalTestMapper(){
-        ProposalText proposalText = proposalTextParam();
-        proposalBusinessMapper.text(proposalText);
-    }
 
-    /**
-     * 创建升级提案
-     */
-    @Test
-    public void proposalUpgradeMapper(){
-        ProposalUpgrade proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
-        proposalBusinessMapper.upgrade(proposalUpgradeOrCancel);
-    }
-
-    /**
-     * 取消提案
-     */
-    @Test
-    public void ProposalCancelMapper(){
-        ProposalUpgrade proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
-        proposalBusinessMapper.upgrade(proposalUpgradeOrCancel);
-    }
-
-    /**
-     * 投票
-     */
-    @Test
-    public void proposalVoteMapper(){
-        ProposalVote proposalVote = proposalVoteParam();
-        proposalBusinessMapper.vote(proposalVote);
-    }
-
-    /**
-     * 地址数据统计
-     */
-    @Test
-    public void addressChangeMapper(){
-        AddressStatChange addressStatChange = addressStatChangeParam();
-        statisticBusinessMapper.addressChange(addressStatChange);
-    }
-
-    /**
-     * 创建锁仓计划
-     */
-    @Test
-    public void restrcingCrateMapper(){
-        RestrictingCreate restrictingCreate = restrictingCreateParam();
-        restrictingBusinessMapper.create(restrictingCreate);
-    }
-
-
-     /**
-     *  其他数据统计
-     */
-    @Test
-    public void netWorkChangeMapper(){
-//        NetworkStatChange networkStatChange = networkStatChangeParam();
-//        statisticBusinessMapper.networkChange(networkStatChange);
-    }
 }

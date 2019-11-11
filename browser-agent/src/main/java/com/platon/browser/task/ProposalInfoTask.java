@@ -51,7 +51,7 @@ public class ProposalInfoTask {
         start();
     }
 
-    private void start ()  {
+    protected void start ()  {
 
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();

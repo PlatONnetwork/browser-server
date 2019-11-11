@@ -32,7 +32,7 @@ public class BakDataDeleteTask {
         start();
     }
 
-    private void start () {
+    protected void start () {
 
         try {
             // 删除小于最高ID的交易备份
