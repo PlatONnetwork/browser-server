@@ -101,3 +101,7 @@ platon:
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
+  
+task:
+   #地址统计任务
+   address-batch-size: 1000  
