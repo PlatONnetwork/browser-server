@@ -49,7 +49,7 @@ public class AddressUpdateTask {
     @Value("${task.address-batch-size}")
     private int batchSize;
 	
-    @Scheduled(cron = "0/1  * * * * ?")
+    @Scheduled(cron = "0/5  * * * * ?")
     private void cron () throws InterruptedException {
     	// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
