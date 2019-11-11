@@ -44,10 +44,10 @@ public class ConsistencyService {
     private BootstrapEventPublisher bootstrapEventPublisher;
 
     /**
-     * 检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
+     * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
      * @throws IOException
      */
-    public void synchronize() throws Exception {
+    public void post() throws Exception {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if(networkStat==null) {
             return;
