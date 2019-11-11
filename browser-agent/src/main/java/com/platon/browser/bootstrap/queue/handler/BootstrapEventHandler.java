@@ -67,29 +67,31 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             transactions.addAll(block.getTransactions());
             block.setTransactions(null);
 
-            // 查询交易信息表
-            List<String> txHashes = new ArrayList<>();
-            transactions.forEach(tx->txHashes.add(tx.getHash()));
-            TxBakExample txBakExample = new TxBakExample();
-            txBakExample.createCriteria().andHashIn(txHashes);
-            List<TxBak> txBaks = txBakMapper.selectByExample(txBakExample);
-            Map<String,TxBak> txBakMap = new HashMap<>();
             Long txMaxId = 0L;
-            for (TxBak bak : txBaks) {
-                if(bak.getId()>txMaxId) txMaxId=bak.getId();
-                txBakMap.put(bak.getHash(), bak);
+            if(!transactions.isEmpty()){
+                // 查询交易信息补充表，补充缺失信息
+                List<String> txHashes = new ArrayList<>();
+                transactions.forEach(tx->txHashes.add(tx.getHash()));
+                TxBakExample txBakExample = new TxBakExample();
+                txBakExample.createCriteria().andHashIn(txHashes);
+                List<TxBak> txBaks = txBakMapper.selectByExample(txBakExample);
+                Map<String,TxBak> txBakMap = new HashMap<>();
+                for (TxBak bak : txBaks) {
+                    if(bak.getId()>txMaxId) txMaxId=bak.getId();
+                    txBakMap.put(bak.getHash(), bak);
+                }
+                // 更新交易入库到ES和Redis的交易信息
+                transactions.forEach(tx->{
+                    TxBak bak = txBakMap.get(tx.getHash());
+                    BeanUtils.copyProperties(bak,tx);
+                });
             }
-            // 更新交易入库到ES和Redis的交易信息
-            transactions.forEach(tx->{
-                TxBak bak = txBakMap.get(tx.getHash());
-                BeanUtils.copyProperties(bak,tx);
-            });
 
-            // 从数据库查询日志信息,入库到ES/Redis
+            // 从数据库查询备份日志信息,补充到到ES/Redis
+            Long nOptMaxId = 0L;
+            Set<NodeOpt> nodeOpts = new HashSet<>();
             NOptBakExample nOptBakExample = new NOptBakExample();
             List<NOptBak> nOptBaks = nOptBakMapper.selectByExample(nOptBakExample);
-            Set<NodeOpt> nodeOpts = new HashSet<>();
-            Long nOptMaxId = 0L;
             for (NOptBak bak : nOptBaks) {
                 if(bak.getId()>nOptMaxId) nOptMaxId=bak.getId();
                 NodeOpt no = ComplementNodeOpt.newInstance();
