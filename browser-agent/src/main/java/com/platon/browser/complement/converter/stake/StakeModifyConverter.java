@@ -8,6 +8,7 @@ import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
     private NetworkStatCache networkStatCache;
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws Exception {
         // 修改质押信息
         StakeModifyParam txParam = tx.getTxParam(StakeModifyParam.class);
 
@@ -50,7 +51,7 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
         		.webSite(txParam.getWebsite())
         		.details(txParam.getDetails())
         		.isInit(isInit(txParam.getBenefitAddress())) 
-        		.stakingBlockNum(BigInteger.valueOf(tx.getNum()))
+        		.stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
                 .build();
         
         stakeBusinessMapper.modify(businessParam);
