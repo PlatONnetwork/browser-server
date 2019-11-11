@@ -1,6 +1,7 @@
 package com.platon.browser.now.service.cache.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -9,7 +10,6 @@ import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -43,15 +43,17 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	/** 最大item数目*/
 	@Value("${spring.redis.max-item}")
 	private long maxItemNum;
-
+	
 	@Autowired
-	private RedisTemplate<String, String> redisTemplate;
+	private RedisFactory redisFactory;
+
+//	@Autowired
+//	private RedisTemplate<String, String> redisTemplate;
 
 	@Override
 	public List<Block> getBlockCache(Integer pageNum, Integer pageSize) {
 		/** 分页根据key来获取数据 */
-		CachePageInfo<Class<Block>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, Block.class, i18n,
-				redisTemplate, maxItemNum);
+		CachePageInfo<Class<Block>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, Block.class, i18n, maxItemNum, redisFactory);
 		List<Block> blockRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/** 获取数据转换成区块对象 */
@@ -63,16 +65,19 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Override
 	public NetworkStat getNetworkStatCache() {
-		String value = redisTemplate.opsForValue().get(networkStatCacheKey);
+		String value = redisFactory.createRedisCommands().get(networkStatCacheKey);
 		/** 获取对象转换成统计对象 */
-		return JSON.parseObject(value, NetworkStat.class);
+		NetworkStat networkStat = JSON.parseObject(value, NetworkStat.class);
+		if(networkStat == null) {
+			networkStat = new NetworkStat();
+		}
+		return networkStat;
 	}
 
 	@Override
 	public TransactionCacheDto getTransactionCache(Integer pageNum, Integer pageSize) {
 		/** 分页根据key来获取交易数据  */
-		CachePageInfo<Class<Transaction>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, Transaction.class, i18n,
-				redisTemplate, maxItemNum);
+		CachePageInfo<Class<Transaction>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, Transaction.class, i18n, maxItemNum, redisFactory);
 		List<Transaction> transactionRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/** 获取数据转换成对象 */
@@ -85,8 +90,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	@Override
 	public List<Block> getBlockCacheByStartEnd(Long start, Long end) {
 		/** 分页根据key来获取数据 */
-		CachePageInfo<Class<Block>> cpi = this.getCachePageInfoByStartEnd(blockCacheKey, start, end, Block.class, i18n,
-				redisTemplate, maxItemNum);
+		CachePageInfo<Class<Block>> cpi = this.getCachePageInfoByStartEnd(blockCacheKey, start, end, Block.class, i18n, maxItemNum, redisFactory);
 		List<Block> blockRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/** 获取数据转换成区块对象 */

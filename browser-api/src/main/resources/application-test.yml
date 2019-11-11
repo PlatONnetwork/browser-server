@@ -77,6 +77,29 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
 
+redisCluster:
+  configKey: DEFAULT
+  connectionTimeout: 4000
+  soTimeout: 5000
+  maxRedirections: 3000
+  maxTotal: 10
+  maxIdle: 5
+  minIdle: 2
+  maxWaitMillis: 2000
+  testOnBorrow: false
+  testOnReturn: false
+  testWhileIdle: true
+  masterIPs: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+  password: platscan
+server:
+  tomcat:
+    min-spare-threads: 80
+    max-threads: 400
+  connection-timeout: 5000
+zuul:
+  FormBodyWrapperFilter:
+    pre:
+     disable: true
 brokenHost: 192.168.16.173
 brokenPort: 61613
 system.username: admin

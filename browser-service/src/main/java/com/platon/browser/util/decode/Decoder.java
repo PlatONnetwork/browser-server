@@ -1,7 +1,6 @@
 package com.platon.browser.util.decode;
 
 import com.platon.browser.param.RestrictingCreateParam;
-import com.platon.browser.param.TxParam;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;

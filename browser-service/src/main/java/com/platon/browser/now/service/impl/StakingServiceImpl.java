@@ -83,6 +83,10 @@ public class StakingServiceImpl implements StakingService {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
+			stakingStatisticNewResp.setStakingDelegationValue(networkStatRedis.getStakingDelegationValue().toString());
+			stakingStatisticNewResp.setBlockReward(networkStatRedis.getBlockReward().toString());
+			stakingStatisticNewResp.setStakingReward(networkStatRedis.getStakingReward().toString());
+			stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue().toString());
 			String sumExitDelegate = customStakingMapper.selectSumExitDelegate();
 			String stakingDelegationValue = networkStatRedis.getStakingDelegationValue()
 					.subtract(new BigDecimal(sumExitDelegate==null?"0":sumExitDelegate)).toString();
@@ -132,6 +136,7 @@ public class StakingServiceImpl implements StakingService {
 			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
 			aliveStakingListResp.setBlockQty(stakings.get(i).getStatBlockQty());
 			aliveStakingListResp.setDelegateQty(stakings.get(i).getStatValidAddrs());
+			aliveStakingListResp.setExpectedIncome(stakings.get(i).getAnnualizedRate().toString());
 			/** 委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额) */
 			String sumAmount = stakings.get(i).getStatDelegateHes()
 					.add(stakings.get(i).getStatDelegateLocked()).toString();
@@ -311,7 +316,9 @@ public class StakingServiceImpl implements StakingService {
 		for (NodeOpt nodeOpt: nodeOpts) {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
 			BeanUtils.copyProperties(nodeOpt, stakingOptRecordListResp);
+			stakingOptRecordListResp.setType(String.valueOf(nodeOpt.getType()));
 			stakingOptRecordListResp.setTimestamp(nodeOpt.getTime().getTime());
+			stakingOptRecordListResp.setBlockNumber(nodeOpt.getBNum());
 			if(StringUtils.isNotBlank(nodeOpt.getDesc())) {
 				String[] desces = nodeOpt.getDesc().split(BrowserConst.OPT_SPILT);
 				/** 根据不同类型组合返回 */

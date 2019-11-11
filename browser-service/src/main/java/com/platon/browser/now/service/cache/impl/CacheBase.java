@@ -1,9 +1,11 @@
 package com.platon.browser.now.service.cache.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.RedisFactory;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.redis.JedisClusterManager;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
@@ -99,6 +101,38 @@ public class CacheBase {
         cpi.page = page;
         return cpi;
     }
+    
+    protected <T> CachePageInfo <T> getCachePageInfo(String cacheKey,int pageNum,int pageSize,T target, I18nUtil i18n, long maxItemNum, RedisFactory redisFactory){
+        RespPage<T> page = new RespPage<>();
+        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
+        CachePageInfo<T> cpi = new CachePageInfo<>();
+        Long pagingTotalCount = redisFactory.createRedisCommands().zsize(cacheKey);
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+        page.setTotalCount(pagingTotalCount.intValue());
+
+        Long pageCount = pagingTotalCount/pageSize;
+        if(pagingTotalCount%pageSize!=0){
+            pageCount+=1;
+        }
+        page.setTotalPages(pageCount.intValue());
+
+        // Redis的缓存分页从索引0开始
+        if(pageNum<=0){
+            pageNum=1;
+        }
+        if(pageSize<=0){
+            pageSize=1;
+        }
+        long start = (pageNum-1l)*pageSize;
+        long end = (pageNum*pageSize)-1l;
+        Set<String> cache = redisFactory.createRedisCommands().zrevrange(cacheKey, start, end);
+        cpi.data = cache;
+        cpi.page = page;
+        return cpi;
+    }
 
     protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,T target, I18nUtil i18n, RedisTemplate<String,String> redisTemplate, long maxItemNum){
         RespPage<T> page = new RespPage<>();
@@ -119,4 +153,14 @@ public class CacheBase {
         return cpi;
     }
 
+    protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,T target, I18nUtil i18n, long maxItemNum, RedisFactory redisFactory){
+        RespPage<T> page = new RespPage<>();
+        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
+
+        CachePageInfo<T> cpi = new CachePageInfo<>();
+        Set<String> cache = redisFactory.createRedisCommands().zrevrange(cacheKey, start, end);
+        cpi.data = cache;
+        cpi.page = page;
+        return cpi;
+    }
 }
