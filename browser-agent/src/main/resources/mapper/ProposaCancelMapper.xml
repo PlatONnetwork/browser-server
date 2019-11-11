@@ -15,7 +15,8 @@
         `pip_id`,
         `topic`,
         `description`,
-        `block_number`
+        `block_number`,
+        `canceled_pip_id`
     )
     values
     (
@@ -30,9 +31,8 @@
         #{pIDID},
         #{topic},
         #{description},
-        #{blockNumber}
+        #{blockNumber},
+        #{canceledId}
     );
-
-
 </update>
 </mapper>
