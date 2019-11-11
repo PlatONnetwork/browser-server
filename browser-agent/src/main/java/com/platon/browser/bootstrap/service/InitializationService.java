@@ -158,7 +158,7 @@ public class InitializationService {
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();
             node.updateWithCustomStaking(staking);
-            node.setTotalValue(BigDecimal.ZERO);
+            node.setTotalValue(staking.getStakingLocked());
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
             node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
             node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
