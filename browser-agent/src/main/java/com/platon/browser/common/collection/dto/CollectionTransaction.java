@@ -111,6 +111,7 @@ public class CollectionTransaction extends Transaction {
                 break;
             default:
         }
+        block.setTxQty(block.getTxQty()+1);
         // 累加当前交易的手续费到当前区块的txFee
         block.setTxFee(block.getTxFee().add(getCost()));
         // 累加当前交易的能量限制到当前区块的txGasLimit
