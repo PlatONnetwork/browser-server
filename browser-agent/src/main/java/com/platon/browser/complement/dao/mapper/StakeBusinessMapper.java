@@ -1,9 +1,12 @@
 package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.dao.entity.Node;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
@@ -40,4 +43,6 @@ public interface StakeBusinessMapper {
      */
     @Transactional
     BigDecimal queryStakingValue(BusinessParam param);
+    
+	int updateNodeForTask(@Param("list") List<Node> updateNodeList);
 }
