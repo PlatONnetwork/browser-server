@@ -295,14 +295,6 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req) {
-//		NodeOptExample nodeOptExample = new NodeOptExample();
-//		nodeOptExample.setOrderByClause(" id desc");
-//		PageHelper.startPage(req.getPageNo(), req.getPageSize());
-//		NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
-//		criteria.andNodeIdEqualTo(req.getNodeId());
-//		/** 根据节点id查询节点操作记录 */
-//		List<NodeOpt> nodeOpts = nodeOptMapper.selectByExample(nodeOptExample);
-		
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
