@@ -3,8 +3,7 @@ package com.platon.browser.client;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.util.HttpUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -30,9 +29,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Date: 2018/10/25
  * Time: 14:42
  */
+@Slf4j
 @Component
 public class PlatOnClient {
-    private static Logger logger = LoggerFactory.getLogger(PlatOnClient.class);
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
     private Map<Web3j,String> web3jMap=new HashMap<>();
@@ -62,25 +61,15 @@ public class PlatOnClient {
 
     @PostConstruct
     public void init(){
-        // 初始化所有web3j实例
+        WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
-            WEB3J_CONFIG_LOCK.writeLock().lock();
-            web3jAddresses.forEach(address->{
-                Web3j web3j = Web3j.build(new HttpService(address));
-                web3jMap.put(web3j,address);
-                if(currentValidWeb3j==null) currentValidWeb3j=web3j;
-                if(currentValidAddress==null) currentValidAddress=address;
-            });
+            web3jAddresses.forEach(address->web3jMap.put(Web3j.build(new HttpService(address)),address));
+            updateCurrentValidWeb3j();
         }catch (Exception e){
-        	logger.error("web3j error{}", e);
+            log.error("web3j error{}", e);
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
-
-        // 更新合约
-        updateContract();
-        // 更新有效web3j实例列表
-        updateCurrentValidWeb3j();
     }
 
     public Web3j getWeb3j(){
@@ -88,7 +77,7 @@ public class PlatOnClient {
         try{
             return currentValidWeb3j;
         }catch (Exception e){
-            logger.error("web3j error{}", e);
+            log.error("web3j error{}", e);
         }finally {
             WEB3J_CONFIG_LOCK.readLock().unlock();
         }
@@ -108,10 +97,11 @@ public class PlatOnClient {
         stakingContract = StakingContract.load(currentValidWeb3j);
     }
 
-    public void updateCurrentValidWeb3j(){
+    private void updateCurrentValidWeb3j(){
         WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
-            // 检查currentValidWeb3j连通性, 取块高最高的作为当前web3j
+            Web3j preWeb3j = currentValidWeb3j;
+            // 检查所有Web3j的连通性, 取块高最高的作为当前web3j
             long maxBlockNumber = 0;
             for (Map.Entry<Web3j, String> entry : web3jMap.entrySet()) {
                 Web3j web3j = entry.getKey();
@@ -124,11 +114,15 @@ public class PlatOnClient {
                         currentValidAddress = address;
                     }
                 } catch (IOException e2) {
-                    logger.info("候选Web3j实例({})无效！", web3j);
+                    log.info("候选Web3j实例({})无效！", web3j);
                 }
             }
+            if(preWeb3j==null||preWeb3j!=currentValidWeb3j){
+                // 前任web3j为空或Web3j有变动,则更新合约变量
+                updateContract();
+            }
             if(maxBlockNumber==0){
-                logger.info("当前所有候选Web3j实例均无法连通！");
+                log.info("当前所有候选Web3j实例均无法连通！");
             }
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
@@ -140,13 +134,13 @@ public class PlatOnClient {
      */
     @Scheduled(cron = "0/20 * * * * ?")
     protected void keepAlive () {
-        logger.debug("*** In the detect task *** ");
+        log.debug("*** In the detect task *** ");
         try {
             updateCurrentValidWeb3j();
         } catch (Exception e) {
-            logger.error("detect exception:{}", e);
+            log.error("detect exception:{}", e);
         }
-        logger.debug("*** End the detect task *** ");
+        log.debug("*** End the detect task *** ");
     }
 
 
@@ -167,14 +161,15 @@ public class PlatOnClient {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,backoff=@Backoff(value=3000L))
-    public EconomicConfig getEconomicConfig() throws IOException {
+    public EconomicConfig getEconomicConfig() throws Exception {
         try {
             EconomicConfig ec = getWeb3j().getEconomicConfig().send().getEconomicConfig();
             String msg = JSON.toJSONString(ec,true);
-            logger.info("链上配置:{}",msg);
+            log.info("链上配置:{}",msg);
             return ec;
         } catch (Exception e) {
-            logger.error("获取链上配置出错({}),将重试!", e.getMessage());
+            updateCurrentValidWeb3j();
+            log.error("获取链上配置出错({}),将重试!", e.getMessage());
             throw e;
         }
     }
@@ -184,12 +179,10 @@ public class PlatOnClient {
     }
 
     public List<Node> getLatestValidators() throws Exception {
-        List<Node> curNodes = getNodeContract().getValidatorList().send().data;
-        return curNodes;
+        return getNodeContract().getValidatorList().send().data;
     }
 
     public List<Node> getLatestVerifiers() throws Exception {
-        List<Node> curNodes = getNodeContract().getVerifierList().send().data;
-        return curNodes;
+        return getNodeContract().getVerifierList().send().data;
     }
 }

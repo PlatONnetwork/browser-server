@@ -1,6 +1,5 @@
 package com.platon.browser.config;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.Retryable;
 import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
@@ -26,7 +24,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 链参数统一配置项
@@ -154,7 +151,7 @@ public class BlockChainConfig {
     private List<CustomStaking> defaultStakings=new ArrayList<>();
 
     @PostConstruct
-    private void init() throws IOException {
+    private void init() throws Exception {
         updateWithEconomicConfig(client.getEconomicConfig());
     }
 
