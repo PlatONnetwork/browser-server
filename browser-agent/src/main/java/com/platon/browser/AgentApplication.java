@@ -12,6 +12,7 @@ import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
 import com.platon.browser.common.service.epoch.EpochService;
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.handler.CollectionEventHandler;
 import com.platon.browser.persistence.handler.ComplementEventHandler;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
@@ -65,12 +66,15 @@ public class AgentApplication implements ApplicationRunner {
 	private Long preBlockNum=0L;
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		String status = System.getProperty(AppStatus.class.getName());
-		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
+		if(AppStatusUtil.isStopped()) return;
+		// 把应用置为BOOTING开机状态
+		AppStatusUtil.setStatus(AppStatus.BOOTING);
         // 进入一致性自检子流程
         consistencyService.synchronize();
 		// 进入应用初始化子流程
 		InitializationResult initialResult = initializationService.init();
+		// 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
+		AppStatusUtil.setStatus(AppStatus.RUNNING);
 		collectedNumber = initialResult.getCollectedBlockNumber();
 		// 进入区块采集主流程
 		while (true) {

@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
@@ -42,6 +43,8 @@ public class ProposalDetailTask {
     }
 
     private void start () {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andCompletionFlagEqualTo(CustomProposal.FlagEnum.INCOMPLETE.getCode());

@@ -1,6 +1,7 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
@@ -37,7 +38,7 @@ import java.util.List;
 public class TestBase {
 
     static {
-        System.setProperty(AppStatus.class.getName(), AppStatus.STOP.name());
+        AppStatusUtil.setStatus(AppStatus.STOPPED);
     }
 
     public StakeCreate stakingParam () {

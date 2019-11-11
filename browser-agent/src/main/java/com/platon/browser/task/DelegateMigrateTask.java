@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import com.platon.browser.common.service.elasticsearch.EsDelegationService;
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
@@ -39,6 +40,8 @@ public class DelegateMigrateTask {
     }
 
     protected void start () throws InterruptedException {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         try {
             DelegationExample delegationExample = new DelegationExample();
             delegationExample.createCriteria().andIsHistoryEqualTo(isHistory);

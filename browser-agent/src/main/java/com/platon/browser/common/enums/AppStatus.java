@@ -6,5 +6,5 @@ package com.platon.browser.common.enums;
  * @Description:
  */
 public enum AppStatus {
-    RUNNING,STOP
+    BOOTING,RUNNING,STOPPED
 }

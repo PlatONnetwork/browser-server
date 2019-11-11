@@ -2,6 +2,7 @@ package com.platon.browser.task;
 
 import java.util.List;
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +50,8 @@ public class AddressUpdateTask {
 	
 //    @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
+    	// 只有程序正常运行才执行任务
+		if(!AppStatusUtil.isRunning()) return;
     	
 		try {
 			int start = 0;

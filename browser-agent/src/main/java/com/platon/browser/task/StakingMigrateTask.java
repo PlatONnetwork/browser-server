@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
@@ -37,12 +38,14 @@ public class StakingMigrateTask {
     }
 
     protected void start () throws InterruptedException {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         try {
             StakingExample stakingExample = new StakingExample();
             stakingExample.createCriteria().andStatusEqualTo(3);
             List <Staking> stakingList = stakingMapper.selectByExample(stakingExample);
             Set <StakingHistory> stakingHistoryList = new HashSet <>();
-            if(stakingList.size() > 0){
+            if(!stakingList.isEmpty()){
                 stakingList.forEach(staking -> {
                    StakingHistory stakingHistory = new StakingHistory();
                    BeanUtils.copyProperties(staking,stakingHistory);
@@ -51,9 +54,7 @@ public class StakingMigrateTask {
                 customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
             log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
-            return;
         }catch (Exception e){
-            e.printStackTrace();
             String error = e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);

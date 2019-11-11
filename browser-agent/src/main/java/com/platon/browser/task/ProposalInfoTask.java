@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
@@ -49,6 +50,8 @@ public class ProposalInfoTask {
     }
 
     private void start ()  {
+        // 只有程序正常运行才执行任务
+        if(!AppStatusUtil.isRunning()) return;
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();
         //针对提案信息只需要更新状态为
@@ -118,7 +121,7 @@ public class ProposalInfoTask {
      * @return
      * @throws Exception
      */
-    public ProposalParticiantStat getProposalParticipantStat ( String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
+    private ProposalParticiantStat getProposalParticipantStat ( String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
         return sca.getProposalParticipants(client.getWeb3j(), proposalHash, blockHash);
     }
 
@@ -129,7 +132,7 @@ public class ProposalInfoTask {
      * @return
      * @throws Exception
      */
-    public TallyResult getTallyResult ( String proposalHash ) throws Exception {
+    private TallyResult getTallyResult ( String proposalHash ) throws Exception {
         BaseResponse <TallyResult> result = client.getProposalContract().getTallyResult(proposalHash).send();
         if (result.isStatusOk()) {
             return result.data;

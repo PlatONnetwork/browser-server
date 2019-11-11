@@ -6,7 +6,8 @@ import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.transaction.ReceiptService;
-import com.platon.browser.common.utils.BakDataDeleteUtil;
+import com.platon.browser.common.enums.AppStatus;
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
@@ -48,10 +49,9 @@ public class ConsistencyService {
      * 检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
      * @throws IOException
      */
-    public void synchronize() throws IOException {
+    public void synchronize() throws Exception {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if(networkStat==null) {
-            BakDataDeleteUtil.setBootstrapDone(true);
             return;
         }
 
@@ -95,7 +95,6 @@ public class ConsistencyService {
 
         if(esMaxBlockNum>=mysqlMaxBlockNum) {
             log.warn("MYSQL/ES/REDIS中的数据已同步!");
-            BakDataDeleteUtil.setBootstrapDone(true);
             return;
         }
 
@@ -114,7 +113,6 @@ public class ConsistencyService {
         }
         while (!callback.isDone()) SleepUtil.sleep(1L);
         bootstrapEventPublisher.shutdown();
-        BakDataDeleteUtil.setBootstrapDone(true);
         log.warn("MYSQL/ES/REDIS中的数据同步完成!");
     }
 }

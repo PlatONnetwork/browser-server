@@ -3,6 +3,7 @@ package com.platon.browser.task;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import com.platon.browser.common.utils.AppStatusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,8 @@ public class NetworkStatUpdateTask {
 	
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
-    	
+		// 只有程序正常运行才执行任务
+		if(!AppStatusUtil.isRunning()) return;
 		try {
 			Long curNumber = networkStatCache.getNetworkStat().getCurNumber();
 			
