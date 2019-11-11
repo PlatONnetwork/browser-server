@@ -32,4 +32,43 @@
     )
     </foreach>
 </update>
+
+<select id="getAddressStatisticsFromStaking"  resultType="com.platon.browser.complement.dao.entity.AddressStatistics">
+	select
+	     staking_addr as stakingAddr,
+	     staking_hes as stakingHes,
+	     staking_locked as stakingLocked,
+	     staking_reduction as stakingReduction
+	from staking
+	where status in (1,2)
+	   and staking_addr in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>;
+</select>
+
+<select id="getAddressStatisticsFromDelegation"  resultType="com.platon.browser.complement.dao.entity.AddressStatistics">
+	select
+	     delegate_addr as delegateAddr,
+	     delegate_hes as delegateHes,
+	     delegate_locked as delegateLocked,
+	     delegate_released as delegateReleased,
+	     node_id as nodeId
+	from delegation
+	where is_history = 2
+	   and delegate_addr in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>;
+</select>
+
+<update id="batchUpdateFromTask">
+	<foreach collection="list" item="item" index="index" separator="">
+		update `address` set
+			`staking_value` = ${item.stakingValue} , 
+			`delegate_value` = ${item.delegateValue} , 
+			`redeemed_value` = ${item.redeemedValue} , 
+			`candidate_count` = ${item.candidateCount} , 
+			`delegate_hes` = ${item.delegateHes} , 
+			`delegate_locked` = ${item.delegateLocked} , 
+			`delegate_released` = ${item.delegateReleased}
+		where
+			`address` = "${item.address}";
+	</foreach>      
+</update>
+
 </mapper>
