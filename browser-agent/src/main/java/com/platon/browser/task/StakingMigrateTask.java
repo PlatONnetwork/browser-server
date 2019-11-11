@@ -35,11 +35,10 @@ public class StakingMigrateTask {
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
         // 只有程序正常运行才执行任务
-        if(!AppStatusUtil.isRunning()) return;
-        start();
+        if(AppStatusUtil.isRunning()) start();
     }
 
-    protected void start () throws InterruptedException {
+    protected void start () {
         try {
             StakingExample stakingExample = new StakingExample();
             stakingExample.createCriteria().andStatusEqualTo(3);
