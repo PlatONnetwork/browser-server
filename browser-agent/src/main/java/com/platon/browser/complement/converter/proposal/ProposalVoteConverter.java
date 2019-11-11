@@ -73,7 +73,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
     	proposalBusinessMapper.vote(businessParam);
 
 		String desc = NodeOpt.TypeEnum.VOTE.getTpl()
-				.replace("ID",proposalId)
+				.replace("ID",proposal.getPipId())
 				.replace("TITLE",proposal.getTopic())
 				.replace("OPTION",txParam.getOption())
 				.replace("TYPE", String.valueOf(proposal.getType()))

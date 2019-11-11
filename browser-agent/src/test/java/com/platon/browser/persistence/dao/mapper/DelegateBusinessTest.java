@@ -50,7 +50,6 @@ public class DelegateBusinessTest extends TestBase {
 
     }
 
-
     /**
      * 创建委托
      */

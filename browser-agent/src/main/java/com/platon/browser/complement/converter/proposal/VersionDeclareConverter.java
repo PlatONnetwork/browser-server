@@ -39,23 +39,10 @@ public class VersionDeclareConverter extends BusinessParamConverter<Optional<Nod
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 
         long startTime = System.currentTimeMillis();
- 
-        String desc = NodeOpt.TypeEnum.VERSION.getTpl()
-                .replace("NODE_NAME",txParam.getNodeName())
-                .replace("VERSION",String.valueOf(txParam.getVersion()))
-                .replace("ACTIVE_NODE", txParam.getActiveNode());
-    	
-        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-        nodeOpt.setNodeId(txParam.getActiveNode());
-        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
-        nodeOpt.setDesc(desc);
-        nodeOpt.setTxHash(tx.getHash());
-        nodeOpt.setBNum(event.getBlock().getNum());
-        nodeOpt.setTime(event.getBlock().getTime());
+
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return Optional.ofNullable(null);
     }
 }

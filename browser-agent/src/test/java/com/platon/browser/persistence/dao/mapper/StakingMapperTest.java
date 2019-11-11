@@ -12,6 +12,8 @@ import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.elasticsearch.NodeOptESRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,9 @@ public class StakingMapperTest extends TestBase {
 
     @Autowired
     private DelegationMapper delegationMapper;
+
+    @Autowired
+    private NodeOptESRepository nodeOptESRepository;
 
 
     @Test
