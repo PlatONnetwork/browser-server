@@ -102,11 +102,11 @@ public class CustomProposal extends Proposal {
     /**
      * 提案信息同步类型枚举类：
      *  1.已完成
-     *  0.未完成
+     *  2.未完成
      */
     public enum FlagEnum {
         COMPLETE(1, "已完成"),
-        INCOMPLETE(0, "未完成");
+        INCOMPLETE(2, "未完成");
         private int code;
         private String desc;
         FlagEnum ( int code, String desc ) {
