@@ -11,6 +11,7 @@ import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.now.service.BlockService;
+import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
@@ -65,14 +66,19 @@ public class BlockServiceImpl implements BlockService {
 
 	@Autowired
 	private I18nUtil i18n;
+	
+	@Autowired
+	private CommonService commonService;
 
 	@Override
 	public RespPage<BlockListResp> blockList(PageReq req) {
+		long startTime = System.currentTimeMillis();
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
 		/** 查询现阶段最大区块数 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Long bNumber = networkStatRedis.getCurNumber();
+		logger.debug("perform-blockList,time1:{}", System.currentTimeMillis() - startTime);
 		/** 小于50万条查询redis */
 		if (req.getPageNo().intValue() * req.getPageSize().intValue() < BrowserConst.MAX_NUM) {
 			/**
@@ -82,6 +88,7 @@ public class BlockServiceImpl implements BlockService {
 			if(req.getPageNo().intValue() == 1) {
 				/** 查询缓存最新的八条区块信息 */
 				items = statisticCacheService.getBlockCache(0,1);
+				logger.debug("perform-blockList,time2:{}", System.currentTimeMillis() - startTime);
 				if(!items.isEmpty()) {
 					/**
 					 * 如果统计区块小于区块交易则重新查询新的区块
@@ -93,9 +100,11 @@ public class BlockServiceImpl implements BlockService {
 						items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 					}
 				}
+				logger.debug("perform-blockList,time3:{}", System.currentTimeMillis() - startTime);
 			} else {
 				items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 			}
+			logger.debug("perform-blockList,time4:{}", System.currentTimeMillis() - startTime);
 			for (Block blockRedis:items) {
 				BlockListResp blockListNewResp = this.transferBlockListResp(blockRedis);
 				lists.add(blockListNewResp);
@@ -115,9 +124,14 @@ public class BlockServiceImpl implements BlockService {
 				lists.add(blockListNewResp);
 			}
 		}
+		bNumber = lists.get(0).getNumber();
+		logger.debug("perform-blockList,time5:{}", System.currentTimeMillis() - startTime);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(bNumber);
 		respPage.init(page, lists);
+		if(System.currentTimeMillis() - startTime > 100) {
+			logger.debug("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
+		}
 		return respPage;
 	}
 	
@@ -131,6 +145,7 @@ public class BlockServiceImpl implements BlockService {
 		blockListResp.setServerTime(new Date().getTime());
 		blockListResp.setTimestamp(block.getTime().getTime());
 		blockListResp.setGasUsed(block.getGasUsed().toString());
+//		blockListResp.setNodeName(commonService.getNodeName(block.getNodeId()));
 		return blockListResp;
 	}
 

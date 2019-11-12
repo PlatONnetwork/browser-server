@@ -28,43 +28,32 @@ public class DelegateMigrateTask {
 
     @Autowired
     private DelegationMapper delegationMapper;
-
     @Autowired
     private EsDelegationService esDelegationService;
 
-
+    @Transactional
     @Scheduled(cron = "0/30  * * * * ?")
-    private void cron () throws InterruptedException {
+    private void cron () {
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }
 
-    protected void start () throws InterruptedException {
-
+    protected void start () {
         try {
             DelegationExample delegationExample = new DelegationExample();
             delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
-            List <Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
-            if (delegationList.size() > 0 && null != delegationList) {
-                Syn(delegationList);
-            }
-            log.debug("[DelegateHistorySyn Syn()] Syn delegate get to ES finish!!");
-            return;
+            List<Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
+            if(delegationList.isEmpty()) return;
+
+            Set<Delegation> delegationSet = new HashSet<>(delegationList);
+            esDelegationService.save(delegationSet);
+            delegationMapper.deleteByExample(delegationExample);
+
+            log.debug("Migrate delegate history to ElasticSearch finished!");
         } catch (Exception e) {
-            //e.printStackTrace();
             String error = e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }
-    }
-
-    @Transactional
-    void Syn ( List <Delegation> list ) throws Exception {
-        Set <Delegation> delegationSet = new HashSet <>(list);
-        esDelegationService.save(delegationSet);
-        DelegationExample delegationExample = new DelegationExample();
-        delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
-        delegationMapper.deleteByExample(delegationExample);
-        log.debug("[DelegateHistorySyn Syn()] Syn transactional finish!!");
     }
 }

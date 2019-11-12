@@ -13,6 +13,7 @@ import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.home.QueryNavigationRequest;
@@ -53,6 +54,8 @@ public class HomeServiceImpl implements HomeService {
 	private StakingMapper stakingMapper;
 	@Autowired
 	private BlockChainConfig blockChainConfig;
+	@Autowired
+	private CommonService commonService;
 
 	/** 记录刷新值 */
 	private static Integer consensusNum = 0;
@@ -172,6 +175,9 @@ public class HomeServiceImpl implements HomeService {
 		/************** 组装图表数据 ************/
 		List<Block> items = statisticCacheService.getBlockCache(0,32);
 		BlockStatisticNewResp blockStatisticNewResp = new BlockStatisticNewResp();
+		if(items.size() == 0) {
+			return blockStatisticNewResp;
+		}
 		/** 查询32条，要进行出块时间扣减，故size减去2 */
 		Long[] x = new Long[items.size()- 2];
 		Double[] ya = new Double[items.size()- 2];
@@ -208,6 +214,10 @@ public class HomeServiceImpl implements HomeService {
 		if(networkStatRedis == null) return chainStatisticNewResp;
 		/** 查询redis统计信息并转换对应返回对象 */
 		BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
+		chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
+		chainStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue().toString());
+		chainStatisticNewResp.setTurnValue(networkStatRedis.getTurnValue().toString());
+		chainStatisticNewResp.setStakingDelegationValue(networkStatRedis.getStakingDelegationValue().toString());
 		Long bNumber = networkStatRedis.getCurNumber();
 		/** 查询缓存最新的八条区块信息 */
 		List<Block> items = statisticCacheService.getBlockCache(0,8);
@@ -225,9 +235,13 @@ public class HomeServiceImpl implements HomeService {
 		for (int i=0; i < items.size(); i++) {
 			BlockListNewResp blockListNewResp = new BlockListNewResp();
 			BeanUtils.copyProperties(items.get(i), blockListNewResp);
+			blockListNewResp.setNodeId(items.get(i).getNodeId());
+			blockListNewResp.setNumber(items.get(i).getNum());
+			blockListNewResp.setStatTxQty(items.get(i).getTxQty());
 			blockListNewResp.setServerTime(new Date().getTime());
 			blockListNewResp.setTimestamp(items.get(i).getTime().getTime());
 			blockListNewResp.setIsRefresh(true);
+			blockListNewResp.setNodeName(commonService.getNodeName(items.get(i).getNodeId()));
 			/**
 			 * 第一个块需要记录缓存，然后进行比对
 			 * 如果块没有增长则置为false
@@ -274,7 +288,7 @@ public class HomeServiceImpl implements HomeService {
 			BeanUtils.copyProperties(stakings.get(i), stakingListResp);
 			/** 只有不是内置节点才计算年化率  */
 			if(CustomStaking.YesNoEnum.YES.getCode() != stakings.get(i).getIsInit()) {
-				stakingListResp.setExpectedIncome(stakings.get(i).getAnnualizedRate() + "%");
+				stakingListResp.setExpectedIncome(stakings.get(i).getAnnualizedRate().toString() + "%");
 			} else {
 				stakingListResp.setExpectedIncome("");
 			}

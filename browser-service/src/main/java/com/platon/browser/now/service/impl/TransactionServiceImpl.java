@@ -272,6 +272,7 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
     		resp.setServerTime(new Date().getTime());
+    		resp.setTxInfo(transaction.getInfo());
     		List<Block> blocks = statisticCacheService.getBlockCache(0, 1);
     		/** 确认区块数等于当前区块书减去交易区块数  */
     		if(!blocks.isEmpty()) {
