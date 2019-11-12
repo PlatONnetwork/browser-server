@@ -47,7 +47,7 @@
 		(#{txHash},
 		#{nodeId},
 		#{slashRate},
-		#{codeCurStakingLocked},
+		#{codeSlashValue},
 		#{codeRewardValue},
 		#{benefitAddr},
 		#{slashData},

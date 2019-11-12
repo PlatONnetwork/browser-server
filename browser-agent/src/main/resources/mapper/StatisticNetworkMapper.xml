@@ -9,11 +9,11 @@
 	 where status = 1
 </select>
 
-<select id="getNetworkStatisticsFromAddress"  resultType="INTEGER">
+<select id="getNetworkStatisticsFromAddress"  resultType="java.lang.Integer">
 	select count(1) from address
 </select>
 
-<select id="getNetworkStatisticsFromProposal"  resultType="INTEGER">
+<select id="getNetworkStatisticsFromProposal"  resultType="java.lang.Integer">
 	select count(1) from proposal where status = 1
 </select>
 

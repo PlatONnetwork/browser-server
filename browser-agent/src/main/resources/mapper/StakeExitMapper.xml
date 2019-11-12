@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
 
-<select id="queryStakingValue" resultType="DECIMAL">
+<select id="queryStakingValue" resultType="java.math.BigDecimal">
 	select
 	    `staking_hes` + `staking_locked`
 	from staking
@@ -33,7 +33,7 @@
 			`total_value` = 0,
 			`staking_locked` = 0,
 			`staking_hes` = 0,
-			`stat_delegate_released` = `stat_delegate_value`,
+			`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,
 			`stat_delegate_value` = 0,
 			`stat_valid_addrs` = 0,
 			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2)
