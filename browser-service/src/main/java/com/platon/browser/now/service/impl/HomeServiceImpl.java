@@ -282,14 +282,14 @@ public class HomeServiceImpl implements HomeService {
 		for (int i = 0;i<nodes.size();i++) {
 			StakingListResp stakingListResp = new StakingListResp();
 			BeanUtils.copyProperties(nodes.get(i), stakingListResp);
+			stakingListResp.setIsInit(nodes.get(i).getIsInit() == 1);
+			stakingListResp.setStakingIcon(nodes.get(i).getNodeIcon());
 			/** 只有不是内置节点才计算年化率  */
 			if(CustomStaking.YesNoEnum.YES.getCode() != nodes.get(i).getIsInit()) {
 				stakingListResp.setExpectedIncome(nodes.get(i).getAnnualizedRate().toString() + "%");
 			} else {
 				stakingListResp.setExpectedIncome("");
 			}
-			stakingListResp.setIsInit(nodes.get(i).getIsInit() == 1);
-			stakingListResp.setNodeName(nodes.get(i).getNodeName());
 			/** 质押总数=有效的质押+委托 */
 			String totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked())
 					.add(nodes.get(i).getStatDelegateValue()).toString();

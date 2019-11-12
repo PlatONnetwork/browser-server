@@ -66,5 +66,8 @@
     <include refid="com.platon.browser.dao.mapper.StakingMapper.Blob_Column_List" />
     from staking where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
-  
+  <select id="selectSumExitDelegate" resultType="string">
+  	SELECT SUM(stat_delegate_hes+stat_delegate_locked+stat_delegate_released) as sumDelegate 
+	FROM staking WHERE `status` in (2,3)
+  </select>
 </mapper>

@@ -87,10 +87,11 @@ public class StakingServiceImpl implements StakingService {
 			stakingStatisticNewResp.setBlockReward(networkStatRedis.getBlockReward().toString());
 			stakingStatisticNewResp.setStakingReward(networkStatRedis.getStakingReward().toString());
 			stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue().toString());
-			String sumExitDelegate = customStakingMapper.selectSumExitDelegate();
-			String stakingDelegationValue = networkStatRedis.getStakingDelegationValue()
-					.subtract(new BigDecimal(sumExitDelegate==null?"0":sumExitDelegate)).toString();
-			stakingStatisticNewResp.setStakingDelegationValue(stakingDelegationValue);
+//			String sumExitDelegate = customStakingMapper.selectSumExitDelegate();
+//			String stakingDelegationValue = networkStatRedis.getStakingDelegationValue()
+//					.subtract(new BigDecimal(sumExitDelegate==null?"0":sumExitDelegate)).toString();
+//			stakingStatisticNewResp.setStakingDelegationValue(stakingDelegationValue);
+			stakingStatisticNewResp.setStakingValue(networkStatRedis.getStakingValue().toString());
 		}
 		return stakingStatisticNewResp;
 	}
@@ -149,6 +150,7 @@ public class StakingServiceImpl implements StakingService {
 			String sumAmount = stakings.get(i).getStatDelegateValue().toString();
 			aliveStakingListResp.setDelegateValue(sumAmount);
 			aliveStakingListResp.setIsInit(stakings.get(i).getIsInit() == 1);
+			aliveStakingListResp.setStakingIcon(stakings.get(i).getNodeIcon());
 			if(stakings.get(i).getIsRecommend() != null) {
 				aliveStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == stakings.get(i).getIsRecommend());
 			}
@@ -186,7 +188,6 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<HistoryStakingListResp> respPage = new RespPage<>();
 		List<HistoryStakingListResp> lists = new LinkedList<>();
 		/** 根据条件和状态进行查询列表 */
-		/** 根据条件和状态进行查询列表 */
 		NodeExample nodeExample = new NodeExample();
 		nodeExample.setOrderByClause(" leave_time desc");
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
@@ -203,6 +204,7 @@ public class StakingServiceImpl implements StakingService {
 				historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 			}
 			historyStakingListResp.setNodeName(stakingNode.getNodeName());
+			historyStakingListResp.setStakingIcon(stakingNode.getNodeIcon());
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			historyStakingListResp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 			/**
@@ -244,6 +246,7 @@ public class StakingServiceImpl implements StakingService {
 			resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
 			resp.setVerifierTime(stakingNode.getStatVerifierTime());
 			resp.setJoinTime(stakingNode.getJoinTime().getTime());
+			resp.setDenefitAddr(stakingNode.getBenefitAddr());
 			/** 只有不是内置节点才计算年化率  */
 			if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
 				resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
