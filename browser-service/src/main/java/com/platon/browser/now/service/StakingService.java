@@ -43,13 +43,6 @@ public interface StakingService {
 	public RespPage<HistoryStakingListResp> historyStakingList(HistoryStakingListReq req);
 
 	/**
-	 *  实时验证人列表分页推送（暂不实现）
-	 * @method stakingChangeNew
-	 * @return
-	 */
-	BaseResp<StakingChangeNewResp> stakingChangeNew();
-
-	/**
 	 * 根绝信息查询单个质押人详情
 	 * @method stakingDetails
 	 * @param req

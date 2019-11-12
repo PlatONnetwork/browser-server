@@ -2,19 +2,22 @@ package com.platon.browser.dto;
 
 import java.math.BigDecimal;
 
+
 import lombok.Data;
 
 /**
- * 地址委托返回数据
- *  @file DelegationStaking.java
+ * 地址委托返回对象
+ *  @file DelegationAddress.java
  *  @description 
  *	@author zhangrj
  *  @data 2019年11月12日
  */
 @Data
-public class DelegationStaking {
+public class DelegationAddress {
 
-	private String delegateAddr;
+	private String nodeId;
+	
+	private String nodeName;
 	
 	private BigDecimal delegateHes;
 	

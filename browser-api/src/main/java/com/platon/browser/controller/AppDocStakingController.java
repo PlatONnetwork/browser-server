@@ -45,14 +45,6 @@ public class AppDocStakingController implements AppDocStaking {
 		return stakingService.historyStakingList(req);
 	}
 
-//	@Override
-//	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor) {
-//		AliveStakingListReq req = new AliveStakingListReq();
-//		RespPage<AliveStakingListResp> aliveStakingListResp = stakingService.aliveStakingList(req);
-//		simpMessageSendingOperations.convertAndSendToUser(stompHeaderAccessor.getUser().getName(), "11",  JSON.toJSONString(aliveStakingListResp));
-//		return stakingService.aliveStakingList(req);
-//	}
-
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req) {
 		return stakingService.stakingDetails(req);

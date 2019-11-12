@@ -36,4 +36,6 @@ public class StakingNode extends Staking{
     private BigDecimal statFeeRewardValue;
 
     private BigDecimal statStakingRewardValue;
+    
+    private Integer nodeStatVerifierTime;
 }

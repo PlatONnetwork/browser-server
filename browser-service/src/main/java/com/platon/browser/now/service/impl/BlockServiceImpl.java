@@ -145,7 +145,7 @@ public class BlockServiceImpl implements BlockService {
 		blockListResp.setServerTime(new Date().getTime());
 		blockListResp.setTimestamp(block.getTime().getTime());
 		blockListResp.setGasUsed(block.getGasUsed().toString());
-//		blockListResp.setNodeName(commonService.getNodeName(block.getNodeId()));
+		blockListResp.setNodeName(commonService.getNodeName(block.getNodeId()));
 		return blockListResp;
 	}
 
@@ -260,17 +260,14 @@ public class BlockServiceImpl implements BlockService {
 	private BlockDetailResp queryBlockByNumber(long blockNumber) {
 		/** 根据区块号查询对应数据 */
 		
-		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.must(new ESQueryBuilders().term("num", blockNumber));
-		ESResult<Block> blockList = new ESResult<>();
+		Block block = null;
 		try {
-			blockList = blockESRepository.search(constructor, Block.class, 1, 1);
+			block = blockESRepository.get(String.valueOf(blockNumber), Block.class);
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
-		if (blockList.getRsData() != null && blockList.getRsData().size() > 0) {
-			Block block = blockList.getRsData().get(0);
+		if (block != null) {
 			BeanUtils.copyProperties(block, blockDetailResp);
 			blockDetailResp.setBlockReward(block.getReward().toString());
 			blockDetailResp.setDelegateQty(block.getDQty());

@@ -16,7 +16,8 @@ public class DelegationListByStakingResp {
 	private String delegateValue; // 委托金额
 	private String delegateTotalValue;// 验证人委托的总金额
 	private String delegateLocked;    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
-	private String allDelegateLocked; //当前验证人总接收的锁定委托量（LAT）  staking  stat_delegate_locked
+//	private String allDelegateLocked; //当前验证人总接收的锁定委托量（LAT）  staking  stat_delegate_locked
+	private String delegateReleased; //当前验证人待赎回委托
 	public String getDelegateAddr() {
 		return delegateAddr;
 	}
@@ -44,12 +45,19 @@ public class DelegationListByStakingResp {
 	public void setDelegateLocked(String delegateLocked) {
 		this.delegateLocked = delegateLocked;
 	}
+//	@JsonSerialize(using = CustomLatSerializer.class)
+//	public String getAllDelegateLocked() {
+//		return allDelegateLocked;
+//	}
+//	public void setAllDelegateLocked(String allDelegateLocked) {
+//		this.allDelegateLocked = allDelegateLocked;
+//	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getAllDelegateLocked() {
-		return allDelegateLocked;
+	public String getDelegateReleased() {
+		return delegateReleased;
 	}
-	public void setAllDelegateLocked(String allDelegateLocked) {
-		this.allDelegateLocked = allDelegateLocked;
+	public void setDelegateReleased(String delegateReleased) {
+		this.delegateReleased = delegateReleased;
 	}
 	
 	

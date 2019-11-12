@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.CustomVoteMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomVoteProposal;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
@@ -17,6 +15,7 @@ import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESResult;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
@@ -80,8 +79,6 @@ public class TransactionServiceImpl implements TransactionService {
     private SlashMapper slashMapper;
     @Autowired
     private ProposalMapper proposalMapper;
-    @Autowired
-    private CustomVoteMapper customVoteMapper;
     @Autowired
     private StatisticCacheService statisticCacheService;
     @Autowired
@@ -161,11 +158,15 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setActualTxCost(transaction.getCost().toString());
             transactionListResp.setBlockNumber(transaction.getNum());
             transactionListResp.setReceiveType(String.valueOf(transaction.getToType()));
-            transactionListResp.setTxReceiptStatus(transaction.getStatus());
             transactionListResp.setTxType(String.valueOf(transaction.getType()));
             transactionListResp.setValue(transaction.getValue().toString());
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
+            if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
+            	transactionListResp.setTxReceiptStatus(0);
+    		} else {
+    			transactionListResp.setTxReceiptStatus(transaction.getStatus());
+    		}
             lists.add(transactionListResp);
         }
     	return lists;
@@ -250,15 +251,14 @@ public class TransactionServiceImpl implements TransactionService {
     	/** 根据hash查询具体的交易数据 */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
-		ESResult<Transaction> items = new ESResult<>();
+		Transaction transaction = null;
 		try {
-			items = transactionESRepository.search(constructor, Transaction.class, 1, 1);
+			transaction = transactionESRepository.get(req.getTxHash(), Transaction.class);
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
     	TransactionDetailsResp resp = new TransactionDetailsResp();
-    	if(items!=null && items.getRsData().size() > 0) {
-    		Transaction transaction = items.getRsData().get(0);
+    	if(transaction != null) {
     		BeanUtils.copyProperties(transaction, resp);
     		resp.setActualTxCost(transaction.getCost().toString());
     		resp.setBlockNumber(transaction.getNum());
@@ -266,13 +266,17 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setGasPrice(transaction.getGasPrice().toString());
     		resp.setGasUsed(transaction.getGasUsed().toString());
     		resp.setReceiveType(String.valueOf(transaction.getToType()));
-    		resp.setTxReceiptStatus(transaction.getStatus());
     		resp.setTxType(String.valueOf(transaction.getType()));
     		resp.setValue(transaction.getValue().toString());
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
     		resp.setServerTime(new Date().getTime());
     		resp.setTxInfo(transaction.getInfo());
+    		if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
+    			resp.setTxReceiptStatus(0);
+    		} else {
+    			resp.setTxReceiptStatus(transaction.getStatus());
+    		}
     		List<Block> blocks = statisticCacheService.getBlockCache(0, 1);
     		/** 确认区块数等于当前区块书减去交易区块数  */
     		if(!blocks.isEmpty()) {
@@ -367,9 +371,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setApplyAmount(exitValidatorParam.getAmount().toString());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
-						if(exitValidatorParam.getStakingBlockNum()==null) {
-							stakingKeyE.setStakingBlockNum(exitValidatorParam.getStakingBlockNum().longValue());
-						}
+						stakingKeyE.setStakingBlockNum(exitValidatorParam.getStakingBlockNum().longValue());
 						Staking staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
 						if(staking!=null) {
 							resp.setRedeemLocked(staking.getStakingReduction().toString());
@@ -401,12 +403,6 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setApplyAmount(unDelegateParam.getAmount().toString());
 						resp.setTxAmount(unDelegateParam.getAmount().toString());
 						resp.setNodeName(this.setStakingName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
-//						UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
-//						if(unDelegation!=null) {
-//							resp.setApplyAmount(unDelegation.getApplyAmount());
-//							resp.setRedeemLocked(unDelegation.getRedeemLocked());
-//							resp.setRedeemStatus(unDelegation.getStatus());
-//						}
 						break;
 					case PROPOSAL_TEXT:
 						ProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, ProposalTextParam.class);
@@ -417,7 +413,6 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalHash(req.getTxHash());
 						resp.setNodeName(this.setStakingName(createProposalTextParam.getVerifier(), createProposalTextParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
-						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_UPGRADE:
 						ProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, ProposalUpgradeParam.class);
@@ -429,7 +424,6 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalHash(req.getTxHash());
 						resp.setNodeName(this.setStakingName(createProposalUpgradeParam.getVerifier(), createProposalUpgradeParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
-						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_PARAMETER:
 					case PROPOSAL_CANCEL:
@@ -441,7 +435,6 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalHash(req.getTxHash());
 						resp.setNodeName(this.setStakingName(cancelProposalParam.getVerifier(), cancelProposalParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
-						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_VOTE:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
@@ -455,29 +448,15 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
 						}
 						resp.setVoteStatus(votingProposalParam.getOption());
-						CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(req.getTxHash());
-						if(customVoteProposal != null) {
-							resp.setNodeId(customVoteProposal.getNodeId());
-							resp.setNodeName(customVoteProposal.getNodeName());
-							resp.setProposalOption(customVoteProposal.getType());
-							resp.setProposalHash(customVoteProposal.getProposalHash());
-							resp.setProposalNewVersion(customVoteProposal.getNewVersion());
-							resp.setPipNum(customVoteProposal.getPipNum());
-							resp.setProposalTitle(customVoteProposal.getTopic());
-							resp.setProposalUrl(customVoteProposal.getUrl());
-							resp.setVoteStatus(String.valueOf(customVoteProposal.getOption()));
-						}
 						/**
-						 * 失败情况下需要到提案上获取提案信息
+						 * 获取提案信息
 						 */
-						if(resp.getTxReceiptStatus() == Transaction.StatusEnum.FAILURE.getCode()) {
-							Proposal proposal = proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
-							if(proposal != null) {
-								resp.setPipNum(proposal.getPipNum());
-								resp.setProposalTitle(proposal.getTopic());
-								resp.setProposalUrl(proposal.getUrl());
-								resp.setProposalOption(String.valueOf(proposal.getType()));
-							}
+						Proposal proposal = proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
+						if(proposal != null) {
+							resp.setPipNum(proposal.getPipNum());
+							resp.setProposalTitle(proposal.getTopic());
+							resp.setProposalUrl(proposal.getUrl());
+							resp.setProposalOption(String.valueOf(proposal.getType()));
 						}
 						break;
 						//版本申明
@@ -486,17 +465,6 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 						resp.setNodeName(this.setStakingName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
-						if(StringUtils.isNotBlank(declareVersionParam.getNodeName())) {
-							resp.setNodeName(declareVersionParam.getNodeName());
-						} else {
-							StakingExample stakingExample = new StakingExample();
-							stakingExample.setOrderByClause(" staking_block_num desc");
-							stakingExample.createCriteria().andNodeIdEqualTo(declareVersionParam.getActiveNode());
-							List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-							if(!stakings.isEmpty()) {
-								resp.setNodeName(stakings.get(0).getNodeName());
-							}
-						}
 						break;
 					case REPORT:
 						ReportParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportParam.class);
@@ -542,27 +510,27 @@ public class TransactionServiceImpl implements TransactionService {
     	return resp;
     }
 
-    /**
-     * 提案信息统一转换
-     * @method transferTransaction
-     * @param resp
-     * @param hash
-     * @return
-     */
-    private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
-    	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
-		if(proposal != null) {
-			resp.setNodeId(proposal.getNodeId());
-			resp.setNodeName(proposal.getNodeName());
-			resp.setPipNum(proposal.getPipNum());
-			resp.setProposalTitle(proposal.getTopic());
-			resp.setProposalStatus(proposal.getStatus());
-			resp.setProposalOption(String.valueOf(proposal.getType()));
-			resp.setProposalNewVersion(proposal.getNewVersion());
-			resp.setProposalUrl(proposal.getUrl());
-		}
-		return resp;
-    }
+//    /**
+//     * 提案信息统一转换
+//     * @method transferTransaction
+//     * @param resp
+//     * @param hash
+//     * @return
+//     */
+//    private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
+//    	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
+//		if(proposal != null) {
+//			resp.setNodeId(proposal.getNodeId());
+//			resp.setNodeName(proposal.getNodeName());
+//			resp.setPipNum(proposal.getPipNum());
+//			resp.setProposalTitle(proposal.getTopic());
+//			resp.setProposalStatus(proposal.getStatus());
+//			resp.setProposalOption(String.valueOf(proposal.getType()));
+//			resp.setProposalNewVersion(proposal.getNewVersion());
+//			resp.setProposalUrl(proposal.getUrl());
+//		}
+//		return resp;
+//    }
 
     /**
      * 统一设置验证人名称

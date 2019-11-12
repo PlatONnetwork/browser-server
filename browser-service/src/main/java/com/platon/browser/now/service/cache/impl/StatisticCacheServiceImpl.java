@@ -47,9 +47,6 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	@Autowired
 	private RedisFactory redisFactory;
 
-//	@Autowired
-//	private RedisTemplate<String, String> redisTemplate;
-
 	@Override
 	public List<Block> getBlockCache(Integer pageNum, Integer pageSize) {
 		/** 分页根据key来获取数据 */

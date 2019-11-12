@@ -2,7 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
@@ -51,7 +51,7 @@ public class HomeServiceImpl implements HomeService {
 	@Autowired
 	private I18nUtil i18n;
 	@Autowired
-	private StakingMapper stakingMapper;
+	private NodeMapper nodeMapper;
 	@Autowired
 	private BlockChainConfig blockChainConfig;
 	@Autowired
@@ -111,13 +111,10 @@ public class HomeServiceImpl implements HomeService {
 				}
 				if (keyword.length() == 130) {
 					/** 判断为节点Id */
-					StakingExample stakingExample = new StakingExample();
-					StakingExample.Criteria criteria = stakingExample.createCriteria();
-					criteria.andNodeIdEqualTo(keyword);
-					List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-					if(!stakings.isEmpty()) {
+					Node node = nodeMapper.selectByPrimaryKey(keyword);
+					if(node != null) {
 						result.setType("staking");
-						queryNavigationStructResp.setNodeId(stakings.get(0).getNodeId());
+						queryNavigationStructResp.setNodeId(node.getNodeId());
 					}
 				}
 				if (keyword.length() == 66) {
@@ -156,13 +153,13 @@ public class HomeServiceImpl implements HomeService {
 				}
 			} else {
 				/** 非0x开头，则默认查询节点信息 */
-				StakingExample stakingExample = new StakingExample();
-				StakingExample.Criteria criteria = stakingExample.createCriteria();
+				NodeExample nodeExample = new NodeExample();
+				NodeExample.Criteria criteria = nodeExample.createCriteria();
 				criteria.andNodeNameEqualTo(keyword);
-				List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-				if(!stakings.isEmpty()) {
+				List<Node> nodes = nodeMapper.selectByExample(nodeExample);
+				if(!nodes.isEmpty()) {
 					result.setType("staking");
-					queryNavigationStructResp.setNodeId(stakings.get(0).getNodeId());
+					queryNavigationStructResp.setNodeId(nodes.get(0).getNodeId());
 				}
 			}
 		}
@@ -275,28 +272,27 @@ public class HomeServiceImpl implements HomeService {
 			consensusNum = num.intValue();
 		}
 		/** 只查询活跃的节点，并倒序返回   */
-		StakingExample stakingExample = new StakingExample();
-		StakingExample.Criteria criteria = stakingExample.createCriteria();
+		NodeExample nodeExample = new NodeExample();
+		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
-		stakingExample.setOrderByClause(" big_version desc,staking_hes + staking_locked "
-				+ " + stat_delegate_hes + stat_delegate_locked desc,staking_block_num desc ,staking_tx_index desc");
-		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+		nodeExample.setOrderByClause(" big_version desc,total_value desc,staking_block_num desc ,staking_tx_index desc");
+		List<Node> nodes = nodeMapper.selectByExample(nodeExample);
 
 		List<StakingListResp> lists = new LinkedList<>();
-		for (int i = 0;i<stakings.size();i++) {
+		for (int i = 0;i<nodes.size();i++) {
 			StakingListResp stakingListResp = new StakingListResp();
-			BeanUtils.copyProperties(stakings.get(i), stakingListResp);
+			BeanUtils.copyProperties(nodes.get(i), stakingListResp);
 			/** 只有不是内置节点才计算年化率  */
-			if(CustomStaking.YesNoEnum.YES.getCode() != stakings.get(i).getIsInit()) {
-				stakingListResp.setExpectedIncome(stakings.get(i).getAnnualizedRate().toString() + "%");
+			if(CustomStaking.YesNoEnum.YES.getCode() != nodes.get(i).getIsInit()) {
+				stakingListResp.setExpectedIncome(nodes.get(i).getAnnualizedRate().toString() + "%");
 			} else {
 				stakingListResp.setExpectedIncome("");
 			}
-			stakingListResp.setIsInit(stakings.get(i).getIsInit() == 1);
-			stakingListResp.setNodeName(stakings.get(i).getNodeName());
+			stakingListResp.setIsInit(nodes.get(i).getIsInit() == 1);
+			stakingListResp.setNodeName(nodes.get(i).getNodeName());
 			/** 质押总数=有效的质押+委托 */
-			String totalValue = stakings.get(i).getStakingHes().add(stakings.get(i).getStakingLocked())
-					.add(stakings.get(i).getStatDelegateHes()).add(stakings.get(i).getStatDelegateLocked()).toString();
+			String totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked())
+					.add(nodes.get(i).getStatDelegateValue()).toString();
 			stakingListResp.setTotalValue(totalValue);
 			stakingListResp.setRanking(i+1);
 			lists.add(stakingListResp);

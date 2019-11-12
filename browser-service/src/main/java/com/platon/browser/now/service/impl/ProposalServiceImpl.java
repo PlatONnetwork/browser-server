@@ -115,7 +115,7 @@ public class ProposalServiceImpl implements ProposalService {
 				break;
 		}
         /** 不为文本提案则有生效时间 */
-        if(CustomProposal.TypeEnum.TEXT.getCode()!=proposalDetailsResp.getType()){
+        if(CustomProposal.TypeEnum.UPGRADE.getCode()==proposalDetailsResp.getType()){
 	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposal.getBlockNumber())))
 	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).multiply(new BigDecimal(1000))
 	        		.add(new BigDecimal(proposal.getTimestamp().getTime()));

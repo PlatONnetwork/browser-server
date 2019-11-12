@@ -84,6 +84,10 @@ public class AddressServiceImpl implements AddressService {
         QueryDetailResp resp = new QueryDetailResp();
         if (item != null) {
         	BeanUtils.copyProperties(item, resp);
+        	resp.setDelegateHes(item.getDelegateHes().toString());
+        	resp.setDelegateLocked(item.getDelegateLocked().toString());
+        	resp.setDelegateUnlock(item.getDelegateHes().toString());
+        	resp.setDelegateReduction(item.getDelegateReleased().toString());
         	/** 预先设置是否展示锁仓 */
         	resp.setIsRestricting(0);
         }
