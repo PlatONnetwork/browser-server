@@ -28,15 +28,19 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
     private StakeBusinessMapper stakeBusinessMapper;
     
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         // 增持质押
         StakeIncreaseParam txParam = tx.getTxParam(StakeIncreaseParam.class);
         // 补充节点名称
         String nodeId=txParam.getNodeId();
-        NodeItem nodeItem = nodeCache.getNode(nodeId);
-        txParam.setNodeName(nodeItem.getNodeName());
-        txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
-        tx.setInfo(txParam.toJSONString());
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            txParam.setNodeName(nodeItem.getNodeName());
+            txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
+            tx.setInfo(txParam.toJSONString());
+        } catch (NoSuchBeanException e) {
+            log.warn("缓存中找不到节点[{}]信息,无法补节点名称和质押区块号",nodeId);
+        }
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 

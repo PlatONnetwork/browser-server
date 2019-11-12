@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ProposalVoteParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +39,16 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws Exception {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         ProposalVoteParam txParam = tx.getTxParam(ProposalVoteParam.class);
         String nodeId=txParam.getVerifier();
-        NodeItem nodeItem = nodeCache.getNode(nodeId);
-        txParam.setNodeName(nodeItem.getNodeName());
-        tx.setInfo(txParam.toJSONString());
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            txParam.setNodeName(nodeItem.getNodeName());
+            tx.setInfo(txParam.toJSONString());
+        } catch (NoSuchBeanException e) {
+            log.warn("缓存中找不到节点[{}]信息,无法补节点名称",nodeId);
+        }
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 
@@ -51,7 +56,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
 		// 获得参数
         String proposalId = txParam.getProposalId();
-        String nodeName = nodeItem.getNodeName();
+        String nodeName = txParam.getNodeName();
         String txHash = tx.getHash();
         Long blockNum = event.getBlock().getNum();
         Date time = tx.getTime();
