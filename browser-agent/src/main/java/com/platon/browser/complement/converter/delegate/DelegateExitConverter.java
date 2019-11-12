@@ -76,6 +76,9 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
                 .codeRmDelegateHes(BigDecimal.ZERO)
                 .codeRmDelegateLocked(BigDecimal.ZERO)
                 .codeRmDelegateReleased(BigDecimal.ZERO)
+                .codeDelegateHes(BigDecimal.ZERO)
+                .codeDelegateLocked(BigDecimal.ZERO)
+                .codeDelegateReleased(BigDecimal.ZERO)
                 .build();
 
         boolean isRefundAll = delegation.getDelegateHes()
