@@ -36,6 +36,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
+            block.setReward(event.getEpochMessage().getBlockReward());
 
             if(preBlockNum!=0L&&(block.getNum()-preBlockNum!=1)) throw new AssertionError();
 
