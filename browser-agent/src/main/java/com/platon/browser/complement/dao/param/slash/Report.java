@@ -79,6 +79,11 @@ public class Report extends BusinessParam {
      * 当前退出中
      */
     private int codeStakingReductionEpoch;
+    
+    /**
+     * 惩罚的金额
+     */
+    private BigDecimal codeSlashValue;
 
     @Override
     public BusinessType getBusinessType() {

@@ -92,6 +92,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
         }
         businessParam.setCodeRewardValue(codeRewardValue);
         businessParam.setCodeCurStakingLocked(codeCurStakingLocked);
+        businessParam.setCodeSlashValue(codeSlashValue);
 
         slashBusinessMapper.report(businessParam);
 
