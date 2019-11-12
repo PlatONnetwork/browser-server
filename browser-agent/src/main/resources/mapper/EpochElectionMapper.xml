@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
 
-<select id="querySlashNode" resultType="string">
+<select id="querySlashNode" resultType="java.lang.String">
 	select 
 		`node_id`
 	from staking
