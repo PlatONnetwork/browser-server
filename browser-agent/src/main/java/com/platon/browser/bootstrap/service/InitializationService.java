@@ -111,7 +111,7 @@ public class InitializationService {
 
         // 配置中的默认内置节点信息
         Map<String,CustomStaking> defaultStakingMap = new HashMap<>();
-        chainConfig.getDefaultStakings().forEach(staking -> defaultStakingMap.put(staking.getNodeId(),staking));
+        chainConfig.getDefaultStakingList().forEach(staking -> defaultStakingMap.put(staking.getNodeId(),staking));
 
         epochRetryService.getPreVerifiers().forEach(v->{
             CustomStaking staking = new CustomStaking();

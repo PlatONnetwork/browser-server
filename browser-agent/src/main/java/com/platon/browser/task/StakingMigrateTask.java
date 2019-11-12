@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,7 @@ public class StakingMigrateTask {
     private CustomStakingHistoryMapper customStakingHistoryMapper;
 
     @Scheduled(cron = "0/30  * * * * ?")
-    private void cron () throws InterruptedException {
+    void cron(){
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }

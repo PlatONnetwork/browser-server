@@ -29,7 +29,7 @@ public class ComplementEventHandler implements IComplementEventHandler {
             persistenceEventPublisher.publish(event.getBlock(),event.getTransactions(),event.getNodeOpts());
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
-            log.error("{}",e);
+            log.error("",e);
             throw e;
         }
 

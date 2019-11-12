@@ -33,7 +33,7 @@ public class DelegateMigrateTask {
 
     @Transactional
     @Scheduled(cron = "0/30  * * * * ?")
-    private void cron () {
+    void cron () {
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }

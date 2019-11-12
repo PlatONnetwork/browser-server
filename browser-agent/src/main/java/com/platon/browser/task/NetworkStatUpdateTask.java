@@ -43,7 +43,7 @@ public class NetworkStatUpdateTask {
 		// 只有程序正常运行才执行任务
 		if(AppStatusUtil.isRunning()) start();
     }
-	protected void start () throws InterruptedException {
+	protected void start (){
 		try {
 			Long curNumber = networkStatCache.getNetworkStat().getCurNumber();
 

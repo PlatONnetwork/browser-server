@@ -48,6 +48,7 @@ public class CollectionTransaction extends Transaction {
             .setInput(transaction.getInput())
             .setTo(transaction.getTo())
             .setFrom(transaction.getFrom())
+            .setGasLimit(transaction.getGas().toString())
             .setNonce(transaction.getNonce().toString());
         return this;
     }

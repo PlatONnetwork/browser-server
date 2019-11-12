@@ -51,7 +51,7 @@ public class AddressUpdateTask {
     private int batchSize;
 	
     @Scheduled(cron = "0/5  * * * * ?")
-    private void cron () throws InterruptedException {
+    private void cron(){
     	// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
     	

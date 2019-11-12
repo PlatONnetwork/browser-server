@@ -6,7 +6,7 @@
     update `node`set
         `total_value` = `total_value` + #{amount},
         `stat_delegate_value` = `stat_delegate_value` + #{amount},
-        `stat_valid_addrs` = if((select 1 from delegation where is_history = 2 and delegate_addr = #{txFrom}  and node_id = #{nodeId}) is null,stat_valid_addrs + 1,stat_valid_addrs)
+        `stat_valid_addrs` = if((select 1 from delegation where is_history = 2 and delegate_addr = #{txFrom}  and node_id = #{nodeId} and delegate_released = 0) is null,stat_valid_addrs + 1,stat_valid_addrs)
     where
         `node_id` = #{nodeId};
 
