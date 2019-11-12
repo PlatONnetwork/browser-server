@@ -11,8 +11,8 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    url: jdbc:mysql://192.168.9.191:3306/platon_aton_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)  
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #Redis配置
   redis:
@@ -26,10 +26,10 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_1
-      transactionIndexName: browser_transaction_1
-      delegationIndexName: browser_delegation_1
-      nodeOptIndexName: browser_nodeopt_1
+      blockIndexName: browser_block_aton_${profile}
+      transactionIndexName: browser_transaction_aton_${profile}
+      delegationIndexName: browser_delegation_aton_${profile}
+      nodeOptIndexName: browser_nodeopt_aton_${profile}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -67,7 +67,7 @@ logging:
 #PlatOn相关配置
 platon:
   # Web3j访问地址
-  web3j.addresses: http://192.168.120.76:6797
+  web3j.addresses: http://192.168.112.141:6789,http://192.168.112.141:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)
