@@ -10,7 +10,7 @@
 </select>
 
 <select id="getNetworkStatisticsFromAddress"  resultType="INTEGER">
-	select count(1) from proposal where status = 1
+	select count(1) from address
 </select>
 
 <select id="getNetworkStatisticsFromProposal"  resultType="INTEGER">

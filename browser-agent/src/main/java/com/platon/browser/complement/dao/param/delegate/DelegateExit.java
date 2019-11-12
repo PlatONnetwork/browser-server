@@ -49,42 +49,51 @@ public class DelegateExit extends BusinessParam {
     /**
      * 当前犹豫金额
      */
-    private BigDecimal codeDelegateHes;
+    @Builder.Default
+    private BigDecimal codeDelegateHes = BigDecimal.ZERO;
 
     /**
      * 扣减犹豫金额
      */
-    private BigDecimal codeRmdelegateHes;
+    @Builder.Default
+    private BigDecimal codeRmdelegateHes = BigDecimal.ZERO;
 
     /**
      * 当前锁定金额
      */
-    private BigDecimal codeDelegateLocked;
+    @Builder.Default
+    private BigDecimal codeDelegateLocked = BigDecimal.ZERO;
+
 
     /**
      * 扣减锁定金额
      */
-    private BigDecimal codeRmDelegateLocked;
+    @Builder.Default
+    private BigDecimal codeRmDelegateLocked = BigDecimal.ZERO;
 
     /**
      * 当前待赎回金额
      */
-    private BigDecimal codeDelegateReleased;
+    @Builder.Default
+    private BigDecimal codeDelegateReleased = BigDecimal.ZERO;
     
     /**
      * 扣减待赎回金额
      */
-    private BigDecimal codeRmDelegateReleased;
+    @Builder.Default
+    private BigDecimal codeRmDelegateReleased = BigDecimal.ZERO;
 
     /**
      * 当前是否为历史
      */
-    private int codeIsHistory;
+    @Builder.Default
+    private int codeIsHistory = 2;
 
     /**
      * 真正退款金额
      */
     private BigDecimal codeRealAmount;
+
 
     /**
      * 节点是否退出
