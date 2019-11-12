@@ -49,12 +49,14 @@ public class EsImportService {
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NodeOpt> nodeOpts) throws InterruptedException {
         log.debug("ES批量导入:{}(blocks({}),transactions({}),statistics({}),delegations({}),nodeOpts({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),nodeOpts.size());
+        long startTime = System.currentTimeMillis();
         try{
             CountDownLatch latch = new CountDownLatch(3);
             submit(blockService,blocks,latch);
             submit(transactionService,transactions,latch);
             submit(nodeOptService,nodeOpts,latch);
             latch.await();
+            log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         }catch (Exception e){
             log.error("",e);
             throw e;
