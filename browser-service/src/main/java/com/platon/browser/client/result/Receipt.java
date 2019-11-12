@@ -32,7 +32,7 @@ public class Receipt {
     public int getStatus() {
         if (null == status) return SUCCESS;
         BigInteger statusQuantity = Numeric.decodeQuantity(status);
-        return BigInteger.ONE.equals(statusQuantity)?1:0;
+        return BigInteger.ONE.equals(statusQuantity)?FAILURE:SUCCESS;
     }
 
     public BigInteger getGasUsed() {
