@@ -148,7 +148,7 @@ public class BlockChainConfig {
     // 初始内置节点默认质押金额(LAT)
     private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息
-    private List<CustomStaking> defaultStakings=new ArrayList<>();
+    private List<CustomStaking> defaultStakingList=new ArrayList<>();
 
     @PostConstruct
     private void init() throws Exception {
