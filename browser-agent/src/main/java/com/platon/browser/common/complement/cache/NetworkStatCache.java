@@ -15,10 +15,7 @@ public class NetworkStatCache {
     
     @Autowired
     private TpsCalcCache tpsCalcCache;
-    @Autowired
-	private AddressCache addressCache;
-    
-    
+
     /**
      * 基于区块维度更新网络统计信息
      * @param txQty
@@ -32,8 +29,6 @@ public class NetworkStatCache {
     	networkStat.setProposalQty(proposalQty+networkStat.getProposalQty());
     	networkStat.setCurTps(tps);
     	networkStat.setCurBlockHash(bHash);
-    	// 更新地址数
-    	networkStat.setAddressQty(addressCache.getAll().size());
     	if(tps > networkStat.getMaxTps()) {
     		networkStat.setMaxTps(tps);
     	}
