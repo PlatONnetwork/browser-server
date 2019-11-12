@@ -1,6 +1,8 @@
 package com.platon.browser.complement.converter.slash;
 
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
@@ -9,6 +11,8 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomSlash;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -36,6 +40,8 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 
     @Autowired
     private StakingMapper stakingMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
@@ -89,8 +95,25 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 
         slashBusinessMapper.report(businessParam);
 
+
+        //操作描述:6【PERCENT|AMOUNT】 
+        String desc = NodeOpt.TypeEnum.MULTI_SIGN.getTpl()
+                .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
+                .replace("AMOUNT",codeSlashValue.toString());
+
+
+
+        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+        nodeOpt.setNodeId(nodeId);
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MULTI_SIGN.getCode()));
+        nodeOpt.setDesc(desc);
+        nodeOpt.setTxHash(tx.getHash());
+        nodeOpt.setBNum(event.getBlock().getNum());
+        nodeOpt.setTime(event.getBlock().getTime());
+
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(null);
+        return Optional.ofNullable(nodeOpt);
     }
 }
