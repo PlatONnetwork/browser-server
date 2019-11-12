@@ -3,14 +3,16 @@ package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -25,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.bean.Node;
 import org.web3j.utils.Convert;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -49,11 +50,15 @@ public class InitializationService {
     private StakingMapper stakingMapper;
     @Autowired
     private NetworkStatMapper networkStatMapper;
+    @Autowired
+    private AddressMapper addressMapper;
 
     @Autowired
     private NodeCache nodeCache;
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private AddressCache addressCache;
 
     @Transactional
     public InitializationResult init() throws Exception {
@@ -66,15 +71,16 @@ public class InitializationService {
             networkStat.setCurNumber(0L);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(0L);
-            // 删除节点表和质押表数据
+            // 删除节点表和质押表、地址表数据
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
+            addressMapper.deleteByExample(null);
             // 初始化内置节点
             List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
-            initNodeCache(nodeList);
+            nodeCache.init(nodeList);
             // 初始化网络缓存
-            networkStatCache.setNetworkStat(networkStat);
+            networkStatCache.init(networkStat);
             return initialResult;
         }
 
@@ -82,21 +88,12 @@ public class InitializationService {
 
         // 初始化节点缓存
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
-        initNodeCache(nodeList);
+        nodeCache.init(nodeList);
+        List<Address> addressList = addressMapper.selectByExample(null);
+        addressCache.init(addressList);
         // 初始化网络缓存
-        networkStatCache.setNetworkStat(networkStat);
+        networkStatCache.init(networkStat);
         return initialResult;
-    }
-
-    private void initNodeCache(List<com.platon.browser.dao.entity.Node> nodeList){
-        nodeList.forEach(s->{
-            NodeItem node = NodeItem.builder()
-                    .nodeId(s.getNodeId())
-                    .nodeName(s.getNodeName())
-                    .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
-                    .build();
-            nodeCache.addNode(node);
-        });
     }
 
     /**

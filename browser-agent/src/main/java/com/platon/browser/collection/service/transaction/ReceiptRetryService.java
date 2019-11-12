@@ -5,16 +5,10 @@ import com.platon.browser.client.RpcParam;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
-import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.bean.Node;
-import org.web3j.protocol.Web3j;
-
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @Auther: Chendongming

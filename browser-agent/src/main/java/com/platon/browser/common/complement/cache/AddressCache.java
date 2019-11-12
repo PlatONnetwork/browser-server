@@ -9,11 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class AddressCache {
-    private Map<String,Address> addressMap = new HashMap<String, Address>();
+    private Map<String,Address> addressMap = new HashMap<>();
     
     public void update(Transaction tx) {
     	String from = tx.getFrom();
@@ -94,4 +95,14 @@ public class AddressCache {
         address.setProposalQty(0);
     	return address;
     }
+
+	/**
+	 * 初始化
+	 * @param addressList 地址实体列表
+	 */
+	public void init(List<Address> addressList) {
+		if(addressList.isEmpty()) return;
+		addressMap.clear();
+		addressList.forEach(address -> addressMap.put(address.getAddress(),address));
+	}
 }
