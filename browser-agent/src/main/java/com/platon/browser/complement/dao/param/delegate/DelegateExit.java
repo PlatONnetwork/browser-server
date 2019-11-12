@@ -54,7 +54,7 @@ public class DelegateExit extends BusinessParam {
     /**
      * 扣减犹豫金额
      */
-    private BigDecimal codeRmdelegateHes;
+    private BigDecimal codeRmDelegateHes;
 
     /**
      * 当前锁定金额
