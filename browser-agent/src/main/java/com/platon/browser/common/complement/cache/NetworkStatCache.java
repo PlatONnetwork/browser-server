@@ -17,6 +17,8 @@ public class NetworkStatCache {
     
     @Autowired
     private TpsCalcCache tpsCalcCache;
+    @Autowired
+	private AddressCache addressCache;
     
     
     /**
@@ -24,7 +26,6 @@ public class NetworkStatCache {
      * @param txQty
      * @param proposalQty
      * @param time
-     * @param string 
      */
     public void updateByBlock(int txQty, int proposalQty, Date time, String bHash) {
     	tpsCalcCache.update(txQty, time.getTime());
@@ -33,6 +34,8 @@ public class NetworkStatCache {
     	networkStat.setProposalQty(proposalQty+networkStat.getProposalQty());
     	networkStat.setCurTps(tps);
     	networkStat.setCurBlockHash(bHash);
+    	// 更新地址数
+    	networkStat.setAddressQty(addressCache.getAll().size());
     	if(tps > networkStat.getMaxTps()) {
     		networkStat.setMaxTps(tps);
     	}
