@@ -32,16 +32,16 @@
     </foreach>
 
     update `delegation` set
-        `delegate_hes` = 0,
-        `delegate_locked` = `delegate_hes` + `delegate_locked`
+    	`delegate_locked` = `delegate_hes` + `delegate_locked`,
+        `delegate_hes` = 0
     where
         `is_history` = 2
     and
         `delegate_hes` > 0;
 
     update `staking` set
-    `stat_delegate_hes` = 0,
-    `stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`
+    	`stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`,
+    	`stat_delegate_hes` = 0
     where
       `stat_delegate_hes` > 0;
 
