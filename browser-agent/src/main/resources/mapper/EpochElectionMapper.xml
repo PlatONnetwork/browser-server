@@ -13,11 +13,11 @@
 
 <update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
 	update `staking` set
-		`staking_hes` = 0,
-		`staking_locked` = 0,
 		`staking_reduction` = `staking_locked`,
 		`staking_reduction_epoch` = #{settingEpoch},
 		`status` = if(`staking_locked` > 0, 2, 3),
+		`staking_hes` = 0,
+		`staking_locked` = 0,
 		`is_consensus` = 2,
 		`is_settle` = 2,
 		`leave_time` = #{time}
@@ -25,16 +25,16 @@
 		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
 
 	update `node` set
-		`staking_hes` = 0,
-		`staking_locked` = 0,
 		`staking_reduction` = `staking_locked`,
 		`staking_reduction_epoch` = #{settingEpoch},
 		`status` = if(`staking_locked` > 0, 2, 3),
+		`staking_hes` = 0,
+		`staking_locked` = 0,
 		`is_consensus` = 2,
 		`is_settle` = 2,
 		`leave_time` = #{time},
 		`stat_slash_low_qty` = `stat_slash_low_qty` + 1 ,
-		`total_value` = `total_value` - `staking_hes` - `staking_locked`
+		`total_value` = 0
 	where `node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
 </update>
 </mapper>
