@@ -42,7 +42,6 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
 
         long startTime = System.currentTimeMillis();
 
-
         StakeModify businessParam= StakeModify.builder()
         		.nodeId(txParam.getNodeId())
         		.nodeName(txParam.getNodeName())

@@ -28,13 +28,17 @@ public class VersionDeclareConverter extends BusinessParamConverter<Optional<Nod
     private NetworkStatCache networkStatCache;
 	
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
         // 补充节点名称
         String nodeId=txParam.getActiveNode();
-        NodeItem nodeItem = nodeCache.getNode(nodeId);
-        txParam.setNodeName(nodeItem.getNodeName());
-        tx.setInfo(txParam.toJSONString());
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            txParam.setNodeName(nodeItem.getNodeName());
+            tx.setInfo(txParam.toJSONString());
+        } catch (NoSuchBeanException e) {
+            log.warn("缓存中找不到节点[{}]信息,无法补节点名称",nodeId);
+        }
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 

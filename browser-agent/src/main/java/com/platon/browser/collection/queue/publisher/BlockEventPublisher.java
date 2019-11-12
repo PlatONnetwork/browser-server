@@ -17,7 +17,6 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * 区块事件生产者

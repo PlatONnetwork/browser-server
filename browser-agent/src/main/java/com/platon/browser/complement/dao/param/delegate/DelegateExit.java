@@ -3,8 +3,8 @@ package com.platon.browser.complement.dao.param.delegate;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
+import com.platon.browser.complement.dao.param.BusinessParam;
 
 import lombok.Builder;
 import lombok.Data;
@@ -54,7 +54,7 @@ public class DelegateExit extends BusinessParam {
     /**
      * 扣减犹豫金额
      */
-    private BigDecimal codeRmdelegateHes;
+    private BigDecimal codeRmDelegateHes;
 
     /**
      * 当前锁定金额

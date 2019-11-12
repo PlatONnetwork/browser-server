@@ -49,12 +49,12 @@ public class EpochRetryService {
     @Autowired
     private SpecialContractApi specialContractApi;
 
-    @Getter private BigInteger inciteBalance=BigInteger.ZERO; // 当前增发周期开始时的激励池余额 IB
-    @Getter private BigInteger inciteAmount4Block=BigInteger.ZERO; // 前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
-    @Getter private BigInteger blockReward=BigInteger.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
-    @Getter private BigInteger inciteAmount4Stake=BigInteger.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
-    @Getter private BigInteger settleStakeReward=BigInteger.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
-    @Getter private BigInteger stakeReward=BigInteger.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
+    @Getter private BigDecimal inciteBalance=BigDecimal.ZERO; // 当前增发周期开始时的激励池余额 IB
+    @Getter private BigDecimal inciteAmount4Block=BigDecimal.ZERO; // 前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
+    @Getter private BigDecimal blockReward=BigDecimal.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
+    @Getter private BigDecimal inciteAmount4Stake=BigDecimal.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
+    @Getter private BigDecimal settleStakeReward=BigDecimal.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
+    @Getter private BigDecimal stakeReward=BigDecimal.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
     @Getter private List<Node> preValidators=new ArrayList<>(); // 前一共识周期验证人列表
     @Getter private List<Node> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
     @Getter private List<Node> preVerifiers=new ArrayList<>(); // 前一结算周期验证人列表
@@ -77,21 +77,19 @@ public class EpochRetryService {
             // 当前增发周期开始时的激励池余额
             inciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
             // 激励池余额分给区块奖励部分
-            BigDecimal blockRewardPart = new BigDecimal(inciteBalance).multiply(chainConfig.getBlockRewardRate());
-            inciteAmount4Block = blockRewardPart.setScale(0,RoundingMode.FLOOR).toBigInteger();
+            inciteAmount4Block = inciteBalance.multiply(chainConfig.getBlockRewardRate());
             // 当前增发周期内每个区块的奖励
-            blockReward = blockRewardPart.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()),0,RoundingMode.FLOOR).toBigInteger();
+            blockReward = inciteAmount4Block.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()),10,RoundingMode.FLOOR);
             // 激励池余额分给质押奖励部分
-            BigDecimal stakeRewardPart = new BigDecimal(inciteBalance).multiply(chainConfig.getStakeRewardRate());
-            inciteAmount4Stake = stakeRewardPart.setScale(0,RoundingMode.FLOOR).toBigInteger();
+            inciteAmount4Stake = inciteBalance.multiply(chainConfig.getStakeRewardRate());
             // 当前增发周期内每个结算周期的质押奖励
-            settleStakeReward = stakeRewardPart.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR).toBigInteger();
+            settleStakeReward = inciteAmount4Stake.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),10,RoundingMode.FLOOR);
             // 触发共识周期变更
             consensusChange(currentBlockNumber);
             // 触发结算周期变更
             settlementChange(currentBlockNumber);
             // 计算当前结算周期内每个验证人的质押奖励
-            stakeReward = new BigDecimal(settleStakeReward).divide(BigDecimal.valueOf(curVerifiers.size()),0,RoundingMode.FLOOR).toBigInteger();
+            stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()),10,RoundingMode.FLOOR);
         }catch (Exception e){
             log.error("",e);
             throw e;

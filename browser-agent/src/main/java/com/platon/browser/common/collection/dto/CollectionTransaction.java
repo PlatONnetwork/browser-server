@@ -85,7 +85,9 @@ public class CollectionTransaction extends Transaction {
             throw new BeanCreateOrUpdateException("交易[hash:" + this.getHash() + "]的参数解析出错:" + e.getMessage());
         }
 
-        // 累加区块中的统计信息
+        // 累加总交易数
+        block.setTxQty(block.getTxQty()+1);
+        // 累加具体业务交易数
         switch (getTypeEnum()){
             case TRANSFER: // 转账交易，from地址转账交易数加一
                 block.setTranQty(block.getTranQty()+1);
@@ -106,12 +108,10 @@ public class CollectionTransaction extends Transaction {
             case PROPOSAL_VOTE:// 提案投票
             case PROPOSAL_CANCEL:// 取消提案
             case VERSION_DECLARE:// 版本声明
-
                 block.setPQty(block.getPQty()+1);
                 break;
             default:
         }
-        block.setTxQty(block.getTxQty()+1);
         // 累加当前交易的手续费到当前区块的txFee
         block.setTxFee(block.getTxFee().add(getCost()));
         // 累加当前交易的能量限制到当前区块的txGasLimit

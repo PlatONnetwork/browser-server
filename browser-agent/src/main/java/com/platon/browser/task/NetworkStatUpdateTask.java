@@ -49,11 +49,11 @@ public class NetworkStatUpdateTask {
 
 			BigInteger issueEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(curNumber),chainConfig.getAddIssuePeriodBlockCount());
 			//获取激励池余额
-			BigInteger inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(curNumber));
+			BigDecimal inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(curNumber));
 			//获取质押余额
-			BigInteger stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(curNumber));
+			BigDecimal stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(curNumber));
 			//获取锁仓余额
-			BigInteger restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(curNumber));
+			BigDecimal restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(curNumber));
 			//计算发行量
 			BigDecimal issueValue = CalculateUtils.calculationIssueValue(issueEpochRound,chainConfig,inciteBalance);
 			//计算流通量

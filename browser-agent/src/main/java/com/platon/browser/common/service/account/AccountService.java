@@ -4,12 +4,12 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.javassist.runtime.Inner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.DefaultBlockParameter;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -31,11 +31,12 @@ public class AccountService {
      * @param blockNumber
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BigInteger getInciteBalance(BigInteger blockNumber) {
+    public BigDecimal getInciteBalance(BigInteger blockNumber) {
         try {
-            return platOnClient.getWeb3j()
+            BigInteger balance = platOnClient.getWeb3j()
                     .platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
+            return new BigDecimal(balance);
         }catch (Exception e){
             String error = "获取激励池["+INCITE_ACCOUNT_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
             log.error("{}",error);
@@ -48,10 +49,11 @@ public class AccountService {
      * @param blockNumber
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BigInteger getLockCabinBalance(BigInteger blockNumber){
+    public BigDecimal getLockCabinBalance(BigInteger blockNumber){
         try {
-           return platOnClient.getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+            BigInteger balance = platOnClient.getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                    .send().getBalance();
+            return new BigDecimal(balance);
         }catch (Exception e){
             String error = "获取锁仓合约["+RESTRICTING_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
             log.error("{}",error);
@@ -64,10 +66,11 @@ public class AccountService {
      * @param blockNumber
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BigInteger getStakingBalance(BigInteger blockNumber){
+    public BigDecimal getStakingBalance(BigInteger blockNumber){
         try {
-            return platOnClient.getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+            BigInteger balance = platOnClient.getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
+            return new BigDecimal(balance);
         }catch (Exception e){
             String error = "获取质押合约["+STAKING_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
             log.error("{}",error);

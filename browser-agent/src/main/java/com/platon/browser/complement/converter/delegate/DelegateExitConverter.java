@@ -39,13 +39,19 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
     private DelegationMapper delegationMapper;
 	
     @Override
-    public DelegateExit convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+    public DelegateExit convert(CollectionEvent event, Transaction tx) {
         // 退出委托
         DelegateExitParam txParam = tx.getTxParam(DelegateExitParam.class);
         // 补充节点名称
         String nodeId=txParam.getNodeId();
-        NodeItem nodeItem = nodeCache.getNode(nodeId);
-        txParam.setNodeName(nodeItem.getNodeName());
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            txParam.setNodeName(nodeItem.getNodeName());
+            txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
+            tx.setInfo(txParam.toJSONString());
+        } catch (NoSuchBeanException e) {
+            log.warn("缓存中找不到节点[{}]信息,无法补节点名称和质押区块号",nodeId);
+        }
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
@@ -67,6 +73,12 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
                 .txFrom(tx.getFrom())
                 .stakingBlockNumber(txParam.getStakingBlockNum())
                 .minimumThreshold(chainConfig.getDelegateThreshold())
+                .codeRmDelegateHes(BigDecimal.ZERO)
+                .codeRmDelegateLocked(BigDecimal.ZERO)
+                .codeRmDelegateReleased(BigDecimal.ZERO)
+                .codeDelegateHes(BigDecimal.ZERO)
+                .codeDelegateLocked(BigDecimal.ZERO)
+                .codeDelegateReleased(BigDecimal.ZERO)
                 .build();
 
         boolean isRefundAll = delegation.getDelegateHes()
@@ -99,7 +111,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
             }
         }
 
-        businessParam.setCodeRmdelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
+        businessParam.setCodeRmDelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
                 .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()))
                 .setCodeRmDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeDelegateReleased()));
 

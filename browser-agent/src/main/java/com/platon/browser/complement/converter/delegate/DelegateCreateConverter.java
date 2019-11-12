@@ -28,15 +28,19 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
     private DelegateBusinessMapper delegateBusinessMapper;
 
     @Override
-    public DelegateCreate convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+    public DelegateCreate convert(CollectionEvent event, Transaction tx) {
         // 发起委托
         DelegateCreateParam txParam = tx.getTxParam(DelegateCreateParam.class);
         // 补充节点名称
         String nodeId=txParam.getNodeId();
-        NodeItem nodeItem = nodeCache.getNode(nodeId);
-        txParam.setNodeName(nodeItem.getNodeName());
-        txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
-        tx.setInfo(txParam.toJSONString());
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            txParam.setNodeName(nodeItem.getNodeName());
+            txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
+            tx.setInfo(txParam.toJSONString());
+        } catch (NoSuchBeanException e) {
+            log.warn("缓存中找不到节点[{}]信息,无法补节点名称和质押区块号",nodeId);
+        }
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
