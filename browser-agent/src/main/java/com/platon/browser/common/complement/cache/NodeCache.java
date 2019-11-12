@@ -1,10 +1,13 @@
 package com.platon.browser.common.complement.cache;
 
 import com.platon.browser.common.complement.cache.bean.NodeItem;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -29,5 +32,17 @@ public class NodeCache {
      */
     public void addNode(NodeItem node){
         cache.put(node.getNodeId(),node);
+    }
+
+    public void init(List<Node> nodeList) {
+        if(nodeList.isEmpty()) return;
+        nodeList.forEach(s->{
+            NodeItem node = NodeItem.builder()
+                    .nodeId(s.getNodeId())
+                    .nodeName(s.getNodeName())
+                    .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
+                    .build();
+            addNode(node);
+        });
     }
 }

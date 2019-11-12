@@ -1,19 +1,17 @@
 package com.platon.browser.common.complement.cache;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
+import com.platon.browser.dao.entity.NetworkStat;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.platon.browser.dao.entity.NetworkStat;
-
-import lombok.Data;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Component
 @Data
 public class NetworkStatCache {
-    private NetworkStat networkStat;
+    private NetworkStat networkStat=new NetworkStat();
     
     @Autowired
     private TpsCalcCache tpsCalcCache;
@@ -67,5 +65,9 @@ public class NetworkStatCache {
 		networkStat.setStakingValue(stakingValue);
 		networkStat.setAddressQty(addressQty);
 		networkStat.setDoingProposalQty(doingProposalQty);		
-	}    
+	}
+
+    public void init(NetworkStat networkStat) {
+	    this.networkStat=networkStat;
+    }
 }

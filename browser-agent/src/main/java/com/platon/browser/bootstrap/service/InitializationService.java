@@ -6,7 +6,6 @@ import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
@@ -79,9 +78,9 @@ public class InitializationService {
             // 初始化内置节点
             List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
-            initNodeCache(nodeList);
+            nodeCache.init(nodeList);
             // 初始化网络缓存
-            networkStatCache.setNetworkStat(networkStat);
+            networkStatCache.init(networkStat);
             return initialResult;
         }
 
@@ -89,23 +88,12 @@ public class InitializationService {
 
         // 初始化节点缓存
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
-        initNodeCache(nodeList);
+        nodeCache.init(nodeList);
         List<Address> addressList = addressMapper.selectByExample(null);
         addressCache.init(addressList);
         // 初始化网络缓存
-        networkStatCache.setNetworkStat(networkStat);
+        networkStatCache.init(networkStat);
         return initialResult;
-    }
-
-    private void initNodeCache(List<com.platon.browser.dao.entity.Node> nodeList){
-        nodeList.forEach(s->{
-            NodeItem node = NodeItem.builder()
-                    .nodeId(s.getNodeId())
-                    .nodeName(s.getNodeName())
-                    .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
-                    .build();
-            nodeCache.addNode(node);
-        });
     }
 
     /**
