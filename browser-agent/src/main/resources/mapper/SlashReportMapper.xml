@@ -40,7 +40,8 @@
 		`slash_value`,
 		`reward`,
 		`benefit_addr`,
-		`data`
+		`data`,
+		`is_quit`
 		)
 	values
 		(#{txHash},
@@ -49,7 +50,8 @@
 		#{codeCurStakingLocked},
 		#{codeRewardValue},
 		#{benefitAddr},
-		#{slashData}
+		#{slashData},
+		1
 		);
 
 </update>
