@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,20 +20,28 @@ public class Block {
     private String pHash;
     private Date time;
     private Integer size;
-    private BigDecimal gasLimit;
-    private BigDecimal gasUsed;
+    private String gasLimit;
+    private String gasUsed;
     private Integer txQty;
     private Integer tranQty;
     private Integer sQty;
     private Integer pQty;
     private Integer dQty;
-    private BigDecimal txGasLimit;
-    private BigDecimal txFee;
+    private String txGasLimit;
+    private String txFee;
     private String nodeName;
     private String nodeId;
-    private BigDecimal reward;
+    private String reward;
     private String miner;
     private Date creTime;
     private Date updTime;
     private String extra;
+
+    /********把字符串类数值转换为大浮点数的便捷方法********/
+    public BigDecimal decimalGasLimit(){return new BigDecimal(this.getGasLimit());}
+    public BigDecimal decimalGasUsed(){return new BigDecimal(this.getGasUsed());}
+    public BigDecimal decimalTxGasLimit(){return new BigDecimal(this.getTxGasLimit());}
+    public BigDecimal decimalTxFee(){return new BigDecimal(this.getTxFee());}
+    public BigDecimal decimalReward(){return new BigDecimal(this.getReward());}
+
 }

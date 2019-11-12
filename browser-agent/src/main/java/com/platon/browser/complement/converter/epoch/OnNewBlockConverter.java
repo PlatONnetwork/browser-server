@@ -2,9 +2,9 @@ package com.platon.browser.complement.converter.epoch;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.NewBlockMapper;
+import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class OnNewBlockConverter {
                 .nodeId(block.getNodeId())
                 .stakingBlockNum(nodeCache.getNode(block.getNodeId()).getStakingBlockNum())
                 .blockRewardValue(event.getEpochMessage().getBlockReward())
-                .feeRewardValue(block.getTxFee())
+                .feeRewardValue(new BigDecimal(block.getTxFee()))
                 .build();
         
 		newBlockMapper.newBlock(newBlock);

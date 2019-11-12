@@ -23,12 +23,12 @@ public class CollectionTransaction extends Transaction {
         CollectionTransaction transaction = new CollectionTransaction();
         transaction.setCreTime(date)
             .setUpdTime(date)
-            .setCost(BigDecimal.ZERO)
-            .setGasLimit(BigDecimal.ZERO)
-            .setGasPrice(BigDecimal.ZERO)
-            .setGasUsed(BigDecimal.ZERO)
+            .setCost(BigDecimal.ZERO.toString())
+            .setGasLimit(BigDecimal.ZERO.toString())
+            .setGasPrice(BigDecimal.ZERO.toString())
+            .setGasUsed(BigDecimal.ZERO.toString())
             .setStatus(StatusEnum.FAILURE.getCode())
-            .setValue(BigDecimal.ZERO)
+            .setValue(BigDecimal.ZERO.toString())
             .setIndex(0);
         return transaction;
     }
@@ -42,9 +42,9 @@ public class CollectionTransaction extends Transaction {
         this.setNum(transaction.getBlockNumber().longValue())
             .setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash())
-            .setValue(new BigDecimal(transaction.getValue()))
+            .setValue(transaction.getValue().toString())
             .setIndex(transaction.getTransactionIndex().intValue())
-            .setGasPrice(new BigDecimal(transaction.getGasPrice()))
+            .setGasPrice(transaction.getGasPrice().toString())
             .setInput(transaction.getInput())
             .setTo(transaction.getTo())
             .setFrom(transaction.getFrom())
@@ -73,8 +73,8 @@ public class CollectionTransaction extends Transaction {
                 toType = ToTypeEnum.ACCOUNT.getCode();
             }
 
-            this.setGasUsed(new BigDecimal(receipt.getGasUsed()))
-                    .setCost(getGasUsed().multiply(getGasPrice()))
+            this.setGasUsed(receipt.getGasUsed().toString())
+                    .setCost(decimalGasUsed().multiply(decimalGasPrice()).toString())
                     .setFailReason(receipt.getFailReason())
                     .setStatus(status)
                     .setSeq(getNum()*10000+getIndex())
@@ -113,9 +113,9 @@ public class CollectionTransaction extends Transaction {
             default:
         }
         // 累加当前交易的手续费到当前区块的txFee
-        block.setTxFee(block.getTxFee().add(getCost()));
+        block.setTxFee(block.decimalTxFee().add(decimalCost()).toString());
         // 累加当前交易的能量限制到当前区块的txGasLimit
-        block.setTxGasLimit(block.getTxGasLimit().add(getGasLimit()));
+        block.setTxGasLimit(block.decimalTxGasLimit().add(decimalGasLimit()).toString());
         return this;
     }
 }

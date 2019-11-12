@@ -23,14 +23,14 @@ public class Transaction {
     private Date time;
     private String nonce;
     private Integer status;
-    private BigDecimal gasPrice;
-    private BigDecimal gasUsed;
-    private BigDecimal gasLimit;
+    private String gasPrice;
+    private String gasUsed;
+    private String gasLimit;
     private String from;
     private String to;
-    private BigDecimal value;
+    private String value;
     private Integer type;
-    private BigDecimal cost;
+    private String cost;
     private Integer toType;
     private Long seq;
     private Date creTime;
@@ -38,6 +38,13 @@ public class Transaction {
     private String input;
     private String info;
     private String failReason;
+
+    /********把字符串类数值转换为大浮点数的便捷方法********/
+    public BigDecimal decimalGasLimit(){return new BigDecimal(this.getGasLimit());}
+    public BigDecimal decimalGasPrice(){return new BigDecimal(this.getGasPrice());}
+    public BigDecimal decimalGasUsed(){return new BigDecimal(this.getGasUsed());}
+    public BigDecimal decimalValue(){return new BigDecimal(this.getValue());}
+    public BigDecimal decimalCost(){return new BigDecimal(this.getCost());}
 
     public enum TypeEnum {
         TRANSFER(0, "转账"),
@@ -150,4 +157,6 @@ public class Transaction {
     public <T> T getTxParam (Class<T> clazz) {
         return JSON.parseObject(this.getInfo(), clazz);
     }
+
+
 }

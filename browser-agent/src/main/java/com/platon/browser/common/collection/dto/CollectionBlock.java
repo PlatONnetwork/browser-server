@@ -33,12 +33,12 @@ public class CollectionBlock extends Block {
             .setSQty(0)
             .setTranQty(0)
             .setTxQty(0)
-            .setReward(BigDecimal.ZERO)
-            .setGasLimit(BigDecimal.ZERO)
-            .setGasUsed(BigDecimal.ZERO)
-            .setTxFee(BigDecimal.ZERO)
+            .setReward(BigDecimal.ZERO.toString())
+            .setGasLimit(BigDecimal.ZERO.toString())
+            .setGasUsed(BigDecimal.ZERO.toString())
+            .setTxFee(BigDecimal.ZERO.toString())
             .setSize(0)
-            .setTxGasLimit(BigDecimal.ZERO);
+            .setTxGasLimit(BigDecimal.ZERO.toString());
         return block;
     }
 
@@ -53,8 +53,8 @@ public class CollectionBlock extends Block {
             .setExtra(block.getExtraData())
             .setMiner(block.getMiner())
             .setNodeId(nodeId)
-            .setGasLimit(new BigDecimal(block.getGasLimit()))
-            .setGasUsed(new BigDecimal(block.getGasUsed()));
+            .setGasLimit(block.getGasLimit().toString())
+            .setGasUsed(block.getGasUsed().toString());
 
         if(block.getTransactions().isEmpty()) return this;
 
