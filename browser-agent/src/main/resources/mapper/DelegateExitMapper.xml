@@ -10,8 +10,8 @@
         <if test="codeIsHistory == 1 and codeNodeIsLeave == true">
           	`stat_invalid_addrs` = `stat_invalid_addrs` - 1,
         </if>
-        `total_value` = `total_value` - #{codeRmdelegateHes} - #{codeRmDelegateLocked},
-        `stat_delegate_value` = `stat_delegate_value` -  #{codeRmdelegateHes}  - #{codeRmDelegateLocked},
+        `total_value` = `total_value` - #{codeRmDelegateHes} - #{codeRmDelegateLocked},
+        `stat_delegate_value` = `stat_delegate_value` -  #{codeRmDelegateHes}  - #{codeRmDelegateLocked},
         `stat_delegate_released` = `stat_delegate_released` - #{codeDelegateReleased}
     where
         `node_id` = #{nodeId};
@@ -29,7 +29,7 @@
       `staking_block_num` = #{stakingBlockNumber};
 
     update `staking` set
-        `stat_delegate_hes` = `stat_delegate_hes` - #{codeRmdelegateHes},
+        `stat_delegate_hes` = `stat_delegate_hes` - #{codeRmDelegateHes},
         `stat_delegate_locked` = `stat_delegate_locked` - #{codeRmDelegateLocked},
         `stat_delegate_released` = `stat_delegate_released` - #{codeRmDelegateReleased}
     where
