@@ -2,8 +2,8 @@ package com.platon.browser.collection.service;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.common.service.account.AccountService;
+import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class EpochRetryServiceTest {
         when(chainConfig.getStakeRewardRate()).thenReturn(BigDecimal.valueOf(0.4));
         when(chainConfig.getSettlePeriodCountPerIssue()).thenReturn(BigInteger.valueOf(5));
         when(platOnClient.getLatestBlockNumber()).thenReturn(BigInteger.valueOf(501));
-        when(accountService.getInciteBalance(any())).thenReturn(BigInteger.valueOf(10000));
+        when(accountService.getInciteBalance(any())).thenReturn(BigDecimal.valueOf(10000));
         List<Node> nodes = new ArrayList<>();
         nodes.add(new Node());
         nodes.add(new Node());

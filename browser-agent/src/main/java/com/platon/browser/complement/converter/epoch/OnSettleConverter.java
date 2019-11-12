@@ -44,7 +44,7 @@ public class OnSettleConverter {
         Settle settle = Settle.builder()
                 .preVerifierList(preVerifierList)
                 .curVerifierList(curVerifierList)
-                .stakingReward(new BigDecimal(event.getEpochMessage().getStakeReward()))
+                .stakingReward(event.getEpochMessage().getStakeReward())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
                 .build();

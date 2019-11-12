@@ -4,13 +4,11 @@ import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dto.CustomStaking;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class CalculateUtils {
@@ -90,7 +88,7 @@ public class CalculateUtils {
         return rate.setScale(2,RoundingMode.FLOOR);
     }
 
-	public static BigDecimal calculationIssueValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigInteger incentivePoolAccountBalance){
+	public static BigDecimal calculationIssueValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
 		Map <Integer, BigDecimal> subsidiesMap = chainConfig.getFoundationSubsidies();
 		int curIssueEpoch=issueEpoch.intValue();
 		int subsidiesSize=subsidiesMap.size();
@@ -112,17 +110,17 @@ public class CalculateUtils {
 		// 发行量
 		BigDecimal issueValue = initIssueAmount
 				.multiply(circulationByYear)
-				.subtract(new BigDecimal(incentivePoolAccountBalance))
+				.subtract(incentivePoolAccountBalance)
 				.add(foundationAmount);
 		return issueValue;
 	}
 
 
-	public static BigDecimal calculationTurnValue(BigDecimal issueValue,BigInteger inciteBalance,BigInteger stakingBalance,BigInteger restrictBalance){
+	public static BigDecimal calculationTurnValue(BigDecimal issueValue,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance){
 		BigDecimal turnValue = issueValue
-				.subtract(new BigDecimal(restrictBalance))
-				.subtract(new BigDecimal(stakingBalance))
-				.subtract(new BigDecimal(inciteBalance));
+				.subtract(restrictBalance)
+				.subtract(stakingBalance)
+				.subtract(inciteBalance);
 
 		return turnValue;
 	}

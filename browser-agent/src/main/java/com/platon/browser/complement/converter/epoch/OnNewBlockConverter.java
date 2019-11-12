@@ -34,7 +34,7 @@ public class OnNewBlockConverter {
 		NewBlock newBlock = NewBlock.builder()
                 .nodeId(block.getNodeId())
                 .stakingBlockNum(nodeCache.getNode(block.getNodeId()).getStakingBlockNum())
-                .blockRewardValue(new BigDecimal(event.getEpochMessage().getBlockReward()))
+                .blockRewardValue(event.getEpochMessage().getBlockReward())
                 .feeRewardValue(block.getTxFee())
                 .build();
         
