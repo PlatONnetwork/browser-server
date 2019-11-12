@@ -137,7 +137,7 @@ public class TransactionParameterService {
                 nodeOpt.ifPresent(np -> nodeOptList.add(np));
                 
             }catch (BusinessException e){
-                log.debug("{}",e);
+                log.debug("",e);
             }
            
         }
