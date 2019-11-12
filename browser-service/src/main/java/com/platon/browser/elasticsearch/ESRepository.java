@@ -60,11 +60,15 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public void createIndex(Map<String, ?> mapping) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		CreateIndexRequest request = new CreateIndexRequest(getIndexName());
 		if (mapping != null && mapping.size() > 0) {
 			request.mapping(mapping);
 		}
 		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 		log.debug("createIndex:{}", JSON.toJSONString(response, true));
 	}
 
@@ -74,8 +78,13 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public void deleteIndex() throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		DeleteIndexRequest request = new DeleteIndexRequest(getIndexName());
 		AcknowledgedResponse response = client.indices().delete(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("deleteIndex:{}", JSON.toJSONString(response, true));
 	}
 
@@ -86,8 +95,13 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public boolean existsIndex() throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		GetIndexRequest request = new GetIndexRequest(getIndexName());
 		boolean response = client.indices().exists(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("existsIndex:{}", response);
 		return response;
 	}
@@ -98,9 +112,14 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public <T> void add(String id, T doc) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		IndexRequest request = new IndexRequest(getIndexName());
 		request.id(id).source(JSON.toJSONString(doc), XContentType.JSON);
 		IndexResponse response = client.index(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("add:{}", JSON.toJSONString(response, true));
 	}
 
@@ -111,9 +130,14 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public boolean exists(String id) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		GetRequest request = new GetRequest(getIndexName(), id);
 		request.fetchSourceContext(new FetchSourceContext(false)).storedFields("_none_");
 		boolean response = client.exists(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("add:{}", JSON.toJSONString(response, true));
 		return response;
 	}
@@ -125,10 +149,15 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public <T> T get(String id, Class<T> clazz) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		GetRequest request = new GetRequest(getIndexName(), id);
 		GetResponse response = client.get(request, RequestOptions.DEFAULT);
 		log.debug("get:{}", JSON.toJSONString(response, true));
 		String res = response.getSourceAsString();
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		return JSON.parseObject(res, clazz);
 	}
 
@@ -138,9 +167,14 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public <T> void update(String id, T block) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		UpdateRequest request = new UpdateRequest(getIndexName(), id);
 		request.doc(JSON.toJSONString(block), XContentType.JSON);
 		UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("update:{}", JSON.toJSONString(response, true));
 	}
 
@@ -151,8 +185,13 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public void delete(String id) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		DeleteRequest request = new DeleteRequest(getIndexName(), id);
 		DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("delete:{}", JSON.toJSONString(response, true));
 	}
 
@@ -163,6 +202,8 @@ public abstract class ESRepository {
 	 */
 	public <T> ESResult<T> search(Map<String, Object> filter, Class<T> clazz, List<ESSortDto> esSortDtos, int pageNo,
 			int pageSize) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		if (pageNo <= 0)
 			pageNo = 1;
 		SearchRequest searchRequest = new SearchRequest(getIndexName());
@@ -185,6 +226,9 @@ public abstract class ESRepository {
 		List<T> list = new ArrayList<>();
 		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
 		esResult.setRsData(list);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		return esResult;
 	}
 	
@@ -195,6 +239,8 @@ public abstract class ESRepository {
 	 */
 	public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz,int pageNo,
 			int pageSize) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		if (pageNo <= 0)
 			pageNo = 1;
 		SearchRequest searchRequest = new SearchRequest(getIndexName());
@@ -216,6 +262,9 @@ public abstract class ESRepository {
 		List<T> list = new ArrayList<>();
 		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
 		esResult.setRsData(list);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		return esResult;
 	}
 
@@ -225,6 +274,8 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public <T> void bulkAddOrUpdate(Map<String, T> docs) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		BulkRequest br = new BulkRequest();
 		for (Map.Entry<String, T> doc : docs.entrySet()) {
 			IndexRequest ir = new IndexRequest(getIndexName());
@@ -233,6 +284,9 @@ public abstract class ESRepository {
 			br.add(ir);
 		}
 		BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
 	}
 
@@ -242,12 +296,17 @@ public abstract class ESRepository {
 	 * @throws IOException
 	 */
 	public void bulkDelete(List<String> ids) throws IOException {
+		long startTime = System.currentTimeMillis();
+
 		BulkRequest br = new BulkRequest();
 		for (String id : ids) {
 			DeleteRequest dr = new DeleteRequest(getIndexName(), id);
 			br.add(dr);
 		}
 		BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+
+		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
 		log.debug("bulkDelete:{}", JSON.toJSONString(response, true));
 	}
 }

@@ -3,14 +3,12 @@ package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
@@ -57,8 +55,6 @@ public class InitializationService {
     private NodeCache nodeCache;
     @Autowired
     private NetworkStatCache networkStatCache;
-    @Autowired
-    private AddressCache addressCache;
 
     @Transactional
     public InitializationResult init() throws Exception {
@@ -89,8 +85,6 @@ public class InitializationService {
         // 初始化节点缓存
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
         nodeCache.init(nodeList);
-        List<Address> addressList = addressMapper.selectByExample(null);
-        addressCache.init(addressList);
         // 初始化网络缓存
         networkStatCache.init(networkStat);
         return initialResult;

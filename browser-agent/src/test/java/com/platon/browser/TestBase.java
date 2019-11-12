@@ -190,7 +190,7 @@ public class TestBase {
                 .minimumThreshold(new BigDecimal("500000"))
                 .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
                 .codeDelegateHes(new BigDecimal("100000000000000"))
-                .codeRmdelegateHes(new BigDecimal("50000000000000"))
+                .codeRmDelegateHes(new BigDecimal("50000000000000"))
                 .codeDelegateLocked(new BigDecimal("100000000000000"))
                 .codeRmDelegateLocked(new BigDecimal("50000000000000"))
                 .codeDelegateReleased(new BigDecimal("50000000000000"))

@@ -48,12 +48,14 @@ public class RedisImportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NetworkStat> statistics) throws InterruptedException {
         log.debug("Redis批量导入:{}(blocks({}),transactions({}),statistics({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),statistics.size());
+        long startTime = System.currentTimeMillis();
         try{
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
             submit(blockService,blocks,false,latch);
             submit(transactionService,transactions,false,latch);
             submit(statisticService,statistics,true,latch);
             latch.await();
+            log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         }catch (Exception e){
             log.error("",e);
             throw e;

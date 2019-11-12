@@ -73,6 +73,9 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
                 .txFrom(tx.getFrom())
                 .stakingBlockNumber(txParam.getStakingBlockNum())
                 .minimumThreshold(chainConfig.getDelegateThreshold())
+                .codeRmDelegateHes(BigDecimal.ZERO)
+                .codeRmDelegateLocked(BigDecimal.ZERO)
+                .codeRmDelegateReleased(BigDecimal.ZERO)
                 .build();
 
         boolean isRefundAll = delegation.getDelegateHes()
@@ -105,7 +108,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
             }
         }
 
-        businessParam.setCodeRmdelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
+        businessParam.setCodeRmDelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
                 .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()))
                 .setCodeRmDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeDelegateReleased()));
 

@@ -103,7 +103,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
 
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
-            log.error("{}",e);
+            log.error("",e);
             throw e;
         }
 
