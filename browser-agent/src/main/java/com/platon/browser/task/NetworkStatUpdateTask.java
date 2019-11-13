@@ -35,8 +35,8 @@ public class NetworkStatUpdateTask {
 	@Autowired
 	private StatisticBusinessMapper statisticBusinessMapper;
 	
-    @Scheduled(cron = "0/30  * * * * ?")
-    private void cron() {
+    @Scheduled(cron = "0/1  * * * * ?")
+    public void cron() {
 		// 只有程序正常运行才执行任务
 		if(AppStatusUtil.isRunning()) start();
     }

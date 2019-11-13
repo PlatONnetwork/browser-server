@@ -40,7 +40,7 @@ public class SpecialContractApiInvoker {
         List<Node> nodes = nodeContract.getValidatorList().send().data;
         List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
-        List<Node> history = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(5000000L));
+        List<Node> history = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(500L));
 
         BaseResponse baseResponse = proposalContract.getActiveVersion().send();
         logger.error("{}",JSON.toJSONString(baseResponse.data));
