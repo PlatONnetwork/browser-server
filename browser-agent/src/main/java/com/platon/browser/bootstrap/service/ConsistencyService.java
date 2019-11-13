@@ -28,10 +28,8 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Service
 public class ConsistencyService {
-
     @Autowired
     private NetworkStatMapper networkStatMapper;
-
     @Autowired
     private BlockESRepository blockESRepository;
     @Autowired
@@ -42,6 +40,8 @@ public class ConsistencyService {
     private ReceiptService receiptService;
     @Autowired
     private BootstrapEventPublisher bootstrapEventPublisher;
+
+    private ShutdownCallback shutdownCallback = ShutdownCallback.builder().build();
 
     /**
      * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
@@ -99,17 +99,15 @@ public class ConsistencyService {
         long startBlockNum = esMaxBlockNum+1;
         log.warn("MYSQL/ES/REDIS数据同步区间:[{},{}]",startBlockNum,mysqlMaxBlockNum);
         // 补充 [startBlockNum,mysqlMaxBlockNum] 闭区间内的区块和交易信息到ES和Redis
-        ShutdownCallback callback = ShutdownCallback.builder()
-                .endBlockNum(mysqlMaxBlockNum)
-                .build();
+        shutdownCallback.setEndBlockNum(mysqlMaxBlockNum);
         for (long number=startBlockNum;number<=mysqlMaxBlockNum;number++){
             // 异步获取区块
             CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(number);
             // 异步获取交易回执
             CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(number);
-            bootstrapEventPublisher.publish(blockCF,receiptCF,callback);
+            bootstrapEventPublisher.publish(blockCF,receiptCF,shutdownCallback);
         }
-        while (!callback.isDone()) SleepUtil.sleep(1L);
+        while (!shutdownCallback.isDone()) SleepUtil.sleep(1L);
         bootstrapEventPublisher.shutdown();
         log.warn("MYSQL/ES/REDIS中的数据同步完成!");
     }

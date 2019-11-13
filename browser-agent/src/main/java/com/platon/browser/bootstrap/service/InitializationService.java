@@ -37,7 +37,6 @@ import java.util.*;
 @Service
 public class InitializationService {
     private static final InitializationResult initialResult = new InitializationResult();
-
     @Autowired
     private EpochRetryService epochRetryService;
     @Autowired
@@ -50,7 +49,6 @@ public class InitializationService {
     private NetworkStatMapper networkStatMapper;
     @Autowired
     private AddressMapper addressMapper;
-
     @Autowired
     private NodeCache nodeCache;
     @Autowired
@@ -132,7 +130,7 @@ public class InitializationService {
 
             // 使用配置文件中的信息更新质押
             CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
-            if(StringUtils.isBlank(staking.getNodeName())&&defaultStaking!=null){
+            if((StringUtils.isBlank(staking.getNodeName())||"Unknown".equals(staking.getNodeName()))&&defaultStaking!=null){
                 staking.setNodeName(defaultStaking.getNodeName());
             }
 
