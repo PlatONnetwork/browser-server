@@ -52,7 +52,7 @@ public class DelegateMigrateTask {
             log.debug("Migrate delegate history to ElasticSearch finished!");
         } catch (Exception e) {
             String error = e.getMessage();
-            log.error("{}",error);
+            log.error("",error);
             throw new BusinessException(error);
         }
     }

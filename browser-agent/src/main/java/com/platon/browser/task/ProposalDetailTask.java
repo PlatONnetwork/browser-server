@@ -81,7 +81,7 @@ public class ProposalDetailTask {
      * @throws IOException
      * @throws BusinessException
      */
-    public ProposalMarkDownDto getMarkdownInfo ( String url ) throws HttpRequestException {
+    private ProposalMarkDownDto getMarkdownInfo(String url) throws HttpRequestException {
         try {
             String fileUrl = MarkDownParserUtil.acquireMD(url);
             if (fileUrl == null) throw new BusinessException("获取不到" + url);
