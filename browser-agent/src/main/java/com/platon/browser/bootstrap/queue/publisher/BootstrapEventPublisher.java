@@ -38,7 +38,7 @@ public class BootstrapEventPublisher {
     @Getter private Disruptor<BootstrapEvent> disruptor;
 
     @PostConstruct
-    private void init(){
+    public void init(){
         disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
         // 设置事件处理器
         disruptor.handleEventsWith(handler);
