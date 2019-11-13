@@ -1,5 +1,7 @@
 package com.platon.browser.res.home;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -17,7 +19,7 @@ public class StakingListResp {
 	private Integer ranking; // 节点排行
 	private String expectedIncome; // 预计年收化率（从验证人加入时刻开始计算）
 	private Boolean isInit; // 是否为初始化的验证人，如果是expectedIncome不显示数值
-	private String totalValue; //
+	private BigDecimal totalValue; //
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -55,10 +57,10 @@ public class StakingListResp {
 		this.isInit = isInit;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getTotalValue() {
+	public BigDecimal getTotalValue() {
 		return totalValue;
 	}
-	public void setTotalValue(String totalValue) {
+	public void setTotalValue(BigDecimal totalValue) {
 		this.totalValue = totalValue;
 	}
 	

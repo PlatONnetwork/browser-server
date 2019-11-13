@@ -5,7 +5,6 @@ import com.platon.browser.config.RedisFactory;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.redis.JedisClusterManager;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;

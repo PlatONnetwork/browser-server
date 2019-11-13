@@ -3,7 +3,6 @@ package com.platon.browser.res.proposal;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomRateSerializer;
 import com.platon.browser.config.CustomVersionSerializer;
-import org.web3j.abi.datatypes.Int;
 
 /**
  *提案详情返回对象

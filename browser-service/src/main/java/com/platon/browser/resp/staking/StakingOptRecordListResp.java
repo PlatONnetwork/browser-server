@@ -1,5 +1,7 @@
 package com.platon.browser.resp.staking;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 import com.platon.browser.config.CustomVersionSerializer;
@@ -21,7 +23,7 @@ public class StakingOptRecordListResp {
     private String title;  //提案标题
     private String option;  //投票选型  1：支持；  2：反对；  3弃权  
     private String percent;  //处罚百分比
-    private String amount;  //处罚金额
+    private BigDecimal amount;  //处罚金额
     private Integer isFire;  //是否踢出列表  0-否，1-是
     private String version;  //版本号
     private String proposalType;  //提案类型  1：文本提案； 2：升级提案；  3参数提案。
@@ -80,10 +82,10 @@ public class StakingOptRecordListResp {
 		this.percent = percent;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
-	public void setAmount(String amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 	public Integer getIsFire() {

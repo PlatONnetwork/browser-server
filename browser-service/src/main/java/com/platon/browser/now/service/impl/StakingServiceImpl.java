@@ -53,8 +53,8 @@ public class StakingServiceImpl implements StakingService {
 	@Autowired
 	private StatisticCacheService statisticCacheService;
 
-	@Autowired
-	private CustomStakingMapper customStakingMapper;
+//	@Autowired
+//	private CustomStakingMapper customStakingMapper;
 
 	@Autowired
 	private CustomDelegationMapper customDelegationMapper;
@@ -83,15 +83,10 @@ public class StakingServiceImpl implements StakingService {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
-			stakingStatisticNewResp.setStakingDelegationValue(networkStatRedis.getStakingDelegationValue().toString());
-			stakingStatisticNewResp.setBlockReward(networkStatRedis.getBlockReward().toString());
-			stakingStatisticNewResp.setStakingReward(networkStatRedis.getStakingReward().toString());
-			stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue().toString());
 //			String sumExitDelegate = customStakingMapper.selectSumExitDelegate();
 //			String stakingDelegationValue = networkStatRedis.getStakingDelegationValue()
 //					.subtract(new BigDecimal(sumExitDelegate==null?"0":sumExitDelegate)).toString();
 //			stakingStatisticNewResp.setStakingDelegationValue(stakingDelegationValue);
-			stakingStatisticNewResp.setStakingValue(networkStatRedis.getStakingValue().toString());
 		}
 		return stakingStatisticNewResp;
 	}
@@ -164,8 +159,6 @@ public class StakingServiceImpl implements StakingService {
 			} else {
 				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus(), stakings.get(i).getIsSettle()));
 			}
-			/** 设置名称 */
-			aliveStakingListResp.setNodeName(stakings.get(i).getNodeName());
 			/** 质押总数=有效的质押+委托 */
 			String totalValue = stakings.get(i).getStakingHes().add(stakings.get(i).getStakingLocked())
 					.add(stakings.get(i).getStatDelegateValue()).toString();
@@ -210,7 +203,7 @@ public class StakingServiceImpl implements StakingService {
 			/**
 			 * 带提取的委托等于hes+lock
 			 */
-			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReleased().toString());
+			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReleased());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSettle()));
 			historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
 			lists.add(historyStakingListResp);
@@ -237,9 +230,7 @@ public class StakingServiceImpl implements StakingService {
 		if (stakingNode != null) {
 			BeanUtils.copyProperties(stakingNode, resp);
 			resp.setIsInit(stakingNode.getIsInit() == 1);
-			resp.setNodeName(stakingNode.getNodeName());
 			resp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSettle()));
-			resp.setDelegateQty(stakingNode.getStatValidAddrs());
 			resp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 			resp.setBlockQty(stakingNode.getStatBlockQty());
@@ -247,13 +238,14 @@ public class StakingServiceImpl implements StakingService {
 			resp.setVerifierTime(stakingNode.getStatVerifierTime());
 			resp.setJoinTime(stakingNode.getJoinTime().getTime());
 			resp.setDenefitAddr(stakingNode.getBenefitAddr());
+			resp.setStakingIcon(stakingNode.getNodeIcon());
 			/** 只有不是内置节点才计算年化率  */
 			if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
 				resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
 				resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue())
-						.add(stakingNode.getStatStakingRewardValue()).toString());
+						.add(stakingNode.getStatStakingRewardValue()));
 			} else {
-				resp.setRewardValue(stakingNode.getStatFeeRewardValue().toString());
+				resp.setRewardValue(stakingNode.getStatFeeRewardValue());
 				resp.setExpectedIncome("");
 			}
 			String webSite = "";
@@ -280,22 +272,22 @@ public class StakingServiceImpl implements StakingService {
 			 * 没有值则标识查询活跃账户
 			 */
 			if(stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()) {
-				String delegateValue= stakingNode.getStatDelegateValue().toString();
+				resp.setDelegateQty(stakingNode.getStatValidAddrs());
 				/** 候选中则返回单条委托的总金额 **/
-				resp.setDelegateValue(delegateValue);
+				resp.setDelegateValue(stakingNode.getStatDelegateValue());
 				/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
-				String stakingValue = stakingNode.getStakingHes().add(stakingNode.getStakingLocked()).toString();
+				BigDecimal stakingValue = stakingNode.getStakingHes().add(stakingNode.getStakingLocked());
 				resp.setStakingValue(stakingValue);
 				/** 质押总数=有效的质押+委托 */
-				String totalValue = new BigDecimal(stakingValue).add(new BigDecimal(delegateValue)).toString();
+				BigDecimal totalValue = stakingValue.add(stakingNode.getStatDelegateValue());
 				resp.setTotalValue(totalValue);
 			} else {
 				resp.setDelegateQty(stakingNode.getStatInvalidAddrs());
-				resp.setDelegateValue(stakingNode.getStatDelegateValue().toString());
-				resp.setStakingValue(stakingNode.getStakingReduction().toString());
-				String totalValue = new BigDecimal(resp.getStakingValue()).add(new BigDecimal(resp.getDelegateValue())).toString();
+				resp.setDelegateValue(stakingNode.getStatDelegateValue());
+				resp.setStakingValue(stakingNode.getStakingReduction());
+				BigDecimal totalValue = resp.getStakingValue().add(resp.getDelegateValue());
 				resp.setTotalValue(totalValue);
-				resp.setStatDelegateReduction(new BigDecimal(resp.getDelegateValue()).add(new BigDecimal(stakingNode.getStatDelegateReleased().toString())).toString());
+				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
 			}
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
@@ -348,12 +340,12 @@ public class StakingServiceImpl implements StakingService {
 					/** 双签 */
 					case MULTI_SIGN:
 						stakingOptRecordListResp.setPercent(desces[0]);
-						stakingOptRecordListResp.setAmount(desces[1]);
+						stakingOptRecordListResp.setAmount(new BigDecimal(desces[1]));
 						break;
 					/** 出块率低 */
 					case LOW_BLOCK_RATE:
 						stakingOptRecordListResp.setPercent(desces[0]);
-						stakingOptRecordListResp.setAmount(desces[2]);
+						stakingOptRecordListResp.setAmount(new BigDecimal(desces[2]));
 						stakingOptRecordListResp.setIsFire(Integer.parseInt(desces[3]));
 						break;
 					default:
@@ -379,16 +371,15 @@ public class StakingServiceImpl implements StakingService {
 		Page<DelegationStaking> delegationStakings = customDelegationMapper.selectStakingByNodeId(req.getNodeId());
 		for (DelegationStaking delegationStaking: delegationStakings.getResult()) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
+			BeanUtils.copyProperties(delegationStaking, byStakingResp);
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
 		   /**已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
-			byStakingResp.setDelegateLocked(delegationStaking.getDelegateLocked().toString());
-			byStakingResp.setDelegateTotalValue(node.getStatDelegateValue().toString());
-			byStakingResp.setDelegateReleased(delegationStaking.getDelegateReleased().toString());
+			byStakingResp.setDelegateTotalValue(node.getStatDelegateValue());
 			/**
 			 * 委托金额等于has加上实际lock金额
 			 */
-			String delValue = delegationStaking.getDelegateHes()
-					.add(delegationStaking.getDelegateLocked()).toString();
+			BigDecimal delValue = delegationStaking.getDelegateHes()
+					.add(delegationStaking.getDelegateLocked());
 			byStakingResp.setDelegateValue(delValue);
 			lists.add(byStakingResp);
 		}
@@ -412,16 +403,14 @@ public class StakingServiceImpl implements StakingService {
 		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationAddress, byAddressResp);
-			byAddressResp.setDelegateHas(delegationAddress.getDelegateHes().toString());
-			byAddressResp.setDelegateLocked(delegationAddress.getDelegateLocked().toString());
+			byAddressResp.setDelegateHas(delegationAddress.getDelegateHes());
 			/** 委托金额=犹豫期金额加上锁定期金额 */
-			String deleValue = delegationAddress.getDelegateHes()
-					.add(new BigDecimal(byAddressResp.getDelegateLocked())).toString();
+			BigDecimal deleValue = delegationAddress.getDelegateHes()
+					.add(byAddressResp.getDelegateLocked());
 			byAddressResp.setDelegateValue(deleValue);
 //			String deletgateUnLock = delegationAddress.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?"0":delegationAddress.getDelegateHes()
 //					.add(delegationAddress.getDelegateLocked()).toString() ;
-			byAddressResp.setDelegateUnlock(delegationAddress.getDelegateHes().toString());
-			byAddressResp.setDelegateReduction(delegationAddress.getDelegateReleased().toString());
+			byAddressResp.setDelegateUnlock(delegationAddress.getDelegateHes());
 			lists.add(byAddressResp);
 		}
 		/** 统计总数 */

@@ -11,7 +11,6 @@ import com.platon.browser.TestBase;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;

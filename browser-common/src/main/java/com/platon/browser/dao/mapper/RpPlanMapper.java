@@ -1,5 +1,6 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import java.util.List;
@@ -16,7 +17,7 @@ public interface RpPlanMapper {
 
     int insertSelective(RpPlan record);
 
-    List<RpPlan> selectByExample(RpPlanExample example);
+    Page<RpPlan> selectByExample(RpPlanExample example);
 
     RpPlan selectByPrimaryKey(Long id);
 

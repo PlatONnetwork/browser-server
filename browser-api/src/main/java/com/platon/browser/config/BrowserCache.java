@@ -96,7 +96,7 @@ public class BrowserCache {
 	public static void sendMessage(String key,String message) {
 		try {
 			BrowserCache.getWebSocketSet().get(key).getBasicRemote().sendText(message);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("sendMessage error", e);
 		}
 	}

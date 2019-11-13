@@ -1,5 +1,7 @@
 package com.platon.browser.resp.staking;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -13,13 +15,11 @@ import com.platon.browser.config.CustomLatSerializer;
 public class DelegationListByAddressResp {
 	private String nodeId;            //节点id
     private String nodeName;          //节点名称
-    private String delegateValue;     //委托数量
-    private String delegateHas;       //未锁定委托（LAT）
-    private String delegateLocked;    //已锁定委托（LAT）
-    private String allDelegateLocked; //当前验证人总接收的锁定委托量（LAT）
-    private String delegateUnlock;    //已解除委托（LAT） 
-    private String delegateReduction;  //赎回中委托（LAT） 
-    private String delegateTotalValue;// 验证人委托的总金额
+    private BigDecimal delegateValue;     //委托数量
+    private BigDecimal delegateHas;       //未锁定委托（LAT）
+    private BigDecimal delegateLocked;    //已锁定委托（LAT）
+    private BigDecimal delegateUnlock;    //已解除委托（LAT） 
+    private BigDecimal delegateReleased;  //赎回中委托（LAT） 
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -33,54 +33,41 @@ public class DelegationListByAddressResp {
 		this.nodeName = nodeName;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateValue() {
+	public BigDecimal getDelegateValue() {
 		return delegateValue;
 	}
-	public void setDelegateValue(String delegateValue) {
+	public void setDelegateValue(BigDecimal delegateValue) {
 		this.delegateValue = delegateValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateHas() {
+	public BigDecimal getDelegateHas() {
 		return delegateHas;
 	}
-	public void setDelegateHas(String delegateHas) {
+	public void setDelegateHas(BigDecimal delegateHas) {
 		this.delegateHas = delegateHas;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateLocked() {
+	public BigDecimal getDelegateLocked() {
 		return delegateLocked;
 	}
-	public void setDelegateLocked(String delegateLocked) {
+	public void setDelegateLocked(BigDecimal delegateLocked) {
 		this.delegateLocked = delegateLocked;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getAllDelegateLocked() {
-		return allDelegateLocked;
-	}
-	public void setAllDelegateLocked(String allDelegateLocked) {
-		this.allDelegateLocked = allDelegateLocked;
-	}
-	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateUnlock() {
+	public BigDecimal getDelegateUnlock() {
 		return delegateUnlock;
 	}
-	public void setDelegateUnlock(String delegateUnlock) {
+	public void setDelegateUnlock(BigDecimal delegateUnlock) {
 		this.delegateUnlock = delegateUnlock;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateReduction() {
-		return delegateReduction;
+	public BigDecimal getDelegateReleased() {
+		return delegateReleased;
 	}
-	public void setDelegateReduction(String delegateReduction) {
-		this.delegateReduction = delegateReduction;
+	public void setDelegateReleased(BigDecimal delegateReleased) {
+		this.delegateReleased = delegateReleased;
 	}
-	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateTotalValue() {
-		return delegateTotalValue;
-	}
-	public void setDelegateTotalValue(String delegateTotalValue) {
-		this.delegateTotalValue = delegateTotalValue;
-	}
+	
     
     
 }

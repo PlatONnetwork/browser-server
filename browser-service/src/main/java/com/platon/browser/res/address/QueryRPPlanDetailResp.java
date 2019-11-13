@@ -1,5 +1,6 @@
 package com.platon.browser.res.address;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -13,32 +14,32 @@ import com.platon.browser.config.CustomLatSerializer;
  *  @data 2019年8月31日
  */
 public class QueryRPPlanDetailResp {
-	private String restrictingBalance;           //锁仓余额(单位:LAT)
-	private String stakingValue;  //锁仓质押\委托(单位:LAT)
-	private String underReleaseValue;        //欠释放(单位:LAT)
+	private BigDecimal restrictingBalance;           //锁仓余额(单位:LAT)
+	private BigDecimal stakingValue;  //锁仓质押\委托(单位:LAT)
+	private BigDecimal underReleaseValue;        //欠释放(单位:LAT)
 	private List<DetailsRPPlanResp> rpPlans;  //锁仓计划
 	private Long total;
-	private String totalValue;//总计锁仓
+	private BigDecimal totalValue;//总计锁仓
 	
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getRestrictingBalance() {
+	public BigDecimal getRestrictingBalance() {
 		return restrictingBalance;
 	}
-	public void setRestrictingBalance(String restrictingBalance) {
+	public void setRestrictingBalance(BigDecimal restrictingBalance) {
 		this.restrictingBalance = restrictingBalance;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getStakingValue() {
+	public BigDecimal getStakingValue() {
 		return stakingValue;
 	}
-	public void setStakingValue(String stakingValue) {
+	public void setStakingValue(BigDecimal stakingValue) {
 		this.stakingValue = stakingValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getUnderReleaseValue() {
+	public BigDecimal getUnderReleaseValue() {
 		return underReleaseValue;
 	}
-	public void setUnderReleaseValue(String underReleaseValue) {
+	public void setUnderReleaseValue(BigDecimal underReleaseValue) {
 		this.underReleaseValue = underReleaseValue;
 	}
 
@@ -57,10 +58,10 @@ public class QueryRPPlanDetailResp {
 		this.total = total;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getTotalValue() {
+	public BigDecimal getTotalValue() {
 		return totalValue;
 	}
-	public void setTotalValue(String totalValue) {
+	public void setTotalValue(BigDecimal totalValue) {
 		this.totalValue = totalValue;
 	}
 	

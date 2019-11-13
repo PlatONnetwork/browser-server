@@ -11,7 +11,6 @@ import com.platon.browser.now.service.StakingService;
 import com.platon.browser.req.staking.AliveStakingListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.res.home.BlockListNewResp;
 import com.platon.browser.res.home.BlockStatisticNewResp;
 import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.StakingListNewResp;
@@ -68,16 +67,6 @@ public class StompPushJob {
     	BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
     	BaseResp<BlockStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
 		messagingTemplate.convertAndSend("/topic/block/statistic/new", resp);
-    }
-    
-    /**
-     *	 推送首页区块相关信息
-     */
-//    @Scheduled(cron="0/3 * * * * ?")
-    public void pushBlockListNew() {
-    	List<BlockListNewResp> lists = homeService.blockListNew();
-		BaseResp<List<BlockListNewResp>> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);
-		messagingTemplate.convertAndSend("/topic/block/list/new", resp);
     }
     
     /**

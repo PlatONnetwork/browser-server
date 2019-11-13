@@ -44,7 +44,7 @@ public class BeanConvertUtil {
         return returnList;
     }
 
-    public static Map objectToMap(Object object) {
+    public static Map<?, ?> objectToMap(Object object) {
         return beanConvert(object, Map.class);
     }
 

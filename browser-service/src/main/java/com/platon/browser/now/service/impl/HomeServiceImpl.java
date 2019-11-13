@@ -88,13 +88,13 @@ public class HomeServiceImpl implements HomeService {
 			/** 存在区块信息则返回区块号 */
 			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 			constructor.must(new ESQueryBuilders().term("num", number));
-			ESResult<Block> blockList = new ESResult<>();
+			Block block = null;
 			try {
-				blockList = blockESRepository.search(constructor, Block.class, 1, 1);
+				block = blockESRepository.get(String.valueOf(number), Block.class);
 			} catch (IOException e) {
 				log.error("获取区块错误。", e);
 			}
-			if(blockList.getTotal().intValue() > 0) {
+			if(block != null) {
 				result.setType("block");
 				queryNavigationStructResp.setNumber(number);
 			}
@@ -212,9 +212,6 @@ public class HomeServiceImpl implements HomeService {
 		/** 查询redis统计信息并转换对应返回对象 */
 		BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
 		chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
-		chainStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue().toString());
-		chainStatisticNewResp.setTurnValue(networkStatRedis.getTurnValue().toString());
-		chainStatisticNewResp.setStakingDelegationValue(networkStatRedis.getStakingDelegationValue().toString());
 		Long bNumber = networkStatRedis.getCurNumber();
 		/** 查询缓存最新的八条区块信息 */
 		List<Block> items = statisticCacheService.getBlockCache(0,8);
@@ -291,8 +288,8 @@ public class HomeServiceImpl implements HomeService {
 				stakingListResp.setExpectedIncome("");
 			}
 			/** 质押总数=有效的质押+委托 */
-			String totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked())
-					.add(nodes.get(i).getStatDelegateValue()).toString();
+			BigDecimal totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked())
+					.add(nodes.get(i).getStatDelegateValue());
 			stakingListResp.setTotalValue(totalValue);
 			stakingListResp.setRanking(i+1);
 			lists.add(stakingListResp);

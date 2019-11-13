@@ -1,5 +1,7 @@
 package com.platon.browser.res.block;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -20,7 +22,7 @@ public class BlockListResp {
     private String nodeId;
     private String gasUsed;
     private String statTxGasLimit;
-    private String blockReward;
+    private BigDecimal blockReward;
 	public Long getNumber() {
 		return number;
 	}
@@ -76,10 +78,10 @@ public class BlockListResp {
 		this.statTxGasLimit = statTxGasLimit;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getBlockReward() {
+	public BigDecimal getBlockReward() {
 		return blockReward;
 	}
-	public void setBlockReward(String blockReward) {
+	public void setBlockReward(BigDecimal blockReward) {
 		this.blockReward = blockReward;
 	}
     

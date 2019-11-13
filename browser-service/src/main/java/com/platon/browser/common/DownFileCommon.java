@@ -1,6 +1,5 @@
 package com.platon.browser.common;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +12,6 @@ import java.io.IOException;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Slf4j
 @Service
 public class DownFileCommon {
 

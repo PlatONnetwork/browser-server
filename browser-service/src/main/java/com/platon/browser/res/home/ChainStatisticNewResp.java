@@ -1,5 +1,6 @@
 package com.platon.browser.res.home;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,9 +20,9 @@ public class ChainStatisticNewResp {
 	private Integer txQty; // 总的交易数
 	private Integer currentTps; // 当前的TPS
 	private Integer maxTps; // 最大交易TPS
-	private String turnValue; // 当前流通量
-	private String issueValue; // 当前发行量
-	private String stakingDelegationValue; // 当前质押总数=有效的质押+委托
+	private BigDecimal turnValue; // 当前流通量
+	private BigDecimal issueValue; // 当前发行量
+	private BigDecimal stakingDelegationValue; // 当前质押总数=有效的质押+委托
 	private Integer addressQty; // 地址数
 	private Integer proposalQty; // 总提案数
 	private Integer doingProposalQty; // 进行中提案数
@@ -64,24 +65,24 @@ public class ChainStatisticNewResp {
 		this.maxTps = maxTps;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getTurnValue() {
+	public BigDecimal getTurnValue() {
 		return turnValue;
 	}
-	public void setTurnValue(String turnValue) {
+	public void setTurnValue(BigDecimal turnValue) {
 		this.turnValue = turnValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getIssueValue() {
+	public BigDecimal getIssueValue() {
 		return issueValue;
 	}
-	public void setIssueValue(String issueValue) {
+	public void setIssueValue(BigDecimal issueValue) {
 		this.issueValue = issueValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getStakingDelegationValue() {
+	public BigDecimal getStakingDelegationValue() {
 		return stakingDelegationValue;
 	}
-	public void setStakingDelegationValue(String stakingDelegationValue) {
+	public void setStakingDelegationValue(BigDecimal stakingDelegationValue) {
 		this.stakingDelegationValue = stakingDelegationValue;
 	}
 	public Integer getAddressQty() {

@@ -31,6 +31,7 @@ public class ESQueryBuilderConstructor {
 	private List<ESCriterion> mustCriterions = new ArrayList<>();
 	private List<ESCriterion> shouldCriterions = new ArrayList<>();
 	private List<ESCriterion> mustNotCriterions = new ArrayList<>();
+	private List<BoolQueryBuilder> queryBuilders = new ArrayList<>();
 
 	//构造builder
     public QueryBuilder listBuilders() {
@@ -62,6 +63,12 @@ public class ESQueryBuilderConstructor {
 					for (QueryBuilder builder : criterion.listBuilders()) {
 						queryBuilder = boolQueryBuilder.mustNot(builder);
 					}
+				}
+			}
+			
+			if (!CollectionUtils.isEmpty(queryBuilders)) {
+				for (BoolQueryBuilder boolQueryBuilder2  : queryBuilders) {
+					queryBuilder = boolQueryBuilder.must(boolQueryBuilder2);
 				}
 			}
 			return queryBuilder;
@@ -98,6 +105,15 @@ public class ESQueryBuilderConstructor {
 		return this;
 	}
 
+    /**
+     * 增加复杂条件表达式
+     */
+    public ESQueryBuilderConstructor build(BoolQueryBuilder boolQueryBuilder){
+        if(boolQueryBuilder!=null){
+        	queryBuilders.add(boolQueryBuilder);
+		}
+		return this;
+	}
 
 	public int getSize() {
 		return size;

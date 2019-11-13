@@ -98,14 +98,4 @@ public class AppDocTransactionControllerTest {
     		.andExpect(status().isOk()).andDo(print());
     }
     
-    @Test
-    public void transactionDetailNavigate() throws Exception{
-    	String requestBody = 
-    			"{\"txHash\":\"0x10eab2c84392db35f9caf87c19c183a19f12462c0935a5b9a2f502ef32773d19\",\"direction\":\"next\"}";
-    	mockMvc.perform(MockMvcRequestBuilders.post("/transaction/transactionDetailNavigate")
-    		.contentType(MediaType.APPLICATION_JSON_UTF8)
-    		.content(requestBody.getBytes()))
-    	.andExpect(status().isOk()).andDo(print());
-    }
-    
 }

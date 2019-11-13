@@ -1,5 +1,6 @@
 package com.platon.browser.res.transaction;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -23,9 +24,9 @@ public class TransactionDetailsResp {
     private Long blockNumber;    //交易所在区块高度
     private String gasLimit;           //能量限制
     private String gasUsed;          //能量消耗
-    private String gasPrice;        //能量价格
-    private String value;            //金额(单位:von)
-    private String actualTxCost;      //交易费用(单位:von)
+    private BigDecimal gasPrice;        //能量价格
+    private BigDecimal value;            //金额(单位:von)
+    private BigDecimal actualTxCost;      //交易费用(单位:von)
     private String txType;              //交易类型
     private String input;               //附加输入数据
     private String txInfo;   //附加输入数据解析后的结构
@@ -34,7 +35,7 @@ public class TransactionDetailsResp {
     private Boolean last;              //是否最后一条记录
     private String receiveType;  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
     private String RPAccount;           //锁仓计划的地址
-    private String RPNum;
+    private BigDecimal RPNum;
     private List<TransactionDetailsRPPlanResp> RPPlan;
     private List<TransactionDetailsEvidencesResp> evidences;
     private String nodeId;              //节点id
@@ -45,8 +46,8 @@ public class TransactionDetailsResp {
     private String website;             //节点的第三方主页(有长度限制，表示该节点的主页)
     private String details;             //节点的描述(有长度限制，表示该节点的描述)
     private String programVersion;      //程序的真实版本，治理rpc获取
-    private String applyAmount;         //申请赎回的金额
-    private String redeemLocked;        //赎回中被锁定的金额
+    private BigDecimal applyAmount;         //申请赎回的金额
+    private BigDecimal redeemLocked;        //赎回中被锁定的金额
     private Integer redeemStatus;      //赎回状态， 1： 退回中   2：退回成功 
     private String redeemUnLockedBlock; //预计赎回到账的区块
     private String proposalUrl;         //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
@@ -59,7 +60,7 @@ public class TransactionDetailsResp {
     
     private String evidence;//证据
     private Integer reportType;//举报类型:1：区块双签
-    private String reportRewards;//举报奖励
+    private BigDecimal reportRewards;//举报奖励
     private Integer reportStatus;//举报状态 \r\n1：失败\r\n2：成功
     
     private String pipNum;//提案pip编号
@@ -69,7 +70,7 @@ public class TransactionDetailsResp {
     private String preHash;// 上一条记录
     private String nextHash;// 下一条记录
     
-    private String txAmount; //惨剧费用
+    private BigDecimal txAmount; //惨剧费用
     
 
 	public String getTxHash() {
@@ -127,24 +128,24 @@ public class TransactionDetailsResp {
 		this.gasUsed = gasUsed;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getGasPrice() {
+	public BigDecimal getGasPrice() {
 		return gasPrice;
 	}
-	public void setGasPrice(String gasPrice) {
+	public void setGasPrice(BigDecimal gasPrice) {
 		this.gasPrice = gasPrice;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
-	public void setValue(String value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getActualTxCost() {
+	public BigDecimal getActualTxCost() {
 		return actualTxCost;
 	}
-	public void setActualTxCost(String actualTxCost) {
+	public void setActualTxCost(BigDecimal actualTxCost) {
 		this.actualTxCost = actualTxCost;
 	}
 	public String getTxType() {
@@ -196,10 +197,10 @@ public class TransactionDetailsResp {
 		RPAccount = rPAccount;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getRPNum() {
+	public BigDecimal getRPNum() {
 		return RPNum;
 	}
-	public void setRPNum(String rPNum) {
+	public void setRPNum(BigDecimal rPNum) {
 		RPNum = rPNum;
 	}
 	public List<TransactionDetailsRPPlanResp> getRPPlan() {
@@ -258,17 +259,17 @@ public class TransactionDetailsResp {
 		this.programVersion = programVersion;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getApplyAmount() {
+	public BigDecimal getApplyAmount() {
 		return applyAmount;
 	}
-	public void setApplyAmount(String applyAmount) {
+	public void setApplyAmount(BigDecimal applyAmount) {
 		this.applyAmount = applyAmount;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getRedeemLocked() {
+	public BigDecimal getRedeemLocked() {
 		return redeemLocked;
 	}
-	public void setRedeemLocked(String redeemLocked) {
+	public void setRedeemLocked(BigDecimal redeemLocked) {
 		this.redeemLocked = redeemLocked;
 	}
 	public Integer getRedeemStatus() {
@@ -334,10 +335,10 @@ public class TransactionDetailsResp {
 		this.reportType = reportType;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getReportRewards() {
+	public BigDecimal getReportRewards() {
 		return reportRewards;
 	}
-	public void setReportRewards(String reportRewards) {
+	public void setReportRewards(BigDecimal reportRewards) {
 		this.reportRewards = reportRewards;
 	}
 	public Integer getReportStatus() {
@@ -377,10 +378,10 @@ public class TransactionDetailsResp {
 		this.nextHash = nextHash;
 	}
     @JsonSerialize(using = CustomLatSerializer.class)
-	public String getTxAmount() {
+	public BigDecimal getTxAmount() {
 		return txAmount;
 	}
-	public void setTxAmount(String txAmount) {
+	public void setTxAmount(BigDecimal txAmount) {
 		this.txAmount = txAmount;
 	}
 	public String getVoteStatus() {

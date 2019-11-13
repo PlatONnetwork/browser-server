@@ -27,6 +27,7 @@ import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,13 +39,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  区块方法逻辑具体实现
@@ -74,7 +77,7 @@ public class BlockServiceImpl implements BlockService {
 	public RespPage<BlockListResp> blockList(PageReq req) {
 		long startTime = System.currentTimeMillis();
 		RespPage<BlockListResp> respPage = new RespPage<>();
-		List<BlockListResp> lists = new LinkedList<>();
+		List<BlockListResp> lists = new ArrayList<>();
 		/** 查询现阶段最大区块数 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Long bNumber = networkStatRedis.getCurNumber();
@@ -105,10 +108,7 @@ public class BlockServiceImpl implements BlockService {
 				items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 			}
 			logger.debug("perform-blockList,time4:{}", System.currentTimeMillis() - startTime);
-			for (Block blockRedis:items) {
-				BlockListResp blockListNewResp = this.transferBlockListResp(blockRedis);
-				lists.add(blockListNewResp);
-			}
+			lists.addAll(this.transferBlockListResp(items));
 		} else {
 			/** 查询超过五十万条数据，根据区块号倒序 */
 			ESResult<Block> blocks = new ESResult<>();
@@ -119,10 +119,8 @@ public class BlockServiceImpl implements BlockService {
 			} catch (IOException e) {
 				logger.error("获取区块错误。", e);
 			}
-			for(Block block:blocks.getRsData()) {
-				BlockListResp blockListNewResp = this.transferBlockListResp(block);
-				lists.add(blockListNewResp);
-			}
+			lists.addAll(this.transferBlockListResp(blocks.getRsData()));
+			
 		}
 		bNumber = lists.get(0).getNumber();
 		logger.debug("perform-blockList,time5:{}", System.currentTimeMillis() - startTime);
@@ -135,24 +133,40 @@ public class BlockServiceImpl implements BlockService {
 		return respPage;
 	}
 	
-	private BlockListResp transferBlockListResp(Block block) {
-		BlockListResp blockListResp = new BlockListResp();
-		BeanUtils.copyProperties(block, blockListResp);
-		blockListResp.setBlockReward(block.getReward().toString());
-		blockListResp.setNumber(block.getNum());
-		blockListResp.setStatTxGasLimit(block.getTxGasLimit().toString());
-		blockListResp.setStatTxQty(block.getTxQty());
-		blockListResp.setServerTime(new Date().getTime());
-		blockListResp.setTimestamp(block.getTime().getTime());
-		blockListResp.setGasUsed(block.getGasUsed().toString());
-		blockListResp.setNodeName(commonService.getNodeName(block.getNodeId()));
-		return blockListResp;
+	/**
+	 * 区块列表统一转换
+	 * @method transferBlockListResp
+	 * @param block
+	 * @return
+	 */
+	private List<BlockListResp> transferBlockListResp(List<Block> blocks) {
+		List<BlockListResp> blockListResps = new ArrayList<>();
+		Map<String, String> nodes = new HashMap<>();
+		for(Block block : blocks) {
+			BlockListResp blockListResp = new BlockListResp();
+			BeanUtils.copyProperties(block, blockListResp);
+			blockListResp.setBlockReward(new BigDecimal(block.getReward()));
+			blockListResp.setNumber(block.getNum());
+			blockListResp.setStatTxGasLimit(block.getTxGasLimit());
+			blockListResp.setStatTxQty(block.getTxQty());
+			blockListResp.setServerTime(new Date().getTime());
+			blockListResp.setTimestamp(block.getTime().getTime());
+			String nodeName = nodes.get(block.getNodeId());
+			if(StringUtils.isNotBlank(nodeName)) {
+				blockListResp.setNodeName(nodeName);
+			} else {
+				blockListResp.setNodeName(commonService.getNodeName(block.getNodeId()));
+				nodes.put(block.getNodeId(), blockListResp.getNodeName());
+			}
+			blockListResps.add(blockListResp);
+		}
+		nodes = null;
+		return blockListResps;
 	}
 
 	@Override
 	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
 		/** 根据nodeId 查询区块列表，以区块号倒序  */
-		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
 		constructor.setDesc("num");
@@ -164,9 +178,14 @@ public class BlockServiceImpl implements BlockService {
 		}
 		/** 初始化返回对象 */
 		RespPage<BlockListResp> respPage = new RespPage<>();
-		List<BlockListResp> lists = new LinkedList<>();
-		for (Block block : blocks.getRsData()) {
-			BlockListResp blockListResp = this.transferBlockListResp(block);
+		List<BlockListResp> lists = new ArrayList<>();
+		for(Block block : blocks.getRsData()) {
+			BlockListResp blockListResp = new BlockListResp();
+			blockListResp.setBlockReward(new BigDecimal(block.getReward()));
+			blockListResp.setNumber(block.getNum());
+			blockListResp.setStatTxQty(block.getTxQty());
+			blockListResp.setServerTime(new Date().getTime());
+			blockListResp.setTimestamp(block.getTime().getTime());
 			lists.add(blockListResp);
 		}
 		/** 设置返回的分页数据 */
@@ -269,19 +288,17 @@ public class BlockServiceImpl implements BlockService {
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {
 			BeanUtils.copyProperties(block, blockDetailResp);
-			blockDetailResp.setBlockReward(block.getReward().toString());
+			blockDetailResp.setBlockReward(new BigDecimal(block.getReward()));
 			blockDetailResp.setDelegateQty(block.getDQty());
 			blockDetailResp.setExtraData(block.getExtra());
 			blockDetailResp.setNumber(block.getNum());
 			blockDetailResp.setParentHash(block.getPHash());
 			blockDetailResp.setProposalQty(block.getPQty());
 			blockDetailResp.setStakingQty(block.getSQty());
-			blockDetailResp.setStatTxGasLimit(block.getTxGasLimit().toString());
+			blockDetailResp.setStatTxGasLimit(block.getTxGasLimit());
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
 			blockDetailResp.setTransferQty(block.getTranQty());
-			blockDetailResp.setGasLimit(block.getGasLimit().toString());
-			blockDetailResp.setGasUsed(block.getGasUsed().toString());
 			
 
 			/** 取上一个区块,如果存在则设置标识和hash */

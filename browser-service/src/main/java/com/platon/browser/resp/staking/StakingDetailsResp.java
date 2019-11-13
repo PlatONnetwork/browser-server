@@ -1,5 +1,7 @@
 package com.platon.browser.resp.staking;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -14,9 +16,9 @@ public class StakingDetailsResp {
 	private String nodeName;            //验证人名称
     private String stakingIcon;         //验证人图标
     private Integer status;              //状态   1:候选中  2:活跃中  3:出块中
-    private String totalValue;          //质押总数=有效的质押+委托
-    private String delegateValue;       //委托总数
-    private String stakingValue;        //质押总数
+    private BigDecimal totalValue;          //质押总数=有效的质押+委托
+    private BigDecimal delegateValue;       //委托总数
+    private BigDecimal stakingValue;        //质押总数
     private Integer delegateQty;         //委托人数
     private Integer slashLowQty;         //低出块率举报次数
     private Integer slashMultiQty;       //多签举报次数
@@ -25,7 +27,7 @@ public class StakingDetailsResp {
     private String expectedIncome;      //预计年收化率（从验证人加入时刻开始计算）
     private Long joinTime;            //加入时间
     private Integer verifierTime;        //进入共识验证轮次数
-    private String rewardValue;         //累计的收益 
+    private BigDecimal rewardValue;         //累计的收益 
     private String nodeId;              //节点id
     private String stakingAddr;         //发起质押的账户地址
     private String denefitAddr;         //收益地址
@@ -34,7 +36,7 @@ public class StakingDetailsResp {
     private String externalId;          //身份证id
     private String externalUrl;          //身份证id连接
     private Long stakingBlockNum;     //最新的质押交易块高
-    private String statDelegateReduction;//待提取的委托
+    private BigDecimal statDelegateReduction;//待提取的委托
     private Long leaveTime;  //退出时间
     private Boolean isInit;          //是否为初始节点 
 	public String getNodeName() {
@@ -56,24 +58,24 @@ public class StakingDetailsResp {
 		this.status = status;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getTotalValue() {
+	public BigDecimal getTotalValue() {
 		return totalValue;
 	}
-	public void setTotalValue(String totalValue) {
+	public void setTotalValue(BigDecimal totalValue) {
 		this.totalValue = totalValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateValue() {
+	public BigDecimal getDelegateValue() {
 		return delegateValue;
 	}
-	public void setDelegateValue(String delegateValue) {
+	public void setDelegateValue(BigDecimal delegateValue) {
 		this.delegateValue = delegateValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getStakingValue() {
+	public BigDecimal getStakingValue() {
 		return stakingValue;
 	}
-	public void setStakingValue(String stakingValue) {
+	public void setStakingValue(BigDecimal stakingValue) {
 		this.stakingValue = stakingValue;
 	}
 	public Integer getDelegateQty() {
@@ -125,10 +127,10 @@ public class StakingDetailsResp {
 		this.verifierTime = verifierTime;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getRewardValue() {
+	public BigDecimal getRewardValue() {
 		return rewardValue;
 	}
-	public void setRewardValue(String rewardValue) {
+	public void setRewardValue(BigDecimal rewardValue) {
 		this.rewardValue = rewardValue;
 	}
 	public String getNodeId() {
@@ -174,10 +176,10 @@ public class StakingDetailsResp {
 		this.stakingBlockNum = stakingBlockNum;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getStatDelegateReduction() {
+	public BigDecimal getStatDelegateReduction() {
 		return statDelegateReduction;
 	}
-	public void setStatDelegateReduction(String statDelegateReduction) {
+	public void setStatDelegateReduction(BigDecimal statDelegateReduction) {
 		this.statDelegateReduction = statDelegateReduction;
 	}
 	public Long getLeaveTime() {

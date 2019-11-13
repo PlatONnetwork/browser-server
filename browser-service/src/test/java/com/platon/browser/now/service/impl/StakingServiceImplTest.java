@@ -19,7 +19,6 @@ import com.platon.browser.resp.staking.AliveStakingListResp;
 import com.platon.browser.resp.staking.DelegationListByAddressResp;
 import com.platon.browser.resp.staking.DelegationListByStakingResp;
 import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingChangeNewResp;
 import com.platon.browser.resp.staking.StakingDetailsResp;
 import com.platon.browser.resp.staking.StakingOptRecordListResp;
 import com.platon.browser.resp.staking.StakingStatisticNewResp;

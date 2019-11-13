@@ -1,5 +1,7 @@
 package com.platon.browser.res.transaction;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -17,8 +19,8 @@ public class TransactionListResp {
 	private String txHash;    //交易hash
     private String from;      //发送方地址（操作地址）
     private String to;        //接收方地址
-    private String value;          //金额(单位:von)
-    private String actualTxCost;    //交易费用(单位:von)
+    private BigDecimal value;          //金额(单位:von)
+    private BigDecimal actualTxCost;    //交易费用(单位:von)
     private String txType;             //交易类型 0：转账  1：合约发布  2：合约调用    5：MPC交易
     private Long serverTime;    //服务器时间
     private Long timestamp;//出块时间
@@ -46,17 +48,17 @@ public class TransactionListResp {
 		this.to = to;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
-	public void setValue(String value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getActualTxCost() {
+	public BigDecimal getActualTxCost() {
 		return actualTxCost;
 	}
-	public void setActualTxCost(String actualTxCost) {
+	public void setActualTxCost(BigDecimal actualTxCost) {
 		this.actualTxCost = actualTxCost;
 	}
 	public String getTxType() {

@@ -37,6 +37,8 @@ import com.platon.browser.util.*;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -130,12 +132,13 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.should(new ESQueryBuilders().term("from", req.getAddress()));
-		constructor.should(new ESQueryBuilders().term("to", req.getAddress()));
+		
 		ESResult<Transaction> items = new ESResult<>();
 		if (req.getTxType() != null && !req.getTxType().isEmpty()) {
 			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
 		}
+		constructor.build(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
+				.should(QueryBuilders.termQuery("to", req.getAddress())));
 		constructor.setDesc("seq");
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
@@ -155,11 +158,10 @@ public class TransactionServiceImpl implements TransactionService {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
-            transactionListResp.setActualTxCost(transaction.getCost().toString());
+            transactionListResp.setActualTxCost(new BigDecimal(transaction.getCost()));
             transactionListResp.setBlockNumber(transaction.getNum());
             transactionListResp.setReceiveType(String.valueOf(transaction.getToType()));
             transactionListResp.setTxType(String.valueOf(transaction.getType()));
-            transactionListResp.setValue(transaction.getValue().toString());
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
             if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
@@ -181,9 +183,9 @@ public class TransactionServiceImpl implements TransactionService {
         /** 限制最多导出3万条记录 */
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.should(new ESQueryBuilders().term("from", address));
-		constructor.should(new ESQueryBuilders().term("to", address));
 		constructor.must(new ESQueryBuilders().range("time", new Date(date).getTime(), currentServerTime.getTime()));
+		constructor.build(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
+				.should(QueryBuilders.termQuery("to", address)));
 		ESResult<Transaction> items = new ESResult<>();
 		constructor.setDesc("seq");
 		try {
@@ -260,14 +262,12 @@ public class TransactionServiceImpl implements TransactionService {
     	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(transaction != null) {
     		BeanUtils.copyProperties(transaction, resp);
-    		resp.setActualTxCost(transaction.getCost().toString());
+    		resp.setActualTxCost(new BigDecimal(transaction.getCost()));
     		resp.setBlockNumber(transaction.getNum());
     		resp.setGasLimit(transaction.getGasLimit().toString());
-    		resp.setGasPrice(transaction.getGasPrice().toString());
     		resp.setGasUsed(transaction.getGasUsed().toString());
     		resp.setReceiveType(String.valueOf(transaction.getToType()));
     		resp.setTxType(String.valueOf(transaction.getType()));
-    		resp.setValue(transaction.getValue().toString());
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
     		resp.setServerTime(new Date().getTime());
@@ -333,7 +333,6 @@ public class TransactionServiceImpl implements TransactionService {
 		    		/** 创建验证人 */
 					case STAKE_CREATE:
 						StakeCreateParam createValidatorParam = JSONObject.parseObject(txInfo, StakeCreateParam.class);
-						resp.setTxAmount(createValidatorParam.getAmount().toString());
 						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
 						resp.setNodeId(createValidatorParam.getNodeId());
 						resp.setNodeName(createValidatorParam.getNodeName());
@@ -341,7 +340,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setWebsite(createValidatorParam.getWebsite());
 						resp.setDetails(createValidatorParam.getDetails());
 						resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
-						resp.setTxAmount(createValidatorParam.getAmount().toString());
+						resp.setTxAmount(createValidatorParam.getAmount());
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//编辑验证人
@@ -359,7 +358,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case STAKE_INCREASE:
 						StakeIncreaseParam increaseStakingParam = JSONObject.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
-						resp.setTxAmount(increaseStakingParam.getAmount().toString());
+						resp.setTxAmount(increaseStakingParam.getAmount());
 						resp.setNodeName(this.setStakingName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
 						break;
 					//退出验证人
@@ -368,13 +367,13 @@ public class TransactionServiceImpl implements TransactionService {
 						StakeExitParam exitValidatorParam = JSONObject.parseObject(txInfo, StakeExitParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
 						resp.setNodeName(this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
-						resp.setApplyAmount(exitValidatorParam.getAmount().toString());
+						resp.setApplyAmount(exitValidatorParam.getAmount());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
 						stakingKeyE.setStakingBlockNum(exitValidatorParam.getStakingBlockNum().longValue());
 						Staking staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
 						if(staking!=null) {
-							resp.setRedeemLocked(staking.getStakingReduction().toString());
+							resp.setRedeemLocked(staking.getStakingReduction());
 							//只有已退出，则金额才会退回到账户
 							if(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
 								resp.setRedeemStatus(RedeemStatusEnum.EXITED.getCode());
@@ -391,7 +390,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case DELEGATE_CREATE:
 						DelegateCreateParam delegateParam = JSONObject.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
-						resp.setTxAmount(delegateParam.getAmount().toString());
+						resp.setTxAmount(delegateParam.getAmount());
 						resp.setNodeName(this.setStakingName(delegateParam.getNodeId(), delegateParam.getNodeName()));
 						break;
 					//委托赎回
@@ -400,8 +399,8 @@ public class TransactionServiceImpl implements TransactionService {
 						// 通过txHash关联un_delegation表
 						DelegateExitParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateExitParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
-						resp.setApplyAmount(unDelegateParam.getAmount().toString());
-						resp.setTxAmount(unDelegateParam.getAmount().toString());
+						resp.setApplyAmount(unDelegateParam.getAmount());
+						resp.setTxAmount(unDelegateParam.getAmount());
 						resp.setNodeName(this.setStakingName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						break;
 					case PROPOSAL_TEXT:
@@ -476,8 +475,8 @@ public class TransactionServiceImpl implements TransactionService {
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 						if(slash != null) {
-							resp.setReportRewards(slash.getReward().toString());
-							resp.setReportStatus(slash.getIsQuit());
+							resp.setReportRewards(slash.getReward());
+							resp.setReportStatus(slash.getIsQuit().intValue() == 1?2:1);
 						}
 						resp.setReportType(reportValidatorParam.getType().intValue());
 						resp.setEvidences(transactionDetailsEvidencesResps);
@@ -491,7 +490,7 @@ public class TransactionServiceImpl implements TransactionService {
 						for(RestrictingCreateParam.RestrictingPlan p:createRestrictingParam.getPlans()) {
 							TransactionDetailsRPPlanResp transactionDetailsRPPlanResp = new TransactionDetailsRPPlanResp();
 							amountSum = amountSum.add(p.getAmount());
-							transactionDetailsRPPlanResp.setAmount(p.getAmount().toString());
+							transactionDetailsRPPlanResp.setAmount(p.getAmount());
 							transactionDetailsRPPlanResp.setEpoch(p.getEpoch());
 							//锁仓周期对应快高  结算周期 * epoch
 							transactionDetailsRPPlanResp.setBlockNumber(blockChainConfig.getSettlePeriodBlockCount()
@@ -499,7 +498,7 @@ public class TransactionServiceImpl implements TransactionService {
 							rpPlanResps.add(transactionDetailsRPPlanResp);
 						}
 						//累加
-						resp.setRPNum(amountSum.toString());
+						resp.setRPNum(amountSum);
 						resp.setRPPlan(rpPlanResps);
 						break;
 				default:

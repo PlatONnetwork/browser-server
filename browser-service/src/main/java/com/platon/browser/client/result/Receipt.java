@@ -58,7 +58,7 @@ public class Receipt {
         RlpList group = (RlpList) b.getValues().get(0);
         RlpString out = (RlpString) group.getValues().get(0);
         String res = new String(out.getBytes());
-        BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
+        BaseResponse<?> response = JSONUtil.parseObject(res, BaseResponse.class);
         if(response==null) {
             logStatus=FAILURE;
             return;

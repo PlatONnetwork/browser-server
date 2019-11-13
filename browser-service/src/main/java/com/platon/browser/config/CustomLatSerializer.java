@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.platon.browser.util.EnergonUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.web3j.utils.Convert;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
@@ -17,11 +17,11 @@ import java.math.RoundingMode;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-public class CustomLatSerializer  extends JsonSerializer<String>{
+public class CustomLatSerializer  extends JsonSerializer<BigDecimal>{
 
 	@Override
-	public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-		if(StringUtils.isNotBlank(value)) {
+	public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+		if(value != null) {
 			/**	金额转换 von统一转换成小数点12位向下取整lat */
 			String transEner = EnergonUtil.format(Convert.fromVon(value, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 12);
 			gen.writeString(transEner);

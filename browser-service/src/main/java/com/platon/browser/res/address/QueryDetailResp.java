@@ -1,5 +1,7 @@
 package com.platon.browser.res.address;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -12,21 +14,21 @@ import com.platon.browser.config.CustomLatSerializer;
  */
 public class QueryDetailResp {
 	private Integer type;                //地址详情  1：账号   2：合约   3：内置合约
-    private String balance;             //余额(单位:LAT)
-    private String restrictingBalance;  //锁仓余额(单位:LAT)
-    private String stakingValue;        //质押的金额
-    private String delegateValue;       //委托的金额
-    private String redeemedValue;       //赎回中的金额
+    private BigDecimal balance;             //余额(单位:LAT)
+    private BigDecimal restrictingBalance;  //锁仓余额(单位:LAT)
+    private BigDecimal stakingValue;        //质押的金额
+    private BigDecimal delegateValue;       //委托的金额
+    private BigDecimal redeemedValue;       //赎回中的金额
     private Integer txQty;             //交易总数
     private Integer transferQty;         //转账交易总数
     private Integer delegateQty;         //委托交易总数
     private Integer stakingQty;          //验证人交易总数
     private Integer proposalQty;         //治理交易总数
     private Integer candidateCount;      //已委托验证人
-    private String delegateHes;         //未锁定委托（LAT）
-    private String delegateLocked;      //已锁定委托（LAT）
-    private String delegateUnlock;      //已解除委托（LAT）   
-    private String delegateReduction;    //赎回中委托（LAT）   
+    private BigDecimal delegateHes;         //未锁定委托（LAT）
+    private BigDecimal delegateLocked;      //已锁定委托（LAT）
+    private BigDecimal delegateUnlock;      //已解除委托（LAT）   
+    private BigDecimal delegateReleased;    //待赎回委托（LAT）   
     private String contractName;        //合约名称
     private String contractCreate;      //合约创建者地址
     private String contractCreateHash; //合约创建哈希
@@ -38,38 +40,38 @@ public class QueryDetailResp {
 		this.type = type;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getBalance() {
+	public BigDecimal getBalance() {
 		return balance;
 	}
-	public void setBalance(String balance) {
+	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getRestrictingBalance() {
+	public BigDecimal getRestrictingBalance() {
 		return restrictingBalance;
 	}
-	public void setRestrictingBalance(String restrictingBalance) {
+	public void setRestrictingBalance(BigDecimal restrictingBalance) {
 		this.restrictingBalance = restrictingBalance;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getStakingValue() {
+	public BigDecimal getStakingValue() {
 		return stakingValue;
 	}
-	public void setStakingValue(String stakingValue) {
+	public void setStakingValue(BigDecimal stakingValue) {
 		this.stakingValue = stakingValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateValue() {
+	public BigDecimal getDelegateValue() {
 		return delegateValue;
 	}
-	public void setDelegateValue(String delegateValue) {
+	public void setDelegateValue(BigDecimal delegateValue) {
 		this.delegateValue = delegateValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getRedeemedValue() {
+	public BigDecimal getRedeemedValue() {
 		return redeemedValue;
 	}
-	public void setRedeemedValue(String redeemedValue) {
+	public void setRedeemedValue(BigDecimal redeemedValue) {
 		this.redeemedValue = redeemedValue;
 	}
 	public Integer getTxQty() {
@@ -109,32 +111,32 @@ public class QueryDetailResp {
 		this.candidateCount = candidateCount;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateHes() {
+	public BigDecimal getDelegateHes() {
 		return delegateHes;
 	}
-	public void setDelegateHes(String delegateHes) {
+	public void setDelegateHes(BigDecimal delegateHes) {
 		this.delegateHes = delegateHes;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateLocked() {
+	public BigDecimal getDelegateLocked() {
 		return delegateLocked;
 	}
-	public void setDelegateLocked(String delegateLocked) {
+	public void setDelegateLocked(BigDecimal delegateLocked) {
 		this.delegateLocked = delegateLocked;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateUnlock() {
+	public BigDecimal getDelegateUnlock() {
 		return delegateUnlock;
 	}
-	public void setDelegateUnlock(String delegateUnlock) {
+	public void setDelegateUnlock(BigDecimal delegateUnlock) {
 		this.delegateUnlock = delegateUnlock;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getDelegateReduction() {
-		return delegateReduction;
+	public BigDecimal getDelegateReleased() {
+		return delegateReleased;
 	}
-	public void setDelegateReduction(String delegateReduction) {
-		this.delegateReduction = delegateReduction;
+	public void setDelegateReleased(BigDecimal delegateReleased) {
+		this.delegateReleased = delegateReleased;
 	}
 	public String getContractName() {
 		return contractName;
