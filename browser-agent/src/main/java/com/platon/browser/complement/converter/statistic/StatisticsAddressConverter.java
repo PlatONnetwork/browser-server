@@ -1,11 +1,11 @@
 package com.platon.browser.complement.converter.statistic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.platon.browser.common.collection.dto.EpochMessage;
+import com.platon.browser.common.complement.cache.AddressCache;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
+import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
@@ -14,12 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.EpochMessage;
-import com.platon.browser.common.complement.cache.AddressCache;
-import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
-import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class StatisticsAddressConverter {
@@ -32,8 +31,10 @@ public class StatisticsAddressConverter {
 	private AddressMapper addressMapper;
     
 	
-    public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
+    public void convert(CollectionEvent event, Block block, EpochMessage epochMessage){
 		long startTime = System.currentTimeMillis();
+
+		log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",block.getNum(),event.getTransactions().size(),epochMessage.getConsensusEpochRound(),epochMessage.getSettleEpochRound(),epochMessage.getIssueEpochRound());
 
 		List<AddressStatItem> addressStatItemList =   addressCache.getAll()
             	.stream()

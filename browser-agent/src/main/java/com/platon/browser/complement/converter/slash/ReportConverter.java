@@ -11,8 +11,6 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomSlash;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -83,7 +81,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
         BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
         //当前锁定的
         BigDecimal codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
-        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) == 1){
+        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO)>0){
             businessParam.setCodeStatus(2);
             businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
         }else {

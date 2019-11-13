@@ -49,5 +49,5 @@ public abstract class BusinessParamConverter<T> {
     			:BusinessParam.YesNoEnum.NO.getCode();
     }
 
-    public abstract T convert(CollectionEvent event, Transaction tx) throws Exception;
+    public abstract T convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException;
 }

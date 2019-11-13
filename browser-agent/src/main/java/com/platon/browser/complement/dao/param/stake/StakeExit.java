@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder
 @Accessors(chain = true)
-public class StakeExit extends BusinessParam {
+public class StakeExit implements BusinessParam {
     /**
      * 节点id
      */

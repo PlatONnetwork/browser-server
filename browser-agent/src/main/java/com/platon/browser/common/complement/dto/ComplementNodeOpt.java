@@ -1,12 +1,6 @@
 package com.platon.browser.common.complement.dto;
 
-import com.platon.browser.complement.dao.param.slash.Report;
-import com.platon.browser.complement.dao.param.stake.StakeCreate;
-import com.platon.browser.complement.dao.param.stake.StakeExit;
-import com.platon.browser.complement.dao.param.stake.StakeIncrease;
-import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -26,30 +20,4 @@ public class ComplementNodeOpt extends NodeOpt {
            .setBNum(0L);
         return bean;
     }
-
-    public ComplementNodeOpt updateWithStakeCreate(StakeCreate param) throws BeanCreateOrUpdateException {
-
-        return this;
-    }
-
-    public ComplementNodeOpt updateWithStakeIncrease(StakeIncrease param) throws BeanCreateOrUpdateException {
-
-        return this;
-    }
-
-    public ComplementNodeOpt updateWithStakeModify(StakeModify param) throws BeanCreateOrUpdateException {
-
-        return this;
-    }
-
-    public ComplementNodeOpt updateWithStakeExit(StakeExit param) throws BeanCreateOrUpdateException {
-
-        return this;
-    }
-
-    public ComplementNodeOpt updateWithReport(Report param) throws BeanCreateOrUpdateException {
-
-        return this;
-    }
-
 }

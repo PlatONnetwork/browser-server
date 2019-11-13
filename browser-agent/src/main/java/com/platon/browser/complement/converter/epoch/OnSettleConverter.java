@@ -2,10 +2,10 @@ package com.platon.browser.complement.converter.epoch;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
-import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
@@ -32,9 +32,10 @@ public class OnSettleConverter {
     @Autowired
     private StakingMapper stakingMapper;
 
-	public void convert(CollectionEvent event, Block block) throws Exception {
-
+	public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
+
+        log.debug("Block Number:{}",block.getNum());
 
         List<String> curVerifierList = new ArrayList<>();
         event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));
@@ -57,7 +58,6 @@ public class OnSettleConverter {
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
-        //todo:stakinglist为空
         stakingList.forEach(staking -> {
             //犹豫期金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));

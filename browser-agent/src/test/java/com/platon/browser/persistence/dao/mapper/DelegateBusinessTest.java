@@ -6,7 +6,6 @@ import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.stake.StakeCreate;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -16,6 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @Auther: dongqile
@@ -57,6 +60,7 @@ public class DelegateBusinessTest extends TestBase {
     public void delegationCreateMapper () {
         DelegateCreate delegateCreate = delegateCreateParam();
         delegateBusinessMapper.create(delegateCreate);
+        verify(delegateBusinessMapper, times(1)).create(any(DelegateCreate.class));
     }
 
     /**
@@ -66,14 +70,6 @@ public class DelegateBusinessTest extends TestBase {
     public void delegationExitMapper () {
         DelegateExit delegateExit = delegateExitParam();
         delegateBusinessMapper.exit(delegateExit);
+        verify(delegateBusinessMapper, times(1)).exit(any(DelegateExit.class));
     }
-
-    public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
-        StakingKey stakingKey = new StakingKey();
-        stakingKey.setNodeId(nodeId);
-        stakingKey.setStakingBlockNum(stakingBlockNumer);
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        return staking;
-    }
-
 }

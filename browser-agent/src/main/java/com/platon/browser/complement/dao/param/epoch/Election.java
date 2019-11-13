@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class Election  extends BusinessParam {
+public class Election implements BusinessParam {
 
     /**
      * 需要惩罚的列表

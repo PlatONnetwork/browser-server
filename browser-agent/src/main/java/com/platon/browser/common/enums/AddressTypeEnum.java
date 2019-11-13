@@ -16,7 +16,7 @@ public enum AddressTypeEnum {
     }
     public int getCode(){return code;}
     public String getDesc(){return desc;}
-    private static Map<Integer, AddressTypeEnum> ENUMS = new HashMap<>();
+    private static final Map<Integer, AddressTypeEnum> ENUMS = new HashMap<>();
     static {Arrays.asList(AddressTypeEnum.values()).forEach(en->ENUMS.put(en.code,en));}
     public static AddressTypeEnum getEnum(Integer code){
        return ENUMS.get(code);

@@ -81,7 +81,7 @@ public class AddressUpdateTask {
     	addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.ACCOUNT.getCode());
     	List<Address> addressList = addressMapper.selectByExample(addressExample);
     	
-    	if( addressList.size() == 0) {
+    	if(addressList.isEmpty()) {
     		stop = true;
     		return stop;
     	}
@@ -116,7 +116,7 @@ public class AddressUpdateTask {
 		
 		List<Address> updateAddressList = new ArrayList<>();
 		
-		addressList.stream().forEach(item ->{
+		addressList.forEach(item ->{
 			AddressStatistics staking = stakingMap.get(item.getAddress());
 			AddressStatistics delegation = delegationMap.get(item.getAddress());
 			boolean hasChange = false;
@@ -160,7 +160,7 @@ public class AddressUpdateTask {
 			if(delegation != null) {
 				delegation.getNodeIdSet().add(delegation.getNodeId());	
 			}
-			Integer candidateCount = delegation == null ? 0 : delegation.getNodeIdSet().size();
+			int candidateCount = delegation == null ? 0 : delegation.getNodeIdSet().size();
 			if(candidateCount != item.getCandidateCount()) {
 				item.setCandidateCount(candidateCount);
 				hasChange = true;
@@ -171,7 +171,7 @@ public class AddressUpdateTask {
 			}
 		});
 		
-		if(updateAddressList.size() > 0) {
+		if(!updateAddressList.isEmpty()) {
 			statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
 		}
 		return stop;

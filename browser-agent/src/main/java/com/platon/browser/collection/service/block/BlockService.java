@@ -25,8 +25,7 @@ public class BlockService {
     public CompletableFuture<PlatonBlock> getBlockAsync(Long blockNumber) {
         return CompletableFuture.supplyAsync(()->{
             try {
-                PlatonBlock block = retryService.getBlock(blockNumber);
-                return block;
+                return retryService.getBlock(blockNumber);
             } catch (Exception e) {
                 log.error("重试采集区块({})异常:",blockNumber,e);
             }

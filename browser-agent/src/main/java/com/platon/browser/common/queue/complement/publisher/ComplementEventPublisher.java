@@ -5,7 +5,6 @@ import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.complement.event.ComplementEvent;
 import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * 补充事件发布者

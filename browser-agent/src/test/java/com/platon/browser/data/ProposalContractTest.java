@@ -3,6 +3,7 @@ package com.platon.browser.data;
 import java.math.BigInteger;
 import java.util.List;
 
+import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
@@ -16,6 +17,10 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * 治理相关接口，包括， 提交文本提案 提交升级提案 提交参数提案 给提案投票 版本声明 查询提案 查询提案结果 查询提案列表 查询生效版本 查询节点代码版本
@@ -72,10 +77,10 @@ public class ProposalContractTest {
 					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_TEXT_FUNC_TYPE).send();
 
 			System.out.println("发起提案结果：" + baseResponse.toString());
-
 			voteForProposal(platonSendTransaction.getTransactionHash());
-
 			queryResult(platonSendTransaction.getTransactionHash());
+			verify(proposalContract, times(1)).submitProposalReturnTransaction(any());
+			verify(proposalContract, times(1)).getSubmitProposalResult(any(),any());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -102,6 +107,9 @@ public class ProposalContractTest {
 //			queryResult(platonSendTransaction.getTransactionHash());
 //
 			this.cancelProposal(platonSendTransaction.getTransactionHash(), String.valueOf(Integer.parseInt(num)+1));
+
+			verify(proposalContract, times(1)).submitProposalReturnTransaction(any());
+			verify(proposalContract, times(1)).getSubmitProposalResult(any(),any());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

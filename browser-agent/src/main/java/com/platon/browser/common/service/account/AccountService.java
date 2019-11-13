@@ -23,6 +23,8 @@ public class AccountService {
     private static final String RESTRICTING_ADDR = InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress();
     private static final String STAKING_ADDR = InnerContractAddrEnum.STAKING_CONTRACT.getAddress();
 
+    private static final String blockTip="]在区块号[",balanceTip="]的余额失败:";
+
     @Autowired
     private PlatOnClient platOnClient;
 
@@ -38,7 +40,7 @@ public class AccountService {
                     .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
-            String error = "获取激励池["+INCITE_ACCOUNT_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
+            String error = "获取激励池["+INCITE_ACCOUNT_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }
@@ -55,7 +57,7 @@ public class AccountService {
                    .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
-            String error = "获取锁仓合约["+RESTRICTING_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
+            String error = "获取锁仓合约["+RESTRICTING_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }
@@ -72,7 +74,7 @@ public class AccountService {
                     .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
-            String error = "获取质押合约["+STAKING_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
+            String error = "获取质押合约["+STAKING_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }

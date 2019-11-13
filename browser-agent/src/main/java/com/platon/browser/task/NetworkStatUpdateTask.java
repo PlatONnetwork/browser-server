@@ -1,28 +1,25 @@
 package com.platon.browser.task;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import com.platon.browser.common.utils.AppStatusUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.account.AccountService;
+import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.entity.NetworkStatistics;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @Auther: dongqile
  * @Date: 2019/11/6
- * @Description: TODO: 网络统计相关信息更新任务
+ * @Description: 网络统计相关信息更新任务
  */
 
 @Component
@@ -39,14 +36,13 @@ public class NetworkStatUpdateTask {
 	private StatisticBusinessMapper statisticBusinessMapper;
 	
     @Scheduled(cron = "0/30  * * * * ?")
-    private void cron () throws InterruptedException {
+    private void cron() {
 		// 只有程序正常运行才执行任务
 		if(AppStatusUtil.isRunning()) start();
     }
 	protected void start (){
 		try {
 			Long curNumber = networkStatCache.getNetworkStat().getCurNumber();
-
 			BigInteger issueEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(curNumber),chainConfig.getAddIssuePeriodBlockCount());
 			//获取激励池余额
 			BigDecimal inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(curNumber));
@@ -66,11 +62,9 @@ public class NetworkStatUpdateTask {
 			int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
 			//获得进行中的提案
 			int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-
 			networkStatCache.updateByTask(issueValue,turnValue,totalValue,stakingValue,addressQty,doingProposalQty);
-
-		} catch (BlockNumberException e) {
-			log.error("on NetworkStatUpdateTask error",e);
+		} catch (Exception e) {
+			log.error("网络统计任务出错:",e);
 		}
 	}
 }

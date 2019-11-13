@@ -1,8 +1,8 @@
 package com.platon.browser.complement.converter.epoch;
 
-import com.platon.browser.complement.dao.param.epoch.Consensus;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.complement.dao.param.epoch.Consensus;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +22,10 @@ public class OnConsensusConverter {
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
 	
-	public void convert(CollectionEvent event, Block block) throws Exception {
+	public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
+
+        log.debug("Block Number:{}",block.getNum());
 
         List<String> validatorList = new ArrayList<>();
         event.getEpochMessage().getCurValidatorList().forEach(v->validatorList.add(v.getNodeId()));

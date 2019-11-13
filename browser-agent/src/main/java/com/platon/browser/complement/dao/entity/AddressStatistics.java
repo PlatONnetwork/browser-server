@@ -17,5 +17,5 @@ public class AddressStatistics {
     private BigDecimal delegateLocked;
     private BigDecimal delegateReleased; 
     private String nodeId;
-    private Set<String> nodeIdSet = new HashSet<String>();
+    private Set<String> nodeIdSet = new HashSet<>();
 }

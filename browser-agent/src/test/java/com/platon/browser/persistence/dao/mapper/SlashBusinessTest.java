@@ -20,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @Auther: dongqile
@@ -32,22 +32,14 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
 public class SlashBusinessTest extends TestBase {
-
-
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
-
-
     @Autowired
     private StakingMapper stakingMapper;
-
     @Autowired
     private NodeMapper nodeMapper;
-
-
     @Autowired
     private SlashMapper slashMapper;
-
 
     @Test
     public void reportDuplicateSignMapper () {
@@ -65,18 +57,14 @@ public class SlashBusinessTest extends TestBase {
         assertEquals(staking.getStakingReduction(), reportDuplicateSignParam.getCodeCurStakingLocked());
         //slash插入数据验证
         Slash slash = slashMapper.selectByPrimaryKey(reportDuplicateSignParam.getTxHash());
-        assertTrue(!StringUtils.isEmpty(slash));
+        assertFalse(StringUtils.isEmpty(slash));
 
     }
-
 
     public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(nodeId);
         stakingKey.setStakingBlockNum(stakingBlockNumer);
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        return staking;
+        return stakingMapper.selectByPrimaryKey(stakingKey);
     }
-
-
 }

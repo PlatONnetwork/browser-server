@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 /**
@@ -33,7 +32,7 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
     private NetworkStatCache networkStatCache;
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws Exception {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
         // 修改质押信息
         StakeModifyParam txParam = tx.getTxParam(StakeModifyParam.class);
 

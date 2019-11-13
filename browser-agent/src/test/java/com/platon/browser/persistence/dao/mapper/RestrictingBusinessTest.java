@@ -11,6 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/10/31
@@ -21,20 +25,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
 public class RestrictingBusinessTest extends TestBase {
-
-
     @Autowired
     private RestrictingBusinessMapper restrictingBusinessMapper;
-
 
     /**
      * 创建锁仓计划
      */
     @Test
-    public void restrcingCrateMapper () {
+    public void restrictingCrateMapper () {
         RestrictingCreate restrictingCreate = restrictingCreateParam();
         restrictingBusinessMapper.create(restrictingCreate);
+        verify(restrictingBusinessMapper, times(1)).create(any(RestrictingCreate.class));
     }
-
-
 }

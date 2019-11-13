@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class DelegateCreate extends BusinessParam {
+public class DelegateCreate implements BusinessParam {
 
     /**
      * 节点id

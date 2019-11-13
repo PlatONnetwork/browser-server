@@ -14,7 +14,7 @@ import java.util.Date;
 @Slf4j
 @Builder
 @Accessors(chain = true)
-public class ProposalVote extends BusinessParam {
+public class ProposalVote implements BusinessParam {
 
 
     /**

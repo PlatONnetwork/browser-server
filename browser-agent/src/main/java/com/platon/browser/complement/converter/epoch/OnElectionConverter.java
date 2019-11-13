@@ -2,9 +2,9 @@ package com.platon.browser.complement.converter.epoch;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.complement.dao.param.epoch.Election;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.complement.dao.param.epoch.Election;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class OnElectionConverter {
     @Autowired
     private NetworkStatCache networkStatCache;
 	
-	public Optional<List<NodeOpt>> convert(CollectionEvent event, Block block) throws Exception {
+	public Optional<List<NodeOpt>> convert(CollectionEvent event, Block block) {
 
 		long startTime = System.currentTimeMillis();
 

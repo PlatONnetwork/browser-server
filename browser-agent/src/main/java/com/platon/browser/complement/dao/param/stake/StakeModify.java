@@ -18,7 +18,7 @@ import java.math.BigInteger;
 @Slf4j
 @Builder
 @Accessors(chain = true)
-public class StakeModify extends BusinessParam {
+public class StakeModify implements BusinessParam {
     /**
      * 节点Id
      */

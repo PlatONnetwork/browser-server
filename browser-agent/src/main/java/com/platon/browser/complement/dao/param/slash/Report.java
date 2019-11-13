@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class Report extends BusinessParam {
+public class Report implements BusinessParam {
     /**
      * 举报证据
      */

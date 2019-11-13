@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class ProposalVersion extends BusinessParam {
+public class ProposalVersion implements BusinessParam {
 
 	private String optDesc;
 	

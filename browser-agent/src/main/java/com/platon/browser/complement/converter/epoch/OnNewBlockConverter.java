@@ -6,6 +6,7 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.NewBlockMapper;
 import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class OnNewBlockConverter {
     @Autowired
     private NetworkStatCache networkStatCache;
 
-	public void convert(CollectionEvent event, Block block) throws Exception {
+	public void convert(CollectionEvent event, Block block) throws NoSuchBeanException {
 
         long startTime = System.currentTimeMillis();
 

@@ -1,12 +1,13 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.epoch.Consensus;
 import com.platon.browser.complement.dao.param.epoch.Election;
+import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.complement.dao.param.proposal.ProposalText;
 import com.platon.browser.complement.dao.param.proposal.ProposalUpgrade;
@@ -20,10 +21,11 @@ import com.platon.browser.complement.dao.param.stake.StakeIncrease;
 import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
-import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
-import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.dao.entity.NetworkStat;
-
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.StakingMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,9 +39,18 @@ import java.util.List;
  * @Description:
  */
 public class TestBase {
+    @Autowired
+    protected StakingMapper stakingMapper;
 
     static {
         AppStatusUtil.setStatus(AppStatus.STOPPED);
+    }
+
+    public Staking getStaking (String nodeId, long stakingBlockNumber ) {
+        StakingKey stakingKey = new StakingKey();
+        stakingKey.setNodeId(nodeId);
+        stakingKey.setStakingBlockNum(stakingBlockNumber);
+        return stakingMapper.selectByPrimaryKey(stakingKey);
     }
 
     public StakeCreate stakingParam () {

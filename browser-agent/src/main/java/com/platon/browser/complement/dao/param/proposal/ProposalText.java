@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder
 @Accessors(chain = true)
-public class ProposalText extends BusinessParam {
+public class ProposalText implements BusinessParam {
 
     /**
      * 节点id

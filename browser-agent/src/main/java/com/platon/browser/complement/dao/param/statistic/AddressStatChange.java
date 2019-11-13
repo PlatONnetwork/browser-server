@@ -48,7 +48,7 @@ insert into `address`
 @Data
 @Builder
 @Accessors(chain = true)
-public class AddressStatChange extends BusinessParam {
+public class AddressStatChange implements BusinessParam {
 	
 	List<AddressStatItem> addressStatItemList;
 

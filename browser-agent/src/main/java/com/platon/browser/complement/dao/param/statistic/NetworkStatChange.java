@@ -70,7 +70,7 @@ insert into `network_stat`
 @Slf4j
 @Builder
 @Accessors(chain = true)
-public class NetworkStatChange extends BusinessParam {
+public class NetworkStatChange implements BusinessParam {
 	/**
 	 * id
 	 */

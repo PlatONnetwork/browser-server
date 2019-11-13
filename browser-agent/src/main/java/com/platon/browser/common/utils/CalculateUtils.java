@@ -58,7 +58,7 @@ public class CalculateUtils {
         BigDecimal costSum=BigDecimal.ZERO;
         
         // 利润=最新的收益累计-最旧的收益收益累计
-        if(ari.getProfit().size()>0) {
+        if(!ari.getProfit().isEmpty()) {
             PeriodValueElement latest=ari.getProfit().get(0);
             PeriodValueElement oldest=latest;
             for (PeriodValueElement pve:ari.getProfit()){
@@ -74,7 +74,7 @@ public class CalculateUtils {
         int count = 0;
         for (PeriodValueElement pve:ari.getCost()){
             if(count==4) break;
-            	costSum= costSum.add(pve.getValue());
+			costSum= costSum.add(pve.getValue());
             count++;
         }
         
@@ -108,21 +108,18 @@ public class CalculateUtils {
 		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
 		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
 		// 发行量
-		BigDecimal issueValue = initIssueAmount
+		return initIssueAmount
 				.multiply(circulationByYear)
 				.subtract(incentivePoolAccountBalance)
 				.add(foundationAmount);
-		return issueValue;
 	}
 
 
 	public static BigDecimal calculationTurnValue(BigDecimal issueValue,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance){
-		BigDecimal turnValue = issueValue
+		return issueValue
 				.subtract(restrictBalance)
 				.subtract(stakingBalance)
 				.subtract(inciteBalance);
-
-		return turnValue;
 	}
 
 

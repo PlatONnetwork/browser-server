@@ -31,7 +31,7 @@ insert into `rp_plan`
 @Data
 @Builder
 @Accessors(chain = true)
-public class RestrictingCreate extends BusinessParam {
+public class RestrictingCreate implements BusinessParam {
 	
 	List<RestrictingItem> itemList;
 

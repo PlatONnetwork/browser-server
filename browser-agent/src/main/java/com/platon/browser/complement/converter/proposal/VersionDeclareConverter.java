@@ -1,8 +1,6 @@
 package com.platon.browser.complement.converter.proposal;
 
-import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -10,7 +8,6 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.VersionDeclareParam;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,9 +20,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class VersionDeclareConverter extends BusinessParamConverter<Optional<NodeOpt>> {
-	
-    @Autowired
-    private NetworkStatCache networkStatCache;
 	
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {

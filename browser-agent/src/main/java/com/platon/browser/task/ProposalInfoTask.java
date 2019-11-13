@@ -105,7 +105,7 @@ public class ProposalInfoTask {
                     }
                 }
             }catch (Exception e){
-                log.error("on ProposalInfoTask error",e);
+                log.error("提案投票信息更新出错:",e);
             }
             customProposalMapper.updateProposalInfoList(proposals);
         }

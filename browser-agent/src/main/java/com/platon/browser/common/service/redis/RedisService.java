@@ -50,9 +50,9 @@ public abstract class RedisService<T> {
         redisTemplate.delete(getCacheKey());
     }
     abstract String getCacheKey();
-    void updateMinMaxScore(Set<T> data){};
-    void updateExistScore(Set<String> exist){};
-    void updateStageSet(Set<T> data){};
+    void updateMinMaxScore(Set<T> data){}
+    void updateExistScore(Set<String> exist){}
+    void updateStageSet(Set<T> data){}
 
     /**
      * 模板方法，通用流程在此操作,具体属性由子类处理

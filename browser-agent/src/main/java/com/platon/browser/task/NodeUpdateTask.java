@@ -55,7 +55,7 @@ public class NodeUpdateTask {
 			List<Node> nodeList = nodeMapper.selectByExample(nodeExample);
 			
 			Map<String, Optional<KeyBaseUser>> cache = new HashMap<>();
-			List<Node> updateNodeList = new ArrayList<Node>();
+			List<Node> updateNodeList = new ArrayList<>();
 
 			nodeList.forEach(node -> {
 				Optional<KeyBaseUser> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
@@ -89,7 +89,7 @@ public class NodeUpdateTask {
 				});	
 			});
 			
-			if(updateNodeList.size()>0) {				
+			if(!updateNodeList.isEmpty()) {
 				stakeBusinessMapper.updateNodeForTask(updateNodeList);
 			}
 			

@@ -44,7 +44,6 @@ public class ProposalDetailTask {
     }
 
     protected void start() {
-
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andCompletionFlagEqualTo(CustomProposal.FlagEnum.INCOMPLETE.getCode());
@@ -53,18 +52,10 @@ public class ProposalDetailTask {
         if (proposals.isEmpty()) return;
 
         for (Proposal proposal : proposals) {
-            ProposalMarkDownDto resp;
             try {
-                resp = getMarkdownInfo(proposal.getUrl());
-            } catch (HttpRequestException e) {
-                log.error("更新提案(proposal={})出错: {}", proposal.getHash(), e.getMessage());
-                continue;
-            }
-
-            try {
+                ProposalMarkDownDto resp = getMarkdownInfo(proposal.getUrl());
                 proposal.setTopic(resp.getTopic());
                 proposal.setDescription(resp.getDescription());
-
                 if (CustomProposal.TypeEnum.CANCEL.getCode() == proposal.getType()) {
                     //补充对应被取消的提案相关信息
                     Proposal cp = proposalMapper.selectByPrimaryKey(proposal.getCanceledPipId());

@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class ProposalUpgrade extends BusinessParam {
+public class ProposalUpgrade implements BusinessParam {
 
     /**
      * 节点id

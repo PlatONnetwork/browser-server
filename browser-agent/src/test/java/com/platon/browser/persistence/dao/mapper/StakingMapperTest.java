@@ -11,9 +11,6 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.elasticsearch.DelegationESRepository;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,25 +33,14 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
 public class StakingMapperTest extends TestBase {
-
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
-
     @Autowired
     private NOptBakMapper nOptBakMapper;
-
-    @Autowired
-    private StakingMapper stakingMapper;
-
     @Autowired
     private NodeMapper nodeMapper;
-
     @Autowired
     private DelegationMapper delegationMapper;
-
-    @Autowired
-    private NodeOptESRepository nodeOptESRepository;
-
 
     @Test
     public void createStakingMapper () {
@@ -152,9 +138,9 @@ public class StakingMapperTest extends TestBase {
         delegationKey.setNodeId(withdrewStakingParam.getNodeId());
         delegationKey.setStakingBlockNum(withdrewStakingParam.getStakingBlockNum().longValue());
         Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
-        assertEquals(delegation.getDelegateHes().longValue(), 0);
-        assertEquals(delegation.getDelegateLocked().longValue(), 0);
-        assertEquals(delegation.getDelegateReleased().longValue(), 0);
+        assertEquals(0,delegation.getDelegateHes().longValue());
+        assertEquals(0,delegation.getDelegateLocked().longValue());
+        assertEquals(0,delegation.getDelegateReleased().longValue());
         //node数据更新验证
         Node node = nodeMapper.selectByPrimaryKey(withdrewStakingParam.getNodeId());
         assertEquals(withdrewStakingParam.getStakingReductionEpoch(), node.getStakingReductionEpoch().intValue());
@@ -168,15 +154,4 @@ public class StakingMapperTest extends TestBase {
         List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(withdrewStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
-
-
-    public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
-        StakingKey stakingKey = new StakingKey();
-        stakingKey.setNodeId(nodeId);
-        stakingKey.setStakingBlockNum(stakingBlockNumer);
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        return staking;
-    }
-
-
 }

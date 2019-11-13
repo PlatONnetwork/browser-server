@@ -4,14 +4,16 @@ import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
-import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
-import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @Auther: dongqile
@@ -23,11 +25,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
 public class StatisticBusinessTest extends TestBase {
-
-
     @Autowired
     private StatisticBusinessMapper statisticBusinessMapper;
-
 
     /**
      * 地址数据统计
@@ -36,17 +35,6 @@ public class StatisticBusinessTest extends TestBase {
     public void addressChangeMapper(){
         AddressStatChange addressStatChange = addressStatChangeParam();
         statisticBusinessMapper.addressChange(addressStatChange);
+        verify(statisticBusinessMapper, times(1)).addressChange(any(AddressStatChange.class));
     }
-
-
-     /**
-     *  其他数据统计
-     */
-//    @Test
-//    public void netWorkChangeMapper(){
-//        NetworkStat networkStatChange = networkStatChangeParam();
-//        statisticBusinessMapper.networkChange(networkStatChange);
-//    }
-
-
 }

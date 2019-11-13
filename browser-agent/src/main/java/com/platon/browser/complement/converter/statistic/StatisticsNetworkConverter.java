@@ -9,6 +9,7 @@ import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,9 @@ public class StatisticsNetworkConverter {
     private StatisticBusinessMapper statisticBusinessMapper;
     
 	
-    public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
+    public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) throws NoSuchBeanException {
         long startTime = System.currentTimeMillis();
-
+        log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",block.getNum(),event.getTransactions().size(),epochMessage.getConsensusEpochRound(),epochMessage.getSettleEpochRound(),epochMessage.getIssueEpochRound());
 		// 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
         networkStat.setNodeId(block.getNodeId());

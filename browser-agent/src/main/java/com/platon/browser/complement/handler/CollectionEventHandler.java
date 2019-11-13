@@ -1,31 +1,26 @@
 package com.platon.browser.complement.handler;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import com.platon.browser.common.utils.BakDataDeleteUtil;
-import com.platon.browser.dao.entity.NOptBak;
-import com.platon.browser.dao.entity.TxBak;
-import com.platon.browser.dao.mapper.NOptBakMapper;
-import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
 import com.platon.browser.complement.service.param.BlockParameterService;
 import com.platon.browser.complement.service.param.StatisticParameterService;
 import com.platon.browser.complement.service.param.TransactionParameterService;
+import com.platon.browser.dao.entity.NOptBak;
+import com.platon.browser.dao.entity.TxBak;
+import com.platon.browser.dao.mapper.NOptBakMapper;
+import com.platon.browser.dao.mapper.TxBakMapper;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * 区块事件处理器

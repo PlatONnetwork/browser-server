@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class NewBlock extends BusinessParam {
+public class NewBlock implements BusinessParam {
     /**
      * 出块奖励（交易手续费）
      */

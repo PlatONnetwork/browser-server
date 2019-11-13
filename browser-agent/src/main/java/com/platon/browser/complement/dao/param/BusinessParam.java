@@ -10,9 +10,8 @@ import java.util.Map;
 /**
  * 持久化参数基类
  */
-@Data
-public abstract class BusinessParam {
-    public enum YesNoEnum{
+public interface BusinessParam {
+    enum YesNoEnum{
         YES(1, "是"),
         NO(2, "否")
         ;
@@ -33,5 +32,5 @@ public abstract class BusinessParam {
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
     }
-    public abstract BusinessType getBusinessType();
+    BusinessType getBusinessType();
 }

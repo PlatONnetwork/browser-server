@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @Builder
 @Accessors(chain = true)
-public class Settle  extends BusinessParam {
+public class Settle implements BusinessParam {
 
     /**
      * 当前结算周期验证人

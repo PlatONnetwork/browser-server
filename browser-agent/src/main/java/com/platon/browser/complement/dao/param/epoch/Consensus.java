@@ -32,7 +32,7 @@ where `status` = 1;
 @Data
 @Builder
 @Accessors(chain = true)
-public class Consensus  extends BusinessParam {
+public class Consensus implements BusinessParam {
 
     /**
      * 每个验证人期望出块数 共识周期出块数/当轮验证人数量

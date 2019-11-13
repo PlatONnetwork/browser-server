@@ -11,7 +11,6 @@ import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import org.junit.Test;
@@ -24,6 +23,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @Auther: dongqile
@@ -35,21 +37,14 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
 public class EpochBusinessTest extends TestBase {
-
-
     @Autowired
     private NewBlockMapper newBlockMapper;
-
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
-
-
     @Autowired
     private StakingMapper stakingMapper;
-
     @Autowired
     private NodeMapper nodeMapper;
-
 
     /**
      * 新增区块
@@ -69,7 +64,6 @@ public class EpochBusinessTest extends TestBase {
         assertEquals(nodeBefore.getStatBlockRewardValue(), nodeAfter.getStatBlockRewardValue().subtract(blockParam.getBlockRewardValue()));
         assertEquals(nodeBefore.getStatFeeRewardValue(), nodeAfter.getStatFeeRewardValue().subtract(blockParam.getFeeRewardValue()));
     }
-
 
     /**
      * 共识周期切换
@@ -93,17 +87,17 @@ public class EpochBusinessTest extends TestBase {
     public void newReductionEpochMapper () {
         Settle settleParam = settleParam();
         epochBusinessMapper.settle(settleParam);
+        verify(epochBusinessMapper, times(1)).settle(any(Settle.class));
     }
-
 
     /**
      * 选举周期切换-查询待踢出验证人
      */
     @Test
     public void newElectionEpochMapperQuerySlashNode () {
-        List <String> nodeList = electionQuerySlashNodeParam();
+        List<String> nodeList = electionQuerySlashNodeParam();
         epochBusinessMapper.querySlashNode(nodeList);
-
+        verify(epochBusinessMapper, times(1)).querySlashNode(any());
     }
 
     /**
@@ -113,14 +107,6 @@ public class EpochBusinessTest extends TestBase {
     public void newElectionEpochMapper () {
         Election electionParam = electionSlashNodeParam();
         epochBusinessMapper.slashNode(electionParam);
-    }
-
-
-    public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
-        StakingKey stakingKey = new StakingKey();
-        stakingKey.setNodeId(nodeId);
-        stakingKey.setStakingBlockNum(stakingBlockNumer);
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        return staking;
+        verify(epochBusinessMapper, times(1)).slashNode(any(Election.class));
     }
 }
