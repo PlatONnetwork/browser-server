@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: Chendongming
@@ -20,7 +21,10 @@ import java.util.concurrent.Executors;
 public class HttpUtil {
     private HttpUtil(){}
 
-    private static final OkHttpClient CLIENT = new OkHttpClient();
+    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
+            .connectTimeout(60,TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
 
     public static <T> CompletableFuture<T> postAsync(String url, String param, Class<T> clazz){
