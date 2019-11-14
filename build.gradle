@@ -40,6 +40,8 @@ subprojects {
 
     dependencies {
         testCompile "junit:junit:$junitVersion"
+        testCompile "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "com.alibaba:fastjson:$fastJsonVersion"
         compile "org.apache.commons:commons-lang3:$commonLang3Version"
         compile "org.projectlombok:lombok:${lombokVersion}"

@@ -1,16 +1,17 @@
 package com.platon.browser.common.complement.cache;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Component;
+
 import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class AddressCache {
@@ -104,5 +105,14 @@ public class AddressCache {
 		if(addressList.isEmpty()) return;
 		addressMap.clear();
 		addressList.forEach(address -> addressMap.put(address.getAddress(),address));
+	}
+	
+	/**
+	 * 第一次启动初始化
+	 */
+	public void initOnFrist() {
+		for(ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
+			addressMap.put(contractDescEnum.getAddress(), createDefaultAddress(contractDescEnum.getAddress()));
+		}
 	}
 }

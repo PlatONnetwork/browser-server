@@ -1,6 +1,7 @@
 package com.platon.browser.bootstrap.service;
 
 import com.github.pagehelper.Page;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class InitializationServiceTest {
+public class InitializationServiceTest extends AgentTestBase {
     @Mock
     private EpochRetryService epochRetryService;
     @Mock
@@ -61,6 +62,17 @@ public class InitializationServiceTest {
 
     @Before
     public void setup() throws Exception {
+        // 修改测试数据
+        Node node = candidateList.get(0);
+        node.setNodeName("node");
+        node.setProgramVersion(BigInteger.valueOf(7988));
+        node.setStakingBlockNum(BigInteger.valueOf(7988));
+        Node node2 = candidateList.get(1);
+        node2.setNodeName(null);
+        CustomStaking staking = stakingList.get(0);
+        staking.setNodeId(node.getNodeId());
+        staking.setNodeName("node-name");
+
         ReflectionTestUtils.setField(target, "epochRetryService", epochRetryService);
         ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
         ReflectionTestUtils.setField(target, "nodeMapper", nodeMapper);
@@ -69,30 +81,11 @@ public class InitializationServiceTest {
         ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
         ReflectionTestUtils.setField(target, "nodeCache", nodeCache);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        List<Node> candidateList = new ArrayList<>();
-        Node node = new Node();
-        node.setNodeId("0x000000000000001");
-        node.setBenifitAddress("0x11111111111111111");
-        node.setDetails("detail");
-        node.setExternalId("externalId");
-        node.setNodeName("node");
-        node.setProgramVersion(BigInteger.valueOf(7988));
-        node.setStakingBlockNum(BigInteger.valueOf(7988));
-        candidateList.add(node);
-        Node node2 = new Node();
-        BeanUtils.copyProperties(node,node2);
-        node2.setNodeId("0x000000000000002");
-        node2.setNodeName(null);
-        candidateList.add(node2);
+
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);
         when(epochRetryService.getCandidates()).thenReturn(candidateList);
         when(epochRetryService.getExpectBlockCount()).thenReturn(10L);
-        CustomStaking staking = new CustomStaking();
-        staking.setNodeId("0x000000000000002");
-        staking.setNodeName("node-name");
-        List<CustomStaking> stakingList = new ArrayList<>();
-        stakingList.add(staking);
         when(chainConfig.getDefaultStakingList()).thenReturn(stakingList);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(100000000));
     }

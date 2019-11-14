@@ -1,11 +1,12 @@
 package com.platon.browser.bootstrap.queue.handler;
 
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
-import com.platon.browser.client.result.Receipt;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
+import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -19,13 +20,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BootstrapEventHandlerTest {
+public class BootstrapEventHandlerTest extends AgentTestBase {
     @Mock
     private EsImportService esImportService;
     @Mock
@@ -44,6 +45,7 @@ public class BootstrapEventHandlerTest {
     private NOptBakMapper nOptBakMapper;
     @Spy
     private BootstrapEventHandler target;
+    private ReceiptResult receiptResult;
 
     @Before
     public void setup() {
@@ -51,17 +53,35 @@ public class BootstrapEventHandlerTest {
         ReflectionTestUtils.setField(target, "redisImportService", redisImportService);
         ReflectionTestUtils.setField(target, "txBakMapper", txBakMapper);
         ReflectionTestUtils.setField(target, "nOptBakMapper", nOptBakMapper);
+        receiptResult = receiptResultList.get(0);
     }
 
     @Test
     public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException {
+        CompletableFuture<PlatonBlock> blockCF=getBlockAsync(7000L);
+        CompletableFuture<ReceiptResult> receiptCF=getReceiptAsync(7000L);
         BootstrapEvent bootstrapEvent = BootstrapEvent.builder()
-                .blockCF(getBlockAsync(7000L))
-                .receiptCF(getReceiptAsync(7000L))
+                .blockCF(blockCF)
+                .receiptCF(receiptCF)
                 .callback(ShutdownCallback.builder().endBlockNum(7000L).build())
                 .build();
+
+        ReflectionTestUtils.setField(target, "preBlockNum", blockCF.get().getBlock().getNumber().longValue()-1);
+
+        when(txBakMapper.selectByExample(any())).thenReturn(Collections.emptyList());
         target.onEvent(bootstrapEvent,1,false);
-        verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
+
+        ReflectionTestUtils.setField(target, "preBlockNum", blockCF.get().getBlock().getNumber().longValue()-1);
+        List<TxBak> txBaks = new ArrayList<>();
+        TxBak bak = new TxBak();
+        bak.setHash(receiptCF.get().getResult().get(0).getTransactionHash());
+        bak.setNum(receiptCF.get().getResult().get(0).getBlockNumber());
+        bak.setId(100L);
+        bak.setInfo("so so");
+        txBaks.add(bak);
+        when(txBakMapper.selectByExample(any())).thenReturn(txBaks);
+        target.onEvent(bootstrapEvent,1,false);
+        verify(target, times(2)).onEvent(any(),anyLong(),anyBoolean());
     }
 
     /**
@@ -70,9 +90,7 @@ public class BootstrapEventHandlerTest {
     public CompletableFuture<PlatonBlock> getBlockAsync(Long blockNumber) {
         return CompletableFuture.supplyAsync(()->{
             PlatonBlock pb = new PlatonBlock();
-            PlatonBlock.Block block = new PlatonBlock.Block();
-            block.setHash("0x");
-            block.setNumber(blockNumber.toString());
+            PlatonBlock.Block block = rawBlockMap.get(receiptResult.getResult().get(0).getBlockNumber());
             pb.setResult(block);
             return pb;
         });
@@ -82,13 +100,6 @@ public class BootstrapEventHandlerTest {
      * 异步获取区块
      */
     public CompletableFuture<ReceiptResult> getReceiptAsync(Long blockNumber) {
-        return CompletableFuture.supplyAsync(()->{
-            ReceiptResult receiptResult = new ReceiptResult();
-            List<Receipt> receipts = new ArrayList<>();
-            Receipt receipt = new Receipt();
-            receipts.add(receipt);
-            receiptResult.setResult(receipts);
-            return receiptResult;
-        });
+        return CompletableFuture.supplyAsync(()->receiptResult);
     }
 }

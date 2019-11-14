@@ -1,7 +1,7 @@
 package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.complement.dao.mapper.RestrictingBusinessMapper;
 import com.platon.browser.complement.dao.param.restricting.RestrictingCreate;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
-public class RestrictingBusinessTest extends TestBase {
+public class RestrictingBusinessTest extends AgentTestBase {
     @Autowired
     private RestrictingBusinessMapper restrictingBusinessMapper;
 

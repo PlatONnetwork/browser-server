@@ -3,6 +3,7 @@ package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
@@ -53,6 +54,8 @@ public class InitializationService {
     private NodeCache nodeCache;
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private AddressCache addressCache;
 
     @Transactional
     public InitializationResult init() throws Exception {
@@ -75,6 +78,9 @@ public class InitializationService {
             nodeCache.init(nodeList);
             // 初始化网络缓存
             networkStatCache.init(networkStat);
+            // 初始化内置地址
+            addressCache.initOnFrist();
+            
             return initialResult;
         }
 

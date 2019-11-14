@@ -20,7 +20,7 @@ import java.util.Optional;
 
 
 /**
- * @description: 创建验证人业务参数转换器
+ * @description: 创建验证人(质押)业务参数转换器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 17:58:27
  **/

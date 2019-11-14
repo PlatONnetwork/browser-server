@@ -1,7 +1,6 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.enums.AppStatus;
@@ -32,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,7 +39,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NetworkStatUpdateTaskTest extends TestBase {
+public class NetworkStatUpdateTaskTest {
     private static final Logger log = LoggerFactory.getLogger(NetworkStatUpdateTask.class);
     @Spy
     private AccountService accountService;
@@ -84,8 +82,7 @@ public class NetworkStatUpdateTaskTest extends TestBase {
         chainConfig.setInitIssueAmount(BigDecimal.valueOf(10000000000L));
         chainConfig.setFoundationSubsidies(subsidies);
 
-        String chainConfigString = JSON.toJSONString(chainConfig);
-        log.debug("{}",chainConfigString);
+
         ReflectionTestUtils.setField(accountService, "platOnClient", platOnClient);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "chainConfig", chainConfig);

@@ -59,7 +59,7 @@ public class ProposalCancelConverter extends BusinessParamConverter<Optional<Nod
     			.pIDID(txParam.getPIDID())
     			.url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
     			.pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
-    			.endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(),chainConfig.getProposalTextConsensusRounds(),chainConfig).toBigInteger())
+    			.endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger())
     			.topic(CustomProposal.QUERY_FLAG)
     			.description(CustomProposal.QUERY_FLAG)
     			.txHash(tx.getHash())

@@ -38,7 +38,7 @@ import java.util.List;
  * @Date: 2019/9/7 16:35
  * @Description:
  */
-public class TestBase extends TestData {
+public class AgentTestBase extends AgentTestData {
     @Autowired
     protected StakingMapper stakingMapper;
 
