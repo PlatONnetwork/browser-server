@@ -79,14 +79,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             nodeOptStage.clear();
 
             // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
-            TxBakExample txBakExample = new TxBakExample();
-            txBakExample.setOrderByClause("id desc limit 1");
-            List<TxBak> txBaks = txBakMapper.selectByExample(txBakExample);
             Long txMaxId = 0L;
-            if(!txBaks.isEmpty()){
-                TxBak txBak = txBaks.get(0);
-                txMaxId=txBak.getId();
-            }
+            List<Transaction> transactions = event.getTransactions();
+            if(!transactions.isEmpty()) txMaxId=transactions.get(0).getId();
             BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
 
             // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
@@ -96,7 +91,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             Long nOptMaxId = 0L;
             if(!nOptBaks.isEmpty()){
                 NOptBak nOptBak = nOptBaks.get(0);
-                nOptMaxId=nOptBak.getId();
+                nOptMaxId=nOptBak.getId()-10000;
             }
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
         }catch (Exception e){
