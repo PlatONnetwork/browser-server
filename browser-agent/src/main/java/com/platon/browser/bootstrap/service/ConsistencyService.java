@@ -10,6 +10,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.ESResult;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -76,15 +80,18 @@ public class ConsistencyService {
         // 取ES中的交易最高序号
         long esMaxTransactionId = mysqlTransactionId;
         exist=false;
+        Map<String, Object> filter =new HashMap<>();
         while (!exist){
-            Transaction tx = transactionESRepository.get(String.valueOf(esMaxTransactionId), Transaction.class);
-            if(tx==null){
+            filter.put("id",esMaxTransactionId);
+            ESResult<Transaction> txs = transactionESRepository.search(filter, Transaction.class, Collections.emptyList(),1,1);
+            if(txs==null||txs.getRsData().isEmpty()){
                 esMaxTransactionId--;
                 // 小于等于0时需要退出
                 if(esMaxTransactionId<=0) exist=true;
             } else {
                 exist=true;
                 // 更新区块号，以最小块号为准
+                Transaction tx = txs.getRsData().get(0);
                 esMaxBlockNum=tx.getNum()<esMaxBlockNum?tx.getNum():esMaxBlockNum;
                 log.warn("ES交易索引最高交易序号:{}",tx.getId());
             }
