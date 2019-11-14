@@ -23,7 +23,7 @@ public class BlockRetryService {
 
     @Autowired
     private PlatOnClient platOnClient;
-
+    private BigInteger latestBlockNumber;
     /**
      * 根据区块号获取区块信息
      * @param blockNumber
@@ -52,7 +52,6 @@ public class BlockRetryService {
      * @param currentBlockNumber
      * @throws
      */
-    private BigInteger latestBlockNumber;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     void checkBlockNumber(Long currentBlockNumber) throws IOException, CollectionBlockException {
         try {
