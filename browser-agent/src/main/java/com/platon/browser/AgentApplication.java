@@ -6,7 +6,7 @@ import com.platon.browser.bootstrap.service.InitializationService;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.transaction.ReceiptService;
+import com.platon.browser.collection.service.receipt.ReceiptService;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;

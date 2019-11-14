@@ -1,4 +1,4 @@
-package com.platon.browser.collection.service.transaction;
+package com.platon.browser.collection.service.receipt;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RpcParam;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class ReceiptRetryService {
     private static final String RECEIPT_RPC_INTERFACE = "platon_getTransactionByBlock";
     @Autowired
-    private PlatOnClient client;
+    private PlatOnClient platOnClient;
 
     /**
      * 带有重试功能的根据区块号获取区块内所有交易的回执信息
@@ -29,7 +29,7 @@ public class ReceiptRetryService {
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException, InterruptedException {
+    public ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException, InterruptedException {
         long startTime = System.currentTimeMillis();
 
         try {
@@ -37,7 +37,7 @@ public class ReceiptRetryService {
             RpcParam param = new RpcParam();
             param.setMethod(RECEIPT_RPC_INTERFACE);
             param.getParams().add(blockNumber);
-            ReceiptResult result = HttpUtil.post(client.getWeb3jAddress(),param.toJsonString(),ReceiptResult.class);
+            ReceiptResult result = getReceiptResult(param);
             result.resolve(blockNumber);
             log.debug("回执结果:{}", result);
 
@@ -48,5 +48,9 @@ public class ReceiptRetryService {
             log.error("",e);
             throw e;
         }
+    }
+
+    public ReceiptResult getReceiptResult(RpcParam param) throws HttpRequestException {
+        return HttpUtil.post(platOnClient.getWeb3jAddress(),param.toJsonString(),ReceiptResult.class);
     }
 }

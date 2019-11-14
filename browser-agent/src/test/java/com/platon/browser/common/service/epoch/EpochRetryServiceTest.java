@@ -1,4 +1,4 @@
-package com.platon.browser.collection.service;
+package com.platon.browser.common.service.epoch;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;

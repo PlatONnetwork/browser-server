@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.service.epoch.EpochRetryService;
@@ -20,14 +21,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,6 +55,8 @@ public class InitializationServiceTest extends AgentTestBase {
     private NodeCache nodeCache;
     @Mock
     private NetworkStatCache networkStatCache;
+    @Mock
+    private AddressCache addressCache;
     @Spy
     private InitializationService target;
 
@@ -81,6 +81,7 @@ public class InitializationServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
         ReflectionTestUtils.setField(target, "nodeCache", nodeCache);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
+        ReflectionTestUtils.setField(target, "addressCache", addressCache);
 
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);

@@ -46,14 +46,12 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     // 交易序号id
     private long transactionId = 0;
 
-    private Long preBlockNum=0L;
     @Transactional
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         long startTime = System.currentTimeMillis();
 
         log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
-        if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
 
         // 使用已入库的交易数量初始化交易ID初始值
         if(transactionId==0) transactionId=networkStatCache.getNetworkStat().getTxQty();
@@ -96,7 +94,6 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                 nOptBakMapper.batchInsert(baks);
             }
 
-            preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
             log.error("",e);
             throw e;

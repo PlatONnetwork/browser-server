@@ -48,7 +48,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private Set<Transaction> transactionStage = new HashSet<>();
     private Set<NodeOpt> nodeOptStage = new HashSet<>();
 
-    private Long preBlockNum=0L;
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "PersistenceEventHandler")
     public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
@@ -56,7 +55,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
         log.debug("PersistenceEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
-        if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
         try {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
@@ -67,7 +65,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
             if(blockStage.size()<batchSize) {
-                preBlockNum=event.getBlock().getNum();
                 return;
             }
 
@@ -102,8 +99,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 nOptMaxId=nOptBak.getId();
             }
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
-
-            preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
             log.error("",e);
             throw e;

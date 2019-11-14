@@ -23,7 +23,7 @@ public class BlockRetryService {
 
     @Autowired
     private PlatOnClient platOnClient;
-
+    private BigInteger latestBlockNumber;
     /**
      * 根据区块号获取区块信息
      * @param blockNumber
@@ -33,12 +33,10 @@ public class BlockRetryService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     PlatonBlock getBlock(Long blockNumber) throws IOException {
         long startTime = System.currentTimeMillis();
-
         try {
             log.debug("获取区块:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
             DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
             PlatonBlock block = platOnClient.getWeb3j().platonGetBlockByNumber(dp,true).send();
-
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
             return block;
         }catch (Exception e){
@@ -52,7 +50,6 @@ public class BlockRetryService {
      * @param currentBlockNumber
      * @throws
      */
-    private BigInteger latestBlockNumber;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     void checkBlockNumber(Long currentBlockNumber) throws IOException, CollectionBlockException {
         try {

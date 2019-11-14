@@ -47,7 +47,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private Set<Block> blocks=new HashSet<>();
     private Set<Transaction> transactions=new HashSet<>();
 
-    private Long preBlockNum=0L;
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BootstrapEventHandler")
     public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
@@ -59,8 +58,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
-
-            if(preBlockNum!=0L&&(block.getNum()-preBlockNum!=1)) throw new AssertionError();
 
             clear();
             blocks.add(block);
@@ -110,7 +107,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             clear();
-            preBlockNum=block.getNum();
             event.getCallback().call(block.getNum());
         }catch (Exception e){
             log.error("",e);
