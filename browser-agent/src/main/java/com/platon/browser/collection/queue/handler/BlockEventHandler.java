@@ -24,7 +24,6 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
     @Autowired
     private CollectionEventPublisher collectionEventPublisher;
 
-    private Long preBlockNum=0L;
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BlockEventHandler")
     public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
@@ -38,10 +37,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
 
-            if(preBlockNum!=0L&&(block.getNum()-preBlockNum!=1)) throw new AssertionError();
-
             collectionEventPublisher.publish(block,block.getTransactions(),event.getEpochMessage());
-            preBlockNum=block.getNum();
         }catch (Exception e){
             log.error("",e);
             throw e;

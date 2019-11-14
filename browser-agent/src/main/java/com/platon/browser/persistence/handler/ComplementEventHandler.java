@@ -15,19 +15,15 @@ public class ComplementEventHandler implements IComplementEventHandler {
     @Autowired
     private PersistenceEventPublisher persistenceEventPublisher;
 
-    private Long preBlockNum=0L;
     @Override
     public void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) {
         long startTime = System.currentTimeMillis();
 
         log.debug("ComplementEvent处理:{}(event(block({}),transactions({}),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
-        if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
-
         try {
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),event.getTransactions(),event.getNodeOpts());
-            preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
             log.error("",e);
             throw e;
