@@ -1,7 +1,7 @@
 package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.complement.dao.param.slash.Report;
 import com.platon.browser.dao.entity.Node;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertFalse;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
-public class SlashBusinessTest extends TestBase {
+public class SlashBusinessTest extends AgentTestBase {
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
     @Autowired

@@ -24,7 +24,7 @@ public class ReceiptResult {
     /**
      * 并行解码Logs
      */
-    public void resolve() throws InterruptedException {
+    public void resolve(Long blockNumber) throws InterruptedException {
         if(result.isEmpty()) return;
         CountDownLatch latch = new CountDownLatch(result.size());
 
@@ -32,6 +32,7 @@ public class ReceiptResult {
             map.put(HexTool.prefix(r.getTransactionHash()),r);
             EXECUTOR.submit(()->{
                 try {
+                    r.setBlockNumber(blockNumber);
                     r.decodeLogs();
                 }finally {
                     latch.countDown();

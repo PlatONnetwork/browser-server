@@ -1,7 +1,7 @@
 package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.mapper.NewBlockMapper;
 import com.platon.browser.complement.dao.param.epoch.Consensus;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
-public class EpochBusinessTest extends TestBase {
+public class EpochBusinessTest extends AgentTestBase {
     @Autowired
     private NewBlockMapper newBlockMapper;
     @Autowired

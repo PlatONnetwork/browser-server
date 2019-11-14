@@ -1,7 +1,7 @@
 package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
-public class ProposalBusinessTest extends TestBase {
+public class ProposalBusinessTest extends AgentTestBase {
     @Autowired
     private DelegateBusinessMapper delegateBusinessMapper;
     @Autowired

@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.enums.AppStatus;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NetworkStatUpdateTaskTest {
+public class NetworkStatUpdateTaskTest extends AgentTestBase {
     private static final Logger log = LoggerFactory.getLogger(NetworkStatUpdateTask.class);
     @Spy
     private AccountService accountService;
@@ -98,7 +99,7 @@ public class NetworkStatUpdateTaskTest {
     public void test() throws BlockNumberException {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
 
-        networkStatCache.getNetworkStat().setCurNumber(10292L);
+        networkStatCache.getNetworkStat().setCurNumber(1880L);
         // 发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
         // ******************手算******************
         //增发轮数

@@ -1,7 +1,7 @@
 package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.complement.dao.param.stake.StakeExit;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
-public class StakingMapperTest extends TestBase {
+public class StakingMapperTest extends AgentTestBase {
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
     @Autowired

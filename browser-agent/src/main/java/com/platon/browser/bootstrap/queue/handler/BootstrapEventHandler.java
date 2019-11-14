@@ -83,6 +83,10 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
                 // 更新交易入库到ES和Redis的交易信息
                 transactions.forEach(tx->{
                     TxBak bak = txBakMap.get(tx.getHash());
+                    if(bak==null){
+                        log.error("交易[{}]在交易备份表中找不到备份信息!",tx.getHash());
+                        return;
+                    }
                     BeanUtils.copyProperties(bak,tx);
                 });
             }

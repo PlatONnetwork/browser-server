@@ -38,7 +38,7 @@ public class ReceiptRetryService {
             param.setMethod(RECEIPT_RPC_INTERFACE);
             param.getParams().add(blockNumber);
             ReceiptResult result = HttpUtil.post(client.getWeb3jAddress(),param.toJsonString(),ReceiptResult.class);
-            result.resolve();
+            result.resolve(blockNumber);
             log.debug("回执结果:{}", result);
 
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);

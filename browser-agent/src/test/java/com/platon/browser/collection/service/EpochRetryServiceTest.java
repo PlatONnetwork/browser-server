@@ -1,5 +1,6 @@
 package com.platon.browser.collection.service;
 
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.common.service.account.AccountService;
@@ -24,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EpochRetryServiceTest {
+public class EpochRetryServiceTest extends AgentTestBase {
 
     @Mock private BlockChainConfig chainConfig;
     @Mock private AccountService accountService;

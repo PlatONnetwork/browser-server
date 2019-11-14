@@ -1,6 +1,7 @@
 package com.platon.browser.bootstrap.queue.publisher;
 
 import com.lmax.disruptor.dsl.Disruptor;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
 import com.platon.browser.client.result.Receipt;
@@ -13,13 +14,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
-import javax.naming.event.EventContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BootstrapEventPublisherTest {
+public class BootstrapEventPublisherTest extends AgentTestBase {
     @Spy
     private BootstrapEventPublisher target;
 
@@ -58,9 +57,7 @@ public class BootstrapEventPublisherTest {
     public CompletableFuture<PlatonBlock> getBlockAsync(Long blockNumber) {
         return CompletableFuture.supplyAsync(()->{
             PlatonBlock pb = new PlatonBlock();
-            PlatonBlock.Block block = new PlatonBlock.Block();
-            block.setHash("0x");
-            block.setNumber(blockNumber.toString());
+            PlatonBlock.Block block = rawBlockList.get(0);
             pb.setResult(block);
             return pb;
         });
