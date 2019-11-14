@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @Auther: dongqile
  * @Date: 2019/10/31
- * @Description:
+ * @Description: 质押相关入库测试类
  */
 
 @RunWith(SpringRunner.class)

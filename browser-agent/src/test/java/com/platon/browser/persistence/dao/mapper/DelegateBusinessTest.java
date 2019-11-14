@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 /**
  * @Auther: dongqile
  * @Date: 2019/10/31
- * @Description:
+ * @Description: 委托相关入库测试类
  */
 
 @RunWith(SpringRunner.class)

@@ -1,0 +1,125 @@
+# ***************************开发配置**************************** #
+# 应用版本
+version: 0.7.3.1
+# 当前激活的配置名称(请不要修改)
+profile: local
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+#Spring框架内部配置
+spring:
+  #数据源配置
+  datasource:
+    url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+  #Redis配置
+  redis:
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.16.171:7000,192.168.16.171:7001,192.168.16.171:7002,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
+    password: platscan
+  #ES配置
+  elasticsearch:
+    high-level-client:
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
+      port: 9200
+      schema: http
+      blockIndexName: browser_block_local
+      transactionIndexName: browser_transaction_local
+      delegationIndexName: browser_delegation_local
+      nodeOptIndexName: browser_nodeopt_local
+# 内存环形缓冲区大小，必须是2的指数倍
+disruptor:
+  queue:
+    # 区块事件环形缓冲区大小
+    block.buffer-size: 1024
+    # 采集事件环形缓冲区大小
+    collection.buffer-size: 1024
+    # 数据补充环形缓冲区大小
+    complement.buffer-size: 1024
+    # 数据持久化
+    persistence:
+      #环形缓冲区大小
+      buffer-size: 1024
+      #每次处理多少个
+      batch-size: 10
+#日志配置
+logging:
+  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  #日志级别
+  level:
+    org.springframework: error
+    org.springframework.retry: error
+    com.platon.browser: error
+    com.platon.browser.bootstrap: error
+    com.platon.browser.collection: error
+    com.platon.browser.collection.queue.handler: error
+    com.platon.browser.common: error
+    com.platon.browser.complement: error
+    com.platon.browser.complement.handler: error
+    com.platon.browser.complement.converter: error
+    com.platon.browser.persistence: error
+    com.platon.browser.persistence.handler: error
+    com.platon.browser.persistence.queue.handler: error
+    com.platon.browser.task: error
+#PlatOn相关配置
+platon:
+  # Web3j访问地址
+  web3j.addresses: http://192.168.112.172:8789
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #PlatON初始总发行量(LAT)
+  initIssueAmount: 10000000000
+  #每年固定增发比例
+  addIssueRate: 0.025
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
+  #每个共识轮中回退多少个块是选举下一轮验证人的时机
+  electionBackwardBlockCount: 20
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(LAT)>
+  foundationSubsidies: {
+    '1':62215742,
+    '2':55965742,
+    '3':49559492,
+    '4':42993086,
+    '5':36262520,
+    '6':29363689,
+    '7':22292388,
+    '8':15044304,
+    '9':7615018
+  }
+  # 初始内置节点默认质押金额(LAT)
+  defaultStakingLockedAmount: 1500000
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
+  #提案pip_num参数模板
+  proposalPipNumTemplate: PIP-%s
+  #keysBase网址
+  keyBase: https://keybase.io/
+  #keyBase api
+  keyBaseApi: _/api/1.0/user/autocomplete.json?q=
+  #默认内置节点补充信息
+  defaultStakingList: [
+    {
+      'nodeId':'0x4fcc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba4150f',
+      'nodeName':'platon.node.1'
+    },
+    {
+      'nodeId':'0x459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85',
+      'nodeName':'platon.node.2'
+    },
+    {
+      'nodeId':'0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3',
+      'nodeName':'platon.node.3'
+    },
+    {
+      'nodeId':'0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc',
+      'nodeName':'platon.node.4'
+    }
+  ]
+  
+task:
+   #地址统计任务
+   address-batch-size: 1000  

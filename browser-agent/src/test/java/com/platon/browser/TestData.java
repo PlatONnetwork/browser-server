@@ -3,6 +3,7 @@ package com.platon.browser;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -32,7 +33,8 @@ public class TestData {
             "validator",
             "candidate",
             "address",
-            "proposal"
+            "proposal",
+            "blockChainConfig"
     };
 
     protected List<CustomNode> nodeList= Collections.emptyList();
@@ -45,6 +47,7 @@ public class TestData {
     protected List<Node> validatorList = new ArrayList<>();
     protected List<Node> candidateList = new ArrayList<>();
     protected List<CustomAddress> addressList= Collections.emptyList();
+    protected BlockChainConfig blockChainConfig = new BlockChainConfig();
 
     @Before
     public void init(){
@@ -88,6 +91,8 @@ public class TestData {
                     case "proposal":
                         proposalList = JSON.parseArray(content,CustomProposal.class);
                         break;
+                    case "blockChainConfig":
+                        blockChainConfig = JSON.parseObject(content,BlockChainConfig.class);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

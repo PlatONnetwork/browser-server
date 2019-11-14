@@ -1,0 +1,17 @@
+{
+  "currentBlockNumber":100,                 //当前区块号
+  "consensusEpochRound": 10,                //当前所处共识周期轮数
+  "settleEpochRound":10,                    //当前所处结算周期轮数
+  "issueEpochRound":10,                     //当前所处结算周期轮数
+  "inciteBalance":7000000000000000000000000,//当前增发周期开始时的激励池余额 IB
+  "inciteAmount4Block":502000,              //前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
+  "blockReward":250,                        //当前增发周期每个区块奖励值 BR/增发周期区块总数
+  "inciteAmount4Stake":,                    //当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
+  "settleStakeReward":,                     //当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
+  "stakeReward": 25,                        //当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
+  "preValidatorList":,                      // 前一共识周期验证人列表
+  "curValidatorList":,                      // 当前共识周期验证人列表
+  "preVerifierList":,                       // 前一结算周期验证人列表
+  "curVerifierList":,                       // 当前结算周期验证人列表
+
+}
