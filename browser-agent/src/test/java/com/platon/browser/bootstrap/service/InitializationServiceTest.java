@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.service.epoch.EpochRetryService;
@@ -54,6 +55,8 @@ public class InitializationServiceTest extends AgentTestBase {
     private NodeCache nodeCache;
     @Mock
     private NetworkStatCache networkStatCache;
+    @Mock
+    private AddressCache addressCache;
     @Spy
     private InitializationService target;
 
@@ -78,6 +81,7 @@ public class InitializationServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
         ReflectionTestUtils.setField(target, "nodeCache", nodeCache);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
+        ReflectionTestUtils.setField(target, "addressCache", addressCache);
 
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);

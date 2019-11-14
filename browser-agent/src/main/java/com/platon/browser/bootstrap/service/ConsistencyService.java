@@ -5,7 +5,7 @@ import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.transaction.ReceiptService;
+import com.platon.browser.collection.service.receipt.ReceiptService;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;

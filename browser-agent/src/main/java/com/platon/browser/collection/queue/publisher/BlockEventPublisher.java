@@ -35,7 +35,7 @@ public class BlockEventPublisher {
     private BlockEventHandler handler;
 
     @PostConstruct
-    private void init(){
+    public void init(){
         Disruptor<BlockEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
         // 设置事件处理器
         disruptor.handleEventsWith(handler);

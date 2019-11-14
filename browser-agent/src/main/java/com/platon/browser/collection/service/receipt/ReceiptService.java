@@ -1,4 +1,4 @@
-package com.platon.browser.collection.service.transaction;
+package com.platon.browser.collection.service.receipt;
 
 import com.platon.browser.client.result.ReceiptResult;
 import lombok.extern.slf4j.Slf4j;

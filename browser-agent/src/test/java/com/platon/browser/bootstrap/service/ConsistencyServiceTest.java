@@ -4,7 +4,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.transaction.ReceiptService;
+import com.platon.browser.collection.service.receipt.ReceiptService;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.dao.entity.NetworkStat;
