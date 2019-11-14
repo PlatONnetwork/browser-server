@@ -53,7 +53,7 @@ public class NetworkStatUpdateTask {
 			//计算发行量
 			BigDecimal issueValue = CalculateUtils.calculationIssueValue(issueEpochRound,chainConfig,inciteBalance);
 			//计算流通量
-			BigDecimal turnValue = CalculateUtils.calculationTurnValue(issueValue,inciteBalance,stakingBalance,restrictBalance);
+			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,issueEpochRound,inciteBalance,stakingBalance,restrictBalance);
 			//获得节点相关的网络统计
 			NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
 			BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();

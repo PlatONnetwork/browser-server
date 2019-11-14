@@ -115,9 +115,18 @@ public class CalculateUtils {
 	}
 
 
-	public static BigDecimal calculationTurnValue(BigDecimal issueValue,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance){
-		return issueValue
-				.subtract(restrictBalance)
+	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, BigInteger issueEpoch,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance){
+		//当前块高所属结算周期
+    	int curIssueEpoch=issueEpoch.intValue();
+    	//获取初始发行金额
+		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
+		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
+		//获取增发比例
+		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
+		//年份增发量 = (1+增发比例)的增发年份次方
+		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+		//计算流通量 = 初始发行量 * 年份增发量 - 锁仓余额  - 质押余额 - 实时激励池余额
+    	return initIssueAmount.multiply(circulationByYear).subtract(restrictBalance)
 				.subtract(stakingBalance)
 				.subtract(inciteBalance);
 	}
