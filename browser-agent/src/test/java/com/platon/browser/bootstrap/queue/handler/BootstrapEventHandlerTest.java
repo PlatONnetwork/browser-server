@@ -66,12 +66,9 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
                 .callback(ShutdownCallback.builder().endBlockNum(7000L).build())
                 .build();
 
-        ReflectionTestUtils.setField(target, "preBlockNum", blockCF.get().getBlock().getNumber().longValue()-1);
-
         when(txBakMapper.selectByExample(any())).thenReturn(Collections.emptyList());
         target.onEvent(bootstrapEvent,1,false);
 
-        ReflectionTestUtils.setField(target, "preBlockNum", blockCF.get().getBlock().getNumber().longValue()-1);
         List<TxBak> txBaks = new ArrayList<>();
         TxBak bak = new TxBak();
         bak.setHash(receiptCF.get().getResult().get(0).getTransactionHash());
