@@ -1,8 +1,6 @@
 package com.platon.browser.common.service.epoch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.service.epoch.EpochRetryService;
-import com.platon.browser.common.service.epoch.EpochService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BlockNumberException;
 import org.junit.Before;
@@ -17,6 +15,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -36,7 +36,7 @@ public class EpochServiceTest extends AgentTestBase {
      * 测试更新
      */
     @Test
-    public void getEpochMessage() throws BlockNumberException {
+    public void getEpochMessage() throws Exception {
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(10));
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(50));
         when(chainConfig.getAddIssuePeriodBlockCount()).thenReturn(BigInteger.valueOf(250));
@@ -79,6 +79,14 @@ public class EpochServiceTest extends AgentTestBase {
         assertEquals(11,target.getSettleEpochRound().intValue());
         assertEquals(3,target.getIssueEpochRound().intValue());
 
+
+        // 测试异常
+        doThrow(new RuntimeException()).when(epochRetryService).consensusChange(any());
+        target.getEpochMessage(1L);
+        doThrow(new RuntimeException()).when(epochRetryService).settlementChange(any());
+        target.getEpochMessage(251L);
+        doThrow(new RuntimeException()).when(epochRetryService).issueChange(any());
+        target.getEpochMessage(501L);
     }
 
 }

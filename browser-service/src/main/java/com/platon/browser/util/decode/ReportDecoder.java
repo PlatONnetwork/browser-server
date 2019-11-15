@@ -23,6 +23,8 @@ public class ReportDecoder extends Decoder {
         String evidence = stringResolver((RlpString) rootList.getValues().get(2));
         evidence = new String(Numeric.hexStringToByteArray(evidence));
 
+        evidence=normalization(evidence);
+
         ReportParam param = ReportParam.builder()
                 .type(type)
                 .data(evidence)

@@ -62,8 +62,6 @@ public class BlockEventHandlerTest extends AgentTestBase {
                 .epochMessage(EpochMessage.newInstance())
                 .build();
 
-        ReflectionTestUtils.setField(target, "preBlockNum", blockCF.get().getBlock().getNumber().longValue()-1);
-
         target.onEvent(blockEvent,1,false);
 
         verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());

@@ -45,6 +45,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
+        if(null==txParam) return Optional.ofNullable(null);
         String nodeId = txParam.getVerify();
         try {
             NodeItem nodeItem = nodeCache.getNode(nodeId);

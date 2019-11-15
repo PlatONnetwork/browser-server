@@ -53,7 +53,7 @@ logging:
     org.springframework: error
     org.springframework.retry: error
     com.platon.browser: error
-    com.platon.browser.bootstrap: warn
+    com.platon.browser.bootstrap: error
     com.platon.browser.collection: error
     com.platon.browser.collection.queue.handler: error
     com.platon.browser.common: debug
@@ -67,7 +67,7 @@ logging:
 #PlatOn相关配置
 platon:
   # Web3j访问地址
-  web3j.addresses: http://192.168.112.171:4789
+  web3j.addresses: http://192.168.112.172:5789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

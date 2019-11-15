@@ -59,7 +59,6 @@ public class ReportParam extends TxParam{
     }
 
     private String format ( BigInteger type, String date ) {
-        date=data.replace("\\","");
         String info = "";
         Evidence evidence = JSON.parseObject(date, Evidence.class);
         if (isObjectFieldEmpty(evidence)) {

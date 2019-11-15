@@ -3,8 +3,8 @@ package com.platon.browser.common.service.epoch;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.common.service.account.AccountService;
-import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,11 +13,13 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
+import org.web3j.platon.contracts.NodeContract;
+import org.web3j.protocol.core.RemoteCall;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -49,16 +51,12 @@ public class EpochRetryServiceTest extends AgentTestBase {
         when(chainConfig.getSettlePeriodCountPerIssue()).thenReturn(BigInteger.valueOf(5));
         when(platOnClient.getLatestBlockNumber()).thenReturn(BigInteger.valueOf(501));
         when(accountService.getInciteBalance(any())).thenReturn(BigDecimal.valueOf(10000));
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(new Node());
-        nodes.add(new Node());
-        nodes.add(new Node());
-        nodes.add(new Node());
+
         when(curVerifiers.size()).thenReturn(4);
-        when(specialContractApi.getHistoryValidatorList(any(),any())).thenReturn(nodes);
-        when(specialContractApi.getHistoryVerifierList(any(),any())).thenReturn(nodes);
-        when(platOnClient.getLatestValidators()).thenReturn(nodes);
-        when(platOnClient.getLatestVerifiers()).thenReturn(nodes);
+        when(specialContractApi.getHistoryValidatorList(any(),any())).thenReturn(validatorList);
+        when(specialContractApi.getHistoryVerifierList(any(),any())).thenReturn(verifierList);
+        when(platOnClient.getLatestValidators()).thenReturn(validatorList);
+        when(platOnClient.getLatestVerifiers()).thenReturn(verifierList);
     }
 
     /**
@@ -91,5 +89,43 @@ public class EpochRetryServiceTest extends AgentTestBase {
     public void settlementEpochChange() throws Exception {
         target.settlementChange(BigInteger.valueOf(321));
         verify(target, times(1)).settlementChange(any(BigInteger.class));
+    }
+
+    /**
+     * 测试取候选人列表
+     */
+    @Test
+    public void getCandidatesNormal() throws Exception {
+        NodeContract nodeContract = mock(NodeContract.class);
+        when(platOnClient.getNodeContract()).thenReturn(nodeContract);
+        RemoteCall call = mock(RemoteCall.class);
+        when(nodeContract.getCandidateList()).thenReturn(call);
+        BaseResponse response = mock(BaseResponse.class);
+        response.data=candidateList;
+        when(call.send()).thenReturn(response);
+
+        when(response.isStatusOk()).thenReturn(true);
+        target.getCandidates();
+
+        verify(target, times(1)).getCandidates();
+    }
+
+    /**
+     * 测试取候选人列表
+     */
+    @Test(expected = CandidateException.class)
+    public void getCandidatesException() throws Exception {
+        NodeContract nodeContract = mock(NodeContract.class);
+        when(platOnClient.getNodeContract()).thenReturn(nodeContract);
+        RemoteCall call = mock(RemoteCall.class);
+        when(nodeContract.getCandidateList()).thenReturn(call);
+        BaseResponse response = mock(BaseResponse.class);
+        response.data=candidateList;
+        when(call.send()).thenReturn(response);
+
+        when(response.isStatusOk()).thenReturn(true);
+        response.data=null;
+        target.getCandidates();
+        verify(target, times(1)).getCandidates();
     }
 }

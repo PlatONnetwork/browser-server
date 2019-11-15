@@ -49,4 +49,16 @@ public abstract class Decoder {
         }
         return list;
     }
+
+    public static String normalization(String json){
+        if(json.startsWith("\"")){
+            json=json.replaceFirst("\"","");
+        }
+        if(json.endsWith("\"")){
+            json=json.substring(0,json.lastIndexOf("\""));
+        }
+        json=json.replace("\\","");
+
+        return json;
+    }
 }
