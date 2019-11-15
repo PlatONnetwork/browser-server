@@ -91,7 +91,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     baks.add(bak);
                 });
 
-                if(txDeleteBatchCount==10){
+                if(txDeleteBatchCount>=10){
                     // 删除小于最高ID的交易备份
                     TxBakExample txBakExample = new TxBakExample();
                     txBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getTxBakMaxId());
@@ -111,7 +111,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     baks.add(bak);
                 });
 
-                if(optDeleteBatchCount==10){
+                if(optDeleteBatchCount>=10){
                     // 删除小于最高ID的操作记录备份
                     NOptBakExample nOptBakExample = new NOptBakExample();
                     nOptBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getNOptBakMaxId());
