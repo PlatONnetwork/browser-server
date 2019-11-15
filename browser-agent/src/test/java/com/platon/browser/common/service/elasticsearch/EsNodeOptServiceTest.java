@@ -1,8 +1,6 @@
 package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.junit.Before;
@@ -39,10 +37,10 @@ public class EsNodeOptServiceTest extends AgentTestBase {
     @Test(expected = Exception.class)
     public void save() throws IOException {
         target.save(Collections.emptySet());
-        Set<NodeOpt> blocks = new HashSet<>();
-        blocks.add(new NodeOpt());
-        target.save(blocks);
+        Set<NodeOpt> data = new HashSet<>();
+        data.add(new NodeOpt());
+        target.save(data);
         doThrow(new RuntimeException("")).when(nodeOptESRepository).bulkAddOrUpdate(anyMap());
-        target.save(blocks);
+        target.save(data);
     }
 }

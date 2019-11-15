@@ -1,4 +1,4 @@
-package com.platon.browser.common.service.elasticsearch;
+package com.platon.browser.common.service.redis;
 
 import com.platon.browser.AgentTestBase;
 import org.junit.Before;
@@ -14,21 +14,21 @@ import java.util.Collections;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsImportServiceTest extends AgentTestBase {
+public class RedisImportServiceTest extends AgentTestBase {
     @Mock
-    private EsBlockService blockService;
+    private RedisBlockService blockService;
     @Mock
-    private EsTransactionService transactionService;
+    private RedisTransactionService transactionService;
     @Mock
-    private EsNodeOptService nodeOptService;
+    private RedisStatisticService statisticService;
     @Spy
-    private EsImportService target;
+    private RedisImportService target;
 
     @Before
-    public void setup() throws Exception {
+    public void setup(){
         ReflectionTestUtils.setField(target, "blockService", blockService);
         ReflectionTestUtils.setField(target, "transactionService", transactionService);
-        ReflectionTestUtils.setField(target, "nodeOptService", nodeOptService);
+        ReflectionTestUtils.setField(target, "statisticService", statisticService);
     }
 
     /**

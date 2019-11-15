@@ -37,10 +37,10 @@ public class EsBlockServiceTest extends AgentTestBase {
     @Test(expected = Exception.class)
     public void save() throws IOException {
         target.save(Collections.emptySet());
-        Set<Block> blocks = new HashSet<>();
-        blocks.add(new Block());
-        target.save(blocks);
+        Set<Block> data = new HashSet<>();
+        data.add(new Block());
+        target.save(data);
         doThrow(new RuntimeException("")).when(blockESRepository).bulkAddOrUpdate(anyMap());
-        target.save(blocks);
+        target.save(data);
     }
 }

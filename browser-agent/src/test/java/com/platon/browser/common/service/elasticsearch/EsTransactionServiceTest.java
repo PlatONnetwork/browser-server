@@ -1,8 +1,8 @@
 package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,15 +20,15 @@ import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsDelegationServiceTest extends AgentTestBase {
+public class EsTransactionServiceTest extends AgentTestBase {
     @Mock
-    private DelegationESRepository delegationESRepository;
+    private TransactionESRepository transactionESRepository;
     @Spy
-    private EsDelegationService target;
+    private EsTransactionService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "delegationESRepository", delegationESRepository);
+        ReflectionTestUtils.setField(target, "transactionESRepository", transactionESRepository);
     }
 
     /**
@@ -37,10 +37,10 @@ public class EsDelegationServiceTest extends AgentTestBase {
     @Test(expected = Exception.class)
     public void save() throws IOException {
         target.save(Collections.emptySet());
-        Set<Delegation> data = new HashSet<>();
-        data.add(new Delegation());
+        Set<Transaction> data = new HashSet<>();
+        data.add(new Transaction());
         target.save(data);
-        doThrow(new RuntimeException("")).when(delegationESRepository).bulkAddOrUpdate(anyMap());
+        doThrow(new RuntimeException("")).when(transactionESRepository).bulkAddOrUpdate(anyMap());
         target.save(data);
     }
 }

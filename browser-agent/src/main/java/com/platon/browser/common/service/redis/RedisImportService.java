@@ -38,7 +38,7 @@ public class RedisImportService {
             try {
                 service.save(data,serialOverride);
             } catch (Exception e) {
-                log.error("{}",e);
+                log.error("",e);
             }finally {
                 latch.countDown();
             }
