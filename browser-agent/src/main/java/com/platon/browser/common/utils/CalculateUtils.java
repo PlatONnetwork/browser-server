@@ -111,7 +111,7 @@ public class CalculateUtils {
 		return initIssueAmount
 				.multiply(circulationByYear)
 				.subtract(incentivePoolAccountBalance)
-				.add(Convert.toVon(foundationAmount,Convert.Unit.LAT));
+				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.LAT):BigDecimal.ZERO);
 	}
 
 
