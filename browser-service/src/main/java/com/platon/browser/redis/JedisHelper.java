@@ -16,6 +16,13 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.ShardedJedis;
 
+/**
+ * jedis对象创建辅助类
+ *  @file JedisHelper.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年11月13日
+ */
 public class JedisHelper {
 
 	private Logger logger = LoggerFactory.getLogger(JedisHelper.class);
@@ -25,6 +32,13 @@ public class JedisHelper {
 	private JedisHelper() {
 	}
 
+	/**
+	 * 获取和设置redis类
+	 * @method getJedisClusterByKey
+	 * @param configKey
+	 * @return
+	 * @throws Exception
+	 */
 	public JedisCluster getJedisClusterByKey(String configKey) throws Exception {
 		JedisCluster jedisCluster = null;
 		JedisConfig jedisConfig = new JedisConfig();
@@ -97,6 +111,12 @@ public class JedisHelper {
 		return true;
 	}
 
+	/**
+	 * 关闭jedis
+	 * @method closeShardedJedis
+	 * @param jedisCluster
+	 * @param key
+	 */
 	public void closeShardedJedis(JedisCluster jedisCluster, String key) {
 		if (null != jedisCluster) {
 			try {

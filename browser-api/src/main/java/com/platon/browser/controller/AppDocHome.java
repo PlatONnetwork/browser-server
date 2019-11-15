@@ -9,9 +9,9 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * 	首页模块接口申明集成swagger
@@ -64,7 +64,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "home/queryNavigation", nickname = "", notes = "", response = QueryNavigationResp.class, tags = { "Home" })
 	@PostMapping(value = "home/queryNavigation", produces = { "application/json" })
-	BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
+	WebAsyncTask<BaseResp<QueryNavigationResp>> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
 	
     /**
      * @api {subscribe} /topic/block/statistic/new b.出块趋势（websocket）
@@ -91,7 +91,7 @@ public interface AppDocHome {
 	@ApiOperation(value = "topic/block/statistic/new", nickname = "", notes = "", response = BlockStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/statistic/new")
 	@PostMapping(value = "home/blockStatistic", produces = { "application/json" })
-	BaseResp<BlockStatisticNewResp> blockStatisticNew();
+	WebAsyncTask<BaseResp<BlockStatisticNewResp>> blockStatisticNew();
 	
     /**
      * @api {subscribe} /topic/chain/statistic/new c.基础数据（websocket）
@@ -138,7 +138,7 @@ public interface AppDocHome {
 	@ApiOperation(value = "/topic/chain/statistic/new", nickname = "", notes = "", response = ChainStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "/topic/chain/statistic/new")
 	@PostMapping(value = "home/chainStatistic", produces = { "application/json" })
-	BaseResp<ChainStatisticNewResp> chainStatisticNew();
+	WebAsyncTask<BaseResp<ChainStatisticNewResp>> chainStatisticNew();
 	
 	
     /**
@@ -174,7 +174,7 @@ public interface AppDocHome {
 //	@ApiOperation(value = "home/blockList", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
 //	@SubscribeMapping(value = "topic/block/list/new")
 //	@PostMapping(value = "home/blockList", produces = { "application/json" })
-	BaseResp<List<BlockListNewResp>> blockListNew();
+//	BaseResp<List<BlockListNewResp>> blockListNew();
 	
     /**
      * @api {subscribe} /topic/staking/list/new e.验证人列表（websocket）
@@ -211,5 +211,5 @@ public interface AppDocHome {
 	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
 	@PostMapping(value = "home/stakingList", produces = { "application/json" })
-	BaseResp<StakingListNewResp> stakingListNew();
+	WebAsyncTask<BaseResp<StakingListNewResp>> stakingListNew();
 }

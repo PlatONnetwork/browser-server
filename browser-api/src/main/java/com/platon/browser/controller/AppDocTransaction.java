@@ -1,7 +1,6 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -78,7 +78,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionList", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionList", produces = { "application/json" })
-    RespPage<TransactionListResp> transactionList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
+	WebAsyncTask<RespPage<TransactionListResp>> transactionList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
 		
 	
     /**
@@ -107,7 +107,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionListByBlock", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionListByBlock", produces = { "application/json" })
-    RespPage<TransactionListResp> transactionListByBlock(@ApiParam(value = "TransactionListByBlockRequest ", required = true)@Valid @RequestBody TransactionListByBlockRequest req);
+	WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@ApiParam(value = "TransactionListByBlockRequest ", required = true)@Valid @RequestBody TransactionListByBlockRequest req);
 	
     /**
      * @api {post} /transaction/transactionListByAddress c.地址的交易列表
@@ -135,7 +135,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionListByAddress", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionListByAddress", produces = { "application/json" })
-    RespPage<TransactionListResp> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
+	WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 	
     /**
      * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date&local=:en d.导出地址交易列表
@@ -267,6 +267,6 @@ public interface AppDocTransaction {
      */	
 	@ApiOperation(value = "transaction/transactionDetails", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionDetails", produces = { "application/json" })
-    BaseResp<TransactionDetailsResp> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
+	WebAsyncTask<BaseResp<TransactionDetailsResp>> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
 
 }

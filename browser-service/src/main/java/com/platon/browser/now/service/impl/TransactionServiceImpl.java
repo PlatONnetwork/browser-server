@@ -21,6 +21,7 @@ import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
+import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.param.*;
@@ -85,6 +86,8 @@ public class TransactionServiceImpl implements TransactionService {
     private StatisticCacheService statisticCacheService;
     @Autowired
     private BlockChainConfig blockChainConfig;
+    @Autowired
+	private CommonService commonService;
 
     @Override
     public RespPage<TransactionListResp> getTransactionList( PageReq req) {
@@ -164,6 +167,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setTxType(String.valueOf(transaction.getType()));
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
+            transactionListResp.setValue(new BigDecimal(transaction.getValue()));
             if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
             	transactionListResp.setTxReceiptStatus(0);
     		} else {
@@ -272,6 +276,8 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTimestamp(transaction.getTime().getTime());
     		resp.setServerTime(new Date().getTime());
     		resp.setTxInfo(transaction.getInfo());
+    		resp.setGasPrice(new BigDecimal(transaction.getGasPrice()));
+    		resp.setValue(new BigDecimal(transaction.getValue()));
     		if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
     			resp.setTxReceiptStatus(0);
     		} else {
@@ -351,7 +357,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setExternalId(editValidatorParam.getExternalId());
 						resp.setWebsite(editValidatorParam.getWebsite());
 						resp.setDetails(editValidatorParam.getDetails());
-						resp.setNodeName(this.setStakingName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
 						resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//增加质押
@@ -359,14 +365,14 @@ public class TransactionServiceImpl implements TransactionService {
 						StakeIncreaseParam increaseStakingParam = JSONObject.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
 						resp.setTxAmount(increaseStakingParam.getAmount());
-						resp.setNodeName(this.setStakingName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
 						break;
 					//退出验证人
 					case STAKE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
 						StakeExitParam exitValidatorParam = JSONObject.parseObject(txInfo, StakeExitParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
-						resp.setNodeName(this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
 						resp.setApplyAmount(exitValidatorParam.getAmount());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
@@ -391,7 +397,7 @@ public class TransactionServiceImpl implements TransactionService {
 						DelegateCreateParam delegateParam = JSONObject.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
 						resp.setTxAmount(delegateParam.getAmount());
-						resp.setNodeName(this.setStakingName(delegateParam.getNodeId(), delegateParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
 						break;
 					//委托赎回
 					case DELEGATE_EXIT:
@@ -401,7 +407,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setNodeId(unDelegateParam.getNodeId());
 						resp.setApplyAmount(unDelegateParam.getAmount());
 						resp.setTxAmount(unDelegateParam.getAmount());
-						resp.setNodeName(this.setStakingName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						break;
 					case PROPOSAL_TEXT:
 						ProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, ProposalTextParam.class);
@@ -410,7 +416,7 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						resp.setNodeId(createProposalTextParam.getVerifier());
 						resp.setProposalHash(req.getTxHash());
-						resp.setNodeName(this.setStakingName(createProposalTextParam.getVerifier(), createProposalTextParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(createProposalTextParam.getVerifier(), createProposalTextParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
 						break;
 					case PROPOSAL_UPGRADE:
@@ -421,7 +427,7 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						resp.setNodeId(createProposalUpgradeParam.getVerifier());
 						resp.setProposalHash(req.getTxHash());
-						resp.setNodeName(this.setStakingName(createProposalUpgradeParam.getVerifier(), createProposalUpgradeParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(createProposalUpgradeParam.getVerifier(), createProposalUpgradeParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
 						break;
 					case PROPOSAL_PARAMETER:
@@ -432,7 +438,7 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						resp.setNodeId(cancelProposalParam.getVerifier());
 						resp.setProposalHash(req.getTxHash());
-						resp.setNodeName(this.setStakingName(cancelProposalParam.getVerifier(), cancelProposalParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(cancelProposalParam.getVerifier(), cancelProposalParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
 						break;
 					case PROPOSAL_VOTE:
@@ -442,7 +448,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalOption(votingProposalParam.getProposalType());
 						resp.setProposalHash(votingProposalParam.getProposalId());
 						resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
-						resp.setNodeName(this.setStakingName(votingProposalParam.getVerifier(), votingProposalParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(votingProposalParam.getVerifier(), votingProposalParam.getNodeName()));
 						if(StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
 							resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
 						}
@@ -463,14 +469,14 @@ public class TransactionServiceImpl implements TransactionService {
 						VersionDeclareParam declareVersionParam = JSONObject.parseObject(txInfo, VersionDeclareParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
-						resp.setNodeName(this.setStakingName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
+						resp.setNodeName(commonService.getNodeName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
 						break;
 					case REPORT:
 						ReportParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportParam.class);
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
-						transactionDetailsEvidencesResp.setNodeName(this.setStakingName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
+						transactionDetailsEvidencesResp.setNodeName(commonService.getNodeName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
 						resp.setEvidence(reportValidatorParam.getData());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
@@ -531,30 +537,30 @@ public class TransactionServiceImpl implements TransactionService {
 //		return resp;
 //    }
 
-    /**
-     * 统一设置验证人名称
-     * @method setStakingName
-     * @param nodeId
-     * @param nodeName
-     * @return
-     */
-    private String setStakingName(String nodeId,String nodeName) {
-    	/**
-    	 * 当nodeId为空或者nodeName不为空则直接返回name
-    	 */
-    	if(StringUtils.isNotBlank(nodeName) || StringUtils.isBlank(nodeId)) {
-    		return nodeName;
-    	}
-    	StakingExample stakingExample = new StakingExample();
-    	stakingExample.setOrderByClause(" staking_block_num desc");
-    	StakingExample.Criteria criteria = stakingExample.createCriteria();
-    	criteria.andNodeIdEqualTo(nodeId);
-    	List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-    	if(stakings != null && !stakings.isEmpty()) {
-    		return stakings.get(0).getNodeName();
-    	}
-    	return nodeName;
-    }
+//    /**
+//     * 统一设置验证人名称
+//     * @method setStakingName
+//     * @param nodeId
+//     * @param nodeName
+//     * @return
+//     */
+//    private String setStakingName(String nodeId,String nodeName) {
+//    	/**
+//    	 * 当nodeId为空或者nodeName不为空则直接返回name
+//    	 */
+//    	if(StringUtils.isNotBlank(nodeName) || StringUtils.isBlank(nodeId)) {
+//    		return nodeName;
+//    	}
+//    	StakingExample stakingExample = new StakingExample();
+//    	stakingExample.setOrderByClause(" staking_block_num desc");
+//    	StakingExample.Criteria criteria = stakingExample.createCriteria();
+//    	criteria.andNodeIdEqualTo(nodeId);
+//    	List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+//    	if(stakings != null && !stakings.isEmpty()) {
+//    		return stakings.get(0).getNodeName();
+//    	}
+//    	return nodeName;
+//    }
 
     /**
      * 统一设置验证人keybaseurl

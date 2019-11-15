@@ -1,10 +1,18 @@
 package com.platon.browser.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+
+import java.util.Arrays;
+
+import javax.sql.DataSource;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 统计数据库性能
@@ -12,8 +20,14 @@ import org.springframework.context.annotation.Bean;
  * @Date: 2019/4/28 11:53
  * @Description:
  */
+//@Configuration
 public class DruidConfig {
 
+	@ConfigurationProperties(prefix = "spring.datasource")
+    @Bean
+    public DataSource druid() {
+        return new DruidDataSource();
+    }
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Bean
@@ -32,6 +46,7 @@ public class DruidConfig {
         FilterRegistrationBean filterRegistrationBean=new FilterRegistrationBean(new WebStatFilter());
         //添加过滤规则
         filterRegistrationBean.addInitParameter("exclusions","*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
+        filterRegistrationBean.setUrlPatterns(Arrays.asList("/*"));//拦截所有请求
         return filterRegistrationBean;
     }
 }

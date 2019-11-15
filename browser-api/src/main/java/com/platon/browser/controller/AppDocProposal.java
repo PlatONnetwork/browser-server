@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.validation.Valid;
 
@@ -66,7 +67,7 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/proposalList", nickname = "", notes = "", response = ProposalListResp.class, tags = { "Proposal" })
 	@PostMapping(value = "proposal/proposalList", produces = { "application/json" })
-	RespPage<ProposalListResp> proposalList(@ApiParam(value = "PageReq")@Valid @RequestBody(required = false) PageReq req);
+	WebAsyncTask<RespPage<ProposalListResp>> proposalList(@ApiParam(value = "PageReq")@Valid @RequestBody(required = false) PageReq req);
 
 	
     /**
@@ -121,7 +122,7 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/proposalDetails", nickname = "", notes = "", response = ProposalDetailsResp.class, tags = { "Proposal" })
 	@PostMapping(value = "proposal/proposalDetails", produces = { "application/json" })
-	BaseResp<ProposalDetailsResp> proposalDetails(
+	WebAsyncTask<BaseResp<ProposalDetailsResp>> proposalDetails(
 			@ApiParam(value = "ProposalDetailRequest ")@Valid @RequestBody ProposalDetailRequest req);
 	
     /**
@@ -159,5 +160,5 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/voteList", nickname = "", notes = "", response = VoteListResp.class, tags = { "Proposal" })
 	@PostMapping(value = "proposal/voteList", produces = { "application/json" })
-	RespPage<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ")@Valid @RequestBody VoteListRequest req);
+	WebAsyncTask<RespPage<VoteListResp>> voteList(@ApiParam(value = "VoteListRequest ")@Valid @RequestBody VoteListRequest req);
 }

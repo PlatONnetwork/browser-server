@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -69,7 +70,7 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockList", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
 	@PostMapping(value = "block/blockList", produces = { "application/json" })
-    RespPage<BlockListResp> blockList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
+	WebAsyncTask<RespPage<BlockListResp>> blockList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
 	
      /**
      *
@@ -93,7 +94,7 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockListByNodeId", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
 	@PostMapping(value = "block/blockListByNodeId", produces = { "application/json" })
-    RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
+	WebAsyncTask<RespPage<BlockListResp>> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
 	
     /**
      * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date&local=:en c.导出节点的区块列表
@@ -163,7 +164,7 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@PostMapping(value = "block/blockDetails", produces = { "application/json" })
-    BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq", required = true)@Valid @RequestBody BlockDetailsReq req);
+	WebAsyncTask<BaseResp<BlockDetailResp>> blockDetails(@ApiParam(value = "BlockDetailsReq", required = true)@Valid @RequestBody BlockDetailsReq req);
 	
 	
     /**
@@ -184,5 +185,5 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@PostMapping(value = "block/blockDetailNavigate", produces = { "application/json" })
-    BaseResp<BlockDetailResp> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
+	WebAsyncTask<BaseResp<BlockDetailResp>> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
 }

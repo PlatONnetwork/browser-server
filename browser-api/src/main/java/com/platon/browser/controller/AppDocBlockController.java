@@ -1,5 +1,6 @@
 package com.platon.browser.controller;
 
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -19,6 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.WebAsyncTask;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -45,13 +50,53 @@ public class AppDocBlockController implements AppDocBlock {
 	private DownFileCommon downFileCommon;
 	
 	@Override
-	public RespPage<BlockListResp> blockList(@Valid PageReq req) {
-		return blockService.blockList(req);
+	public WebAsyncTask<RespPage<BlockListResp>> blockList(@Valid PageReq req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<BlockListResp>>() {  
+            @Override  
+            public RespPage<BlockListResp> call() throws Exception {  
+            	RespPage<BlockListResp> blockListResps = blockService.blockList(req);
+                return blockListResps;  
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<RespPage<BlockListResp>>() {  
+            @Override  
+            public RespPage<BlockListResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 	@Override
-	public RespPage<BlockListResp> blockListByNodeId(@Valid BlockListByNodeIdReq req) {
-		return blockService.blockListByNodeId(req);
+	public WebAsyncTask<RespPage<BlockListResp>> blockListByNodeId(@Valid BlockListByNodeIdReq req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<BlockListResp>>() {  
+            @Override  
+            public RespPage<BlockListResp> call() throws Exception {  
+            	RespPage<BlockListResp> blockListResps = blockService.blockListByNodeId(req);
+                return blockListResps;  
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<RespPage<BlockListResp>>() {  
+            @Override  
+            public RespPage<BlockListResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 	@Override
@@ -66,15 +111,53 @@ public class AppDocBlockController implements AppDocBlock {
 	}
 
 	@Override
-	public BaseResp<BlockDetailResp> blockDetails(@Valid BlockDetailsReq req) {
-		BlockDetailResp blockDetailResp = blockService.blockDetails(req);
-		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
+	public WebAsyncTask<BaseResp<BlockDetailResp>> blockDetails(@Valid BlockDetailsReq req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<BlockDetailResp>>() {  
+            @Override  
+            public BaseResp<BlockDetailResp> call() throws Exception {  
+            	BlockDetailResp blockDetailResp = blockService.blockDetails(req);
+        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<BaseResp<BlockDetailResp>>() {  
+            @Override  
+            public BaseResp<BlockDetailResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 	@Override
-	public BaseResp<BlockDetailResp> blockDetailNavigate(@Valid BlockDetailNavigateReq req) {
-		BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
-		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
+	public WebAsyncTask<BaseResp<BlockDetailResp>> blockDetailNavigate(@Valid BlockDetailNavigateReq req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<BlockDetailResp>>() {  
+            @Override  
+            public BaseResp<BlockDetailResp> call() throws Exception {  
+            	BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
+        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<BaseResp<BlockDetailResp>>() {  
+            @Override  
+            public BaseResp<BlockDetailResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask; 
 	}
 
 	

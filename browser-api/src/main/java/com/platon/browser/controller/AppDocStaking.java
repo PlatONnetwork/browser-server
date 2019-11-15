@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.validation.Valid;
 
@@ -55,7 +56,7 @@ public interface AppDocStaking {
 	@ApiOperation(value = "topic/staking/statistic/new", nickname = "", notes = "", tags = { "Staking" })
 	@SubscribeMapping(value = "topic/staking/statistic/new")
 	@PostMapping(value = "staking/statistic", produces = { "application/json" })
-	BaseResp<StakingStatisticNewResp> stakingStatisticNew();
+	WebAsyncTask<BaseResp<StakingStatisticNewResp>> stakingStatisticNew();
 	
     /**
      * @api {post} /staking/aliveStakingList b.实时验证人列表
@@ -105,7 +106,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/aliveStakingList", nickname = "", notes = "", response = AliveStakingListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/aliveStakingList", produces = { "application/json" })
-    RespPage<AliveStakingListResp> aliveStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
+	WebAsyncTask<RespPage<AliveStakingListResp>> aliveStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
 	
 	
     /**
@@ -147,7 +148,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/historyStakingList", nickname = "", notes = "", response = HistoryStakingListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/historyStakingList", produces = { "application/json" })
-    RespPage<HistoryStakingListResp> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
+	WebAsyncTask<RespPage<HistoryStakingListResp>> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
 	
     /**
      * @api {post} /staking/stakingDetails d.验证人详情
@@ -198,7 +199,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/stakingDetails", nickname = "", notes = "", response = StakingDetailsResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/stakingDetails", produces = { "application/json" })
-    BaseResp<StakingDetailsResp> stakingDetails(@ApiParam(value = "StakingDetailsReq ", required = true)@Valid @RequestBody StakingDetailsReq req);
+	WebAsyncTask<BaseResp<StakingDetailsResp>> stakingDetails(@ApiParam(value = "StakingDetailsReq ", required = true)@Valid @RequestBody StakingDetailsReq req);
 	
     /**
      * @api {post} /staking/stakingOptRecordList e.节点操作记录
@@ -243,7 +244,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/stakingOptRecordList", nickname = "", notes = "", response = StakingOptRecordListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/stakingOptRecordList", produces = { "application/json" })
-    RespPage<StakingOptRecordListResp> stakingOptRecordList(@ApiParam(value = "StakingOptRecordListReq ", required = true)@Valid @RequestBody StakingOptRecordListReq req);
+	WebAsyncTask<RespPage<StakingOptRecordListResp>> stakingOptRecordList(@ApiParam(value = "StakingOptRecordListReq ", required = true)@Valid @RequestBody StakingOptRecordListReq req);
 	
     /**
      * @api {post} /staking/delegationListByStaking f.验证人相关的委托列表
@@ -282,7 +283,7 @@ public interface AppDocStaking {
      */
 	@ApiOperation(value = "staking/delegationListByStaking", nickname = "", notes = "", response = DelegationListByStakingResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/delegationListByStaking", produces = { "application/json" })
-    RespPage<DelegationListByStakingResp> delegationListByStaking(@ApiParam(value = "DelegationListByStakingReq ", required = true)@Valid @RequestBody DelegationListByStakingReq req);
+	WebAsyncTask<RespPage<DelegationListByStakingResp>> delegationListByStaking(@ApiParam(value = "DelegationListByStakingReq ", required = true)@Valid @RequestBody DelegationListByStakingReq req);
 	
 	
     /**
@@ -322,7 +323,7 @@ public interface AppDocStaking {
      */
 	@ApiOperation(value = "staking/delegationListByAddress", nickname = "", notes = "", response = DelegationListByAddressResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/delegationListByAddress", produces = { "application/json" })
-    RespPage<DelegationListByAddressResp> delegationListByAddress(@ApiParam(value = "DelegationListByAddressReq ", required = true)@Valid @RequestBody DelegationListByAddressReq req);
+	WebAsyncTask<RespPage<DelegationListByAddressResp>> delegationListByAddress(@ApiParam(value = "DelegationListByAddressReq ", required = true)@Valid @RequestBody DelegationListByAddressReq req);
 	
 	
     /**

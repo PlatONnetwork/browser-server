@@ -7,9 +7,22 @@ import redis.clients.jedis.Jedis;
 
 import java.util.Set;
 
+/**
+ * jedis默认配置参数
+ *  @file JedisConfig.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年11月13日
+ */
 public class JedisConfig {
 
+	/**
+	 * 连接超时时间
+	 */
     private int connectionTimeout = 30000;
+    /**
+     * socket通讯超时时间
+     */
     private int soTimeout = 30000;
     private int maxRedirections = 30000;
 

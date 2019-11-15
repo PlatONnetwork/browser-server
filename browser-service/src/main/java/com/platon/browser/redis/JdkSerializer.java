@@ -13,6 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 反序列化工具
+ *  @file JdkSerializer.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年11月13日
+ */
 public class JdkSerializer<T> implements JedisSerializer<T> {
 	
 	@SuppressWarnings("unchecked")

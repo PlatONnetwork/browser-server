@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
@@ -71,6 +72,7 @@ public class ProposalServiceImpl implements ProposalService {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());
             for (Proposal proposal : list) {
                 ProposalListResp proposalListResp = BeanConvertUtil.beanConvert(proposal, ProposalListResp.class);
+                proposalListResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
                 proposalListResp.setProposalHash(proposal.getHash());
                 /** 获取统计的最新块高 */
                 NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
@@ -95,9 +97,11 @@ public class ProposalServiceImpl implements ProposalService {
             return BaseResp.build(ErrorCodeEnum.RECORD_NOT_EXIST.getCode(), i18n.i(I18nEnum.RECORD_NOT_EXIST, req.getProposalHash()), null);
         }
         ProposalDetailsResp proposalDetailsResp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
+        proposalDetailsResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
         proposalDetailsResp.setProposalHash(req.getProposalHash());
         proposalDetailsResp.setNodeId(proposal.getNodeId());
         proposalDetailsResp.setNodeName(proposal.getNodeName());
+        proposalDetailsResp.setDescription(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
         proposalDetailsResp.setCurBlock(String.valueOf(networkStat.getCurNumber()));
         /** 不同的类型有不同的通过率 */

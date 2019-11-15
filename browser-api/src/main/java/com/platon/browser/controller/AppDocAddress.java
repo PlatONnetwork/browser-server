@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.validation.Valid;
 
@@ -68,7 +69,7 @@ public interface AppDocAddress {
      */
 	@ApiOperation(value = "address/details", nickname = "address details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
 	@PostMapping(value = "address/details", produces = { "application/json" })
-	BaseResp<QueryDetailResp> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);
+	WebAsyncTask<BaseResp<QueryDetailResp>> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);
 	
 	/**
      * @api {post}  /address/rpplanDetail b.查询地址锁仓详情
@@ -110,5 +111,5 @@ public interface AppDocAddress {
      */
 	@ApiOperation(value = "address/rpplanDetail", nickname = "address rpplan details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
 	@PostMapping(value = "address/rpplanDetail", produces = { "application/json" })
-	BaseResp<QueryRPPlanDetailResp> rpplanDetail(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryRPPlanDetailRequest req);
+	WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> rpplanDetail(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryRPPlanDetailRequest req);
 }

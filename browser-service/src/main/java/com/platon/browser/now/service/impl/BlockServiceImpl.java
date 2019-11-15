@@ -81,7 +81,6 @@ public class BlockServiceImpl implements BlockService {
 		/** 查询现阶段最大区块数 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Long bNumber = networkStatRedis.getCurNumber();
-		logger.debug("perform-blockList,time1:{}", System.currentTimeMillis() - startTime);
 		/** 小于50万条查询redis */
 		if (req.getPageNo().intValue() * req.getPageSize().intValue() < BrowserConst.MAX_NUM) {
 			/**
@@ -91,7 +90,6 @@ public class BlockServiceImpl implements BlockService {
 			if(req.getPageNo().intValue() == 1) {
 				/** 查询缓存最新的八条区块信息 */
 				items = statisticCacheService.getBlockCache(0,1);
-				logger.debug("perform-blockList,time2:{}", System.currentTimeMillis() - startTime);
 				if(!items.isEmpty()) {
 					/**
 					 * 如果统计区块小于区块交易则重新查询新的区块
@@ -103,11 +101,9 @@ public class BlockServiceImpl implements BlockService {
 						items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 					}
 				}
-				logger.debug("perform-blockList,time3:{}", System.currentTimeMillis() - startTime);
 			} else {
 				items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 			}
-			logger.debug("perform-blockList,time4:{}", System.currentTimeMillis() - startTime);
 			lists.addAll(this.transferBlockListResp(items));
 		} else {
 			/** 查询超过五十万条数据，根据区块号倒序 */
@@ -123,12 +119,11 @@ public class BlockServiceImpl implements BlockService {
 			
 		}
 		bNumber = lists.get(0).getNumber();
-		logger.debug("perform-blockList,time5:{}", System.currentTimeMillis() - startTime);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(bNumber);
 		respPage.init(page, lists);
 		if(System.currentTimeMillis() - startTime > 100) {
-			logger.debug("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
+			logger.error("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
 		}
 		return respPage;
 	}
@@ -141,6 +136,9 @@ public class BlockServiceImpl implements BlockService {
 	 */
 	private List<BlockListResp> transferBlockListResp(List<Block> blocks) {
 		List<BlockListResp> blockListResps = new ArrayList<>();
+		/**
+		 * 申明节点列表，减少整体查询次数
+		 */
 		Map<String, String> nodes = new HashMap<>();
 		for(Block block : blocks) {
 			BlockListResp blockListResp = new BlockListResp();
@@ -152,10 +150,13 @@ public class BlockServiceImpl implements BlockService {
 			blockListResp.setServerTime(new Date().getTime());
 			blockListResp.setTimestamp(block.getTime().getTime());
 			String nodeName = nodes.get(block.getNodeId());
+			/**
+			 * 判断节点名称是否需要重复查询
+			 */
 			if(StringUtils.isNotBlank(nodeName)) {
 				blockListResp.setNodeName(nodeName);
 			} else {
-				blockListResp.setNodeName(commonService.getNodeName(block.getNodeId()));
+				blockListResp.setNodeName(commonService.getNodeName(block.getNodeId(), null));
 				nodes.put(block.getNodeId(), blockListResp.getNodeName());
 			}
 			blockListResps.add(blockListResp);

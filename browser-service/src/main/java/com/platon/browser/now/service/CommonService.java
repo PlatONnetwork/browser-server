@@ -15,5 +15,5 @@ public interface CommonService {
 	 * @param nodeId
 	 * @return
 	 */
-	String getNodeName(String nodeId);
+	String getNodeName(String nodeId,String nodeName);
 }

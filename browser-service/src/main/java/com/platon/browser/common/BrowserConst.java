@@ -37,4 +37,10 @@ public class BrowserConst {
 	/**账户*/
 	public static final String ACCOUNT = "0x1000000000000000000000000000000000000001";
 	
+	/**默认提案标题*/
+	public static final String INQUIRY = "inquiry";
+	
+	/**WEB超时时间*/
+	public static final Integer WEB_TIME_OUT = 5000;
+	
 }

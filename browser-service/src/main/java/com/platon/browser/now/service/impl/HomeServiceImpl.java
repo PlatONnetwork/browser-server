@@ -223,6 +223,9 @@ public class HomeServiceImpl implements HomeService {
 			if(dValue > 0) {
 				items = statisticCacheService.getBlockCacheByStartEnd(dValue, dValue+8);
 			}
+			if(dValue < 0) {
+				chainStatisticNewResp.setCurrentNumber(items.get(0).getNum());
+			}
 		}
 
 		List<BlockListNewResp> lists = new LinkedList<>();
@@ -235,7 +238,7 @@ public class HomeServiceImpl implements HomeService {
 			blockListNewResp.setServerTime(new Date().getTime());
 			blockListNewResp.setTimestamp(items.get(i).getTime().getTime());
 			blockListNewResp.setIsRefresh(true);
-			blockListNewResp.setNodeName(commonService.getNodeName(items.get(i).getNodeId()));
+			blockListNewResp.setNodeName(commonService.getNodeName(items.get(i).getNodeId(), null));
 			/**
 			 * 第一个块需要记录缓存，然后进行比对
 			 * 如果块没有增长则置为false

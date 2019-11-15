@@ -2,6 +2,13 @@ package com.platon.browser.redis;
 
 import java.util.*;
 
+/**
+ * 序列化工具了
+ *  @file SerializerUtils.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年11月13日
+ */
 public class SerializerUtils {
 
 

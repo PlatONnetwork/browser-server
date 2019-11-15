@@ -9,7 +9,6 @@ import java.io.ObjectOutputStream;
 /**
  * 序列化工具
  * @author Jungle
- *
  */
 public class JedisSerializeUtil {
 

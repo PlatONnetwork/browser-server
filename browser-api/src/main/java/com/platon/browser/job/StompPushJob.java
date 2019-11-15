@@ -52,7 +52,7 @@ public class StompPushJob {
     /**
      * 	推送统计相关信息
      */
-    @Scheduled(cron="0/5 * * * * ?")
+    @Scheduled(cron="0/3 * * * * ?")
     public void pushChainStatisticNew(){
     	ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
     	BaseResp<ChainStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
@@ -62,7 +62,7 @@ public class StompPushJob {
     /**
      * 	推送出块趋势相关信息
      */
-    @Scheduled(cron="0/5 * * * * ?")
+    @Scheduled(cron="0/3 * * * * ?")
     public void pushBlockStatisticNew(){
     	BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
     	BaseResp<BlockStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);

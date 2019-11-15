@@ -1,14 +1,13 @@
 package com.platon.browser.controller;
 
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.ResponseException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
@@ -21,6 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.WebAsyncTask;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -47,18 +50,75 @@ public class AppDocTransactionController implements AppDocTransaction {
 	private DownFileCommon downFileCommon;
 
 	@Override
-	public RespPage<TransactionListResp> transactionList(@Valid PageReq req) {
-		return transactionService.getTransactionList(req);
+	public WebAsyncTask<RespPage<TransactionListResp>> transactionList(@Valid PageReq req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<TransactionListResp>>() {  
+            @Override  
+            public RespPage<TransactionListResp> call() throws Exception {  
+            	return transactionService.getTransactionList(req);
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<RespPage<TransactionListResp>>() {  
+            @Override  
+            public RespPage<TransactionListResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 	@Override
-	public RespPage<TransactionListResp> transactionListByBlock(@Valid TransactionListByBlockRequest req) {
-		return transactionService.getTransactionListByBlock(req);
+	public WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@Valid TransactionListByBlockRequest req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<TransactionListResp>>() {  
+            @Override  
+            public RespPage<TransactionListResp> call() throws Exception {  
+        		return transactionService.getTransactionListByBlock(req);
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<RespPage<TransactionListResp>>() {  
+            @Override  
+            public RespPage<TransactionListResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 	@Override
-	public RespPage<TransactionListResp> transactionListByAddress(@Valid TransactionListByAddressRequest req) {
-		return transactionService.getTransactionListByAddress(req);
+	public WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@Valid TransactionListByAddressRequest req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<TransactionListResp>>() {  
+            @Override  
+            public RespPage<TransactionListResp> call() throws Exception {  
+            	return transactionService.getTransactionListByAddress(req);
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<RespPage<TransactionListResp>>() {  
+            @Override  
+            public RespPage<TransactionListResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 	@Override
@@ -73,9 +133,28 @@ public class AppDocTransactionController implements AppDocTransaction {
 	}
 
 	@Override
-	public BaseResp<TransactionDetailsResp> transactionDetails(@Valid TransactionDetailsReq req) {
-		TransactionDetailsResp transactionDetailsResp = transactionService.transactionDetails(req);
-		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailsResp);
+	public WebAsyncTask<BaseResp<TransactionDetailsResp>> transactionDetails(@Valid TransactionDetailsReq req) {
+		// 5s钟没返回，则认为超时  
+        WebAsyncTask<BaseResp<TransactionDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<TransactionDetailsResp>>() {  
+            @Override  
+            public BaseResp<TransactionDetailsResp> call() throws Exception {  
+            	TransactionDetailsResp transactionDetailsResp = transactionService.transactionDetails(req);
+        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailsResp);
+            }  
+        });  
+        webAsyncTask.onCompletion(new Runnable() {  
+            @Override  
+            public void run() {  
+            }  
+        });  
+        webAsyncTask.onTimeout(new Callable<BaseResp<TransactionDetailsResp>>() {  
+            @Override  
+            public BaseResp<TransactionDetailsResp> call() throws Exception {  
+                // 超时的时候，直接抛异常，让外层统一处理超时异常  
+                throw new TimeoutException("System busy!");  
+            }  
+        });  
+        return webAsyncTask;  
 	}
 
 }

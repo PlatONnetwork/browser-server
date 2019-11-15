@@ -14,6 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import com.platon.browser.config.RedisConfig;
 
+/**
+ * 具体实现整个接口调用
+ *  @file JedisClusterManager.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年11月13日
+ */
 public class JedisClusterManager implements RedisCommands {
 
 	private static Logger logger = LoggerFactory.getLogger(JedisClusterManager.class);
@@ -23,6 +30,11 @@ public class JedisClusterManager implements RedisCommands {
 	private JedisCluster jedisCluster = null;
 	private static String defaultConfigKey ;
 
+	/**
+	 * 线程安全的初始化整个对象
+	 * @method getInstance
+	 * @return
+	 */
 	public static synchronized JedisClusterManager getInstance() {
 		defaultConfigKey = RedisConfig.getRedisConfigKey();
 		if (jedisClusterManager == null) {
@@ -33,6 +45,9 @@ public class JedisClusterManager implements RedisCommands {
 
 	private JedisClusterManager() {
 		try {
+			/**
+			 * 加载默认key的jedismap
+			 */
 			jedisCluster = JedisHelper.getInstance().getJedisClusterByKey(defaultConfigKey);
 			//jedisExecute = new JedisExecute(jedisCluster);
 		} catch (Exception e) {
