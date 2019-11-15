@@ -4,11 +4,14 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
+import com.platon.browser.common.utils.BakDataDeleteUtil;
 import com.platon.browser.complement.service.param.BlockParameterService;
 import com.platon.browser.complement.service.param.StatisticParameterService;
 import com.platon.browser.complement.service.param.TransactionParameterService;
 import com.platon.browser.dao.entity.NOptBak;
+import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;
+import com.platon.browser.dao.entity.TxBakExample;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -46,6 +49,9 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     // 交易序号id
     private long transactionId = 0;
 
+    private long txDeleteBatchCount = 0;
+    private long optDeleteBatchCount = 0;
+
     @Transactional
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -72,6 +78,10 @@ public class CollectionEventHandler implements ICollectionEventHandler {
 
             complementEventPublisher.publish(event.getBlock(),transactions,nodeOpts1);
 
+
+            txDeleteBatchCount++;
+            optDeleteBatchCount++;
+
             // 交易入库mysql
             if(!transactions.isEmpty()){
                 List<TxBak> baks = new ArrayList<>();
@@ -80,6 +90,15 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     BeanUtils.copyProperties(tx,bak);
                     baks.add(bak);
                 });
+
+                if(txDeleteBatchCount==10){
+                    // 删除小于最高ID的交易备份
+                    TxBakExample txBakExample = new TxBakExample();
+                    txBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getTxBakMaxId());
+                    int txCount = txBakMapper.deleteByExample(txBakExample);
+                    log.debug("清除交易备份记录({})条",txCount);
+                    txDeleteBatchCount=0;
+                }
                 txBakMapper.batchInsert(baks);
             }
 
@@ -91,6 +110,15 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     BeanUtils.copyProperties(no,bak);
                     baks.add(bak);
                 });
+
+                if(optDeleteBatchCount==10){
+                    // 删除小于最高ID的操作记录备份
+                    NOptBakExample nOptBakExample = new NOptBakExample();
+                    nOptBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getNOptBakMaxId());
+                    int optCount = nOptBakMapper.deleteByExample(nOptBakExample);
+                    log.debug("清除操作备份记录({})条",optCount);
+                    optDeleteBatchCount=0;
+                }
                 nOptBakMapper.batchInsert(baks);
             }
 

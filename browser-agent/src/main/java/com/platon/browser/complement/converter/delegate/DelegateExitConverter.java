@@ -64,7 +64,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
         delegationKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
         Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
 
-        if(delegation==null) throw new BusinessError("找不到对应的委托信息:[delegateAddr="+tx.getFrom()+",nodeId="+txParam.getNodeId()+",stakingBlockNum="+txParam.getStakingBlockNum()+"]");
+        if(delegation==null) return null;
         DelegateExit businessParam= DelegateExit.builder()
                 .nodeId(txParam.getNodeId())
                 .amount(txParam.getAmount())

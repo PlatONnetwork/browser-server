@@ -36,10 +36,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private RedisImportService redisImportService;
     @Autowired
     private NetworkStatCache networkStatCache;
-    @Autowired
-    private NOptBakMapper nOptBakMapper;
-    @Autowired
-    private TxBakMapper txBakMapper;
 
     @Value("${disruptor.queue.persistence.batch-size}")
     private int batchSize;
@@ -85,14 +81,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
 
             // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
-            NOptBakExample nOptBakExample = new NOptBakExample();
-            nOptBakExample.setOrderByClause("id desc limit 1");
-            List<NOptBak> nOptBaks = nOptBakMapper.selectByExample(nOptBakExample);
+            List<NodeOpt> nOptBaks = event.getNodeOpts();
             Long nOptMaxId = 0L;
-            if(!nOptBaks.isEmpty()){
-                NOptBak nOptBak = nOptBaks.get(0);
-                nOptMaxId=nOptBak.getId()-10000;
-            }
+            if(!nOptBaks.isEmpty()) nOptMaxId=nOptBaks.get(0).getId();
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
         }catch (Exception e){
             log.error("",e);
