@@ -56,14 +56,14 @@ logging:
     com.platon.browser.bootstrap: error
     com.platon.browser.collection: error
     com.platon.browser.collection.queue.handler: error
-    com.platon.browser.common: debug
+    com.platon.browser.common: error
     com.platon.browser.complement: error
     com.platon.browser.complement.handler: error
     com.platon.browser.complement.converter: error
     com.platon.browser.persistence: error
     com.platon.browser.persistence.handler: error
     com.platon.browser.persistence.queue.handler: error
-    com.platon.browser.task: error
+    com.platon.browser.task: info
 #PlatOn相关配置
 platon:
   # Web3j访问地址
