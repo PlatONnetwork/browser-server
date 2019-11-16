@@ -2,7 +2,7 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
-import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Proposal;
@@ -33,7 +33,7 @@ public class ProposalInfoTask {
     @Autowired
     private PlatOnClient client;
     @Autowired
-    private SpecialContractApi sca;
+    private SpecialApi sca;
     @Autowired
     private NetworkStatCache networkStatCache;
     @Autowired
@@ -122,7 +122,7 @@ public class ProposalInfoTask {
      * @throws Exception
      */
     private ProposalParticiantStat getProposalParticipantStat ( String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
-        return sca.getProposalParticipants(client.getWeb3j(), proposalHash, blockHash);
+        return sca.getProposalParticipants(client.getWeb3jWrapper().getWeb3j(), proposalHash, blockHash);
     }
 
     /**

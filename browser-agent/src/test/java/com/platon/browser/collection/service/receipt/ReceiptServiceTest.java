@@ -1,7 +1,6 @@
 package com.platon.browser.collection.service.receipt;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.exception.HttpRequestException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +30,7 @@ public class ReceiptServiceTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws InterruptedException, HttpRequestException {
+    public void test() throws Exception {
         target.getReceiptAsync(1L);
         when(retryService.getReceipt(any())).thenThrow(new RuntimeException(""));
         target.getReceiptAsync(1L);

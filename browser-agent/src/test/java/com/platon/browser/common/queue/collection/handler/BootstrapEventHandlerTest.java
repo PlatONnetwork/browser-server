@@ -4,7 +4,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
 import com.platon.browser.bootstrap.queue.handler.BootstrapEventHandler;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
 import com.platon.browser.dao.entity.TxBak;

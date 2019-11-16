@@ -1,4 +1,4 @@
-package com.platon.browser.client.result;
+package com.platon.browser.client;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

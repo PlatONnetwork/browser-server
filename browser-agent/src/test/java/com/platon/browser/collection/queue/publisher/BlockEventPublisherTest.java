@@ -1,8 +1,8 @@
 package com.platon.browser.bootstrap.queue.publisher;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.result.Receipt;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.Receipt;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import org.junit.Before;

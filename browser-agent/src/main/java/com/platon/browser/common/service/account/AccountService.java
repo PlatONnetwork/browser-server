@@ -35,7 +35,7 @@ public class AccountService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getInciteBalance(BigInteger blockNumber) {
         try {
-            BigInteger balance = platOnClient.getWeb3j()
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j()
                     .platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
             return new BigDecimal(balance);
@@ -53,7 +53,7 @@ public class AccountService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getLockCabinBalance(BigInteger blockNumber){
         try {
-            BigInteger balance = platOnClient.getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                    .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
@@ -70,7 +70,7 @@ public class AccountService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getStakingBalance(BigInteger blockNumber){
         try {
-            BigInteger balance = platOnClient.getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){

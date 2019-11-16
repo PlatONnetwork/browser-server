@@ -7,7 +7,7 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.bootstrap.queue.callback.Callback;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
 import com.platon.browser.bootstrap.queue.handler.BootstrapEventHandler;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.queue.AbstractPublisher;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

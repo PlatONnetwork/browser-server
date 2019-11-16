@@ -17,12 +17,14 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteCall;
+import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.PlatonCall;
 import org.web3j.utils.JSONUtil;
 import org.web3j.utils.Numeric;
 import org.web3j.utils.PlatOnUtil;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +37,7 @@ import java.util.concurrent.Callable;
  * @Description:
  */
 @Component
-public class SpecialContractApi {
+public class SpecialApi {
 
     /**
      * 查询结算周期历史验证人队列
@@ -210,5 +212,14 @@ public class SpecialContractApi {
             String msg = JSON.toJSONString(br,true);
             throw new ContractInvokeException(String.format("【查询提案参与者出错】提案Hash:%s,区块Hash:%s,返回数据:%s",proposalHash,blockHash,msg));
         }
+    }
+
+    public ReceiptResult getReceiptResult(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws IOException {
+        Request<?, ReceiptResult> request = new Request(
+                "platon_getTransactionByBlock",
+                Arrays.asList(blockNumber),
+                web3jWrapper.getWeb3jService(),
+                ReceiptResult.class);
+        return request.send();
     }
 }

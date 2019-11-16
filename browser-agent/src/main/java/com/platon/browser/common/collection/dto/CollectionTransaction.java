@@ -1,6 +1,6 @@
 package com.platon.browser.common.collection.dto;
 
-import com.platon.browser.client.result.Receipt;
+import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;

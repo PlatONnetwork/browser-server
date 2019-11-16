@@ -1,7 +1,7 @@
 package com.platon.browser.collection.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.queue.event.BlockEvent;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.exception.BeanCreateOrUpdateException;

@@ -3,7 +3,7 @@ package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.receipt.ReceiptService;
 import com.platon.browser.dao.entity.NetworkStat;
@@ -79,6 +79,8 @@ public class ConsistencyService {
         log.warn("MYSQL/ES/REDIS数据同步区间:[{},{}]",startBlockNum,mysqlMaxBlockNum);
         // 补充 [startBlockNum,mysqlMaxBlockNum] 闭区间内的区块和交易信息到ES和Redis
         shutdownCallback.setEndBlockNum(mysqlMaxBlockNum);
+        if(startBlockNum<=0) startBlockNum=1;
+        if(startBlockNum>mysqlMaxBlockNum) return;
         for (long number=startBlockNum;number<=mysqlMaxBlockNum;number++){
             // 异步获取区块
             CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(number);
