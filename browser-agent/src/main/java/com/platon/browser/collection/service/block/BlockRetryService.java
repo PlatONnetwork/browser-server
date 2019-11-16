@@ -40,6 +40,7 @@ public class BlockRetryService {
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
             return block;
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }

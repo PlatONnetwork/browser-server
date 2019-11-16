@@ -42,6 +42,7 @@ public class ReceiptRetryService {
 
             return result;
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }

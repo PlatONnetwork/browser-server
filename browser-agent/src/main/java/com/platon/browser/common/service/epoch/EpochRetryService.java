@@ -138,6 +138,7 @@ public class EpochRetryService {
             // 更新期望出块数：期望出块数=共识周期块数/实际参与共识节点数
             expectBlockCount=chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(curValidators.size())).longValue();
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }
@@ -182,6 +183,7 @@ public class EpochRetryService {
             curVerifiers.clear();
             curVerifiers.addAll(curNodes);
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }
@@ -204,6 +206,7 @@ public class EpochRetryService {
             candidates.forEach(v->v.setNodeId(HexTool.prefix(v.getNodeId())));
             return candidates;
         } catch (Exception e) {
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }
