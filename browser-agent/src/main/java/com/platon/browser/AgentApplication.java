@@ -3,7 +3,7 @@ package com.platon.browser;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.service.ConsistencyService;
 import com.platon.browser.bootstrap.service.InitializationService;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.receipt.ReceiptService;

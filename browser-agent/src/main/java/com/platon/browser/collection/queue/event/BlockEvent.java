@@ -1,6 +1,6 @@
 package com.platon.browser.collection.queue.event;
 
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import lombok.Builder;
 import lombok.Data;

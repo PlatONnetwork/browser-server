@@ -1,7 +1,7 @@
 package com.platon.browser.common.collection.dto;
 
-import com.platon.browser.client.result.Receipt;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.Receipt;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;

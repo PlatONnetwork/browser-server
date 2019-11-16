@@ -38,8 +38,6 @@ public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private BlockESRepository blockESRepository;
     @Mock
-    private TransactionESRepository transactionESRepository;
-    @Mock
     private BlockService blockService;
     @Mock
     private ReceiptService receiptService;
@@ -54,7 +52,6 @@ public class ConsistencyServiceTest extends AgentTestBase {
     public void setup() {
         ReflectionTestUtils.setField(target, "networkStatMapper", networkStatMapper);
         ReflectionTestUtils.setField(target, "blockESRepository", blockESRepository);
-        ReflectionTestUtils.setField(target, "transactionESRepository", transactionESRepository);
         ReflectionTestUtils.setField(target, "blockService", blockService);
         ReflectionTestUtils.setField(target, "receiptService", receiptService);
         ReflectionTestUtils.setField(target, "bootstrapEventPublisher", bootstrapEventPublisher);
@@ -76,21 +73,11 @@ public class ConsistencyServiceTest extends AgentTestBase {
         when(blockESRepository.exists(anyString())).thenReturn(true);
         target.post();
 
-        Transaction tx = null;
-        when(transactionESRepository.get(anyString(),any())).thenReturn(tx);
-        target.post();
-
-        tx = CollectionTransaction.newInstance();
-        when(transactionESRepository.get(anyString(),any())).thenReturn(tx);
-        tx.setNum(5L);
-        tx.setId(10L);
         when(blockService.getBlockAsync(anyLong())).thenReturn(null);
         when(receiptService.getReceiptAsync(anyLong())).thenReturn(null);
         target.post();
 
-        tx.setNum(50L);
-        target.post();
-        verify(target, times(6)).post();
+        verify(target, times(4)).post();
     }
 
 }

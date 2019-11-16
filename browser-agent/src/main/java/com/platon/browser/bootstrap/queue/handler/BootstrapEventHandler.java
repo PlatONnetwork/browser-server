@@ -2,7 +2,7 @@ package com.platon.browser.bootstrap.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.service.elasticsearch.EsImportService;

@@ -36,10 +36,11 @@ public class BlockRetryService {
         try {
             log.debug("获取区块:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
             DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
-            PlatonBlock block = platOnClient.getWeb3j().platonGetBlockByNumber(dp,true).send();
+            PlatonBlock block = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBlockByNumber(dp,true).send();
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
             return block;
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }
@@ -55,7 +56,7 @@ public class BlockRetryService {
         try {
             if(latestBlockNumber==null||currentBlockNumber>latestBlockNumber.longValue()) {
                 // 如果记录的链上最新区块号为空,或当前区块号大于记录的链上最新区块号,则更新链上最新区块号
-                latestBlockNumber = platOnClient.getWeb3j().platonBlockNumber().send().getBlockNumber();
+                latestBlockNumber = platOnClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
             }
             if(currentBlockNumber>latestBlockNumber.longValue()){
                 // 如果当前区块号仍然大于更新后的链上最新区块号

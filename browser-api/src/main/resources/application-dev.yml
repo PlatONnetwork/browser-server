@@ -65,7 +65,11 @@ logging:
     com.platon.browser.dao: debug
 #初始化链相关的配置
 platon:
-  web3j.addresses: http://192.168.112.171:6789
+  # Web3j访问地址
+  web3j:
+    #HTTP或WS
+    protocol: HTTP
+    addresses: 192.168.112.171:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

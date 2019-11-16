@@ -7,7 +7,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.HttpUtil;
 
 public class HttpUtilTest {
 

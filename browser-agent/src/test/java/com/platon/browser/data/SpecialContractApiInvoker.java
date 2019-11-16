@@ -1,7 +1,7 @@
 package com.platon.browser.data;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.client.SpecialApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.platon.BaseResponse;
@@ -32,7 +32,7 @@ public class SpecialContractApiInvoker {
     private static DelegateContract delegateContract = DelegateContract.load(web3j);
     private static RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(web3j);
     private static ProposalContract proposalContract = ProposalContract.load(web3j);
-    private static SpecialContractApi sca = new SpecialContractApi();
+    private static SpecialApi sca = new SpecialApi();
 
     public static void main(String args[]) throws Exception {
 

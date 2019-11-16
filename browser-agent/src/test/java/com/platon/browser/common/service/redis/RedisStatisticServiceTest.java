@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.util.ReflectionTestUtils;
-import sun.nio.ch.Net;
 
 import java.util.HashSet;
 import java.util.Set;

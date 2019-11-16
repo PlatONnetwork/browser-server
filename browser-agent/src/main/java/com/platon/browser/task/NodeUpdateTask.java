@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.platon.browser.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +20,6 @@ import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.HttpUtil;
 import com.platon.browser.util.KeyBaseAnalysis;
 
 import lombok.extern.slf4j.Slf4j;

@@ -1,27 +1,29 @@
 package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.result.ReceiptResult;
-import com.platon.browser.util.HttpUtil;
+import com.platon.browser.enums.Web3jProtocolEnum;
+import com.platon.browser.exception.ConfigLoadingException;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.websocket.WebSocketService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.HashMap;
+import java.net.ConnectException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -33,10 +35,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class PlatOnClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
-
-    private Map<Web3j,String> web3jMap=new HashMap<>();
-    private Web3j currentValidWeb3j;
-    private String currentValidAddress;
+    @Value("${platon.web3j.protocol}")
+    private Web3jProtocolEnum protocol;
+    @Getter
+    @Value("${platon.web3j.addresses}")
+    private List<String> addresses;
+    @Autowired
+    private SpecialApi specialApi;
+    private List<Web3jWrapper> web3jWrappers=new ArrayList<>();
+    private Web3jWrapper currentWeb3jWrapper;
     // 委托合约接口
     private DelegateContract delegateContract;
     public DelegateContract getDelegateContract(){return delegateContract;}
@@ -56,126 +63,122 @@ public class PlatOnClient {
     private StakingContract stakingContract;
     public StakingContract getStakingContract(){return stakingContract;}
 
-    @Value("${platon.web3j.addresses}")
-    private List<String> web3jAddresses;
 
     @PostConstruct
     public void init(){
         WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
-            web3jAddresses.forEach(address->web3jMap.put(Web3j.build(new HttpService(address)),address));
-            updateCurrentValidWeb3j();
+            web3jWrappers.clear();
+            addresses.forEach(address->{
+                Web3jService service=null;
+                if(protocol==Web3jProtocolEnum.WS){
+                    WebSocketService wss = new WebSocketService(protocol.getHead()+address,true);
+                    try {
+                        wss.connect();
+                        service=wss;
+                    } catch (ConnectException e) {
+                        log.error("Websocket地址({})无法连通:",protocol.getHead()+address,e);
+                        return;
+                    }
+                }else if(protocol==Web3jProtocolEnum.HTTP){
+                    service = new HttpService(protocol.getHead()+address);
+                }else{
+                    log.error("Web3j连接协议[{}]不合法!",protocol.getHead());
+                    System.exit(1);
+                }
+                Web3jWrapper web3j = Web3jWrapper.builder()
+                        .address(protocol.getHead()+address)
+                        .web3jService(service)
+                        .web3j(Web3j.build(service))
+                        .build();
+                web3jWrappers.add(web3j);
+            });
+            if(web3jWrappers.isEmpty()) throw new ConfigLoadingException("没有可用Web3j实例!");
+            updateCurrentWeb3jWrapper();
         }catch (Exception e){
-            log.error("web3j error{}", e);
+            log.error("加载Web3j配置错误:", e);
+            System.exit(1);
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
     }
 
-    public Web3j getWeb3j(){
+    public Web3jWrapper getWeb3jWrapper(){
         WEB3J_CONFIG_LOCK.readLock().lock();
         try{
-            return currentValidWeb3j;
+            return currentWeb3jWrapper;
         }catch (Exception e){
-            log.error("web3j error{}", e);
+            log.error("加载Web3j配置错误:", e);
         }finally {
             WEB3J_CONFIG_LOCK.readLock().unlock();
         }
         return null;
     }
 
-    public String getWeb3jAddress(){
-        return currentValidAddress;
-    }
-
     private void updateContract(){
-        delegateContract = DelegateContract.load(currentValidWeb3j);
-        nodeContract = NodeContract.load(currentValidWeb3j);
-        proposalContract = ProposalContract.load(currentValidWeb3j);
-        restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j);
-        slashContract = SlashContract.load(currentValidWeb3j);
-        stakingContract = StakingContract.load(currentValidWeb3j);
+        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j());
+        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j());
+        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j());
+        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j());
+        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j());
+        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j());
     }
 
-    private void updateCurrentValidWeb3j(){
+    public void updateCurrentWeb3jWrapper(){
         WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
-            Web3j preWeb3j = currentValidWeb3j;
+            Web3jWrapper preWeb3j = currentWeb3jWrapper;
             // 检查所有Web3j的连通性, 取块高最高的作为当前web3j
             long maxBlockNumber = 0;
-            for (Map.Entry<Web3j, String> entry : web3jMap.entrySet()) {
-                Web3j web3j = entry.getKey();
-                String address = entry.getValue();
+            for (Web3jWrapper wrapper:web3jWrappers) {
                 try {
-                    BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
+                    BigInteger blockNumber = wrapper.getWeb3j().platonBlockNumber().send().getBlockNumber();
                     if (blockNumber.longValue() > maxBlockNumber) {
                         maxBlockNumber = blockNumber.longValue();
-                        currentValidWeb3j = web3j;
-                        currentValidAddress = address;
+                        currentWeb3jWrapper = wrapper;
                     }
                 } catch (IOException e2) {
-                    log.info("候选Web3j实例({})无效！", web3j);
+                    log.info("候选Web3j实例({})无效！",wrapper.getAddress());
                 }
             }
-            if(preWeb3j==null||preWeb3j!=currentValidWeb3j){
+            if(preWeb3j==null||preWeb3j!=currentWeb3jWrapper){
                 // 前任web3j为空或Web3j有变动,则更新合约变量
                 updateContract();
             }
             if(maxBlockNumber==0){
-                log.info("当前所有候选Web3j实例均无法连通！");
+                log.info("当前所有候选Web3j实例均无法连通!");
+                if(protocol==Web3jProtocolEnum.WS){
+                    log.info("重新初始化websocket连接!");
+                    init();
+                }
             }
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
     }
 
-    /**
-     * web3j实例保活
-     */
-    @Scheduled(cron = "0/20 * * * * ?")
-    protected void keepAlive () {
-        log.debug("*** In the detect task *** ");
-        try {
-            updateCurrentValidWeb3j();
-        } catch (Exception e) {
-            log.error("detect exception:{}", e);
-        }
-        log.debug("*** End the detect task *** ");
-    }
-
-
-    /**
-     * 根据区块号取交易回执
-     * @param blockNumber
-     */
-    private RpcParam rpcParam = new RpcParam();
-    public CompletableFuture<ReceiptResult> getReceiptAsync(long blockNumber){
-        rpcParam.setMethod("platon_getTransactionByBlock");
-        rpcParam.getParams().clear();
-        rpcParam.getParams().add(blockNumber);
-        CompletableFuture<ReceiptResult> cf = com.platon.browser.util.HttpUtil.postAsync(getWeb3jAddress(),rpcParam.toJsonString(), ReceiptResult.class);
-        while (cf.isCompletedExceptionally()){
-            cf = HttpUtil.postAsync(getWeb3jAddress(),rpcParam.toJsonString(), ReceiptResult.class);
-        }
-        return cf;
+    public ReceiptResult getReceiptResult(Long blockNumber) throws IOException, InterruptedException {
+        ReceiptResult receiptResult = specialApi.getReceiptResult(getWeb3jWrapper(),BigInteger.valueOf(blockNumber));
+        receiptResult.resolve(blockNumber);
+        return receiptResult;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,backoff=@Backoff(value=3000L))
     public EconomicConfig getEconomicConfig() throws Exception {
         try {
-            EconomicConfig ec = getWeb3j().getEconomicConfig().send().getEconomicConfig();
+            EconomicConfig ec = getWeb3jWrapper().getWeb3j().getEconomicConfig().send().getEconomicConfig();
             String msg = JSON.toJSONString(ec,true);
             log.info("链上配置:{}",msg);
             return ec;
         } catch (Exception e) {
-            updateCurrentValidWeb3j();
+            updateCurrentWeb3jWrapper();
             log.error("获取链上配置出错({}),将重试!", e.getMessage());
             throw e;
         }
     }
 
     public BigInteger getLatestBlockNumber() throws IOException {
-        return getWeb3j().platonBlockNumber().send().getBlockNumber();
+        return getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
     }
 
     public List<Node> getLatestValidators() throws Exception {

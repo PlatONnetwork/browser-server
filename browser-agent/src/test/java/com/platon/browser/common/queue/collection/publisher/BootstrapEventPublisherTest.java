@@ -1,10 +1,12 @@
-package com.platon.browser.bootstrap.queue.publisher;
+package com.platon.browser.common.queue.collection.publisher;
 
+import com.lmax.disruptor.dsl.Disruptor;
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
+import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
+import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
-import com.platon.browser.common.collection.dto.EpochMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -27,9 +29,9 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockEventPublisherTest extends AgentTestBase {
+public class BootstrapEventPublisherTest extends AgentTestBase {
     @Spy
-    private BlockEventPublisher target;
+    private BootstrapEventPublisher target;
 
     @Before
     public void setup() {
@@ -39,12 +41,15 @@ public class BlockEventPublisherTest extends AgentTestBase {
     @Test
     public void test(){
         target.init();
+        ShutdownCallback shutdownCallback = ShutdownCallback.builder()
+                .endBlockNum(7000L)
+                .build();
+        target.publish(getBlockAsync(7000L),getReceiptAsync(7000L),shutdownCallback);
 
-        EpochMessage ep = EpochMessage.newInstance();
-
-        target.publish(getBlockAsync(7000L),getReceiptAsync(7000L),ep);
-
-        verify(target, times(1)).publish(any(),any(),any());
+        target.shutdown();
+        Disruptor<BootstrapEvent> disruptor = target.getDisruptor();
+        assertNotNull(disruptor);
+        verify(target, times(1)).getDisruptor();
     }
 
     /**

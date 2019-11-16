@@ -3,6 +3,7 @@ package com.platon.browser.common.service.redis;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.elasticsearch.dto.Block;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class RedisBlockServiceTest extends AgentTestBase {
     @Mock

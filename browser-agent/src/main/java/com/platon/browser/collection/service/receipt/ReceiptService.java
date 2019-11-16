@@ -1,6 +1,6 @@
 package com.platon.browser.collection.service.receipt;
 
-import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.client.ReceiptResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class ReceiptService {
         return CompletableFuture.supplyAsync(()->{
             try {
                 return retryService.getReceipt(blockNumber);
-            } catch (Exception e) {
+            } catch (Exception  e) {
                 log.error("采集区块({})异常!",blockNumber,e);
             }
             return null;

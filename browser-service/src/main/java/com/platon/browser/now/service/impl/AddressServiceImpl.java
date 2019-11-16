@@ -4,7 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RestrictingBalance;
-import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
@@ -73,7 +73,7 @@ public class AddressServiceImpl implements AddressService {
 	private BlockESRepository blockESRepository;
     
     @Autowired
-    private SpecialContractApi specialContractApi;
+    private SpecialApi specialApi;
 
     @Override
     public QueryDetailResp getDetails(QueryDetailRequest req) {
@@ -88,14 +88,14 @@ public class AddressServiceImpl implements AddressService {
         }
         /** 特殊账户余额直接查询链  */
 	  	try {
-			List<RestrictingBalance> restrictingBalances = specialContractApi.getRestrictingBalance(platonClient.getWeb3j(), req.getAddress());
+			List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
 			if(restrictingBalances != null && restrictingBalances.size() > 0) {
 				resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
 				resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
 			}
 			/** 特殊账户余额直接查询链  */
 			if(BrowserConst.ACCOUNT.contains(req.getAddress())) {
-				BigInteger balance = platonClient.getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
+				BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
 				resp.setBalance(new BigDecimal(balance));
 			}
 	  	} catch (Exception e) {

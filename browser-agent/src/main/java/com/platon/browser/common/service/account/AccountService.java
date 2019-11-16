@@ -35,11 +35,12 @@ public class AccountService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getInciteBalance(BigInteger blockNumber) {
         try {
-            BigInteger balance = platOnClient.getWeb3j()
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j()
                     .platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             String error = "获取激励池["+INCITE_ACCOUNT_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
@@ -53,10 +54,11 @@ public class AccountService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getLockCabinBalance(BigInteger blockNumber){
         try {
-            BigInteger balance = platOnClient.getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                    .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             String error = "获取锁仓合约["+RESTRICTING_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
@@ -70,10 +72,11 @@ public class AccountService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getStakingBalance(BigInteger blockNumber){
         try {
-            BigInteger balance = platOnClient.getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             String error = "获取质押合约["+STAKING_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);

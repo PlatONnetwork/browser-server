@@ -2,8 +2,8 @@ package com.platon.browser.collection.service.receipt;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.result.ReceiptResult;
-import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.exception.NetworkException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,19 +32,19 @@ public class ReceiptRetryServiceTest extends AgentTestBase {
     }
 
     @Test
-    public void testNormal() throws InterruptedException, HttpRequestException {
+    public void testNormal() throws Exception, NetworkException {
         when(target.getReceipt(anyLong())).thenCallRealMethod();
         ReceiptResult rr = receiptResultList.get(0);
-        when(target.getReceiptResult(any())).thenReturn(rr);
+        when(platOnClient.getReceiptResult(any())).thenReturn(rr);
         target.getReceipt(1L);
 
         verify(target, times(1)).getReceipt(any());
     }
 
     @Test(expected = RuntimeException.class)
-    public void getBlockException() throws HttpRequestException, InterruptedException {
+    public void getBlockException() throws Exception, NetworkException {
         when(target.getReceipt(anyLong())).thenCallRealMethod();
-        when(target.getReceiptResult(any())).thenThrow(new RuntimeException(""));
+        when(platOnClient.getReceiptResult(any())).thenThrow(new RuntimeException(""));
         target.getReceipt(1L);
     }
 }

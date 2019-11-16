@@ -1,9 +1,9 @@
-package com.platon.browser.client.result;
+package com.platon.browser.client;
 
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
+import org.web3j.protocol.core.Response;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,11 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Data
-public class ReceiptResult {
-    private String jsonrpc;
-    private int id;
-    private List<Receipt> result=new ArrayList<>();
-
+public class ReceiptResult extends Response<List<Receipt>> {
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(100);
 
     private Map<String,Receipt> map = new ConcurrentHashMap<>();
@@ -25,10 +21,9 @@ public class ReceiptResult {
      * 并行解码Logs
      */
     public void resolve(Long blockNumber) throws InterruptedException {
-        if(result.isEmpty()) return;
-        CountDownLatch latch = new CountDownLatch(result.size());
-
-        result.forEach(r->{
+        if(getResult().isEmpty()) return;
+        CountDownLatch latch = new CountDownLatch(getResult().size());
+        getResult().forEach(r->{
             map.put(HexTool.prefix(r.getTransactionHash()),r);
             EXECUTOR.submit(()->{
                 try {
@@ -39,7 +34,6 @@ public class ReceiptResult {
                 }
             });
         });
-
         latch.await();
     }
 }

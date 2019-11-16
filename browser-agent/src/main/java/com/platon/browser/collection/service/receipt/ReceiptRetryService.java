@@ -2,9 +2,7 @@ package com.platon.browser.collection.service.receipt;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RpcParam;
-import com.platon.browser.client.result.ReceiptResult;
-import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.HttpUtil;
+import com.platon.browser.client.ReceiptResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -29,7 +27,7 @@ public class ReceiptRetryService {
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException, InterruptedException {
+    public ReceiptResult getReceipt(Long blockNumber) throws Exception {
         long startTime = System.currentTimeMillis();
 
         try {
@@ -37,20 +35,15 @@ public class ReceiptRetryService {
             RpcParam param = new RpcParam();
             param.setMethod(RECEIPT_RPC_INTERFACE);
             param.getParams().add(blockNumber);
-            ReceiptResult result = getReceiptResult(param);
-            result.resolve(blockNumber);
-            log.debug("回执结果:{}", result);
-
+            ReceiptResult result = platOnClient.getReceiptResult(blockNumber);
+            log.debug("回执结果数:{}", result.getResult().size());
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
-
             return result;
         }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
             throw e;
         }
     }
 
-    public ReceiptResult getReceiptResult(RpcParam param) throws HttpRequestException {
-        return HttpUtil.post(platOnClient.getWeb3jAddress(),param.toJsonString(),ReceiptResult.class);
-    }
 }

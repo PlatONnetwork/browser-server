@@ -44,7 +44,7 @@ public class BlockRetryServiceTest extends AgentTestBase {
     public void setup() throws IOException {
         ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
         ReflectionTestUtils.setField(target, "latestBlockNumber", BigInteger.TEN);
-        when(platOnClient.getWeb3j()).thenReturn(web3j);
+        when(platOnClient.getWeb3jWrapper().getWeb3j()).thenReturn(web3j);
     }
 
     @Test
@@ -66,13 +66,13 @@ public class BlockRetryServiceTest extends AgentTestBase {
 
     @Test(expected = RuntimeException.class)
     public void getBlockException() throws IOException, CollectionBlockException {
-        when(platOnClient.getWeb3j()).thenThrow(new RuntimeException());
+        when(platOnClient.getWeb3jWrapper().getWeb3j()).thenThrow(new RuntimeException());
         target.getBlock(1L);
     }
 
     @Test(expected = RuntimeException.class)
     public void checkBlockNumberException() throws IOException, CollectionBlockException {
-        when(platOnClient.getWeb3j()).thenThrow(new RuntimeException());
+        when(platOnClient.getWeb3jWrapper().getWeb3j()).thenThrow(new RuntimeException());
         target.checkBlockNumber(null);
     }
 

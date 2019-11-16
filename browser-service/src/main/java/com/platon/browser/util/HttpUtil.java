@@ -19,13 +19,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class HttpUtil {
-    private HttpUtil(){}
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
-            .connectTimeout(60,TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .build();
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build();
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(1024);
 
     public static <T> CompletableFuture<T> postAsync(String url, String param, Class<T> clazz){
         CompletableFuture<T> future = new CompletableFuture<>();
