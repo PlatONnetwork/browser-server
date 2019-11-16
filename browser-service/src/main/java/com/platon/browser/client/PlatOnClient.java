@@ -2,6 +2,7 @@ package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,10 +15,12 @@ import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.websocket.WebSocketService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class PlatOnClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
+    @Value("${platon.web3j.protocol}")
+    private String protocol;
+    @Value("${platon.web3j.addresses}")
+    private List<String> web3jAddresses;
 
     private Map<Web3j,String> web3jMap=new HashMap<>();
     private Web3j currentValidWeb3j;
@@ -56,17 +63,34 @@ public class PlatOnClient {
     private StakingContract stakingContract;
     public StakingContract getStakingContract(){return stakingContract;}
 
-    @Value("${platon.web3j.addresses}")
-    private List<String> web3jAddresses;
-
     @PostConstruct
     public void init(){
         WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
-            web3jAddresses.forEach(address->web3jMap.put(Web3j.build(new HttpService(address)),address));
+            web3jMap.clear();
+            if(protocol.startsWith("ws")){
+                web3jAddresses.forEach(address->{
+                    WebSocketService wss = new WebSocketService(protocol+address,true);
+                    try {
+                        wss.connect();
+                        web3jMap.put(Web3j.build(wss),protocol+address);
+                    } catch (ConnectException e) {
+                        log.error("Websocket地址({})无法连通:",protocol+address,e);
+                    }
+                });
+                if(web3jMap.size()==0){
+                    log.error("没有可用Web3j实例!");
+                    System.exit(1);
+                }
+            }else
+            if(protocol.startsWith("http")){
+                web3jAddresses.forEach(address->web3jMap.put(Web3j.build(new HttpService(protocol+address)),protocol+address));
+            }else{
+                throw new ConfigLoadingException("Web3j连接协议不合法!");
+            }
             updateCurrentValidWeb3j();
         }catch (Exception e){
-            log.error("web3j error{}", e);
+            log.error("加载Web3j配置错误:", e);
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
@@ -77,7 +101,7 @@ public class PlatOnClient {
         try{
             return currentValidWeb3j;
         }catch (Exception e){
-            log.error("web3j error{}", e);
+            log.error("加载Web3j配置错误:", e);
         }finally {
             WEB3J_CONFIG_LOCK.readLock().unlock();
         }
@@ -122,7 +146,11 @@ public class PlatOnClient {
                 updateContract();
             }
             if(maxBlockNumber==0){
-                log.info("当前所有候选Web3j实例均无法连通！");
+                log.info("当前所有候选Web3j实例均无法连通!");
+                if(protocol.startsWith("ws")){
+                    log.info("重新初始化websocket连接!");
+                    init();
+                }
             }
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
