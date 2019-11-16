@@ -128,6 +128,10 @@ public class CustomStaking extends Staking {
         // 设置官网
         String website = candidate.getWebsite();
         if(StringUtils.isNotBlank(website)) setWebSite(website);
+        // 设置质押金额
+        if(candidate.getShares()!=null&&candidate.getShares().compareTo(BigInteger.ZERO)>0){
+            setStakingLocked(new BigDecimal(candidate.getShares()));
+        }
     }
 
     /**
