@@ -9,9 +9,6 @@ import com.platon.browser.collection.service.receipt.ReceiptService;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
-import com.platon.browser.elasticsearch.dto.ESResult;
-import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +16,6 @@ import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -36,8 +30,6 @@ public class ConsistencyService {
     private NetworkStatMapper networkStatMapper;
     @Autowired
     private BlockESRepository blockESRepository;
-    @Autowired
-    private TransactionESRepository transactionESRepository;
     @Autowired
     private BlockService blockService;
     @Autowired
@@ -77,26 +69,6 @@ public class ConsistencyService {
             }
         }
         log.warn("ES区块索引最高区块号:{}",esMaxBlockNum);
-        // 取ES中的交易最高序号
-        long esMaxTransactionId = mysqlTransactionId;
-        exist=false;
-        Map<String, Object> filter =new HashMap<>();
-        while (!exist){
-            filter.put("id",esMaxTransactionId);
-            ESResult<Transaction> txs = transactionESRepository.search(filter, Transaction.class, Collections.emptyList(),1,1);
-            if(txs==null||txs.getRsData().isEmpty()){
-                esMaxTransactionId--;
-                // 小于等于0时需要退出
-                if(esMaxTransactionId<=0) exist=true;
-            } else {
-                exist=true;
-                // 更新区块号，以最小块号为准
-                Transaction tx = txs.getRsData().get(0);
-                esMaxBlockNum=tx.getNum()<esMaxBlockNum?tx.getNum():esMaxBlockNum;
-                log.warn("ES交易索引最高交易序号:{}",tx.getId());
-            }
-        }
-        log.warn("ES交易索引最高区块号:{}",esMaxBlockNum);
 
         if(esMaxBlockNum>=mysqlMaxBlockNum) {
             log.warn("MYSQL/ES/REDIS中的数据已同步!");
