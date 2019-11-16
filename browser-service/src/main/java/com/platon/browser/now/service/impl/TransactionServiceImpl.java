@@ -3,6 +3,7 @@ package com.platon.browser.now.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
@@ -88,6 +89,8 @@ public class TransactionServiceImpl implements TransactionService {
     private BlockChainConfig blockChainConfig;
     @Autowired
 	private CommonService commonService;
+    @Autowired
+    private RedisFactory redisFactory;
 
     @Override
     public RespPage<TransactionListResp> getTransactionList( PageReq req) {
@@ -418,6 +421,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalHash(req.getTxHash());
 						resp.setNodeName(commonService.getNodeName(createProposalTextParam.getVerifier(), createProposalTextParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_UPGRADE:
 						ProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, ProposalUpgradeParam.class);
@@ -429,6 +433,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalHash(req.getTxHash());
 						resp.setNodeName(commonService.getNodeName(createProposalUpgradeParam.getVerifier(), createProposalUpgradeParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_PARAMETER:
 					case PROPOSAL_CANCEL:
@@ -440,6 +445,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProposalHash(req.getTxHash());
 						resp.setNodeName(commonService.getNodeName(cancelProposalParam.getVerifier(), cancelProposalParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_VOTE:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
@@ -515,27 +521,27 @@ public class TransactionServiceImpl implements TransactionService {
     	return resp;
     }
 
-//    /**
-//     * 提案信息统一转换
-//     * @method transferTransaction
-//     * @param resp
-//     * @param hash
-//     * @return
-//     */
-//    private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
-//    	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
-//		if(proposal != null) {
-//			resp.setNodeId(proposal.getNodeId());
-//			resp.setNodeName(proposal.getNodeName());
-//			resp.setPipNum(proposal.getPipNum());
-//			resp.setProposalTitle(proposal.getTopic());
-//			resp.setProposalStatus(proposal.getStatus());
-//			resp.setProposalOption(String.valueOf(proposal.getType()));
-//			resp.setProposalNewVersion(proposal.getNewVersion());
-//			resp.setProposalUrl(proposal.getUrl());
-//		}
-//		return resp;
-//    }
+    /**
+     * 提案信息统一转换
+     * @method transferTransaction
+     * @param resp
+     * @param hash
+     * @return
+     */
+    private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
+    	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
+		if(proposal != null) {
+			resp.setNodeId(proposal.getNodeId());
+			resp.setNodeName(proposal.getNodeName());
+			resp.setPipNum(proposal.getPipNum());
+			resp.setProposalTitle(proposal.getTopic());
+			resp.setProposalStatus(proposal.getStatus());
+			resp.setProposalOption(String.valueOf(proposal.getType()));
+			resp.setProposalNewVersion(proposal.getNewVersion());
+			resp.setProposalUrl(proposal.getUrl());
+		}
+		return resp;
+    }
 
 //    /**
 //     * 统一设置验证人名称
@@ -584,9 +590,15 @@ public class TransactionServiceImpl implements TransactionService {
 			if(txReceiptStatus == Transaction.StatusEnum.FAILURE.getCode()) {
 				return defaultBaseUrl;
 			}
-
+			/**
+			 * 检查redis是否已经存储
+			 */
+			String userName = redisFactory.createRedisCommands().get(externalId);
+			if(StringUtils.isNotBlank(userName)) { 
+				defaultBaseUrl += userName;
+				return defaultBaseUrl;
+			}
 			String url = keyBaseUrl.concat(keyBaseApi.concat(externalId));
-            String userName = "";
 			try {
 				KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
 				userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
@@ -594,7 +606,11 @@ public class TransactionServiceImpl implements TransactionService {
 				logger.error("getStakingUrl error.externalId:{},txReceiptStatus:{},error:{}",externalId, txReceiptStatus, e.getMessage());
 				return defaultBaseUrl;
 			}
-			if(StringUtils.isNotBlank(userName)) {
+			if(StringUtils.isNotBlank(userName)) { 
+				/**
+				 * 设置redis
+				 */
+				redisFactory.createRedisCommands().set(externalId, userName);
 				defaultBaseUrl += userName;
 			}
 			return defaultBaseUrl;

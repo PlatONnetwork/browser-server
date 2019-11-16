@@ -22,6 +22,9 @@ import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.util.BeanConvertUtil;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.VerUtil;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -102,6 +106,7 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setNodeId(proposal.getNodeId());
         proposalDetailsResp.setNodeName(proposal.getNodeName());
         proposalDetailsResp.setDescription(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
+        proposalDetailsResp.setCanceledTopic(BrowserConst.INQUIRY.equals(proposal.getCanceledTopic())?"":proposal.getCanceledTopic());
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
         proposalDetailsResp.setCurBlock(String.valueOf(networkStat.getCurNumber()));
         /** 不同的类型有不同的通过率 */
@@ -113,6 +118,21 @@ public class ProposalServiceImpl implements ProposalService {
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalUpgradePassRate().toString());
 				break;
 			case CANCEL:
+				 /**
+		         * 如果被取消的提案标题没有就查询对应的提案确认返回的交易标题
+		         */
+		        if(StringUtils.isBlank(proposalDetailsResp.getCanceledTopic())) {
+		        	Proposal cancelProposal = proposalMapper.selectByPrimaryKey(proposal.getCanceledPipId());
+		        	if (cancelProposal != null) {
+		        		switch (CustomProposal.TypeEnum.getEnum(cancelProposal.getType())) {
+		        		case UPGRADE:
+		        			proposalDetailsResp.setCanceledTopic("版本升级-V" + VerUtil.toVersion(new BigInteger(cancelProposal.getNewVersion())));
+		    				break;
+						default:
+							break;
+		        		}
+		        	}
+		        }
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelSupportRate().toString());
 				break;
 			default:

@@ -32,6 +32,7 @@ public class ESQueryBuilderConstructor {
 	private List<ESCriterion> shouldCriterions = new ArrayList<>();
 	private List<ESCriterion> mustNotCriterions = new ArrayList<>();
 	private List<BoolQueryBuilder> queryBuilders = new ArrayList<>();
+	private String[] result ;
 
 	//构造builder
     public QueryBuilder listBuilders() {
@@ -146,4 +147,13 @@ public class ESQueryBuilderConstructor {
 	public void setFrom(int from) {
 		this.from = from;
 	}
+
+	public String[] getResult() {
+		return result;
+	}
+
+	public void setResult(String[] result) {
+		this.result = result;
+	}
+	
 }

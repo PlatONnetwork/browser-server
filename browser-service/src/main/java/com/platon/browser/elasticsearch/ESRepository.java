@@ -219,7 +219,7 @@ public abstract class ESRepository {
 		}
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-		log.debug("search:{}", JSON.toJSONString(response, true));
+//		log.debug("search:{}", JSON.toJSONString(response, true));
 		ESResult<T> esResult = new ESResult<>();
 		SearchHits hits = response.getHits();
 		esResult.setTotal(hits.getTotalHits().value);
@@ -246,13 +246,18 @@ public abstract class ESRepository {
 		SearchRequest searchRequest = new SearchRequest(getIndexName());
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		//排序
-        if (StringUtils.isNotEmpty(constructor.getAsc()))
+        if (StringUtils.isNotEmpty(constructor.getAsc())) {
         	searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
-        if (StringUtils.isNotEmpty(constructor.getDesc()))
+        }
+        if (StringUtils.isNotEmpty(constructor.getDesc())) {
         	searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
+        }
         //设置查询体
         searchSourceBuilder.query(constructor.listBuilders());
         searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
+        if(constructor.getResult() != null ) {
+        	searchSourceBuilder.fetchSource(constructor.getResult(), null);
+        }
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 //		log.debug("search:{}", JSON.toJSONString(response, true));

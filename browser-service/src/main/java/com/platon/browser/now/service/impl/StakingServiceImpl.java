@@ -126,7 +126,7 @@ public class StakingServiceImpl implements StakingService {
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(status);
 		if(StringUtils.isNotBlank(req.getKey())){
-			criteria.andNodeNameLike(req.getKey());
+			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
 		if(isSettle != null) {
 			criteria.andIsSettleEqualTo(isSettle);
