@@ -5,13 +5,13 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
 import com.platon.browser.common.utils.BakDataDeleteUtil;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.NOptBakMapper;
-import com.platon.browser.dao.mapper.TxBakMapper;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.persistence.queue.event.PersistenceEvent;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,8 +37,14 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     @Autowired
     private NetworkStatCache networkStatCache;
 
+    @Setter
+    @Getter
     @Value("${disruptor.queue.persistence.batch-size}")
-    private int batchSize;
+    private volatile int batchSize;
+
+    // 处理的最大区块号
+    @Getter
+    private volatile long maxBlockNumber;
 
     private Set<Block> blockStage = new HashSet<>();
     private Set<Transaction> transactionStage = new HashSet<>();
@@ -61,6 +67,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
             if(blockStage.size()<batchSize) {
+                maxBlockNumber=event.getBlock().getNum();
                 return;
             }
 
@@ -85,6 +92,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             Long nOptMaxId = 0L;
             if(!nOptBaks.isEmpty()) nOptMaxId=nOptBaks.get(0).getId();
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
+
+            maxBlockNumber=event.getBlock().getNum();
         }catch (Exception e){
             log.error("",e);
             throw e;
