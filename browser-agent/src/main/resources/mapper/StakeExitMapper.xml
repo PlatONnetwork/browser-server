@@ -36,7 +36,9 @@
 			`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,
 			`stat_delegate_value` = 0,
 			`stat_valid_addrs` = 0,
-			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2)
+			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2),
+			`is_consensus` = 2,
+			`is_settle` = 2
 		where
 			`node_id` = #{nodeId};
 
@@ -50,7 +52,9 @@
 			`staking_hes` = 0,
 			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
 			`stat_delegate_hes` = 0,
-			`stat_delegate_locked` = 0
+			`stat_delegate_locked` = 0,
+			`is_consensus` = 2,
+			`is_settle` = 2
 		where
 		 	`node_id` = #{nodeId}
 		and

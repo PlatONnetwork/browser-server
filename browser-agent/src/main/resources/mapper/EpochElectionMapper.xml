@@ -13,28 +13,35 @@
 
 <update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
 	update `staking` set
-		`staking_reduction` = `staking_locked`,
-		`staking_reduction_epoch` = #{settingEpoch},
+		`leave_time` = #{time},
 		`status` = if(`staking_locked` > 0, 2, 3),
-		`staking_hes` = 0,
+		`staking_reduction_epoch` = #{settingEpoch},
+		`staking_reduction` = `staking_locked`,
 		`staking_locked` = 0,
+		`staking_hes` = 0,
+		`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
+		`stat_delegate_hes` = 0,
+		`stat_delegate_locked` = 0,
 		`is_consensus` = 2,
-		`is_settle` = 2,
-		`leave_time` = #{time}
+		`is_settle` = 2
 	where `status` = 1
 		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
 
-	update `node` set
-		`staking_reduction` = `staking_locked`,
-		`staking_reduction_epoch` = #{settingEpoch},
-		`status` = if(`staking_locked` > 0, 2, 3),
-		`staking_hes` = 0,
-		`staking_locked` = 0,
-		`is_consensus` = 2,
-		`is_settle` = 2,
-		`leave_time` = #{time},
-		`stat_slash_low_qty` = `stat_slash_low_qty` + 1 ,
-		`total_value` = 0
-	where `node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
+	update `node` n set
+		n.`leave_time` = #{time},
+		n.`status` = if(n.`staking_locked` > 0, 2, 3),
+		n.`staking_reduction_epoch` = #{settingEpoch},
+		n.`staking_reduction` = n.`staking_locked`,
+		n.`total_value` = 0,
+		n.`staking_locked` = 0,
+		n.`staking_hes` = 0,
+		n.`stat_delegate_released` = n.`stat_delegate_released` + n.`stat_delegate_value`,
+		n.`stat_delegate_value` = 0,
+		n.`stat_valid_addrs` = 0,
+		n.`stat_invalid_addrs` = (select count(distinct d.delegate_addr) from delegation d where d.node_id = n.`node_id` and d.is_history = 2),
+		n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
+		n.`is_consensus` = 2,
+		n.`is_settle` = 2
+	where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
 </update>
 </mapper>
