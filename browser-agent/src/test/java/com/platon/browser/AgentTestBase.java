@@ -1,6 +1,7 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
@@ -32,6 +33,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
  * @Auther: Chendongming
@@ -44,6 +46,7 @@ public class AgentTestBase extends AgentTestData {
 
     static {
         AppStatusUtil.setStatus(AppStatus.STOPPED);
+        PlatOnClient.LOG_DECODE_EXECUTOR = Executors.newFixedThreadPool(100);
     }
 
     public Staking getStaking (String nodeId, long stakingBlockNumber ) {
