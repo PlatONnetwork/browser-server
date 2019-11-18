@@ -1,16 +1,5 @@
 package com.platon.browser.task;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.entity.AddressStatistics;
@@ -18,8 +7,17 @@ import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -51,7 +49,7 @@ public class AddressUpdateTask {
     private int batchSize;
 	
     @Scheduled(cron = "0/5  * * * * ?")
-    private void cron(){
+	public void cron(){
     	// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
     	
