@@ -52,10 +52,10 @@ public class ProposalBusinessTest extends AgentTestBase {
         delegateBusinessMapper.exit(delegateExit);
     }
 
-    public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
+    public Staking getStaking ( String nodeId, long stakingBlockNumber ) {
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(nodeId);
-        stakingKey.setStakingBlockNum(stakingBlockNumer);
+        stakingKey.setStakingBlockNum(stakingBlockNumber);
         return stakingMapper.selectByPrimaryKey(stakingKey);
     }
 
