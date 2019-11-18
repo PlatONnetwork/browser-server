@@ -5,7 +5,6 @@ import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.exception.BlockNumberException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @description:
@@ -46,9 +45,9 @@ public class AddressUpdateTaskTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws BlockNumberException {
+    public void test(){
         AppStatusUtil.setStatus(AppStatus.RUNNING);
-
         target.batchUpdate(4,55);
+        //verify(target, times(1)).batchUpdate(any(),any());
     }
 }

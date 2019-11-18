@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * @Auther: chendongming@juzix.net
  * @Date: 2019/11/16
@@ -34,8 +32,14 @@ public class BatchVariableDynamicAdjustTask {
         try {
             long chainBlockNumber = platOnClient.getLatestBlockNumber().longValue();
             long appBlockNumber = persistenceEventHandler.getMaxBlockNumber();
-            if(chainBlockNumber-appBlockNumber<10) persistenceEventHandler.setBatchSize(1);
-            if(chainBlockNumber-appBlockNumber>=10) persistenceEventHandler.setBatchSize(10);
+            if(chainBlockNumber-appBlockNumber<10) {
+                log.info("-----------------------------------------已追上链,调整批量大小为1-----------------------------------------");
+                persistenceEventHandler.setBatchSize(1);
+            }
+            if(chainBlockNumber-appBlockNumber>=10) {
+                log.info("-----------------------------------------未追上链,调整批量大小为10-----------------------------------------");
+                persistenceEventHandler.setBatchSize(10);
+            }
         } catch (Exception e) {
             log.error("批次处理相关变量动态调整出错:",e);
         }
