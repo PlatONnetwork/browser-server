@@ -6,7 +6,6 @@ import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
-import com.platon.browser.complement.error.BusinessError;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationKey;

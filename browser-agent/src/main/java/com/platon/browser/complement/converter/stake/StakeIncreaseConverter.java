@@ -1,6 +1,8 @@
 package com.platon.browser.complement.converter.stake;
 
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
@@ -10,6 +12,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeIncreaseParam;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,8 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
 
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
     
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
@@ -57,6 +62,15 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(null);
+        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+        nodeOpt.setNodeId(txParam.getNodeId());
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MODIFY.getCode()));
+        nodeOpt.setTxHash(tx.getHash());
+        nodeOpt.setBNum(tx.getNum());
+        nodeOpt.setTime(tx.getTime());
+
+
+        return Optional.ofNullable(nodeOpt);
     }
 }

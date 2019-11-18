@@ -1,6 +1,7 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
@@ -29,9 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.Executors;
 
 /**
  * @Auther: Chendongming
@@ -42,8 +42,21 @@ public class AgentTestBase extends AgentTestData {
     @Autowired
     protected StakingMapper stakingMapper;
 
+    public static Map<Integer, BigDecimal> subsidies = new HashMap<>();
+
     static {
         AppStatusUtil.setStatus(AppStatus.STOPPED);
+        PlatOnClient.LOG_DECODE_EXECUTOR = Executors.newFixedThreadPool(100);
+
+        subsidies.put(1,BigDecimal.valueOf(62215742));
+        subsidies.put(2,BigDecimal.valueOf(55965742));
+        subsidies.put(3,BigDecimal.valueOf(49559492));
+        subsidies.put(4,BigDecimal.valueOf(42993086));
+        subsidies.put(5,BigDecimal.valueOf(36262520));
+        subsidies.put(6,BigDecimal.valueOf(29363689));
+        subsidies.put(7,BigDecimal.valueOf(22292388));
+        subsidies.put(8,BigDecimal.valueOf(15044304));
+        subsidies.put(9,BigDecimal.valueOf(7615018));
     }
 
     public Staking getStaking (String nodeId, long stakingBlockNumber ) {

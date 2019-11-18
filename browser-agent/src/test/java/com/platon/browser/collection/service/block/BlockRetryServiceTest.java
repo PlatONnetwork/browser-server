@@ -2,6 +2,7 @@ package com.platon.browser.collection.service.block;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.collection.exception.CollectionBlockException;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,8 @@ public class BlockRetryServiceTest extends AgentTestBase {
     @Mock
     private PlatOnClient platOnClient;
     @Mock
+    private Web3jWrapper web3jWrapper;
+    @Mock
     private Web3j web3j;
     @Mock
     private Request request;
@@ -44,7 +47,8 @@ public class BlockRetryServiceTest extends AgentTestBase {
     public void setup() throws IOException {
         ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
         ReflectionTestUtils.setField(target, "latestBlockNumber", BigInteger.TEN);
-        when(platOnClient.getWeb3jWrapper().getWeb3j()).thenReturn(web3j);
+        when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
+        when(web3jWrapper.getWeb3j()).thenReturn(web3j);
     }
 
     @Test

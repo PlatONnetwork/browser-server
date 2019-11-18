@@ -2,6 +2,7 @@ package com.platon.browser.common.service.account;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.exception.BusinessException;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +32,10 @@ public class AccountServiceTest extends AgentTestBase {
     @Before
     public void setup() throws Exception {
         ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
+        Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
+        when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);
-        when(platOnClient.getWeb3jWrapper().getWeb3j()).thenReturn(web3j);
+        when(web3jWrapper.getWeb3j()).thenReturn(web3j);
         Request request = mock(Request.class);
         when(web3j.platonGetBalance(anyString(),any())).thenReturn(request);
         PlatonGetBalance pgb = mock(PlatonGetBalance.class);

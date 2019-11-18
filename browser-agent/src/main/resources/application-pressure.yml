@@ -2,7 +2,7 @@
 # 应用版本
 version: 0.7.3.1
 # 当前激活的配置名称(请不要修改)
-profile: press
+profile: pressure
 # 密码加密配置
 jasypt:
   encryptor:
@@ -11,7 +11,7 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.120.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
     password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
   #Redis配置
@@ -26,10 +26,10 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_press
-      transactionIndexName: browser_transaction_press
-      delegationIndexName: browser_delegation_press
-      nodeOptIndexName: browser_nodeopt_press
+      blockIndexName: browser_block_pressure
+      transactionIndexName: browser_transaction_pressure
+      delegationIndexName: browser_delegation_pressure
+      nodeOptIndexName: browser_nodeopt_pressure
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -73,7 +73,6 @@ platon:
     #HTTP或WS
     protocol: WS
     addresses: 192.168.112.171:4788
-#    addresses: 192.168.112.171:4788
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

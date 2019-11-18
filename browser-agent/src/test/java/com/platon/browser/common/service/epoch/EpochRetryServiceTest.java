@@ -3,6 +3,7 @@ package com.platon.browser.common.service.epoch;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
@@ -16,6 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.NodeContract;
+import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;
 
 import java.math.BigDecimal;
@@ -42,7 +44,7 @@ public class EpochRetryServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
         ReflectionTestUtils.setField(target, "accountService", accountService);
         ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
-        ReflectionTestUtils.setField(target, "specialContractApi", specialApi);
+        ReflectionTestUtils.setField(target, "specialApi", specialApi);
         ReflectionTestUtils.setField(target, "curVerifiers", curVerifiers);
         when(chainConfig.getAddIssuePeriodBlockCount()).thenReturn(BigInteger.valueOf(250));
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(10));
@@ -53,9 +55,15 @@ public class EpochRetryServiceTest extends AgentTestBase {
         when(platOnClient.getLatestBlockNumber()).thenReturn(BigInteger.valueOf(501));
         when(accountService.getInciteBalance(any())).thenReturn(BigDecimal.valueOf(10000));
 
-        when(curVerifiers.size()).thenReturn(4);
+        Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
+        when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
+        Web3j web3j = mock(Web3j.class);
+        when(web3jWrapper.getWeb3j()).thenReturn(web3j);
+
         when(specialApi.getHistoryValidatorList(any(),any())).thenReturn(validatorList);
         when(specialApi.getHistoryVerifierList(any(),any())).thenReturn(verifierList);
+
+        when(curVerifiers.size()).thenReturn(4);
         when(platOnClient.getLatestValidators()).thenReturn(validatorList);
         when(platOnClient.getLatestVerifiers()).thenReturn(verifierList);
     }

@@ -6,8 +6,11 @@ import com.platon.browser.bean.NodeBean;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -17,6 +20,7 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
 
@@ -56,6 +60,7 @@ public class AgentTestData {
     protected List<Node> validatorList = new ArrayList<>();
     protected List<Node> candidateList = new ArrayList<>();
     protected List<CustomAddress> addressList= Collections.emptyList();
+    protected List<NodeOpt> nodeOptList= new ArrayList<>();
     protected BlockChainConfig blockChainConfig = new BlockChainConfig();
 
     protected Map<Long,PlatonBlock.Block> rawBlockMap = new HashMap<>();
@@ -75,6 +80,18 @@ public class AgentTestData {
                         break;
                     case "block":
                         blockList = JSON.parseArray(content,CollectionBlock.class);
+                        blockList.forEach(b->{
+                            NodeOpt no = ComplementNodeOpt.newInstance().setId(b.getNum())
+                                    .setCreTime(new Date())
+                                    .setBNum(b.getNum())
+                                    .setDesc("sfsf")
+                                    .setNodeId(b.getNodeId())
+                                    .setTime(new Date())
+                                    .setTxHash("0x3435424242423")
+                                    .setType(Transaction.TypeEnum.TRANSFER.getCode())
+                                    .setUpdTime(new Date());
+                            nodeOptList.add(no);
+                        });
                         break;
                     case "raw-block":
                         List<BlockBean> blockBeans = JSON.parseArray(content, BlockBean.class);
@@ -131,4 +148,6 @@ public class AgentTestData {
             }
         });
     }
+
+
 }

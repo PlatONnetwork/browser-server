@@ -117,7 +117,9 @@ public class InitializationService {
         Map<String,CustomStaking> defaultStakingMap = new HashMap<>();
         chainConfig.getDefaultStakingList().forEach(staking -> defaultStakingMap.put(staking.getNodeId(),staking));
 
-        epochRetryService.getPreVerifiers().forEach(v->{
+        List<Node> nodeList = epochRetryService.getPreVerifiers();
+        for (int index=0;index<nodeList.size();index++) {
+            Node v = nodeList.get(index);
             CustomStaking staking = new CustomStaking();
             staking.updateWithVerifier(v);
             staking.setStakingReductionEpoch(BigInteger.ONE.intValue()); // 提前设置验证轮数
@@ -126,17 +128,17 @@ public class InitializationService {
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
             staking.setStakingLocked(Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT));
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-            if(validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+            if (validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 
             // 使用实时候选人信息更新质押
             Node candidate = candidateMap.get(v.getNodeId());
-            if(candidate!=null) {
+            if (candidate != null) {
                 staking.updateWithCandidate(candidate);
             }
 
             // 使用配置文件中的信息更新质押
             CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
-            if((StringUtils.isBlank(staking.getNodeName())||"Unknown".equals(staking.getNodeName()))&&defaultStaking!=null){
+            if ((StringUtils.isBlank(staking.getNodeName()) || "Unknown".equals(staking.getNodeName())) && defaultStaking != null) {
                 staking.setNodeName(defaultStaking.getNodeName());
             }
 
@@ -160,7 +162,7 @@ public class InitializationService {
 
             nodes.add(node);
             stakingList.add(staking);
-        });
+        }
 
         // 入库
         List<com.platon.browser.dao.entity.Node> returnData = new ArrayList<>(nodes);
