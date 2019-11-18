@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 @Component
 public class PlatOnClient {
     // 交易输入参数并行解码线程池
-    static ExecutorService LOG_DECODE_EXECUTOR;
+    public static ExecutorService LOG_DECODE_EXECUTOR;
 
     // 交易输入参数并行解码线程数
     @Value("${platon.txLogDecodeThreadNum}")

@@ -3,6 +3,7 @@ package com.platon.browser;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.BlockBean;
 import com.platon.browser.bean.NodeBean;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 /**
  * @description: 测试数据
@@ -63,6 +65,7 @@ public class AgentTestData {
 
     @Before
     public void init(){
+        PlatOnClient.LOG_DECODE_EXECUTOR = Executors.newFixedThreadPool(100);
         Arrays.asList(dataFile).forEach(fileName->{
             try {
                 URL url = AgentTestBase.class.getClassLoader().getResource(prefix+fileName+suffix);
