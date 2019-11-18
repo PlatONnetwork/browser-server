@@ -20,9 +20,10 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * User: dongqile
- * Date: 2018/10/25
- * Time: 14:42
+ * 链参数统一配置项
+ * @Auther: Chendongming
+ * @Date: 2019/11/18 10:12
+ * @Description:
  */
 @Slf4j
 @Component
