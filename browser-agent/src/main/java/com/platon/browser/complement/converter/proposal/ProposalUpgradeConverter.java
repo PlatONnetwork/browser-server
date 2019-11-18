@@ -60,7 +60,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
     			.url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
     			.pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
     			.endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger())
-    			.activeBlock(RoundCalculation.activeBlockNumCal(tx.getNum().toString(), chainConfig.getVersionProposalActiveConsensusRounds(), chainConfig).toBigInteger())
+    			.activeBlock(RoundCalculation.activeBlockNumCal(tx.getNum().toString(), txParam.getEndVotingRound(), chainConfig).toBigInteger())
     			.topic(CustomProposal.QUERY_FLAG)
     			.description(CustomProposal.QUERY_FLAG)
     			.txHash(tx.getHash())
