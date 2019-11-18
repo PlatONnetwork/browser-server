@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.dao.mapper;
+package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.AgentTestBase;
@@ -60,7 +60,6 @@ public class DelegateBusinessTest extends AgentTestBase {
     public void delegationCreateMapper () {
         DelegateCreate delegateCreate = delegateCreateParam();
         delegateBusinessMapper.create(delegateCreate);
-        verify(delegateBusinessMapper, times(1)).create(any(DelegateCreate.class));
     }
 
     /**
@@ -70,6 +69,5 @@ public class DelegateBusinessTest extends AgentTestBase {
     public void delegationExitMapper () {
         DelegateExit delegateExit = delegateExitParam();
         delegateBusinessMapper.exit(delegateExit);
-        verify(delegateBusinessMapper, times(1)).exit(any(DelegateExit.class));
     }
 }

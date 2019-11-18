@@ -96,7 +96,7 @@ public class InitializationServiceTest extends AgentTestBase {
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
         InitializationResult result = target.init();
-        assertEquals(0L,result.getCollectedBlockNumber().longValue());
+        assertEquals(-1L,result.getCollectedBlockNumber().longValue());
 
         networkStat = CollectionNetworkStat.newInstance();
         networkStat.setCurNumber(7000L);
