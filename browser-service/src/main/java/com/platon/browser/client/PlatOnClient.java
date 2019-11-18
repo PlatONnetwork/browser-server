@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.ConfigLoadingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,8 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * User: dongqile
@@ -24,6 +27,12 @@ import java.util.List;
 @Slf4j
 @Component
 public class PlatOnClient {
+    // 交易输入参数并行解码线程池
+    static ExecutorService LOG_DECODE_EXECUTOR;
+
+    // 交易输入参数并行解码线程数
+    @Value("${platon.txLogDecodeThreadNum}")
+    private int logDecodeThreadNum;
     @Autowired
     private RetryableClient retryableClient;
 
@@ -38,6 +47,7 @@ public class PlatOnClient {
 
     @PostConstruct
     private void init() throws ConfigLoadingException {
+        LOG_DECODE_EXECUTOR=Executors.newFixedThreadPool(logDecodeThreadNum);
         retryableClient.init();
     }
 
