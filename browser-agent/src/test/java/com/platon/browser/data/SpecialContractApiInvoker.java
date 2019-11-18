@@ -12,8 +12,10 @@ import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.websocket.WebSocketService;
 
 import java.math.BigInteger;
+import java.net.ConnectException;
 import java.util.List;
 
 /**
@@ -25,7 +27,17 @@ public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
     //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797")); // atonDev
 //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.90:6789")); // atonTest
-    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:8789")); // test
+    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.172:8788",false);
+    private static Web3j web3j; // test
+    static {
+        try {
+            socketService.connect();
+            web3j = Web3j.build(socketService); // test
+        } catch (ConnectException e) {
+            e.printStackTrace();
+        }
+    }
+
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
     private static NodeContract nodeContract = NodeContract.load(web3j);
@@ -40,7 +52,7 @@ public class SpecialContractApiInvoker {
         List<Node> nodes = nodeContract.getValidatorList().send().data;
         List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
-        List<Node> history = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(500L));
+        List<Node> history = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(35120L));
 
         BaseResponse baseResponse = proposalContract.getActiveVersion().send();
         logger.error("{}",JSON.toJSONString(baseResponse.data));

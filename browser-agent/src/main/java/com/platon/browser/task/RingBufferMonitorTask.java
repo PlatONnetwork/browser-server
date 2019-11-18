@@ -25,8 +25,7 @@ public class RingBufferMonitorTask {
 
     protected void start () {
         Map<String,AbstractPublisher> publisherMap = AbstractPublisher.getPublisherMap();
-        log.info("RingBuffer info start -------------------------");
-        publisherMap.forEach((name,publisher)->log.info("环形缓冲区({}):{}",name,publisher.info()));
-        log.info("RingBuffer info end ---------------------------");
+        log.info("-----------------------------------------环形缓冲区信息-----------------------------------------");
+        publisherMap.forEach((name,publisher)->log.info("({}):{}",name,publisher.info()));
     }
 }

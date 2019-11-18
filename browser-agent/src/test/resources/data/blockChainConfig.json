@@ -27,7 +27,7 @@
 "blockRewardRate": "0.50",
 "stakeRewardRate": "0.50",
 "platOnFoundationYear": "10",
-"maxSettlePeriodCount4AnnualizedRateStat":"",
+"maxSettlePeriodCount4AnnualizedRateStat":"4",
 "initIssueAmount": "10000000000",
 "addIssueRate": "0.025",
 "incentiveRateFromIssue": "0.8",
@@ -44,10 +44,10 @@
   "7":15044304,
   "8":7615018
   },
-"proposalUrlTemplate":"",
-"proposalPipNumTemplate":"",
-"keyBase":"",
-"keyBaseApi":"",
+"proposalUrlTemplate":"https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md",
+"proposalPipNumTemplate":"PIP-%s",
+"keyBase":"https://keybase.io/",
+"keyBaseApi":"_/api/1.0/user/autocomplete.json?q=",
 "defaultStakingLockedAmount": "1500000",
 "defaultStakingList":[]
 }

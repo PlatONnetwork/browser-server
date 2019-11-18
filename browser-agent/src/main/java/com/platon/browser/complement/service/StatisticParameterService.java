@@ -36,6 +36,9 @@ public class StatisticParameterService {
         long startTime = System.currentTimeMillis();
 
         Block block = event.getBlock();
+
+        if(block.getNum()==0) return;
+
         EpochMessage epochMessage = event.getEpochMessage();
         
         statisticsNetworkConverter.convert(event, block, epochMessage);

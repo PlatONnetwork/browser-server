@@ -1,9 +1,9 @@
-package com.platon.browser.persistence.dao.mapper;
+package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.complement.dao.mapper.RestrictingBusinessMapper;
-import com.platon.browser.complement.dao.param.restricting.RestrictingCreate;
+import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +18,22 @@ import static org.mockito.Mockito.verify;
 /**
  * @Auther: dongqile
  * @Date: 2019/10/31
- * @Description: 锁仓相关入库测试类
+ * @Description: 统计数据测试类
  */
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
 @SpringBootApplication
-public class RestrictingBusinessTest extends AgentTestBase {
+public class StatisticBusinessTest extends AgentTestBase {
     @Autowired
-    private RestrictingBusinessMapper restrictingBusinessMapper;
+    private StatisticBusinessMapper statisticBusinessMapper;
 
     /**
-     * 创建锁仓计划
+     * 地址数据统计
      */
     @Test
-    public void restrictingCrateMapper () {
-        RestrictingCreate restrictingCreate = restrictingCreateParam();
-        restrictingBusinessMapper.create(restrictingCreate);
-        verify(restrictingBusinessMapper, times(1)).create(any(RestrictingCreate.class));
+    public void addressChangeMapper(){
+        AddressStatChange addressStatChange = addressStatChangeParam();
+        statisticBusinessMapper.addressChange(addressStatChange);
     }
 }

@@ -23,7 +23,8 @@ public class AccountService {
     private static final String RESTRICTING_ADDR = InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress();
     private static final String STAKING_ADDR = InnerContractAddrEnum.STAKING_CONTRACT.getAddress();
 
-    private static final String blockTip="]在区块号[",balanceTip="]的余额失败:";
+    private static final String BLOCK_TIP="]在区块号[";
+    private static final String BALANCE_TIP="]的余额失败:";
 
     @Autowired
     private PlatOnClient platOnClient;
@@ -34,6 +35,7 @@ public class AccountService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getInciteBalance(BigInteger blockNumber) {
+        if(blockNumber.compareTo(BigInteger.ZERO)<0) blockNumber=BigInteger.ZERO;
         try {
             BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j()
                     .platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber))
@@ -41,7 +43,7 @@ public class AccountService {
             return new BigDecimal(balance);
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
-            String error = "获取激励池["+INCITE_ACCOUNT_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
+            String error = "获取激励池["+INCITE_ACCOUNT_ADDR+BLOCK_TIP+blockNumber+BALANCE_TIP+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }
@@ -53,13 +55,14 @@ public class AccountService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getLockCabinBalance(BigInteger blockNumber){
+        if(blockNumber.compareTo(BigInteger.ZERO)<0) blockNumber=BigInteger.ZERO;
         try {
             BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                    .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
-            String error = "获取锁仓合约["+RESTRICTING_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
+            String error = "获取锁仓合约["+RESTRICTING_ADDR+BLOCK_TIP+blockNumber+BALANCE_TIP+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }
@@ -71,13 +74,14 @@ public class AccountService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BigDecimal getStakingBalance(BigInteger blockNumber){
+        if(blockNumber.compareTo(BigInteger.ZERO)<0) blockNumber=BigInteger.ZERO;
         try {
             BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
                     .send().getBalance();
             return new BigDecimal(balance);
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
-            String error = "获取质押合约["+STAKING_ADDR+blockTip+blockNumber+balanceTip+e.getMessage();
+            String error = "获取质押合约["+STAKING_ADDR+BLOCK_TIP+blockNumber+BALANCE_TIP+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }

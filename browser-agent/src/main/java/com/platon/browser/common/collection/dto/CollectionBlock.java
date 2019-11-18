@@ -43,7 +43,12 @@ public class CollectionBlock extends Block {
     }
 
     public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block,ReceiptResult receiptResult) throws BeanCreateOrUpdateException {
-        String nodeId = NodeTool.getPublicKey(block);
+        String nodeId;
+        if(block.getNumber().longValue()==0){
+            nodeId="000000000000000000000000000000000";
+        }else{
+            nodeId = NodeTool.getPublicKey(block);
+        }
         nodeId = HexTool.prefix(nodeId);
         this.setNum(block.getNumber().longValue())
             .setHash(block.getHash())

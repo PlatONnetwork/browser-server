@@ -6,7 +6,6 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dto.CustomDelegation;
-import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

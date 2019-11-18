@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.dao.mapper;
+package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.AgentTestBase;
@@ -41,7 +41,6 @@ public class ProposalBusinessTest extends AgentTestBase {
     public void delegationCreateMapper () {
         DelegateCreate delegateCreate = delegateCreateParam();
         delegateBusinessMapper.create(delegateCreate);
-        verify(delegateBusinessMapper, times(1)).create(any(DelegateCreate.class));
     }
 
     /**
@@ -51,13 +50,12 @@ public class ProposalBusinessTest extends AgentTestBase {
     public void delegationExitMapper () {
         DelegateExit delegateExit = delegateExitParam();
         delegateBusinessMapper.exit(delegateExit);
-        verify(delegateBusinessMapper, times(1)).exit(any(DelegateExit.class));
     }
 
-    public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
+    public Staking getStaking ( String nodeId, long stakingBlockNumber ) {
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(nodeId);
-        stakingKey.setStakingBlockNum(stakingBlockNumer);
+        stakingKey.setStakingBlockNum(stakingBlockNumber);
         return stakingMapper.selectByPrimaryKey(stakingKey);
     }
 

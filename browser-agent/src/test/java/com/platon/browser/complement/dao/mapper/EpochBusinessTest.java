@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.dao.mapper;
+package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.AgentTestBase;
@@ -87,7 +87,6 @@ public class EpochBusinessTest extends AgentTestBase {
     public void newReductionEpochMapper () {
         Settle settleParam = settleParam();
         epochBusinessMapper.settle(settleParam);
-        verify(epochBusinessMapper, times(1)).settle(any(Settle.class));
     }
 
     /**
@@ -97,7 +96,6 @@ public class EpochBusinessTest extends AgentTestBase {
     public void newElectionEpochMapperQuerySlashNode () {
         List<String> nodeList = electionQuerySlashNodeParam();
         epochBusinessMapper.querySlashNode(nodeList);
-        verify(epochBusinessMapper, times(1)).querySlashNode(any());
     }
 
     /**
@@ -107,6 +105,5 @@ public class EpochBusinessTest extends AgentTestBase {
     public void newElectionEpochMapper () {
         Election electionParam = electionSlashNodeParam();
         epochBusinessMapper.slashNode(electionParam);
-        verify(epochBusinessMapper, times(1)).slashNode(any(Election.class));
     }
 }
