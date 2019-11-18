@@ -72,6 +72,8 @@ public class TransactionParameterService {
 
         List<Transaction> transactions = event.getTransactions();
         List<NodeOpt> nodeOptList = new ArrayList<>();
+
+        if(event.getBlock().getNum()==0) return nodeOptList;
         
         int txQty = transactions.size();
         int proposalQty = 0;

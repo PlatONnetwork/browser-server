@@ -48,6 +48,8 @@ public class BlockParameterService {
         List<NodeOpt> nodeOptList = new ArrayList<>();
         Block block = event.getBlock();
 
+        if(block.getNum()==0) return nodeOptList;
+
         // 新区块事件
         onNewBlockConverter.convert(event,block);
 

@@ -65,9 +65,9 @@ public class InitializationService {
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
             networkStat.setId(1);
-            networkStat.setCurNumber(0L);
+            networkStat.setCurNumber(-1L);
             networkStatMapper.insert(networkStat);
-            initialResult.setCollectedBlockNumber(0L);
+            initialResult.setCollectedBlockNumber(-1L);
             // 删除节点表和质押表、地址表数据
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
