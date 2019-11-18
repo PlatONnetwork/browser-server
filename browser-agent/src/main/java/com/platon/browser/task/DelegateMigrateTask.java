@@ -44,16 +44,12 @@ public class DelegateMigrateTask {
             delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
             List<Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
             if(delegationList.isEmpty()) return;
-
             Set<Delegation> delegationSet = new HashSet<>(delegationList);
             esDelegationService.save(delegationSet);
             delegationMapper.deleteByExample(delegationExample);
-
             log.debug("Migrate delegate history to ElasticSearch finished!");
         } catch (Exception e) {
-            String error = e.getMessage();
-            log.error("",error);
-            throw new BusinessException(error);
+            log.error("",e);
         }
     }
 }

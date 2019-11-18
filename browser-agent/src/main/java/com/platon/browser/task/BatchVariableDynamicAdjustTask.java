@@ -36,7 +36,7 @@ public class BatchVariableDynamicAdjustTask {
             long appBlockNumber = persistenceEventHandler.getMaxBlockNumber();
             if(chainBlockNumber-appBlockNumber<10) persistenceEventHandler.setBatchSize(1);
             if(chainBlockNumber-appBlockNumber>=10) persistenceEventHandler.setBatchSize(10);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("批次处理相关变量动态调整出错:",e);
         }
     }

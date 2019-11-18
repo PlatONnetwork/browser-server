@@ -6,7 +6,6 @@ import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
 import com.platon.browser.dao.mapper.CustomStakingHistoryMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +53,7 @@ public class StakingMigrateTask {
             }
             log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
         }catch (Exception e){
-            String error = e.getMessage();
-            log.error("{}",error);
-            throw new BusinessException(error);
+            log.error("",e);
         }
     }
-
 }
