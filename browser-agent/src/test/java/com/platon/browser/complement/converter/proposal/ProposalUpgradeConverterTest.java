@@ -1,4 +1,4 @@
-package com.platon.browser.complement.converter.delegate.proposal;
+package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -7,6 +7,7 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.proposal.ProposalTextConverter;
+import com.platon.browser.complement.converter.proposal.ProposalUpgradeConverter;
 import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -30,7 +31,8 @@ import static org.mockito.Mockito.when;
  * @Description: 文本提案参数转换测试类
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalTextConverterTest extends AgentTestBase {
+public class ProposalUpgradeConverterTest extends AgentTestBase {
+
     @Mock
     private BlockChainConfig chainConfig;
     @Mock
@@ -41,7 +43,7 @@ public class ProposalTextConverterTest extends AgentTestBase {
     private NodeCache nodeCache;
 
     @Spy
-    private ProposalTextConverter target;
+    private ProposalUpgradeConverter target;
 
     @Before
     public void setup()throws Exception{
@@ -58,7 +60,6 @@ public class ProposalTextConverterTest extends AgentTestBase {
         when(chainConfig.getProposalUrlTemplate()).thenReturn(blockChainConfig.getProposalUrlTemplate());
         when(chainConfig.getProposalPipNumTemplate()).thenReturn(blockChainConfig.getProposalPipNumTemplate());
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
-
     }
 
     @Test
@@ -69,7 +70,7 @@ public class ProposalTextConverterTest extends AgentTestBase {
                 .build();
         Transaction tx = new Transaction();
         for(CollectionTransaction collectionTransaction : transactionList){
-            if(collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.PROPOSAL_TEXT)){
+            if(collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.PROPOSAL_UPGRADE)){
                 tx = collectionTransaction;
             }
         }

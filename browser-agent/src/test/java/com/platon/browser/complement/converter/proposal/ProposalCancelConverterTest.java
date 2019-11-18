@@ -1,4 +1,4 @@
-package com.platon.browser.complement.converter.delegate.proposal;
+package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
