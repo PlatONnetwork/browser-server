@@ -1,6 +1,8 @@
 package com.platon.browser.complement.converter.stake;
 
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
@@ -27,6 +29,8 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>
 
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 	
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
@@ -67,6 +71,15 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>
     
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(null);
+        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+        nodeOpt.setNodeId(txParam.getNodeId());
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.QUIT.getCode()));
+        nodeOpt.setTxHash(tx.getHash());
+        nodeOpt.setBNum(tx.getNum());
+        nodeOpt.setTime(tx.getTime());
+
+
+        return Optional.ofNullable(nodeOpt);
     }
 }
