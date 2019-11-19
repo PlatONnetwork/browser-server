@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -37,12 +38,15 @@ public class StakeExitConverterTest extends AgentTestBase {
     private StakeBusinessMapper stakeBusinessMapper;
     @Mock
     private NodeCache nodeCache;
+    @Mock
+    private NetworkStatCache networkStatCache;
     @Spy
     private StakeExitConverter target;
 
     @Before
     public void setup()throws Exception{
         ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
+        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")

@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-import static com.platon.browser.client.PlatOnClient.LOG_DECODE_EXECUTOR;
-
 @Data
 public class ReceiptResult extends Response<List<Receipt>> {
     private Map<String,Receipt> map = new ConcurrentHashMap<>();
@@ -23,7 +21,7 @@ public class ReceiptResult extends Response<List<Receipt>> {
         CountDownLatch latch = new CountDownLatch(getResult().size());
         getResult().forEach(r->{
             map.put(HexTool.prefix(r.getTransactionHash()),r);
-            LOG_DECODE_EXECUTOR.submit(()->{
+            PlatOnClient.getLogDecodeExecutor().submit(()->{
                 try {
                     r.setBlockNumber(blockNumber);
                     r.decodeLogs();

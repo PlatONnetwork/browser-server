@@ -24,10 +24,10 @@ public class JdkSerializer<T> implements JedisSerializer<T> {
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		JdkSerializer<Object> a = new JdkSerializer<Object>();
+		JdkSerializer<Object> a = new JdkSerializer<>();
 		
-		List<Map<String, Integer>> serialize = new ArrayList<Map<String, Integer>>();
-		Map<String, Integer> m = new HashMap<String, Integer>();
+		List<Map<String, Integer>> serialize = new ArrayList<>();
+		Map<String, Integer> m = new HashMap<>();
 		m.put("A", 123);
 		serialize.add(m);
 		byte[] str = a.serialize(serialize);

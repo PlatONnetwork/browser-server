@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
  */
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=test")
+@SpringBootTest(classes = AgentApplication.class, value = "spring.profiles.active=unit")
 @SpringBootApplication
 public class DelegateBusinessTest extends AgentTestBase {
 

@@ -2,6 +2,8 @@ package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.ConfigLoadingException;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +30,9 @@ import java.util.concurrent.Executors;
 @Component
 public class PlatOnClient {
     // 交易输入参数并行解码线程池
-    public static ExecutorService LOG_DECODE_EXECUTOR;
+    @Getter
+    @Setter
+    private static ExecutorService logDecodeExecutor;
 
     // 交易输入参数并行解码线程数
     @Value("${platon.txLogDecodeThreadNum}")
@@ -47,7 +51,7 @@ public class PlatOnClient {
 
     @PostConstruct
     private void init() throws ConfigLoadingException {
-        LOG_DECODE_EXECUTOR=Executors.newFixedThreadPool(logDecodeThreadNum);
+        logDecodeExecutor=Executors.newFixedThreadPool(logDecodeThreadNum);
         retryableClient.init();
     }
 

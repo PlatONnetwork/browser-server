@@ -46,7 +46,7 @@ public class AgentTestBase extends AgentTestData {
 
     static {
         AppStatusUtil.setStatus(AppStatus.STOPPED);
-        PlatOnClient.LOG_DECODE_EXECUTOR = Executors.newFixedThreadPool(100);
+        PlatOnClient.setLogDecodeExecutor(Executors.newFixedThreadPool(100));
 
         subsidies.put(1,BigDecimal.valueOf(62215742));
         subsidies.put(2,BigDecimal.valueOf(55965742));

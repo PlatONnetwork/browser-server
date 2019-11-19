@@ -10,18 +10,18 @@ import java.util.*;
  *  @data 2019年11月13日
  */
 public class SerializerUtils {
+    private SerializerUtils(){}
+
+    private final static JedisSerializer<Object> redisSerializer = new JdkSerializer<>();
 
 
-    private final static JedisSerializer<Object> redisSerializer = new JdkSerializer<Object>();
-
-
-	public static JedisSerializer<Object> getRedisserializer() {
+	public static JedisSerializer<Object> getRedisSerializer() {
         return redisSerializer;
     }
 
     //key 值 序列化
     public static byte[] rawKey(Object key) {
-        if (redisSerializer == null && key instanceof byte[]) {
+        if (key instanceof byte[]) {
             return (byte[]) key;
         }
         return redisSerializer.serialize(key);
@@ -29,7 +29,7 @@ public class SerializerUtils {
 
     //value值序列化
     public static byte[] rawValue(Object value) {
-        if (redisSerializer == null && value instanceof byte[]) {
+        if (value instanceof byte[]) {
             return (byte[]) value;
         }
         return redisSerializer.serialize(value);
@@ -69,14 +69,14 @@ public class SerializerUtils {
     }
 
     public static <HK> byte[] rawHashKey(HK hashKey) {
-        if (redisSerializer == null && hashKey instanceof byte[]) {
+        if (hashKey instanceof byte[]) {
             return (byte[]) hashKey;
         }
         return redisSerializer.serialize(hashKey);
     }
 
     public static <HV> byte[] rawHashValue(HV value) {
-        if (redisSerializer == null & value instanceof byte[]) {
+        if (value instanceof byte[]) {
             return (byte[]) value;
         }
         return redisSerializer.serialize(value);
