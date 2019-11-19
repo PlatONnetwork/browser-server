@@ -47,9 +47,12 @@ public class OnElectionConverterTest extends AgentTestBase {
     public void setup()throws Exception{
         ReflectionTestUtils.setField(target,"epochBusinessMapper",epochBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        List<String> list = new ArrayList <>();
-        stakingList.forEach(staking ->{
-            list.add(staking.getNodeId());
+        List<Staking> list = new ArrayList <>();
+        stakingList.forEach(item ->{
+        	Staking staking = new Staking();
+        	staking.setNodeId(item.getNodeId());
+        	staking.setStakingBlockNum(item.getStakingBlockNum());
+            list.add(staking);
         });
         when(epochBusinessMapper.querySlashNode(any())).thenReturn(list);
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);

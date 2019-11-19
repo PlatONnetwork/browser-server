@@ -1,4 +1,4 @@
-package com.platon.browser.bootstrap.queue.publisher;
+package com.platon.browser.collection.queue.publisher;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.Receipt;

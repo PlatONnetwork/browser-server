@@ -1,21 +1,24 @@
 package com.platon.browser.complement.converter.epoch;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.platon.bean.Node;
+
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Election;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.platon.bean.Node;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -38,7 +41,7 @@ public class OnElectionConverter {
 		}
 	
 		//查询需要惩罚的节点
-		List<String> slashNodeList = epochBusinessMapper.querySlashNode(preValidatorList);
+		List<Staking> slashNodeList = epochBusinessMapper.querySlashNode(preValidatorList);
 		if(slashNodeList.isEmpty()) {
 			return Optional.ofNullable(null);
 		}
@@ -57,7 +60,7 @@ public class OnElectionConverter {
 				.map(node -> {
 					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-					nodeOpt.setNodeId(node);
+					nodeOpt.setNodeId(node.getNodeId());
 					nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
 					nodeOpt.setBNum(bNum.longValue());
 					nodeOpt.setTime(block.getTime());

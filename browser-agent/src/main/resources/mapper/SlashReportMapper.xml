@@ -3,6 +3,17 @@
 <mapper namespace="com.platon.browser.complement.dao.mapper.SlashBusinessMapper">
 <update id="report" parameterType="com.platon.browser.complement.dao.param.slash.Report">
 
+	update `delegation` set
+		`delegate_released` = `delegate_hes` + `delegate_locked`,
+		`delegate_hes` = 0,
+		`delegate_locked` = 0
+	where
+		`node_id` = #{nodeId}
+	and
+		`staking_block_num` = #{stakingBlockNum}
+	and
+		`is_history` = 2;
+
 	update `node` set
 		`leave_time` = #{time},
 		`status` =  #{codeStatus},

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.common.enums.BusinessType;
 
 import lombok.Builder;
@@ -23,7 +24,7 @@ public class Election implements BusinessParam {
     /**
      * 需要惩罚的列表
      */
-    private List <String> slashNodeList;
+    private List <Staking> slashNodeList;
 
     /**
      *  结算周期

@@ -2,9 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
 
-<select id="querySlashNode" resultType="java.lang.String">
+<select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
 	select 
-		`node_id`
+		`node_id` as nodeId,
+		`staking_block_num` as stakingBlockNum
 	from staking
 	where `status` = 1
 		and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
@@ -12,6 +13,21 @@
 </select>
 
 <update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
+
+	<foreach collection="slashNodeList" item="item">
+		update `delegation` set
+			`delegate_released` = `delegate_hes` + `delegate_locked`,
+			`delegate_hes` = 0,
+			`delegate_locked` = 0
+		where
+			`node_id` = #{item.nodeId}
+		and
+			`staking_block_num` = #{item.stakingBlockNum}
+		and
+			`is_history` = 2;
+    </foreach>
+
+
 	update `staking` set
 		`leave_time` = #{time},
 		`status` = if(`staking_locked` > 0, 2, 3),
@@ -25,7 +41,7 @@
 		`is_consensus` = 2,
 		`is_settle` = 2
 	where `status` = 1
-		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
+		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
 
 	update `node` n set
 		n.`leave_time` = #{time},
@@ -42,6 +58,6 @@
 		n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
 		n.`is_consensus` = 2,
 		n.`is_settle` = 2
-	where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item} </foreach>;
+	where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
 </update>
 </mapper>

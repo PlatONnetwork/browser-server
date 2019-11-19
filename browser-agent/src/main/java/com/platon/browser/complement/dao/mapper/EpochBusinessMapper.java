@@ -1,11 +1,12 @@
 package com.platon.browser.complement.dao.mapper;
 
-import com.platon.browser.complement.dao.param.BusinessParam;
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.dao.entity.Staking;
 
 /*
  * @Auther: dongqile
@@ -36,5 +37,5 @@ public interface EpochBusinessMapper {
      * @param preValidatorList
      * @return
      */
-	List<String> querySlashNode(@Param("list") List<String> preValidatorList);
+	List<Staking> querySlashNode(@Param("list") List<String> preValidatorList);
 }
