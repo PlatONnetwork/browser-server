@@ -8,7 +8,7 @@
         `pre_cons_block_qty` = `cur_cons_block_qty`,
         `cur_cons_block_qty` = 0
     where
-        `status` = 1;
+        `status` in (1,  2);
 
     update `node` set
         `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),
