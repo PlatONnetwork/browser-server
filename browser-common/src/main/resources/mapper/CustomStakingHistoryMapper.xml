@@ -101,6 +101,9 @@
         <if test="'staking_reward_value'.toString() == column.value">
           #{item.stakingRewardValue,jdbcType=DECIMAL}
         </if>
+        <if test="'predict_staking_reward'.toString() == column.value">
+          #{item.predictStakingReward,jdbcType=DECIMAL}
+        </if>
         <if test="'cur_cons_block_qty'.toString() == column.value">
           #{item.curConsBlockQty,jdbcType=BIGINT}
         </if>
