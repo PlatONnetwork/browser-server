@@ -1,16 +1,20 @@
-//package com.platon.browser.param;
-//
-//import static org.junit.Assert.assertTrue;
-//
-//import org.junit.Test;
-//
-//public class DeclareVersionParamTest {
-//
-//	@Test
-//	public void testInit() {
-//		DeclareVersionParam param = new DeclareVersionParam();
-//		param.init("activeNode",1,"versionSigns");
-//		assertTrue(param.getActiveNode().equals("activeNode"));
-//	}
-//
-//}
+package com.platon.browser.param;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class DeclareVersionParamTest {
+
+	@Test
+	public void testInit() {
+		VersionDeclareParam param = VersionDeclareParam.builder()
+                .activeNode("sss")
+                .nodeName("fdfdsf")
+                .version(333)
+                .versionSigns("dfdsfs")
+                .build();
+		assertTrue(param.getActiveNode().equals("sss"));
+	}
+
+}

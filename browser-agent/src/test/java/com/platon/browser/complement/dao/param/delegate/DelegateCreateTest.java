@@ -22,6 +22,7 @@ public class DelegateCreateTest extends AgentTestBase {
 
     @Test
     public void test(){
+
         DelegateCreate target = DelegateCreate.builder()
                 .amount(BigDecimal.ONE)
                 .blockNumber(BigInteger.ONE)
