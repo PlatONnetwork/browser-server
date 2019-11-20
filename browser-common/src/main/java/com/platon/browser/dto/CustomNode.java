@@ -1,13 +1,14 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming

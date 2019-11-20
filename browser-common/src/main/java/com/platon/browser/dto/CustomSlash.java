@@ -1,8 +1,6 @@
 package com.platon.browser.dto;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Slash;
-import com.platon.browser.param.ReportParam;
 import lombok.Data;
 
 import java.util.Arrays;

@@ -12,13 +12,9 @@ public class CustomSlashTest {
 
 	private CustomSlash slash;
 
-	@Before
-	public void setUp() throws Exception {
-		slash = new CustomSlash();
-	}
-
 	@Test
 	public void testCustomSlash() {
+		slash = new CustomSlash();
 		assertNotNull(slash);
 	}
 
