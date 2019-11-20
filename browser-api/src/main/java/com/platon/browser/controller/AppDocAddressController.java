@@ -38,25 +38,16 @@ public class AppDocAddressController implements AppDocAddress {
 	@Override
 	public WebAsyncTask<BaseResp<QueryDetailResp>> details(@Valid QueryDetailRequest req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<QueryDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<QueryDetailResp>>() {  
-            @Override  
-            public BaseResp<QueryDetailResp> call() throws Exception {  
-            	QueryDetailResp queryDetailResp = addressService.getDetails(req);
-        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), queryDetailResp);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<QueryDetailResp>>() {  
-            @Override  
-            public BaseResp<QueryDetailResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<QueryDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+            QueryDetailResp queryDetailResp = addressService.getDetails(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), queryDetailResp);
+        });
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
@@ -70,18 +61,12 @@ public class AppDocAddressController implements AppDocAddress {
         		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), dueryRPPlanDetailResp);
             }  
         });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<QueryRPPlanDetailResp>>() {  
-            @Override  
-            public BaseResp<QueryRPPlanDetailResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;
 	}
 

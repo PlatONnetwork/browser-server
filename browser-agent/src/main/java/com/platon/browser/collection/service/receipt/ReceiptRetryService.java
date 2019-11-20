@@ -3,6 +3,7 @@ package com.platon.browser.collection.service.receipt;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RpcParam;
 import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -27,7 +28,7 @@ public class ReceiptRetryService {
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public ReceiptResult getReceipt(Long blockNumber) throws Exception {
+    public ReceiptResult getReceipt(Long blockNumber){
         long startTime = System.currentTimeMillis();
 
         try {
@@ -42,7 +43,7 @@ public class ReceiptRetryService {
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
-            throw e;
+            throw new BusinessException(e.getMessage());
         }
     }
 

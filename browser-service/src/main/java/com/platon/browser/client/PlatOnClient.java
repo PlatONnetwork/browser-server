@@ -32,7 +32,7 @@ public class PlatOnClient {
     // 交易输入参数并行解码线程池
     @Getter
     @Setter
-    private static ExecutorService logDecodeExecutor;
+    private ExecutorService logDecodeExecutor;
 
     // 交易输入参数并行解码线程数
     @Value("${platon.txLogDecodeThreadNum}")
@@ -65,12 +65,12 @@ public class PlatOnClient {
 
     public ReceiptResult getReceiptResult(Long blockNumber) throws IOException, InterruptedException {
         ReceiptResult receiptResult = specialApi.getReceiptResult(retryableClient.getWeb3jWrapper(),BigInteger.valueOf(blockNumber));
-        receiptResult.resolve(blockNumber);
+        receiptResult.resolve(blockNumber,logDecodeExecutor);
         return receiptResult;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,backoff=@Backoff(value=3000L))
-    public EconomicConfig getEconomicConfig() throws Exception {
+    public EconomicConfig getEconomicConfig() throws ConfigLoadingException {
         try {
             EconomicConfig ec = retryableClient.getWeb3jWrapper().getWeb3j().getEconomicConfig().send().getEconomicConfig();
             String msg = JSON.toJSONString(ec,true);
@@ -79,7 +79,7 @@ public class PlatOnClient {
         } catch (Exception e) {
             retryableClient.updateCurrentWeb3jWrapper();
             log.error("获取链上配置出错({}),将重试!", e.getMessage());
-            throw e;
+            throw new ConfigLoadingException(e.getMessage());
         }
     }
 

@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class CalculateUtils {
 
-
+	private CalculateUtils(){}
 
 	/**
 	 * 当前增发周期开始块高

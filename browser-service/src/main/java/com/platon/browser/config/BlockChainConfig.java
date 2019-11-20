@@ -213,9 +213,6 @@ public class BlockChainConfig {
         //【治理】文本提案投票周期
         this.proposalTextConsensusRounds=dec.getGov().getTextProposalVoteDurationSeconds()
                 .divide(new BigDecimal(this.blockInterval.multiply(dec.getCommon().getPerRoundBlocks()).multiply(dec.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
-        //【治理】设置预升级开始轮数
-//        this.versionProposalActiveConsensusRounds=dec.getGov().getVersionProposalVoteDurationSeconds()
-//                .divide(new BigDecimal(this.blockInterval.multiply(dec.getCommon().getPerRoundBlocks()).multiply(dec.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         this.versionProposalActiveConsensusRounds=dec.getGov().getVersionProposalActiveConsensusRounds();
         //【奖励】激励池分配给出块激励的比例
         this.blockRewardRate=dec.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);

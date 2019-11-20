@@ -37,120 +37,75 @@ public class AppDocHomeController implements AppDocHome {
 	@Override
 	public WebAsyncTask<BaseResp<QueryNavigationResp>> queryNavigation(@Valid QueryNavigationRequest req) {
      // 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<QueryNavigationResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<QueryNavigationResp>>() {  
-            @Override  
-            public BaseResp<QueryNavigationResp> call() throws Exception {  
-            	 try{
-                 	QueryNavigationResp queryNavigationResp = homeService.queryNavigation(req);
-                     return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),queryNavigationResp);
-                 }catch (BusinessException be){
-                     throw new ResponseException(be.getErrorMessage());
-                 }
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<QueryNavigationResp>>() {  
-            @Override  
-            public BaseResp<QueryNavigationResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<QueryNavigationResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+             try{
+                 QueryNavigationResp queryNavigationResp = homeService.queryNavigation(req);
+                 return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),queryNavigationResp);
+             }catch (BusinessException be){
+                 throw new ResponseException(be.getErrorMessage());
+             }
+        });
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<BaseResp<BlockStatisticNewResp>> blockStatisticNew() {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<BlockStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<BlockStatisticNewResp>>() {  
-            @Override  
-            public BaseResp<BlockStatisticNewResp> call() throws Exception {  
-            	BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
-        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
-            }  
-        });  
+        WebAsyncTask<BaseResp<BlockStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+            BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
+        });
         webAsyncTask.onCompletion(new Runnable() {  
             @Override  
             public void run() {  
             }  
         });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<BlockStatisticNewResp>>() {  
-            @Override  
-            public BaseResp<BlockStatisticNewResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<BaseResp<ChainStatisticNewResp>> chainStatisticNew() {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<ChainStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<ChainStatisticNewResp>>() {  
-            @Override  
-            public BaseResp<ChainStatisticNewResp> call() throws Exception {  
-            	ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
-        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<ChainStatisticNewResp>>() {  
-            @Override  
-            public BaseResp<ChainStatisticNewResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<ChainStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+            ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
+        });
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
-
-//	@Override
-//	public BaseResp<List<BlockListNewResp>> blockListNew() {
-//		List<BlockListNewResp> lists = homeService.blockListNew();
-//		/**
-//		 * 第一次返回都设为true
-//		 */
-//		if(lists !=null && !lists.isEmpty()) {
-//			lists.get(0).setIsRefresh(true);
-//		}
-//		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);
-//	}
 
 	@Override
 	public WebAsyncTask<BaseResp<StakingListNewResp>> stakingListNew() {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<StakingListNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<StakingListNewResp>>() {  
-            @Override  
-            public BaseResp<StakingListNewResp> call() throws Exception {  
-            	StakingListNewResp stakingListNewResp = homeService.stakingListNew();
-        		/**
-        		 * 第一次返回都设为true
-        		 */
-        		stakingListNewResp.setIsRefresh(true);
-        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<StakingListNewResp>>() {  
-            @Override  
-            public BaseResp<StakingListNewResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<StakingListNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+            StakingListNewResp stakingListNewResp = homeService.stakingListNew();
+            /**
+             * 第一次返回都设为true
+             */
+            stakingListNewResp.setIsRefresh(true);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
+        });
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	
 	}

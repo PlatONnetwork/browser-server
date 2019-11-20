@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 @Data
 public class ReceiptResult extends Response<List<Receipt>> {
@@ -16,12 +17,12 @@ public class ReceiptResult extends Response<List<Receipt>> {
     /**
      * 并行解码Logs
      */
-    public void resolve(Long blockNumber) throws InterruptedException {
+    public void resolve(Long blockNumber, ExecutorService threadPool) throws InterruptedException {
         if(getResult().isEmpty()) return;
         CountDownLatch latch = new CountDownLatch(getResult().size());
         getResult().forEach(r->{
             map.put(HexTool.prefix(r.getTransactionHash()),r);
-            PlatOnClient.getLogDecodeExecutor().submit(()->{
+            threadPool.submit(()->{
                 try {
                     r.setBlockNumber(blockNumber);
                     r.decodeLogs();

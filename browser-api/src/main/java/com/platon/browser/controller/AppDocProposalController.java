@@ -48,77 +48,46 @@ public class AppDocProposalController implements AppDocProposal {
     @Override
     public WebAsyncTask<RespPage<ProposalListResp>> proposalList(@Valid PageReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<ProposalListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<ProposalListResp>>() {  
-            @Override  
-            public RespPage<ProposalListResp> call() throws Exception {  
-            	return proposalService.list(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<ProposalListResp>>() {  
-            @Override  
-            public RespPage<ProposalListResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<ProposalListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> proposalService.list(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
     }
 
     @Override
     public WebAsyncTask<BaseResp<ProposalDetailsResp>> proposalDetails(@Valid ProposalDetailRequest req) {
     	// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<ProposalDetailsResp>>() {  
-            @Override  
-            public BaseResp<ProposalDetailsResp> call() throws Exception {  
-            	return proposalService.get(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<ProposalDetailsResp>>() {  
-            @Override  
-            public BaseResp<ProposalDetailsResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> proposalService.get(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
     }
 
     @Override
     public WebAsyncTask<RespPage<VoteListResp>> voteList(@Valid VoteListRequest req) {
      // 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<VoteListResp>>() {  
-            @Override  
-            public RespPage<VoteListResp> call() throws Exception {  
-            	if(Objects.isNull(req)|| StringUtils.isBlank(req.getProposalHash())){
-            	    String msg = JSON.toJSONString(req);
-            		logger.error("## ERROR # proposal param error req:{}", msg);
-            		throw new BusinessException(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.PROPOSAL_PARAM_ERROR));
-        		}
-                return voteService.queryByProposal(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<VoteListResp>>() {  
-            @Override  
-            public RespPage<VoteListResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+            if(Objects.isNull(req)|| StringUtils.isBlank(req.getProposalHash())){
+                String msg = JSON.toJSONString(req);
+                logger.error("## ERROR # proposal param error req:{}", msg);
+                throw new BusinessException(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.PROPOSAL_PARAM_ERROR));
+            }
+            return voteService.queryByProposal(req);
+        });
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
     }
 

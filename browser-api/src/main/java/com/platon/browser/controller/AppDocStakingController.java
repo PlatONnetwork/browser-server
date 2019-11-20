@@ -13,10 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.WebAsyncTask;
 
+import javax.validation.Valid;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
-
-import javax.validation.Valid;
 
 /**
  *  验证人模块Contract。定义使用方法
@@ -37,169 +36,94 @@ public class AppDocStakingController implements AppDocStaking {
 	@Override
 	public WebAsyncTask<BaseResp<StakingStatisticNewResp>> stakingStatisticNew() {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<StakingStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<StakingStatisticNewResp>>() {  
-            @Override  
-            public BaseResp<StakingStatisticNewResp> call() throws Exception {  
-            	StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
-        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingStatisticNewResp);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<StakingStatisticNewResp>>() {  
-            @Override  
-            public BaseResp<StakingStatisticNewResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<StakingStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+            StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingStatisticNewResp);
+        });
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<RespPage<AliveStakingListResp>> aliveStakingList(@Valid AliveStakingListReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<AliveStakingListResp>>() {  
-            @Override  
-            public RespPage<AliveStakingListResp> call() throws Exception {  
-            	return stakingService.aliveStakingList(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<AliveStakingListResp>>() {  
-            @Override  
-            public RespPage<AliveStakingListResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.aliveStakingList(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<RespPage<HistoryStakingListResp>> historyStakingList(@Valid HistoryStakingListReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<HistoryStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<HistoryStakingListResp>>() {  
-            @Override  
-            public RespPage<HistoryStakingListResp> call() throws Exception {  
-            	return stakingService.historyStakingList(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<HistoryStakingListResp>>() {  
-            @Override  
-            public RespPage<HistoryStakingListResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<HistoryStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.historyStakingList(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<BaseResp<StakingDetailsResp>> stakingDetails(@Valid StakingDetailsReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<StakingDetailsResp>>() {  
-            @Override  
-            public BaseResp<StakingDetailsResp> call() throws Exception {  
-            	return stakingService.stakingDetails(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<BaseResp<StakingDetailsResp>>() {  
-            @Override  
-            public BaseResp<StakingDetailsResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.stakingDetails(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<RespPage<StakingOptRecordListResp>> stakingOptRecordList(@Valid StakingOptRecordListReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<StakingOptRecordListResp>>() {  
-            @Override  
-            public RespPage<StakingOptRecordListResp> call() throws Exception {  
-            	return stakingService.stakingOptRecordList(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<StakingOptRecordListResp>>() {  
-            @Override  
-            public RespPage<StakingOptRecordListResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.stakingOptRecordList(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<RespPage<DelegationListByStakingResp>> delegationListByStaking(@Valid DelegationListByStakingReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<DelegationListByStakingResp>>() {  
-            @Override  
-            public RespPage<DelegationListByStakingResp> call() throws Exception {  
-            	return stakingService.delegationListByStaking(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<DelegationListByStakingResp>>() {  
-            @Override  
-            public RespPage<DelegationListByStakingResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.delegationListByStaking(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
 	@Override
 	public WebAsyncTask<RespPage<DelegationListByAddressResp>> delegationListByAddress(@Valid DelegationListByAddressReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<RespPage<DelegationListByAddressResp>>() {  
-            @Override  
-            public RespPage<DelegationListByAddressResp> call() throws Exception {  
-            	return stakingService.delegationListByAddress(req);
-            }  
-        });  
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
-        webAsyncTask.onTimeout(new Callable<RespPage<DelegationListByAddressResp>>() {  
-            @Override  
-            public RespPage<DelegationListByAddressResp> call() throws Exception {  
-                // 超时的时候，直接抛异常，让外层统一处理超时异常  
-                throw new TimeoutException("System busy!");  
-            }  
-        });  
+        WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.delegationListByAddress(req));
+        webAsyncTask.onCompletion(() -> {
+        });
+        webAsyncTask.onTimeout(() -> {
+            // 超时的时候，直接抛异常，让外层统一处理超时异常
+            throw new TimeoutException("System busy!");
+        });
         return webAsyncTask;  
 	}
 
