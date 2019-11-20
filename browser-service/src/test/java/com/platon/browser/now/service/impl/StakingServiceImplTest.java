@@ -15,13 +15,13 @@ import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.AliveStakingListResp;
-import com.platon.browser.resp.staking.DelegationListByAddressResp;
-import com.platon.browser.resp.staking.DelegationListByStakingResp;
-import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingDetailsResp;
-import com.platon.browser.resp.staking.StakingOptRecordListResp;
-import com.platon.browser.resp.staking.StakingStatisticNewResp;
+import com.platon.browser.res.staking.AliveStakingListResp;
+import com.platon.browser.res.staking.DelegationListByAddressResp;
+import com.platon.browser.res.staking.DelegationListByStakingResp;
+import com.platon.browser.res.staking.HistoryStakingListResp;
+import com.platon.browser.res.staking.StakingDetailsResp;
+import com.platon.browser.res.staking.StakingOptRecordListResp;
+import com.platon.browser.res.staking.StakingStatisticNewResp;
 
 public class StakingServiceImplTest extends TestBase{
 

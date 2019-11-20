@@ -27,14 +27,6 @@ public class BrowserCache {
 		BrowserCache.webSocketSet = webSocketSet;
 	}
 
-	public static Logger getLogger() {
-		return logger;
-	}
-
-	public static void setLogger(Logger logger) {
-		BrowserCache.logger = logger;
-	}
-
 	public static Map<String, List<String>> getKeys() {
 		return keys;
 	}
@@ -76,8 +68,9 @@ public class BrowserCache {
 
 	/**
 	 * * 给所有人发消息 * @param message
+	 * @throws Exception 
 	 */
-	public static void sendAll(String message) {
+	public static void sendAll(String message) throws Exception {
 		// 遍历HashMap
 		for (String key : BrowserCache.getWebSocketSet().keySet()) {
 			// 判断接收用户是否是当前发消息的用户
@@ -91,13 +84,15 @@ public class BrowserCache {
 
 	/**
 	 * * 这个方法与上面几个方法不一样。没有用注解，是根据自己需要添加的方法。 * * @param message * @throws IOException
+	 * @throws Exception 
 	 */
 
-	public static void sendMessage(String key,String message) {
+	public static void sendMessage(String key,String message) throws Exception {
 		try {
 			BrowserCache.getWebSocketSet().get(key).getBasicRemote().sendText(message);
 		} catch (Exception e) {
 			logger.error("sendMessage error", e);
+			throw e;
 		}
 	}
 }

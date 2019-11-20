@@ -17,8 +17,12 @@ public class BaseResp<T> {
     protected Integer code;
     protected T data;
 
+    public BaseResp() {
+    	this.code=0;
+    }
+    
     /** 初始化返回对象 */
-    private BaseResp(Integer code, String errMsg, T data){
+    public BaseResp(Integer code, String errMsg, T data){
         this.code=code;
         this.errMsg=errMsg;
         this.data=data;

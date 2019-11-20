@@ -9,9 +9,9 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.DelegationAddress;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
+import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.DelegationStaking;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
-import com.platon.browser.elasticsearch.dto.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -23,7 +23,7 @@ import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.staking.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.*;
+import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -263,6 +263,8 @@ public class StakingServiceImpl implements StakingService {
 			/** 实际跳转地址是url拼接上名称 */
 			if (StringUtils.isNotBlank(stakingNode.getExternalName())) {
 				resp.setExternalUrl(blockChainConfig.getKeyBase() + stakingNode.getExternalName());
+			} else {
+				resp.setExternalUrl(blockChainConfig.getKeyBase());
 			}
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());

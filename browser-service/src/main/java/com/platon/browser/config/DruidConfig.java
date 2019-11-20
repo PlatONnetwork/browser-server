@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2019/4/28 11:53
  * @Description:
  */
-//@Configuration
+@Configuration
 public class DruidConfig {
 
 	@ConfigurationProperties(prefix = "spring.datasource")

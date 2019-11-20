@@ -17,22 +17,22 @@ public class MessageDtoTest {
 	
 	@Before
 	public void setUp() {
-		messageDto.analysisKey("1|10||all");
+		messageDto.analysisKey("1|10|1|all");
 	}
 	
 	@Test
 	public void test_analysisData() {
-		assertNotNull(messageDto.analysisData("1,1,10,all,"));
+		assertNotNull(messageDto.analysisData("1,1,10,all,1"));
 	}
 	
 	@Test
 	public void test_analysisKey() {
-		assertNotNull(messageDto.analysisKey("1|10||all"));
+		assertNotNull(messageDto.analysisKey("1|10|1|all"));
 	}
 	
 	@Test
 	public void test_getMessageKey() {
-		assertEquals(messageDto.getMessageKey(), "1|10||all");
+		assertEquals(messageDto.getMessageKey(), "1|10|1|all");
 	}
 	
 }

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.platon.browser.enums.ErrorCodeEnum;
 
+
 public class BusinessExceptionTest {
 
 	@Test

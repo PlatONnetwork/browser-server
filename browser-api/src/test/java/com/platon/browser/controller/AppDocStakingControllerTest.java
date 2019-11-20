@@ -31,6 +31,12 @@ public class AppDocStakingControllerTest {
     }
     
     @Test
+    public void stakingListNew() throws Exception{
+    	mockMvc.perform(MockMvcRequestBuilders.post("/staking/statistic")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk()).andDo(print());
+    }
+    
+    @Test
     public void aliveStakingList() throws Exception{
     	String requestBody = "{\"key\":\"aa\",\"queryStatus\":\"all\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/staking/aliveStakingList")

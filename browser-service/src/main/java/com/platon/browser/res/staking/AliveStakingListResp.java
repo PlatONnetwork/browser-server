@@ -1,4 +1,4 @@
-package com.platon.browser.resp.staking;
+package com.platon.browser.res.staking;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLowLatSerializer;

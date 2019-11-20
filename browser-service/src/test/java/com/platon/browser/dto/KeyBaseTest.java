@@ -1,12 +1,7 @@
-package com.platon.browser.dao.entity;
+package com.platon.browser.dto;
 
-import com.platon.browser.TestBase;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.utils.ClassUtil;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,16 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-/**
- * @Auther: Chendongming
- * @Date: 2019/9/9 20:29
- * @Description:
- */
+import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.utils.ClassUtil;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EntityTest extends TestBase {
+public class KeyBaseTest {
+
 
     private List<Class<?>> target = new ArrayList<>();
     /**
@@ -35,25 +31,30 @@ public class EntityTest extends TestBase {
      */
     @Before
     public void setup() {
-        String packageName= EntityTest.class.getPackage().getName();
+        String packageName= KeyBaseTest.class.getPackage().getName();
         Set<Class<?>> classSet = ClassUtil.getClasses(packageName);
         classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")
-                &&!clazz.getName().endsWith("Column")
+                &&!clazz.getName().contains("Custom")
                 &&!clazz.getName().endsWith("Criterion")
                 &&!clazz.getName().endsWith("GeneratedCriteria")
         ).forEach(target::add);
     }
     @Test
-    public void test() throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public void test() {
         for (Class<?> clazz:target){
             Method[] methods = clazz.getDeclaredMethods();
             for(Method method:methods){
-//                if(Modifier.isStatic(method.getModifiers())) continue;
-//                if(Modifier.isProtected(method.getModifiers())) continue;
+                if(Modifier.isStatic(method.getModifiers())) continue;
+                if(Modifier.isProtected(method.getModifiers())) continue;
                 if(Modifier.isPrivate(method.getModifiers())) continue;
                 if(method.getName().equals("init")) continue;
                 Class<?>[] types = method.getParameterTypes();
-                Object instance = clazz.newInstance();
+                Object instance = null;
+				try {
+					instance = clazz.newInstance();
+				} catch (InstantiationException | IllegalAccessException e1) {
+					e1.printStackTrace();
+				}
                 if(types.length!=0){
                     Object[] args = new Object[types.length];
                     for (int i=0;i<types.length;i++){
@@ -77,16 +78,39 @@ public class EntityTest extends TestBase {
                             args[i]=333L;
                             continue;
                         }
+                        if(types[i].getTypeName().equals("byte[]")) {
+                        	args[i]=new byte[] {1};
+                            continue;
+                        }
+                        if(types[i].getTypeName().equals("java.lang.Double[]")) {
+                        	args[i]=new Double[] {};
+                            continue;
+                        }
+                        if(types[i].getTypeName().equals("java.lang.Long[]")) {
+                        	args[i]=new Long[] {};
+                            continue;
+                        }
                         args[i]=mock(types[i]);
                     }
                     method.setAccessible(true);
-                    method.invoke(instance,args);
+                    try {
+						method.invoke(instance,args);
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
                     continue;
                 }
                 method.setAccessible(true);
-                method.invoke(instance);
+                try {
+					method.invoke(instance);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
             }
         }
         assertTrue(true);
     }
+
+
+
 }

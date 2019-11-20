@@ -113,18 +113,6 @@ public class AppDocHomeController implements AppDocHome {
         return webAsyncTask;  
 	}
 
-//	@Override
-//	public BaseResp<List<BlockListNewResp>> blockListNew() {
-//		List<BlockListNewResp> lists = homeService.blockListNew();
-//		/**
-//		 * 第一次返回都设为true
-//		 */
-//		if(lists !=null && !lists.isEmpty()) {
-//			lists.get(0).setIsRefresh(true);
-//		}
-//		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);
-//	}
-
 	@Override
 	public WebAsyncTask<BaseResp<StakingListNewResp>> stakingListNew() {
 		// 5s钟没返回，则认为超时  

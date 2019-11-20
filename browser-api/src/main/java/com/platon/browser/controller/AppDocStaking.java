@@ -3,7 +3,8 @@ package com.platon.browser.controller;
 import com.platon.browser.req.staking.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.*;
+import com.platon.browser.res.staking.*;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

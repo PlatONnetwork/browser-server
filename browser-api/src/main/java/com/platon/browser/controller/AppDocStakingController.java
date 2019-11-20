@@ -7,7 +7,7 @@ import com.platon.browser.now.service.StakingService;
 import com.platon.browser.req.staking.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.*;
+import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;

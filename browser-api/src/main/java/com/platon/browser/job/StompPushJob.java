@@ -14,8 +14,8 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.res.home.BlockStatisticNewResp;
 import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.StakingListNewResp;
-import com.platon.browser.resp.staking.AliveStakingListResp;
-import com.platon.browser.resp.staking.StakingStatisticNewResp;
+import com.platon.browser.res.staking.AliveStakingListResp;
+import com.platon.browser.res.staking.StakingStatisticNewResp;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map.Entry;
+
 
 /**
  * 	推送任务
@@ -106,7 +107,7 @@ public class StompPushJob {
     			try {
     				ObjectMapper mapper = new ObjectMapper();  
     				BrowserCache.sendMessage(userNo, mapper.writeValueAsString(alives));
-    			}catch (IllegalStateException e) {
+    			}catch (Exception e) {
     				BrowserCache.getWebSocketSet().remove(userNo);
     				m.getValue().remove(userNo);
     				/**
@@ -114,6 +115,7 @@ public class StompPushJob {
     				 */
     				if(m.getValue().isEmpty()) {
     					BrowserCache.getKeys().remove(m.getKey());
+    					break;
     				}
 					logger.error("连接异常清楚连接",e);
 				}

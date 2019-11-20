@@ -1,4 +1,4 @@
-package com.platon.browser.elasticsearch.dto;
+package com.platon.browser.dto.elasticsearch;
 
 import java.util.List;
 

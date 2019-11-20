@@ -38,4 +38,22 @@ public class AppDocHomeControllerTest {
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
     
+    @Test
+    public void blockStatisticNew() throws Exception{
+    	mockMvc.perform(MockMvcRequestBuilders.post("/home/blockStatistic")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk()).andDo(print());
+    }
+    
+    @Test
+    public void chainStatisticNew() throws Exception{
+    	mockMvc.perform(MockMvcRequestBuilders.post("/home/chainStatistic")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk()).andDo(print());
+    }
+    
+    @Test
+    public void stakingListNew() throws Exception{
+    	mockMvc.perform(MockMvcRequestBuilders.post("/home/stakingList")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk()).andDo(print());
+    }
+    
 }

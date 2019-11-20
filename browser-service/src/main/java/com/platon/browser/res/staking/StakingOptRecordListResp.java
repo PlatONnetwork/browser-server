@@ -1,4 +1,4 @@
-package com.platon.browser.resp.staking;
+package com.platon.browser.res.staking;
 
 import java.math.BigDecimal;
 

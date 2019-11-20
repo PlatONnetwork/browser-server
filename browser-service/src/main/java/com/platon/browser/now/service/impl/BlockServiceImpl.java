@@ -3,9 +3,9 @@ package com.platon.browser.now.service.impl;
 import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.ESResult;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
@@ -300,7 +300,7 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
 			blockDetailResp.setTransferQty(block.getTranQty());
-			
+			blockDetailResp.setNodeName(commonService.getNodeName(block.getNodeId(), null));
 
 			/** 取上一个区块,如果存在则设置标识和hash */
 	        blockDetailResp.setFirst(false);

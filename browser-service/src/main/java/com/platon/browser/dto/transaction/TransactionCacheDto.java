@@ -3,6 +3,7 @@ package com.platon.browser.dto.transaction;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.res.RespPage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +15,9 @@ import java.util.List;
  */
 public class TransactionCacheDto {
 	
+	public TransactionCacheDto() {
+		this.transactionList = new ArrayList<>();
+	}
 	/**
 	 * 交易构造初始方法
 	 * @param page

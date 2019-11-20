@@ -8,7 +8,7 @@ import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.*;
+import com.platon.browser.res.staking.*;
 
 /**
  * 质押模块方法接口实现

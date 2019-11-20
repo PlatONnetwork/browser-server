@@ -1,12 +1,7 @@
-package com.platon.browser.dao.entity;
+package com.platon.browser.req;
 
-import com.platon.browser.TestBase;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.utils.ClassUtil;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,16 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-/**
- * @Auther: Chendongming
- * @Date: 2019/9/9 20:29
- * @Description:
- */
+import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.utils.ClassUtil;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EntityTest extends TestBase {
+public class ReqTest {
 
     private List<Class<?>> target = new ArrayList<>();
     /**
@@ -35,7 +30,7 @@ public class EntityTest extends TestBase {
      */
     @Before
     public void setup() {
-        String packageName= EntityTest.class.getPackage().getName();
+        String packageName= ReqTest.class.getPackage().getName();
         Set<Class<?>> classSet = ClassUtil.getClasses(packageName);
         classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")
                 &&!clazz.getName().endsWith("Column")
@@ -75,6 +70,10 @@ public class EntityTest extends TestBase {
                         }
                         if(Long.class==types[i]||long.class==types[i]){
                             args[i]=333L;
+                            continue;
+                        }
+                        if(types[i].getTypeName().equals("byte[]")) {
+                        	args[i]=new byte[] {1};
                             continue;
                         }
                         args[i]=mock(types[i]);
