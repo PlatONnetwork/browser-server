@@ -84,7 +84,11 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
             Long txMaxId = 0L;
             List<Transaction> transactions = event.getTransactions();
-            if(!transactions.isEmpty()) txMaxId=transactions.get(0).getId();
+            if(!transactions.isEmpty()) {
+                for (Transaction tx : transactions) {
+                    if(tx.getId()>txMaxId) txMaxId=tx.getId();
+                }
+            }
             BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
 
             // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
