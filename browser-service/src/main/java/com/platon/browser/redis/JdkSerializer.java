@@ -1,5 +1,7 @@
 package com.platon.browser.redis;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.Map;
  *	@author zhangrj
  *  @data 2019年11月13日
  */
+@Slf4j
 public class JdkSerializer<T> implements JedisSerializer<T> {
 	
 	@SuppressWarnings("unchecked")
@@ -33,7 +36,7 @@ public class JdkSerializer<T> implements JedisSerializer<T> {
 		byte[] str = a.serialize(serialize);
 		Object deserialize = a.deserialize(str);
 		if(deserialize != null){
-			System.out.println(((List<Map<String, Integer>>)deserialize).get(0));
+			log.error("{}",((List<Map<String, Integer>>)deserialize).get(0));
 		}
 		
 	}
@@ -44,7 +47,7 @@ public class JdkSerializer<T> implements JedisSerializer<T> {
 			serialize(t, byteStream);
 			return byteStream.toByteArray();
 		}catch (Throwable ex) {
-			ex.printStackTrace();
+			log.error("",ex);
 			throw new RuntimeException("序列化失败");
 		}
 	}
@@ -80,5 +83,4 @@ public class JdkSerializer<T> implements JedisSerializer<T> {
 			throw new IOException("Failed to deserialize object type", ex);
 		}
 	}
-	
 }

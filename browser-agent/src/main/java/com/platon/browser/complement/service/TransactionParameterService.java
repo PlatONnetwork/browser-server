@@ -15,6 +15,7 @@ import com.platon.browser.complement.converter.stake.StakeModifyConverter;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class TransactionParameterService {
      * @param event
      * @return
      */
-    public List<NodeOpt> getParameters(CollectionEvent event) throws Exception{
+    public List<NodeOpt> getParameters(CollectionEvent event){
         long startTime = System.currentTimeMillis();
 
         List<Transaction> transactions = event.getTransactions();
@@ -138,7 +139,7 @@ public class TransactionParameterService {
                 
                 nodeOpt.ifPresent(nodeOptList::add);
                 
-            }catch (BusinessException e){
+            }catch (BusinessException | NoSuchBeanException e){
                 log.debug("",e);
             }
            

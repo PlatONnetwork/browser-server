@@ -52,6 +52,7 @@ public class NodeUpdateTask {
 			List<Node> updateNodeList = new ArrayList<>();
 
 			nodeList.forEach(node -> {
+				if( node.getExternalId().trim().length() != 16) return;
 				Optional<KeyBaseUser> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
 					String url = keyBaseUrl.concat(keyBaseApi.concat(key));
 					try {

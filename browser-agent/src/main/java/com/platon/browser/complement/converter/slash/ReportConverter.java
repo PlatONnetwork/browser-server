@@ -49,8 +49,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
         String nodeId = txParam.getVerify();
         try {
             NodeItem nodeItem = nodeCache.getNode(nodeId);
-            txParam.setNodeName(nodeItem.getNodeName());
-            txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
+            txParam.setNodeName(nodeItem.getNodeName()).setStakingBlockNum(nodeItem.getStakingBlockNum());
             tx.setInfo(txParam.toJSONString());
         } catch (NoSuchBeanException e) {
             log.warn("缓存中找不到节点[{}]信息,无法补节点名称和质押区块号",nodeId);

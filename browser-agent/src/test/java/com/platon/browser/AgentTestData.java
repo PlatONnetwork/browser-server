@@ -20,9 +20,10 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * @description: 测试数据
@@ -109,7 +110,7 @@ public class AgentTestData {
                         receiptResultList = JSON.parseArray(content,ReceiptResult.class);
                         receiptResultList.forEach(rr->{
                             try {
-                                rr.resolve(rr.getResult().get(0).getBlockNumber());
+                                rr.resolve(rr.getResult().get(0).getBlockNumber(), Executors.newFixedThreadPool(10));
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }

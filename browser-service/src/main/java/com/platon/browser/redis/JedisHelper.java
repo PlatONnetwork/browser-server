@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +24,12 @@ import redis.clients.jedis.ShardedJedis;
  *	@author zhangrj
  *  @data 2019年11月13日
  */
+@Slf4j
 public class JedisHelper {
 
 	private Logger logger = LoggerFactory.getLogger(JedisHelper.class);
 
-	private static Map<String, JedisCluster> redisMaps = new HashMap<String, JedisCluster>();
+	private static Map<String, JedisCluster> redisMaps = new HashMap<>();
 
 	private JedisHelper() {
 	}
@@ -43,26 +45,26 @@ public class JedisHelper {
 		JedisCluster jedisCluster = null;
 		JedisConfig jedisConfig = new JedisConfig();
 		jedisConfig.setConnectionTimeout(Integer
-				.parseInt(RedisConfig.redisClusterConnectionTimeout));
+				.parseInt(RedisConfig.getRedisClusterConnectionTimeout()));
 		jedisConfig.setSoTimeout(Integer
-				.parseInt(RedisConfig.redisClusterSoTimeout));
+				.parseInt(RedisConfig.getRedisClusterSoTimeout()));
 		jedisConfig.setMaxRedirections(Integer
-				.parseInt(RedisConfig.redisClusterMaxRedirections));
+				.parseInt(RedisConfig.getRedisClusterMaxRedirections()));
 		GenericObjectPoolConfig<Jedis> poolConfig = new GenericObjectPoolConfig<Jedis>();
 		poolConfig.setMaxTotal(Integer
-				.parseInt(RedisConfig.redisClusterMaxTotal));
+				.parseInt(RedisConfig.getRedisClusterMaxTotal()));
 		poolConfig
-				.setMaxIdle(Integer.parseInt(RedisConfig.redisClusterMaxIdle));
+				.setMaxIdle(Integer.parseInt(RedisConfig.getRedisClusterMaxIdle()));
 		poolConfig
-				.setMinIdle(Integer.parseInt(RedisConfig.redisClusterMinIdle));
+				.setMinIdle(Integer.parseInt(RedisConfig.getRedisClusterMinIdle()));
 		poolConfig.setTestOnBorrow(Boolean
-				.valueOf(RedisConfig.redisClusterTestOnBorrow));
+				.valueOf(RedisConfig.getRedisClusterTestOnBorrow()));
 		poolConfig.setTestOnReturn(Boolean
-				.valueOf(RedisConfig.redisClusterTestOnReturn));
+				.valueOf(RedisConfig.getRedisClusterTestOnReturn()));
 		poolConfig.setTestWhileIdle(Boolean
-				.valueOf(RedisConfig.redisClusterTestWhileIdle));
+				.valueOf(RedisConfig.getRedisClusterTestWhileIdle()));
 		Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
-		String[] ips = RedisConfig.redisClusterMasterIPs.split(",");
+		String[] ips = RedisConfig.getRedisClusterMasterIPs().split(",");
 		for(String ip: ips){
 			String[] arr = ip.split(":");
 			HostAndPort hostAndPort = new HostAndPort(arr[0], Integer.parseInt(arr[1]));
@@ -83,7 +85,7 @@ public class JedisHelper {
 			throws Exception {
 
 		JedisCluster jedisCluster = null;
-		if (jedisConfig.getJedisClusterNodes().size() <= 0) {
+		if (jedisConfig.getJedisClusterNodes().isEmpty()) {
 			logger.error("Redis [masterIPs] 参数未配置！");
 			return null;
 		}
@@ -122,7 +124,7 @@ public class JedisHelper {
 			try {
 				getJedisClusterByKey(key).close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("",e);
 			}
 		}
 	}
@@ -130,12 +132,10 @@ public class JedisHelper {
 	public void recovery(ShardedJedis shardedJedis, String key, boolean recovery) {
 		try {
 			if (shardedJedis != null && !recovery) {
-				// getJedisPoolByKey(key).returnBrokenResource(shardedJedis);
 				shardedJedis.disconnect();
 			}
 			if (recovery && shardedJedis != null) {
 				shardedJedis.close();
-				// getJedisPoolByKey(key).returnBrokenResource(shardedJedis);
 			}
 			;
 		} catch (Exception e) {

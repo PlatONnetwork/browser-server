@@ -1,5 +1,7 @@
 package com.platon.browser.redis;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
 /**
@@ -9,6 +11,7 @@ import java.util.*;
  *	@author zhangrj
  *  @data 2019年11月13日
  */
+@Slf4j
 public class SerializerUtils {
     private SerializerUtils(){}
 
@@ -97,49 +100,6 @@ public class SerializerUtils {
     }
 
     /**
-     * 序列化Map对象
-     *
-     * @param paramsMap Map对象
-     * @return 返回序列化后的Map对象
-     */
-   /* public static Map<byte[], byte[]> serializerMapObj(Map<String, Object> paramsMap) {
-        try {
-            final Map<byte[], byte[]> hashes = new LinkedHashMap<byte[], byte[]>(paramsMap.size());
-            for (Map.Entry<?, ?> entry : paramsMap.entrySet()) {
-                Object valueObj = entry.getValue();
-                // 判断valueObje 的类型：NativeObject->Map NativeArray->List ConsString->String
-                byte[] byt = null;
-                if (valueObj instanceof String) {
-                    byt = SerializerUtils.rawValue(valueObj);
-                } else if (valueObj instanceof NativeObject) {
-                    Map<String, Object> tmpMap = (Map) valueObj;
-                    byt = SerializerUtils.rawValue(JSONUtil.naviveObj2Map(tmpMap));
-                } else if (valueObj instanceof NativeArray) {
-                    List tmpList = (List) valueObj;
-                    List resultList = new ArrayList();
-                    // 特殊处理 [{},{},{}] 这种数据结构
-                    for (int i = 0; i < tmpList.size(); i++) {
-                        if (tmpList.get(i) instanceof NativeObject) {
-                            Map m = (Map) tmpList.get(i);
-                            resultList.add(JSONUtil.naviveObj2Map(m));
-                        } else {
-                            resultList.add(tmpList.get(i));
-                        }
-                    }
-                    byt = SerializerUtils.rawValue(resultList);
-                } else { // 普通javaMap对象
-                    byt = SerializerUtils.rawValue(valueObj);
-                }
-                hashes.put(SerializerUtils.rawHashKey(entry.getKey() + ""), byt);
-            }
-            return hashes;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }*/
-
-    /**
      * 将Map对象反序列化
      *
      * @param byteMap
@@ -155,36 +115,8 @@ public class SerializerUtils {
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("",e);
         }
         return null;
     }
-
-
-    /**
-     * 比较两个Map剔除重复项
-     *
-     * @param paramMap
-     * @param allMap
-     * @return
-     */
-    /*public static Map<byte[], byte[]> unquie2Map(Map<byte[], byte[]> paramMap, Map<byte[], byte[]> allMap) {
-        Map<String, Object> paramMapStr = SerializerUtils.deserializerMapObj(paramMap);
-        Map<String, Object> allMapStr = SerializerUtils.deserializerMapObj(allMap);
-        Set<String> paramKeys = paramMapStr.keySet();
-        Set<String> allKeys = allMapStr.keySet();
-        for (String tmp : paramKeys) {
-            if (allMapStr.containsKey(tmp)) {
-                allMapStr.remove(tmp);
-            }
-        }
-        for (Map.Entry<String, Object> allMapTmp : allMapStr.entrySet()) {
-            // 合并
-            paramMapStr.put(allMapTmp.getKey(), allMapTmp.getValue());
-        }
-
-        return SerializerUtils.serializerMapObj(paramMapStr);
-    }*/
-
-
 }

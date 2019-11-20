@@ -7,6 +7,7 @@ import com.platon.browser.complement.converter.statistic.StatisticsAddressConver
 import com.platon.browser.complement.converter.statistic.StatisticsNetworkConverter;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class StatisticParameterService {
      * 解析区块, 构造业务入库参数信息
      * @return
      */
-    public void getParameters(CollectionEvent event) throws Exception{
+    public void getParameters(CollectionEvent event) throws NoSuchBeanException {
         long startTime = System.currentTimeMillis();
 
         Block block = event.getBlock();

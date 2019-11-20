@@ -6,49 +6,30 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RedisConfig {
+	private static String redisConfigKey;
+	private static String redisHost;
+	private static String redisPort;
+	private static String redisModel;
+	private static String redisExpire;
+	private static String redisClusterConfigKey;
+	private static String redisClusterConnectionTimeout;
+	private static String redisClusterSoTimeout;
+	private static String redisClusterMaxRedirections;
+	private static String redisClusterMaxTotal;
+	private static String redisClusterMaxIdle;
+	private static String redisClusterMinIdle;
+	private static String redisClusterMaxWaitMillis;
+	private static String redisClusterTestOnBorrow;
+	private static String redisClusterTestOnReturn;
+	private static String redisClusterTestWhileIdle;
+	private static String redisClusterMasterIPs;
+	private static String redisClusterPassword;
+	private static String redisClusterSSL;
 
-	public static String redisConfigKey;
-	
-	public static String redisHost;
-	
-	public static String redisPort;
-	
-	public static String redisModel;
-	
-	public static String redisExpire;
 
-	public static String redisClusterConfigKey;
-	
-	public static String redisClusterConnectionTimeout;
-	
-	public static String redisClusterSoTimeout;
-	
-	public static String redisClusterMaxRedirections;
-	
-	public static String redisClusterMaxTotal;
-	
-	public static String redisClusterMaxIdle;
-	
-	public static String redisClusterMinIdle;
-	
-	public static String redisClusterMaxWaitMillis;
-	
-	public static String redisClusterTestOnBorrow;
-	
-	public static String redisClusterTestOnReturn;
-	
-	public static String redisClusterTestWhileIdle;
-	
-	public static String redisClusterMasterIPs;
-	
-	public static String redisClusterPassword;
-	
-	public static String redisClusterSSL;
-
-	public static String getRedisConfigKey() {
-		return redisConfigKey;
-	}
-
+    public static String getRedisConfigKey() {
+        return redisConfigKey;
+    }
 	@Value("${redis.configKey:DEFAULT}")
 	public void setRedisConfigKey(String redisConfigKey) {
 		RedisConfig.redisConfigKey = redisConfigKey;
@@ -173,7 +154,7 @@ public class RedisConfig {
 		RedisConfig.redisClusterTestOnBorrow = redisClusterTestOnBorrow;
 	}
 
-	public String getRedisClusterTestOnReturn() {
+	public static String getRedisClusterTestOnReturn() {
 		return redisClusterTestOnReturn;
 	}
 
