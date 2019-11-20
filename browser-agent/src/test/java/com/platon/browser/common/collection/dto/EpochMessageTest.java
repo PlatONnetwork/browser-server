@@ -1,4 +1,4 @@
-package com.platon.browser.common.collection;
+package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;

@@ -1,7 +1,8 @@
-package com.platon.browser.common.collection;
+package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +14,10 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class CollectionTransactionTest extends AgentTestBase {
+public class CollectionNetworkStatTest extends AgentTestBase {
 
     @Test
-    public void test() {
-        CollectionTransaction transaction = CollectionTransaction.newInstance();
+    public void test() throws BeanCreateOrUpdateException {
+        CollectionNetworkStat networkStat = CollectionNetworkStat.newInstance();
     }
 }
