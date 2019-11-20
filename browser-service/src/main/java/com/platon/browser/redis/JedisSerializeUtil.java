@@ -1,5 +1,7 @@
 package com.platon.browser.redis;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -10,6 +12,7 @@ import java.io.ObjectOutputStream;
  * 序列化工具
  * @author Jungle
  */
+@Slf4j
 public class JedisSerializeUtil {
 
 	// 序列化
@@ -23,7 +26,7 @@ public class JedisSerializeUtil {
 			byte[] bytes = byteArrayOutputStream.toByteArray();
 			return bytes;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("",e);
 		}
 		return null;
 	}
@@ -36,8 +39,7 @@ public class JedisSerializeUtil {
 			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayOutputStream);
 			return objectInputStream.readObject();
 		} catch (Exception e) {
-			System.out.println("deserialize exception");
-
+			log.error("deserialize exception");
 		}
 		return null;
 	}

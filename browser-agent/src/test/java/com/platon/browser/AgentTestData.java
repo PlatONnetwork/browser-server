@@ -20,7 +20,6 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
 
