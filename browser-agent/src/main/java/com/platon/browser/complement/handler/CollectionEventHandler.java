@@ -82,6 +82,14 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             txDeleteBatchCount++;
             optDeleteBatchCount++;
 
+            if(txDeleteBatchCount>=10){
+                // 删除小于最高ID的交易备份
+                TxBakExample txBakExample = new TxBakExample();
+                txBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getTxBakMaxId());
+                int txCount = txBakMapper.deleteByExample(txBakExample);
+                log.debug("清除交易备份记录({})条",txCount);
+                txDeleteBatchCount=0;
+            }
             // 交易入库mysql
             if(!transactions.isEmpty()){
                 List<TxBak> baks = new ArrayList<>();
@@ -90,18 +98,17 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     BeanUtils.copyProperties(tx,bak);
                     baks.add(bak);
                 });
-
-                if(txDeleteBatchCount>=10){
-                    // 删除小于最高ID的交易备份
-                    TxBakExample txBakExample = new TxBakExample();
-                    txBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getTxBakMaxId());
-                    int txCount = txBakMapper.deleteByExample(txBakExample);
-                    log.debug("清除交易备份记录({})条",txCount);
-                    txDeleteBatchCount=0;
-                }
                 txBakMapper.batchInsert(baks);
             }
 
+            if(optDeleteBatchCount>=10){
+                // 删除小于最高ID的操作记录备份
+                NOptBakExample nOptBakExample = new NOptBakExample();
+                nOptBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getNOptBakMaxId());
+                int optCount = nOptBakMapper.deleteByExample(nOptBakExample);
+                log.debug("清除操作备份记录({})条",optCount);
+                optDeleteBatchCount=0;
+            }
             // 操作日志入库mysql
             if(!nodeOpts1.isEmpty()){
                 List<NOptBak> baks = new ArrayList<>();
@@ -110,15 +117,6 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     BeanUtils.copyProperties(no,bak);
                     baks.add(bak);
                 });
-
-                if(optDeleteBatchCount>=10){
-                    // 删除小于最高ID的操作记录备份
-                    NOptBakExample nOptBakExample = new NOptBakExample();
-                    nOptBakExample.createCriteria().andIdLessThan(BakDataDeleteUtil.getNOptBakMaxId());
-                    int optCount = nOptBakMapper.deleteByExample(nOptBakExample);
-                    log.debug("清除操作备份记录({})条",optCount);
-                    optDeleteBatchCount=0;
-                }
                 nOptBakMapper.batchInsert(baks);
             }
 
