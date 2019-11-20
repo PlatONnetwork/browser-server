@@ -30,6 +30,11 @@ public class NewBlock implements BusinessParam {
     private BigDecimal blockRewardValue;
 
     /**
+     * 本结算周期预计可获得的质押奖励
+     */
+    private BigDecimal predictStakingReward;
+
+    /**
      * 节点Id
      */
     private String nodeId;

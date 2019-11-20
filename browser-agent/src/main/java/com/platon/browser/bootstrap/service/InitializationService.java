@@ -135,6 +135,7 @@ public class InitializationService {
                     .cost(Collections.singletonList(pve))
                     .build();
             staking.setAnnualizedRateInfo(ari.toJSONString());
+            staking.setPredictStakingReward(epochRetryService.getStakeReward());
 
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();

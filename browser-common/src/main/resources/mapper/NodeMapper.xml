@@ -40,6 +40,7 @@
     <result column="stat_block_reward_value" jdbcType="DECIMAL" property="statBlockRewardValue" />
     <result column="stat_staking_reward_value" jdbcType="DECIMAL" property="statStakingRewardValue" />
     <result column="stat_fee_reward_value" jdbcType="DECIMAL" property="statFeeRewardValue" />
+    <result column="predict_staking_reward" jdbcType="DECIMAL" property="predictStakingReward" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -112,7 +113,7 @@
     program_version, big_version, web_site, details, join_time, leave_time, `status`, 
     is_consensus, is_settle, is_init, stat_delegate_value, stat_delegate_released, stat_valid_addrs, 
     stat_invalid_addrs, stat_block_reward_value, stat_staking_reward_value, stat_fee_reward_value, 
-    create_time, update_time
+    predict_staking_reward, create_time, update_time
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -179,8 +180,9 @@
       is_settle, is_init, stat_delegate_value, 
       stat_delegate_released, stat_valid_addrs, stat_invalid_addrs, 
       stat_block_reward_value, stat_staking_reward_value, 
-      stat_fee_reward_value, create_time, update_time, 
-      annualized_rate_info)
+      stat_fee_reward_value, predict_staking_reward, 
+      create_time, update_time, annualized_rate_info
+      )
     values (#{nodeId,jdbcType=VARCHAR}, #{statSlashMultiQty,jdbcType=INTEGER}, #{statSlashLowQty,jdbcType=INTEGER}, 
       #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=BIGINT}, #{statVerifierTime,jdbcType=INTEGER}, 
       #{isRecommend,jdbcType=INTEGER}, #{totalValue,jdbcType=DECIMAL}, #{stakingBlockNum,jdbcType=BIGINT}, 
@@ -194,8 +196,9 @@
       #{isSettle,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, #{statDelegateValue,jdbcType=DECIMAL}, 
       #{statDelegateReleased,jdbcType=DECIMAL}, #{statValidAddrs,jdbcType=INTEGER}, #{statInvalidAddrs,jdbcType=INTEGER}, 
       #{statBlockRewardValue,jdbcType=DECIMAL}, #{statStakingRewardValue,jdbcType=DECIMAL}, 
-      #{statFeeRewardValue,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
+      #{statFeeRewardValue,jdbcType=DECIMAL}, #{predictStakingReward,jdbcType=DECIMAL}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
     insert into node
@@ -313,6 +316,9 @@
       </if>
       <if test="statFeeRewardValue != null">
         stat_fee_reward_value,
+      </if>
+      <if test="predictStakingReward != null">
+        predict_staking_reward,
       </if>
       <if test="createTime != null">
         create_time,
@@ -438,6 +444,9 @@
       </if>
       <if test="statFeeRewardValue != null">
         #{statFeeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="predictStakingReward != null">
+        #{predictStakingReward,jdbcType=DECIMAL},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -573,6 +582,9 @@
       <if test="record.statFeeRewardValue != null">
         stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
       </if>
+      <if test="record.predictStakingReward != null">
+        predict_staking_reward = #{record.predictStakingReward,jdbcType=DECIMAL},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -627,6 +639,7 @@
       stat_block_reward_value = #{record.statBlockRewardValue,jdbcType=DECIMAL},
       stat_staking_reward_value = #{record.statStakingRewardValue,jdbcType=DECIMAL},
       stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
+      predict_staking_reward = #{record.predictStakingReward,jdbcType=DECIMAL},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
@@ -674,6 +687,7 @@
       stat_block_reward_value = #{record.statBlockRewardValue,jdbcType=DECIMAL},
       stat_staking_reward_value = #{record.statStakingRewardValue,jdbcType=DECIMAL},
       stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
+      predict_staking_reward = #{record.predictStakingReward,jdbcType=DECIMAL},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -794,6 +808,9 @@
       <if test="statFeeRewardValue != null">
         stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
       </if>
+      <if test="predictStakingReward != null">
+        predict_staking_reward = #{predictStakingReward,jdbcType=DECIMAL},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -845,6 +862,7 @@
       stat_block_reward_value = #{statBlockRewardValue,jdbcType=DECIMAL},
       stat_staking_reward_value = #{statStakingRewardValue,jdbcType=DECIMAL},
       stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
+      predict_staking_reward = #{predictStakingReward,jdbcType=DECIMAL},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
@@ -889,6 +907,7 @@
       stat_block_reward_value = #{statBlockRewardValue,jdbcType=DECIMAL},
       stat_staking_reward_value = #{statStakingRewardValue,jdbcType=DECIMAL},
       stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
+      predict_staking_reward = #{predictStakingReward,jdbcType=DECIMAL},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where node_id = #{nodeId,jdbcType=VARCHAR}
@@ -907,7 +926,8 @@
       program_version, big_version, web_site, details, join_time, leave_time, `status`, 
       is_consensus, is_settle, is_init, stat_delegate_value, stat_delegate_released, 
       stat_valid_addrs, stat_invalid_addrs, stat_block_reward_value, stat_staking_reward_value, 
-      stat_fee_reward_value, create_time, update_time, annualized_rate_info)
+      stat_fee_reward_value, predict_staking_reward, create_time, update_time, annualized_rate_info
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.statSlashMultiQty,jdbcType=INTEGER}, #{item.statSlashLowQty,jdbcType=INTEGER}, 
@@ -924,8 +944,8 @@
         #{item.isInit,jdbcType=INTEGER}, #{item.statDelegateValue,jdbcType=DECIMAL}, #{item.statDelegateReleased,jdbcType=DECIMAL}, 
         #{item.statValidAddrs,jdbcType=INTEGER}, #{item.statInvalidAddrs,jdbcType=INTEGER}, 
         #{item.statBlockRewardValue,jdbcType=DECIMAL}, #{item.statStakingRewardValue,jdbcType=DECIMAL}, 
-        #{item.statFeeRewardValue,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        #{item.statFeeRewardValue,jdbcType=DECIMAL}, #{item.predictStakingReward,jdbcType=DECIMAL}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         )
     </foreach>
   </insert>
@@ -1057,6 +1077,9 @@
         </if>
         <if test="'stat_fee_reward_value'.toString() == column.value">
           #{item.statFeeRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'predict_staking_reward'.toString() == column.value">
+          #{item.predictStakingReward,jdbcType=DECIMAL}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}

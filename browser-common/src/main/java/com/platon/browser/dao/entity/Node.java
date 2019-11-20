@@ -82,6 +82,8 @@ public class Node {
 
     private BigDecimal statFeeRewardValue;
 
+    private BigDecimal predictStakingReward;
+
     private Date createTime;
 
     private Date updateTime;
@@ -392,6 +394,14 @@ public class Node {
         this.statFeeRewardValue = statFeeRewardValue;
     }
 
+    public BigDecimal getPredictStakingReward() {
+        return predictStakingReward;
+    }
+
+    public void setPredictStakingReward(BigDecimal predictStakingReward) {
+        this.predictStakingReward = predictStakingReward;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -462,6 +472,7 @@ public class Node {
         statBlockRewardValue("stat_block_reward_value", "statBlockRewardValue", "DECIMAL", false),
         statStakingRewardValue("stat_staking_reward_value", "statStakingRewardValue", "DECIMAL", false),
         statFeeRewardValue("stat_fee_reward_value", "statFeeRewardValue", "DECIMAL", false),
+        predictStakingReward("predict_staking_reward", "predictStakingReward", "DECIMAL", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);

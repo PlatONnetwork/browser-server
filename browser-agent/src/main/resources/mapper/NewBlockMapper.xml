@@ -6,7 +6,8 @@
 	update `staking` set
 		`cur_cons_block_qty` = `cur_cons_block_qty` + 1,
 		`block_reward_value` = `block_reward_value` + #{blockRewardValue},
-		`fee_reward_value` = `fee_reward_value` + #{feeRewardValue}
+		`fee_reward_value` = `fee_reward_value` + #{feeRewardValue},
+		`predict_staking_reward` = #{predictStakingReward}
 	where
 		`node_id` = #{nodeId}
 	and
@@ -15,7 +16,8 @@
 	update `node` set
 		`stat_block_qty` = `stat_block_qty` + 1,
 		`stat_block_reward_value` = `stat_block_reward_value` + #{blockRewardValue},
-		`stat_fee_reward_value` = `stat_fee_reward_value` +  #{feeRewardValue}
+		`stat_fee_reward_value` = `stat_fee_reward_value` +  #{feeRewardValue},
+		`predict_staking_reward` = #{predictStakingReward}
 	where
 		`node_id` = #{nodeId};
 

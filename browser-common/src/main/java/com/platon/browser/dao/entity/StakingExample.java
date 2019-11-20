@@ -1896,63 +1896,63 @@ public class StakingExample {
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueIsNull() {
-            addCriterion("fee_reward_value is null");
+        public Criteria andPredictStakingRewardIsNull() {
+            addCriterion("predict_staking_reward is null");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueIsNotNull() {
-            addCriterion("fee_reward_value is not null");
+        public Criteria andPredictStakingRewardIsNotNull() {
+            addCriterion("predict_staking_reward is not null");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueEqualTo(BigDecimal value) {
-            addCriterion("fee_reward_value =", value, "feeRewardValue");
+        public Criteria andPredictStakingRewardEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward =", value, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueNotEqualTo(BigDecimal value) {
-            addCriterion("fee_reward_value <>", value, "feeRewardValue");
+        public Criteria andPredictStakingRewardNotEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward <>", value, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueGreaterThan(BigDecimal value) {
-            addCriterion("fee_reward_value >", value, "feeRewardValue");
+        public Criteria andPredictStakingRewardGreaterThan(BigDecimal value) {
+            addCriterion("predict_staking_reward >", value, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("fee_reward_value >=", value, "feeRewardValue");
+        public Criteria andPredictStakingRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward >=", value, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueLessThan(BigDecimal value) {
-            addCriterion("fee_reward_value <", value, "feeRewardValue");
+        public Criteria andPredictStakingRewardLessThan(BigDecimal value) {
+            addCriterion("predict_staking_reward <", value, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("fee_reward_value <=", value, "feeRewardValue");
+        public Criteria andPredictStakingRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward <=", value, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueIn(List<BigDecimal> values) {
-            addCriterion("fee_reward_value in", values, "feeRewardValue");
+        public Criteria andPredictStakingRewardIn(List<BigDecimal> values) {
+            addCriterion("predict_staking_reward in", values, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueNotIn(List<BigDecimal> values) {
-            addCriterion("fee_reward_value not in", values, "feeRewardValue");
+        public Criteria andPredictStakingRewardNotIn(List<BigDecimal> values) {
+            addCriterion("predict_staking_reward not in", values, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("fee_reward_value between", value1, value2, "feeRewardValue");
+        public Criteria andPredictStakingRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("predict_staking_reward between", value1, value2, "predictStakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andFeeRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("fee_reward_value not between", value1, value2, "feeRewardValue");
+        public Criteria andPredictStakingRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("predict_staking_reward not between", value1, value2, "predictStakingReward");
             return (Criteria) this;
         }
 
@@ -2013,6 +2013,66 @@ public class StakingExample {
 
         public Criteria andStakingRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_reward_value not between", value1, value2, "stakingRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueIsNull() {
+            addCriterion("fee_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueIsNotNull() {
+            addCriterion("fee_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueEqualTo(BigDecimal value) {
+            addCriterion("fee_reward_value =", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotEqualTo(BigDecimal value) {
+            addCriterion("fee_reward_value <>", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueGreaterThan(BigDecimal value) {
+            addCriterion("fee_reward_value >", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("fee_reward_value >=", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueLessThan(BigDecimal value) {
+            addCriterion("fee_reward_value <", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("fee_reward_value <=", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueIn(List<BigDecimal> values) {
+            addCriterion("fee_reward_value in", values, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotIn(List<BigDecimal> values) {
+            addCriterion("fee_reward_value not in", values, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("fee_reward_value between", value1, value2, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("fee_reward_value not between", value1, value2, "feeRewardValue");
             return (Criteria) this;
         }
 

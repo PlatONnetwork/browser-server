@@ -2016,6 +2016,66 @@ public class StakingHistoryExample {
             return (Criteria) this;
         }
 
+        public Criteria andPredictStakingRewardIsNull() {
+            addCriterion("predict_staking_reward is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardIsNotNull() {
+            addCriterion("predict_staking_reward is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward =", value, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardNotEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward <>", value, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardGreaterThan(BigDecimal value) {
+            addCriterion("predict_staking_reward >", value, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward >=", value, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardLessThan(BigDecimal value) {
+            addCriterion("predict_staking_reward <", value, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("predict_staking_reward <=", value, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardIn(List<BigDecimal> values) {
+            addCriterion("predict_staking_reward in", values, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardNotIn(List<BigDecimal> values) {
+            addCriterion("predict_staking_reward not in", values, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("predict_staking_reward between", value1, value2, "predictStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPredictStakingRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("predict_staking_reward not between", value1, value2, "predictStakingReward");
+            return (Criteria) this;
+        }
+
         public Criteria andCurConsBlockQtyIsNull() {
             addCriterion("cur_cons_block_qty is null");
             return (Criteria) this;

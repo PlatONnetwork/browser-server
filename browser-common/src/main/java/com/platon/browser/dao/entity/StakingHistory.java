@@ -62,6 +62,8 @@ public class StakingHistory extends StakingHistoryKey {
 
     private BigDecimal stakingRewardValue;
 
+    private BigDecimal predictStakingReward;
+
     private Long curConsBlockQty;
 
     private Long preConsBlockQty;
@@ -296,6 +298,14 @@ public class StakingHistory extends StakingHistoryKey {
         this.stakingRewardValue = stakingRewardValue;
     }
 
+    public BigDecimal getPredictStakingReward() {
+        return predictStakingReward;
+    }
+
+    public void setPredictStakingReward(BigDecimal predictStakingReward) {
+        this.predictStakingReward = predictStakingReward;
+    }
+
     public Long getCurConsBlockQty() {
         return curConsBlockQty;
     }
@@ -374,6 +384,7 @@ public class StakingHistory extends StakingHistoryKey {
         blockRewardValue("block_reward_value", "blockRewardValue", "DECIMAL", false),
         feeRewardValue("fee_reward_value", "feeRewardValue", "DECIMAL", false),
         stakingRewardValue("staking_reward_value", "stakingRewardValue", "DECIMAL", false),
+        predictStakingReward("predict_staking_reward", "predictStakingReward", "DECIMAL", false),
         curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
         preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),

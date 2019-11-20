@@ -58,9 +58,11 @@ public class Staking extends StakingKey {
 
     private BigDecimal blockRewardValue;
 
-    private BigDecimal feeRewardValue;
+    private BigDecimal predictStakingReward;
 
     private BigDecimal stakingRewardValue;
+
+    private BigDecimal feeRewardValue;
 
     private Long curConsBlockQty;
 
@@ -280,12 +282,12 @@ public class Staking extends StakingKey {
         this.blockRewardValue = blockRewardValue;
     }
 
-    public BigDecimal getFeeRewardValue() {
-        return feeRewardValue;
+    public BigDecimal getPredictStakingReward() {
+        return predictStakingReward;
     }
 
-    public void setFeeRewardValue(BigDecimal feeRewardValue) {
-        this.feeRewardValue = feeRewardValue;
+    public void setPredictStakingReward(BigDecimal predictStakingReward) {
+        this.predictStakingReward = predictStakingReward;
     }
 
     public BigDecimal getStakingRewardValue() {
@@ -294,6 +296,14 @@ public class Staking extends StakingKey {
 
     public void setStakingRewardValue(BigDecimal stakingRewardValue) {
         this.stakingRewardValue = stakingRewardValue;
+    }
+
+    public BigDecimal getFeeRewardValue() {
+        return feeRewardValue;
+    }
+
+    public void setFeeRewardValue(BigDecimal feeRewardValue) {
+        this.feeRewardValue = feeRewardValue;
     }
 
     public Long getCurConsBlockQty() {
@@ -372,8 +382,9 @@ public class Staking extends StakingKey {
         statDelegateLocked("stat_delegate_locked", "statDelegateLocked", "DECIMAL", false),
         statDelegateReleased("stat_delegate_released", "statDelegateReleased", "DECIMAL", false),
         blockRewardValue("block_reward_value", "blockRewardValue", "DECIMAL", false),
-        feeRewardValue("fee_reward_value", "feeRewardValue", "DECIMAL", false),
+        predictStakingReward("predict_staking_reward", "predictStakingReward", "DECIMAL", false),
         stakingRewardValue("staking_reward_value", "stakingRewardValue", "DECIMAL", false),
+        feeRewardValue("fee_reward_value", "feeRewardValue", "DECIMAL", false),
         curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
         preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
