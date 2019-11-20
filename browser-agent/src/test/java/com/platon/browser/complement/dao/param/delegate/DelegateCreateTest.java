@@ -6,6 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertTrue;
 
 
@@ -20,12 +23,12 @@ public class DelegateCreateTest extends AgentTestBase {
     @Test
     public void test(){
         DelegateCreate target = DelegateCreate.builder()
-                .amount(null)
-                .blockNumber(null)
-                .sequence(null)
-                .stakingBlockNumber(null)
-                .nodeId(null)
-                .txFrom(null)
+                .amount(BigDecimal.ONE)
+                .blockNumber(BigInteger.ONE)
+                .sequence(BigInteger.TEN)
+                .stakingBlockNumber(BigInteger.TEN)
+                .nodeId("0X3333")
+                .txFrom("0xddd")
                 .build();
         target.setTxFrom(null);
         target.setAmount(null);

@@ -1,12 +1,6 @@
 package com.platon.browser.complement.dao.param.statistic;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.enums.BusinessType;
-import com.platon.browser.complement.dao.param.BusinessParam;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -21,22 +15,22 @@ public class NetworkStatChangeTest extends AgentTestBase {
 	@Test
 	public void test(){
 		NetworkStatChange target = NetworkStatChange.builder()
-				.addIssueBegin(null)
-				.addIssueEnd(null)
-				.blockReward(null)
-				.curNumber(null)
-				.curTps(null)
-				.id(null)
-				.issueValue(null)
-				.maxTps(null)
-				.nodeId(null)
-				.nextSettle(null)
-				.nodeName(null)
-				.nodeOptSeq(null)
-				.proposalQty(null)
-				.stakingReward(null)
-				.turnValue(null)
-				.txQty(null)
+				.addIssueBegin(333L)
+				.addIssueEnd(333L)
+				.blockReward(BigDecimal.ZERO)
+				.curNumber(33L)
+				.curTps(333)
+				.id(333)
+				.issueValue(BigDecimal.TEN)
+				.maxTps(33)
+				.nodeId("null")
+				.nextSettle(33L)
+				.nodeName("null")
+				.nodeOptSeq(33L)
+				.proposalQty(33)
+				.stakingReward(BigDecimal.TEN)
+				.turnValue(BigDecimal.TEN)
+				.txQty(33)
 				.build();
 		target.setAddIssueBegin(null)
 			.setAddIssueEnd(null)

@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -13,14 +15,14 @@ public class StakeModifyTest extends AgentTestBase {
     @Test
     public void test(){
         StakeModify target = StakeModify.builder()
-                .nodeId(null)
-                .stakingBlockNum(null)
-                .benefitAddr(null)
-                .details(null)
-                .externalId(null)
+                .nodeId("null")
+                .stakingBlockNum(BigInteger.ONE)
+                .benefitAddr("null")
+                .details("null")
+                .externalId("null")
                 .isInit(3)
-                .nodeName(null)
-                .webSite(null)
+                .nodeName("null")
+                .webSite("null")
                 .build();
 
         target.setNodeId(null)

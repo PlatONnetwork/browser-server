@@ -32,7 +32,7 @@ public class SettleTest extends AgentTestBase {
                 .preVerifierList(Collections.emptyList())
                 .settingEpoch(3)
                 .stakingLockEpoch(3)
-                .stakingReward(null)
+                .stakingReward(BigDecimal.TEN)
                 .stakingList(Collections.emptyList())
                 .build();
         target.setStakingList(Collections.emptyList())

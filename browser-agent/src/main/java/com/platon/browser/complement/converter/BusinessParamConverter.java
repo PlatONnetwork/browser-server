@@ -7,6 +7,7 @@ import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.param.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,4 +49,77 @@ public abstract class BusinessParamConverter<T> {
     }
 
     public abstract T convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException;
+
+
+    protected void updateTxInfo(TxParam txParam,Transaction tx){
+        NodeItem nodeItem;
+        try {
+            switch (tx.getTypeEnum()) {
+                case STAKE_CREATE: // 1000 创建验证人
+                    break;
+                case STAKE_MODIFY: // 1001 编辑验证人
+                    break;
+                case STAKE_INCREASE: // 1002 增持质押
+                    StakeIncreaseParam sip = (StakeIncreaseParam)txParam;
+                    nodeItem = nodeCache.getNode(sip.getNodeId());
+                    sip.setNodeName(nodeItem.getNodeName())
+                            .setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    break;
+                case STAKE_EXIT: // 1003 退出质押
+                    StakeExitParam sep = (StakeExitParam)txParam;
+                    nodeItem = nodeCache.getNode(sep.getNodeId());
+                    sep.setNodeName(nodeItem.getNodeName())
+                            .setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    break;
+                case DELEGATE_CREATE: // 1004
+                    DelegateCreateParam dcp = (DelegateCreateParam)txParam;
+                    nodeItem = nodeCache.getNode(dcp.getNodeId());
+                    dcp.setNodeName(nodeItem.getNodeName()).setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    break;
+                case DELEGATE_EXIT: // 1005
+                    DelegateExitParam dep = (DelegateExitParam)txParam;
+                    nodeItem = nodeCache.getNode(dep.getNodeId());
+                    dep.setNodeName(nodeItem.getNodeName()).setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    break;
+                case PROPOSAL_TEXT: // 2000
+                    ProposalTextParam ptp = (ProposalTextParam)txParam;
+                    nodeItem = nodeCache.getNode(ptp.getVerifier());
+                    ptp.setNodeName(nodeItem.getNodeName());
+                    break;
+                case PROPOSAL_UPGRADE: // 2001
+                    ProposalUpgradeParam pup = (ProposalUpgradeParam)txParam;
+                    nodeItem = nodeCache.getNode(pup.getVerifier());
+                    pup.setNodeName(nodeItem.getNodeName());
+                    break;
+                case PROPOSAL_CANCEL: // 2005
+                    ProposalCancelParam pcp = (ProposalCancelParam)txParam;
+                    nodeItem = nodeCache.getNode(pcp.getVerifier());
+                    pcp.setNodeName(nodeItem.getNodeName());
+                    break;
+                case PROPOSAL_VOTE: // 2003
+                    ProposalVoteParam pvp = (ProposalVoteParam)txParam;
+                    nodeItem = nodeCache.getNode(pvp.getVerifier());
+                    pvp.setNodeName(nodeItem.getNodeName());
+                    break;
+                case VERSION_DECLARE: // 2004
+                    VersionDeclareParam vdp = (VersionDeclareParam)txParam;
+                    nodeItem = nodeCache.getNode(vdp.getActiveNode());
+                    vdp.setNodeName(nodeItem.getNodeName());
+                    break;
+                case REPORT: // 3000
+                    ReportParam rp = (ReportParam)txParam;
+                    nodeItem = nodeCache.getNode(rp.getVerify());
+                    rp.setNodeName(nodeItem.getNodeName())
+                            .setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    break;
+                case RESTRICTING_CREATE: // 4000
+                    break;
+                default:
+                    break;
+            }
+            tx.setInfo(txParam.toJSONString());
+        }catch (NoSuchBeanException e){
+            log.warn("缓存中找不到节点信息,无法补节点名称和质押区块号:{}",txParam.toJSONString());
+        }
+    }
 }

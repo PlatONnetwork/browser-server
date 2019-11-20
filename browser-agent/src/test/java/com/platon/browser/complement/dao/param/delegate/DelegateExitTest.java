@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -12,22 +15,22 @@ public class DelegateExitTest extends AgentTestBase {
     @Test
     public void test(){
         DelegateExit target = DelegateExit.builder()
-                .amount(null)
-                .blockNumber(null)
-                .codeDelegateHes(null)
-                .codeDelegateLocked(null)
-                .codeDelegateReleased(null)
-                .codeRmDelegateHes(null)
-                .codeRmDelegateLocked(null)
-                .codeRmDelegateReleased(null)
+                .amount(BigDecimal.ONE)
+                .blockNumber(BigInteger.ONE)
+                .codeDelegateHes(BigDecimal.ZERO)
+                .codeDelegateLocked(BigDecimal.TEN)
+                .codeDelegateReleased(BigDecimal.TEN)
+                .codeRmDelegateHes(BigDecimal.TEN)
+                .codeRmDelegateLocked(BigDecimal.TEN)
+                .codeRmDelegateReleased(BigDecimal.TEN)
                 .codeIsHistory(1)
                 .codeNodeIsLeave(false)
-                .codeRealAmount(null)
+                .codeRealAmount(BigDecimal.TEN)
                 .codeNodeIsLeave(true)
-                .minimumThreshold(null)
-                .nodeId(null)
-                .stakingBlockNumber(null)
-                .txFrom(null)
+                .minimumThreshold(BigDecimal.TEN)
+                .nodeId("0xdfd")
+                .stakingBlockNumber(BigInteger.ONE)
+                .txFrom("0x33")
                 .build();
         target.setAmount(null);
         target.setBlockNumber(null);

@@ -22,7 +22,7 @@ public class ConsensusTest extends AgentTestBase {
     @Test
     public void test(){
         Consensus target = Consensus.builder()
-                .expectBlockNum(null)
+                .expectBlockNum(BigInteger.TEN)
                 .validatorList(Collections.emptyList())
                 .build();
         target.setExpectBlockNum(null)

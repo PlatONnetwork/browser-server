@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertTrue;
 
 
@@ -14,10 +17,10 @@ public class RestrictingItemTest extends AgentTestBase {
     @Test
     public void test(){
         RestrictingItem target = RestrictingItem.builder()
-                .address(null)
-                .amount(null)
+                .address("null")
+                .amount(BigDecimal.ONE)
                 .epoch(3L)
-                .number(null)
+                .number(BigInteger.ONE)
                 .build();
         target.setAddress(null);
         target.setAmount(null);

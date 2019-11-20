@@ -13,7 +13,7 @@ public class ProposalVersionTest extends AgentTestBase {
 	@Test
 	public void test(){
 		ProposalVersion target = ProposalVersion.builder()
-				.optDesc(null)
+				.optDesc("null")
 				.build();
 		target.setOptDesc(null);
 

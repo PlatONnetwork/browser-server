@@ -5,6 +5,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
+
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -13,19 +17,19 @@ public class ReportTest extends AgentTestBase {
     @Test
     public void test(){
         Report target = Report.builder()
-                .benefitAddr(null)
-                .nodeId(null)
+                .benefitAddr("null")
+                .nodeId("null")
                 .settingEpoch(3)
-                .slashData(null)
-                .slashRate(null)
-                .stakingBlockNum(null)
-                .time(null)
-                .txHash(null)
-                .codeCurStakingLocked(null)
-                .codeRewardValue(null)
+                .slashData("null")
+                .slashRate(BigDecimal.ONE)
+                .stakingBlockNum(BigInteger.ONE)
+                .time(new Date())
+                .txHash("null")
+                .codeCurStakingLocked(BigDecimal.TEN)
+                .codeRewardValue(BigDecimal.TEN)
                 .codeStatus(3)
-                .slash2ReportRate(null)
-                .codeSlashValue(null)
+                .slash2ReportRate(BigDecimal.TEN)
+                .codeSlashValue(BigDecimal.TEN)
                 .codeStakingReductionEpoch(3)
                 .build();
           target.setBenefitAddr(null)

@@ -26,10 +26,10 @@ public class NewBlockTest extends AgentTestBase {
     @Test
     public void test(){
         NewBlock target = NewBlock.builder()
-                .blockRewardValue(null)
-                .feeRewardValue(null)
-                .nodeId(null)
-                .stakingBlockNum(null)
+                .blockRewardValue(BigDecimal.TEN)
+                .feeRewardValue(BigDecimal.TEN)
+                .nodeId("0xdd")
+                .stakingBlockNum(BigInteger.TEN)
                 .build();
         target.setBlockRewardValue(null)
                 .setFeeRewardValue(null)

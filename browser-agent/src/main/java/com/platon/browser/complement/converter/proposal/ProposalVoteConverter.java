@@ -1,7 +1,6 @@
 package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -11,7 +10,6 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ProposalVoteParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +39,8 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         ProposalVoteParam txParam = tx.getTxParam(ProposalVoteParam.class);
-        String nodeId=txParam.getVerifier();
-        try {
-            NodeItem nodeItem = nodeCache.getNode(nodeId);
-            txParam.setNodeName(nodeItem.getNodeName());
-            tx.setInfo(txParam.toJSONString());
-        } catch (NoSuchBeanException e) {
-            log.warn("缓存中找不到节点[{}]信息,无法补节点名称",nodeId);
-        }
+		// 补充节点名称
+        updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 
@@ -66,7 +58,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
         // 投票记录
     	ProposalVote businessParam= ProposalVote.builder()
-    			.nodeId(nodeId)
+    			.nodeId(txParam.getVerifier())
     			.txHash(txHash)
     			.bNum(BigInteger.valueOf(blockNum))
     			.timestamp(time)
@@ -86,7 +78,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-		nodeOpt.setNodeId(nodeId);
+		nodeOpt.setNodeId(txParam.getVerifier());
 		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.VOTE.getCode()));
 		nodeOpt.setDesc(desc);
 		nodeOpt.setTxHash(txHash);

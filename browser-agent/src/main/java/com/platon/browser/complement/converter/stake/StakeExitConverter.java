@@ -1,7 +1,6 @@
 package com.platon.browser.complement.converter.stake;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -9,7 +8,6 @@ import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeExit;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeExitParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +35,7 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>
         // 撤销质押
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         // 补充节点名称
-        String nodeId=txParam.getNodeId();
-        try {
-            NodeItem nodeItem = nodeCache.getNode(nodeId);
-            txParam.setNodeName(nodeItem.getNodeName()).setStakingBlockNum(nodeItem.getStakingBlockNum());
-            tx.setInfo(txParam.toJSONString());
-        } catch (NoSuchBeanException e) {
-            log.warn("缓存中找不到节点[{}]信息,无法补节点名称和质押区块号",nodeId);
-        }
+        updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 
@@ -52,7 +43,7 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>
 
         // 撤销质押
         StakeExit businessParam= StakeExit.builder()
-        		.nodeId(nodeId)
+        		.nodeId(txParam.getNodeId())
         		.stakingBlockNum(txParam.getStakingBlockNum())
         		.time(tx.getTime())
                 .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())

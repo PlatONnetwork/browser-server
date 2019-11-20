@@ -1,11 +1,9 @@
 package com.platon.browser.complement.converter.proposal;
 
-import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.VersionDeclareParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,14 +23,7 @@ public class VersionDeclareConverter extends BusinessParamConverter<Optional<Nod
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
         // 补充节点名称
-        String nodeId=txParam.getActiveNode();
-        try {
-            NodeItem nodeItem = nodeCache.getNode(nodeId);
-            txParam.setNodeName(nodeItem.getNodeName());
-            tx.setInfo(txParam.toJSONString());
-        } catch (NoSuchBeanException e) {
-            log.warn("缓存中找不到节点[{}]信息,无法补节点名称",nodeId);
-        }
+        updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 

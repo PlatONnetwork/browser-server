@@ -13,10 +13,10 @@ public class AddressStatItemTest extends AgentTestBase {
 	@Test
 	public void test(){
 		AddressStatItem target = AddressStatItem.builder()
-				.address(null)
-				.contractCreate(null)
-				.contractCreatehash(null)
-				.contractName(null)
+				.address("null")
+				.contractCreate("null")
+				.contractCreatehash("null")
+				.contractName("null")
 				.delegateQty(3)
 				.proposalQty(3)
 				.stakingQty(3)

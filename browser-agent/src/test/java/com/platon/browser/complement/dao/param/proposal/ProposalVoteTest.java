@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigInteger;
+import java.util.Date;
+
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -13,12 +16,12 @@ public class ProposalVoteTest extends AgentTestBase {
     @Test
     public void test(){
         ProposalVote target = ProposalVote.builder()
-                .bNum(null)
-                .nodeId(null)
-                .proposalHash(null)
-                .stakingName(null)
-                .timestamp(null)
-                .txHash(null)
+                .bNum(BigInteger.ONE)
+                .nodeId("null")
+                .proposalHash("null")
+                .stakingName("null")
+                .timestamp(new Date())
+                .txHash("null")
                 .voteOption(1)
                 .build();
         target.setBNum(null)

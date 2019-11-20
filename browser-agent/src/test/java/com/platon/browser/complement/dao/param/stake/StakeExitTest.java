@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
@@ -15,8 +16,8 @@ public class StakeExitTest extends AgentTestBase {
     @Test
     public void test(){
         StakeExit target = StakeExit.builder()
-                .nodeId(null)
-                .stakingBlockNum(null)
+                .nodeId("null")
+                .stakingBlockNum(BigInteger.ONE)
                 .stakingReductionEpoch(4)
                 .time(new Date())
                 .build();

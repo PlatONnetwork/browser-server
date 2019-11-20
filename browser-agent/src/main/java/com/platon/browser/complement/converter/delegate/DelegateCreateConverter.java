@@ -1,12 +1,10 @@
 package com.platon.browser.complement.converter.delegate;
 
-import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateCreateParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +29,7 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
         // 发起委托
         DelegateCreateParam txParam = tx.getTxParam(DelegateCreateParam.class);
         // 补充节点名称
-        String nodeId=txParam.getNodeId();
-        try {
-            NodeItem nodeItem = nodeCache.getNode(nodeId);
-            txParam.setNodeName(nodeItem.getNodeName()).setStakingBlockNum(nodeItem.getStakingBlockNum());
-            tx.setInfo(txParam.toJSONString());
-        } catch (NoSuchBeanException e) {
-            log.warn("缓存中找不到节点[{}]信息,无法补节点名称和质押区块号",nodeId);
-        }
+        updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
@@ -52,7 +43,7 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
         		.sequence(BigInteger.valueOf(tx.getSeq()))
         		.stakingBlockNumber(txParam.getStakingBlockNum())
                 .build();
-        
+
         delegateBusinessMapper.create(businessParam);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
