@@ -94,7 +94,12 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
             List<NodeOpt> nOptBaks = event.getNodeOpts();
             Long nOptMaxId = 0L;
-            if(!nOptBaks.isEmpty()) nOptMaxId=nOptBaks.get(0).getId();
+            if(!nOptBaks.isEmpty()) {
+                for (NodeOpt no : nOptBaks) {
+                    if(no.getId()>nOptMaxId) nOptMaxId=no.getId();
+                }
+                nOptMaxId=nOptBaks.get(0).getId();
+            }
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             maxBlockNumber=event.getBlock().getNum();
