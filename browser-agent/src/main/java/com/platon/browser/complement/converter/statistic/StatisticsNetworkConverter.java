@@ -37,7 +37,6 @@ public class StatisticsNetworkConverter {
         networkStat.setNodeName(nodeCache.getNode(block.getNodeId()).getNodeName());
         networkStat.setBlockReward(epochMessage.getBlockReward());
         networkStat.setSettleStakingReward(epochMessage.getSettleStakeReward());
-        networkStat.setStakingReward(epochMessage.getStakeReward());
         networkStat.setAddIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()));
         networkStat.setAddIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()));
         networkStat.setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()));

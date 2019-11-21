@@ -19,6 +19,12 @@ dependencies {
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
     testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
 }
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "src/main/java/**/dao/param**"
+    }
+}
 //判断 build命令是否指定属性 profile。
 //例如 gradle buildTar -xtest -Pprofile=online
 

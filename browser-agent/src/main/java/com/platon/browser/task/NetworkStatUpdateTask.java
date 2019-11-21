@@ -4,7 +4,10 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.common.utils.CalculateUtils;
-import com.platon.browser.complement.dao.entity.NetworkStatistics;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.utils.EpochUtil;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 /**
  * @Auther: dongqile
@@ -34,6 +38,8 @@ public class NetworkStatUpdateTask {
 	private AccountService accountService;
 	@Autowired
 	private StatisticBusinessMapper statisticBusinessMapper;
+	@Autowired
+	private NodeMapper nodeMapper;
 	
     @Scheduled(cron = "0/1  * * * * ?")
     public void cron() {
@@ -60,9 +66,18 @@ public class NetworkStatUpdateTask {
 			BigDecimal stakingValue = networkStatistics.getStakingValue() == null ? BigDecimal.ZERO : networkStatistics.getStakingValue();
 			//获得地址数统计
 			int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
+			// 重新计算质押奖励
+			NodeExample nodeExample = new NodeExample();
+			nodeExample.createCriteria().andIsSettleEqualTo(CustomNode.YesNoEnum.YES.getCode());
+			long nodeCount = nodeMapper.countByExample(nodeExample);
+			BigDecimal stakingReward=networkStatCache.getNetworkStat().getStakingReward();
+			if(nodeCount!=0){
+				stakingReward=networkStatCache.getNetworkStat().getSettleStakingReward().divide(BigDecimal.valueOf(nodeCount),16, RoundingMode.FLOOR);
+			}
+
 			//获得进行中的提案
 			int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-			networkStatCache.updateByTask(issueValue,turnValue,totalValue,stakingValue,addressQty,doingProposalQty);
+			networkStatCache.updateByTask(issueValue,turnValue,totalValue,stakingValue,addressQty,doingProposalQty,stakingReward);
 		} catch (Exception e) {
 			log.error("网络统计任务出错:",e);
 		}

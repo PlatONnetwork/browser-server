@@ -33,7 +33,7 @@
     </foreach>
 </update>
 
-<select id="getAddressStatisticsFromStaking"  resultType="com.platon.browser.complement.dao.entity.AddressStatistics">
+<select id="getAddressStatisticsFromStaking"  resultType="com.platon.browser.task.bean.AddressStatistics">
 	select
 	     staking_addr as stakingAddr,
 	     staking_hes as stakingHes,
@@ -44,7 +44,7 @@
 	   and staking_addr in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>;
 </select>
 
-<select id="getAddressStatisticsFromDelegation"  resultType="com.platon.browser.complement.dao.entity.AddressStatistics">
+<select id="getAddressStatisticsFromDelegation"  resultType="com.platon.browser.task.bean.AddressStatistics">
 	select
 	     delegate_addr as delegateAddr,
 	     delegate_hes as delegateHes,

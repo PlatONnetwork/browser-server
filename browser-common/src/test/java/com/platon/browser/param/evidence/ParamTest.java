@@ -1,6 +1,5 @@
 package com.platon.browser.param.evidence;
 
-import com.platon.browser.TestBase;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.utils.ClassUtil;
 import org.junit.Before;
@@ -12,7 +11,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.mock;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ParamTest extends TestBase {
+public class ParamTest {
 
     private List<Class<?>> target = new ArrayList<>();
     /**

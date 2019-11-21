@@ -1,6 +1,7 @@
-package com.platon.browser.complement.dao.entity;
+package com.platon.browser.task.bean;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.task.bean.NetworkStatistics;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

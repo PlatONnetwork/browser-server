@@ -1,16 +1,10 @@
-package com.platon.browser.complement.dao.entity;
+package com.platon.browser.task.bean;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.collection.dto.EpochMessage;
-import com.platon.browser.common.service.epoch.EpochRetryService;
-import com.platon.browser.common.service.epoch.EpochService;
+import com.platon.browser.task.bean.AddressStatistics;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;

@@ -2,7 +2,7 @@ package com.platon.browser.task;
 
 import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.complement.dao.entity.AddressStatistics;
+import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;

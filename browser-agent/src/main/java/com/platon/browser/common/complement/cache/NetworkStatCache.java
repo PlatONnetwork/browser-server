@@ -53,13 +53,14 @@ public class NetworkStatCache {
      * @param addressQty
      * @param doingProposalQty
      */
-	public void updateByTask(BigDecimal issueValue, BigDecimal turnValue, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty) {
+	public void updateByTask(BigDecimal issueValue, BigDecimal turnValue, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty,BigDecimal stakingReward) {
 		networkStat.setIssueValue(issueValue);
 		networkStat.setTurnValue(turnValue);
 		networkStat.setStakingDelegationValue(totalValue);
 		networkStat.setStakingValue(stakingValue);
 		networkStat.setAddressQty(addressQty);
-		networkStat.setDoingProposalQty(doingProposalQty);		
+		networkStat.setDoingProposalQty(doingProposalQty);
+		networkStat.setStakingReward(stakingReward);
 	}
 
     public void init(NetworkStat networkStat) {

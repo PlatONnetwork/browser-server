@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platon.browser.complement.dao.entity.AddressStatistics;
-import com.platon.browser.complement.dao.entity.NetworkStatistics;
+import com.platon.browser.task.bean.AddressStatistics;
+import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;

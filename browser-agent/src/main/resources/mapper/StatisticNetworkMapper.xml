@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.StatisticBusinessMapper">
 
-<select id="getNetworkStatisticsFromNode"  resultType="com.platon.browser.complement.dao.entity.NetworkStatistics">
+<select id="getNetworkStatisticsFromNode"  resultType="com.platon.browser.task.bean.NetworkStatistics">
 	select sum(total_value) as totalValue,
 	    sum(staking_hes + staking_locked) as stakingValue
 	 from node 

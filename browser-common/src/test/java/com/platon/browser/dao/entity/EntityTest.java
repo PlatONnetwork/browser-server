@@ -1,6 +1,5 @@
 package com.platon.browser.dao.entity;
 
-import com.platon.browser.TestBase;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.utils.ClassUtil;
 import org.junit.Before;
@@ -25,7 +24,7 @@ import static org.mockito.Mockito.mock;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EntityTest extends TestBase {
+public class EntityTest {
 
     private List<Class<?>> target = new ArrayList<>();
     /**
@@ -41,6 +40,7 @@ public class EntityTest extends TestBase {
                 &&!clazz.getName().endsWith("Column")
                 &&!clazz.getName().endsWith("Criterion")
                 &&!clazz.getName().endsWith("GeneratedCriteria")
+                &&!clazz.getName().endsWith("Example")
         ).forEach(target::add);
     }
     @Test

@@ -18,6 +18,6 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "src/main/java/com/platon/browser/dao/**,src/test/java/com/platon/browser/dao/**"
+        property "sonar.exclusions", "src/main/java/**/dao/**,src/main/java/**/param/**,src/main/java/**/dto/**,src/main/java/**/utils/ClassUtil.java"
     }
 }
