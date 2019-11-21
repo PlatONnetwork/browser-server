@@ -7,7 +7,10 @@ import org.junit.Test;
 
 import com.platon.browser.dto.CustomSlash.StatusEnum;
 import com.platon.browser.dto.CustomSlash.YesNoEnum;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CustomSlashTest {
 
 	private CustomSlash slash;

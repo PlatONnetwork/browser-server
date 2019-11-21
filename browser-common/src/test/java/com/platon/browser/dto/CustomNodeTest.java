@@ -2,9 +2,12 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dto.CustomNode.YesNoEnum;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertNotNull;
 
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CustomNodeTest {
 
 	private CustomNode customNode;

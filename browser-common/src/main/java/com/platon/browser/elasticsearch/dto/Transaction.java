@@ -2,7 +2,6 @@ package com.platon.browser.elasticsearch.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platon.browser.dto.CustomStaking;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
