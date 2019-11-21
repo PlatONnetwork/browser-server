@@ -57,6 +57,6 @@ public class NetworkStatCacheTest extends AgentTestBase {
         target.setNetworkStat(networkStat);
         target.setTpsCalcCache(tpsCalcCache);
         target.init(networkStat);
-        target.updateByTask(BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,33,33);
+        target.updateByTask(BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,33,33,BigDecimal.TEN);
     }
 }
