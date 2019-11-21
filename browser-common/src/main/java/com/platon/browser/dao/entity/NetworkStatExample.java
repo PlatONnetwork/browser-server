@@ -1156,6 +1156,66 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
+        public Criteria andSettleStakingRewardIsNull() {
+            addCriterion("settle_staking_reward is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardIsNotNull() {
+            addCriterion("settle_staking_reward is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardEqualTo(BigDecimal value) {
+            addCriterion("settle_staking_reward =", value, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardNotEqualTo(BigDecimal value) {
+            addCriterion("settle_staking_reward <>", value, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardGreaterThan(BigDecimal value) {
+            addCriterion("settle_staking_reward >", value, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("settle_staking_reward >=", value, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardLessThan(BigDecimal value) {
+            addCriterion("settle_staking_reward <", value, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("settle_staking_reward <=", value, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardIn(List<BigDecimal> values) {
+            addCriterion("settle_staking_reward in", values, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardNotIn(List<BigDecimal> values) {
+            addCriterion("settle_staking_reward not in", values, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("settle_staking_reward between", value1, value2, "settleStakingReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleStakingRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("settle_staking_reward not between", value1, value2, "settleStakingReward");
+            return (Criteria) this;
+        }
+
         public Criteria andAddIssueBeginIsNull() {
             addCriterion("add_issue_begin is null");
             return (Criteria) this;

@@ -40,7 +40,8 @@
         `staking_delegation_value`,
         `staking_value`,
         `doing_proposal_qty`,
-        `address_qty`
+        `address_qty`,
+        `settle_staking_reward`
     )
     values
     (
@@ -64,7 +65,8 @@
         #{stakingDelegationValue},
         #{stakingValue},
         #{doingProposalQty},
-        #{addressQty}
+        #{addressQty},
+        #{settleStakingReward}
     )
     on duplicate
     key update
@@ -87,6 +89,7 @@
         `staking_delegation_value` = #{stakingDelegationValue},
         `staking_value` = #{stakingValue},
         `doing_proposal_qty`= #{doingProposalQty},
-        `address_qty` = #{addressQty};
+        `address_qty` = #{addressQty},
+        `settle_staking_reward` = #{settleStakingReward};
 </update>
 </mapper>

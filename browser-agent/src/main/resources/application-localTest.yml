@@ -67,7 +67,7 @@ logging:
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数
-  txLogDecodeThreadNum: 200
+  txLogDecodeThreadNum: 10
   # Web3j访问地址
   web3j:
     #HTTP或WS

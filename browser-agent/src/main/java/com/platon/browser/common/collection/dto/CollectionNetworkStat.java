@@ -41,6 +41,7 @@ public class CollectionNetworkStat extends NetworkStat {
         stat.setTxQty(0);
         stat.setTurnValue(BigDecimal.ZERO);
         stat.setStakingValue(BigDecimal.ZERO);
+        stat.setSettleStakingReward(BigDecimal.ZERO);
         stat.setStakingReward(BigDecimal.ZERO);
         stat.setStakingDelegationValue(BigDecimal.ZERO);
         stat.setNodeOptSeq(0L);

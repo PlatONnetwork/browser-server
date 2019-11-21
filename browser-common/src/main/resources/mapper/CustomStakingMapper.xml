@@ -31,6 +31,7 @@
     <result column="stat_delegate_locked" jdbcType="DECIMAL" property="statDelegateLocked" />
     <result column="stat_delegate_released" jdbcType="DECIMAL" property="statDelegateReleased" />
     <result column="block_reward_value" jdbcType="DECIMAL" property="blockRewardValue" />
+    <result column="predict_staking_reward" jdbcType="DECIMAL" property="predictStakingReward" />
     <result column="fee_reward_value" jdbcType="DECIMAL" property="feeRewardValue" />
     <result column="staking_reward_value" jdbcType="DECIMAL" property="stakingRewardValue" />
     <result column="cur_cons_block_qty" jdbcType="BIGINT" property="curConsBlockQty" />

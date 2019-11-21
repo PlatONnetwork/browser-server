@@ -40,6 +40,8 @@ public class NetworkStat {
 
     private BigDecimal stakingReward;
 
+    private BigDecimal settleStakingReward;
+
     private Long addIssueBegin;
 
     private Long addIssueEnd;
@@ -188,6 +190,14 @@ public class NetworkStat {
         this.stakingReward = stakingReward;
     }
 
+    public BigDecimal getSettleStakingReward() {
+        return settleStakingReward;
+    }
+
+    public void setSettleStakingReward(BigDecimal settleStakingReward) {
+        this.settleStakingReward = settleStakingReward;
+    }
+
     public Long getAddIssueBegin() {
         return addIssueBegin;
     }
@@ -261,6 +271,7 @@ public class NetworkStat {
         addressQty("address_qty", "addressQty", "INTEGER", false),
         blockReward("block_reward", "blockReward", "DECIMAL", false),
         stakingReward("staking_reward", "stakingReward", "DECIMAL", false),
+        settleStakingReward("settle_staking_reward", "settleStakingReward", "DECIMAL", false),
         addIssueBegin("add_issue_begin", "addIssueBegin", "BIGINT", false),
         addIssueEnd("add_issue_end", "addIssueEnd", "BIGINT", false),
         nextSettle("next_settle", "nextSettle", "BIGINT", false),
