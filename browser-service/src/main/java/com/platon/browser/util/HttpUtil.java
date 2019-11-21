@@ -93,23 +93,27 @@ public class HttpUtil {
      */
     @SuppressWarnings("unchecked")
 	private static <T> T resolve(Request request,String url,Class<T> clazz) throws HttpRequestException {
-        Response response;
+        Response response=null;
         try {
             response = CLIENT.newCall(request).execute();
+            if(response.isSuccessful()){
+                try {
+                    String res = Objects.requireNonNull(response.body()).string();
+                    res = res.replace("\n","");
+                    if(clazz==String.class) return (T)res;
+                    return JSON.parseObject(res,clazz);
+                } catch (IOException e) {
+                    throw new HttpRequestException("获取返回内容出错:"+e.getMessage());
+                }
+            }else{
+                throw new HttpRequestException("请求地址["+url+"]失败:"+response.message());
+            }
         } catch (IOException e) {
             throw new HttpRequestException("请求地址["+url+"]出错:"+e.getMessage());
-        }
-        if(response.isSuccessful()){
-            try {
-                String res = Objects.requireNonNull(response.body()).string();
-                res = res.replace("\n","");
-                if(clazz==String.class) return (T)res;
-                return JSON.parseObject(res,clazz);
-            } catch (IOException e) {
-                throw new HttpRequestException("获取返回内容出错:"+e.getMessage());
+        } finally {
+            if(response!=null){
+                response.close();
             }
-        }else{
-            throw new HttpRequestException("请求地址["+url+"]失败:"+response.message());
         }
     }
 }
