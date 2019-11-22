@@ -9,13 +9,16 @@ import org.web3j.utils.Numeric;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class StakeCreateDecoder extends Decoder {
-
+class StakeCreateDecoder {
+    private StakeCreateDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 发起质押
         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
@@ -41,7 +44,7 @@ public class StakeCreateDecoder extends Decoder {
         //程序的真实版本，治理rpc获取
         BigInteger version =  bigIntegerResolver((RlpString) rootList.getValues().get(9));
 
-        TxParam param = StakeCreateParam.builder()
+        return StakeCreateParam.builder()
                 .type(type.intValue())
                 .benefitAddress(address)
                 .nodeId(nodeId)
@@ -52,6 +55,5 @@ public class StakeCreateDecoder extends Decoder {
                 .amount(new BigDecimal(amount))
                 .programVersion(version)
                 .build();
-        return param;
     }
 }

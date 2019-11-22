@@ -127,9 +127,4 @@ public class DateUtil {
     	String timeStr = simpleDateFormat.format(time);
     	return DateUtil.timeZoneTransfer(timeStr, pattern, "0", "+8");
     }
-	
-
-    public static void main(String[] args) {
-    	System.out.println(DateUtil.timeZoneTransfer(new Date(), "0", "+8"));
-    }
 }

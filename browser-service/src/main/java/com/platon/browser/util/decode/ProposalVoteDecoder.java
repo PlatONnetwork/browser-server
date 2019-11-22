@@ -7,13 +7,16 @@ import org.web3j.rlp.RlpString;
 
 import java.math.BigInteger;
 
+import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class ProposalVoteDecoder extends Decoder {
-
+class ProposalVoteDecoder {
+    private ProposalVoteDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 给提案投票
         //投票验证人
@@ -27,13 +30,12 @@ public class ProposalVoteDecoder extends Decoder {
         //代码版本签名，有rpc的getProgramVersion接口获取
         String versionSign = stringResolver((RlpString) rootList.getValues().get(5));
 
-        ProposalVoteParam param = ProposalVoteParam.builder()
+        return ProposalVoteParam.builder()
                 .verifier(nodeId)
                 .proposalId(proposalID)
                 .option(option.toString())
                 .programVersion(programVersion.toString())
                 .versionSign(versionSign)
                 .build();
-        return param;
     }
 }

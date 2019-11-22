@@ -24,8 +24,7 @@ public class KeyBaseAnalysis {
         Components components = completion.getComponents();
         ValueScore vs = components.getUsername();
         if(vs==null) return null;
-        String username = vs.getVal();
-        return username;
+        return vs.getVal();
     }
 
 
@@ -35,7 +34,6 @@ public class KeyBaseAnalysis {
         // 取最新一条
         Completion completion = completions.get(0);
         //获取头像
-        String icon = completion.getThumbnail();
-        return icon;
+        return completion.getThumbnail();
     }
 }
