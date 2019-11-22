@@ -43,6 +43,11 @@ public interface StakeBusinessMapper {
      */
     @Transactional
     BigDecimal queryStakingValue(BusinessParam param);
-    
+
+    /**
+     * 更新节点信息：keybase信息，程序版本号信息
+     * @param updateNodeList
+     * @return
+     */
 	int updateNodeForTask(@Param("list") List<Node> updateNodeList);
 }

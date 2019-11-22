@@ -1,6 +1,7 @@
 package com.platon.browser.data;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.NodeVersion;
 import com.platon.browser.client.SpecialApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +49,19 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]) throws Exception {
 
+        List<NodeVersion> versions = sca.getNodeVersionList(web3j);
+
+        logger.error("");
+
         //List<Node> nodes = nodeContract.getVerifierList().send().data;
         List<Node> nodes = nodeContract.getValidatorList().send().data;
         List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
-        List<Node> history = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(35120L));
+        List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(320L));
+        List<Node> curVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(321L));
+
+        List<Node> preVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(320L));
+        List<Node> curVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(321L));
 
         BaseResponse baseResponse = proposalContract.getActiveVersion().send();
         logger.error("{}",JSON.toJSONString(baseResponse.data));

@@ -48,6 +48,10 @@ public class SpecialApi {
      */
     public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1107;
     /**
+     * 查询版本列表
+     */
+    public static final int GET_NODE_VERSION = 1108;
+    /**
      * 获取可用和锁仓余额
      */
     public static final int GET_RESTRICTING_BALANCE_FUNC_TYPE = 4101;
@@ -140,6 +144,35 @@ public class SpecialApi {
     }
 
     /**
+     * 根据区块号获取节点列表
+     * @return
+     * @throws Exception
+     */
+    public List<NodeVersion> getNodeVersionList(Web3j web3j) throws ContractInvokeException, BlankResponseException {
+        final Function function = new Function(
+                GET_NODE_VERSION,
+                Collections.emptyList(),
+                Collections.singletonList(new TypeReference<Utf8String>() {})
+        );
+        BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.data==null){
+            throw new BlankResponseException(String.format("【查询节点版本出错】函数类型:%s,返回为空!%s",GET_NODE_VERSION,JSON.toJSONString(Thread.currentThread().getStackTrace())));
+        }
+        if(br.isStatusOk()){
+            String data = br.data;
+            if(StringUtils.isBlank(data)){
+                throw new BlankResponseException(BLANK_RES);
+            }
+            List<NodeVersion> result;
+            result = JSONUtil.parseArray(data, NodeVersion.class);
+            return result;
+        }else{
+            String msg = JSON.toJSONString(br,true);
+            throw new ContractInvokeException(String.format("【查询节点版本出错】函数类型:%s,返回数据:%s",GET_NODE_VERSION,msg));
+        }
+    }
+
+    /**
      * 根据账户地址获取锁仓余额
      * @param addresses
      * @return
@@ -222,4 +255,6 @@ public class SpecialApi {
                 ReceiptResult.class);
         return request.send();
     }
+
+
 }
