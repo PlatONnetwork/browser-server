@@ -5,7 +5,6 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.Getter;
