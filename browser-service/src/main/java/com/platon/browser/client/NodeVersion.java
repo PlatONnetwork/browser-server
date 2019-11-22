@@ -21,6 +21,9 @@ public class NodeVersion {
     private int programVersion;
     public void setNodeId(String nodeId){
         this.nodeId = HexTool.prefix(nodeId);
+    }
+    public void setProgramVersion(int programVersion){
+        this.programVersion=programVersion;
         this.bigVersion= VerUtil.transferBigVersion(BigInteger.valueOf(this.programVersion)).intValue();
     }
 }
