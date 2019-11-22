@@ -99,20 +99,20 @@ public class EpochRetryService {
 
     /**
      * 共识周期变更
-     * @param nextEpochFirstBlockNumber 下一周期第一个区块号
+     * @param currentBlockNumber 当前区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void consensusChange(BigInteger nextEpochFirstBlockNumber) throws Exception {
-        log.debug("共识周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),nextEpochFirstBlockNumber);
+    public void consensusChange(BigInteger currentBlockNumber) throws Exception {
+        log.debug("共识周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
         try {
             // 当前块所处的共识周期
-            BigInteger currentEpoch = EpochUtil.getEpoch(nextEpochFirstBlockNumber,chainConfig.getConsensusPeriodBlockCount());
+            BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
             // 链上最新块所处的共识周期
             Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
             BigInteger latestBlockNumber = platOnClient.getLatestBlockNumber();
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getConsensusPeriodBlockCount());
             // 上一个周期的最后一个块号
-            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(nextEpochFirstBlockNumber,chainConfig.getConsensusPeriodBlockCount());
+            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
 
             // 前一周期的验证人
             List<Node> preNodes = specialApi.getHistoryValidatorList(web3j,preEpochLastBlockNumber);
@@ -132,10 +132,6 @@ public class EpochRetryService {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestValidators();
             }
-            if(latestEpoch.compareTo(currentEpoch)<0){
-                // 周期超前，抛异常重试，进行等待
-                throw new BusinessException("等待链进入下一周期!");
-            }
             curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
             curValidators.clear();
             curValidators.addAll(curNodes);
@@ -151,20 +147,20 @@ public class EpochRetryService {
 
     /**
      * 结算周期变更
-     * @param nextEpochFirstBlockNumber 下一周期第一个区块号
+     * @param currentBlockNumber 当前区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void settlementChange(BigInteger nextEpochFirstBlockNumber) throws Exception {
-        log.debug("结算周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),nextEpochFirstBlockNumber);
+    public void settlementChange(BigInteger currentBlockNumber) throws Exception {
+        log.debug("结算周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
         try {
             // 当前块所处周期
-            BigInteger currentEpoch = EpochUtil.getEpoch(nextEpochFirstBlockNumber,chainConfig.getSettlePeriodBlockCount());
+            BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
             // 链上最新块所处周期
             Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
             BigInteger latestBlockNumber = platOnClient.getLatestBlockNumber();
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getSettlePeriodBlockCount());
             // 上一个周期的最后一个块号
-            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(nextEpochFirstBlockNumber,chainConfig.getSettlePeriodBlockCount());
+            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
 
             // 前一周期的验证人
             List<Node> preNodes = specialApi.getHistoryVerifierList(web3j,preEpochLastBlockNumber);
@@ -183,10 +179,6 @@ public class EpochRetryService {
             if(latestEpoch.compareTo(currentEpoch)==0){
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestVerifiers();
-            }
-            if(latestEpoch.compareTo(currentEpoch)<0){
-                // 周期超前，抛异常重试，进行等待
-                throw new BusinessException("等待链进入下一周期!");
             }
             curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
             curVerifiers.clear();

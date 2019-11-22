@@ -51,9 +51,6 @@ public class BlockParameterService {
 
         if(block.getNum()==0) return nodeOptList;
 
-        // 新区块事件
-        onNewBlockConverter.convert(event,block);
-
         // 新选举周期事件
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
@@ -64,16 +61,19 @@ public class BlockParameterService {
         }
 
         // 新共识周期事件
-        if (block.getNum() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
+        if ((block.getNum()-1) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("共识周期切换：Block Number({})", block.getNum());
             onConsensusConverter.convert(event, block);
         }
 
         // 新结算周期事件
-        if (block.getNum() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
+        if ((block.getNum()-1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
             onSettleConverter.convert(event, block);
         }
+
+        // 新区块事件
+        onNewBlockConverter.convert(event,block);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
