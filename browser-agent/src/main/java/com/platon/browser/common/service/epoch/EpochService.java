@@ -40,7 +40,8 @@ public class EpochService {
      * @param blockNumber
      */
     public EpochMessage getEpochMessage(Long blockNumber) throws BlockNumberException {
-        currentBlockNumber=BigInteger.valueOf(blockNumber);
+        // 每个周期最后一个块计算下一个周期的相关数据
+        currentBlockNumber=BigInteger.valueOf(blockNumber+1);
         // 计算共识周期轮数
         BigInteger oldConsensusEpochRound = consensusEpochRound;
         consensusEpochRound=EpochUtil.getEpoch(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());

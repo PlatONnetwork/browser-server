@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class HttpUtil {
+    private HttpUtil(){}
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)

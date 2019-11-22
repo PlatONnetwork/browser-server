@@ -6,13 +6,15 @@ import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.utils.Numeric;
 
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class StakeModifyDecoder extends Decoder {
-
+public class StakeModifyDecoder {
+    private StakeModifyDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 修改质押信息
         //用于接受出块奖励和质押奖励的收益账户
@@ -32,7 +34,7 @@ public class StakeModifyDecoder extends Decoder {
         String detail = stringResolver((RlpString) rootList.getValues().get(6));
         detail = new String(Numeric.hexStringToByteArray(detail));
 
-        StakeModifyParam param = StakeModifyParam.builder()
+        return StakeModifyParam.builder()
                 .nodeId(nodeId)
                 .benefitAddress(address)
                 .externalId("0x".equals(externalId)?"":externalId)
@@ -40,6 +42,5 @@ public class StakeModifyDecoder extends Decoder {
                 .website(website)
                 .details(detail)
                 .build();
-        return param;
     }
 }

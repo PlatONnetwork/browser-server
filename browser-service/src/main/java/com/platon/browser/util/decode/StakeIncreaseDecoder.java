@@ -8,13 +8,16 @@ import org.web3j.rlp.RlpString;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class StakeIncreaseDecoder extends Decoder {
-
+class StakeIncreaseDecoder {
+    private StakeIncreaseDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 增持质押
         //被质押的节点的NodeId
@@ -24,12 +27,11 @@ public class StakeIncreaseDecoder extends Decoder {
         //质押的von
         BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
-        StakeIncreaseParam param = StakeIncreaseParam.builder()
+        return StakeIncreaseParam.builder()
                 .nodeId(nodeId)
                 .type(type.intValue())
                 .amount(new BigDecimal(amount))
                 .stakingBlockNum(null)
                 .build();
-        return param;
     }
 }

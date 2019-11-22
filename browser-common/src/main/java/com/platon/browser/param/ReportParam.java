@@ -54,8 +54,9 @@ public class ReportParam extends TxParam{
      */
     private BigInteger stakingBlockNum;
 
-    public void init() {
+    public ReportParam init() {
         this.verify = format(type, data);
+        return this;
     }
 
     private String format ( BigInteger type, String date ) {

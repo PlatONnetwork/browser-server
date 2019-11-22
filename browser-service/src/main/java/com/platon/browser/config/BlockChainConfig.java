@@ -151,7 +151,7 @@ public class BlockChainConfig {
     private List<CustomStaking> defaultStakingList=new ArrayList<>();
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() throws ConfigLoadingException {
         updateWithEconomicConfig(client.getEconomicConfig());
     }
 

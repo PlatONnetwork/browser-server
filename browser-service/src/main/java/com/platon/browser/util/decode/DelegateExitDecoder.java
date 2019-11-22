@@ -8,13 +8,16 @@ import org.web3j.rlp.RlpString;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class DelegateExitDecoder extends Decoder {
-
+class DelegateExitDecoder {
+    private DelegateExitDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 减持/撤销委托
         //代表着某个node的某次质押的唯一标示
@@ -25,11 +28,10 @@ public class DelegateExitDecoder extends Decoder {
         //减持委托的金额(按照最小单位算，1LAT = 10**18 von)
         BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
-        DelegateExitParam param = DelegateExitParam.builder()
+        return DelegateExitParam.builder()
                 .stakingBlockNum(new BigInteger(blockNumber,16))
                 .nodeId(nodeId)
                 .amount(new BigDecimal(amount))
                 .build();
-        return param;
     }
 }

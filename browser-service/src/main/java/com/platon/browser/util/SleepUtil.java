@@ -6,9 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class SleepUtil {
-    public static final void sleep(long seconds){
+    private SleepUtil(){}
+    public static void sleep(long seconds){
         try {
-            TimeUnit.SECONDS.sleep(1L);
+            TimeUnit.SECONDS.sleep(seconds);
         } catch (Exception ex) {
             log.error("",ex);
         }

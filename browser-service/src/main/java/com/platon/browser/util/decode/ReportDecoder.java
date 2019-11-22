@@ -8,13 +8,15 @@ import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 
+import static com.platon.browser.util.decode.Decoder.*;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class ReportDecoder extends Decoder {
-
+class ReportDecoder {
+    private ReportDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 举报双签
         //type
@@ -25,11 +27,9 @@ public class ReportDecoder extends Decoder {
 
         evidence=normalization(evidence);
 
-        ReportParam param = ReportParam.builder()
+        return ReportParam.builder()
                 .type(type)
                 .data(evidence)
-                .build();
-        param.init();
-        return param;
+                .build().init();
     }
 }

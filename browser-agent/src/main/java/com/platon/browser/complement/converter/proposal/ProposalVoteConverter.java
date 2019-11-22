@@ -39,22 +39,34 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         ProposalVoteParam txParam = tx.getTxParam(ProposalVoteParam.class);
-		// 补充节点名称
+        
+        String proposalId = "";
+        // 查询投票的提案信息
+        Proposal proposal = null;
+		try {
+			proposalId = txParam.getProposalId();
+			proposal = proposalMapper.selectByPrimaryKey(proposalId);
+	        txParam.setPIDID(proposal.getPipId());
+	        txParam.setProposalType(String.valueOf(proposal.getType()));
+		} catch (Exception e) {
+			//可能存在问题
+		}
+		
+        // 补充节点名称
         updateTxInfo(txParam,tx);
+        
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 
         long startTime = System.currentTimeMillis();
 
 		// 获得参数
-        String proposalId = txParam.getProposalId();
         String nodeName = txParam.getNodeName();
         String txHash = tx.getHash();
         Long blockNum = event.getBlock().getNum();
         Date time = tx.getTime();
 
-        // 查询投票的提案信息
-        Proposal proposal = proposalMapper.selectByPrimaryKey(proposalId);
+
 
         // 投票记录
     	ProposalVote businessParam= ProposalVote.builder()
@@ -84,11 +96,6 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 		nodeOpt.setTxHash(txHash);
 		nodeOpt.setBNum(blockNum);
 		nodeOpt.setTime(time);
-
-        // 补充txInfo
-        txParam.setPIDID(proposal.getPipId());
-        txParam.setProposalType(String.valueOf(proposal.getType()));
-        tx.setInfo(txParam.toJSONString());
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 

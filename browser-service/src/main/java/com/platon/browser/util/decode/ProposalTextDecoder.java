@@ -6,13 +6,15 @@ import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.utils.Numeric;
 
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class ProposalTextDecoder extends Decoder {
-
+class ProposalTextDecoder {
+    private ProposalTextDecoder(){}
     static TxParam decode(RlpList rootList) {
         // 提交文本提案
         //提交提案的验证人
@@ -21,10 +23,9 @@ public class ProposalTextDecoder extends Decoder {
         String pIdID = stringResolver((RlpString) rootList.getValues().get(2));
         pIdID =  new String(Numeric.hexStringToByteArray(pIdID));
 
-        ProposalTextParam param = ProposalTextParam.builder()
+        return ProposalTextParam.builder()
                 .verifier(nodeId)
                 .pIDID(pIdID)
                 .build();
-        return param;
     }
 }

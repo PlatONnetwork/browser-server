@@ -8,12 +8,16 @@ import org.web3j.rlp.RlpString;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
  **/
-public class DelegateCreateDecoder extends Decoder {
+class DelegateCreateDecoder{
+    private DelegateCreateDecoder(){}
 
     static TxParam decode(RlpList rootList) {
         // 发起委托
@@ -22,15 +26,14 @@ public class DelegateCreateDecoder extends Decoder {
         //被质押的节点的NodeId
         String nodeId = stringResolver((RlpString) rootList.getValues().get(2));
         //委托的金额
-        BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
+        BigInteger amount = bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
-        DelegateCreateParam param = DelegateCreateParam.builder()
+        return DelegateCreateParam.builder()
                 .type(type.intValue())
                 .nodeId(nodeId)
                 .amount(new BigDecimal(amount))
                 .nodeName("")
                 .stakingBlockNum(null)
                 .build();
-        return param;
     }
 }
