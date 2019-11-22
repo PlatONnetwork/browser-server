@@ -118,9 +118,9 @@ public class BlockServiceImpl implements BlockService {
 			lists.addAll(this.transferBlockListResp(blocks.getRsData()));
 			
 		}
-		bNumber = lists.get(0).getNumber();
+//		bNumber = lists.get(0).getNumber();
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(bNumber);
+		page.setTotal(networkStatRedis.getCurNumber());
 		respPage.init(page, lists);
 		if(System.currentTimeMillis() - startTime > 100) {
 			logger.error("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
