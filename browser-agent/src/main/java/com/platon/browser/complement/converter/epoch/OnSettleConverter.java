@@ -92,7 +92,7 @@ public class OnSettleConverter {
                 if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
             }
             // 对超出数量的收益轮换
-            CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
+            CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()-1L),ari,chainConfig);
             BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari,chainConfig.getSettlePeriodCountPerIssue());
             staking.setAnnualizedRate(annualizedRate.doubleValue());
 

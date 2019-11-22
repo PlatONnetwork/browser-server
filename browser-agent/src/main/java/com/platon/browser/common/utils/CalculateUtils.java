@@ -158,7 +158,7 @@ public class CalculateUtils {
 	public static void rotateCost(Staking staking,BigInteger curSettingEpoch,AnnualizedRateInfo ari,BlockChainConfig chainConfig) {
 		// 添加下一周期的质押成本
 		BigDecimal cost = staking.getStakingLocked().add(staking.getStakingHes());
-		ari.getCost().add(new PeriodValueElement(curSettingEpoch.add(BigInteger.ONE).longValue(),cost));
+		ari.getCost().add(new PeriodValueElement(curSettingEpoch.longValue(),cost));
 		// 保留指定数量最新的记录
 		if(ari.getCost().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
 			// 按结算周期由大到小排序

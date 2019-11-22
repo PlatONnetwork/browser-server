@@ -49,24 +49,24 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]) throws Exception {
 
-        List<NodeVersion> versions = sca.getNodeVersionList(web3j);
+//        List<NodeVersion> versions = sca.getNodeVersionList(web3j);
+//
+//        logger.error("");
+//
+//        //List<Node> nodes = nodeContract.getVerifierList().send().data;
+//        List<Node> nodes = nodeContract.getValidatorList().send().data;
+//        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
-        logger.error("");
-
-        //List<Node> nodes = nodeContract.getVerifierList().send().data;
-        List<Node> nodes = nodeContract.getValidatorList().send().data;
-        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
-
-        List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(320L));
-        List<Node> curVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(321L));
+        List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(6400L));
+        List<Node> curVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(6440L));
 
         List<Node> preVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(320L));
-        List<Node> curVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(321L));
-
-        BaseResponse baseResponse = proposalContract.getActiveVersion().send();
-        logger.error("{}",JSON.toJSONString(baseResponse.data));
-        logger.error("{}",JSON.toJSONString(nodes1));
-        BigInteger stakingNumber = new BigInteger("1");
+//        List<Node> curVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(321L));
+//
+//        BaseResponse baseResponse = proposalContract.getActiveVersion().send();
+//        logger.error("{}",JSON.toJSONString(baseResponse.data));
+//        logger.error("{}",JSON.toJSONString(nodes1));
+//        BigInteger stakingNumber = new BigInteger("1");
 
 //        List<Node>  verifierList = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(16930));
 //        logger.error("{}",JSON.toJSONString(verifierList));
