@@ -99,8 +99,7 @@ public class NodeUpdateTask {
 
 				// 更新节点版本号相关信息
 				NodeVersion version = versionMap.get(node.getNodeId());
-				if(version!=null&&version.getProgramVersion()!=node.getProgramVersion()){
-					node.setProgramVersion(version.getProgramVersion());
+				if(version!=null&&version.getBigVersion()!=node.getBigVersion()){
 					node.setBigVersion(version.getBigVersion());
 					updateNodeList.add(node);
 				}
