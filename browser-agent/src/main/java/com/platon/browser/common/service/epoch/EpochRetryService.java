@@ -5,6 +5,7 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.Getter;
@@ -64,16 +65,16 @@ public class EpochRetryService {
     /**
      * 增发周期变更:
      * 必然伴随着结算周期和共识周期的变更
-     * @param currentBlockNumber 当前区块号
+     * @param nextEpochFirstBlockNumber 下一周期第一个区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void issueChange(BigInteger currentBlockNumber) throws Exception {
-        log.debug("增发周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
+    public void issueChange(BigInteger nextEpochFirstBlockNumber) throws Exception {
+        log.debug("增发周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),nextEpochFirstBlockNumber);
         try {
             // >>>>如果增发周期变更,则更新相应的奖励字段
             // >>>>当前增发周期的初始激励池余额需要在上一增发周期最后一个块时候确定
             // 上一增发周期最后一个块号
-            BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getAddIssuePeriodBlockCount());
+            BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(nextEpochFirstBlockNumber,chainConfig.getAddIssuePeriodBlockCount());
             // 当前增发周期开始时的激励池余额
             inciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
             // 激励池余额分给区块奖励部分
@@ -85,9 +86,9 @@ public class EpochRetryService {
             // 当前增发周期内每个结算周期的质押奖励
             settleStakeReward = inciteAmount4Stake.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),10,RoundingMode.FLOOR);
             // 触发共识周期变更
-            consensusChange(currentBlockNumber);
+            consensusChange(nextEpochFirstBlockNumber);
             // 触发结算周期变更
-            settlementChange(currentBlockNumber);
+            settlementChange(nextEpochFirstBlockNumber);
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()),10,RoundingMode.FLOOR);
         }catch (Exception e){
@@ -98,20 +99,20 @@ public class EpochRetryService {
 
     /**
      * 共识周期变更
-     * @param currentBlockNumber 当前区块号
+     * @param nextEpochFirstBlockNumber 下一周期第一个区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void consensusChange(BigInteger currentBlockNumber) throws Exception {
-        log.debug("共识周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
+    public void consensusChange(BigInteger nextEpochFirstBlockNumber) throws Exception {
+        log.debug("共识周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),nextEpochFirstBlockNumber);
         try {
             // 当前块所处的共识周期
-            BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
+            BigInteger currentEpoch = EpochUtil.getEpoch(nextEpochFirstBlockNumber,chainConfig.getConsensusPeriodBlockCount());
             // 链上最新块所处的共识周期
             Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
             BigInteger latestBlockNumber = platOnClient.getLatestBlockNumber();
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getConsensusPeriodBlockCount());
             // 上一个周期的最后一个块号
-            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
+            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(nextEpochFirstBlockNumber,chainConfig.getConsensusPeriodBlockCount());
 
             // 前一周期的验证人
             List<Node> preNodes = specialApi.getHistoryValidatorList(web3j,preEpochLastBlockNumber);
@@ -131,6 +132,10 @@ public class EpochRetryService {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestValidators();
             }
+            if(latestEpoch.compareTo(currentEpoch)<0){
+                // 周期超前，抛异常重试，进行等待
+                throw new BusinessException("等待链进入下一周期!");
+            }
             curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
             curValidators.clear();
             curValidators.addAll(curNodes);
@@ -146,20 +151,20 @@ public class EpochRetryService {
 
     /**
      * 结算周期变更
-     * @param currentBlockNumber 当前区块号
+     * @param nextEpochFirstBlockNumber 下一周期第一个区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void settlementChange(BigInteger currentBlockNumber) throws Exception {
-        log.debug("结算周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
+    public void settlementChange(BigInteger nextEpochFirstBlockNumber) throws Exception {
+        log.debug("结算周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),nextEpochFirstBlockNumber);
         try {
             // 当前块所处周期
-            BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
+            BigInteger currentEpoch = EpochUtil.getEpoch(nextEpochFirstBlockNumber,chainConfig.getSettlePeriodBlockCount());
             // 链上最新块所处周期
             Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
             BigInteger latestBlockNumber = platOnClient.getLatestBlockNumber();
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getSettlePeriodBlockCount());
             // 上一个周期的最后一个块号
-            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
+            BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(nextEpochFirstBlockNumber,chainConfig.getSettlePeriodBlockCount());
 
             // 前一周期的验证人
             List<Node> preNodes = specialApi.getHistoryVerifierList(web3j,preEpochLastBlockNumber);
@@ -178,6 +183,10 @@ public class EpochRetryService {
             if(latestEpoch.compareTo(currentEpoch)==0){
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestVerifiers();
+            }
+            if(latestEpoch.compareTo(currentEpoch)<0){
+                // 周期超前，抛异常重试，进行等待
+                throw new BusinessException("等待链进入下一周期!");
             }
             curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
             curVerifiers.clear();
