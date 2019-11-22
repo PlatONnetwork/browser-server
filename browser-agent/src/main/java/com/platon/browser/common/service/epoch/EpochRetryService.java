@@ -52,9 +52,11 @@ public class EpochRetryService {
     @Getter private BigDecimal inciteBalance=BigDecimal.ZERO; // 当前增发周期开始时的激励池余额 IB
     @Getter private BigDecimal inciteAmount4Block=BigDecimal.ZERO; // 前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
     @Getter private BigDecimal blockReward=BigDecimal.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
+    @Getter private BigDecimal preBlockReward=BigDecimal.ZERO; // 前一增发周期每个区块奖励值 BR/增发周期区块总数
     @Getter private BigDecimal inciteAmount4Stake=BigDecimal.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
     @Getter private BigDecimal settleStakeReward=BigDecimal.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
     @Getter private BigDecimal stakeReward=BigDecimal.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
+    @Getter private BigDecimal preStakeReward=BigDecimal.ZERO; // 前一结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
     @Getter private List<Node> preValidators=new ArrayList<>(); // 前一共识周期验证人列表
     @Getter private List<Node> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
     @Getter private List<Node> preVerifiers=new ArrayList<>(); // 前一结算周期验证人列表
@@ -78,6 +80,8 @@ public class EpochRetryService {
             inciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
             // 激励池余额分给区块奖励部分
             inciteAmount4Block = inciteBalance.multiply(chainConfig.getBlockRewardRate());
+            // 前一结算周期质押奖励轮换
+            preBlockReward=blockReward;
             // 当前增发周期内每个区块的奖励
             blockReward = inciteAmount4Block.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()),10,RoundingMode.FLOOR);
             // 激励池余额分给质押奖励部分
@@ -88,6 +92,8 @@ public class EpochRetryService {
             consensusChange(nextEpochFirstBlockNumber);
             // 触发结算周期变更
             settlementChange(nextEpochFirstBlockNumber);
+            // 前一结算周期质押奖励轮换
+            preStakeReward=stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()),10,RoundingMode.FLOOR);
         }catch (Exception e){

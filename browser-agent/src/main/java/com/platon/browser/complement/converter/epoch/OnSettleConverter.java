@@ -38,18 +38,16 @@ public class OnSettleConverter {
         log.debug("Block Number:{}",block.getNum());
 
         List<String> curVerifierList = new ArrayList<>();
-        event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));
-        List<String> preVerifierList = new ArrayList<>();
+        event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));List<String> preVerifierList = new ArrayList<>();
         event.getEpochMessage().getPreVerifierList().forEach(v->preVerifierList.add(v.getNodeId()));
 
         Settle settle = Settle.builder()
                 .preVerifierList(preVerifierList)
                 .curVerifierList(curVerifierList)
-                .stakingReward(event.getEpochMessage().getStakeReward())
+                .stakingReward(event.getEpochMessage().getPreStakeReward())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
                 .build();
-
 
         List<Integer> statusList = new ArrayList <>();
         statusList.add(1);
@@ -69,9 +67,9 @@ public class OnSettleConverter {
             }
             //当前质押是上轮结算周期验证人,发放质押奖励
             if(preVerifierList.contains(staking.getNodeId())){
-                staking.setFeeRewardValue(settle.getStakingReward());
+                staking.setStakingRewardValue(settle.getStakingReward());
             }else {
-                staking.setFeeRewardValue(BigDecimal.ZERO);
+                staking.setStakingRewardValue(BigDecimal.ZERO);
             }
             //当前质押是下轮结算周期验证人
             if(curVerifierList.contains(staking.getNodeId())){
@@ -86,7 +84,6 @@ public class OnSettleConverter {
                     .profit(new ArrayList<>())
                     .slash(new ArrayList<>())
                     .build();
-
             // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
             if(curVerifierList.contains(staking.getNodeId())){
                 String ariString = staking.getAnnualizedRateInfo();
@@ -95,7 +92,6 @@ public class OnSettleConverter {
                 }
                 CalculateUtils.rotateCost(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
             }
-
             // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
             if(preVerifierList.contains(staking.getNodeId())){
                 if(ari.getProfit()==null) ari.setProfit(new ArrayList<>());
@@ -105,7 +101,6 @@ public class OnSettleConverter {
                 BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari,chainConfig.getSettlePeriodCountPerIssue());
                 staking.setAnnualizedRate(annualizedRate.doubleValue());
             }
-
             staking.setAnnualizedRateInfo(ari.toJSONString());
         });
         settle.setStakingList(stakingList);

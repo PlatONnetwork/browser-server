@@ -138,7 +138,7 @@ public class CalculateUtils {
 	 */
 	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig chainConfig)  {
 		// 添加上一周期的收益
-		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue());
+		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
 		ari.getProfit().add(new PeriodValueElement(curSettingEpoch.longValue(),profit));
 		if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
 			// 按结算周期由大到小排序
