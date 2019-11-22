@@ -87,23 +87,23 @@ public class OnSettleConverter {
                     .slash(new ArrayList<>())
                     .build();
 
-            // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
-            if(preVerifierList.contains(staking.getNodeId())){
+            // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
+            if(curVerifierList.contains(staking.getNodeId())){
                 String ariString = staking.getAnnualizedRateInfo();
                 if(StringUtils.isNotBlank(ariString)){
                     ari = JSON.parseObject(ariString,AnnualizedRateInfo.class);
-                    if(ari.getProfit()==null) ari.setProfit(new ArrayList<>());
-                    if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
                 }
+                CalculateUtils.rotateCost(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
+            }
+
+            // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
+            if(preVerifierList.contains(staking.getNodeId())){
+                if(ari.getProfit()==null) ari.setProfit(new ArrayList<>());
+                if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
                 // 对超出数量的收益轮换
                 CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()-1L),ari,chainConfig);
                 BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari,chainConfig.getSettlePeriodCountPerIssue());
                 staking.setAnnualizedRate(annualizedRate.doubleValue());
-            }
-
-            // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
-            if(curVerifierList.contains(staking.getNodeId())){
-                CalculateUtils.rotateCost(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
             }
 
             staking.setAnnualizedRateInfo(ari.toJSONString());

@@ -73,7 +73,7 @@ public class CalculateUtils {
         ari.getCost().sort((c1,c2)-> Integer.compare(c1.getPeriod().compareTo(c2.getPeriod()), 0));
         int count = 0;
         for (PeriodValueElement pve:ari.getCost()){
-            if(count==4) break;
+            if(count==ari.getProfit().size()) break;
 			costSum= costSum.add(pve.getValue());
             count++;
         }
