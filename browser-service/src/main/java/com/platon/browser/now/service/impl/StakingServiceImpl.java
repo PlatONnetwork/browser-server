@@ -53,8 +53,8 @@ public class StakingServiceImpl implements StakingService {
 	@Autowired
 	private StatisticCacheService statisticCacheService;
 
-//	@Autowired
-//	private CustomStakingMapper customStakingMapper;
+	@Autowired
+	private CustomStakingMapper customStakingMapper;
 
 	@Autowired
 	private CustomDelegationMapper customDelegationMapper;
@@ -83,10 +83,10 @@ public class StakingServiceImpl implements StakingService {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
-//			String sumExitDelegate = customStakingMapper.selectSumExitDelegate();
-//			String stakingDelegationValue = networkStatRedis.getStakingDelegationValue()
-//					.subtract(new BigDecimal(sumExitDelegate==null?"0":sumExitDelegate)).toString();
-//			stakingStatisticNewResp.setStakingDelegationValue(stakingDelegationValue);
+			//实时除以现有的结算周期人数
+			Integer count= customStakingMapper.selectCountByActive();
+			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, BigDecimal.ROUND_DOWN));
+			
 		}
 		return stakingStatisticNewResp;
 	}
@@ -186,7 +186,7 @@ public class StakingServiceImpl implements StakingService {
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusIn(status);
 		if(StringUtils.isNotBlank(req.getKey())) {
-			criteria.andNodeNameLike(req.getKey());
+			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
 		Page<Node> stakings = nodeMapper.selectByExample(nodeExample);
 		

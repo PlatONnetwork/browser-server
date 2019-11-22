@@ -112,7 +112,7 @@ public class ProposalServiceImpl implements ProposalService {
         /** 不同的类型有不同的通过率 */
         switch (CustomProposal.TypeEnum.getEnum(proposal.getType())) {
 			case TEXT:
-				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalTextSupportRate().toString());
+				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalTextParticipationRate().toString());
 				break;
 			case UPGRADE:
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalUpgradePassRate().toString());
@@ -133,7 +133,7 @@ public class ProposalServiceImpl implements ProposalService {
 		        		}
 		        	}
 		        }
-				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelSupportRate().toString());
+				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelParticipationRate().toString());
 				break;
 			default:
 				break;

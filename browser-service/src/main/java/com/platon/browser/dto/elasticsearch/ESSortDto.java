@@ -18,6 +18,11 @@ public class ESSortDto {
 	
 	private SortOrder sortOrder;
 	
+	public ESSortDto() {
+		this.sortName = "";
+		this.sortOrder = SortOrder.DESC;
+	}
+	
 	public ESSortDto(String sortName, SortOrder sortOrder) {
 		this.sortName = sortName;
 		this.sortOrder = sortOrder;

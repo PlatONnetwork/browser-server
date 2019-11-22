@@ -71,4 +71,9 @@
   	SELECT SUM(stat_delegate_hes+stat_delegate_locked+stat_delegate_released) as sumDelegate 
 	FROM staking WHERE `status` in (2,3)
   </select>
+  
+  <select id="selectCountByActive" resultType="java.lang.Integer">
+  	SELECT count(*)
+	FROM staking WHERE `status` = 1 and `is_settle` = 1
+  </select>
 </mapper>

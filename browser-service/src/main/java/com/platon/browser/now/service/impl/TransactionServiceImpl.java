@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.*;
@@ -466,7 +467,7 @@ public class TransactionServiceImpl implements TransactionService {
 						Proposal proposal = proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
 						if(proposal != null) {
 							resp.setPipNum(proposal.getPipNum());
-							resp.setProposalTitle(proposal.getTopic());
+							resp.setProposalTitle(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
 							resp.setProposalUrl(proposal.getUrl());
 							resp.setProposalOption(String.valueOf(proposal.getType()));
 						}
@@ -535,7 +536,7 @@ public class TransactionServiceImpl implements TransactionService {
 			resp.setNodeId(proposal.getNodeId());
 			resp.setNodeName(proposal.getNodeName());
 			resp.setPipNum(proposal.getPipNum());
-			resp.setProposalTitle(proposal.getTopic());
+			resp.setProposalTitle(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
 			resp.setProposalStatus(proposal.getStatus());
 			resp.setProposalOption(String.valueOf(proposal.getType()));
 			resp.setProposalNewVersion(proposal.getNewVersion());
