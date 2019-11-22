@@ -144,7 +144,7 @@ public class EpochRetryService {
             expectBlockCount=chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(curValidators.size())).longValue();
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
-            log.error("{}",e.getMessage());
+            log.warn("{}",e.getMessage());
             throw e;
         }
     }
@@ -193,7 +193,7 @@ public class EpochRetryService {
             curVerifiers.addAll(curNodes);
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
-            log.error("{}",e.getMessage());
+            log.warn("{}",e.getMessage());
             throw e;
         }
     }
