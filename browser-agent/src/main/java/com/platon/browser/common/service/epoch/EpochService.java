@@ -40,40 +40,38 @@ public class EpochService {
      * @param blockNumber
      */
     public EpochMessage getEpochMessage(Long blockNumber) throws BlockNumberException {
-        // 每个周期最后一个块计算下一个周期的相关数据
+        // 每个周期第一个块计算下一个周期的相关数据
         currentBlockNumber=BigInteger.valueOf(blockNumber);
         // 计算共识周期轮数
-        BigInteger oldConsensusEpochRound = consensusEpochRound;
+
+        BigInteger prevBlockNumber = currentBlockNumber.subtract(BigInteger.ONE);
         consensusEpochRound=EpochUtil.getEpoch(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
-        if(oldConsensusEpochRound.compareTo(consensusEpochRound)!=0){
+        if(prevBlockNumber.longValue()%chainConfig.getConsensusPeriodBlockCount().longValue()==0){
             // 共识周期变更
             try {
                 epochRetryService.consensusChange(currentBlockNumber);
             } catch (Exception e) {
                 log.error("共识周期变更执行失败:",e);
             }
+        }
 
-            BigInteger oldSettleEpochRound = settleEpochRound;
-            settleEpochRound=EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
-            if(oldSettleEpochRound.compareTo(settleEpochRound)!=0){
-                // 结算周期变更
-                try {
-                    epochRetryService.settlementChange(currentBlockNumber);
-                } catch (Exception e) {
-                    log.error("结算周期变更执行失败:",e);
-                }
+        settleEpochRound=EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
+        if(prevBlockNumber.longValue()%chainConfig.getSettlePeriodBlockCount().longValue()==0){
+            // 结算周期变更
+            try {
+                epochRetryService.settlementChange(currentBlockNumber);
+            } catch (Exception e) {
+                log.error("共识周期变更执行失败:",e);
+            }
+        }
 
-                // 暂存未计算前的增发周期值
-                BigInteger oldIssueEpochRound = issueEpochRound;
-                issueEpochRound=EpochUtil.getEpoch(currentBlockNumber,chainConfig.getAddIssuePeriodBlockCount());
-                if(oldIssueEpochRound.compareTo(issueEpochRound)!=0){
-                    // 增发周期变更
-                    try {
-                        epochRetryService.issueChange(currentBlockNumber);
-                    } catch (Exception e) {
-                        log.error("增发周期变更执行失败:",e);
-                    }
-                }
+        issueEpochRound=EpochUtil.getEpoch(currentBlockNumber,chainConfig.getAddIssuePeriodBlockCount());
+        if(prevBlockNumber.longValue()%chainConfig.getAddIssuePeriodBlockCount().longValue()==0){
+            // 增发周期变更
+            try {
+                epochRetryService.issueChange(currentBlockNumber);
+            } catch (Exception e) {
+                log.error("增发周期变更执行失败:",e);
             }
         }
 

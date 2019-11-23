@@ -94,6 +94,8 @@ public class InitializationService {
 
         // 确保epochRetryService中的preBlockReward和preStakeReward不为0
         epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
+        epochRetryService.settlementChange(BigInteger.valueOf(networkStat.getCurNumber()));
+        epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
         return initialResult;
     }
 
@@ -103,6 +105,8 @@ public class InitializationService {
      */
     private List<com.platon.browser.dao.entity.Node> initInnerStake() throws Exception {
         epochRetryService.issueChange(BigInteger.ZERO);
+        epochRetryService.settlementChange(BigInteger.ZERO);
+        epochRetryService.consensusChange(BigInteger.ZERO);
 
         List<CustomNode> nodes = new ArrayList<>();
         List<CustomStaking> stakingList = new ArrayList<>();

@@ -69,7 +69,7 @@ public class OnSettleConverter {
             }
             //当前质押是上轮结算周期验证人,发放质押奖励
             if(preVerifierList.contains(staking.getNodeId())){
-                staking.setStakingRewardValue(settle.getStakingReward());
+                staking.setStakingRewardValue(staking.getStakingRewardValue().add(settle.getStakingReward()));
             }else {
                 staking.setStakingRewardValue(BigDecimal.ZERO);
             }

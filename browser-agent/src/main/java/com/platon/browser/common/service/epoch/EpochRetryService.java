@@ -88,10 +88,6 @@ public class EpochRetryService {
             inciteAmount4Stake = inciteBalance.multiply(chainConfig.getStakeRewardRate());
             // 当前增发周期内每个结算周期的质押奖励
             settleStakeReward = inciteAmount4Stake.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),10,RoundingMode.FLOOR);
-            // 触发共识周期变更
-            consensusChange(currentBlockNumber);
-            // 触发结算周期变更
-            settlementChange(currentBlockNumber);
         }catch (Exception e){
             log.error("",e);
             throw e;
