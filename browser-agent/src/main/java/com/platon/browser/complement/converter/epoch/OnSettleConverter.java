@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -36,6 +35,7 @@ public class OnSettleConverter {
 
 	public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
+	    if(block.getNum()==1) return;
 
         log.debug("Block Number:{}",block.getNum());
 

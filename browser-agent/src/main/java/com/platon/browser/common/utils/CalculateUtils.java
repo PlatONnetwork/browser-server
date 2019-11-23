@@ -4,6 +4,7 @@ import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
+import lombok.extern.slf4j.Slf4j;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Map;
 
+@Slf4j
 public class CalculateUtils {
 
 	private CalculateUtils(){}
@@ -114,7 +116,6 @@ public class CalculateUtils {
 				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.LAT):BigDecimal.ZERO);
 	}
 
-
 	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, BigInteger issueEpoch,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance){
 		//当前块高所属结算周期
     	int curIssueEpoch=issueEpoch.intValue();
@@ -131,13 +132,13 @@ public class CalculateUtils {
 				.subtract(inciteBalance);
 	}
 
-
 	/**
 	 * 轮换记录利润
 	 * @param staking
 	 */
 	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig chainConfig)  {
 		// 添加上一周期的收益
+		log.debug("结算周期:{}\n节点ID:{}\n质押奖励:{}\n区块奖励:{}\n交易手续费:{}",curSettingEpoch,staking.getNodeId(),staking.getStakingRewardValue(),staking.getBlockRewardValue(),staking.getFeeRewardValue());
 		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
 		if(curSettingEpoch.longValue()==0) profit=BigDecimal.ZERO;
 		ari.getProfit().add(new PeriodValueElement(curSettingEpoch.longValue(),profit));

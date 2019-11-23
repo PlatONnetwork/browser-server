@@ -57,15 +57,16 @@ logging:
     com.platon.browser.collection: error
     com.platon.browser.collection.queue.handler: error
     com.platon.browser.common: error
+    com.platon.browser.common.utils: debug
     com.platon.browser.complement: error
     com.platon.browser.complement.handler: error
     com.platon.browser.complement.converter: error
-    com.platon.browser.complement.converter.epoch: debug
-    com.platon.browser.complement.dao.mapper: debug
+    com.platon.browser.complement.converter.epoch: error
+    com.platon.browser.complement.dao.mapper: error
     com.platon.browser.persistence: error
     com.platon.browser.persistence.handler: error
     com.platon.browser.persistence.queue.handler: error
-    com.platon.browser.task: info
+    com.platon.browser.task: error
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数

@@ -26,7 +26,6 @@ public class OnNewBlockConverter {
     @Autowired
     private NetworkStatCache networkStatCache;
 
-    private long blockCount=0;
 	public void convert(CollectionEvent event, Block block) throws NoSuchBeanException {
 
         long startTime = System.currentTimeMillis();
@@ -41,11 +40,6 @@ public class OnNewBlockConverter {
                 .build();
         
 		newBlockMapper.newBlock(newBlock);
-
-        if(block.getNodeId().equals("0xff40ac420279ddbe58e1bf1cfe19f4b5978f86e7c483223be26e80ac9790e855cb5d7bd743d94b9bd72be79f01ee068bc1fefe79c06ba9cd49fa96f52c7bdce0")) {
-            ++blockCount;
-            log.error("block count:{}",blockCount);
-        }
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}
