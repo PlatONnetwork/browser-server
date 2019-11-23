@@ -15,11 +15,11 @@ import java.util.*;
 public class SerializerUtils {
     private SerializerUtils(){}
 
-    private final static JedisSerializer<Object> redisSerializer = new JdkSerializer<>();
+    private static final JedisSerializer<Object> REDIS_SERIALIZER = new JdkSerializer<>();
 
 
 	public static JedisSerializer<Object> getRedisSerializer() {
-        return redisSerializer;
+        return REDIS_SERIALIZER;
     }
 
     //key 值 序列化
@@ -27,7 +27,7 @@ public class SerializerUtils {
         if (key instanceof byte[]) {
             return (byte[]) key;
         }
-        return redisSerializer.serialize(key);
+        return REDIS_SERIALIZER.serialize(key);
     }
 
     //value值序列化
@@ -35,7 +35,7 @@ public class SerializerUtils {
         if (value instanceof byte[]) {
             return (byte[]) value;
         }
-        return redisSerializer.serialize(value);
+        return REDIS_SERIALIZER.serialize(value);
     }
 
     //序列化集合
@@ -52,9 +52,9 @@ public class SerializerUtils {
     //序列化集合
     @SuppressWarnings({"unchecked"})
     public static <T extends Collection<?>> T deserializeValues(Collection<byte[]> rawValues, Class<T> type,
-                                                                JedisSerializer<?> redisSerializer) {
+                                                                JedisSerializer<?> REDIS_SERIALIZER) {
 
-        if (redisSerializer == null) {
+        if (REDIS_SERIALIZER == null) {
             return (T) rawValues;
         }
         // connection in pipeline/multi mode
@@ -65,38 +65,38 @@ public class SerializerUtils {
         Collection<Object> values = (List.class.isAssignableFrom(type) ? new ArrayList<Object>(rawValues.size())
                 : new LinkedHashSet<Object>(rawValues.size()));
         for (byte[] bs : rawValues) {
-            values.add(redisSerializer.deserialize(bs));
+            values.add(REDIS_SERIALIZER.deserialize(bs));
         }
 
         return (T) values;
     }
 
-    public static <HK> byte[] rawHashKey(HK hashKey) {
+    public static <K> byte[] rawHashKey(K hashKey) {
         if (hashKey instanceof byte[]) {
             return (byte[]) hashKey;
         }
-        return redisSerializer.serialize(hashKey);
+        return REDIS_SERIALIZER.serialize(hashKey);
     }
 
-    public static <HV> byte[] rawHashValue(HV value) {
+    public static <V> byte[] rawHashValue(V value) {
         if (value instanceof byte[]) {
             return (byte[]) value;
         }
-        return redisSerializer.serialize(value);
+        return REDIS_SERIALIZER.serialize(value);
     }
 
     @SuppressWarnings("unchecked")
-	public static <HK> byte[][] rawHashKeys(HK... hashKeys) {
+	public static <K> byte[][] rawHashKeys(K... hashKeys) {
         final byte[][] rawHashKeys = new byte[hashKeys.length][];
         int i = 0;
-        for (HK hashKey : hashKeys) {
+        for (K hashKey : hashKeys) {
             rawHashKeys[i++] = rawHashKey(hashKey);
         }
         return rawHashKeys;
     }
 
     public static Object deserializeStr(byte[] byt) {
-        return redisSerializer.deserialize(byt);
+        return REDIS_SERIALIZER.deserialize(byt);
     }
 
     /**
@@ -107,7 +107,7 @@ public class SerializerUtils {
      */
     public static Map<String, Object> deserializerMapObj(Map<byte[], byte[]> byteMap) {
         try {
-            Map<String, Object> result = new HashMap<String, Object>();
+            Map<String, Object> result = new HashMap<>();
             for (Map.Entry<?, ?> tmpMap : byteMap.entrySet()) {
                 byte[] byteKey = (byte[]) tmpMap.getKey();
                 byte[] byteValue = (byte[]) tmpMap.getValue();

@@ -16,7 +16,7 @@ public interface JedisSerializer<T> {
 	 * @param t object to serialize
 	 * @return the equivalent binary data
 	 */
-	byte[] serialize(T t) throws RuntimeException;
+	byte[] serialize(T t);
 
 	/**
 	 * Deserialize an object from the given binary data.
@@ -24,5 +24,5 @@ public interface JedisSerializer<T> {
 	 * @param bytes object binary representation
 	 * @return the equivalent object instance
 	 */
-	T deserialize(byte[] bytes) throws RuntimeException;
+	T deserialize(byte[] bytes);
 }

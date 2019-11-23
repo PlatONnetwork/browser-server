@@ -39,7 +39,7 @@ public class JedisClusterManager implements RedisCommands {
 
 	private JedisClusterManager() {
 		try {
-			/**
+			/*
 			 * 加载默认key的jedismap
 			 */
 			jedisCluster = JedisHelper.getInstance().getJedisClusterByKey(defaultConfigKey);
@@ -50,74 +50,62 @@ public class JedisClusterManager implements RedisCommands {
 
 	@Override
 	public String set(final byte[] key,final byte[] value) {
-		String result = execute((JedisCallback<String>) jedisCluster -> jedisCluster.set(key,value));
-		return result;
+		return execute((JedisCallback<String>) cluster -> cluster.set(key,value));
 	}
 
 	@Override
 	public String set(final byte[] key, final byte[] value, final int expire) {
-		String result = execute((JedisCallback<String>) jedisCluster -> jedisCluster.setex(key, expire, value));
-		return result;
+		return execute((JedisCallback<String>) cluster -> cluster.setex(key, expire, value));
 	}
 
 	@Override
 	public byte[] get(final byte[] key) {
-		byte[] value = execute((JedisCallback<byte[]>) jedisCluster -> jedisCluster.get(key));
-		return value;
+		return execute((JedisCallback<byte[]>) cluster -> cluster.get(key));
 	}
 
 	@Override
 	public Long hset(final byte[] key, final byte[] field, final byte[] value){
-		Long result = execute((JedisCallback<Long>) jedisCluster -> jedisCluster.hset(key, field, value));
-		return result;
+		return execute((JedisCallback<Long>) cluster -> cluster.hset(key, field, value));
 	}
 
 	@Override
 	public String hmset(final byte[] key, final Map<byte[], byte[]> hash) {
-		String result = execute((JedisCallback<String>) jedisCluster -> jedisCluster.hmset(key, hash));
-		return result;
+		return execute((JedisCallback<String>) cluster -> cluster.hmset(key, hash));
 	}
 
 	@Override
 	public byte[] hget(final byte[] key, final byte[] field) {
-		byte[] result = execute(jedisCluster -> jedisCluster.hget(key, field));
-		return result;
+		return execute(cluster -> cluster.hget(key, field));
 	}
 
 	@Override
 	public List<byte[]> hmget(final byte[] key, final byte[]... fields) {
-		List<byte[]> result = execute((JedisCallback<List<byte[]>>) jedisCluster -> jedisCluster.hmget(key, fields));
-		return result;
+		return execute((JedisCallback<List<byte[]>>) cluster -> cluster.hmget(key, fields));
 	}
 
 	@Override
 	public Long hdel(final byte[] key, final byte[]... field) {
-		Long result = execute((JedisCallback<Long>) jedisCluster -> jedisCluster.hdel(key, field));
-		return result;
+		return execute((JedisCallback<Long>) cluster -> cluster.hdel(key, field));
 	}
 
 	@Override
 	public Map<byte[], byte[]> hlistAll(final byte[] key) {
-		Map<byte[], byte[]> result = execute((JedisCallback<Map<byte[], byte[]>>) jedisCluster -> jedisCluster.hgetAll(key));
-		return result;
+		return execute((JedisCallback<Map<byte[], byte[]>>) cluster -> cluster.hgetAll(key));
 	}
 
 	@Override
 	public long rpush(byte[] key, byte[]... strings) {
-		Long result = execute((JedisCallback<Long>) jedisCluster -> jedisCluster.rpush(key, strings));
-		return result;
+		return execute((JedisCallback<Long>) cluster -> cluster.rpush(key, strings));
 	}
 
 	@Override
 	public long lpush(byte[] key, byte[]... strings) {
-		Long result = execute((JedisCallback<Long>) jedisCluster -> jedisCluster.lpush(key, strings));
-		return result;
+		return execute((JedisCallback<Long>) cluster -> cluster.lpush(key, strings));
 	}
 
 	@Override
 	public byte[] lpop(byte[] key) {
-		byte[] result = execute((JedisCallback<byte[]>) jedisCluster -> jedisCluster.lpop(key));
-		return result;
+		return execute((JedisCallback<byte[]>) cluster -> cluster.lpop(key));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -126,27 +114,23 @@ public class JedisClusterManager implements RedisCommands {
 			return (T) callback.doInRedis(jedisCluster);
 		} catch (Exception e) {
 			log.error("Redis Execute执行回调失败!!", e);
-		} finally {
-			// jedisCluster.close();
 		}
 		return null;
 	}
 
 	@Override
 	public String set(String key, String value) {
-		String result = execute((JedisCallback<String>) jedisCluster -> jedisCluster.set(key, value));
-		return result;
+		return execute((JedisCallback<String>) cluster -> cluster.set(key, value));
 	}
 
 	@Override
 	public String set(String key, String value, int expire) {
-		String result = execute((JedisCallback<String>) jedisCluster -> jedisCluster.setex(key, expire, value));
-		return result;
+		return execute((JedisCallback<String>) cluster -> cluster.setex(key, expire, value));
 	}
 
 	@Override
 	public String get(String key) {
-		String result = execute((JedisCallback<String>) jedisCluster -> jedisCluster.get(key));
+		String result = execute((JedisCallback<String>) cluster -> cluster.get(key));
 		if(StringUtils.isBlank(result)) {
 			result = "";
 		}
@@ -155,40 +139,37 @@ public class JedisClusterManager implements RedisCommands {
 
 	@Override
 	public String del(String key) {
-		String result = execute((JedisCallback<String>) jedisCluster -> {
-			if(jedisCluster.del(key).intValue() == 0){
+		return execute((JedisCallback<String>) cluster -> {
+			if(cluster.del(key).intValue() == 0){
 				return "fail";
 			}
 			return "OK";
 		});
-		return result;
 	}
 
 	@Override
 	public String setNX(String key, String value) {
-		String result = execute((JedisCallback<String>) jedisCluster -> {
-			if(jedisCluster.setnx(key, value).intValue() == 0){
+		return execute((JedisCallback<String>) cluster -> {
+			if(cluster.setnx(key, value).intValue() == 0){
 				return "fail";
 			}
 			return "OK";
 		});
-		return result;
 	}
 
 	@Override
 	public String expire(String key, int expire) {
-		String result = execute((JedisCallback<String>) jedisCluster -> {
-			if(jedisCluster.expire(key, expire).intValue() == 0){
+		return execute((JedisCallback<String>) cluster -> {
+			if(cluster.expire(key, expire).intValue() == 0){
 				return "fail";
 			}
 			return "OK";
 		});
-		return result;
 	}
 
 	@Override
 	public Set<String> zrange(String key, Long start, Long end) {
-		Set<String> result = execute((JedisCallback<Set<String>>) jedisCluster -> jedisCluster.zrange(key, start, end));
+		Set<String> result = execute((JedisCallback<Set<String>>) cluster -> cluster.zrange(key, start, end));
 		if(result == null) {
 			result = new TreeSet<>(); 
 		}
@@ -197,16 +178,16 @@ public class JedisClusterManager implements RedisCommands {
 
 	@Override
 	public long zsize(String key) {
-		Long result = execute((JedisCallback<Long>) jedisCluster -> jedisCluster.zcard(key));
+		Long result = execute((JedisCallback<Long>) cluster -> cluster.zcard(key));
 		if (result == null) {
-			result = 0l;
+			result = 0L;
 		}
 		return result;
 	}
 
 	@Override
 	public Set<String> zrevrange(String key, Long start, Long end) {
-		Set<String> result = execute((JedisCallback<Set<String>>) jedisCluster -> jedisCluster.zrevrange(key, start, end));
+		Set<String> result = execute((JedisCallback<Set<String>>) cluster -> cluster.zrevrange(key, start, end));
 		if(result == null) {
 			result = new TreeSet<>(); 
 		}

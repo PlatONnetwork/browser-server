@@ -1,21 +1,19 @@
 package com.platon.browser.redis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.platon.browser.config.RedisConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.platon.browser.config.RedisConfig;
-
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.ShardedJedis;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * jedis对象创建辅助类
@@ -39,9 +37,8 @@ public class JedisHelper {
 	 * @method getJedisClusterByKey
 	 * @param configKey
 	 * @return
-	 * @throws Exception
 	 */
-	public JedisCluster getJedisClusterByKey(String configKey) throws Exception {
+	public JedisCluster getJedisClusterByKey(String configKey) {
 		JedisCluster jedisCluster = null;
 		JedisConfig jedisConfig = new JedisConfig();
 		jedisConfig.setConnectionTimeout(Integer
@@ -50,7 +47,7 @@ public class JedisHelper {
 				.parseInt(RedisConfig.getRedisClusterSoTimeout()));
 		jedisConfig.setMaxRedirections(Integer
 				.parseInt(RedisConfig.getRedisClusterMaxRedirections()));
-		GenericObjectPoolConfig<Jedis> poolConfig = new GenericObjectPoolConfig<Jedis>();
+		GenericObjectPoolConfig<Jedis> poolConfig = new GenericObjectPoolConfig<>();
 		poolConfig.setMaxTotal(Integer
 				.parseInt(RedisConfig.getRedisClusterMaxTotal()));
 		poolConfig
@@ -58,12 +55,12 @@ public class JedisHelper {
 		poolConfig
 				.setMinIdle(Integer.parseInt(RedisConfig.getRedisClusterMinIdle()));
 		poolConfig.setTestOnBorrow(Boolean
-				.valueOf(RedisConfig.getRedisClusterTestOnBorrow()));
+				.parseBoolean(RedisConfig.getRedisClusterTestOnBorrow()));
 		poolConfig.setTestOnReturn(Boolean
-				.valueOf(RedisConfig.getRedisClusterTestOnReturn()));
+				.parseBoolean(RedisConfig.getRedisClusterTestOnReturn()));
 		poolConfig.setTestWhileIdle(Boolean
-				.valueOf(RedisConfig.getRedisClusterTestWhileIdle()));
-		Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
+				.parseBoolean(RedisConfig.getRedisClusterTestWhileIdle()));
+		Set<HostAndPort> jedisClusterNodes = new HashSet<>();
 		String[] ips = RedisConfig.getRedisClusterMasterIPs().split(",");
 		for(String ip: ips){
 			String[] arr = ip.split(":");
@@ -81,10 +78,9 @@ public class JedisHelper {
 		return jedisCluster;
 	}
 
-	public JedisCluster getJedisCluster(JedisConfig jedisConfig)
-			throws Exception {
+	public JedisCluster getJedisCluster(JedisConfig jedisConfig){
 
-		JedisCluster jedisCluster = null;
+		JedisCluster jedisCluster;
 		if (jedisConfig.getJedisClusterNodes().isEmpty()) {
 			logger.error("Redis [masterIPs] 参数未配置！");
 			return null;
@@ -107,10 +103,7 @@ public class JedisHelper {
 		if (null == host || "".equals(host.trim())) {
 			return false;
 		}
-		if (null == (port + "") || port == 0) {
-			return false;
-		}
-		return true;
+		return port != 0;
 	}
 
 	/**
@@ -129,7 +122,7 @@ public class JedisHelper {
 		}
 	}
 
-	public void recovery(ShardedJedis shardedJedis, String key, boolean recovery) {
+	public void recovery(ShardedJedis shardedJedis, boolean recovery) {
 		try {
 			if (shardedJedis != null && !recovery) {
 				shardedJedis.disconnect();
@@ -137,7 +130,6 @@ public class JedisHelper {
 			if (recovery && shardedJedis != null) {
 				shardedJedis.close();
 			}
-			;
 		} catch (Exception e) {
 			logger.error("Redis ShardedJedis返回资源池完成!!!", e);
 		}

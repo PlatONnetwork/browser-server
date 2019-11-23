@@ -1,5 +1,6 @@
 package com.platon.browser.redis;
 
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
@@ -41,25 +42,25 @@ public class JdkSerializer<T> implements JedisSerializer<T> {
 		
 	}
 	
-	public byte[] serialize(T t) throws RuntimeException {
+	public byte[] serialize(T t) {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream(256);
 		try  {
 			serialize(t, byteStream);
 			return byteStream.toByteArray();
-		}catch (Throwable ex) {
+		}catch (IOException ex) {
 			log.error("",ex);
-			throw new RuntimeException("序列化失败");
+			throw new BusinessException("序列化失败");
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public T deserialize(byte[] bytes) throws RuntimeException {
+	public T deserialize(byte[] bytes) {
 		ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
 		try {
 			return (T) deserialize(byteStream);
 		}
-		catch (Throwable ex) {
-			throw new RuntimeException("反序列化失败");
+		catch (IOException ex) {
+			throw new BusinessException("反序列化失败");
 		}
 	}
 	

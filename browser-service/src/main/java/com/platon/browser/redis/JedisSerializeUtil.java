@@ -17,18 +17,18 @@ public class JedisSerializeUtil {
 
 	// 序列化
 	public static byte[] serialize(Object object) {
+		byte[] bytes ={};
 		ObjectOutputStream objectOutputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
 		try {
 			byteArrayOutputStream = new ByteArrayOutputStream();
 			objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
 			objectOutputStream.writeObject(object);
-			byte[] bytes = byteArrayOutputStream.toByteArray();
-			return bytes;
+			return byteArrayOutputStream.toByteArray();
 		} catch (Exception e) {
 			log.error("",e);
 		}
-		return null;
+		return bytes;
 	}
 
 	// 反序列化
@@ -46,6 +46,6 @@ public class JedisSerializeUtil {
 
 	public static void main(String[] args) {
 		Object str = "tobytes";
-		System.out.print(JedisSerializeUtil.deSeialize(JedisSerializeUtil.serialize(str)));
+		log.info("{}",JedisSerializeUtil.deSeialize(JedisSerializeUtil.serialize(str)));
 	}
 }

@@ -9,5 +9,5 @@ import redis.clients.jedis.JedisCluster;
  */
 public interface JedisCallback<T> {
 
-	T doInRedis(JedisCluster jedisCluster) throws Exception;
+	T doInRedis(JedisCluster jedisCluster);
 }
