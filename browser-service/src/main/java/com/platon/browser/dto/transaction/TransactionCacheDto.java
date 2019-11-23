@@ -38,7 +38,7 @@ public class TransactionCacheDto {
 		this.transactionList = transactionList;
 	}
 
-	public RespPage<?> getPage() {
+	public RespPage getPage() {
 		return page;
 	}
 

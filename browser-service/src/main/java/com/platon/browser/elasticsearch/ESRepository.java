@@ -53,6 +53,8 @@ public abstract class ESRepository {
 	private RestHighLevelClient client;
 
 	public abstract String getIndexName();
+	
+	private final static String CONSUME_TIME_TIPS="处理耗时:{} ms";
 
 	/**
 	 * 创建索引
@@ -68,7 +70,7 @@ public abstract class ESRepository {
 		}
 		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 		log.debug("createIndex:{}", JSON.toJSONString(response, true));
 	}
 
@@ -83,7 +85,7 @@ public abstract class ESRepository {
 		DeleteIndexRequest request = new DeleteIndexRequest(getIndexName());
 		AcknowledgedResponse response = client.indices().delete(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("deleteIndex:{}", JSON.toJSONString(response, true));
 	}
@@ -100,7 +102,7 @@ public abstract class ESRepository {
 		GetIndexRequest request = new GetIndexRequest(getIndexName());
 		boolean response = client.indices().exists(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("existsIndex:{}", response);
 		return response;
@@ -118,7 +120,7 @@ public abstract class ESRepository {
 		request.id(id).source(JSON.toJSONString(doc), XContentType.JSON);
 		IndexResponse response = client.index(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("add:{}", JSON.toJSONString(response, true));
 	}
@@ -136,7 +138,7 @@ public abstract class ESRepository {
 		request.fetchSourceContext(new FetchSourceContext(false)).storedFields("_none_");
 		boolean response = client.exists(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("add:{}", JSON.toJSONString(response, true));
 		return response;
@@ -156,7 +158,7 @@ public abstract class ESRepository {
 		log.debug("get:{}", JSON.toJSONString(response, true));
 		String res = response.getSourceAsString();
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		return JSON.parseObject(res, clazz);
 	}
@@ -173,7 +175,7 @@ public abstract class ESRepository {
 		request.doc(JSON.toJSONString(block), XContentType.JSON);
 		UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("update:{}", JSON.toJSONString(response, true));
 	}
@@ -190,7 +192,7 @@ public abstract class ESRepository {
 		DeleteRequest request = new DeleteRequest(getIndexName(), id);
 		DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("delete:{}", JSON.toJSONString(response, true));
 	}
@@ -219,7 +221,6 @@ public abstract class ESRepository {
 		}
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-//		log.debug("search:{}", JSON.toJSONString(response, true));
 		ESResult<T> esResult = new ESResult<>();
 		SearchHits hits = response.getHits();
 		esResult.setTotal(hits.getTotalHits().value);
@@ -227,7 +228,7 @@ public abstract class ESRepository {
 		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
 		esResult.setRsData(list);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		return esResult;
 	}
@@ -260,7 +261,6 @@ public abstract class ESRepository {
         }
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-//		log.debug("search:{}", JSON.toJSONString(response, true));
 		ESResult<T> esResult = new ESResult<>();
 		SearchHits hits = response.getHits();
 		esResult.setTotal(hits.getTotalHits().value);
@@ -268,7 +268,7 @@ public abstract class ESRepository {
 		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
 		esResult.setRsData(list);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		return esResult;
 	}
@@ -290,7 +290,7 @@ public abstract class ESRepository {
 		}
 		BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
 	}
@@ -310,7 +310,7 @@ public abstract class ESRepository {
 		}
 		BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
 		log.debug("bulkDelete:{}", JSON.toJSONString(response, true));
 	}
