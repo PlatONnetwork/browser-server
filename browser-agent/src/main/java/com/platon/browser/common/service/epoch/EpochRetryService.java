@@ -66,21 +66,21 @@ public class EpochRetryService {
     /**
      * 增发周期变更:
      * 必然伴随着结算周期和共识周期的变更
-     * @param nextEpochFirstBlockNumber 下一周期第一个区块号
+     * @param currentBlockNumber 增发周期内的任意块
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void issueChange(BigInteger nextEpochFirstBlockNumber) throws Exception {
-        log.debug("增发周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),nextEpochFirstBlockNumber);
+    public void issueChange(BigInteger currentBlockNumber) throws Exception {
+        log.debug("增发周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
         try {
             // >>>>如果增发周期变更,则更新相应的奖励字段
             // >>>>当前增发周期的初始激励池余额需要在上一增发周期最后一个块时候确定
             // 上一增发周期最后一个块号
-            BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(nextEpochFirstBlockNumber,chainConfig.getAddIssuePeriodBlockCount());
+            BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getAddIssuePeriodBlockCount());
             // 当前增发周期开始时的激励池余额
             inciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
             // 激励池余额分给区块奖励部分
             inciteAmount4Block = inciteBalance.multiply(chainConfig.getBlockRewardRate());
-            // 前一结算周期质押奖励轮换
+            // 前一增发周期区块奖励轮换
             preBlockReward=blockReward;
             // 当前增发周期内每个区块的奖励
             blockReward = inciteAmount4Block.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()),10,RoundingMode.FLOOR);
@@ -89,9 +89,9 @@ public class EpochRetryService {
             // 当前增发周期内每个结算周期的质押奖励
             settleStakeReward = inciteAmount4Stake.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),10,RoundingMode.FLOOR);
             // 触发共识周期变更
-            consensusChange(nextEpochFirstBlockNumber);
+            consensusChange(currentBlockNumber);
             // 触发结算周期变更
-            settlementChange(nextEpochFirstBlockNumber);
+            settlementChange(currentBlockNumber);
             // 前一结算周期质押奖励轮换
             preStakeReward=stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
@@ -104,7 +104,7 @@ public class EpochRetryService {
 
     /**
      * 共识周期变更
-     * @param currentBlockNumber 当前区块号
+     * @param currentBlockNumber 共识周期内的任意块
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void consensusChange(BigInteger currentBlockNumber) throws Exception {
@@ -152,7 +152,7 @@ public class EpochRetryService {
 
     /**
      * 结算周期变更
-     * @param currentBlockNumber 当前区块号
+     * @param currentBlockNumber 结算周期内的任意块
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void settlementChange(BigInteger currentBlockNumber) throws Exception {

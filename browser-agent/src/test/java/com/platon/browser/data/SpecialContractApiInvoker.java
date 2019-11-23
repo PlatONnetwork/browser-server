@@ -2,7 +2,9 @@ package com.platon.browser.data;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.NodeVersion;
+import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.client.Web3jWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.platon.BaseResponse;
@@ -12,6 +14,8 @@ import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 
@@ -27,9 +31,10 @@ import java.util.List;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
     //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797")); // atonDev
-//    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.90:6789")); // atonTest
-    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.172:8788",false);
-    private static Web3j web3j; // test
+    private static Web3jService service = new HttpService("http://192.168.120.151:6789");
+    private static Web3j web3j = Web3j.build(service); // atonTest
+//    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.172:8788",false);
+    /*private static Web3j web3j; // test
     static {
         try {
             socketService.connect();
@@ -37,7 +42,7 @@ public class SpecialContractApiInvoker {
         } catch (ConnectException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
@@ -49,6 +54,18 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]) throws Exception {
 
+       /* Web3jWrapper web3jWrapper = Web3jWrapper.builder()
+                .web3j(web3j)
+                .web3jService(service)
+                .address("http://192.168.120.151:6789")
+                .build();
+        ReceiptResult receiptResult = sca.getReceiptResult(web3jWrapper,BigInteger.valueOf(85087));
+        receiptResult.resolve();
+        TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x8e464b64554e572ba7c53a6fca539c93f615c98d86c079706d1fee3efb685173").send().getTransactionReceipt().get();
+
+        boolean ok = tr.isStatusOK();
+        logger.error("{}",tr.isStatusOK());
+*/
 //        List<NodeVersion> versions = sca.getNodeVersionList(web3j);
 //
 //        logger.error("");

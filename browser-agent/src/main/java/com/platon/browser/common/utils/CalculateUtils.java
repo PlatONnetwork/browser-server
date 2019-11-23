@@ -49,10 +49,10 @@ public class CalculateUtils {
 	/**
 	 * 年化率计算
 	 * @param ari 年化率信息
-	 * @param settlePeriodCountPerIssue 一个增发周期包含结算周期的个数
+	 * @param chainConfig 链配置
 	 * @return
 	 */
-    public static BigDecimal calculateAnnualizedRate(AnnualizedRateInfo ari, BigInteger settlePeriodCountPerIssue){
+    public static BigDecimal calculateAnnualizedRate(AnnualizedRateInfo ari, BlockChainConfig chainConfig){
         // 年化率推算信息
         BigDecimal profitSum=BigDecimal.ZERO;
         BigDecimal costSum=BigDecimal.ZERO;
@@ -72,8 +72,18 @@ public class CalculateUtils {
         // 按周期从小到大排序
         ari.getCost().sort((c1,c2)-> Integer.compare(c1.getPeriod().compareTo(c2.getPeriod()), 0));
         int count = 0;
+        int statRound=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().intValue();
         for (PeriodValueElement pve:ari.getCost()){
-            if(count==ari.getProfit().size()) break;
+        	// 成本的累计终止条件：
+			if(
+				// 1：如果收益记录大于指定的年化率计算轮数，且累计次数等于指定的年化率计算轮数，则终止累计
+				(ari.getProfit().size()>statRound&&count==statRound)
+					||
+				// 2：如果收益记录小于指定的年化率计算轮数，且累计次数等于利润记录大小，则终止累计
+				(ari.getProfit().size()<=statRound&&count==ari.getProfit().size())
+			){
+			 break;
+			}
 			costSum= costSum.add(pve.getValue());
             count++;
         }
@@ -83,7 +93,7 @@ public class CalculateUtils {
         }
         BigDecimal rate = profitSum
                 .divide(costSum,16,RoundingMode.FLOOR) // 除总成本
-                .multiply(new BigDecimal(settlePeriodCountPerIssue)) // 乘每个增发周期的结算周期数
+                .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
                 .multiply(BigDecimal.valueOf(100));
         return rate.setScale(2,RoundingMode.FLOOR);
     }
@@ -139,12 +149,14 @@ public class CalculateUtils {
 	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig chainConfig)  {
 		// 添加上一周期的收益
 		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
+		if(curSettingEpoch.longValue()==0) profit=BigDecimal.ZERO;
 		ari.getProfit().add(new PeriodValueElement(curSettingEpoch.longValue(),profit));
-		if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
+		// +1: 保留指定周期数中最旧周期的前一周期收益，用作收益计算参考点
+		if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
 			// 按结算周期由大到小排序
 			ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-			// 删除多余的元素
-			for (int i=ari.getProfit().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
+			// 删除多余的元素, +1:保留指定周期数中最旧周期的前一周期收益，用作收益计算参考点
+			for (int i=ari.getProfit().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getProfit().remove(i);
 		}
 	}
 
@@ -158,6 +170,7 @@ public class CalculateUtils {
 	public static void rotateCost(Staking staking,BigInteger curSettingEpoch,AnnualizedRateInfo ari,BlockChainConfig chainConfig) {
 		// 添加下一周期的质押成本
 		BigDecimal cost = staking.getStakingLocked().add(staking.getStakingHes());
+		if(curSettingEpoch.longValue()==0) cost=BigDecimal.ZERO;
 		ari.getCost().add(new PeriodValueElement(curSettingEpoch.longValue(),cost));
 		// 保留指定数量最新的记录
 		if(ari.getCost().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){

@@ -17,6 +17,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.bean.Node;
 import org.web3j.utils.Convert;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -89,6 +91,9 @@ public class InitializationService {
         nodeCache.init(nodeList);
         // 初始化网络缓存
         networkStatCache.init(networkStat);
+
+        // 确保epochRetryService中的preBlockReward和preStakeReward不为0
+        epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
         return initialResult;
     }
 
@@ -129,7 +134,7 @@ public class InitializationService {
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
             PeriodValueElement pve = PeriodValueElement.builder()
                     .period(0L)
-                    .value(staking.getStakingLocked())
+                    .value(BigDecimal.ZERO)
                     .build();
             AnnualizedRateInfo ari = AnnualizedRateInfo.builder()
                     .cost(Collections.singletonList(pve))
