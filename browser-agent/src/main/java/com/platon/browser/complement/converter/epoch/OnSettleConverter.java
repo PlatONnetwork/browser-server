@@ -2,6 +2,7 @@ package com.platon.browser.complement.converter.epoch;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
+import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -94,7 +96,16 @@ public class OnSettleConverter {
             }
             // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
             if(preVerifierList.contains(staking.getNodeId())){
-                if(ari.getProfit()==null) ari.setProfit(new ArrayList<>());
+                if(ari.getProfit()==null||ari.getProfit().isEmpty()) {
+                    // 设置0收益作为计算基础
+                    PeriodValueElement pv = PeriodValueElement.builder()
+                            .period(settle.getSettingEpoch()-2L)
+                            .value(BigDecimal.ZERO)
+                            .build();
+                    List<PeriodValueElement> profits = new ArrayList<>();
+                    profits.add(pv);
+                    ari.setProfit(profits);
+                }
                 if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
                 // 对超出数量的收益轮换
                 CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()-1L),ari,chainConfig);

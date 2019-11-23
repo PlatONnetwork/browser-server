@@ -58,35 +58,25 @@ public class CalculateUtils {
         BigDecimal costSum=BigDecimal.ZERO;
         
         // 利润=最新的收益累计-最旧的收益收益累计
+		long profitMaxPeriod=0;
         if(!ari.getProfit().isEmpty()) {
             PeriodValueElement latest=ari.getProfit().get(0);
             PeriodValueElement oldest=latest;
             for (PeriodValueElement pve:ari.getProfit()){
                 if(latest==null||latest.getPeriod().compareTo(pve.getPeriod())<0) latest=pve;
                 if(oldest==null||latest.getPeriod().compareTo(pve.getPeriod())>0) oldest=pve;
+                if(pve.getPeriod()>profitMaxPeriod) profitMaxPeriod=pve.getPeriod();
             }
             if (latest==oldest) profitSum=latest.getValue();
             if (latest!=oldest) profitSum=latest.getValue().subtract(oldest.getValue());
         }
 
-        // 按周期从小到大排序
-        ari.getCost().sort((c1,c2)-> Integer.compare(c1.getPeriod().compareTo(c2.getPeriod()), 0));
-        int count = 0;
-        int statRound=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().intValue();
-        for (PeriodValueElement pve:ari.getCost()){
-        	// 成本的累计终止条件：
-			if(
-				// 1：如果收益记录大于指定的年化率计算轮数，且累计次数等于指定的年化率计算轮数，则终止累计
-				(ari.getProfit().size()>statRound&&count==statRound)
-					||
-				// 2：如果收益记录小于指定的年化率计算轮数，且累计次数等于利润记录大小，则终止累计
-				(ari.getProfit().size()<=statRound&&count==ari.getProfit().size())
-			){
-			 break;
+		for (PeriodValueElement cost : ari.getCost()) {
+			// 凡是小于或等于收益记录中最大周期的成本都累加起来
+			if (cost.getPeriod() <= profitMaxPeriod) {
+				costSum= costSum.add(cost.getValue());
 			}
-			costSum= costSum.add(pve.getValue());
-            count++;
-        }
+		}
         
         if(costSum.compareTo(BigDecimal.ZERO)==0) {
             return BigDecimal.ZERO;

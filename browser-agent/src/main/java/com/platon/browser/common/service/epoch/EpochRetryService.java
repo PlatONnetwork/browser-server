@@ -92,10 +92,6 @@ public class EpochRetryService {
             consensusChange(currentBlockNumber);
             // 触发结算周期变更
             settlementChange(currentBlockNumber);
-            // 前一结算周期质押奖励轮换
-            preStakeReward=stakeReward;
-            // 计算当前结算周期内每个验证人的质押奖励
-            stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()),10,RoundingMode.FLOOR);
         }catch (Exception e){
             log.error("",e);
             throw e;
@@ -188,6 +184,11 @@ public class EpochRetryService {
             curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
             curVerifiers.clear();
             curVerifiers.addAll(curNodes);
+
+            // 前一结算周期质押奖励轮换
+            preStakeReward=stakeReward;
+            // 计算当前结算周期内每个验证人的质押奖励
+            stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()),10,RoundingMode.FLOOR);
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
             log.error("",e);
