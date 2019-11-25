@@ -211,6 +211,7 @@ public class HomeServiceImpl implements HomeService {
 		if(networkStatRedis == null) return chainStatisticNewResp;
 		/** 查询redis统计信息并转换对应返回对象 */
 		BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
+		chainStatisticNewResp.setCurrentTps(networkStatRedis.getCurTps());
 		chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 		Long bNumber = networkStatRedis.getCurNumber();
 		/** 查询缓存最新的八条区块信息 */
