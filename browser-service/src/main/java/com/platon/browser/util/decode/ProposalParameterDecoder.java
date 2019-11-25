@@ -1,0 +1,42 @@
+package com.platon.browser.util.decode;
+
+import com.platon.browser.param.ProposalParameterParam;
+import com.platon.browser.param.TxParam;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.utils.Numeric;
+
+import static com.platon.browser.util.decode.Decoder.stringResolver;
+
+/**
+ * @description: 参数提案交易输入参数解码器
+ * @author: chendongming@juzix.net
+ * @create: 2019-11-25 10:13:04
+ **/
+class ProposalParameterDecoder {
+    private ProposalParameterDecoder(){}
+    static TxParam decode(RlpList rootList) {
+        // 提交升级提案
+        //提交提案的验证人
+        String nodeId = stringResolver((RlpString) rootList.getValues().get(1));
+        //pIDID
+        String pIdID = stringResolver((RlpString) rootList.getValues().get(2));
+        pIdID =  new String(Numeric.hexStringToByteArray(pIdID));
+        //参数模块
+        String module = stringResolver((RlpString) rootList.getValues().get(3));
+        module =  new String(Numeric.hexStringToByteArray(module));
+        //参数名称
+        String name = stringResolver((RlpString) rootList.getValues().get(4));
+        name =  new String(Numeric.hexStringToByteArray(name));
+        //参数值
+        String newValue = stringResolver((RlpString) rootList.getValues().get(5));
+        newValue =  new String(Numeric.hexStringToByteArray(newValue));
+        return ProposalParameterParam.builder()
+                .verifier(nodeId)
+                .pIDID(pIdID)
+                .module(module)
+                .name(name)
+                .newValue(newValue)
+                .build();
+    }
+}

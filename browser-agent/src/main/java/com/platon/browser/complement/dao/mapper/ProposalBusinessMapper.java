@@ -1,6 +1,7 @@
 package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.complement.dao.param.proposal.ProposalParameter;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
@@ -32,4 +33,10 @@ public interface ProposalBusinessMapper {
      */
     @Transactional
     void vote ( BusinessParam param );
+
+    /**
+     * 参数提案
+     */
+    @Transactional
+    void parameter(ProposalParameter businessParam);
 }

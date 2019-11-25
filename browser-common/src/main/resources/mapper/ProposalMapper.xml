@@ -26,6 +26,9 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="completion_flag" jdbcType="INTEGER" property="completionFlag" />
+    <result column="module" jdbcType="VARCHAR" property="module" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="new_value" jdbcType="VARCHAR" property="newValue" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -89,7 +92,7 @@
     hash, `type`, node_id, node_name, url, new_version, end_voting_block, active_block, 
     `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, pip_num, pip_id, 
     topic, description, canceled_pip_id, canceled_topic, block_number, create_time, update_time, 
-    completion_flag
+    completion_flag, `module`, `name`, new_value
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultMap="BaseResultMap">
     select
@@ -129,7 +132,8 @@
       accu_verifiers, `status`, pip_num, 
       pip_id, topic, description, 
       canceled_pip_id, canceled_topic, block_number, 
-      create_time, update_time, completion_flag
+      create_time, update_time, completion_flag, 
+      `module`, `name`, new_value
       )
     values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{nodeId,jdbcType=VARCHAR}, 
       #{nodeName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
@@ -138,7 +142,8 @@
       #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{pipNum,jdbcType=VARCHAR}, 
       #{pipId,jdbcType=VARCHAR}, #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
       #{canceledPipId,jdbcType=VARCHAR}, #{canceledTopic,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{completionFlag,jdbcType=INTEGER}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{completionFlag,jdbcType=INTEGER}, 
+      #{module,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{newValue,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
@@ -216,6 +221,15 @@
       <if test="completionFlag != null">
         completion_flag,
       </if>
+      <if test="module != null">
+        `module`,
+      </if>
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="newValue != null">
+        new_value,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
@@ -289,6 +303,15 @@
       </if>
       <if test="completionFlag != null">
         #{completionFlag,jdbcType=INTEGER},
+      </if>
+      <if test="module != null">
+        #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="newValue != null">
+        #{newValue,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -373,6 +396,15 @@
       <if test="record.completionFlag != null">
         completion_flag = #{record.completionFlag,jdbcType=INTEGER},
       </if>
+      <if test="record.module != null">
+        `module` = #{record.module,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null">
+        `name` = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.newValue != null">
+        new_value = #{record.newValue,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -403,7 +435,10 @@
       block_number = #{record.blockNumber,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      completion_flag = #{record.completionFlag,jdbcType=INTEGER}
+      completion_flag = #{record.completionFlag,jdbcType=INTEGER},
+      `module` = #{record.module,jdbcType=VARCHAR},
+      `name` = #{record.name,jdbcType=VARCHAR},
+      new_value = #{record.newValue,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -480,6 +515,15 @@
       <if test="completionFlag != null">
         completion_flag = #{completionFlag,jdbcType=INTEGER},
       </if>
+      <if test="module != null">
+        `module` = #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="newValue != null">
+        new_value = #{newValue,jdbcType=VARCHAR},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -507,7 +551,10 @@
       block_number = #{blockNumber,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      completion_flag = #{completionFlag,jdbcType=INTEGER}
+      completion_flag = #{completionFlag,jdbcType=INTEGER},
+      `module` = #{module,jdbcType=VARCHAR},
+      `name` = #{name,jdbcType=VARCHAR},
+      new_value = #{newValue,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -520,7 +567,7 @@
     (hash, `type`, node_id, node_name, url, new_version, end_voting_block, active_block, 
       `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, pip_num, pip_id, 
       topic, description, canceled_pip_id, canceled_topic, block_number, create_time, 
-      update_time, completion_flag)
+      update_time, completion_flag, `module`, `name`, new_value)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.nodeId,jdbcType=VARCHAR}, 
@@ -531,7 +578,8 @@
         #{item.pipId,jdbcType=VARCHAR}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
         #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR}, 
         #{item.blockNumber,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.completionFlag,jdbcType=INTEGER})
+        #{item.completionFlag,jdbcType=INTEGER}, #{item.module,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
+        #{item.newValue,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -621,8 +669,18 @@
         <if test="'completion_flag'.toString() == column.value">
           #{item.completionFlag,jdbcType=INTEGER}
         </if>
+        <if test="'module'.toString() == column.value">
+          #{item.module,jdbcType=VARCHAR}
+        </if>
+        <if test="'name'.toString() == column.value">
+          #{item.name,jdbcType=VARCHAR}
+        </if>
+        <if test="'new_value'.toString() == column.value">
+          #{item.newValue,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

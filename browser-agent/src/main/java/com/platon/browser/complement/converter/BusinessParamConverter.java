@@ -91,6 +91,11 @@ public abstract class BusinessParamConverter<T> {
                     nodeItem = nodeCache.getNode(pup.getVerifier());
                     pup.setNodeName(nodeItem.getNodeName());
                     break;
+                case PROPOSAL_PARAMETER: // 2002
+                    ProposalParameterParam ppp = (ProposalParameterParam)txParam;
+                    nodeItem = nodeCache.getNode(ppp.getVerifier());
+                    ppp.setNodeName(nodeItem.getNodeName());
+                    break;
                 case PROPOSAL_CANCEL: // 2005
                     ProposalCancelParam pcp = (ProposalCancelParam)txParam;
                     nodeItem = nodeCache.getNode(pcp.getVerifier());
