@@ -29,7 +29,6 @@ public class EpochMessage {
     private BigDecimal inciteBalance=BigDecimal.ZERO; // 当前增发周期开始时的激励池余额 IB
     private BigDecimal inciteAmount4Block=BigDecimal.ZERO; // 前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
     private BigDecimal blockReward=BigDecimal.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
-    private BigDecimal preBlockReward=BigDecimal.ZERO; // 前一增发周期每个区块奖励值 BR/增发周期区块总数
     private BigDecimal inciteAmount4Stake=BigDecimal.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
     private BigDecimal settleStakeReward=BigDecimal.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
     private BigDecimal stakeReward=BigDecimal.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
