@@ -24,7 +24,7 @@ public interface StakingService {
 	 * @method stakingStatisticNew
 	 * @return
 	 */
-	public StakingStatisticNewResp stakingStatisticNew();
+	 StakingStatisticNewResp stakingStatisticNew();
 	
 	/**
 	 * 实时验证人列表分页查询
@@ -32,7 +32,7 @@ public interface StakingService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req);
+	 RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req);
 	
 	/**
 	 * 历史验证人列表分页查询
@@ -40,7 +40,7 @@ public interface StakingService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<HistoryStakingListResp> historyStakingList(HistoryStakingListReq req);
+	 RespPage<HistoryStakingListResp> historyStakingList(HistoryStakingListReq req);
 
 	/**
 	 * 根绝信息查询单个质押人详情
@@ -56,7 +56,7 @@ public interface StakingService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req);
+	 RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req);
 
 	/**
 	 * 根据请求查询验证人委托信息
@@ -64,7 +64,7 @@ public interface StakingService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req);
+	 RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req);
 
 	/**
 	 * 根据地址查询委托信息
@@ -72,6 +72,6 @@ public interface StakingService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<DelegationListByAddressResp> delegationListByAddress( DelegationListByAddressReq req);
+	 RespPage<DelegationListByAddressResp> delegationListByAddress( DelegationListByAddressReq req);
 	
 }

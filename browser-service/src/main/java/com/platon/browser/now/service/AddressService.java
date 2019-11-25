@@ -18,7 +18,7 @@ public interface AddressService {
 	 * 根据钱包地址查询对应信息
 	 * @method getDetails
 	 */
-	public QueryDetailResp getDetails(QueryDetailRequest req);
+	 QueryDetailResp getDetails(QueryDetailRequest req);
 	
 	/**
 	 * 查询锁仓详情
@@ -26,5 +26,5 @@ public interface AddressService {
 	 * @param req
 	 * @return
 	 */
-	public QueryRPPlanDetailResp rpplanDetail(QueryRPPlanDetailRequest req);
+	 QueryRPPlanDetailResp rpplanDetail(QueryRPPlanDetailRequest req);
 }

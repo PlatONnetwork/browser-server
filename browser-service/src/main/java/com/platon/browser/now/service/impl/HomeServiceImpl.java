@@ -57,15 +57,17 @@ public class HomeServiceImpl implements HomeService {
 	@Autowired
 	private CommonService commonService;
 
+	private final static String BLOCK_ERR_TIPS="获取区块错误。";
+
 	/** 记录刷新值 */
 	private static Integer consensusNum = 0;
 
 	/** 记录最新块高 */
-	private static Long newBlockNum = 0l;
+	private static Long newBlockNum = 0L;
 
 	@Override
 	public QueryNavigationResp queryNavigation(QueryNavigationRequest req) {
-		/** 以太坊内部和外部账户都是20个字节，0x开头，string长度40,加上0x，【外部账户-钱包地址，内部账户-合约地址】
+		/* 以太坊内部和外部账户都是20个字节，0x开头，string长度40,加上0x，【外部账户-钱包地址，内部账户-合约地址】
 		* 以太坊区块hash和交易hash都是0x打头长度33
 		* 1.判断是否是块高
 		* 2.判断是否是地址
@@ -73,44 +75,44 @@ public class HomeServiceImpl implements HomeService {
 		*/
 		req.setParameter(req.getParameter().trim());
 		String keyword = req.getParameter();
-		/** 判断是否为纯数字 */
+		/* 判断是否为纯数字 */
 		boolean isNumber = keyword.matches("[0-9]+");
 		QueryNavigationResp result = new QueryNavigationResp();
 		QueryNavigationStructResp queryNavigationStructResp = new QueryNavigationStructResp();
 		if (isNumber) {
 			Long number;
 			try {
-				/** 转换失败则超出long的数字范围，则认为无效区块号  */
+				/* 转换失败则超出long的数字范围，则认为无效区块号  */
 				number = Long.valueOf(keyword);
 			} catch (Exception e) {
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
 			}
-			/** 存在区块信息则返回区块号 */
+			/* 存在区块信息则返回区块号 */
 			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 			constructor.must(new ESQueryBuilders().term("num", number));
 			Block block = null;
 			try {
 				block = blockESRepository.get(String.valueOf(number), Block.class);
 			} catch (IOException e) {
-				log.error("获取区块错误。", e);
+				log.error(BLOCK_ERR_TIPS, e);
 			}
 			if(block != null) {
 				result.setType("block");
 				queryNavigationStructResp.setNumber(number);
 			}
 		} else {
-			/** 为false则可能为区块交易hash或者为账户  */
+			/* 为false则可能为区块交易hash或者为账户  */
 			if (keyword.length() <= 2)
-				/** 小于两位的则认为不是正确hash */
+				/* 小于两位的则认为不是正确hash */
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
 			if (keyword.startsWith("0x")) {
 				if (keyword.length() == 42) {
-					/** 判断为合约或账户地址 */
+					/* 判断为合约或账户地址 */
 					result.setType("address");
 					queryNavigationStructResp.setAddress(keyword);
 				}
 				if (keyword.length() == 130) {
-					/** 判断为节点Id */
+					/* 判断为节点Id */
 					Node node = nodeMapper.selectByPrimaryKey(keyword);
 					if(node != null) {
 						result.setType("staking");
@@ -118,7 +120,7 @@ public class HomeServiceImpl implements HomeService {
 					}
 				}
 				if (keyword.length() == 66) {
-					/**
+					/*
 					 * 交易hash或者区块hash 逻辑分析 1、优先查询已完成交易 2、已完成交易查询无记录，则查询区块
 					 * 4、以上都无记录，则返回空结果
 					 */
@@ -128,7 +130,7 @@ public class HomeServiceImpl implements HomeService {
 					try {
 						items = transactionESRepository.search(constructor, Transaction.class, 1, 1);
 					} catch (IOException e) {
-						log.error("获取区块错误。", e);
+						log.error(BLOCK_ERR_TIPS, e);
 					}
 					if(items.getTotal().intValue() > 0) {
 						result.setType("transaction");
@@ -142,17 +144,17 @@ public class HomeServiceImpl implements HomeService {
 						try {
 							blockList = blockESRepository.search(blockConstructor, Block.class, 1, 1);
 						} catch (IOException e) {
-							log.error("获取区块错误。", e);
+							log.error(BLOCK_ERR_TIPS, e);
 						}
 						if (blockList.getTotal() > 0l) {
-							/**  如果找到区块信息，则构造结果并返回  */
+							/*  如果找到区块信息，则构造结果并返回  */
 							result.setType("block");
 							queryNavigationStructResp.setNumber(blockList.getRsData().get(0).getNum());
 						}
 					}
 				}
 			} else {
-				/** 非0x开头，则默认查询节点信息 */
+				/* 非0x开头，则默认查询节点信息 */
 				NodeExample nodeExample = new NodeExample();
 				NodeExample.Criteria criteria = nodeExample.createCriteria();
 				criteria.andNodeNameEqualTo(keyword);
@@ -169,33 +171,33 @@ public class HomeServiceImpl implements HomeService {
 
 	@Override
 	public BlockStatisticNewResp blockStatisticNew() {
-		/************** 组装图表数据 ************/
+		/*------------ 组装图表数据 ------------*/
 		List<Block> items = statisticCacheService.getBlockCache(0,32);
 		BlockStatisticNewResp blockStatisticNewResp = new BlockStatisticNewResp();
-		if(items.size() == 0) {
+		if(items.isEmpty()) {
 			return blockStatisticNewResp;
 		}
-		/** 查询32条，要进行出块时间扣减，故size减去2 */
+		/* 查询32条，要进行出块时间扣减，故size减去2 */
 		Long[] x = new Long[items.size()- 2];
 		Double[] ya = new Double[items.size()- 2];
 		Long[] yb = new Long[items.size()- 2];
 		for (int i=0;i<items.size() - 1;i++){
 			Block currentBlock = items.get(i);
 			if(i < items.size() - 2) {
-				/** 最后一个扣减不需要对应的设置 */
+				/* 最后一个扣减不需要对应的设置 */
 				x[i] = currentBlock.getNum();
-				/** 区块交易数等于null则认为交易为空 */
+				/* 区块交易数等于null则认为交易为空 */
 				if(currentBlock.getTxQty()==null) {
-					yb[i] = 0l;
+					yb[i] = 0L;
 				} else {
 					yb[i] = Long.valueOf(currentBlock.getTxQty());
 				}
 			}
-			/** 第一个区块不需要计算出块时间 */
+			/* 第一个区块不需要计算出块时间 */
 			if(i==0) continue;
 			Block previousBlock = items.get(i-1);
 			BigDecimal sec = BigDecimal.valueOf(previousBlock.getTime().getTime()-currentBlock.getTime().getTime())
-					.divide(BigDecimal.valueOf(1000));
+					.divide(BigDecimal.valueOf(1000),4,RoundingMode.FLOOR);
 			ya[i-1] = sec.doubleValue();
 		}
 		blockStatisticNewResp.setX(x);
@@ -209,14 +211,14 @@ public class HomeServiceImpl implements HomeService {
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		ChainStatisticNewResp chainStatisticNewResp = new ChainStatisticNewResp();
 		if(networkStatRedis == null) return chainStatisticNewResp;
-		/** 查询redis统计信息并转换对应返回对象 */
+		/* 查询redis统计信息并转换对应返回对象 */
 		BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
 		chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 		Long bNumber = networkStatRedis.getCurNumber();
-		/** 查询缓存最新的八条区块信息 */
+		/* 查询缓存最新的八条区块信息 */
 		List<Block> items = statisticCacheService.getBlockCache(0,8);
-		if(items.size() > 0 ) {
-			/**
+		if(!items.isEmpty()) {
+			/*
 			 * 如果统计区块小于区块交易则重新查询新的区块
 			 */
 			Long dValue = items.get(0).getNum()-bNumber;
@@ -239,7 +241,7 @@ public class HomeServiceImpl implements HomeService {
 			blockListNewResp.setTimestamp(items.get(i).getTime().getTime());
 			blockListNewResp.setIsRefresh(true);
 			blockListNewResp.setNodeName(commonService.getNodeName(items.get(i).getNodeId(), null));
-			/**
+			/*
 			 * 第一个块需要记录缓存，然后进行比对
 			 * 如果块没有增长则置为false
 			 */
@@ -263,15 +265,14 @@ public class HomeServiceImpl implements HomeService {
 		StakingListNewResp stakingListNewResp = new StakingListNewResp();
 		stakingListNewResp.setIsRefresh(false);
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-		/** 当前区块除以共识区块算出第几轮 */
-		BigDecimal num = new BigDecimal(networkStatRedis.getCurNumber()).divide(new BigDecimal(blockChainConfig.getConsensusPeriodBlockCount()))
-				.setScale(0, RoundingMode.UP);
+		/* 当前区块除以共识区块算出第几轮 */
+		BigDecimal num = new BigDecimal(networkStatRedis.getCurNumber()).divide(new BigDecimal(blockChainConfig.getConsensusPeriodBlockCount()),0,RoundingMode.UP);
 		if(num.intValue() > consensusNum) {
-			/** 现有共识轮数大于存储轮则全量刷新  */
+			/* 现有共识轮数大于存储轮则全量刷新  */
 			stakingListNewResp.setIsRefresh(true);
 			consensusNum = num.intValue();
 		}
-		/** 只查询活跃的节点，并倒序返回   */
+		/* 只查询活跃的节点，并倒序返回 */
 		NodeExample nodeExample = new NodeExample();
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
@@ -284,13 +285,13 @@ public class HomeServiceImpl implements HomeService {
 			BeanUtils.copyProperties(nodes.get(i), stakingListResp);
 			stakingListResp.setIsInit(nodes.get(i).getIsInit() == 1);
 			stakingListResp.setStakingIcon(nodes.get(i).getNodeIcon());
-			/** 只有不是内置节点才计算年化率  */
+			/* 只有不是内置节点才计算年化率  */
 			if(CustomStaking.YesNoEnum.YES.getCode() != nodes.get(i).getIsInit()) {
 				stakingListResp.setExpectedIncome(nodes.get(i).getAnnualizedRate().toString() + "%");
 			} else {
 				stakingListResp.setExpectedIncome("");
 			}
-			/** 质押总数=有效的质押+委托 */
+			/* 质押总数=有效的质押+委托 */
 			BigDecimal totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked())
 					.add(nodes.get(i).getStatDelegateValue());
 			stakingListResp.setTotalValue(totalValue);
@@ -300,45 +301,4 @@ public class HomeServiceImpl implements HomeService {
 		stakingListNewResp.setDataList(lists);
 		return stakingListNewResp;
 	}
-
-	@Override
-	public List<BlockListNewResp> blockListNew() {
-//		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-//		Long bNumber = networkStatRedis.getCurrentNumber();
-//		/** 查询缓存最新的八条区块信息 */
-//		List<Block> items = statisticCacheService.getBlockCache(0,8);
-//		if(items.size() > 0 ) {
-//			/**
-//			 * 如果统计区块小于区块交易则重新查询新的区块
-//			 */
-//			Long dValue = items.get(0).getNumber()-bNumber;
-//			if(dValue > 0) {
-//				items = statisticCacheService.getBlockCache(dValue.intValue()/8+1, 8);
-//			}
-//		}
-//
-		List<BlockListNewResp> lists = new LinkedList<>();
-//		for (int i=0; i < items.size(); i++) {
-//			BlockListNewResp blockListNewResp = new BlockListNewResp();
-//			BeanUtils.copyProperties(items.get(i), blockListNewResp);
-//			blockListNewResp.setServerTime(new Date().getTime());
-//			blockListNewResp.setTimestamp(items.get(i).getTimestamp().getTime());
-//			blockListNewResp.setIsRefresh(true);
-//			/**
-//			 * 第一个块需要记录缓存，然后进行比对
-//			 * 如果块没有增长则置为false
-//			 */
-//			if(i == 0) {
-//				log.debug("newBlockNum:{},item number:{},isFresh:{}",newBlockNum , items.get(i).getNumber(),blockListNewResp.getIsRefresh());
-//				if(items.get(i).getNumber().longValue() != newBlockNum.longValue()) {
-//					newBlockNum = items.get(i).getNumber();
-//				} else {
-//					blockListNewResp.setIsRefresh(false);
-//				}
-//			}
-//			lists.add(blockListNewResp);
-//		}
-		return lists;
-	}
-
 }

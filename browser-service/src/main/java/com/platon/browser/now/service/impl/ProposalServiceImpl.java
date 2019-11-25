@@ -124,13 +124,9 @@ public class ProposalServiceImpl implements ProposalService {
 		        if(StringUtils.isBlank(proposalDetailsResp.getCanceledTopic())) {
 		        	Proposal cancelProposal = proposalMapper.selectByPrimaryKey(proposal.getCanceledPipId());
 		        	if (cancelProposal != null) {
-		        		switch (CustomProposal.TypeEnum.getEnum(cancelProposal.getType())) {
-		        		case UPGRADE:
-		        			proposalDetailsResp.setCanceledTopic("版本升级-V" + VerUtil.toVersion(new BigInteger(cancelProposal.getNewVersion())));
-		    				break;
-						default:
-							break;
-		        		}
+                        if (CustomProposal.TypeEnum.getEnum(cancelProposal.getType()) == CustomProposal.TypeEnum.UPGRADE) {
+                            proposalDetailsResp.setCanceledTopic("版本升级-V" + VerUtil.toVersion(new BigInteger(cancelProposal.getNewVersion())));
+                        }
 		        	}
 		        }
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelParticipationRate().toString());

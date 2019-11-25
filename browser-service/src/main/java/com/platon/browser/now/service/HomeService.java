@@ -1,9 +1,6 @@
 package com.platon.browser.now.service;
 
-import java.util.List;
-
 import com.platon.browser.req.home.QueryNavigationRequest;
-import com.platon.browser.res.home.BlockListNewResp;
 import com.platon.browser.res.home.BlockStatisticNewResp;
 import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.QueryNavigationResp;
@@ -22,33 +19,26 @@ public interface HomeService {
      * @param req
      * @return
      */
-	public QueryNavigationResp queryNavigation(QueryNavigationRequest req);
+	 QueryNavigationResp queryNavigation(QueryNavigationRequest req);
 	
 	/**
 	 * 区块实时推送websocket
 	 * @method blockStatisticNew
 	 * @return
 	 */
-	public BlockStatisticNewResp blockStatisticNew();
+	 BlockStatisticNewResp blockStatisticNew();
 	
 	/**
 	 * 统计信息实时推送websocket
 	 * @method chainStatisticNew
 	 * @return
 	 */
-	public ChainStatisticNewResp chainStatisticNew();
-	
-	/**
-	 * 首页区块实时推送列表
-	 * @method blockListNew
-	 * @return
-	 */
-	public List<BlockListNewResp> blockListNew();
+	 ChainStatisticNewResp chainStatisticNew();
 	
 	/**
 	 * 首页验证人试试推送列表
 	 * @method stakingListNew
 	 * @return
 	 */
-	public StakingListNewResp stakingListNew();
+	 StakingListNewResp stakingListNew();
 }

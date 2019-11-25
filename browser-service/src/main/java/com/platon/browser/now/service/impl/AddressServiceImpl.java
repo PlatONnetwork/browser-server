@@ -89,7 +89,7 @@ public class AddressServiceImpl implements AddressService {
         /** 特殊账户余额直接查询链  */
 	  	try {
 			List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
-			if(restrictingBalances != null && restrictingBalances.size() > 0) {
+			if(restrictingBalances != null && !restrictingBalances.isEmpty()) {
 				resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
 				resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
 			}

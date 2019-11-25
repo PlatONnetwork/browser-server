@@ -66,13 +66,7 @@ public class HomeServiceImplTest extends TestBase {
 		ChainStatisticNewResp resp = homeService.chainStatisticNew();
 		assertNotNull(resp);
 	}
-	
-	@Test
-	public void blockListNew() {
-		List<BlockListNewResp> list = homeService.blockListNew();
-		assertNotNull(list);
-	}
-	
+
 	@Test
 	public void stakingListNew() {
 		StakingListNewResp list = homeService.stakingListNew();

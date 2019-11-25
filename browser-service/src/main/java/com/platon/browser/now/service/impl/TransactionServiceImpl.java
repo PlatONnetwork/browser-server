@@ -1,6 +1,6 @@
 package com.platon.browser.now.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
@@ -37,7 +37,6 @@ import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.*;
-import com.platon.browser.util.HttpUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -273,8 +272,8 @@ public class TransactionServiceImpl implements TransactionService {
     		BeanUtils.copyProperties(transaction, resp);
     		resp.setActualTxCost(new BigDecimal(transaction.getCost()));
     		resp.setBlockNumber(transaction.getNum());
-    		resp.setGasLimit(transaction.getGasLimit().toString());
-    		resp.setGasUsed(transaction.getGasUsed().toString());
+    		resp.setGasLimit(transaction.getGasLimit());
+    		resp.setGasUsed(transaction.getGasUsed());
     		resp.setReceiveType(String.valueOf(transaction.getToType()));
     		resp.setTxType(String.valueOf(transaction.getType()));
     		resp.setTxHash(transaction.getHash());
@@ -307,7 +306,7 @@ public class TransactionServiceImpl implements TransactionService {
     		 * "last":true,              //是否最后一条记录
     		 */
     		resp.setFirst(false);
-    		if(transaction.getId().longValue() == 1l) {
+    		if(transaction.getId() == 1) {
     			resp.setFirst(true);
     		} else {
     			/** 根据id查询具体的交易数据 */
@@ -332,7 +331,7 @@ public class TransactionServiceImpl implements TransactionService {
     		} catch (IOException e) {
     			logger.error("获取交易错误。", e);
     		}
-    		if(last.getTotal().longValue() > 0l) {
+    		if(last.getTotal() > 0) {
     			resp.setLast(false);
     			resp.setNextHash(last.getRsData().get(0).getHash());
     		}
@@ -343,7 +342,7 @@ public class TransactionServiceImpl implements TransactionService {
 	    		switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
 		    		/** 创建验证人 */
 					case STAKE_CREATE:
-						StakeCreateParam createValidatorParam = JSONObject.parseObject(txInfo, StakeCreateParam.class);
+						StakeCreateParam createValidatorParam = JSON.parseObject(txInfo, StakeCreateParam.class);
 						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
 						resp.setNodeId(createValidatorParam.getNodeId());
 						resp.setNodeName(createValidatorParam.getNodeName());
@@ -356,7 +355,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					//编辑验证人
 					case STAKE_MODIFY:
-						StakeModifyParam editValidatorParam = JSONObject.parseObject(txInfo, StakeModifyParam.class);
+						StakeModifyParam editValidatorParam = JSON.parseObject(txInfo, StakeModifyParam.class);
 						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
 						resp.setNodeId(editValidatorParam.getNodeId());
 						resp.setExternalId(editValidatorParam.getExternalId());
@@ -367,7 +366,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					//增加质押
 					case STAKE_INCREASE:
-						StakeIncreaseParam increaseStakingParam = JSONObject.parseObject(txInfo, StakeIncreaseParam.class);
+						StakeIncreaseParam increaseStakingParam = JSON.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
 						resp.setTxAmount(increaseStakingParam.getAmount());
 						resp.setNodeName(commonService.getNodeName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
@@ -375,7 +374,7 @@ public class TransactionServiceImpl implements TransactionService {
 					//退出验证人
 					case STAKE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
-						StakeExitParam exitValidatorParam = JSONObject.parseObject(txInfo, StakeExitParam.class);
+						StakeExitParam exitValidatorParam = JSON.parseObject(txInfo, StakeExitParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
 						resp.setNodeName(commonService.getNodeName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
 						resp.setApplyAmount(exitValidatorParam.getAmount());
@@ -399,7 +398,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 						//委托
 					case DELEGATE_CREATE:
-						DelegateCreateParam delegateParam = JSONObject.parseObject(txInfo, DelegateCreateParam.class);
+						DelegateCreateParam delegateParam = JSON.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
 						resp.setTxAmount(delegateParam.getAmount());
 						resp.setNodeName(commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
@@ -408,14 +407,14 @@ public class TransactionServiceImpl implements TransactionService {
 					case DELEGATE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
 						// 通过txHash关联un_delegation表
-						DelegateExitParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateExitParam.class);
+						DelegateExitParam unDelegateParam = JSON.parseObject(txInfo, DelegateExitParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
 						resp.setApplyAmount(unDelegateParam.getAmount());
 						resp.setTxAmount(unDelegateParam.getAmount());
 						resp.setNodeName(commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						break;
 					case PROPOSAL_TEXT:
-						ProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, ProposalTextParam.class);
+						ProposalTextParam createProposalTextParam = JSON.parseObject(txInfo, ProposalTextParam.class);
 						if(StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
 							resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
 						}
@@ -426,7 +425,7 @@ public class TransactionServiceImpl implements TransactionService {
 						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_UPGRADE:
-						ProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, ProposalUpgradeParam.class);
+						ProposalUpgradeParam createProposalUpgradeParam = JSON.parseObject(txInfo, ProposalUpgradeParam.class);
 						resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
 						if(StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
 							resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
@@ -439,7 +438,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					case PROPOSAL_PARAMETER:
 					case PROPOSAL_CANCEL:
-						ProposalCancelParam cancelProposalParam = JSONObject.parseObject(txInfo, ProposalCancelParam.class);
+						ProposalCancelParam cancelProposalParam = JSON.parseObject(txInfo, ProposalCancelParam.class);
 						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
 							resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
 						}
@@ -451,7 +450,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					case PROPOSAL_VOTE:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
-						ProposalVoteParam votingProposalParam = JSONObject.parseObject(txInfo, ProposalVoteParam.class);
+						ProposalVoteParam votingProposalParam = JSON.parseObject(txInfo, ProposalVoteParam.class);
 						resp.setNodeId(votingProposalParam.getVerifier());
 						resp.setProposalOption(votingProposalParam.getProposalType());
 						resp.setProposalHash(votingProposalParam.getProposalId());
@@ -474,13 +473,13 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 						//版本申明
 					case VERSION_DECLARE:
-						VersionDeclareParam declareVersionParam = JSONObject.parseObject(txInfo, VersionDeclareParam.class);
+						VersionDeclareParam declareVersionParam = JSON.parseObject(txInfo, VersionDeclareParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 						resp.setNodeName(commonService.getNodeName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
 						break;
 					case REPORT:
-						ReportParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportParam.class);
+						ReportParam reportValidatorParam = JSON.parseObject(txInfo, ReportParam.class);
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
@@ -490,14 +489,14 @@ public class TransactionServiceImpl implements TransactionService {
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 						if(slash != null) {
 							resp.setReportRewards(slash.getReward());
-							resp.setReportStatus(slash.getIsQuit().intValue() == 1?2:1);
+							resp.setReportStatus(slash.getIsQuit() == 1?2:1);
 						}
 						resp.setReportType(reportValidatorParam.getType().intValue());
 						resp.setEvidences(transactionDetailsEvidencesResps);
 						break;
 					case RESTRICTING_CREATE:
 						// RPAccount + value + RPPlan
-						RestrictingCreateParam createRestrictingParam = JSONObject.parseObject(txInfo, RestrictingCreateParam.class);
+						RestrictingCreateParam createRestrictingParam = JSON.parseObject(txInfo, RestrictingCreateParam.class);
 						List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<>();
 						resp.setRPAccount(createRestrictingParam.getAccount());
 						BigDecimal amountSum = new BigDecimal(0);
@@ -544,31 +543,6 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 		return resp;
     }
-
-//    /**
-//     * 统一设置验证人名称
-//     * @method setStakingName
-//     * @param nodeId
-//     * @param nodeName
-//     * @return
-//     */
-//    private String setStakingName(String nodeId,String nodeName) {
-//    	/**
-//    	 * 当nodeId为空或者nodeName不为空则直接返回name
-//    	 */
-//    	if(StringUtils.isNotBlank(nodeName) || StringUtils.isBlank(nodeId)) {
-//    		return nodeName;
-//    	}
-//    	StakingExample stakingExample = new StakingExample();
-//    	stakingExample.setOrderByClause(" staking_block_num desc");
-//    	StakingExample.Criteria criteria = stakingExample.createCriteria();
-//    	criteria.andNodeIdEqualTo(nodeId);
-//    	List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-//    	if(stakings != null && !stakings.isEmpty()) {
-//    		return stakings.get(0).getNodeName();
-//    	}
-//    	return nodeName;
-//    }
 
     /**
      * 统一设置验证人keybaseurl

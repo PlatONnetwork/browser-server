@@ -63,8 +63,7 @@ public class PlatOnClientTest {
 		EconomicConfig ec = new EconomicConfig();
 
 
-
-		log.error("{}",rr);
+		assertTrue(true);
 	}
 
 

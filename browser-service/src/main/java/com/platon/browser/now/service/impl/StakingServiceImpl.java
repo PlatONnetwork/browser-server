@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,9 +66,6 @@ public class StakingServiceImpl implements StakingService {
 	@Autowired
 	private NodeOptESRepository nodeOptESRepository;
 
-//	@Autowired
-//	private AddressMapper addressMapper;
-
 	@Autowired
 	private I18nUtil i18n;
 
@@ -85,7 +83,7 @@ public class StakingServiceImpl implements StakingService {
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
 			//实时除以现有的结算周期人数
 			Integer count= customStakingMapper.selectCountByActive();
-			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, BigDecimal.ROUND_DOWN));
+			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
 			
 		}
 		return stakingStatisticNewResp;
@@ -401,7 +399,6 @@ public class StakingServiceImpl implements StakingService {
 		Page<DelegationAddress> delegationAddresses =
 				customDelegationMapper.selectAddressByAddr(req.getAddress());
 
-//		Address address = addressMapper.selectByPrimaryKey(req.getAddress());
 		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationAddress, byAddressResp);
@@ -410,8 +407,6 @@ public class StakingServiceImpl implements StakingService {
 			BigDecimal deleValue = delegationAddress.getDelegateHes()
 					.add(byAddressResp.getDelegateLocked());
 			byAddressResp.setDelegateValue(deleValue);
-//			String deletgateUnLock = delegationAddress.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?"0":delegationAddress.getDelegateHes()
-//					.add(delegationAddress.getDelegateLocked()).toString() ;
 			byAddressResp.setDelegateUnlock(delegationAddress.getDelegateHes());
 			lists.add(byAddressResp);
 		}

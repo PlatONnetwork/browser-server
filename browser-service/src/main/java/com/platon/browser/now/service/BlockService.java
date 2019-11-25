@@ -24,7 +24,7 @@ public interface BlockService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<BlockListResp> blockList( PageReq req);
+	 RespPage<BlockListResp> blockList( PageReq req);
 	
 	/**
 	 *  根据节点id分页查询区块列表
@@ -32,7 +32,7 @@ public interface BlockService {
 	 * @param req
 	 * @return
 	 */
-	public RespPage<BlockListResp> blockListByNodeId( BlockListByNodeIdReq req);
+	 RespPage<BlockListResp> blockListByNodeId( BlockListByNodeIdReq req);
 	
 	/**
 	 * 根据区块id查询区块详情
@@ -40,7 +40,7 @@ public interface BlockService {
 	 * @param req
 	 * @return
 	 */
-	public BlockDetailResp blockDetails( BlockDetailsReq req);
+	 BlockDetailResp blockDetails( BlockDetailsReq req);
 	
 	/**
 	 * 根据区块id切换上一个下一个区块详情
@@ -48,7 +48,7 @@ public interface BlockService {
 	 * @param req
 	 * @return
 	 */
-	public BlockDetailResp blockDetailNavigate( BlockDetailNavigateReq req);
+	 BlockDetailResp blockDetailNavigate( BlockDetailNavigateReq req);
 	
 	/**
 	 * 根据节点id和开始日期下载文件
@@ -57,5 +57,5 @@ public interface BlockService {
 	 * @param date
 	 * @return
 	 */
-	public BlockDownload blockListByNodeIdDownload(String nodeId, Long date, String local, String timeZone);
+	 BlockDownload blockListByNodeIdDownload(String nodeId, Long date, String local, String timeZone);
 }

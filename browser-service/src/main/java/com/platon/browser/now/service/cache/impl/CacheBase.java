@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -43,48 +44,47 @@ public class CacheBase {
     }
 
     protected <T> void updateCache(String cacheKey,Collection<T> data, RedisTemplate<String,String> redisTemplate, long maxItemNum){
-        long size = redisTemplate.opsForZSet().size(cacheKey);
+        Long size = redisTemplate.opsForZSet().size(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
         data.forEach(item -> {
-            Long startOffset=0l;
-            Long endOffset=0l;
-            Long score=0l;
+            long startOffset=0L;
+            long endOffset=0L;
+            long score=0L;
             if(item instanceof Block) startOffset=endOffset=score = ((Block)item).getTime().getTime();
             if(item instanceof Transaction) startOffset=endOffset=score = ((Transaction)item).getTime().getTime();
             // 根据score来判断缓存中的记录是否已经存在
             Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,startOffset,endOffset);
-            if(exist.isEmpty()){
+            if(Objects.requireNonNull(exist).isEmpty()){
                 // 在缓存中不存在的才放入缓存
-                tupleSet.add(new DefaultTypedTuple<>(JSON.toJSONString(item),score.doubleValue()));
+                tupleSet.add(new DefaultTypedTuple<>(JSON.toJSONString(item), (double) score));
             }
         });
         if(!tupleSet.isEmpty()){
             redisTemplate.opsForZSet().add(cacheKey, tupleSet);
         }
-        if(size>maxItemNum){
+        if(size!=null&&size>maxItemNum){
             // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
             redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
         }
     }
 
-    protected <T> CachePageInfo <T> getCachePageInfo(String cacheKey,int pageNum,int pageSize,T target, I18nUtil i18n, RedisTemplate<String,String> redisTemplate, long maxItemNum){
+    protected <T> CachePageInfo <T> getCachePageInfo(String cacheKey,int pageNum,int pageSize,I18nUtil i18n, RedisTemplate<String,String> redisTemplate, long maxItemNum){
         RespPage<T> page = new RespPage<>();
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
 
         CachePageInfo<T> cpi = new CachePageInfo<>();
-        Long size = redisTemplate.opsForZSet().size(cacheKey);
-        Long pagingTotalCount = size;
-        if(pagingTotalCount>maxItemNum){
+        Long pagingTotalCount = redisTemplate.opsForZSet().size(cacheKey);
+        if(pagingTotalCount!=null&&pagingTotalCount>maxItemNum){
             // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
             pagingTotalCount = maxItemNum;
         }
-        page.setTotalCount(pagingTotalCount.intValue());
+        page.setTotalCount(pagingTotalCount==null?0L:pagingTotalCount);
 
-        Long pageCount = pagingTotalCount/pageSize;
-        if(pagingTotalCount%pageSize!=0){
+        long pageCount = pagingTotalCount==null?0:(pagingTotalCount/pageSize);
+        if(pagingTotalCount!=null&&pagingTotalCount%pageSize!=0){
             pageCount+=1;
         }
-        page.setTotalPages(pageCount.intValue());
+        page.setTotalPages(pageCount);
 
         // Redis的缓存分页从索引0开始
         if(pageNum<=0){
@@ -93,30 +93,29 @@ public class CacheBase {
         if(pageSize<=0){
             pageSize=1;
         }
-        long start = (pageNum-1l)*pageSize;
-        long end = (pageNum*pageSize)-1l;
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey, start, end);
-        cpi.data = cache;
+        long start = (pageNum-1L)*pageSize;
+        long end = (pageNum*pageSize)-1L;
+        cpi.data = redisTemplate.opsForZSet().reverseRange(cacheKey, start, end);
         cpi.page = page;
         return cpi;
     }
     
-    protected <T> CachePageInfo <T> getCachePageInfo(String cacheKey,int pageNum,int pageSize,T target, I18nUtil i18n, long maxItemNum, RedisFactory redisFactory){
+    protected <T> CachePageInfo <T> getCachePageInfo(String cacheKey,int pageNum,int pageSize,I18nUtil i18n, long maxItemNum, RedisFactory redisFactory){
         RespPage<T> page = new RespPage<>();
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         CachePageInfo<T> cpi = new CachePageInfo<>();
-        Long pagingTotalCount = redisFactory.createRedisCommands().zsize(cacheKey);
+        long pagingTotalCount = redisFactory.createRedisCommands().zsize(cacheKey);
         if(pagingTotalCount>maxItemNum){
             // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
             pagingTotalCount = maxItemNum;
         }
-        page.setTotalCount(pagingTotalCount.intValue());
+        page.setTotalCount(pagingTotalCount);
 
-        Long pageCount = pagingTotalCount/pageSize;
+        long pageCount = pagingTotalCount/pageSize;
         if(pagingTotalCount%pageSize!=0){
             pageCount+=1;
         }
-        page.setTotalPages(pageCount.intValue());
+        page.setTotalPages(pageCount);
 
         // Redis的缓存分页从索引0开始
         if(pageNum<=0){
@@ -125,40 +124,36 @@ public class CacheBase {
         if(pageSize<=0){
             pageSize=1;
         }
-        long start = (pageNum-1l)*pageSize;
-        long end = (pageNum*pageSize)-1l;
-        Set<String> cache = redisFactory.createRedisCommands().zrevrange(cacheKey, start, end);
-        cpi.data = cache;
+        long start = (pageNum-1L)*pageSize;
+        long end = (pageNum*pageSize)-1L;
+        cpi.data = redisFactory.createRedisCommands().zrevrange(cacheKey, start, end);
         cpi.page = page;
         return cpi;
     }
 
-    protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,T target, I18nUtil i18n, RedisTemplate<String,String> redisTemplate, long maxItemNum){
+    protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,I18nUtil i18n, RedisTemplate<String,String> redisTemplate, long maxItemNum){
         RespPage<T> page = new RespPage<>();
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
 
         CachePageInfo<T> cpi = new CachePageInfo<>();
-        Long size = redisTemplate.opsForZSet().size(cacheKey);
-        Long pagingTotalCount = size;
-        if(pagingTotalCount>maxItemNum){
+        Long pagingTotalCount = redisTemplate.opsForZSet().size(cacheKey);
+        if(pagingTotalCount!=null&&pagingTotalCount>maxItemNum){
             // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
             pagingTotalCount = maxItemNum;
         }
-        page.setTotalCount(pagingTotalCount.intValue());
+        page.setTotalCount(pagingTotalCount==null?0L:pagingTotalCount);
 
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey, start, end);
-        cpi.data = cache;
+        cpi.data = redisTemplate.opsForZSet().reverseRange(cacheKey, start, end);
         cpi.page = page;
         return cpi;
     }
 
-    protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,T target, I18nUtil i18n, long maxItemNum, RedisFactory redisFactory){
+    protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,I18nUtil i18n,RedisFactory redisFactory){
         RespPage<T> page = new RespPage<>();
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
 
         CachePageInfo<T> cpi = new CachePageInfo<>();
-        Set<String> cache = redisFactory.createRedisCommands().zrevrange(cacheKey, start, end);
-        cpi.data = cache;
+        cpi.data = redisFactory.createRedisCommands().zrevrange(cacheKey, start, end);
         cpi.page = page;
         return cpi;
     }

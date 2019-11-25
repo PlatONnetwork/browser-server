@@ -49,11 +49,11 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Override
 	public List<Block> getBlockCache(Integer pageNum, Integer pageSize) {
-		/** 分页根据key来获取数据 */
-		CachePageInfo<Class<Block>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, Block.class, i18n, maxItemNum, redisFactory);
+		/* 分页根据key来获取数据 */
+		CachePageInfo<Class<Block>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, i18n, maxItemNum, redisFactory);
 		List<Block> blockRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
-			/** 获取数据转换成区块对象 */
+			/* 获取数据转换成区块对象 */
 			Block blockRedis = JSON.parseObject(str, Block.class);
 			blockRedisList.add(blockRedis);
 		});
@@ -63,7 +63,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	@Override
 	public NetworkStat getNetworkStatCache() {
 		String value = redisFactory.createRedisCommands().get(networkStatCacheKey);
-		/** 获取对象转换成统计对象 */
+		/* 获取对象转换成统计对象 */
 		NetworkStat networkStat = JSON.parseObject(value, NetworkStat.class);
 		if(networkStat == null) {
 			networkStat = new NetworkStat();
@@ -73,11 +73,11 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Override
 	public TransactionCacheDto getTransactionCache(Integer pageNum, Integer pageSize) {
-		/** 分页根据key来获取交易数据  */
-		CachePageInfo<Class<Transaction>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, Transaction.class, i18n, maxItemNum, redisFactory);
+		/* 分页根据key来获取交易数据  */
+		CachePageInfo<Class<Transaction>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, i18n, maxItemNum, redisFactory);
 		List<Transaction> transactionRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
-			/** 获取数据转换成对象 */
+			/* 获取数据转换成对象 */
 			Transaction transactionRedis = JSON.parseObject(str, Transaction.class);
 			transactionRedisList.add(transactionRedis);
 		});
@@ -86,11 +86,11 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Override
 	public List<Block> getBlockCacheByStartEnd(Long start, Long end) {
-		/** 分页根据key来获取数据 */
-		CachePageInfo<Class<Block>> cpi = this.getCachePageInfoByStartEnd(blockCacheKey, start, end, Block.class, i18n, maxItemNum, redisFactory);
+		/* 分页根据key来获取数据 */
+		CachePageInfo<Class<Block>> cpi = this.getCachePageInfoByStartEnd(blockCacheKey, start, end, i18n, redisFactory);
 		List<Block> blockRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
-			/** 获取数据转换成区块对象 */
+			/* 获取数据转换成区块对象 */
 			Block blockRedis = JSON.parseObject(str, Block.class);
 			blockRedisList.add(blockRedis);
 		});
