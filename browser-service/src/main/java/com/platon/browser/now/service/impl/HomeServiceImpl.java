@@ -213,6 +213,7 @@ public class HomeServiceImpl implements HomeService {
 		if(networkStatRedis == null) return chainStatisticNewResp;
 		/* 查询redis统计信息并转换对应返回对象 */
 		BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
+		chainStatisticNewResp.setCurrentTps(networkStatRedis.getCurTps());
 		chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 		Long bNumber = networkStatRedis.getCurNumber();
 		/* 查询缓存最新的八条区块信息 */
@@ -276,7 +277,7 @@ public class HomeServiceImpl implements HomeService {
 		NodeExample nodeExample = new NodeExample();
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
-		nodeExample.setOrderByClause(" big_version desc,total_value desc,staking_block_num desc ,staking_tx_index desc");
+		nodeExample.setOrderByClause(" big_version desc,total_value desc,staking_block_num asc ,staking_tx_index asc");
 		List<Node> nodes = nodeMapper.selectByExample(nodeExample);
 
 		List<StakingListResp> lists = new LinkedList<>();
