@@ -11,9 +11,13 @@ public class Config {
 
     private String name;
 
+    private String initValue;
+
     private String staleValue;
 
     private String value;
+
+    private String rangeDesc;
 
     private Long activeBlock;
 
@@ -45,6 +49,14 @@ public class Config {
         this.name = name == null ? null : name.trim();
     }
 
+    public String getInitValue() {
+        return initValue;
+    }
+
+    public void setInitValue(String initValue) {
+        this.initValue = initValue == null ? null : initValue.trim();
+    }
+
     public String getStaleValue() {
         return staleValue;
     }
@@ -59,6 +71,14 @@ public class Config {
 
     public void setValue(String value) {
         this.value = value == null ? null : value.trim();
+    }
+
+    public String getRangeDesc() {
+        return rangeDesc;
+    }
+
+    public void setRangeDesc(String rangeDesc) {
+        this.rangeDesc = rangeDesc == null ? null : rangeDesc.trim();
     }
 
     public Long getActiveBlock() {
@@ -96,8 +116,10 @@ public class Config {
         id("id", "id", "INTEGER", false),
         module("module", "module", "VARCHAR", true),
         name("name", "name", "VARCHAR", true),
+        initValue("init_value", "initValue", "VARCHAR", false),
         staleValue("stale_value", "staleValue", "VARCHAR", false),
         value("value", "value", "VARCHAR", true),
+        rangeDesc("range_desc", "rangeDesc", "VARCHAR", false),
         activeBlock("active_block", "activeBlock", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);

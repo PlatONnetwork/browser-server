@@ -1,14 +1,16 @@
 package com.platon.browser.config;
 
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.config.govern.ModifiableParam;
+import com.platon.browser.dao.entity.Config;
+import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ConfigLoadingException;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -32,10 +34,13 @@ import java.util.*;
  * @Description:
  */
 @Data
+@Slf4j
 @Configuration
 @ConfigurationProperties(prefix="platon")
 public class BlockChainConfig {
-    private static Logger logger = LoggerFactory.getLogger(BlockChainConfig.class);
+
+    @Autowired
+    private ConfigMapper configMapper;
 
     static {
         File saltFile = FileUtils.getFile(System.getProperty("user.dir"), "jasypt.properties");
@@ -46,9 +51,9 @@ public class BlockChainConfig {
             if(StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
             salt=salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
-            logger.info("salt:{}",salt);
+            log.info("salt:{}",salt);
         } catch (IOException | ConfigLoadingException e) {
-            logger.error("加载解密文件出错",e);
+            log.error("加载解密文件出错",e);
             System.exit(1);
         }
     }
@@ -63,12 +68,16 @@ public class BlockChainConfig {
     }
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
+    //【通用】默认每个区块的最大Gas
+    private BigDecimal maxBlockGasLimit=BigDecimal.ZERO;
     //【通用】每个验证人每个共识周期出块数量目标值
     private BigInteger expectBlockCount;
     //【通用】每个共识轮验证节点数量
     private BigInteger consensusValidatorCount;
     //【通用】每个增发周期的分钟数
     private BigInteger additionalCycleMinutes;
+    //【通用】每个结算周期的分钟数
+    private BigInteger settlementCycleMinutes;
     //【通用】每个增发周期内的结算周期数
     private BigInteger settlePeriodCountPerIssue;
     //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
@@ -95,12 +104,14 @@ public class BlockChainConfig {
     //【质押】节点质押退回锁定的结算周期数
     private BigInteger unStakeRefundSettlePeriodCount;
 
+    //【惩罚】双签奖励百分比
+    private BigDecimal duplicateSignRewardRate;
     //【惩罚】双签处罚百分比
     private BigDecimal duplicateSignSlashRate;
-    //【惩罚】双签奖励百分比
-    private BigDecimal duplicateSignReportRate;
     //【惩罚】举报证据生效周期数
     private BigDecimal evidenceValidEpoch;
+    //【惩罚】扣除区块奖励的个数
+    private BigDecimal slashBlockRewardCount;
 
     //【治理】文本提案参与率: >
     private BigDecimal minProposalTextParticipationRate;
@@ -116,6 +127,12 @@ public class BlockChainConfig {
     private BigDecimal proposalTextConsensusRounds;
     //【治理】设置预升级开始轮数
     private BigDecimal versionProposalActiveConsensusRounds;
+    //【治理】参数提案的投票持续最长的时间（单位：s）
+    private BigInteger paramProposalVoteDurationSeconds;
+    //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
+    private BigDecimal paramProposalVoteRate;
+    //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
+    private BigDecimal paramProposalSupportRate;
 
     //【奖励】激励池分配给出块激励的比例
     private BigDecimal blockRewardRate;
@@ -153,6 +170,10 @@ public class BlockChainConfig {
     @PostConstruct
     public void init() throws ConfigLoadingException {
         updateWithEconomicConfig(client.getEconomicConfig());
+        // 使用数据库config表的配置覆盖当前配置
+        List<Config> configList = configMapper.selectByExample(null);
+        ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
+        updateWithModifiableParam(modifiableParam);
     }
 
     private void updateWithEconomicConfig(EconomicConfig dec) {
@@ -162,12 +183,14 @@ public class BlockChainConfig {
         this.consensusValidatorCount=dec.getCommon().getMaxConsensusVals();
         //【通用】增发周期规定的分钟数
         this.additionalCycleMinutes=dec.getCommon().getAdditionalCycleTime();
+        //【通用】每个结算周期的分钟数
+        this.settlementCycleMinutes=dec.getCommon().getMaxEpochMinutes();
         //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
         this.blockInterval=dec.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount);
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
         this.consensusPeriodBlockCount=this.expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals());
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        this.settlePeriodBlockCount=dec.getCommon().getMaxEpochMinutes()
+        this.settlePeriodBlockCount=settlementCycleMinutes
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
                 .multiply(this.consensusPeriodBlockCount);
@@ -194,7 +217,7 @@ public class BlockChainConfig {
         //【质押】节点质押退回锁定的结算周期数
         this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeDuration();
         //【惩罚】双签奖励百分比
-        this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        this.duplicateSignRewardRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【惩罚】双签处罚万分比
         this.duplicateSignSlashRate=new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR);
         //【惩罚】举报证据有效周期数
@@ -219,13 +242,40 @@ public class BlockChainConfig {
                                         .multiply(this.consensusValidatorCount)) //每个共识轮验证节点数量
                         ,0,RoundingMode.FLOOR
                 );
-        //【治理】版本
-        //this.versionProposalActiveConsensusRounds=dec.getGov().getv.getVersionProposalActiveConsensusRounds();
+
+        //【治理】参数提案的投票持续最长的时间（单位：s）
+        this.paramProposalVoteDurationSeconds=dec.getGov().getParamProposalVoteDurationSeconds();
+        //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
+        this.paramProposalVoteRate=dec.getGov().getParamProposalVoteRate();
+        //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
+        this.paramProposalSupportRate=dec.getGov().getParamProposalSupportRate();
+
         //【奖励】激励池分配给出块激励的比例
         this.blockRewardRate=new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
         //【奖励】Platon基金会年限
         this.platOnFoundationYear=dec.getReward().getPlatonFoundationYear();
+    }
+    
+    public void updateWithModifiableParam(ModifiableParam modifiableParam){
+        //创建验证人最低的质押Token数(K)
+        this.stakeThreshold=modifiableParam.getStaking().getStakeThreshold();
+        //委托人每次委托及赎回的最低Token数(H)
+        this.delegateThreshold=modifiableParam.getStaking().getOperatingThreshold();
+        //节点质押退回锁定周期
+        this.unStakeRefundSettlePeriodCount=modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger();
+        //备选验证节点数量(U)
+        this.consensusValidatorCount=modifiableParam.getStaking().getMaxValidators().toBigInteger();
+        //举报最高处罚n3‱
+        this.duplicateSignSlashRate=modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000),16,RoundingMode.FLOOR);
+        //举报奖励n4%
+        this.duplicateSignRewardRate=modifiableParam.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);;
+        //证据有效期
+        this.evidenceValidEpoch=modifiableParam.getSlashing().getMaxEvidenceAge();
+        //扣除区块奖励的个数
+        this.slashBlockRewardCount=modifiableParam.getSlashing().getSlashBlocksReward();
+        //默认每个区块的最大Gas
+        this.maxBlockGasLimit=modifiableParam.getBlock().getMaxBlockGasLimit();
     }
 }

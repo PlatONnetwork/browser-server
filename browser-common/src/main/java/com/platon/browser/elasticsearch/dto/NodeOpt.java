@@ -35,6 +35,7 @@ public class NodeOpt {
         MODIFY("2", "修改",""),
         QUIT("3", "退出",""),
         PROPOSALS("4", "提案","ID|TITLE|TYPE|VERSION"),
+        PARAMETER("9", "参数提案","ID|TITLE|TYPE|MODULE|NAME|VALUE"),
         VOTE("5", "投票","ID|TITLE|OPTION|TYPE|VERSION"),
         MULTI_SIGN("6", "双签","PERCENT|AMOUNT"),
         LOW_BLOCK_RATE("7", "出块率低","BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT"),

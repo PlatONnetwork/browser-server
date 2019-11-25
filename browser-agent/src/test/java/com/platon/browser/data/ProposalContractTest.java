@@ -6,6 +6,7 @@ import org.web3j.crypto.Credentials;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.FunctionType;
 import org.web3j.platon.VoteOption;
+import org.web3j.platon.bean.GovernParam;
 import org.web3j.platon.bean.ProgramVersion;
 import org.web3j.platon.bean.Proposal;
 import org.web3j.platon.bean.TallyResult;
@@ -229,6 +230,22 @@ public class ProposalContractTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void getParamList() throws Exception {
+		List<GovernParam> params = proposalContract.getParamList("").send().data;
+		System.out.println(params);
+	}
+
+	@Test
+	public void parameterProposal() throws Exception {
+		String module = "staking";
+		String name = "stakeThreshold";
+		String value = "1000000000000000000000001";
+		PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(Proposal.createSubmitParamProposalParam(nodeId, "00002", module, name, value)).send();
+		BaseResponse baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIR_PARAM_FUNCTION_TYPE).send();
+		System.out.println(baseResponse);
 	}
 
 	/**

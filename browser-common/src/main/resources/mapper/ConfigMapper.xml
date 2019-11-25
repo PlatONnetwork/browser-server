@@ -5,8 +5,10 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="module" jdbcType="VARCHAR" property="module" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="init_value" jdbcType="VARCHAR" property="initValue" />
     <result column="stale_value" jdbcType="VARCHAR" property="staleValue" />
     <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="range_desc" jdbcType="VARCHAR" property="rangeDesc" />
     <result column="active_block" jdbcType="BIGINT" property="activeBlock" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -70,7 +72,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `module`, `name`, stale_value, `value`, active_block, create_time, update_time
+    id, `module`, `name`, init_value, stale_value, `value`, range_desc, active_block, 
+    create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ConfigExample" resultMap="BaseResultMap">
     select
@@ -104,11 +107,13 @@
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Config">
     insert into config (id, `module`, `name`, 
-      stale_value, `value`, active_block, 
-      create_time, update_time)
+      init_value, stale_value, `value`, 
+      range_desc, active_block, create_time, 
+      update_time)
     values (#{id,jdbcType=INTEGER}, #{module,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{staleValue,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{activeBlock,jdbcType=BIGINT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+      #{initValue,jdbcType=VARCHAR}, #{staleValue,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, 
+      #{rangeDesc,jdbcType=VARCHAR}, #{activeBlock,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Config">
     insert into config
@@ -122,11 +127,17 @@
       <if test="name != null">
         `name`,
       </if>
+      <if test="initValue != null">
+        init_value,
+      </if>
       <if test="staleValue != null">
         stale_value,
       </if>
       <if test="value != null">
         `value`,
+      </if>
+      <if test="rangeDesc != null">
+        range_desc,
       </if>
       <if test="activeBlock != null">
         active_block,
@@ -148,11 +159,17 @@
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
+      <if test="initValue != null">
+        #{initValue,jdbcType=VARCHAR},
+      </if>
       <if test="staleValue != null">
         #{staleValue,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
         #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeDesc != null">
+        #{rangeDesc,jdbcType=VARCHAR},
       </if>
       <if test="activeBlock != null">
         #{activeBlock,jdbcType=BIGINT},
@@ -183,11 +200,17 @@
       <if test="record.name != null">
         `name` = #{record.name,jdbcType=VARCHAR},
       </if>
+      <if test="record.initValue != null">
+        init_value = #{record.initValue,jdbcType=VARCHAR},
+      </if>
       <if test="record.staleValue != null">
         stale_value = #{record.staleValue,jdbcType=VARCHAR},
       </if>
       <if test="record.value != null">
         `value` = #{record.value,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rangeDesc != null">
+        range_desc = #{record.rangeDesc,jdbcType=VARCHAR},
       </if>
       <if test="record.activeBlock != null">
         active_block = #{record.activeBlock,jdbcType=BIGINT},
@@ -208,8 +231,10 @@
     set id = #{record.id,jdbcType=INTEGER},
       `module` = #{record.module,jdbcType=VARCHAR},
       `name` = #{record.name,jdbcType=VARCHAR},
+      init_value = #{record.initValue,jdbcType=VARCHAR},
       stale_value = #{record.staleValue,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
+      range_desc = #{record.rangeDesc,jdbcType=VARCHAR},
       active_block = #{record.activeBlock,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
@@ -226,11 +251,17 @@
       <if test="name != null">
         `name` = #{name,jdbcType=VARCHAR},
       </if>
+      <if test="initValue != null">
+        init_value = #{initValue,jdbcType=VARCHAR},
+      </if>
       <if test="staleValue != null">
         stale_value = #{staleValue,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
         `value` = #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeDesc != null">
+        range_desc = #{rangeDesc,jdbcType=VARCHAR},
       </if>
       <if test="activeBlock != null">
         active_block = #{activeBlock,jdbcType=BIGINT},
@@ -248,8 +279,10 @@
     update config
     set `module` = #{module,jdbcType=VARCHAR},
       `name` = #{name,jdbcType=VARCHAR},
+      init_value = #{initValue,jdbcType=VARCHAR},
       stale_value = #{staleValue,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
+      range_desc = #{rangeDesc,jdbcType=VARCHAR},
       active_block = #{activeBlock,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
@@ -262,13 +295,14 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into config
-    (id, `module`, `name`, stale_value, `value`, active_block, create_time, update_time
-      )
+    (id, `module`, `name`, init_value, stale_value, `value`, range_desc, active_block, 
+      create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.module,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
-        #{item.staleValue,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, #{item.activeBlock,jdbcType=BIGINT}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+        #{item.initValue,jdbcType=VARCHAR}, #{item.staleValue,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, 
+        #{item.rangeDesc,jdbcType=VARCHAR}, #{item.activeBlock,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -295,11 +329,17 @@
         <if test="'name'.toString() == column.value">
           #{item.name,jdbcType=VARCHAR}
         </if>
+        <if test="'init_value'.toString() == column.value">
+          #{item.initValue,jdbcType=VARCHAR}
+        </if>
         <if test="'stale_value'.toString() == column.value">
           #{item.staleValue,jdbcType=VARCHAR}
         </if>
         <if test="'value'.toString() == column.value">
           #{item.value,jdbcType=VARCHAR}
+        </if>
+        <if test="'range_desc'.toString() == column.value">
+          #{item.rangeDesc,jdbcType=VARCHAR}
         </if>
         <if test="'active_block'.toString() == column.value">
           #{item.activeBlock,jdbcType=BIGINT}
@@ -314,4 +354,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

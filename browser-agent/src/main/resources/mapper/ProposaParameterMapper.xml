@@ -10,7 +10,6 @@
         `node_id`,
         `node_name`,
         `url`,
-        `new_version`,
         `end_voting_block`,
         `active_block`,
         `timestamp`,
@@ -26,11 +25,10 @@
     values
     (
         #{txHash},
-        '2',
+        '3',
         #{nodeId},
         #{stakingName},
         #{url},
-        #{newVersion},
         #{endVotingBlock},
         #{activeBlock},
         #{timestamp},

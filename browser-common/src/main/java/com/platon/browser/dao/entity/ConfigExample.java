@@ -305,6 +305,76 @@ public class ConfigExample {
             return (Criteria) this;
         }
 
+        public Criteria andInitValueIsNull() {
+            addCriterion("init_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueIsNotNull() {
+            addCriterion("init_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueEqualTo(String value) {
+            addCriterion("init_value =", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueNotEqualTo(String value) {
+            addCriterion("init_value <>", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueGreaterThan(String value) {
+            addCriterion("init_value >", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueGreaterThanOrEqualTo(String value) {
+            addCriterion("init_value >=", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueLessThan(String value) {
+            addCriterion("init_value <", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueLessThanOrEqualTo(String value) {
+            addCriterion("init_value <=", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueLike(String value) {
+            addCriterion("init_value like", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueNotLike(String value) {
+            addCriterion("init_value not like", value, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueIn(List<String> values) {
+            addCriterion("init_value in", values, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueNotIn(List<String> values) {
+            addCriterion("init_value not in", values, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueBetween(String value1, String value2) {
+            addCriterion("init_value between", value1, value2, "initValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andInitValueNotBetween(String value1, String value2) {
+            addCriterion("init_value not between", value1, value2, "initValue");
+            return (Criteria) this;
+        }
+
         public Criteria andStaleValueIsNull() {
             addCriterion("stale_value is null");
             return (Criteria) this;
@@ -442,6 +512,76 @@ public class ConfigExample {
 
         public Criteria andValueNotBetween(String value1, String value2) {
             addCriterion("`value` not between", value1, value2, "value");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescIsNull() {
+            addCriterion("range_desc is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescIsNotNull() {
+            addCriterion("range_desc is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescEqualTo(String value) {
+            addCriterion("range_desc =", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescNotEqualTo(String value) {
+            addCriterion("range_desc <>", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescGreaterThan(String value) {
+            addCriterion("range_desc >", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescGreaterThanOrEqualTo(String value) {
+            addCriterion("range_desc >=", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescLessThan(String value) {
+            addCriterion("range_desc <", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescLessThanOrEqualTo(String value) {
+            addCriterion("range_desc <=", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescLike(String value) {
+            addCriterion("range_desc like", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescNotLike(String value) {
+            addCriterion("range_desc not like", value, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescIn(List<String> values) {
+            addCriterion("range_desc in", values, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescNotIn(List<String> values) {
+            addCriterion("range_desc not in", values, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescBetween(String value1, String value2) {
+            addCriterion("range_desc between", value1, value2, "rangeDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andRangeDescNotBetween(String value1, String value2) {
+            addCriterion("range_desc not between", value1, value2, "rangeDesc");
             return (Criteria) this;
         }
 

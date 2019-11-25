@@ -11,10 +11,12 @@ import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalParameterParam;
+import com.platon.browser.util.RoundCalculation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -44,13 +46,15 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
 
 		long startTime = System.currentTimeMillis();
 
+		BigDecimal voteEndBlockNum = RoundCalculation.getParameterProposalVoteEndBlockNum(tx.getNum(),chainConfig);
+		BigDecimal activeBlockNum = voteEndBlockNum.add(BigDecimal.ONE);
 		ProposalParameter businessParam= ProposalParameter.builder()
     			.nodeId(txParam.getVerifier())
     			.pIDID(txParam.getPIDID())
     			.url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
     			.pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
-//    			.endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger())
-//    			.activeBlock(RoundCalculation.activeBlockNumCal(tx.getNum().toString(), txParam.getEndVotingRound(), chainConfig).toBigInteger())
+    			.endVotingBlock(voteEndBlockNum.toBigInteger())
+    			.activeBlock(activeBlockNum.toBigInteger())
     			.topic(CustomProposal.QUERY_FLAG)
     			.description(CustomProposal.QUERY_FLAG)
     			.txHash(tx.getHash())
@@ -61,23 +65,21 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
 				.name(txParam.getName())
 				.newValue(txParam.getNewValue())
                 .build();
-    	
 
     	proposalBusinessMapper.parameter(businessParam);
 
-
-		String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
+		String desc = NodeOpt.TypeEnum.PARAMETER.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
 				.replace("TYPE",String.valueOf(CustomProposal.TypeEnum.PARAMETER.getCode()))
 				.replace("MODULE",businessParam.getModule())
-				.replace("PARAMETER",businessParam.getName());
-
+				.replace("NAME",businessParam.getName())
+				.replace("VALUE",businessParam.getNewValue());
 
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		nodeOpt.setNodeId(txParam.getVerifier());
-		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
+		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PARAMETER.getCode()));
 		nodeOpt.setDesc(desc);
 		nodeOpt.setTxHash(tx.getHash());
 		nodeOpt.setBNum(event.getBlock().getNum());

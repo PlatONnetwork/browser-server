@@ -58,7 +58,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
                 .stakingBlockNum(txParam.getStakingBlockNum())
                 .slashRate(chainConfig.getDuplicateSignSlashRate())
                 .benefitAddr(tx.getFrom())
-                .slash2ReportRate(chainConfig.getDuplicateSignReportRate())
+                .slash2ReportRate(chainConfig.getDuplicateSignRewardRate())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
         

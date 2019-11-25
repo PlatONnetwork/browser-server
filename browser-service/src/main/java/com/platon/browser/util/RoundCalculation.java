@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 
 /**
  * User: dongqile
@@ -24,6 +26,33 @@ public class RoundCalculation {
 
     private static Logger logger = LoggerFactory.getLogger(RoundCalculation.class);
 
+    /**
+     * 取参数提案投票结束区块号
+     * @param proposalTxBlockNumber 提案交易所在区块号
+     * @param chainConfig 链配置
+     * @return
+     */
+    public static BigDecimal getParameterProposalVoteEndBlockNum (long proposalTxBlockNumber, BlockChainConfig chainConfig ) {
+        try {
+            //交易所在区块高度
+            BigDecimal txBlockNumber = BigDecimal.valueOf(proposalTxBlockNumber);
+            //结算周期块数
+            BigDecimal settlePeriodBlockCount = new BigDecimal(chainConfig.getSettlePeriodBlockCount());
+            //【治理】参数提案的投票持续最长的时间（单位：s）
+            BigDecimal paramProposalVoteDurationSeconds= new BigDecimal(chainConfig.getParamProposalVoteDurationSeconds());
+            // 出块间隔
+            BigDecimal blockInterval = new BigDecimal(chainConfig.getBlockInterval());
+            // 计算投票截止区块号：
+            // (CEILING(参数提案所在区块号/结算周期块数)+FLOOR(参数提案的投票持续最长的时间/(出块间隔*结算周期块数)))*结算周期块数
+            return txBlockNumber
+                    .divide(settlePeriodBlockCount,0, RoundingMode.CEILING)
+                    .add(paramProposalVoteDurationSeconds.divide(blockInterval.multiply(settlePeriodBlockCount),0,RoundingMode.FLOOR))
+                    .multiply(settlePeriodBlockCount);
+        } catch (Exception e) {
+            logger.error("[RoundCalculation] exception");
+            return BigDecimal.ZERO;
+        }
+    }
 
     public static BigDecimal endBlockNumCal ( String blockNumber, BigDecimal consensusRound, BlockChainConfig chainConfig ) {
         try {

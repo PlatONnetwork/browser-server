@@ -1,24 +1,19 @@
 package com.platon.browser.data;
 
-import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.NodeVersion;
-import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.client.Web3jWrapper;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.websocket.WebSocketService;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.List;
@@ -31,10 +26,10 @@ import java.util.List;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
     //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797")); // atonDev
-    private static Web3jService service = new HttpService("http://192.168.120.151:6789");
-    private static Web3j web3j = Web3j.build(service); // atonTest
-//    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.172:8788",false);
-    /*private static Web3j web3j; // test
+//    private static Web3jService service = new HttpService("http://192.168.120.151:6789");
+//    private static Web3j web3j = Web3j.build(service); // atonTest
+    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.172:8788",false);
+    private static Web3j web3j; // test
     static {
         try {
             socketService.connect();
@@ -42,7 +37,7 @@ public class SpecialContractApiInvoker {
         } catch (ConnectException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
@@ -70,14 +65,22 @@ public class SpecialContractApiInvoker {
 //
 //        logger.error("");
 //
-//        //List<Node> nodes = nodeContract.getVerifierList().send().data;
+//        proposalContract.getParamList("");
+//        List<Node> nodes = nodeContract.getVerifierList().send().data;
 //        List<Node> nodes = nodeContract.getValidatorList().send().data;
 //        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
-        List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(6400L));
+        //BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
+        BigInteger balance = web3j
+                .platonGetBalance("0x1000000000000000000000000000000000000001", DefaultBlockParameter.valueOf(BigInteger.valueOf(1)))
+                .send().getBalance();
+
+        List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(40));
+
+
         List<Node> curVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(6440L));
 
-        List<Node> preVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(320L));
+//        List<Node> preVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(320L));
 //        List<Node> curVer = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(321L));
 //
 //        BaseResponse baseResponse = proposalContract.getActiveVersion().send();

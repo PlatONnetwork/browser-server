@@ -115,10 +115,10 @@
 
         -->
 
-        <table tableName="proposal" domainObjectName="Proposal">
+        <!--<table tableName="proposal" domainObjectName="Proposal">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>
+        </table>-->
         <table tableName="config" domainObjectName="Config">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
