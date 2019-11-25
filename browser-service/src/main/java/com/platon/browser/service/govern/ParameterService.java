@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.bean.GovernParam;
+import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -99,10 +100,10 @@ public class ParameterService {
         switch (paramEnum){
             // 质押相关
             case STAKE_THRESHOLD:
-                config.setInitValue(chainConfig.getStakeThreshold().toString());
+                config.setInitValue(Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT).toString());
                 break;
             case OPERATING_THRESHOLD:
-                config.setInitValue(chainConfig.getDelegateThreshold().toString());
+                config.setInitValue(Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT).toString());
                 break;
             case MAX_VALIDATORS:
                 config.setInitValue(chainConfig.getConsensusValidatorCount().toString());
@@ -112,10 +113,10 @@ public class ParameterService {
                 break;
             // 惩罚相关
             case SLASH_FRACTION_DUPLICATE_SIGN:
-                config.setInitValue(chainConfig.getDuplicateSignSlashRate().toString());
+                config.setInitValue(chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).toString());
                 break;
             case DUPLICATE_SIGN_REPORT_REWARD:
-                config.setInitValue(chainConfig.getDuplicateSignRewardRate().toString());
+                config.setInitValue(chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).toString());
                 break;
             case MAX_EVIDENCE_AGE:
                 config.setInitValue(chainConfig.getEvidenceValidEpoch().toString());
