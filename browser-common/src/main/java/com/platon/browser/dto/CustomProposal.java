@@ -29,14 +29,16 @@ public class CustomProposal extends Proposal {
     }
 
     /**
-     * 委托类型枚举类：
+     * 提案类型枚举类：
      *  1.文本提案
      *  2.升级提案
+     *  3.参数提案
      *  4.取消提案
      */
     public enum TypeEnum {
         TEXT(1, "文本提案"),
         UPGRADE(2, "升级提案"),
+        PARAMETER(3, "参数提案"),
         CANCEL(4, "取消提案");
         private int code;
         private String desc;

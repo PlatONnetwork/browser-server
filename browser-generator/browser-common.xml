@@ -24,7 +24,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/browser_0.7.3.1_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://localhost:3306/browser_0.7.4.0_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="root"
                         password="root"/>
 
@@ -115,7 +115,11 @@
 
         -->
 
-        <table tableName="network_stat" domainObjectName="NetworkStat">
+        <table tableName="proposal" domainObjectName="Proposal">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+        <table tableName="config" domainObjectName="Config">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

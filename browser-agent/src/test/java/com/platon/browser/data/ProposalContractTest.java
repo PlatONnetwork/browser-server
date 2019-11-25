@@ -1,15 +1,12 @@
 package com.platon.browser.data;
 
-import java.math.BigInteger;
-import java.util.List;
-
-import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.FunctionType;
 import org.web3j.platon.VoteOption;
+import org.web3j.platon.bean.ProgramVersion;
 import org.web3j.platon.bean.Proposal;
 import org.web3j.platon.bean.TallyResult;
 import org.web3j.platon.contracts.ProposalContract;
@@ -17,6 +14,9 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
+
+import java.math.BigInteger;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -146,7 +146,12 @@ public class ProposalContractTest {
 
 			Web3j web3j = Web3j.build(new HttpService(nodeHost));
 			ProposalContract voteContract = ProposalContract.load(web3j, voteCredentials, chainId);
-			BaseResponse<?> baseResponse = voteContract.vote(proposalID, nodeId, VoteOption.YEAS).send();
+
+			ProgramVersion pv = new ProgramVersion();
+			pv.setSign("xsf");
+			pv.setVersion(BigInteger.valueOf(1792));
+			BaseResponse<?> baseResponse = voteContract.vote(pv,VoteOption.YEAS,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9",
+					"25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d").send();
 			System.out.println("投票结果：" + baseResponse.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -162,7 +167,11 @@ public class ProposalContractTest {
     @Test
     public void vote() {
         try {
-            BaseResponse<?> baseResponse = proposalContract.vote("0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9", "25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d", VoteOption.YEAS).send();
+			ProgramVersion pv = new ProgramVersion();
+			pv.setVersion(BigInteger.valueOf(1792));
+			pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
+
+			BaseResponse<?> baseResponse = proposalContract.vote(pv,VoteOption.YEAS,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9","25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d").send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -228,8 +237,10 @@ public class ProposalContractTest {
 	@Test
 	public void declareVersion() {
 		try {
-			BaseResponse<?> baseResponse = proposalContract.declareVersion(
-					"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
+			ProgramVersion pv = new ProgramVersion();
+			pv.setVersion(BigInteger.valueOf(1792));
+			pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
+			BaseResponse<?> baseResponse = proposalContract.declareVersion(pv,"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
 					.send();
 			System.out.println(baseResponse.toString());
 		} catch (Exception e) {
@@ -243,8 +254,8 @@ public class ProposalContractTest {
 	@Test
 	public void getProgramVersion() {
 		try {
-			BaseResponse<?> baseResponse = proposalContract.getProgramVersion().send();
-			System.out.println(baseResponse.data);
+			BigInteger baseResponse = proposalContract.getProgramVersion().getProgramVersion();
+			System.out.println(baseResponse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
