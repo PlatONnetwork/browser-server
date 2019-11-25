@@ -18,6 +18,7 @@ import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
+import javax.jws.soap.SOAPBinding;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -170,10 +171,6 @@ public class BlockChainConfig {
     @PostConstruct
     public void init() throws ConfigLoadingException {
         updateWithEconomicConfig(client.getEconomicConfig());
-        // 使用数据库config表的配置覆盖当前配置
-        List<Config> configList = configMapper.selectByExample(null);
-        ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
-        updateWithModifiableParam(modifiableParam);
     }
 
     private void updateWithEconomicConfig(EconomicConfig dec) {
@@ -222,6 +219,8 @@ public class BlockChainConfig {
         this.duplicateSignSlashRate=new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR);
         //【惩罚】举报证据有效周期数
         this.evidenceValidEpoch=new BigDecimal(dec.getSlashing().getMaxEvidenceAge());
+        //【惩罚】扣除区块奖励的个数
+        this.slashBlockRewardCount=new BigDecimal(dec.getSlashing().getSlashBlocksReward());
 
         //【治理】文本提案参与率: >
         this.minProposalTextParticipationRate=dec.getGov().getTextProposalVoteRate();
@@ -256,26 +255,5 @@ public class BlockChainConfig {
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
         //【奖励】Platon基金会年限
         this.platOnFoundationYear=dec.getReward().getPlatonFoundationYear();
-    }
-    
-    public void updateWithModifiableParam(ModifiableParam modifiableParam){
-        //创建验证人最低的质押Token数(K)
-        this.stakeThreshold=modifiableParam.getStaking().getStakeThreshold();
-        //委托人每次委托及赎回的最低Token数(H)
-        this.delegateThreshold=modifiableParam.getStaking().getOperatingThreshold();
-        //节点质押退回锁定周期
-        this.unStakeRefundSettlePeriodCount=modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger();
-        //备选验证节点数量(U)
-        this.consensusValidatorCount=modifiableParam.getStaking().getMaxValidators().toBigInteger();
-        //举报最高处罚n3‱
-        this.duplicateSignSlashRate=modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000),16,RoundingMode.FLOOR);
-        //举报奖励n4%
-        this.duplicateSignRewardRate=modifiableParam.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);;
-        //证据有效期
-        this.evidenceValidEpoch=modifiableParam.getSlashing().getMaxEvidenceAge();
-        //扣除区块奖励的个数
-        this.slashBlockRewardCount=modifiableParam.getSlashing().getSlashBlocksReward();
-        //默认每个区块的最大Gas
-        this.maxBlockGasLimit=modifiableParam.getBlock().getMaxBlockGasLimit();
     }
 }

@@ -1,0 +1,134 @@
+package com.platon.browser.service.govern;
+
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.config.govern.ModifiableParam;
+import com.platon.browser.dao.entity.Config;
+import com.platon.browser.dao.mapper.ConfigMapper;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.platon.bean.GovernParam;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @description: 治理参数服务
+ * @author: chendongming@juzix.net
+ * @create: 2019-11-25 20:36:04
+ **/
+@Slf4j
+@Service
+public class ParameterService {
+
+    @Autowired
+    private ConfigMapper configMapper;
+    @Autowired
+    private PlatOnClient platOnClient;
+    @Autowired
+    private BlockChainConfig chainConfig;
+
+    /**
+     * 初始化配置表，只有从第一个块开始同步时需要调用
+     */
+    public void initConfigTable() throws Exception {
+        configMapper.deleteByExample(null);
+        List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().data;
+        List<Config> configList = new ArrayList<>();
+        int id = 1;
+        for (GovernParam gp : governParamList) {
+            Config config = new Config();
+            config.setId(id);
+            config.setModule(gp.getParamItem().getModule());
+            config.setName(gp.getParamItem().getName());
+            config.setValue(gp.getParamValue().getValue());
+            config.setStaleValue(gp.getParamValue().getStaleValue());
+            config.setActiveBlock(Long.parseLong(gp.getParamValue().getActiveBlock()));
+            config.setRangeDesc(gp.getParamItem().getDesc());
+            configList.add(config);
+            // 更新缺失的initValue字段值
+            updateInitValue(config);
+            id++;
+        }
+        configMapper.batchInsert(configList);
+        ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
+        updateWithModifiableParam(modifiableParam);
+    }
+
+    /**
+     * 使用配置表中的配置覆盖内存中的BlockChainConfig，在重新启动的时候调用
+     */
+    public void overrideBlockChainConfig(){
+        // 使用数据库config表的配置覆盖当前配置
+        List<Config> configList = configMapper.selectByExample(null);
+        ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
+        updateWithModifiableParam(modifiableParam);
+    }
+
+    private void updateWithModifiableParam(ModifiableParam modifiableParam){
+        //创建验证人最低的质押Token数(K)
+        chainConfig.setStakeThreshold(modifiableParam.getStaking().getStakeThreshold());
+        //委托人每次委托及赎回的最低Token数(H)
+        chainConfig.setDelegateThreshold(modifiableParam.getStaking().getOperatingThreshold());
+        //节点质押退回锁定周期
+        chainConfig.setUnStakeRefundSettlePeriodCount(modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger());
+        //备选验证节点数量(U)
+        chainConfig.setConsensusValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
+        //举报最高处罚n3‱
+        chainConfig.setDuplicateSignSlashRate(modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        //举报奖励n4%
+        chainConfig.setDuplicateSignRewardRate(modifiableParam.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
+        //证据有效期
+        chainConfig.setEvidenceValidEpoch(modifiableParam.getSlashing().getMaxEvidenceAge());
+        //扣除区块奖励的个数
+        chainConfig.setSlashBlockRewardCount(modifiableParam.getSlashing().getSlashBlocksReward());
+        //默认每个区块的最大Gas
+        chainConfig.setMaxBlockGasLimit(modifiableParam.getBlock().getMaxBlockGasLimit());
+    }
+
+    /**
+     * 更新缺失的initValue字段值
+     * @param config
+     */
+    private void updateInitValue(Config config) {
+        ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
+        switch (paramEnum){
+            // 质押相关
+            case STAKE_THRESHOLD:
+                config.setInitValue(chainConfig.getStakeThreshold().toString());
+                break;
+            case OPERATING_THRESHOLD:
+                config.setInitValue(chainConfig.getDelegateThreshold().toString());
+                break;
+            case MAX_VALIDATORS:
+                config.setInitValue(chainConfig.getConsensusValidatorCount().toString());
+                break;
+            case UN_STAKE_FREEZE_DURATION:
+                config.setInitValue(chainConfig.getUnStakeRefundSettlePeriodCount().toString());
+                break;
+            // 惩罚相关
+            case SLASH_FRACTION_DUPLICATE_SIGN:
+                config.setInitValue(chainConfig.getDuplicateSignSlashRate().toString());
+                break;
+            case DUPLICATE_SIGN_REPORT_REWARD:
+                config.setInitValue(chainConfig.getDuplicateSignRewardRate().toString());
+                break;
+            case MAX_EVIDENCE_AGE:
+                config.setInitValue(chainConfig.getEvidenceValidEpoch().toString());
+                break;
+            case SLASH_BLOCKS_REWARD:
+                config.setInitValue(chainConfig.getSlashBlockRewardCount().toString());
+                break;
+            // 区块相关
+            case MAX_BLOCK_GAS_LIMIT:
+                config.setInitValue(chainConfig.getMaxBlockGasLimit().toString());
+                break;
+            default:
+                break;
+        }
+    }
+}

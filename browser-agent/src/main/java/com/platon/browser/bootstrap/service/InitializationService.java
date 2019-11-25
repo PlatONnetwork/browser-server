@@ -2,7 +2,6 @@ package com.platon.browser.bootstrap.service;
 
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
@@ -10,18 +9,19 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.govern.ModifiableParam;
-import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.platon.bean.GovernParam;
 import org.web3j.platon.bean.Node;
 import org.web3j.utils.Convert;
 
@@ -57,40 +57,15 @@ public class InitializationService {
     @Autowired
     private AddressCache addressCache;
     @Autowired
-    private ConfigMapper configMapper;
-    @Autowired
-    private PlatOnClient platOnClient;
+    private ParameterService parameterService;
 
     @Transactional
     public InitializationResult init() throws Exception {
-        // 确保chainConfig先就绪
-        List<Config> configList = configMapper.selectByExample(null);
-        ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
-        chainConfig.updateWithModifiableParam(modifiableParam);
-
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if(networkStat==null){
-            // 初始化参数配置表
-            configMapper.deleteByExample(null);
-            List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().data;
-            configList = new ArrayList<>();
-
-            int id = 1;
-            for (GovernParam gp : governParamList) {
-                Config config = new Config();
-                config.setId(id);
-                config.setModule(gp.getParamItem().getModule());
-                config.setName(gp.getParamItem().getName());
-                config.setValue(gp.getParamValue().getValue());
-                config.setStaleValue(gp.getParamValue().getStaleValue());
-                config.setActiveBlock(Long.parseLong(gp.getParamValue().getActiveBlock()));
-                configList.add(config);
-                id++;
-            }
-            configMapper.batchInsert(configList);
-            modifiableParam = ModifiableParam.builder().build().init(configList);
-            chainConfig.updateWithModifiableParam(modifiableParam);
+            // 确保chainConfig先就绪
+            parameterService.initConfigTable();
 
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
@@ -113,6 +88,9 @@ public class InitializationService {
 
             return initialResult;
         }
+
+        // 确保chainConfig先就绪
+        parameterService.overrideBlockChainConfig();
 
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
 
