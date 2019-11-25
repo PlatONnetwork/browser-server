@@ -1,15 +1,11 @@
 package com.platon.browser.util.decode;
 
-import com.platon.browser.param.ProposalUpgradeParam;
+import com.platon.browser.param.ProposalParameterParam;
 import com.platon.browser.param.TxParam;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.utils.Numeric;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
 import static com.platon.browser.util.decode.Decoder.stringResolver;
 
 /**
@@ -26,17 +22,21 @@ class ProposalParameterDecoder {
         //pIDID
         String pIdID = stringResolver((RlpString) rootList.getValues().get(2));
         pIdID =  new String(Numeric.hexStringToByteArray(pIdID));
-        //升级版本
-        BigInteger version =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
-        //投票截止区块高度
-        BigInteger round =  bigIntegerResolver((RlpString) rootList.getValues().get(4));
-        //结束轮转换结束区块高度
-
-        return ProposalUpgradeParam.builder()
+        //参数模块
+        String module = stringResolver((RlpString) rootList.getValues().get(3));
+        module =  new String(Numeric.hexStringToByteArray(module));
+        //参数名称
+        String name = stringResolver((RlpString) rootList.getValues().get(4));
+        name =  new String(Numeric.hexStringToByteArray(name));
+        //参数值
+        String newValue = stringResolver((RlpString) rootList.getValues().get(5));
+        newValue =  new String(Numeric.hexStringToByteArray(newValue));
+        return ProposalParameterParam.builder()
                 .verifier(nodeId)
-                .endVotingRound(new BigDecimal(round))
-                .newVersion(version.intValue())
                 .pIDID(pIdID)
+                .module(module)
+                .name(name)
+                .newValue(newValue)
                 .build();
     }
 }
