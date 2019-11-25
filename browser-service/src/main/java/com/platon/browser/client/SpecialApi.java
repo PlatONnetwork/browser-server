@@ -10,6 +10,7 @@ import org.web3j.abi.datatypes.BytesType;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.platon.BaseResponse;
+import org.web3j.platon.ErrorCode;
 import org.web3j.platon.PlatOnFunction;
 import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
@@ -83,7 +84,11 @@ public class SpecialApi {
                 String value = ethCall.getValue();
                 if("0x".equals(value)){
                     // 证明没数据,返回空响应
-                    return new BaseResponse<>();
+                    BaseResponse<JSONArray> data = new BaseResponse<>();
+                    data.data=new JSONArray();
+                    data.errMsg=null;
+                    data.code= ErrorCode.SUCCESS;
+                    return data;
                 }
                 String decodedValue = new String(Numeric.hexStringToByteArray(value));
                 return JSONUtil.parseObject(decodedValue, BaseResponse.class);
