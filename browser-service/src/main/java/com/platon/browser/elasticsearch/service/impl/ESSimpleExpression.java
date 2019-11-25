@@ -64,6 +64,7 @@ public class ESSimpleExpression {
                 break;
             case QUERY_STRING:
                 qb = QueryBuilders.queryStringQuery(value.toString());
+                break;
 		default:
 			break;
         }
