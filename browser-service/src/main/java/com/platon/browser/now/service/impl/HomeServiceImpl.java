@@ -276,7 +276,7 @@ public class HomeServiceImpl implements HomeService {
 		NodeExample nodeExample = new NodeExample();
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
-		nodeExample.setOrderByClause(" big_version desc,total_value desc,staking_block_num desc ,staking_tx_index desc");
+		nodeExample.setOrderByClause(" big_version desc,total_value desc,staking_block_num asc ,staking_tx_index asc");
 		List<Node> nodes = nodeMapper.selectByExample(nodeExample);
 
 		List<StakingListResp> lists = new LinkedList<>();
