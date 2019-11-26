@@ -9,15 +9,21 @@ import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.platon.BaseResponse;
+import org.web3j.platon.ProposalType;
 import org.web3j.platon.StakingAmountType;
 import org.web3j.platon.bean.Node;
+import org.web3j.platon.bean.Proposal;
 import org.web3j.platon.bean.StakingParam;
 import org.web3j.platon.bean.UpdateStakingParam;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
+import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.Platon;
+import org.web3j.protocol.core.RemoteCall;
+import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
@@ -41,7 +47,7 @@ import java.util.List;
 public class TransactionSender {
 	private static String chainId = "100";
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:5789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
@@ -50,6 +56,7 @@ public class TransactionSender {
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
+    ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
 //    private String stakingPubKey = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
 //    private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 
@@ -182,6 +189,25 @@ public class TransactionSender {
 //    	WalletUtils.generateWalletFile("88888888", credentials.getEcKeyPair(), new File("d://"), true);
     }
 
+    //提案交易
+    @Test
+    public void paramPrposal(){
+        try{
+            PlatonBlockNumber platonBlockNumber = currentValidWeb3j.platonBlockNumber().send();
+            Proposal proposal = new Proposal();
+            proposal.setSubmitBlock(platonBlockNumber.getBlockNumber());
+            proposal.setProposalType(ProposalType.PARAM_PROPOSAL);
+            proposal.setPiPid("2000");
+            proposal.setVerifier("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
+            proposal.setModule("staking");
+            proposal.setName("maxValidators");
+            proposal.setNewValue("26");
+            BaseResponse baseResponse = proposalContract.submitProposal(proposal).send();
+            logger.debug("res:{}",baseResponse.code);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
     // 发送解委托交易
