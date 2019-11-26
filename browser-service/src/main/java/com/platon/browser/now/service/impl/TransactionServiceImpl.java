@@ -437,6 +437,16 @@ public class TransactionServiceImpl implements TransactionService {
 						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case PROPOSAL_PARAMETER:
+						ProposalParameterParam proposalParameterParam = JSON.parseObject(txInfo, ProposalParameterParam.class);
+						if(StringUtils.isNotBlank(proposalParameterParam.getPIDID())) {
+							resp.setPipNum("PIP-" + proposalParameterParam.getPIDID());
+						}
+						resp.setNodeId(proposalParameterParam.getVerifier());
+						resp.setProposalHash(req.getTxHash());
+						resp.setNodeName(commonService.getNodeName(proposalParameterParam.getVerifier(), proposalParameterParam.getNodeName()));
+						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
+						break;
 					case PROPOSAL_CANCEL:
 						ProposalCancelParam cancelProposalParam = JSON.parseObject(txInfo, ProposalCancelParam.class);
 						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {

@@ -6,8 +6,12 @@ import com.platon.browser.config.BrowserCache;
 import com.platon.browser.config.MessageDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.now.service.BlockService;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.StakingService;
+import com.platon.browser.now.service.TransactionService;
+import com.platon.browser.req.newblock.BlockDetailsReq;
+import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.AliveStakingListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
@@ -49,6 +53,10 @@ public class StompPushJob {
     private HomeService homeService;
     @Autowired
     private StakingService stakingService;
+    @Autowired
+    private BlockService blockService;
+    @Autowired
+    private TransactionService transactionService;
     
     /**
      * 	推送统计相关信息
@@ -121,5 +129,26 @@ public class StompPushJob {
 				}
     		}
     	}
+    }
+    
+    /**
+     * es定时查询，warm
+     */
+    @Scheduled(cron="0/20 * * * * ?")
+    public void eswarm() {
+    	/**
+    	 * 区块index做warm
+    	 */
+    	BlockDetailsReq blockDetailsReq = new BlockDetailsReq();
+    	blockDetailsReq.setNumber(1);
+    	blockService.blockDetails(blockDetailsReq);
+    	TransactionListByBlockRequest transactionListByBlockRequest = new TransactionListByBlockRequest();
+    	/**
+    	 * 交易index做warm
+    	 */
+    	transactionListByBlockRequest.setBlockNumber(1);
+    	transactionListByBlockRequest.setPageNo(1);
+    	transactionListByBlockRequest.setPageSize(10);
+    	transactionService.getTransactionListByBlock(transactionListByBlockRequest);
     }
 }
