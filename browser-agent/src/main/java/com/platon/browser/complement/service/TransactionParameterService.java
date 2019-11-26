@@ -51,6 +51,8 @@ public class TransactionParameterService {
     @Autowired
     private ProposalUpgradeConverter proposalUpgradeConverter;
     @Autowired
+    private ProposalParameterConverter proposalParameterConverter;
+    @Autowired
     private ProposalCancelConverter proposalCancelConverter;
     @Autowired
     private ProposalVoteConverter proposalVoteConverter;
@@ -114,6 +116,12 @@ public class TransactionParameterService {
                      	if( Transaction.StatusEnum.SUCCESS.getCode()==tx.getStatus()) {
                     		proposalQty++;
                     	} 
+                        break;
+                    case PROPOSAL_PARAMETER: // 2002
+                        nodeOpt = proposalParameterConverter.convert(event,tx);
+                        if( Transaction.StatusEnum.SUCCESS.getCode()==tx.getStatus()) {
+                            proposalQty++;
+                        }
                         break;
                     case PROPOSAL_CANCEL: // 2005
                     	nodeOpt = proposalCancelConverter.convert(event,tx);
