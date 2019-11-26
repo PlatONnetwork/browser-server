@@ -2,13 +2,11 @@ package com.platon.browser.client;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.platon.BaseResponse;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
-import org.web3j.utils.JSONUtil;
+import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
@@ -54,21 +52,14 @@ public class Receipt {
             logStatus=FAILURE;
             return;
         }
-        data=data.replace("0x","");
-        RlpList b = RlpDecoder.decode(Hex.decode(data));
-        RlpList group = (RlpList) b.getValues().get(0);
-        RlpString out = (RlpString) group.getValues().get(0);
-        String res = new String(out.getBytes());
-        BaseResponse<?> response = JSONUtil.parseObject(res, BaseResponse.class);
-        if(response==null) {
+        RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(data));
+        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+        int statusCode = Integer.parseInt(decodedStatus);
+        if(statusCode==0){
+            logStatus=SUCCESS;
+        }else {
             logStatus=FAILURE;
-            return;
         }
-        if(!response.isStatusOk()) {
-            logStatus=FAILURE;
-            failReason=response.errMsg;
-            return;
-        }
-        logStatus=SUCCESS;
     }
 }
