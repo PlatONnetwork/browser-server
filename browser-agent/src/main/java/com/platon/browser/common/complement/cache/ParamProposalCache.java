@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * 参数提案缓存
- * 缓存结构: Map<提案生效块号,List<参数提案ID>>
+ * 缓存结构: Map<提案生效块号,List<参数提案交易Hash>>
  */
 @Component
 public class ParamProposalCache {
@@ -25,6 +25,6 @@ public class ParamProposalCache {
 
     public void init(List<Proposal> proposalList) {
         if(proposalList.isEmpty()) return;
-        proposalList.forEach(p->add(p.getActiveBlock(),p.getPipId()));
+        proposalList.forEach(p->add(p.getActiveBlock(),p.getHash()));
     }
 }

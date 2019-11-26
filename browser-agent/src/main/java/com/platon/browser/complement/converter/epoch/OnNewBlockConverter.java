@@ -61,21 +61,21 @@ public class OnNewBlockConverter {
 		newBlockMapper.newBlock(newBlock);
 
 		// 检查当前区块是否有参数提案生效
-        Set<String> pidSet = paramProposalCache.get(block.getNum());
-        if(pidSet!=null){
+        Set<String> proposalTxHashSet = paramProposalCache.get(block.getNum());
+        if(proposalTxHashSet!=null){
             ProposalExample proposalExample = new ProposalExample();
-            proposalExample.createCriteria().andPipIdIn(new ArrayList<>(pidSet));
+            proposalExample.createCriteria().andHashIn(new ArrayList<>(proposalTxHashSet));
             List<Proposal> proposalList = proposalMapper.selectByExample(proposalExample);
             Map<String,Proposal> proposalMap = new HashMap<>();
-            proposalList.forEach(p->proposalMap.put(p.getPipId(),p));
+            proposalList.forEach(p->proposalMap.put(p.getHash(),p));
             List<Config> configList = new ArrayList<>();
-            for (String pid : pidSet) {
+            for (String hash : proposalTxHashSet) {
                 try {
-                    TallyResult tr = proposalService.getTallyResult(pid);
+                    TallyResult tr = proposalService.getTallyResult(hash);
                     if(tr.getStatus()== CustomProposal.StatusEnum.FINISH.getCode()){
                         // 提案生效：
                         // 把提案表中的参数覆盖到Config表中对应的参数
-                        Proposal proposal = proposalMap.get(pid);
+                        Proposal proposal = proposalMap.get(hash);
                         Config config = new Config();
                         config.setModule(proposal.getModule());
                         config.setName(proposal.getName());
