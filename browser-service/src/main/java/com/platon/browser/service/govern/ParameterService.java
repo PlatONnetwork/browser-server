@@ -34,7 +34,7 @@ public class ParameterService {
     private BlockChainConfig chainConfig;
 
     /**
-     * 初始化配置表，只有从第一个块开始同步时需要调用
+     * 使用debug_economic_config接口返回的数据初始化配置表，只有从第一个块开始同步时需要调用
      */
     public void initConfigTable() throws Exception {
         configMapper.deleteByExample(null);
@@ -46,18 +46,50 @@ public class ParameterService {
             config.setId(id);
             config.setModule(gp.getParamItem().getModule());
             config.setName(gp.getParamItem().getName());
-            config.setValue(gp.getParamValue().getValue());
-            config.setStaleValue(gp.getParamValue().getStaleValue());
-            config.setActiveBlock(Long.parseLong(gp.getParamValue().getActiveBlock()));
             config.setRangeDesc(gp.getParamItem().getDesc());
+            config.setActiveBlock(0L);
             configList.add(config);
-            // 更新缺失的initValue字段值
-            updateInitValue(config);
+            // 更新内存中的blockChainConfig中在init_value,stale_value,value字段值
+            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
+            switch (paramEnum){
+                // 质押相关
+                case STAKE_THRESHOLD:
+                    config.setInitValue(Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT).toString());
+                    break;
+                case OPERATING_THRESHOLD:
+                    config.setInitValue(Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT).toString());
+                    break;
+                case MAX_VALIDATORS:
+                    config.setInitValue(chainConfig.getConsensusValidatorCount().toString());
+                    break;
+                case UN_STAKE_FREEZE_DURATION:
+                    config.setInitValue(chainConfig.getUnStakeRefundSettlePeriodCount().toString());
+                    break;
+                // 惩罚相关
+                case SLASH_FRACTION_DUPLICATE_SIGN:
+                    config.setInitValue(chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).toString());
+                    break;
+                case DUPLICATE_SIGN_REPORT_REWARD:
+                    config.setInitValue(chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).toString());
+                    break;
+                case MAX_EVIDENCE_AGE:
+                    config.setInitValue(chainConfig.getEvidenceValidEpoch().toString());
+                    break;
+                case SLASH_BLOCKS_REWARD:
+                    config.setInitValue(chainConfig.getSlashBlockRewardCount().toString());
+                    break;
+                // 区块相关
+                case MAX_BLOCK_GAS_LIMIT:
+                    config.setInitValue(chainConfig.getMaxBlockGasLimit().toString());
+                    break;
+                default:
+                    break;
+            }
+            config.setValue(config.getInitValue());
+            config.setStaleValue(config.getInitValue());
             id++;
         }
         configMapper.batchInsert(configList);
-        ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
-        updateWithModifiableParam(modifiableParam);
     }
 
     /**
@@ -67,10 +99,7 @@ public class ParameterService {
         // 使用数据库config表的配置覆盖当前配置
         List<Config> configList = configMapper.selectByExample(null);
         ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
-        updateWithModifiableParam(modifiableParam);
-    }
 
-    private void updateWithModifiableParam(ModifiableParam modifiableParam){
         //创建验证人最低的质押Token数(K)
         chainConfig.setStakeThreshold(modifiableParam.getStaking().getStakeThreshold());
         //委托人每次委托及赎回的最低Token数(H)
@@ -89,47 +118,5 @@ public class ParameterService {
         chainConfig.setSlashBlockRewardCount(modifiableParam.getSlashing().getSlashBlocksReward());
         //默认每个区块的最大Gas
         chainConfig.setMaxBlockGasLimit(modifiableParam.getBlock().getMaxBlockGasLimit());
-    }
-
-    /**
-     * 更新缺失的initValue字段值
-     * @param config
-     */
-    private void updateInitValue(Config config) {
-        ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
-        switch (paramEnum){
-            // 质押相关
-            case STAKE_THRESHOLD:
-                config.setInitValue(Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT).toString());
-                break;
-            case OPERATING_THRESHOLD:
-                config.setInitValue(Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT).toString());
-                break;
-            case MAX_VALIDATORS:
-                config.setInitValue(chainConfig.getConsensusValidatorCount().toString());
-                break;
-            case UN_STAKE_FREEZE_DURATION:
-                config.setInitValue(chainConfig.getUnStakeRefundSettlePeriodCount().toString());
-                break;
-            // 惩罚相关
-            case SLASH_FRACTION_DUPLICATE_SIGN:
-                config.setInitValue(chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).toString());
-                break;
-            case DUPLICATE_SIGN_REPORT_REWARD:
-                config.setInitValue(chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).toString());
-                break;
-            case MAX_EVIDENCE_AGE:
-                config.setInitValue(chainConfig.getEvidenceValidEpoch().toString());
-                break;
-            case SLASH_BLOCKS_REWARD:
-                config.setInitValue(chainConfig.getSlashBlockRewardCount().toString());
-                break;
-            // 区块相关
-            case MAX_BLOCK_GAS_LIMIT:
-                config.setInitValue(chainConfig.getMaxBlockGasLimit().toString());
-                break;
-            default:
-                break;
-        }
     }
 }

@@ -4,6 +4,7 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.platon.bean.GovernParam;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
@@ -69,6 +70,8 @@ public class SpecialContractApiInvoker {
 //        List<Node> nodes = nodeContract.getVerifierList().send().data;
 //        List<Node> nodes = nodeContract.getValidatorList().send().data;
 //        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
+
+        List<GovernParam> governParamList = proposalContract.getParamList("").send().data;
 
         //BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
         BigInteger balance = web3j
