@@ -12,6 +12,7 @@ import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.websocket.WebSocketService;
 
 import java.math.BigDecimal;
@@ -49,6 +50,8 @@ public class SpecialContractApiInvoker {
     private static SpecialApi sca = new SpecialApi();
 
     public static void main(String args[]) throws Exception {
+
+        TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x6d73ce6d593b39a4cd47971a8f7be7e9b1df70fce2975945a910738f00513b8d").send().getTransactionReceipt().get();
 
        /* Web3jWrapper web3jWrapper = Web3jWrapper.builder()
                 .web3j(web3j)
