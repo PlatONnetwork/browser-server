@@ -77,8 +77,8 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
 		// 业务数据入库
     	proposalBusinessMapper.parameter(businessParam);
 
-    	// 添加到参数提案缓存
-		paramProposalCache.add(tx.getNum(),txParam.getPIDID());
+    	// 添加到参数提案缓存Map<未来生效块号,List<提案ID>>
+		paramProposalCache.add(activeBlockNum.longValue(),tx.getHash());
 
 		String desc = NodeOpt.TypeEnum.PARAMETER.getTpl()
 				.replace("ID",txParam.getPIDID())

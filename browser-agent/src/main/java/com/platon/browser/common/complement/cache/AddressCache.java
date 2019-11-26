@@ -57,6 +57,7 @@ public class AddressCache {
 		    break;
 		case PROPOSAL_TEXT:// 创建文本提案
 		case PROPOSAL_UPGRADE:// 创建升级提案
+		case PROPOSAL_PARAMETER:// 创建参数提案
 		case PROPOSAL_VOTE:// 提案投票
 		case PROPOSAL_CANCEL:// 取消提案
 		case VERSION_DECLARE:// 版本声明
