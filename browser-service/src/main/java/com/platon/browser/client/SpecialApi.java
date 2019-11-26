@@ -213,11 +213,16 @@ public class SpecialApi {
             }
             String json = data.toJSONString();
             String[] a = json.replace("[","").replace("]","").split(",");
-            if (a.length<4) throw new ContractInvokeException("返回数据不完整!");
-            String voterCount=a[0].trim();
-            String supportCount=a[1].trim();
-            String opposeCount=a[2].trim();
-            String abstainCount=a[3].trim();
+            String voterCount="0";
+            String supportCount="0";
+            String opposeCount="0";
+            String abstainCount="0";
+            if (a.length>=4){
+                voterCount=a[0].trim();
+                supportCount=a[1].trim();
+                opposeCount=a[2].trim();
+                abstainCount=a[3].trim();
+            }
             ProposalParticiantStat pps = new ProposalParticiantStat();
             pps.setVoterCount(Long.parseLong(voterCount));
             pps.setSupportCount(Long.parseLong(supportCount));
