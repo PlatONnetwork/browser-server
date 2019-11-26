@@ -75,15 +75,12 @@ public class RoundCalculation {
      * 生效轮数转化区块高度
      * 生效块高 = 投票结束区块  + 共识周期块数 - 提案交易所在块高%共识周期块数  + 1
      */
-    public static BigDecimal activeBlockNumCal ( String blockNumber, BigDecimal voteNum, BlockChainConfig chainConfig ) {
+    public static BigDecimal activeBlockNumCal ( BigDecimal voteNum, BlockChainConfig chainConfig ) {
         try {
-            //结束区块
-            //交易所在区块高度
-            BigDecimal txBlockNumber = new BigDecimal(blockNumber);
             //共识周期块数
             BigDecimal consensusCount = new BigDecimal(chainConfig.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮
-            BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
+            BigDecimal[] belongToConList = voteNum.divideAndRemainder(consensusCount);
             BigDecimal belongToCon = belongToConList[1];
             //转换生效块高
             return voteNum.add(consensusCount).subtract(belongToCon).add(BigDecimal.ONE);
