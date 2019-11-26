@@ -21,7 +21,7 @@
         `module`,
         `name`,
         `stale_value`,
-        `new_value`,
+        `new_value`
     )
     values
     (
