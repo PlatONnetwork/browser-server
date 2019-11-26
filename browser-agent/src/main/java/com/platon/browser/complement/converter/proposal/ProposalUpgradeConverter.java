@@ -43,6 +43,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
 		updateTxInfo(txParam,tx);
 		// 失败的交易不分析业务数据
 		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+
 		BigInteger voteNum = RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger();
 		long startTime = System.currentTimeMillis();
     	ProposalUpgrade businessParam= ProposalUpgrade.builder()
