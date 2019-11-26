@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -42,16 +43,15 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
 		updateTxInfo(txParam,tx);
 		// 失败的交易不分析业务数据
 		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
-
+		BigInteger voteNum = RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger();
 		long startTime = System.currentTimeMillis();
-
     	ProposalUpgrade businessParam= ProposalUpgrade.builder()
     			.nodeId(txParam.getVerifier())
     			.pIDID(txParam.getPIDID())
     			.url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
     			.pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
-    			.endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger())
-    			.activeBlock(RoundCalculation.activeBlockNumCal(tx.getNum().toString(), txParam.getEndVotingRound(), chainConfig).toBigInteger())
+    			.endVotingBlock(voteNum)
+    			.activeBlock(RoundCalculation.activeBlockNumCal(tx.getNum().toString(), new BigDecimal(voteNum.toString()), chainConfig).toBigInteger())
     			.topic(CustomProposal.QUERY_FLAG)
     			.description(CustomProposal.QUERY_FLAG)
     			.txHash(tx.getHash())
