@@ -5,10 +5,12 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.govern.ModifiableParam;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
+import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.bean.GovernParam;
 import org.web3j.utils.Convert;
 
@@ -24,6 +26,7 @@ import java.util.List;
  **/
 @Slf4j
 @Service
+@Transactional
 public class ParameterService {
 
     @Autowired
@@ -32,6 +35,8 @@ public class ParameterService {
     private PlatOnClient platOnClient;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private CustomConfigMapper customConfigMapper;
 
     /**
      * 使用debug_economic_config接口返回的数据初始化配置表，只有从第一个块开始同步时需要调用
@@ -118,5 +123,17 @@ public class ParameterService {
         chainConfig.setSlashBlockRewardCount(modifiableParam.getSlashing().getSlashBlocksReward());
         //默认每个区块的最大Gas
         chainConfig.setMaxBlockGasLimit(modifiableParam.getBlock().getMaxBlockGasLimit());
+    }
+
+    /**
+     * 配置值轮换：value旧值覆盖到stale_value，参数中的新值覆盖value
+     * @param activeConfigList 被激活的配置信息列表
+     */
+    @Transactional
+    public void rotateConfig(List<Config> activeConfigList) {
+        // 更新配置表
+        customConfigMapper.rotateConfig(activeConfigList);
+        //更新内存中的BlockChainConfig
+        overrideBlockChainConfig();
     }
 }

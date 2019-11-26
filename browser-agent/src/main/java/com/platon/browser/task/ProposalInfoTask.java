@@ -1,23 +1,18 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
-import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.service.proposal.ProposalService;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.TallyResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +26,13 @@ import java.util.List;
 @Component
 public class ProposalInfoTask {
     @Autowired
-    private PlatOnClient client;
-    @Autowired
-    private SpecialApi sca;
-    @Autowired
     private NetworkStatCache networkStatCache;
     @Autowired
     private ProposalMapper proposalMapper;
     @Autowired
     private CustomProposalMapper customProposalMapper;
+    @Autowired
+    private ProposalService proposalService;
 
     /**
      *
@@ -71,7 +64,7 @@ public class ProposalInfoTask {
 
             try {
                 //发送rpc请求查询提案结果
-                ProposalParticiantStat pps = getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
+                ProposalParticiantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
                 //设置参与人数
                 if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
                     // 有变更
@@ -98,7 +91,7 @@ public class ProposalInfoTask {
                 //只有在结束快高之后才有返回提案结果
                 if (networkStatCache.getNetworkStat().getCurNumber() >= proposal.getEndVotingBlock()) {
                     //设置状态
-                    int status = getTallyResult(proposal.getHash()).getStatus();
+                    int status = proposalService.getTallyResult(proposal.getHash()).getStatus();
                     if (status != proposal.getStatus()) {
                         // 有变更
                         proposal.setStatus(status);
@@ -110,34 +103,4 @@ public class ProposalInfoTask {
             customProposalMapper.updateProposalInfoList(proposals);
         }
     }
-
-
-
-    /**
-     * 取提案参与者统计信息
-     *
-     * @param proposalHash
-     * @param blockHash
-     * @return
-     * @throws Exception
-     */
-    private ProposalParticiantStat getProposalParticipantStat ( String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
-        return sca.getProposalParticipants(client.getWeb3jWrapper().getWeb3j(), proposalHash, blockHash);
-    }
-
-    /**
-     * 根据提案hash取提案投票结果
-     *
-     * @param proposalHash
-     * @return
-     * @throws Exception
-     */
-    private TallyResult getTallyResult ( String proposalHash ) throws Exception {
-        BaseResponse <TallyResult> result = client.getProposalContract().getTallyResult(proposalHash).send();
-        if (result.isStatusOk()) {
-            return result.data;
-        }
-        throw new ContractInvokeException("查询不到提案[proposalHash=" + proposalHash + "]对应的投票结果!");
-    }
-
 }

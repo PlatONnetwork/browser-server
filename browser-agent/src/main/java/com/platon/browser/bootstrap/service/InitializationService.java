@@ -6,16 +6,17 @@ import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.common.complement.cache.ParamProposalCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.entity.ProposalExample;
+import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import lombok.extern.slf4j.Slf4j;
@@ -58,9 +59,19 @@ public class InitializationService {
     private AddressCache addressCache;
     @Autowired
     private ParameterService parameterService;
+    @Autowired
+    private ProposalMapper proposalMapper;
+    @Autowired
+    private ParamProposalCache paramProposalCache;
 
     @Transactional
     public InitializationResult init() throws Exception {
+        // 初始化参数提案缓存：把所有状态为投票中的参数提案缓存到内存中
+        ProposalExample proposalExample = new ProposalExample();
+        proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
+        List<Proposal> proposalList = proposalMapper.selectByExample(proposalExample);
+        paramProposalCache.init(proposalList);
+
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if(networkStat==null){
