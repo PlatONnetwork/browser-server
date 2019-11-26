@@ -73,22 +73,22 @@ public class RoundCalculation {
 
     /**
      * 生效轮数转化区块高度
-     * 生效块高 = 提案交易所在块高 + 共识周期块数 - 提案交易所在块高%共识周期块数 + (提案入参轮数+设置预升级开始轮数) * 共识周期块数  + 1
+     * 生效块高 = 投票结束区块  + 共识周期块数 - 提案交易所在块高%共识周期块数  + 1
      */
-    public static BigDecimal activeBlockNumCal ( String blockNumber, BigDecimal endRound, BlockChainConfig chainConfig ) {
+    public static BigDecimal activeBlockNumCal ( String blockNumber, BigDecimal voteNum, BlockChainConfig chainConfig ) {
         try {
+            //结束区块
             //交易所在区块高度
             BigDecimal txBlockNumber = new BigDecimal(blockNumber);
-            //治理交易生效轮数
-            BigDecimal txActiveRound = endRound.add(chainConfig.getVersionProposalActiveConsensusRounds().subtract(BigDecimal.ONE));
             //共识周期块数
             BigDecimal consensusCount = new BigDecimal(chainConfig.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
             BigDecimal belongToCon = belongToConList[1];
             //转换生效块高
-            return txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound.multiply(consensusCount)).add(BigDecimal.ONE);
+            return voteNum.add(consensusCount).subtract(belongToCon).add(BigDecimal.ONE);
         } catch (Exception e) {
+            logger.error("---------------------------------------------------------------", e);
             return BigDecimal.ZERO;
         }
     }
