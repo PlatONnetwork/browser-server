@@ -348,6 +348,15 @@ public class StakingServiceImpl implements StakingService {
 						stakingOptRecordListResp.setAmount(new BigDecimal(desces[2]));
 						stakingOptRecordListResp.setIsFire(Integer.parseInt(desces[3]));
 						break;
+						/**
+						 * 参数提案
+						 */
+					case PARAMETER:
+						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
+						stakingOptRecordListResp.setTitle(BrowserConst.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setProposalType(desces[2]);
+						stakingOptRecordListResp.setType("4");
+						break;
 					default:
 						break;
 				}

@@ -1,12 +1,17 @@
 package com.platon.browser.now.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
 
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.now.service.ExtraService;
@@ -64,25 +69,49 @@ public class ExtraServiceImpl implements ExtraService {
 	        String res3 = config.getRangeDesc().replaceAll(regex, "$3");
 	        String res4 = config.getRangeDesc().replaceAll(regex, "$4");
 			configDetail.setStart(res1);
-			configDetail.setStartValue(res2);
-			configDetail.setEndValue(res3);
 			configDetail.setEnd(res4);
+			BeanUtils.copyProperties(config, configDetail);
+			/**
+			 * lat转换单位
+			 */
+			if(BrowserConst.EXTRA_LAT_PARAM.contains(config.getName())) {
+				if(StringUtils.isNotBlank(res2)) {
+					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+				}
+				if(StringUtils.isNotBlank(res3)) {
+					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+				}
+				if(StringUtils.isNotBlank(config.getValue())) {
+					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+				}
+				if(StringUtils.isNotBlank(config.getInitValue())) {
+					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+				}
+			} else {
+				configDetail.setStartValue(res2.trim());
+				configDetail.setEndValue(res3.trim());
+			}
+			/**
+			 * 百分比转换
+			 */
+			if(BrowserConst.EXTRA_PECENT_PARAM.contains(config.getName())) {
+				configDetail.setValue(new BigDecimal(config.getValue()).setScale(0).toString());
+				configDetail.setInitValue(new BigDecimal(config.getInitValue()).setScale(0).toString());
+			}
 			switch (config.getModule()) {
 			case "staking":
-				BeanUtils.copyProperties(config, configDetail);
 				stakingConfigDetails.add(configDetail);
 				break;
 			case "slashing":
-				BeanUtils.copyProperties(config, configDetail);
 				slashingConfigDetails.add(configDetail);
 				break;
 			case "block":
-				BeanUtils.copyProperties(config, configDetail);
 				blockConfigDetails.add(configDetail);
 				break;
 			default:
 				break;
 			}
+			
 			configDetail.setName(ConvertUtil.captureName(config.getName()));
 			/**
 			 * 设置质押和证据的上下区块

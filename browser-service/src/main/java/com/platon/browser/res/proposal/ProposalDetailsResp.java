@@ -41,8 +41,6 @@ public class ProposalDetailsResp {
     private Long inBlock;   //所在块高
     private String canceledPipId;//取消提案對應的提案id
     private String canceledTopic;//取消提案對應的提案標題
-    private String oriParams;//旧参数
-    private String newParams;//新参数
     private String participationRate;//通过条件率
 	public String getPipNum() {
 		return pipNum;
@@ -220,18 +218,7 @@ public class ProposalDetailsResp {
 	public void setCanceledTopic(String canceledTopic) {
 		this.canceledTopic = canceledTopic;
 	}
-	public String getOriParams() {
-		return oriParams;
-	}
-	public void setOriParams(String oriParams) {
-		this.oriParams = oriParams;
-	}
-	public String getNewParams() {
-		return newParams;
-	}
-	public void setNewParams(String newParams) {
-		this.newParams = newParams;
-	}
+	@JsonSerialize(using = CustomRateSerializer.class)
 	public String getParticipationRate() {
 		return participationRate;
 	}

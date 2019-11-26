@@ -20,6 +20,7 @@ import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.StakingListNewResp;
 import com.platon.browser.res.staking.AliveStakingListResp;
 import com.platon.browser.res.staking.StakingStatisticNewResp;
+import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class StompPushJob {
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    private ParameterService parameterService;
     
     /**
      * 	推送统计相关信息
@@ -150,5 +153,14 @@ public class StompPushJob {
     	transactionListByBlockRequest.setPageNo(1);
     	transactionListByBlockRequest.setPageSize(10);
     	transactionService.getTransactionListByBlock(transactionListByBlockRequest);
+    }
+    
+    
+    /**
+     * 定时获取配置
+     */
+    @Scheduled(cron="0 0/30 * * * ?")
+    public void updateConfig() {
+    	parameterService.overrideBlockChainConfig();
     }
 }

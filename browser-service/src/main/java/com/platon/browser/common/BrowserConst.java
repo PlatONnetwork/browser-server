@@ -43,4 +43,10 @@ public class BrowserConst {
 	/**WEB超时时间*/
 	public static final Integer WEB_TIME_OUT = 30000;
 	
+	/**lat转换的name名*/
+	public static final String EXTRA_LAT_PARAM = "stakeThreshold,operatingThreshold";
+	
+	/**百分比转换的name名*/
+	public static final String EXTRA_PECENT_PARAM = "slashFractionDuplicateSign,duplicateSignReportReward";
+	
 }

@@ -21,6 +21,7 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.util.BeanConvertUtil;
+import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.VerUtil;
 
@@ -119,8 +120,11 @@ public class ProposalServiceImpl implements ProposalService {
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalUpgradePassRate().toString());
 				break;
 			case PARAMETER:
-				proposalDetailsResp.setNewParams(proposal.getNewValue());
-				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalUpgradePassRate().toString());
+				proposalDetailsResp.setParamName(ConvertUtil.captureName(proposal.getName()));
+				proposalDetailsResp.setCurrentValue(proposal.getNewValue());
+				proposalDetailsResp.setNewValue(proposal.getStaleValue());
+				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getParamProposalSupportRate().toString());
+				proposalDetailsResp.setParticipationRate(blockChainConfig.getParamProposalVoteRate().toString());
 				break;
 			case CANCEL:
 				 /**
