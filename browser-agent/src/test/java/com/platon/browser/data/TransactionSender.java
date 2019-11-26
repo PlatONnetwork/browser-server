@@ -123,6 +123,8 @@ public class TransactionSender {
                .setWebSite(webSite)
                .setDetails(details)
                .setBlsPubKey(stakingBlsKey)
+               .setProcessVersion(stakingContract.getProgramVersion())
+               .setBlsProof(stakingContract.getAdminSchnorrNIZKProve())
                .build()).send();
         BaseResponse<?> baseResponse = stakingContract.getStakingResult(platonSendTransaction).send();
         System.out.println(baseResponse.toString());

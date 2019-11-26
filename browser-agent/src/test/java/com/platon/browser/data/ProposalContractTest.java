@@ -115,6 +115,33 @@ public class ProposalContractTest {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 提交参数提案 verifier
+	 */
+	@Test
+	public void submitParamsProposal() {
+		try {
+			String num = "10";
+			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
+					Proposal.createSubmitParamProposalParam(nodeId, num, "staking", "maxValidators", "5"))
+					.send();
+			BaseResponse<?> baseResponse = proposalContract
+					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
+			System.out.println("发起提案结果：" + baseResponse.toString());
+
+			voteForProposal(platonSendTransaction.getTransactionHash());
+//
+//			queryResult(platonSendTransaction.getTransactionHash());
+//
+//			this.cancelProposal(platonSendTransaction.getTransactionHash(), String.valueOf(Integer.parseInt(num)+1));
+
+//			verify(proposalContract, times(1)).submitProposalReturnTransaction(any());
+//			verify(proposalContract, times(1)).getSubmitProposalResult(any(),any());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void voteForProposal(String proposalID) {
 //		vote(proposalID,
@@ -148,11 +175,8 @@ public class ProposalContractTest {
 			Web3j web3j = Web3j.build(new HttpService(nodeHost));
 			ProposalContract voteContract = ProposalContract.load(web3j, voteCredentials, chainId);
 
-			ProgramVersion pv = new ProgramVersion();
-			pv.setSign("xsf");
-			pv.setVersion(BigInteger.valueOf(1792));
-			BaseResponse<?> baseResponse = voteContract.vote(pv,VoteOption.YEAS,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9",
-					"25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d").send();
+			ProgramVersion pv = voteContract.getProgramVersion();
+			BaseResponse<?> baseResponse = voteContract.vote(pv,voteOption,proposalID,nodeId).send();
 			System.out.println("投票结果：" + baseResponse.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
