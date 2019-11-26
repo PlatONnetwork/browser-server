@@ -85,7 +85,6 @@ public class RoundCalculation {
             //转换生效块高
             return voteNum.add(consensusCount).subtract(belongToCon).add(BigDecimal.ONE);
         } catch (Exception e) {
-            logger.error("---------------------------------------------------------------", e);
             return BigDecimal.ZERO;
         }
     }
