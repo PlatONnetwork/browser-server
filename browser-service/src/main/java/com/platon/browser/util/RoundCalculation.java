@@ -73,7 +73,7 @@ public class RoundCalculation {
 
     /**
      * 生效轮数转化区块高度
-     * 生效块高 = 投票结束区块  + 共识周期块数 - 提案交易所在块高%共识周期块数  + 1
+     * 生效块高 = 投票结束区块  + 共识周期块数 - 投票结束区块%共识周期块数  + 1
      */
     public static BigDecimal activeBlockNumCal ( BigDecimal voteNum, BlockChainConfig chainConfig ) {
         try {
