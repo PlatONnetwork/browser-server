@@ -7,7 +7,7 @@ PUT /_template/block_template
   "settings": {
     "number_of_shards": 5,
     "number_of_replicas": 1,
-    "max_result_window": 100000
+    "max_result_window": 2000000000
   },
   "mappings": {
     "properties": {
@@ -111,12 +111,12 @@ PUT /_template/block_template
 PUT /_template/transaction_template
 {
   "index_patterns": [
-    "browser_transaction_*"
+    "browser_transaction_*",
+    "max_result_window": 2000000000
   ],
   "settings": {
     "number_of_shards": 5,
-    "number_of_replicas": 1,
-    "max_result_window": 100000
+    "number_of_replicas": 1
   },
   "mappings": {
     "properties": {
@@ -225,7 +225,7 @@ PUT /_template/delegation_template
   "settings": {
     "number_of_shards": 5,
     "number_of_replicas": 1,
-    "max_result_window": 100000
+    "max_result_window": 2000000000
   },
   "mappings": {
     "properties": {
@@ -283,7 +283,7 @@ PUT /_template/nodeopt_template
   "settings": {
     "number_of_shards": 5,
     "number_of_replicas": 1,
-    "max_result_window": 100000
+    "max_result_window": 2000000000
   },
   "mappings": {
     "properties": {
