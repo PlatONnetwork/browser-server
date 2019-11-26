@@ -57,6 +57,8 @@ public class Proposal {
 
     private String name;
 
+    private String staleValue;
+
     private String newValue;
 
     public String getHash() {
@@ -267,6 +269,14 @@ public class Proposal {
         this.name = name == null ? null : name.trim();
     }
 
+    public String getStaleValue() {
+        return staleValue;
+    }
+
+    public void setStaleValue(String staleValue) {
+        this.staleValue = staleValue == null ? null : staleValue.trim();
+    }
+
     public String getNewValue() {
         return newValue;
     }
@@ -309,6 +319,7 @@ public class Proposal {
         completionFlag("completion_flag", "completionFlag", "INTEGER", false),
         module("module", "module", "VARCHAR", true),
         name("name", "name", "VARCHAR", true),
+        staleValue("stale_value", "staleValue", "VARCHAR", false),
         newValue("new_value", "newValue", "VARCHAR", false);
 
         /**

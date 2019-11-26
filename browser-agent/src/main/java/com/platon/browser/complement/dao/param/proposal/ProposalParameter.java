@@ -63,6 +63,10 @@ public class ProposalParameter implements BusinessParam {
      */
     private String name;
     /**
+     * 原参数值
+     */
+    private String staleValue;
+    /**
      * 参数值
      */
     private String newValue;

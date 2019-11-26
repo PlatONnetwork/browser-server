@@ -28,6 +28,7 @@
     <result column="completion_flag" jdbcType="INTEGER" property="completionFlag" />
     <result column="module" jdbcType="VARCHAR" property="module" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="stale_value" jdbcType="VARCHAR" property="staleValue" />
     <result column="new_value" jdbcType="VARCHAR" property="newValue" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -92,7 +93,7 @@
     hash, `type`, node_id, node_name, url, new_version, end_voting_block, active_block, 
     `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, pip_num, pip_id, 
     topic, description, canceled_pip_id, canceled_topic, block_number, create_time, update_time, 
-    completion_flag, `module`, `name`, new_value
+    completion_flag, `module`, `name`, stale_value, new_value
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultMap="BaseResultMap">
     select
@@ -133,8 +134,8 @@
       pip_id, topic, description, 
       canceled_pip_id, canceled_topic, block_number, 
       create_time, update_time, completion_flag, 
-      `module`, `name`, new_value
-      )
+      `module`, `name`, stale_value, 
+      new_value)
     values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{nodeId,jdbcType=VARCHAR}, 
       #{nodeName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
       #{endVotingBlock,jdbcType=BIGINT}, #{activeBlock,jdbcType=BIGINT}, #{timestamp,jdbcType=TIMESTAMP}, 
@@ -143,8 +144,8 @@
       #{pipId,jdbcType=VARCHAR}, #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
       #{canceledPipId,jdbcType=VARCHAR}, #{canceledTopic,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{completionFlag,jdbcType=INTEGER}, 
-      #{module,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{newValue,jdbcType=VARCHAR}
-      )
+      #{module,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{staleValue,jdbcType=VARCHAR}, 
+      #{newValue,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
     insert into proposal
@@ -226,6 +227,9 @@
       </if>
       <if test="name != null">
         `name`,
+      </if>
+      <if test="staleValue != null">
+        stale_value,
       </if>
       <if test="newValue != null">
         new_value,
@@ -309,6 +313,9 @@
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="staleValue != null">
+        #{staleValue,jdbcType=VARCHAR},
       </if>
       <if test="newValue != null">
         #{newValue,jdbcType=VARCHAR},
@@ -402,6 +409,9 @@
       <if test="record.name != null">
         `name` = #{record.name,jdbcType=VARCHAR},
       </if>
+      <if test="record.staleValue != null">
+        stale_value = #{record.staleValue,jdbcType=VARCHAR},
+      </if>
       <if test="record.newValue != null">
         new_value = #{record.newValue,jdbcType=VARCHAR},
       </if>
@@ -438,6 +448,7 @@
       completion_flag = #{record.completionFlag,jdbcType=INTEGER},
       `module` = #{record.module,jdbcType=VARCHAR},
       `name` = #{record.name,jdbcType=VARCHAR},
+      stale_value = #{record.staleValue,jdbcType=VARCHAR},
       new_value = #{record.newValue,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -521,6 +532,9 @@
       <if test="name != null">
         `name` = #{name,jdbcType=VARCHAR},
       </if>
+      <if test="staleValue != null">
+        stale_value = #{staleValue,jdbcType=VARCHAR},
+      </if>
       <if test="newValue != null">
         new_value = #{newValue,jdbcType=VARCHAR},
       </if>
@@ -554,6 +568,7 @@
       completion_flag = #{completionFlag,jdbcType=INTEGER},
       `module` = #{module,jdbcType=VARCHAR},
       `name` = #{name,jdbcType=VARCHAR},
+      stale_value = #{staleValue,jdbcType=VARCHAR},
       new_value = #{newValue,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -567,7 +582,7 @@
     (hash, `type`, node_id, node_name, url, new_version, end_voting_block, active_block, 
       `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, pip_num, pip_id, 
       topic, description, canceled_pip_id, canceled_topic, block_number, create_time, 
-      update_time, completion_flag, `module`, `name`, new_value)
+      update_time, completion_flag, `module`, `name`, stale_value, new_value)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.nodeId,jdbcType=VARCHAR}, 
@@ -579,7 +594,7 @@
         #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR}, 
         #{item.blockNumber,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
         #{item.completionFlag,jdbcType=INTEGER}, #{item.module,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
-        #{item.newValue,jdbcType=VARCHAR})
+        #{item.staleValue,jdbcType=VARCHAR}, #{item.newValue,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -674,6 +689,9 @@
         </if>
         <if test="'name'.toString() == column.value">
           #{item.name,jdbcType=VARCHAR}
+        </if>
+        <if test="'stale_value'.toString() == column.value">
+          #{item.staleValue,jdbcType=VARCHAR}
         </if>
         <if test="'new_value'.toString() == column.value">
           #{item.newValue,jdbcType=VARCHAR}

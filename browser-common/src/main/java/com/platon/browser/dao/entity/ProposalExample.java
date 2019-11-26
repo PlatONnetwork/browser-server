@@ -1795,6 +1795,76 @@ public class ProposalExample {
             return (Criteria) this;
         }
 
+        public Criteria andStaleValueIsNull() {
+            addCriterion("stale_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueIsNotNull() {
+            addCriterion("stale_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueEqualTo(String value) {
+            addCriterion("stale_value =", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueNotEqualTo(String value) {
+            addCriterion("stale_value <>", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueGreaterThan(String value) {
+            addCriterion("stale_value >", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueGreaterThanOrEqualTo(String value) {
+            addCriterion("stale_value >=", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueLessThan(String value) {
+            addCriterion("stale_value <", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueLessThanOrEqualTo(String value) {
+            addCriterion("stale_value <=", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueLike(String value) {
+            addCriterion("stale_value like", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueNotLike(String value) {
+            addCriterion("stale_value not like", value, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueIn(List<String> values) {
+            addCriterion("stale_value in", values, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueNotIn(List<String> values) {
+            addCriterion("stale_value not in", values, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueBetween(String value1, String value2) {
+            addCriterion("stale_value between", value1, value2, "staleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStaleValueNotBetween(String value1, String value2) {
+            addCriterion("stale_value not between", value1, value2, "staleValue");
+            return (Criteria) this;
+        }
+
         public Criteria andNewValueIsNull() {
             addCriterion("new_value is null");
             return (Criteria) this;

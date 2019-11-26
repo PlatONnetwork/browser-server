@@ -12,6 +12,7 @@ import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalParameterParam;
+import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.util.RoundCalculation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
     private NetworkStatCache networkStatCache;
     @Autowired
 	private ParamProposalCache paramProposalCache;
+    @Autowired
+	private ParameterService parameterService;
 	
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
@@ -51,6 +54,7 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
 
 		BigDecimal voteEndBlockNum = RoundCalculation.getParameterProposalVoteEndBlockNum(tx.getNum(),chainConfig);
 		BigDecimal activeBlockNum = voteEndBlockNum.add(BigDecimal.ONE);
+		String staleValue = parameterService.getValueInBlockChainConfig(txParam.getName());
 		ProposalParameter businessParam= ProposalParameter.builder()
     			.nodeId(txParam.getVerifier())
     			.pIDID(txParam.getPIDID())
@@ -66,6 +70,7 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
     			.stakingName(txParam.getNodeName())
 				.module(txParam.getModule())
 				.name(txParam.getName())
+				.staleValue(staleValue)
 				.newValue(txParam.getNewValue())
                 .build();
 

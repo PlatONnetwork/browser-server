@@ -55,41 +55,8 @@ public class ParameterService {
             config.setActiveBlock(0L);
             configList.add(config);
             // 更新内存中的blockChainConfig中在init_value,stale_value,value字段值
-            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
-            switch (paramEnum){
-                // 质押相关
-                case STAKE_THRESHOLD:
-                    config.setInitValue(Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT).toString());
-                    break;
-                case OPERATING_THRESHOLD:
-                    config.setInitValue(Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT).toString());
-                    break;
-                case MAX_VALIDATORS:
-                    config.setInitValue(chainConfig.getConsensusValidatorCount().toString());
-                    break;
-                case UN_STAKE_FREEZE_DURATION:
-                    config.setInitValue(chainConfig.getUnStakeRefundSettlePeriodCount().toString());
-                    break;
-                // 惩罚相关
-                case SLASH_FRACTION_DUPLICATE_SIGN:
-                    config.setInitValue(chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).toString());
-                    break;
-                case DUPLICATE_SIGN_REPORT_REWARD:
-                    config.setInitValue(chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).toString());
-                    break;
-                case MAX_EVIDENCE_AGE:
-                    config.setInitValue(chainConfig.getEvidenceValidEpoch().toString());
-                    break;
-                case SLASH_BLOCKS_REWARD:
-                    config.setInitValue(chainConfig.getSlashBlockRewardCount().toString());
-                    break;
-                // 区块相关
-                case MAX_BLOCK_GAS_LIMIT:
-                    config.setInitValue(chainConfig.getMaxBlockGasLimit().toString());
-                    break;
-                default:
-                    break;
-            }
+            String initValue = getValueInBlockChainConfig(config.getName());
+            config.setInitValue(initValue);
             config.setValue(config.getInitValue());
             config.setStaleValue(config.getInitValue());
             id++;
@@ -135,5 +102,50 @@ public class ParameterService {
         customConfigMapper.rotateConfig(activeConfigList);
         //更新内存中的BlockChainConfig
         overrideBlockChainConfig();
+    }
+
+    /**
+     * 根据参数提案中的参数name获取当前blockChainConfig中的对应的当前值
+     * @param name
+     * @return
+     */
+    public String getValueInBlockChainConfig(String name) {
+        ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(name);
+        String staleValue = "";
+        switch (paramEnum){
+            // 质押相关
+            case STAKE_THRESHOLD:
+                staleValue = Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT).toString();
+                break;
+            case OPERATING_THRESHOLD:
+                staleValue = Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT).toString();
+                break;
+            case MAX_VALIDATORS:
+                staleValue = chainConfig.getConsensusValidatorCount().toString();
+                break;
+            case UN_STAKE_FREEZE_DURATION:
+                staleValue = chainConfig.getUnStakeRefundSettlePeriodCount().toString();
+                break;
+            // 惩罚相关
+            case SLASH_FRACTION_DUPLICATE_SIGN:
+                staleValue = chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).toString();
+                break;
+            case DUPLICATE_SIGN_REPORT_REWARD:
+                staleValue = chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).toString();
+                break;
+            case MAX_EVIDENCE_AGE:
+                staleValue = chainConfig.getEvidenceValidEpoch().toString();
+                break;
+            case SLASH_BLOCKS_REWARD:
+                staleValue = chainConfig.getSlashBlockRewardCount().toString();
+                break;
+            // 区块相关
+            case MAX_BLOCK_GAS_LIMIT:
+                staleValue = chainConfig.getMaxBlockGasLimit().toString();
+                break;
+            default:
+                break;
+        }
+        return staleValue;
     }
 }

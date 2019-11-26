@@ -119,7 +119,7 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>-->
-        <table tableName="config" domainObjectName="Config">
+        <table tableName="proposal" domainObjectName="Proposal">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

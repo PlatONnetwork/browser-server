@@ -20,6 +20,7 @@
         `block_number`,
         `module`,
         `name`,
+        `stale_value`,
         `new_value`,
     )
     values
@@ -39,6 +40,7 @@
         #{blockNumber},
         #{module},
         #{name},
+        #{staleValue},
         #{newValue}
     );
 </update>
