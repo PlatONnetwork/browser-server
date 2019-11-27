@@ -77,7 +77,7 @@ public class TransactionParameterService {
         List<NodeOpt> nodeOptList = new ArrayList<>();
 
         if(event.getBlock().getNum()==0) return nodeOptList;
-        
+
         int proposalQty = 0;
 
         for (Transaction tx : transactions) {
