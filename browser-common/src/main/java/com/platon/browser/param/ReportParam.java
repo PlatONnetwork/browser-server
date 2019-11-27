@@ -6,7 +6,6 @@ import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +36,7 @@ public class ReportParam extends TxParam{
     private String data;
 
     /**
-     * 举报的节点id
+     * 被举报的节点id
      */
     private String verify;
     public void setVerify(String verify){
@@ -45,7 +44,7 @@ public class ReportParam extends TxParam{
     }
 
     /**
-     * 被质押节点的名称(有长度限制，表示该节点的名称)
+     * 被举报节点的名称(有长度限制，表示该节点的名称)
      */
     private String nodeName;
 
