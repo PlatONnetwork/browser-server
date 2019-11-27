@@ -96,6 +96,8 @@ platon:
   }
   # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 10000000
+  #区块最大Gas限制
+  maxBlockGasLimit: 100800000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keysBase网址

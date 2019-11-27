@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.platon.bean.EconomicConfig;
@@ -67,7 +68,8 @@ public class BlockChainConfig {
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
     //【通用】默认每个区块的最大Gas
-    private BigDecimal maxBlockGasLimit=BigDecimal.valueOf(100800000L);
+    @Value("${platon.maxBlockGasLimit}")
+    private BigDecimal maxBlockGasLimit;
     //【通用】每个验证人每个共识周期出块数量目标值
     private BigInteger expectBlockCount;
     //【通用】每个共识轮验证节点数量
