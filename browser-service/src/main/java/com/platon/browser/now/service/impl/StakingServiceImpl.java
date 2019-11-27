@@ -120,7 +120,7 @@ public class StakingServiceImpl implements StakingService {
 		List<AliveStakingListResp> lists = new LinkedList<>();
 		/** 根据条件和状态进行查询列表 */
 		NodeExample nodeExample = new NodeExample();
-		nodeExample.setOrderByClause(" big_version desc, total_value desc,staking_block_num desc, staking_tx_index desc");
+		nodeExample.setOrderByClause(" big_version desc, total_value desc,staking_block_num asc, staking_tx_index asc");
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(status);
 		if(StringUtils.isNotBlank(req.getKey())){

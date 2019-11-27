@@ -41,6 +41,6 @@ public class BrowserConst {
 	public static final String INQUIRY = "inquiry";
 	
 	/**WEB超时时间*/
-	public static final Integer WEB_TIME_OUT = 5000;
+	public static final Integer WEB_TIME_OUT = 30000;
 	
 }
