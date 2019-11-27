@@ -46,7 +46,7 @@ public class ProposalContractTest {
 	@Before
 	public void init() throws Exception {
 
-		superCredentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
+		superCredentials = Credentials.create("1a4c5a5b88433a9aaff294cdd7193eca632aec0a41e46e46aa47d82ca16fd19f");
 		System.out.println("superCredentials balance=" + web3j
 				.platonGetBalance(superCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
 
@@ -150,11 +150,11 @@ public class ProposalContractTest {
 //		
 		vote(proposalID,
 				"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
-				"http://192.168.112.172:8789", VoteOption.YEAS);
+				"http://192.168.112.172:8789", VoteOption.YEAS, voteCredentials);
 		
 	      vote(proposalID,
 			"459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",
-			"http://192.168.112.171:7789", VoteOption.YEAS);
+			"http://192.168.112.171:7789", VoteOption.YEAS, superCredentials);
 //
 //        vote(proposalID,
 //        		"459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",
@@ -169,11 +169,11 @@ public class ProposalContractTest {
 //        		"http://192.168.112.172:7789", VoteOption.YEAS);
 	}
 
-	public void vote(String proposalID, String nodeId, String nodeHost, VoteOption voteOption) {
+	public void vote(String proposalID, String nodeId, String nodeHost, VoteOption voteOption, Credentials credentials) {
 		try {
 
 			Web3j web3j = Web3j.build(new HttpService(nodeHost));
-			ProposalContract voteContract = ProposalContract.load(web3j, voteCredentials, chainId);
+			ProposalContract voteContract = ProposalContract.load(web3j, credentials, chainId);
 
 			ProgramVersion pv = voteContract.getProgramVersion();
 			BaseResponse<?> baseResponse = voteContract.vote(pv,voteOption,proposalID,nodeId).send();
