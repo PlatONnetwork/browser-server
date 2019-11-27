@@ -1,8 +1,6 @@
 package com.platon.browser.config;
 
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.govern.ModifiableParam;
-import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -18,7 +16,6 @@ import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
-import javax.jws.soap.SOAPBinding;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -70,7 +67,7 @@ public class BlockChainConfig {
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
     //【通用】默认每个区块的最大Gas
-    private BigDecimal maxBlockGasLimit=BigDecimal.ZERO;
+    private BigDecimal maxBlockGasLimit=BigDecimal.valueOf(100800000L);
     //【通用】每个验证人每个共识周期出块数量目标值
     private BigInteger expectBlockCount;
     //【通用】每个共识轮验证节点数量

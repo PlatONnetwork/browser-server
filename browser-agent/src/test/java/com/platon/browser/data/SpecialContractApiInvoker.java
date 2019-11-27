@@ -1,7 +1,6 @@
 package com.platon.browser.data;
 
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.platon.bean.GovernParam;
@@ -12,10 +11,8 @@ import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.websocket.WebSocketService;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.List;
@@ -51,7 +48,7 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]) throws Exception {
 
-        TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x6d73ce6d593b39a4cd47971a8f7be7e9b1df70fce2975945a910738f00513b8d").send().getTransactionReceipt().get();
+        //TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x6d73ce6d593b39a4cd47971a8f7be7e9b1df70fce2975945a910738f00513b8d").send().getTransactionReceipt().get();
 
        /* Web3jWrapper web3jWrapper = Web3jWrapper.builder()
                 .web3j(web3j)

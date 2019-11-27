@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,12 +54,15 @@ public class ParameterService {
             config.setName(gp.getParamItem().getName());
             config.setRangeDesc(gp.getParamItem().getDesc());
             config.setActiveBlock(0L);
+            config.setValue(config.getActiveBlock()==Integer.parseInt(gp.getParamValue().getActiveBlock())?gp.getParamValue().getStaleValue():gp.getParamValue().getValue());
             configList.add(config);
+
             // 更新内存中的blockChainConfig中在init_value,stale_value,value字段值
             String initValue = getValueInBlockChainConfig(config.getName());
             config.setInitValue(initValue);
-            config.setValue(config.getInitValue());
             config.setStaleValue(config.getInitValue());
+
+            if(StringUtils.isBlank(config.getValue())) config.setValue(config.getInitValue());
             id++;
         }
         configMapper.batchInsert(configList);
