@@ -4,10 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * User: dongqile
@@ -20,5 +16,5 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class OthersTxParam extends TxParam{
-
+    private String data;
 }

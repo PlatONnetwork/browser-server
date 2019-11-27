@@ -1,6 +1,7 @@
 package com.platon.browser.util.decode;
 
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.OthersTxParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -26,12 +27,20 @@ public class TxInputUtil {
             if (StringUtils.isNotEmpty(txInput) && !txInput.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
                 List <RlpType> rlpTypes = rlpList.getValues();
+
+                if(rlpTypes.size() == 1 && rlpTypes.get(0).getClass().equals(RlpString.class)) {
+                    result.setParam(OthersTxParam.builder().data(((RlpString)rlpTypes.get(0)).asString()).build());
+                    return result;
+                }
+
                 RlpList rootList = (RlpList) rlpTypes.get(0);
 
                 RlpString rlpString = (RlpString) rootList.getValues().get(0);
                 RlpList rlpList2 = RlpDecoder.decode(rlpString.getBytes());
                 RlpString rl = (RlpString) rlpList2.getValues().get(0);
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
+
+
 
                 Transaction.TypeEnum typeEnum = Transaction.TypeEnum.getEnum(txCode.intValue());
                 result.setTypeEnum(typeEnum);

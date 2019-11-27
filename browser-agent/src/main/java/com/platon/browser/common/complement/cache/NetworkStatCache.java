@@ -1,12 +1,12 @@
 package com.platon.browser.common.complement.cache;
 
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.elasticsearch.dto.Block;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Component
 @Data
@@ -18,17 +18,16 @@ public class NetworkStatCache {
 
     /**
      * 基于区块维度更新网络统计信息
-     * @param txQty
+     * @param block
      * @param proposalQty
-     * @param time
      */
-    public void updateByBlock(int txQty, int proposalQty, Date time, String bHash) {
-    	tpsCalcCache.update(txQty, time.getTime());
+    public void updateByBlock(Block block,int proposalQty) {
+    	tpsCalcCache.update(block);
     	int tps = tpsCalcCache.getTps();
-    	networkStat.setTxQty(txQty+networkStat.getTxQty());
+    	networkStat.setTxQty(block.getTransactions().size()+networkStat.getTxQty());
     	networkStat.setProposalQty(proposalQty+networkStat.getProposalQty());
     	networkStat.setCurTps(tps);
-    	networkStat.setCurBlockHash(bHash);
+    	networkStat.setCurBlockHash(block.getHash());
     	if(tps > networkStat.getMaxTps()) {
     		networkStat.setMaxTps(tps);
     	}
