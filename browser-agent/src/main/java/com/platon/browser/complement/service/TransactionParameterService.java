@@ -78,7 +78,6 @@ public class TransactionParameterService {
 
         if(event.getBlock().getNum()==0) return nodeOptList;
         
-        int txQty = transactions.size();
         int proposalQty = 0;
 
         for (Transaction tx : transactions) {
@@ -153,7 +152,7 @@ public class TransactionParameterService {
            
         }
         
-        networkStatCache.updateByBlock(txQty, proposalQty, event.getBlock().getTime(), event.getBlock().getHash());
+        networkStatCache.updateByBlock(event.getBlock(), proposalQty);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 

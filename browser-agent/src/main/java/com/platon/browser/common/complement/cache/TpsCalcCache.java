@@ -1,5 +1,6 @@
 package com.platon.browser.common.complement.cache;
 
+import com.platon.browser.elasticsearch.dto.Block;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,11 +22,16 @@ public class TpsCalcCache {
 
     private int tps=0;
 
-    public void update(int txQty, long timestamp){
-        BigDecimal seconds = BigDecimal.valueOf(timestamp).divide(BigDecimal.valueOf(1000),0, RoundingMode.CEILING);
+    // 前一个区块号
+    private long preBlockNumber = 0L;
+
+    public void update(Block block){
+        // 如果当前区块号与前一个一样，证明这是重复处理的块(例如:某部分业务处理失败，由于重试机制进来此处)
+        if(block.getNum()==preBlockNumber) return;
+        BigDecimal seconds = BigDecimal.valueOf(block.getTime().getTime()).divide(BigDecimal.valueOf(1000),0, RoundingMode.CEILING);
         now = seconds.longValue();
         cacheMap.putIfAbsent(now, 0L);
-        cacheMap.put(now,cacheMap.get(now)+txQty);
+        cacheMap.put(now,cacheMap.get(now)+block.getTransactions().size());
         // 离now时间差大于等于10秒的都需要清理
         Set<Long> invalid = new HashSet<>();
         cacheMap.keySet().forEach(second->{
