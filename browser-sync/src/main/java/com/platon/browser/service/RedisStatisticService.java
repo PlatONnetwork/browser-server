@@ -1,4 +1,4 @@
-package com.platon.browser.service.redis;
+package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.NetworkStat;
 import lombok.extern.slf4j.Slf4j;

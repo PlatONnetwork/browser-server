@@ -31,10 +31,10 @@ public class SyncApplication implements ApplicationRunner {
     public void run ( ApplicationArguments args ) {
         EXECUTOR_SERVICE.submit(()->syncService.syncBlock());
         EXECUTOR_SERVICE.submit(()->syncService.syncTransaction());
-        while (syncService.isBlockSyncDone()&&syncService.isTransactionSyncDone()){
-            log.info("数据同步完成!");
-            SleepUtil.sleep(2L);
+        while (!SyncService.isBlockSyncDone()||!SyncService.isTransactionSyncDone()){
+            SleepUtil.sleep(1L);
         }
+        log.info("数据同步完成!");
         System.exit(0);
     }
 }

@@ -6,8 +6,6 @@ import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.queue.publisher.BlockEventPublisher;
-import com.platon.browser.queue.publisher.TransactionEventPublisher;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -22,21 +21,21 @@ import java.util.List;
 public class SyncService {
 
     @Getter
-    private volatile boolean blockSyncDone =false;
+    private static volatile boolean blockSyncDone =false;
     @Getter
-    private volatile boolean transactionSyncDone =false;
-
-    @Autowired
-    private BlockEventPublisher blockEventPublisher;
-
-    @Autowired
-    private TransactionEventPublisher transactionEventPublisher;
+    private static volatile boolean transactionSyncDone =false;
 
     @Autowired
     private BlockESRepository blockESRepository;
 
     @Autowired
     private TransactionESRepository transactionESRepository;
+
+    @Autowired
+    private RedisBlockService redisBlockService;
+    @Autowired
+    private RedisTransactionService redisTransactionService;
+
 
     @Value("${esyncnfo.searchBlockPageSize}")
     private int blockPageSize;
@@ -60,7 +59,11 @@ public class SyncService {
             try {
                 esResult = blockESRepository.search(blockConstructor, Block.class, pageNo, blockPageSize);
             } catch (Exception e) {
-                log.error("查询ES出错:",e);
+                if(e.getMessage().contains("all shards failed")) {
+                    break;
+                }else {
+                    log.error("【syncBlock()】查询ES出错:",e);
+                }
             }
             if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
                 // 如果查询结果为空则结束
@@ -68,9 +71,11 @@ public class SyncService {
             }
             List<Block> blocks = esResult.getRsData();
             try{
-                blockEventPublisher.publish(blocks);
+                redisBlockService.save(new HashSet<>(blocks),false);
+                log.info("【syncBlock()】第{}页,{}条记录",pageNo,blocks.size());
             }catch (Exception e){
-                log.error("发布区块到队列出错:",e);
+                log.error("【syncBlock()】同步区块到Redis出错:",e);
+                throw e;
             }
             // 所有数据不够一页大小，退出
             if(blocks.size()<blockPageSize) break;
@@ -88,7 +93,11 @@ public class SyncService {
             try {
                 esResult = transactionESRepository.search(transactionConstructor,Transaction.class,pageNo,txPageSize);
             } catch (Exception e) {
-                log.error("查询ES出错:",e);
+                if(e.getMessage().contains("all shards failed")){
+                    break;
+                }else{
+                    log.error("【syncTransaction()】查询ES出错:",e);
+                }
             }
             if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
                 // 如果查询结果为空则结束
@@ -96,9 +105,11 @@ public class SyncService {
             }
             List<Transaction> transactions = esResult.getRsData();
             try{
-                transactionEventPublisher.publish(transactions);
+                redisTransactionService.save(new HashSet<>(transactions),false);
+                log.info("【syncTransaction()】第{}页,{}条记录",pageNo,transactions.size());
             }catch (Exception e){
-                log.error("发布交易到队列出错:",e);
+                log.error("【syncTransaction()】同步交易到Redis出错:",e);
+                throw e;
             }
             // 所有数据不够一页大小，退出
             if(transactions.size()<txPageSize) break;
