@@ -34,11 +34,12 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -47,18 +48,6 @@ import java.util.*;
  */
 @Slf4j
 public abstract class ESRepository {
-
-	@Value("${spring.redis.max-item}")
-	private String maxItem;
-
-	@PostConstruct
-	private void init() throws IOException {
-		if(!existsIndex()) createIndex(null);
-		Map<String,String> setting = new HashMap<>();
-		setting.put("max_result_window",maxItem);
-		AcknowledgedResponse blockAck = updateIndexSetting(setting);
-		log.info("[{}]updateIndexSetting Ack: {}",getIndexName(),blockAck.isAcknowledged());
-	}
 
 	@Autowired
 	private RestHighLevelClient client;
