@@ -1,4 +1,4 @@
-package com.platon.browser;
+package com.platon.browser.sync;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
