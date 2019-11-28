@@ -48,6 +48,7 @@ public class RedisBlockService extends RedisService<Block> {
     void updateStageSet(Set<Block> data) {
         data.forEach(item -> {
             // 在缓存中不存在的才放入缓存
+            if(item.getNum()==null) return;
             if(!existScore.contains(item.getNum())) stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getNum().doubleValue()));
         });
     }
