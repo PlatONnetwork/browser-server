@@ -8,18 +8,13 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -48,18 +43,6 @@ public class SyncService {
     private int transactionPageSize;
     @Value("${paging.transaction.page-count}")
     private int transactionPageCount;
-    @Value("${spring.redis.max-item}")
-    private String maxItem;
-
-    @PostConstruct
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    private void init() throws IOException {
-        Map<String,String> setting = new HashMap<>();
-        setting.put("max_result_window",maxItem);
-        AcknowledgedResponse blockAck = blockESRepository.updateIndexSetting(setting);
-        AcknowledgedResponse transactionAck = transactionESRepository.updateIndexSetting(setting);
-        log.info("Block Ack: {},Transaction Ack: {}",blockAck.isAcknowledged(),transactionAck.isAcknowledged());
-    }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void syncBlock(){
