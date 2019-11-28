@@ -11,6 +11,7 @@ import com.platon.browser.queue.publisher.TransactionEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -33,15 +34,22 @@ public class SyncService {
     @Value("${esyncnfo.searchBlockPageSize}")
     private int blockPageSize;
 
+    @Value("${esyncnfo.blockPageCount}")
+    private int blockPageCount;
+
     @Value("${esyncnfo.searchTxPageSize}")
     private int txPageSize;
 
+    @Value("${esyncnfo.txPageCount}")
+    private int txPageCount;
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void syncBlock(){
         ESQueryBuilderConstructor blockConstructor = new ESQueryBuilderConstructor();
         blockConstructor.setDesc("num");
         // 分页查询区块数据
         ESResult<Block> esResult=null;
-        for (int pageNo = 0; pageNo <= 1000; pageNo++) {
+        for (int pageNo = 0; pageNo <= blockPageCount; pageNo++) {
             try {
                 esResult = blockESRepository.search(blockConstructor, Block.class, pageNo, blockPageSize);
             } catch (IOException e) {
@@ -59,12 +67,13 @@ public class SyncService {
         }
     }
 
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void syncTransaction(){
         ESQueryBuilderConstructor transactionConstructor = new ESQueryBuilderConstructor();
         transactionConstructor.setDesc("seq");
         // 分页查询区块数据
         ESResult<Transaction> esResult=null;
-        for (int pageNo = 0; pageNo <= 100; pageNo++) {
+        for (int pageNo = 0; pageNo <= txPageCount; pageNo++) {
             try {
                 esResult = transactionESRepository.search(transactionConstructor,Transaction.class,pageNo,txPageSize);
             } catch (IOException e) {

@@ -43,3 +43,10 @@ logging:
   level:
     org.springframework: error
     org.springframework.retry: error
+
+esyncnfo:
+  searchBlockPageSize: 500
+  blockPageCount: 1000
+
+  searchTxPageSize: 5000
+  txPageCount: 100
