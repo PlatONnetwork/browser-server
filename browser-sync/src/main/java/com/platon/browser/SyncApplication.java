@@ -17,16 +17,12 @@ import java.util.concurrent.Executors;
 @EnableRetry
 @SpringBootApplication
 public class SyncApplication implements ApplicationRunner {
-
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
     @Autowired
     private SyncService syncService;
-
     public static void main ( String[] args ) {
         SpringApplication.run(SyncApplication.class, args);
     }
-
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
-
     @Override
     public void run ( ApplicationArguments args ) {
         EXECUTOR_SERVICE.submit(()->syncService.syncBlock());

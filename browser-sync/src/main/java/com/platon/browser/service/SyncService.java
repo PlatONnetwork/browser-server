@@ -24,7 +24,6 @@ import java.util.Map;
 @Slf4j
 @Service
 public class SyncService {
-
     @Getter
     private static volatile boolean blockSyncDone =false;
     @Getter
@@ -41,19 +40,14 @@ public class SyncService {
     @Autowired
     private RedisTransactionService redisTransactionService;
 
-
-    @Value("${esyncnfo.searchBlockPageSize}")
+    @Value("${paging.block.page-size}")
     private int blockPageSize;
-
-    @Value("${esyncnfo.blockPageCount}")
+    @Value("${paging.block.page-count}")
     private int blockPageCount;
-
-    @Value("${esyncnfo.searchTxPageSize}")
-    private int txPageSize;
-
-    @Value("${esyncnfo.txPageCount}")
-    private int txPageCount;
-
+    @Value("${paging.transaction.page-size}")
+    private int transactionPageSize;
+    @Value("${paging.transaction.page-count}")
+    private int transactionPageCount;
     @Value("${spring.redis.max-item}")
     private String maxItem;
 
@@ -107,9 +101,9 @@ public class SyncService {
         transactionConstructor.setDesc("seq");
         // 分页查询区块数据
         ESResult<Transaction> esResult=null;
-        for (int pageNo = 0; pageNo <= txPageCount; pageNo++) {
+        for (int pageNo = 0; pageNo <= transactionPageCount; pageNo++) {
             try {
-                esResult = transactionESRepository.search(transactionConstructor,Transaction.class,pageNo,txPageSize);
+                esResult = transactionESRepository.search(transactionConstructor,Transaction.class,pageNo,transactionPageSize);
             } catch (Exception e) {
                 if(e.getMessage().contains("all shards failed")){
                     break;
@@ -130,7 +124,7 @@ public class SyncService {
                 throw e;
             }
             // 所有数据不够一页大小，退出
-            if(transactions.size()<txPageSize) break;
+            if(transactions.size()<transactionPageSize) break;
         }
         transactionSyncDone=true;
     }

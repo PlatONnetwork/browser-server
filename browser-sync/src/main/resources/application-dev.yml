@@ -21,13 +21,6 @@ spring:
       transactionIndexName: browser_transaction_aton_${profile}
       delegationIndexName: browser_delegation_aton_${profile}
       nodeOptIndexName: browser_nodeopt_aton_${profile}
-# 内存环形缓冲区大小，必须是2的指数倍
-disruptor:
-  queue:
-    # 区块环形缓冲区大小
-    block.buffer-size: 1024
-    # 交易环形缓冲区大小
-    transaction.buffer-size: 1024
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -35,12 +28,14 @@ logging:
   level:
     org.springframework: error
     org.springframework.retry: error
-esyncnfo:
-  searchBlockPageSize: 500
-  blockPageCount: 1000
-
-  searchTxPageSize: 5000
-  txPageCount: 100
+#同步时的索引查询分页参数配置
+paging:
+  block:
+    pageSize: 2000
+    pageCount: 250
+  transaction:
+    pageSize: 2000
+    pageCount: 250
 
 #PlatOn相关配置
 platon:
