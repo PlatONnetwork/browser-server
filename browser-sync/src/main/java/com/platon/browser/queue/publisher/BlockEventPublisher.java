@@ -6,7 +6,6 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.AbstractPublisher;
-import com.platon.browser.queue.event.BlockEvent;
 import com.platon.browser.queue.handler.BlockEventHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,16 +14,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 自检事件生产者
  */
 @Slf4j
 @Component
-public class BlockEventPublisher extends AbstractPublisher<BlockEvent> {
-    private static final EventTranslatorOneArg<BlockEvent,CompletableFuture<Block>>
-    TRANSLATOR = (event, sequence, blockCF)->event.setBlockCF(blockCF);
+public class BlockEventPublisher extends AbstractPublisher<List<Block>> {
+    private static final EventTranslatorOneArg<List<Block>,List<Block>>
+    TRANSLATOR = (event, sequence, blocks)->event.addAll(blocks);
     @Value("${disruptor.queue.block.buffer-size}")
     private int ringBufferSize;
     @Override
@@ -32,12 +32,12 @@ public class BlockEventPublisher extends AbstractPublisher<BlockEvent> {
         return ringBufferSize;
     }
 
-    private EventFactory<BlockEvent> eventFactory = () -> BlockEvent.builder().build();
+    private EventFactory<List<Block>> eventFactory = ArrayList::new;
     @Autowired
     private BlockEventHandler handler;
 
     @Getter
-    private Disruptor<BlockEvent> disruptor;
+    private Disruptor<List<Block>> disruptor;
 
     @PostConstruct
     public void init(){
@@ -48,7 +48,7 @@ public class BlockEventPublisher extends AbstractPublisher<BlockEvent> {
         register(BlockEventPublisher.class.getSimpleName(),this);
     }
 
-    public void publish(CompletableFuture<Block> blockCF){
-        ringBuffer.publishEvent(TRANSLATOR, blockCF);
+    public void publish(List<Block> blocks){
+        ringBuffer.publishEvent(TRANSLATOR, blocks);
     }
 }
