@@ -65,6 +65,8 @@ public class SyncService {
             }catch (Exception e){
                 log.error("发布区块到队列出错:",e);
             }
+            // 所有数据不够一页大小，退出
+            if(blocks.size()<blockPageSize) break;
         }
     }
 
@@ -90,6 +92,8 @@ public class SyncService {
             }catch (Exception e){
                 log.error("发布交易到队列出错:",e);
             }
+            // 所有数据不够一页大小，退出
+            if(transactions.size()<txPageSize) break;
         }
     }
 }
