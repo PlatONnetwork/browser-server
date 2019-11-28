@@ -10,21 +10,20 @@ import com.platon.browser.common.complement.cache.ParamProposalCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.service.govern.ParameterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.bean.Node;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -147,7 +146,7 @@ public class InitializationService {
             staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
             staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
-            staking.setStakingLocked(Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT));
+            staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
             if (validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.bean.GovernParam;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -116,10 +115,10 @@ public class ParameterService {
         switch (paramEnum){
             // 质押相关
             case STAKE_THRESHOLD:
-                staleValue = Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT).toString();
+                staleValue = chainConfig.getStakeThreshold().toString();
                 break;
             case OPERATING_THRESHOLD:
-                staleValue = Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT).toString();
+                staleValue = chainConfig.getDelegateThreshold().toString();
                 break;
             case MAX_VALIDATORS:
                 staleValue = chainConfig.getConsensusValidatorCount().toString();

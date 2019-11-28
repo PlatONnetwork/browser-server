@@ -97,9 +97,9 @@ public class BlockChainConfig {
     //【通用】开发者激励基金账户初始余额
     private BigDecimal communityFundInitAmount;
 
-    //【质押】质押门槛: 创建验证人最低的质押Token数(LAT)
+    //【质押】质押门槛: 创建验证人最低的质押Token数(VON)
     private BigDecimal stakeThreshold;
-    //【质押】委托门槛(LAT)
+    //【质押】委托门槛(VON)
     private BigDecimal delegateThreshold;
     //【质押】节点质押退回锁定的结算周期数
     private BigInteger unStakeRefundSettlePeriodCount;
@@ -162,13 +162,14 @@ public class BlockChainConfig {
     private String keyBase;
     //keyBaseApi
     private String keyBaseApi;
-    // 初始内置节点默认质押金额(LAT)
+    // 初始内置节点默认质押金额(VON)
     private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakingList=new ArrayList<>();
 
     @PostConstruct
     public void init() throws ConfigLoadingException {
+        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.LAT);
         updateWithEconomicConfig(client.getEconomicConfig());
     }
 
@@ -206,10 +207,10 @@ public class BlockChainConfig {
         //【通用】社区开发者激励基金账户初始余额
         this.communityFundInitAmount=new BigDecimal(dec.getInnerAcc().getCdfBalance());
 
-        //【质押】创建验证人最低的质押Token数(LAT)
-        this.stakeThreshold= Convert.fromVon(new BigDecimal(dec.getStaking().getStakeThreshold()), Convert.Unit.LAT);
-        //【质押】委托人每次委托及赎回的最低Token数(LAT)
-        this.delegateThreshold=Convert.fromVon(new BigDecimal(dec.getStaking().getOperatingThreshold()), Convert.Unit.LAT);
+        //【质押】创建验证人最低的质押Token数(VON)
+        this.stakeThreshold= new BigDecimal(dec.getStaking().getStakeThreshold());
+        //【质押】委托人每次委托及赎回的最低Token数(VON)
+        this.delegateThreshold=new BigDecimal(dec.getStaking().getOperatingThreshold());
         //【质押】节点质押退回锁定的结算周期数
         this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeDuration();
         //【惩罚】双签奖励百分比

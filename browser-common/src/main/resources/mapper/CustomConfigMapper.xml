@@ -6,7 +6,7 @@
             UPDATE
             `config`
             SET
-            `stale_value` = `value`,
+            `stale_value` = #{item.staleValue},
             `value` = #{item.value}
             WHERE `module` = #{item.module}
             AND `name` = #{item.name};

@@ -72,13 +72,14 @@ public class OnNewBlockConverter {
             for (String hash : proposalTxHashSet) {
                 try {
                     TallyResult tr = proposalService.getTallyResult(hash);
-                    if(tr.getStatus()== CustomProposal.StatusEnum.FINISH.getCode()){
+                    if(tr.getStatus()== CustomProposal.StatusEnum.PASS.getCode()){
                         // 提案生效：
                         // 把提案表中的参数覆盖到Config表中对应的参数
                         Proposal proposal = proposalMap.get(hash);
                         Config config = new Config();
                         config.setModule(proposal.getModule());
                         config.setName(proposal.getName());
+                        config.setStaleValue(proposal.getStaleValue());
                         config.setValue(proposal.getNewValue());
                         configList.add(config);
                     }

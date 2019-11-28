@@ -4,11 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.elasticsearch.ESSortDto;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -27,6 +26,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
@@ -232,7 +232,18 @@ public abstract class ESRepository {
 
 		return esResult;
 	}
-	
+
+	/**
+	 * 更新索引配置
+	 */
+	public AcknowledgedResponse updateIndexSetting(Map<String,String> settingMap) throws IOException {
+		UpdateSettingsRequest request = new UpdateSettingsRequest(getIndexName());
+		Settings.Builder builder = Settings.builder();
+		settingMap.forEach(builder::put);
+		request.settings(builder.build());
+		return client.indices().putSettings(request, RequestOptions.DEFAULT);
+	}
+
 	/**
 	 * 搜索
 	 * 

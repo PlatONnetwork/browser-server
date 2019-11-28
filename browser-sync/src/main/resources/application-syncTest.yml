@@ -1,8 +1,8 @@
-# ***************************Aton测试配置**************************** #
+# ***************************Aton开发配置**************************** #
 # 应用版本
 version: 0.7.4.0
 # 当前激活的配置名称(请不要修改)
-profile: test
+profile: syncTest
 #Spring框架内部配置
 spring:
   #Redis配置
@@ -17,10 +17,10 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_aton_${profile}
-      transactionIndexName: browser_transaction_aton_${profile}
-      delegationIndexName: browser_delegation_aton_${profile}
-      nodeOptIndexName: browser_nodeopt_aton_${profile}
+      blockIndexName: browser_block_1
+      transactionIndexName: browser_transaction_1
+      delegationIndexName: browser_delegation_1
+      nodeOptIndexName: browser_nodeopt_1
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log

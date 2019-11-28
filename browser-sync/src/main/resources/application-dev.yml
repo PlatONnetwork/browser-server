@@ -1,4 +1,4 @@
-# ***************************开发配置**************************** #
+# ***************************Aton开发配置**************************** #
 # 应用版本
 version: 0.7.4.0
 # 当前激活的配置名称(请不要修改)
@@ -17,21 +17,10 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_1
-      transactionIndexName: browser_transaction_1
-      delegationIndexName: browser_delegation_1
-      nodeOptIndexName: browser_nodeopt_1
-# 内存环形缓冲区大小，必须是2的指数倍
-disruptor:
-  queue:
-    # 区块环形缓冲区大小
-    block.buffer-size: 1024
-    # 批量入库至Redis的大小
-    block.batch-size: 100
-    # 交易环形缓冲区大小
-    transaction.buffer-size: 1024
-    # 交易环形缓冲区大小
-    transaction.batch-size: 100
+      blockIndexName: browser_block_aton_${profile}
+      transactionIndexName: browser_transaction_aton_${profile}
+      delegationIndexName: browser_delegation_aton_${profile}
+      nodeOptIndexName: browser_nodeopt_aton_${profile}
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -39,3 +28,55 @@ logging:
   level:
     org.springframework: error
     org.springframework.retry: error
+#同步时的索引查询分页参数配置
+paging:
+  block:
+    pageSize: 2000
+    pageCount: 250
+  transaction:
+    pageSize: 2000
+    pageCount: 250
+
+#PlatOn相关配置
+platon:
+  # 交易输入参数并行解码线程数
+  txLogDecodeThreadNum: 10
+  # Web3j访问地址
+  web3j:
+    #HTTP或WS
+    protocol: WS
+    addresses: 192.168.112.172:8788
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #PlatON初始总发行量(LAT)
+  initIssueAmount: 10000000000
+  #每年固定增发比例
+  addIssueRate: 0.025
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
+  #每个共识轮中回退多少个块是选举下一轮验证人的时机
+  electionBackwardBlockCount: 20
+  #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
+  foundationSubsidies: {
+    '1':62215742,
+    '2':55965742,
+    '3':49559492,
+    '4':42993086,
+    '5':36262520,
+    '6':29363689,
+    '7':22292388,
+    '8':15044304,
+    '9':7615018
+  }
+  # 初始内置节点默认质押金额(LAT)
+  defaultStakingLockedAmount: 1500000
+  #区块最大Gas限制
+  maxBlockGasLimit: 100800000
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
+  #提案pip_num参数模板
+  proposalPipNumTemplate: PIP-%s
+  #keysBase网址
+  keyBase: https://keybase.io/
+  #keyBase api
+  keyBaseApi: _/api/1.0/user/autocomplete.json?q=
