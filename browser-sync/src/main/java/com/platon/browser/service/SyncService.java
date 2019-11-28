@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -53,7 +52,7 @@ public class SyncService {
         for (int pageNo = 0; pageNo <= blockPageCount; pageNo++) {
             try {
                 esResult = blockESRepository.search(blockConstructor, Block.class, pageNo, blockPageSize);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("查询ES出错:",e);
             }
             if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
@@ -78,7 +77,7 @@ public class SyncService {
         for (int pageNo = 0; pageNo <= txPageCount; pageNo++) {
             try {
                 esResult = transactionESRepository.search(transactionConstructor,Transaction.class,pageNo,txPageSize);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("查询ES出错:",e);
             }
             if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){

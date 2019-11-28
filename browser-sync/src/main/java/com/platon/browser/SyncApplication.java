@@ -30,5 +30,6 @@ public class SyncApplication implements ApplicationRunner {
     public void run ( ApplicationArguments args ) {
         EXECUTOR_SERVICE.submit(()->syncService.syncBlock());
         EXECUTOR_SERVICE.submit(()->syncService.syncTransaction());
+        log.info("数据同步完成!");
     }
 }
