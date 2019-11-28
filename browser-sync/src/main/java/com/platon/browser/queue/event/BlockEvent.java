@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -14,5 +15,5 @@ import java.util.concurrent.CompletableFuture;
 @Builder
 @Accessors(chain = true)
 public class BlockEvent {
-    private CompletableFuture<Block> blockCF;
+    private List <Block> blockCF;
 }

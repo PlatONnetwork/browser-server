@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -23,8 +24,8 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Component
 public class TransactionEventPublisher extends AbstractPublisher<TransactionEvent> {
-    private static final EventTranslatorOneArg<TransactionEvent,CompletableFuture<Transaction>>
-    TRANSLATOR = (event, sequence, transactionCF)->event.setTransactionCF(transactionCF);
+    private static final EventTranslatorOneArg<TransactionEvent, List <Transaction>>
+    TRANSLATOR = (event, sequence, transactions)->event.setTransactions(transactions);
     @Value("${disruptor.queue.transaction.buffer-size}")
     private int ringBufferSize;
     @Override
@@ -48,7 +49,7 @@ public class TransactionEventPublisher extends AbstractPublisher<TransactionEven
         register(TransactionEventPublisher.class.getSimpleName(),this);
     }
 
-    public void publish(CompletableFuture<Transaction> transactionCF){
-        ringBuffer.publishEvent(TRANSLATOR, transactionCF);
+    public void publish(List<Transaction> transactions){
+        ringBuffer.publishEvent(TRANSLATOR, transactions);
     }
 }
