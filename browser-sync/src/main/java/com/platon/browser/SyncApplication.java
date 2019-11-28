@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.platon.browser.service.SyncService;
+import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -30,7 +31,10 @@ public class SyncApplication implements ApplicationRunner {
     public void run ( ApplicationArguments args ) {
         EXECUTOR_SERVICE.submit(()->syncService.syncBlock());
         EXECUTOR_SERVICE.submit(()->syncService.syncTransaction());
-        log.info("数据同步完成!");
+        while (syncService.isBlockSyncDone()&&syncService.isTransactionSyncDone()){
+            log.info("数据同步完成!");
+            SleepUtil.sleep(2L);
+        }
         System.exit(0);
     }
 }
