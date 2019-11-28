@@ -79,6 +79,7 @@ public class OnNewBlockConverter {
                         Config config = new Config();
                         config.setModule(proposal.getModule());
                         config.setName(proposal.getName());
+                        config.setStaleValue(proposal.getStaleValue());
                         config.setValue(proposal.getNewValue());
                         configList.add(config);
                     }
