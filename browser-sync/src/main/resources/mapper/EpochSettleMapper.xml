@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
+<update id="settle" parameterType="com.platon.browser.complement.dao.param.epoch.Settle">
+
+    <foreach collection="stakingList" item="staking">
+        update `staking` set
+        `staking_locked` = #{staking.stakingLocked},
+        `staking_hes` = #{staking.stakingHes},
+        `staking_reduction` = #{staking.stakingReduction},
+        `status` = #{staking.status},
+        `staking_reward_value` =  #{staking.stakingRewardValue},
+        `is_settle` = #{staking.isSettle},
+        `annualized_rate` = #{staking.annualizedRate},
+        `annualized_rate_info` = #{staking.annualizedRateInfo}
+        where `node_id` = #{staking.nodeId}
+        and staking_block_num = #{staking.stakingBlockNum};
+    </foreach>
+
+    <foreach collection="stakingList" item="staking">
+      update `node` set
+        `staking_locked` = #{staking.stakingLocked},
+        `staking_hes` = #{staking.stakingHes},
+        `staking_reduction` = #{staking.stakingReduction},
+        `status` = #{staking.status},
+        `stat_staking_reward_value` = #{staking.stakingRewardValue},
+        `is_settle` = #{staking.isSettle},
+        `annualized_rate` = #{staking.annualizedRate},
+        `annualized_rate_info` = #{staking.annualizedRateInfo}
+      where
+        `node_id` =  #{staking.nodeId};
+    </foreach>
+
+    update `delegation` set
+    	`delegate_locked` = `delegate_hes` + `delegate_locked`,
+        `delegate_hes` = 0
+    where
+        `is_history` = 2
+    and
+        `delegate_hes` > 0;
+
+    update `staking` set
+    	`stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`,
+    	`stat_delegate_hes` = 0
+    where
+      `stat_delegate_hes` > 0;
+
+</update>
+</mapper>
