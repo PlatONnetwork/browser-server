@@ -2,7 +2,6 @@ package com.platon.browser;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@MapperScan(basePackages = {"com.platon.browser.dao.mapper","com.platon.browser.complement.dao.mapper"})
 public class SyncApplication implements ApplicationRunner {
 
 	public static void main(String[] args) {
