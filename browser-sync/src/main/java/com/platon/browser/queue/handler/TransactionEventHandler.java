@@ -3,18 +3,14 @@ package com.platon.browser.queue.handler;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.queue.event.TransactionEvent;
 import com.platon.browser.service.redis.RedisTransactionService;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -22,32 +18,21 @@ import java.util.concurrent.ExecutionException;
  */
 @Slf4j
 @Component
-public class TransactionEventHandler implements EventHandler<TransactionEvent> {
+public class TransactionEventHandler implements EventHandler<List<Transaction>> {
 
-    @Setter
-    @Getter
-    @Value("${disruptor.queue.transaction.batch-size}")
-    private volatile int batchSize;
     @Autowired
     private RedisTransactionService redisTransactionService;
 
-    private Set<Transaction> transactionStage = new HashSet<>();
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "TransactionEventHandler")
-    public void onEvent(TransactionEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
+    public void onEvent(List<Transaction> event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
         long startTime = System.currentTimeMillis();
 
-        log.debug("TransactionEvent处理:{}(event(blockCF({}),sequence({}),endOfBatch({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getTransactionCF().get().getNum(),sequence,endOfBatch);
+        log.debug("TransactionEvent处理:{}(event(transactions({}),sequence({}),endOfBatch({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),event.size(),sequence,endOfBatch);
         try{
 
-            // 如区块暂存区的区块数量达不到批量入库大小,则返回
-            if(transactionStage.size()<batchSize) {
-                return;
-            }
-
-            redisTransactionService.save(transactionStage,false);
-            transactionStage.clear();
+            redisTransactionService.save(new HashSet<>(event),false);
 
         }catch (Exception e){
             log.error("",e);

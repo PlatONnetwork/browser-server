@@ -26,12 +26,8 @@ disruptor:
   queue:
     # 区块环形缓冲区大小
     block.buffer-size: 1024
-    # 批量入库至Redis的大小
-    block.batch-size: 100
     # 交易环形缓冲区大小
     transaction.buffer-size: 1024
-      # 交易环形缓冲区大小
-    transaction.batch-size: 100
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
