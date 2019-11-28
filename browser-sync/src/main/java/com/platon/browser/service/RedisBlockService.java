@@ -33,6 +33,7 @@ public class RedisBlockService extends RedisService<Block> {
         minMax.reset();
         data.forEach(item->{
             Long score = item.getNum();
+            if(score==null) return;
             if(score<minMax.getMinOffset()) minMax.setMinOffset(score);
             if(score>minMax.getMaxOffset()) minMax.setMaxOffset(score);
         });
