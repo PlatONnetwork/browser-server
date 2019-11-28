@@ -12,12 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
-@Component
+@Service
 public class SyncService {
     @Autowired
     private BlockEventPublisher blockEventPublisher;
@@ -55,12 +56,13 @@ public class SyncService {
             } catch (IOException e) {
                 log.error("查询ES出错:",e);
             }
-            if(esResult!=null&&esResult.getTotal()==0){
+            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
                 // 如果查询结果为空则结束
                 break;
             }
+            List<Block> blocks = esResult.getRsData();
             try{
-                blockEventPublisher.publish(esResult.getRsData());
+                blockEventPublisher.publish(blocks);
             }catch (Exception e){
                 log.error("发布区块到队列出错:",e);
             }
@@ -79,14 +81,15 @@ public class SyncService {
             } catch (IOException e) {
                 log.error("查询ES出错:",e);
             }
-            if(esResult!=null&&esResult.getTotal()==0){
+            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
                 // 如果查询结果为空则结束
                 break;
             }
+            List<Transaction> transactions = esResult.getRsData();
             try{
-                transactionEventPublisher.publish(esResult.getRsData());
+                transactionEventPublisher.publish(transactions);
             }catch (Exception e){
-                log.error("发布区块到队列出错:",e);
+                log.error("发布交易到队列出错:",e);
             }
         }
     }

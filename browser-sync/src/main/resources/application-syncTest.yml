@@ -1,0 +1,40 @@
+# ***************************Aton开发配置**************************** #
+# 应用版本
+version: 0.7.4.0
+# 当前激活的配置名称(请不要修改)
+profile: syncTest
+#Spring框架内部配置
+spring:
+  #Redis配置
+  redis:
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+    password: platscan
+  #ES配置
+  elasticsearch:
+    high-level-client:
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
+      port: 9200
+      schema: http
+      blockIndexName: browser_block_aton_1
+      transactionIndexName: browser_transaction_aton_1
+      delegationIndexName: browser_delegation_aton_1
+      nodeOptIndexName: browser_nodeopt_aton_1
+# 内存环形缓冲区大小，必须是2的指数倍
+disruptor:
+  queue:
+    # 区块环形缓冲区大小
+    block.buffer-size: 1024
+    # 交易环形缓冲区大小
+    transaction.buffer-size: 1024
+#日志配置
+logging:
+  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  #日志级别
+  level:
+    org.springframework: error
+    org.springframework.retry: error
+esyncnfo:
+  searchBlockPageSize: 500
+  searchTxPageSize: 5000
