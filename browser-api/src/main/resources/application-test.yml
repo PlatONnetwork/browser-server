@@ -90,8 +90,8 @@ platon:
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.112.171:6789
+    protocol: WS
+    addresses: 192.168.112.171:6788
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

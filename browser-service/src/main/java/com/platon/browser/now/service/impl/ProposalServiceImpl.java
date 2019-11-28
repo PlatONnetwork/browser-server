@@ -121,8 +121,8 @@ public class ProposalServiceImpl implements ProposalService {
 				break;
 			case PARAMETER:
 				proposalDetailsResp.setParamName(ConvertUtil.captureName(proposal.getName()));
-				proposalDetailsResp.setCurrentValue(proposal.getNewValue());
-				proposalDetailsResp.setNewValue(proposal.getStaleValue());
+				proposalDetailsResp.setCurrentValue(proposal.getStaleValue());
+				proposalDetailsResp.setNewValue(proposal.getNewValue());
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getParamProposalSupportRate().toString());
 				proposalDetailsResp.setParticipationRate(blockChainConfig.getParamProposalVoteRate().toString());
 				break;

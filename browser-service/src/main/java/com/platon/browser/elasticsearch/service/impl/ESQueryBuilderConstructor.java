@@ -36,7 +36,7 @@ public class ESQueryBuilderConstructor {
 
 	//构造builder
     public QueryBuilder listBuilders() {
-		int count = mustCriterions.size() + shouldCriterions.size() + mustNotCriterions.size();
+		int count = mustCriterions.size() + shouldCriterions.size() + mustNotCriterions.size() + queryBuilders.size();
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		QueryBuilder queryBuilder = null;
 
