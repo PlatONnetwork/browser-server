@@ -22,12 +22,7 @@ public class TpsCalcCache {
 
     private int tps=0;
 
-    // 前一个区块号
-    private long preBlockNumber = 0L;
-
     public void update(Block block){
-        // 如果当前区块号与前一个一样，证明这是重复处理的块(例如:某部分业务处理失败，由于重试机制进来此处)
-        if(block.getNum()==preBlockNumber) return;
         BigDecimal seconds = BigDecimal.valueOf(block.getTime().getTime()).divide(BigDecimal.valueOf(1000),0, RoundingMode.CEILING);
         now = seconds.longValue();
         cacheMap.putIfAbsent(now, 0L);

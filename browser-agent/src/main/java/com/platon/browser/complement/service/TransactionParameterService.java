@@ -12,6 +12,7 @@ import com.platon.browser.complement.converter.stake.StakeCreateConverter;
 import com.platon.browser.complement.converter.stake.StakeExitConverter;
 import com.platon.browser.complement.converter.stake.StakeIncreaseConverter;
 import com.platon.browser.complement.converter.stake.StakeModifyConverter;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
@@ -64,6 +65,9 @@ public class TransactionParameterService {
     private NetworkStatCache networkStatCache;
     @Autowired
     private AddressCache addressCache;
+
+    // 前一个区块号
+    private long preBlockNumber = 0L;
 
     /**
      * 解析交易, 构造业务入库参数信息
@@ -151,10 +155,16 @@ public class TransactionParameterService {
             }
            
         }
-        
+
+        Block block = event.getBlock();
+        // 如果当前区块号与前一个一样，证明这是重复处理的块(例如:某部分业务处理失败，由于重试机制进来此处)
+        // 防止重复计算
+        if(block.getNum()==preBlockNumber) return nodeOptList;
         networkStatCache.updateByBlock(event.getBlock(), proposalQty);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
+        preBlockNumber=block.getNum();
 
         return nodeOptList;
     }
