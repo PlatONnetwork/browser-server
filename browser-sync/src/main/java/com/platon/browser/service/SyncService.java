@@ -8,6 +8,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.queue.publisher.BlockEventPublisher;
 import com.platon.browser.queue.publisher.TransactionEventPublisher;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,12 @@ import java.util.List;
 @Slf4j
 @Service
 public class SyncService {
+
+    @Getter
+    private volatile boolean blockSyncDone =false;
+    @Getter
+    private volatile boolean transactionSyncDone =false;
+
     @Autowired
     private BlockEventPublisher blockEventPublisher;
 
@@ -68,6 +75,7 @@ public class SyncService {
             // 所有数据不够一页大小，退出
             if(blocks.size()<blockPageSize) break;
         }
+        blockSyncDone=true;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
@@ -95,5 +103,6 @@ public class SyncService {
             // 所有数据不够一页大小，退出
             if(transactions.size()<txPageSize) break;
         }
+        transactionSyncDone=true;
     }
 }
