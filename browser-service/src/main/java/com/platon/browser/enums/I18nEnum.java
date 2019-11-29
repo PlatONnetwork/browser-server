@@ -1,5 +1,10 @@
 package com.platon.browser.enums;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+
 /**
  * 国际化枚举
  *  @file I18nEnum.java
@@ -102,21 +107,21 @@ public enum I18nEnum {
     CONTRACT_EXECUTION,
     OTHERS,
     MPC,
-    CREATE_VALIDATOR,
-    EDIT_VALIDATOR,
-    INCREASE_STAKING,
-    EXIT_VALIDATOR,
-    DELEGATE,
-    UN_DELEGATE,
-    CREATE_PROPOSAL_TEXT,
-    CREATE_PROPOSAL_UPGRADE,
-    CREATE_PROPOSAL_PARAMETER,
-    CANCEL_PROPOSAL,
-    VOTING_PROPOSAL,
-    DECLARE_VERSION,
-    REPORT_VALIDATOR,
-    CREATE_RESTRICTING,
-    DUPLICATE_SIGN,
+    STAKE_CREATE,
+    STAKE_MODIFY,
+    STAKE_INCREASE,
+    STAKE_EXIT,
+    DELEGATE_CREATE,
+    DELEGATE_EXIT,
+    PROPOSAL_TEXT,
+    PROPOSAL_UPGRADE,
+    PROPOSAL_PARAMETER,
+    PROPOSAL_CANCEL,
+    PROPOSAL_VOTE,
+    VERSION_DECLARE,
+    REPORT,
+    RESTRICTING_CREATE,
+    MULTI_SIGN,
     
     CODE0,
     CODE1,
@@ -185,6 +190,11 @@ public enum I18nEnum {
     CODE302028,
     CODE302029,
     CODE302030,
+    CODE302031,
+    CODE302032,
+    CODE302033,
+    CODE302034,
+    
     CODE303000,
     CODE303001,
     CODE303002,
@@ -210,4 +220,12 @@ public enum I18nEnum {
     CODE304012,
     CODE304013
     ;
+	
+	private static final Map <String, I18nEnum> ENUMS = new HashMap <>();
+    static {
+        Arrays.asList(I18nEnum.values()).forEach(en -> ENUMS.put(en.name(), en));
+    }
+    public static I18nEnum getEnum ( String code ) {
+        return ENUMS.get(code);
+    }
 }

@@ -175,7 +175,10 @@ public class TransactionServiceImpl implements TransactionService {
             /**
     		 * 失败信息国际化
     		 */
-            transactionListResp.setFailReason(i18n.i(I18nEnum.valueOf("CODE" + transactionListResp.getFailReason())));
+            I18nEnum i18nEnum = I18nEnum.getEnum("CODE" + transaction.getFailReason());
+    		if(i18nEnum != null) {
+    			transactionListResp.setFailReason(i18n.i(i18nEnum));
+    		}
             if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
             	transactionListResp.setTxReceiptStatus(0);
     		} else {
@@ -289,7 +292,10 @@ public class TransactionServiceImpl implements TransactionService {
     		/**
     		 * 失败信息国际化
     		 */
-    		resp.setFailReason(i18n.i(I18nEnum.valueOf("CODE" + transaction.getFailReason())));
+    		I18nEnum i18nEnum = I18nEnum.getEnum("CODE" + transaction.getFailReason());
+    		if(i18nEnum != null) {
+    			resp.setFailReason(i18n.i(i18nEnum));
+    		}
     		if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
     			resp.setTxReceiptStatus(0);
     		} else {
