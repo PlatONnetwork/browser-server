@@ -55,7 +55,16 @@ subprojects {
             exclude module: 'elasticsearch-rest-client'
         }
         compile "org.elasticsearch:elasticsearch:$elasticSearchVersion"
-        compile "org.elasticsearch.client:elasticsearch-rest-client:$elasticSearchVersion"
+        compile ("org.elasticsearch.client:elasticsearch-rest-client:$elasticSearchVersion"){
+            exclude module: 'httpclient'
+            exclude module: 'httpcore'
+            exclude module: 'httpasyncclient'
+            exclude module: 'httcore-nio'
+        }
+        compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.10'
+        compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.12'
+        compile group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
+        compile group: 'org.apache.httpcomponents', name: 'httpcore-nio', version: '4.4.12'
 
         compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
         testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
@@ -92,11 +101,11 @@ subprojects {
 	test {
 	 //   include '**/Test*.class'
 	// 忽略指定的测试用例
-//	    exclude '**/ProposalContractTest.class'
-//	    exclude '**/RestrictingPlanContractTest.class'
-//	    exclude '**/SlashContractTest.class'
-//	    exclude '**/TransactionSender.class'
-//	    exclude '**/CustomNodeMapperTest.class'
+	    exclude '**/ProposalContractTest.class'
+	    exclude '**/RestrictingPlanContractTest.class'
+	    exclude '**/SlashContractTest.class'
+	    exclude '**/TransactionSender.class'
+	    exclude '**/CustomNodeMapperTest.class'
 	}
 }
 

@@ -15,7 +15,7 @@
 "delegateThreshold": "10",
 "unStakeRefundSettlePeriodCount": "5",
 "duplicateSignSlashRate": "0.0100000000000000",
-"duplicateSignReportRate": "0.50",
+"duplicateSignRewardRate": "0.50",
 "evidenceValidEpoch": "4",
 "minProposalTextParticipationRate": "0.5",
 "minProposalTextSupportRate": "0.667",

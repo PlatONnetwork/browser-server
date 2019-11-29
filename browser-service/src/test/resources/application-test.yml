@@ -1,6 +1,6 @@
 # ***************************测试配置**************************** #
 # 应用版本
-version: 0.7.3.1
+version: 0.7.4.0
 # 当前激活的配置名称(请不要修改)
 profile: test
 # 密码加密配置
@@ -96,6 +96,8 @@ platon:
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
+  #区块最大Gas限制
+  maxBlockGasLimit: 100800000
   #每年固定增发比例
   addIssueRate: 0.025
   #每年增发分配给激励池的比例
@@ -128,3 +130,16 @@ system.username: admin
 system.password: admin
 client.username: guest
 client.password: guest
+
+
+task:
+  #地址统计任务
+  address-batch-size: 1000
+  #动态调整参数
+  dynamic-adjust:
+    #agent与实际链上区块号相差多少个块号时触发调整操作
+    threshold: 20
+    #未追上链,批量入ES和Redis的缓存大小
+    cache-batch-max-size: 10
+    #已追上链,批量入ES和Redis的缓存大小
+    cache-batch-min-size: 1

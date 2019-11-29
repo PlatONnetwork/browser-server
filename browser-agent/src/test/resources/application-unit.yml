@@ -97,6 +97,8 @@ platon:
   }
   # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 1500000
+  #区块最大Gas限制
+  maxBlockGasLimit: 100800000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
   #提案pip_num参数模板
@@ -107,5 +109,13 @@ platon:
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
 
 task:
-   #地址统计任务
-   address-batch-size: 1000  
+  #地址统计任务
+  address-batch-size: 1000
+  #动态调整参数
+  dynamic-adjust:
+    #agent与实际链上区块号相差多少个块号时触发调整操作
+    threshold: 20
+    #未追上链,批量入ES和Redis的缓存大小
+    cache-batch-max-size: 10
+    #已追上链,批量入ES和Redis的缓存大小
+    cache-batch-min-size: 1
