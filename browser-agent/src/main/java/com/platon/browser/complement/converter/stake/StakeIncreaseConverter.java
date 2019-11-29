@@ -54,7 +54,7 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getNodeId());
-        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MODIFY.getCode()));
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.INCREASE.getCode()));
         nodeOpt.setTxHash(tx.getHash());
         nodeOpt.setBNum(tx.getNum());
         nodeOpt.setTime(tx.getTime());

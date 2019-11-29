@@ -172,6 +172,10 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
             transactionListResp.setValue(new BigDecimal(transaction.getValue()));
+            /**
+    		 * 失败信息国际化
+    		 */
+            transactionListResp.setFailReason(i18n.i(I18nEnum.valueOf("CODE" + transactionListResp.getFailReason())));
             if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
             	transactionListResp.setTxReceiptStatus(0);
     		} else {
@@ -282,6 +286,10 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTxInfo(transaction.getInfo());
     		resp.setGasPrice(new BigDecimal(transaction.getGasPrice()));
     		resp.setValue(new BigDecimal(transaction.getValue()));
+    		/**
+    		 * 失败信息国际化
+    		 */
+    		resp.setFailReason(i18n.i(I18nEnum.valueOf("CODE" + transaction.getFailReason())));
     		if(StatusEnum.FAILURE.getCode() == transaction.getStatus()) {
     			resp.setTxReceiptStatus(0);
     		} else {
