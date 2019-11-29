@@ -11,6 +11,7 @@ import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.req.newblock.BlockDetailsReq;
+import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.AliveStakingListReq;
 import com.platon.browser.res.BaseResp;
@@ -153,6 +154,12 @@ public class StompPushJob {
     	transactionListByBlockRequest.setPageNo(1);
     	transactionListByBlockRequest.setPageSize(10);
     	transactionService.getTransactionListByBlock(transactionListByBlockRequest);
+    	/**
+    	 * 交易index做warm
+    	 */
+    	TransactionDetailsReq transactionDetailsReq = new TransactionDetailsReq();
+    	transactionDetailsReq.setTxHash("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
+    	transactionService.transactionDetails(transactionDetailsReq);
     }
     
     

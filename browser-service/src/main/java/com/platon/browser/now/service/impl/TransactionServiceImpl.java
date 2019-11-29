@@ -390,9 +390,14 @@ public class TransactionServiceImpl implements TransactionService {
 							} else {
 								resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
 							}
-							//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C) + 现有区块数
-							BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
-									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount())).add(new BigDecimal(resp.getBlockNumber()));
+							//（math.ceil（现有区块/结算周期区块数） + 锁定周期数） +* 结算周期区块数
+							//提案交易所在块高%共识周期块数,交易所在第几个共识轮
+				            BigDecimal[] belongToConList = new BigDecimal(resp.getBlockNumber())
+				            		.divideAndRemainder(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
+				            BigDecimal belongToCon = belongToConList[0];
+				            
+							BigDecimal blockNum = (belongToCon.add(new BigDecimal(1)).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
+									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
 							resp.setRedeemUnLockedBlock(blockNum.toString());
 						}
 						break;
