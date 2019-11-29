@@ -2,7 +2,6 @@ package com.platon.browser.client;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.web3j.platon.ErrorCode;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -60,7 +59,7 @@ public class Receipt {
         if(statusCode==0){
             logStatus=SUCCESS;
         }else {
-            failReason= ErrorCode.getErrorMsg(statusCode);
+            failReason=decodedStatus;
             logStatus=FAILURE;
         }
     }
