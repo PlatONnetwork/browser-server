@@ -1,14 +1,12 @@
 package com.platon.browser.task;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.enums.AppStatus;
+import com.platon.browser.common.service.proposal.ProposalService;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import org.junit.Before;
@@ -31,25 +29,22 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProposalInfoTaskTest extends AgentTestBase {
     @Mock
-    private PlatOnClient client;
-    @Mock
-    private SpecialApi sca;
-    @Mock
     private NetworkStatCache networkStatCache;
     @Mock
     private ProposalMapper proposalMapper;
     @Mock
     private CustomProposalMapper customProposalMapper;
+    @Mock
+    private ProposalService proposalService;
     @Spy
     private ProposalInfoTask target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "client", client);
-        ReflectionTestUtils.setField(target, "sca", sca);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
         ReflectionTestUtils.setField(target, "customProposalMapper", customProposalMapper);
+        ReflectionTestUtils.setField(target, "proposalService", proposalService);
     }
 
     @Test

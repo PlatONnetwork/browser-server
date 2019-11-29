@@ -7,14 +7,13 @@ import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.common.complement.cache.ParamProposalCache;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.service.govern.ParameterService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +25,7 @@ import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,6 +57,12 @@ public class InitializationServiceTest extends AgentTestBase {
     private NetworkStatCache networkStatCache;
     @Mock
     private AddressCache addressCache;
+    @Mock
+    private ProposalMapper proposalMapper;
+    @Mock
+    private ParamProposalCache paramProposalCache;
+    @Mock
+    private ParameterService parameterService;
     @Spy
     private InitializationService target;
 
@@ -82,6 +88,9 @@ public class InitializationServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "nodeCache", nodeCache);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "addressCache", addressCache);
+        ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
+        ReflectionTestUtils.setField(target, "paramProposalCache", paramProposalCache);
+        ReflectionTestUtils.setField(target, "parameterService", parameterService);
 
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);
@@ -89,6 +98,7 @@ public class InitializationServiceTest extends AgentTestBase {
         when(epochRetryService.getExpectBlockCount()).thenReturn(10L);
         when(chainConfig.getDefaultStakingList()).thenReturn(stakingList);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(100000000));
+        when(proposalMapper.selectByExample(any())).thenReturn(new ArrayList<>(proposalList));
     }
 
     @Test

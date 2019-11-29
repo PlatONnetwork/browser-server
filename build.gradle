@@ -101,11 +101,11 @@ subprojects {
 	test {
 	 //   include '**/Test*.class'
 	// 忽略指定的测试用例
-//	    exclude '**/ProposalContractTest.class'
-//	    exclude '**/RestrictingPlanContractTest.class'
-//	    exclude '**/SlashContractTest.class'
-//	    exclude '**/TransactionSender.class'
-//	    exclude '**/CustomNodeMapperTest.class'
+	    exclude '**/ProposalContractTest.class'
+	    exclude '**/RestrictingPlanContractTest.class'
+	    exclude '**/SlashContractTest.class'
+	    exclude '**/TransactionSender.class'
+	    exclude '**/CustomNodeMapperTest.class'
 	}
 }
 

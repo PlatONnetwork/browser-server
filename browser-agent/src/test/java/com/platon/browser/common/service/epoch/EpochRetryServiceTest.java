@@ -22,6 +22,7 @@ import org.web3j.protocol.core.RemoteCall;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -78,7 +79,6 @@ public class EpochRetryServiceTest extends AgentTestBase {
         assertEquals(24,target.getBlockReward().intValue());
         assertEquals(4000,target.getInciteAmount4Stake().intValue());
         assertEquals(800,target.getSettleStakeReward().intValue());
-        assertEquals(200,target.getStakeReward().intValue());
         verify(target, times(1)).issueChange(any(BigInteger.class));
     }
 
@@ -96,7 +96,13 @@ public class EpochRetryServiceTest extends AgentTestBase {
      */
     @Test
     public void settlementEpochChange() throws Exception {
+        target.issueChange(BigInteger.valueOf(321));
         target.settlementChange(BigInteger.valueOf(321));
+        BigDecimal stakeReward=chainConfig.getStakeRewardRate()
+                .multiply(accountService.getInciteBalance(BigInteger.ONE))
+                .divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR)
+                .divide(BigDecimal.valueOf(curVerifiers.size()),0, RoundingMode.FLOOR);
+        assertEquals(stakeReward.intValue(),target.getStakeReward().intValue());
         verify(target, times(1)).settlementChange(any(BigInteger.class));
     }
 
