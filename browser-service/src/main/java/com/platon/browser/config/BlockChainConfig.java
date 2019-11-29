@@ -74,6 +74,8 @@ public class BlockChainConfig {
     private BigInteger expectBlockCount;
     //【通用】每个共识轮验证节点数量
     private BigInteger consensusValidatorCount;
+    //【通用】每个结算周期验证节点数量
+    private BigInteger settlementValidatorCount;
     //【通用】每个增发周期的分钟数
     private BigInteger additionalCycleMinutes;
     //【通用】每个结算周期的分钟数
@@ -178,6 +180,8 @@ public class BlockChainConfig {
         this.expectBlockCount=dec.getCommon().getPerRoundBlocks();
         //【通用】每个共识轮验证节点数量
         this.consensusValidatorCount=dec.getCommon().getMaxConsensusVals();
+        //【通用】每个结算周期验证节点数量
+        this.settlementValidatorCount=dec.getStaking().getMaxValidators();
         //【通用】增发周期规定的分钟数
         this.additionalCycleMinutes=dec.getCommon().getAdditionalCycleTime();
         //【通用】每个结算周期的分钟数

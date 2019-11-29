@@ -79,7 +79,7 @@ public abstract class BusinessParamConverter<T> {
                 case DELEGATE_EXIT: // 1005
                     DelegateExitParam dep = (DelegateExitParam)txParam;
                     nodeItem = nodeCache.getNode(dep.getNodeId());
-                    dep.setNodeName(nodeItem.getNodeName()).setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    dep.setNodeName(nodeItem.getNodeName());
                     break;
                 case PROPOSAL_TEXT: // 2000
                     ProposalTextParam ptp = (ProposalTextParam)txParam;

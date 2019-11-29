@@ -78,8 +78,8 @@ public class ParameterService {
         chainConfig.setDelegateThreshold(modifiableParam.getStaking().getOperatingThreshold());
         //节点质押退回锁定周期
         chainConfig.setUnStakeRefundSettlePeriodCount(modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger());
-        //备选验证节点数量(U)
-        chainConfig.setConsensusValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
+        //备选结算周期验证节点数量(U)
+        chainConfig.setSettlementValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
         //举报最高处罚n3‱
         chainConfig.setDuplicateSignSlashRate(modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //举报奖励n4%
@@ -121,7 +121,7 @@ public class ParameterService {
                 staleValue = chainConfig.getDelegateThreshold().toString();
                 break;
             case MAX_VALIDATORS:
-                staleValue = chainConfig.getConsensusValidatorCount().toString();
+                staleValue = chainConfig.getSettlementValidatorCount().toString();
                 break;
             case UN_STAKE_FREEZE_DURATION:
                 staleValue = chainConfig.getUnStakeRefundSettlePeriodCount().toString();
