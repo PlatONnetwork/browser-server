@@ -110,7 +110,7 @@ public class InitializationService {
         // 初始化网络缓存
         networkStatCache.init(networkStat);
 
-        // 确保epochRetryService中的preBlockReward和preStakeReward不为0
+        // 确保epochRetryService中的preStakeReward不为0
         epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
         epochRetryService.settlementChange(BigInteger.valueOf(networkStat.getCurNumber()));
         epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));

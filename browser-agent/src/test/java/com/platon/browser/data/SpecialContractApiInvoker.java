@@ -48,6 +48,7 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]) throws Exception {
 
+
         //TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x6d73ce6d593b39a4cd47971a8f7be7e9b1df70fce2975945a910738f00513b8d").send().getTransactionReceipt().get();
 
        /* Web3jWrapper web3jWrapper = Web3jWrapper.builder()
