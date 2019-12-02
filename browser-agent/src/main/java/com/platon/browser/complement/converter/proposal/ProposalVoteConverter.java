@@ -51,6 +51,8 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 		} catch (Exception e) {
 			//可能存在问题
 		}
+
+		if(proposal==null) throw new Error("找不到投票提案[proposalId="+txParam.getProposalId()+"], 无法相关信息!");
 		
         // 补充节点名称
         updateTxInfo(txParam,tx);
