@@ -9,6 +9,7 @@ import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisBlockService;
 import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +23,10 @@ import java.util.List;
 @Service
 public class SyncService {
     @Getter
+    @Setter
     private static volatile boolean blockSyncDone =false;
     @Getter
+    @Setter
     private static volatile boolean transactionSyncDone =false;
 
     @Autowired
