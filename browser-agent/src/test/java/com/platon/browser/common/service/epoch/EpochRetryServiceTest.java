@@ -132,6 +132,7 @@ public class EpochRetryServiceTest extends AgentTestBase {
     public void getCandidatesException() throws Exception {
         NodeContract nodeContract = mock(NodeContract.class);
         when(platOnClient.getNodeContract()).thenReturn(nodeContract);
+
         RemoteCall call = mock(RemoteCall.class);
         when(nodeContract.getCandidateList()).thenReturn(call);
         BaseResponse response = mock(BaseResponse.class);
@@ -141,6 +142,5 @@ public class EpochRetryServiceTest extends AgentTestBase {
         when(response.isStatusOk()).thenReturn(true);
         response.data=null;
         target.getCandidates();
-        verify(target, times(1)).getCandidates();
     }
 }

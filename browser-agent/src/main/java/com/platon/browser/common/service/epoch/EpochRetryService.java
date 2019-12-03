@@ -213,7 +213,7 @@ public class EpochRetryService {
      * @throws Exception
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public List <Node> getCandidates () {
+    public List <Node> getCandidates () throws CandidateException {
         log.debug("获取实时候选人列表:{}()", Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
             BaseResponse <List <Node>> br = platOnClient.getNodeContract().getCandidateList().send();
@@ -225,7 +225,7 @@ public class EpochRetryService {
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
             log.error("", e);
-            throw new BusinessException(e.getMessage());
+            throw new CandidateException(e.getMessage());
         }
     }
 }
