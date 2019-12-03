@@ -127,3 +127,6 @@ task buildTar(dependsOn: [
         monitorDistTar
 ]){}
 
+sonarqube {
+    skipProject = true
+}

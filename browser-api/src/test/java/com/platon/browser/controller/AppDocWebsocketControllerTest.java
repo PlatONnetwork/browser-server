@@ -1,0 +1,66 @@
+package com.platon.browser.controller;
+
+import com.platon.browser.BrowserApiApplication;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = BrowserApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+public class AppDocWebsocketControllerTest {
+	@Autowired
+    private WebApplicationContext wac;
+    private MockMvc mockMvc;
+
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build(); //初始化MockMvc对象
+    }
+    @Test
+    public void websocket() throws Exception{
+    	Map<String, String> map = new HashMap<>();
+    	String url = "ws://127.0.0.1:9061/websocket/";
+    	map.put("message", "1|10||all");
+        URI uri = new URI(url);
+    	WebSocketClient webSocketClient = new WebSocketClient(uri, map) {
+			
+			@Override
+			public void onOpen(ServerHandshake handshakedata) {
+				
+			}
+			
+			@Override
+			public void onMessage(String message) {
+				
+			}
+			
+			@Override
+			public void onError(Exception ex) {
+				
+			}
+			
+			@Override
+			public void onClose(int code, String reason, boolean remote) {
+				
+			}
+		};
+		webSocketClient.connect();
+//		webSocketClient.send("1|10||all");
+		webSocketClient.close();
+    }
+    
+}

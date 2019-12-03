@@ -222,6 +222,9 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getNum(),
                     DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
+                    /**
+                     * 枚举类型名称需要对应
+                     */
                     i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
                     transaction.getFrom(),
                     transaction.getTo(),

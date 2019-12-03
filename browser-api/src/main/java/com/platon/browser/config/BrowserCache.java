@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.websocket.Session;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,36 +48,6 @@ public class BrowserCache {
 
 	public static synchronized void subOnlineCount() {
 		BrowserCache.onlineCount--;
-	}
-
-	/**
-	 * * 给指定的人发送消息 * @param message
-	 */
-	public static void sendToUser(String userno, String message) {
-		if (BrowserCache.getWebSocketSet().get(userno) != null) {
-			try {
-				BrowserCache.getWebSocketSet().get(userno).getBasicRemote().sendText(message);
-			} catch (IOException e) {
-				logger.error("", e);
-			}
-		} else {
-			logger.debug("当前用户不在线");
-		}
-	}
-
-	/**
-	 * * 给所有人发消息 * @param message
-	 * @throws Exception 
-	 */
-	public static void sendAll(String message) throws Exception {
-		// 遍历HashMap
-		for (String key : BrowserCache.getWebSocketSet().keySet()) {
-			// 判断接收用户是否是当前发消息的用户
-			if (!message.equals(key)) {
-				BrowserCache.sendMessage(key,message);
-				logger.debug("key = {}",key);
-			}
-		}
 	}
 
 
