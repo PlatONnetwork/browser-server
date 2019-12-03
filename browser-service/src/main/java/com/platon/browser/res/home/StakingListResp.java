@@ -1,9 +1,9 @@
 package com.platon.browser.res.home;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+
+import java.math.BigDecimal;
 
 /**
  * 首页验证人列表返回子结构对象

@@ -1,6 +1,7 @@
 package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
 import lombok.Getter;
 import lombok.Setter;
@@ -87,11 +88,19 @@ public class PlatOnClient {
         return retryableClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
     }
 
-    public List<Node> getLatestValidators() throws Exception {
-        return getNodeContract().getValidatorList().send().data;
+    public List<Node> getLatestValidators() {
+        try {
+            return getNodeContract().getValidatorList().send().data;
+        } catch (Exception e) {
+           throw new BusinessException(e.getMessage());
+        }
     }
 
-    public List<Node> getLatestVerifiers() throws Exception {
-        return getNodeContract().getVerifierList().send().data;
+    public List<Node> getLatestVerifiers() {
+        try {
+            return getNodeContract().getVerifierList().send().data;
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
     }
 }

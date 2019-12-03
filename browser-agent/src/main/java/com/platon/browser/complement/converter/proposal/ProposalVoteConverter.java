@@ -10,6 +10,7 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.ProposalVoteParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,8 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 			//可能存在问题
 		}
 
-		if(proposal==null) throw new Error("找不到投票提案[proposalId="+txParam.getProposalId()+"], 无法相关信息!");
+		if(proposal==null)
+			throw new BusinessException("找不到投票提案[proposalId="+txParam.getProposalId()+"], 无法相关信息!");
 		
         // 补充节点名称
         updateTxInfo(txParam,tx);

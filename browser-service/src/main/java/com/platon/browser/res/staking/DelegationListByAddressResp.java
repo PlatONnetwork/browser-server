@@ -1,9 +1,9 @@
 package com.platon.browser.res.staking;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+
+import java.math.BigDecimal;
 
 /**
  * 地址锁仓列表返回对象

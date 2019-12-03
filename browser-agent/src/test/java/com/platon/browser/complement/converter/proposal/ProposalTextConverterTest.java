@@ -6,7 +6,6 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.converter.proposal.ProposalTextConverter;
 import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Block;

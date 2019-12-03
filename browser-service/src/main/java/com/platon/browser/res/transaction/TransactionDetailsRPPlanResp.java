@@ -1,9 +1,9 @@
 package com.platon.browser.res.transaction;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+
+import java.math.BigDecimal;
 
 /**
  *  交易详情锁仓子结构体返回对象

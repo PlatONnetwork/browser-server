@@ -1,11 +1,11 @@
 package com.platon.browser.res.transaction;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 import com.platon.browser.config.CustomVersionSerializer;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 交易详情返回对象

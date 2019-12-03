@@ -1,10 +1,10 @@
 package com.platon.browser.res.address;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  *  查询地址锁仓信息的返回的对象

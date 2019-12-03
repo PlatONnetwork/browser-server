@@ -1,5 +1,6 @@
 package com.platon.browser.config;
 
+import com.platon.browser.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +57,12 @@ public class BrowserCache {
 	 * @throws Exception 
 	 */
 
-	public static void sendMessage(String key,String message) throws Exception {
+	public static void sendMessage(String key,String message)  {
 		try {
 			BrowserCache.getWebSocketSet().get(key).getBasicRemote().sendText(message);
 		} catch (Exception e) {
 			logger.error("sendMessage error", e);
-			throw e;
+			throw new BusinessException(e.getMessage());
 		}
 	}
 }

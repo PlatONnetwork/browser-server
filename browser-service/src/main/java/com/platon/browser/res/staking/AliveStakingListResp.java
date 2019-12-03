@@ -5,7 +5,7 @@ import com.platon.browser.config.CustomLowLatSerializer;
 
 /**
  * 活跃验证人列表返回对象
- *  @file AliveStakingListResp.java
+ *  @file AliveStakingListResp.javaStakingListResp
  *  @description 
  *	@author zhangrj
  *  @data 2019年8月31日

@@ -1,9 +1,9 @@
 package com.platon.browser.res.address;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+
+import java.math.BigDecimal;
 
 /**
  *  查询地址的返回的对象
