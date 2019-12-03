@@ -16,15 +16,12 @@ import java.math.BigDecimal;
 @RunWith(MockitoJUnitRunner.Silent.class)
 @Slf4j
 public class BlockTest {
-    @Test
-    public void setBlock(){
-        Block block = new Block(BigDecimal.TEN);
-        log.debug("staking : {}", JSON.toJSONString(block));
-    }
 
     @Test
-    public void getBlock(){
+    public void blockTest(){
         Block block = new Block(BigDecimal.TEN);
+        block.setMaxBlockGasLimit(BigDecimal.ONE);
+        log.debug("staking : {}", JSON.toJSONString(block));
         block.getMaxBlockGasLimit();
         log.debug("value : {} ",block.getMaxBlockGasLimit());
 

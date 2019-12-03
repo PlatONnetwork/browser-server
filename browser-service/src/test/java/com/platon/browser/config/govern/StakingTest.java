@@ -18,14 +18,13 @@ import java.math.BigDecimal;
 public class StakingTest {
 
     @Test
-    public void setStaking(){
+    public void satkingTest(){
         Staking staking = new Staking(BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN);
+        staking.setMaxValidators(BigDecimal.ONE);
+        staking.setOperatingThreshold(BigDecimal.ONE);
+        staking.setStakeThreshold(BigDecimal.ONE);
+        staking.setUnStakeFreezeDuration(BigDecimal.ONE);
         log.debug("staking : {}", JSON.toJSONString(staking));
-    }
-
-    @Test
-    public void getSatking(){
-        Staking staking = new Staking(BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN);
         staking.getMaxValidators();
         staking.getOperatingThreshold();
         staking.getStakeThreshold();

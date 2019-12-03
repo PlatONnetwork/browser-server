@@ -17,16 +17,14 @@ import java.math.BigDecimal;
 @Slf4j
 public class SlashingTest {
 
-
     @Test
-    public void setSlashing(){
+    public void slashingTest(){
         Slashing slashing = new Slashing(BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN);
+        slashing.setDuplicateSignReportReward(BigDecimal.ONE);
+        slashing.setMaxEvidenceAge(BigDecimal.ONE);
+        slashing.setSlashBlocksReward(BigDecimal.ONE);
+        slashing.setSlashFractionDuplicateSign(BigDecimal.ONE);
         log.debug("slashing : {}", JSON.toJSONString(slashing));
-    }
-
-    @Test
-    public void getSlashing(){
-        Slashing slashing = new Slashing(BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN);
         slashing.getDuplicateSignReportReward();
         slashing.getMaxEvidenceAge();
         slashing.getSlashBlocksReward();
