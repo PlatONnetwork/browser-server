@@ -1,34 +1,33 @@
-package com.platon.browser.common.service.redis;
+package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.elasticsearch.dto.Block;
-import lombok.extern.slf4j.Slf4j;
+import com.platon.browser.common.collection.dto.CollectionNetworkStat;
+import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisBlockServiceTest extends AgentTestBase {
+public class RedisStatisticServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @Spy
-    private RedisBlockService target;
+    private RedisStatisticService target;
 
     @Before
     public void setup(){
@@ -48,8 +47,9 @@ public class RedisBlockServiceTest extends AgentTestBase {
      */
     @Test
     public void test(){
-        Set<Block> data = new HashSet<>(blockList);
-        target.save(data,false);
+        NetworkStat networkStat = CollectionNetworkStat.newInstance();
+        Set<NetworkStat> data = new HashSet<>();
+        data.add(networkStat);
         target.save(data,true);
     }
 }

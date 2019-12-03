@@ -3,6 +3,10 @@ package com.platon.browser.common.service.redis;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.service.redis.RedisBlockService;
+import com.platon.browser.service.redis.RedisService;
+import com.platon.browser.service.redis.RedisStatisticService;
+import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -33,7 +37,7 @@ public class RedisImportService {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
-    private <T> void submit(RedisService<T> service,Set<T> data,boolean serialOverride,CountDownLatch latch){
+    private <T> void submit(RedisService<T> service, Set<T> data, boolean serialOverride, CountDownLatch latch){
         EXECUTOR.submit(()->{
             try {
                 service.save(data,serialOverride);

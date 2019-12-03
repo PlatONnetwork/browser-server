@@ -1,4 +1,4 @@
-package com.platon.browser.common.service.redis;
+package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -24,12 +24,12 @@ public class RedisBlockService extends RedisService<Block> {
     @Value("${spring.redis.key.blocks}")
     private String blocksCacheKey;
     @Override
-    String getCacheKey() {
+    public String getCacheKey() {
         return blocksCacheKey;
     }
 
     @Override
-    void updateMinMaxScore(Set<Block> data) {
+    public void updateMinMaxScore(Set<Block> data) {
         minMax.reset();
         data.forEach(item->{
             Long score = item.getNum();
@@ -39,12 +39,12 @@ public class RedisBlockService extends RedisService<Block> {
     }
 
     @Override
-    void updateExistScore(Set<String> exist) {
+    public void updateExistScore(Set<String> exist) {
         Objects.requireNonNull(exist).forEach(item->existScore.add(JSON.parseObject(item, Block.class).getNum()));
     }
 
     @Override
-    void updateStageSet(Set<Block> data) {
+    public void updateStageSet(Set<Block> data) {
         data.forEach(item -> {
             // 在缓存中不存在的才放入缓存
             if(!existScore.contains(item.getNum())) stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getNum().doubleValue()));

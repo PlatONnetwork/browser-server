@@ -1,4 +1,4 @@
-package com.platon.browser.service;
+package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Builder;
@@ -49,10 +49,10 @@ public abstract class RedisService<T> {
     public void clear() {
         redisTemplate.delete(getCacheKey());
     }
-    abstract String getCacheKey();
-    void updateMinMaxScore(Set<T> data){}
-    void updateExistScore(Set<String> exist){}
-    void updateStageSet(Set<T> data){}
+    public abstract String getCacheKey();
+    public void updateMinMaxScore(Set<T> data){}
+    public void updateExistScore(Set<String> exist){}
+    public void updateStageSet(Set<T> data){}
 
     /**
      * 模板方法，通用流程在此操作,具体属性由子类处理

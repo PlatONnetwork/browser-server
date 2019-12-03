@@ -1,9 +1,8 @@
-package com.platon.browser.common.service.redis;
+package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,16 +17,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisStatisticServiceTest extends AgentTestBase {
+public class RedisTransactionServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @Spy
-    private RedisStatisticService target;
+    private RedisTransactionService target;
 
     @Before
     public void setup(){
@@ -47,9 +44,8 @@ public class RedisStatisticServiceTest extends AgentTestBase {
      */
     @Test
     public void test(){
-        NetworkStat networkStat = CollectionNetworkStat.newInstance();
-        Set<NetworkStat> data = new HashSet<>();
-        data.add(networkStat);
+        Set<Transaction> data = new HashSet<>(transactionList);
+        target.save(data,false);
         target.save(data,true);
     }
 }

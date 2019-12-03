@@ -1,6 +1,10 @@
-package com.platon.browser.common.service.redis;
+package com.platon.browser.service.redis;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.common.service.redis.RedisImportService;
+import com.platon.browser.service.redis.RedisBlockService;
+import com.platon.browser.service.redis.RedisStatisticService;
+import com.platon.browser.service.redis.RedisTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

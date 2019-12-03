@@ -1,4 +1,4 @@
-package com.platon.browser.service;
+package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 交易缓存数据处理逻辑
+ * 交易缓存数据处理逻辑\
  */
 @Slf4j
 @Service
@@ -20,12 +20,12 @@ public class RedisTransactionService extends RedisService<Transaction>{
     @Value("${spring.redis.key.transactions}")
     private String transactionsCacheKey;
     @Override
-    String getCacheKey() {
+    public String getCacheKey() {
         return transactionsCacheKey;
     }
 
     @Override
-    void updateMinMaxScore(Set<Transaction> data) {
+    public void updateMinMaxScore(Set<Transaction> data) {
         minMax.reset();
         data.forEach(item->{
             Long score = item.getSeq();
@@ -35,12 +35,12 @@ public class RedisTransactionService extends RedisService<Transaction>{
     }
 
     @Override
-    void updateExistScore(Set<String> exist) {
+    public void updateExistScore(Set<String> exist) {
         Objects.requireNonNull(exist).forEach(item->existScore.add(JSON.parseObject(item, Transaction.class).getSeq()));
     }
 
     @Override
-    void updateStageSet(Set<Transaction> data) {
+    public void updateStageSet(Set<Transaction> data) {
         data.forEach(item -> {
             // 在缓存中不存在的才放入缓存
             if(!existScore.contains(item.getSeq())) stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getSeq().doubleValue()));

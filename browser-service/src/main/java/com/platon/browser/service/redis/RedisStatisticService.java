@@ -1,4 +1,4 @@
-package com.platon.browser.service;
+package com.platon.browser.service.redis;
 
 import com.platon.browser.dao.entity.NetworkStat;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ public class RedisStatisticService extends RedisService<NetworkStat> {
     @Value("${spring.redis.key.networkStat}")
     private String networkStatCacheKey;
     @Override
-    String getCacheKey() {
+    public String getCacheKey() {
         return networkStatCacheKey;
     }
 }
