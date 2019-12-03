@@ -4,7 +4,6 @@ import com.platon.browser.dao.entity.Config;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import lombok.Builder;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.List;
  * @create: 2019-11-25 17:34:20
  **/
 @Data
-@Slf4j
 @Builder
 public class ModifiableParam {
 

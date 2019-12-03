@@ -12,7 +12,6 @@ import java.math.BigDecimal;
  * @create: 2019-11-25 18:31:37
  **/
 @Data
-@Slf4j
 @Builder
 public class Slashing {
     private BigDecimal slashFractionDuplicateSign;
