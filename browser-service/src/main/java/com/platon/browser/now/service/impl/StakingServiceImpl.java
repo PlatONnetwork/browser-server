@@ -121,14 +121,29 @@ public class StakingServiceImpl implements StakingService {
 		/** 根据条件和状态进行查询列表 */
 		NodeExample nodeExample = new NodeExample();
 		nodeExample.setOrderByClause(" big_version desc, total_value desc,staking_block_num asc, staking_tx_index asc");
-		NodeExample.Criteria criteria = nodeExample.createCriteria();
-		criteria.andStatusEqualTo(status);
+		NodeExample.Criteria criteria1 = nodeExample.createCriteria();
+		criteria1.andStatusEqualTo(status);
 		if(StringUtils.isNotBlank(req.getKey())){
-			criteria.andNodeNameLike("%" + req.getKey() + "%");
+			criteria1.andNodeNameLike("%" + req.getKey() + "%");
 		}
 		if(isSettle != null) {
-			criteria.andIsSettleEqualTo(isSettle);
+			criteria1.andIsSettleEqualTo(isSettle);
 		}
+		nodeExample.or(criteria1);
+		/**
+		 * 如果节点状态为退出中且为结算周期则认为在活跃中
+		 */
+		NodeExample.Criteria criteria2 = nodeExample.createCriteria();
+		criteria2.andStatusEqualTo(CustomStaking.StatusEnum.EXITING.getCode());
+		if(StringUtils.isNotBlank(req.getKey())){
+			criteria2.andNodeNameLike("%" + req.getKey() + "%");
+		}
+		criteria2.andIsSettleEqualTo(CustomStaking.YesNoEnum.YES.getCode());
+		if(isSettle != null) {
+			criteria1.andIsSettleEqualTo(isSettle);
+		}
+		nodeExample.or(criteria2);
+		
 		Page<Node> stakingPage = nodeMapper.selectByExample(nodeExample);
 		List<Node> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
@@ -183,6 +198,11 @@ public class StakingServiceImpl implements StakingService {
 		nodeExample.setOrderByClause(" leave_time desc");
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusIn(status);
+		/**
+		 * 防止直接退出的节点出现在历史表中
+		 */
+		criteria.andIsSettleEqualTo(CustomStaking.YesNoEnum.NO.getCode());
+		
 		if(StringUtils.isNotBlank(req.getKey())) {
 			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}

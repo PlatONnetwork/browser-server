@@ -304,7 +304,7 @@ public class BlockServiceImpl implements BlockService {
 
 			/** 取上一个区块,如果存在则设置标识和hash */
 	        blockDetailResp.setFirst(false);
-	        if(blockNumber == 1) {
+	        if(blockNumber == 0) {
 	        	blockDetailResp.setTimeDiff(0l);
 	        	blockDetailResp.setFirst(true);
 	        } 

@@ -74,6 +74,6 @@
   
   <select id="selectCountByActive" resultType="java.lang.Integer">
   	SELECT count(*)
-	FROM staking WHERE `status` = 1 and `is_settle` = 1
+	FROM staking WHERE (`status` = 1 and `is_settle` = 1) or (`status` = 2 and `is_settle` = 1)
   </select>
 </mapper>

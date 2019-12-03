@@ -42,7 +42,7 @@ public class BlockServiceImplTest extends TestBase{
 	@Test
 	public void blockDetails() {
 		BlockDetailsReq req = new BlockDetailsReq();
-		req.setNumber(3);
+		req.setNumber(0);
 		BlockDetailResp blockDetailResp = blockService.blockDetails(req);
 		assertNotNull(blockDetailResp);
 	}
@@ -50,7 +50,7 @@ public class BlockServiceImplTest extends TestBase{
 	@Test
 	public void blockDetailNavigate() {
 		BlockDetailNavigateReq req = new BlockDetailNavigateReq();
-		req.setNumber(2l);
+		req.setNumber(0l);
 		req.setDirection("next");
 		BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
 		assertNotNull(blockDetailResp);

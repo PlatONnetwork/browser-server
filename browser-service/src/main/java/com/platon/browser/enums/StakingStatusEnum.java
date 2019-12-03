@@ -46,6 +46,10 @@ public enum StakingStatusEnum {
 			return StakingStatusEnum.CANDIDATE.getCode();
 		}
 		if(CustomStaking.StatusEnum.EXITING.getCode() == status) {
+			if(CustomStaking.YesNoEnum.YES.getCode() == isSetting) {
+				/** 当状态退出中且在结算周期则认为节点为活跃中*/
+				return StakingStatusEnum.ACTIVE.getCode();
+			}
 			return StakingStatusEnum.EXITING.getCode();
 		}
 		if(CustomStaking.StatusEnum.EXITED.getCode() == status) {

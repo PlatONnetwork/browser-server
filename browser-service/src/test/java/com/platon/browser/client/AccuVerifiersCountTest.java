@@ -1,6 +1,11 @@
 package com.platon.browser.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -15,5 +20,48 @@ public class AccuVerifiersCountTest {
 		assertTrue(avc.getNays().intValue()==3);
 		assertTrue(avc.getYeas().intValue()==2);
 	}
+	
+	@Test
+	public void testRpcParam() {
+		RpcParam rpcParam = new RpcParam();
+		rpcParam.setId(1);
+		rpcParam.setJsonrpc("2.0");
+		rpcParam.setMethod("1");
+		List<Long> params = new ArrayList<>();
+		rpcParam.setParams(params);
+		assertNotNull(rpcParam.toJsonString());
+	}
+	
+	@Test
+	public void testNodeVersion() {
+		NodeVersion nodeVersion = new NodeVersion();
+		nodeVersion.setBigVersion("1982");
+		nodeVersion.setNodeId("0x1212");
+		assertNotNull(nodeVersion);
+	}
 
+	@Test
+	public void testProposalParticiantStat() {
+		ProposalParticiantStat proposalParticiantStat = new ProposalParticiantStat();
+		proposalParticiantStat.setVoterCount(1l);
+		proposalParticiantStat.setSupportCount(1l);
+		proposalParticiantStat.setOpposeCount(1l);
+		proposalParticiantStat.setAbstainCount(1l);
+		assertEquals(proposalParticiantStat.getVoterCount().longValue(), 1l);
+		assertEquals(proposalParticiantStat.getSupportCount().longValue(), 1l);
+		assertEquals(proposalParticiantStat.getOpposeCount().longValue(), 1l);
+		assertEquals(proposalParticiantStat.getAbstainCount().longValue(), 1l);
+	}
+	
+	@Test
+	public void testLog() {
+		Log log = new Log();
+		log.setData("1");
+		log.setLogIndex(1);
+		log.setRemoved(true);
+		assertEquals(log.getData(), "1");
+		assertEquals(log.getLogIndex(), 1);
+		assertEquals(log.isRemoved(), true);
+	}
+	
 }

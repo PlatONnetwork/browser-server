@@ -20,7 +20,7 @@ public class AddressServiceImplTest extends TestBase{
 	@Test
 	public void getDetails() {
 		QueryDetailRequest req = new QueryDetailRequest();
-		req.setAddress("abcdefdsfdsa");
+		req.setAddress("0x1000000000000000000000000000000000000001");
 		assertNotNull(addressService.getDetails(req));
 	}
 	@Test

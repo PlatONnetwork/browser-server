@@ -5,6 +5,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.web3j.abi.datatypes.BytesType;
 import org.web3j.abi.datatypes.Utf8String;
@@ -34,6 +37,7 @@ import java.util.concurrent.Callable;
  * @Date: 2019/8/31 11:00
  * @Description:
  */
+@Slf4j
 @Component
 public class SpecialApi {
 
@@ -94,6 +98,7 @@ public class SpecialApi {
                 return JSONUtil.parseObject(decodedValue, BaseResponse.class);
             }).send();
         } catch (Exception e) {
+        	log.error("get rpc error", e);
             throw new ContractInvokeException(e.getMessage());
         }
         return br;
