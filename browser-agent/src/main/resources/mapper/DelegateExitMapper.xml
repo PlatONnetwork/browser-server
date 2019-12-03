@@ -12,7 +12,7 @@
         </if>
         `total_value` = `total_value` - #{codeRmDelegateHes} - #{codeRmDelegateLocked},
         `stat_delegate_value` = `stat_delegate_value` -  #{codeRmDelegateHes}  - #{codeRmDelegateLocked},
-        `stat_delegate_released` = `stat_delegate_released` - #{codeDelegateReleased}
+        `stat_delegate_released` = `stat_delegate_released` - #{codeRmDelegateReleased}
     where
         `node_id` = #{nodeId};
 
