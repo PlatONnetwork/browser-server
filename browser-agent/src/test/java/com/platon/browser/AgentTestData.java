@@ -8,6 +8,7 @@ import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.*;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
@@ -46,7 +46,8 @@ public class AgentTestData {
             "candidate",
             "address",
             "proposal",
-            "blockChainConfig"
+            "blockChainConfig",
+            "networkstat"
     };
 
     protected List<CustomNode> nodeList= Collections.emptyList();
@@ -62,6 +63,7 @@ public class AgentTestData {
     protected List<Node> candidateList = new ArrayList<>();
     protected List<CustomAddress> addressList= Collections.emptyList();
     protected List<NodeOpt> nodeOptList= new ArrayList<>();
+    protected List<NetworkStat> networkStatList= new ArrayList<>();
     protected BlockChainConfig blockChainConfig = new BlockChainConfig();
 
     protected Map<Long,PlatonBlock.Block> rawBlockMap = new HashMap<>();
@@ -102,6 +104,9 @@ public class AgentTestData {
                             rawBlockList.add(block);
                             rawBlockMap.put(block.getNumber().longValue(),block);
                         });
+                        break;
+                    case "networkstat":
+                        networkStatList = JSON.parseArray(content,NetworkStat.class);
                         break;
                     case "transaction":
                         transactionList = JSON.parseArray(content,CollectionTransaction.class);

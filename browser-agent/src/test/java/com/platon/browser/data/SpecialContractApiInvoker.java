@@ -1,5 +1,6 @@
 package com.platon.browser.data;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.SpecialApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,8 @@ public class SpecialContractApiInvoker {
 //        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
         List<GovernParam> governParamList = proposalContract.getParamList("").send().data;
-
+        String json = JSON.toJSONString(governParamList,true);
+        logger.error("{}",json);
         //BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
         BigInteger balance = web3j
                 .platonGetBalance("0x1000000000000000000000000000000000000001", DefaultBlockParameter.valueOf(BigInteger.valueOf(1)))
