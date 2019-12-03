@@ -19,7 +19,9 @@ public class BlockTest {
 
     @Test
     public void blockTest(){
-        Block block = new Block(BigDecimal.TEN);
+        Block block = Block.builder()
+                .maxBlockGasLimit(BigDecimal.TEN)
+                .build();
         block.setMaxBlockGasLimit(BigDecimal.ONE);
         log.debug("staking : {}", JSON.toJSONString(block));
         block.getMaxBlockGasLimit();

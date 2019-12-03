@@ -19,7 +19,12 @@ public class StakingTest {
 
     @Test
     public void satkingTest(){
-        Staking staking = new Staking(BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN);
+        Staking staking = Staking.builder()
+                .unStakeFreezeDuration(BigDecimal.TEN)
+                .stakeThreshold(BigDecimal.TEN)
+                .operatingThreshold(BigDecimal.TEN)
+                .maxValidators(BigDecimal.TEN)
+                .build();
         staking.setMaxValidators(BigDecimal.ONE);
         staking.setOperatingThreshold(BigDecimal.ONE);
         staking.setStakeThreshold(BigDecimal.ONE);

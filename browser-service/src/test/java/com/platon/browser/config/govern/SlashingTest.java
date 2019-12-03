@@ -19,7 +19,12 @@ public class SlashingTest {
 
     @Test
     public void slashingTest(){
-        Slashing slashing = new Slashing(BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN,BigDecimal.TEN);
+        Slashing slashing = Slashing.builder()
+                .slashFractionDuplicateSign(BigDecimal.TEN)
+                .slashBlocksReward(BigDecimal.TEN)
+                .duplicateSignReportReward(BigDecimal.TEN)
+                .maxEvidenceAge(BigDecimal.TEN)
+                .build();
         slashing.setDuplicateSignReportReward(BigDecimal.ONE);
         slashing.setMaxEvidenceAge(BigDecimal.ONE);
         slashing.setSlashBlocksReward(BigDecimal.ONE);
