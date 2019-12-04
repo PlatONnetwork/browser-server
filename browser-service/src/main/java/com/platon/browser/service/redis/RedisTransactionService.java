@@ -2,7 +2,6 @@ package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import java.util.Set;
 /**
  * 交易缓存数据处理逻辑\
  */
-@Slf4j
 @Service
 public class RedisTransactionService extends RedisService<Transaction>{
     /** 交易缓存key */
@@ -43,7 +41,7 @@ public class RedisTransactionService extends RedisService<Transaction>{
     public void updateStageSet(Set<Transaction> data) {
         data.forEach(item -> {
             // 在缓存中不存在的才放入缓存
-            if(!existScore.contains(item.getSeq())) stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getSeq().doubleValue()));
+            if(!existScore.contains(item.getSeq())) stageSet.add(new DefaultTypedTuple<String>(JSON.toJSONString(item),item.getSeq().doubleValue()));
         });
     }
 }

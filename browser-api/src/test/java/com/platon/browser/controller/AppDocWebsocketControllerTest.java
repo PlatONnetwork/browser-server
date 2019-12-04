@@ -28,7 +28,7 @@ public class AppDocWebsocketControllerTest {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build(); //初始化MockMvc对象
+        setMockMvc(MockMvcBuilders.webAppContextSetup(wac).build()); //初始化MockMvc对象
     }
     @Test
     public void websocket() throws Exception{
@@ -62,5 +62,11 @@ public class AppDocWebsocketControllerTest {
 //		webSocketClient.send("1|10||all");
 		webSocketClient.close();
     }
+	public MockMvc getMockMvc() {
+		return mockMvc;
+	}
+	public void setMockMvc(MockMvc mockMvc) {
+		this.mockMvc = mockMvc;
+	}
     
 }

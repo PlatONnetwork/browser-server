@@ -2,7 +2,6 @@ package com.platon.browser.res.transaction;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
-import lombok.Data;
 
 import java.math.BigDecimal;
 
@@ -13,7 +12,6 @@ import java.math.BigDecimal;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class TransactionListResp {
 	private String txHash;    //交易hash
     private String from;      //发送方地址（操作地址）

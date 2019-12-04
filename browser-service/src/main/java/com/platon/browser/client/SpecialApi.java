@@ -241,7 +241,7 @@ public class SpecialApi {
     }
 
     public ReceiptResult getReceiptResult(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws IOException {
-        Request<?, ReceiptResult> request = new Request(
+        Request<?, ReceiptResult> request = new Request<Object, ReceiptResult>(
                 "platon_getTransactionByBlock",
                 Arrays.asList(blockNumber),
                 web3jWrapper.getWeb3jService(),

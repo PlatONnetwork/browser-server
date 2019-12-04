@@ -1,7 +1,5 @@
 package com.platon.browser.req.staking;
 
-import lombok.Data;
-
 import com.platon.browser.req.PageReq;
 
 /**
@@ -11,7 +9,15 @@ import com.platon.browser.req.PageReq;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class HistoryStakingListReq extends PageReq{
     private String key;
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+    
 }

@@ -1,6 +1,5 @@
 package com.platon.browser.req.home;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
@@ -12,9 +11,17 @@ import javax.validation.constraints.NotBlank;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class QueryNavigationRequest {
     @NotBlank(message = "{parameter not null}")
     private String parameter;
+
+	public String getParameter() {
+		return parameter;
+	}
+
+	public void setParameter(String parameter) {
+		this.parameter = parameter;
+	}
+    
 }

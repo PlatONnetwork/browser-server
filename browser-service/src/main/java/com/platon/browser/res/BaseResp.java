@@ -1,7 +1,6 @@
 package com.platon.browser.res;
 
 import com.platon.browser.util.I18NUtils;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -11,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class BaseResp<T> {
     protected String errMsg;
     protected Integer code;
@@ -39,4 +37,25 @@ public class BaseResp<T> {
     public static <T> BaseResp<T> build(Integer code, String errMsg, T data){
         return new BaseResp<>(code,errMsg,data);
     }
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
+	public T getData() {
+		return data;
+	}
+
+	public void setData(T data) {
+		this.data = data;
+	}
+
+	public void setErrMsg(String errMsg) {
+		this.errMsg = errMsg;
+	}
+    
 }

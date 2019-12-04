@@ -2,8 +2,6 @@ package com.platon.browser.res.extra;
 
 import java.util.List;
 
-import lombok.Data;
-
 /**
  * 查询配置文件返回参数
  *  @file QueryConfigResp.java
@@ -11,8 +9,16 @@ import lombok.Data;
  *	@author zhangrj
  *  @data 2019年11月25日
  */
-@Data
 public class QueryConfigResp {
 
 	private List<ModuleConfig> config;
+
+	public List<ModuleConfig> getConfig() {
+		return config;
+	}
+
+	public void setConfig(List<ModuleConfig> config) {
+		this.config = config;
+	}
+	
 }

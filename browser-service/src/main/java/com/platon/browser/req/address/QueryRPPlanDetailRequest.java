@@ -1,7 +1,6 @@
 package com.platon.browser.req.address;
 
 import com.platon.browser.req.PageReq;
-import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
@@ -12,8 +11,16 @@ import javax.validation.constraints.NotBlank;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class QueryRPPlanDetailRequest extends PageReq{
     @NotBlank(message = "{address not null}")
     private String address;
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+    
 }

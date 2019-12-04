@@ -1,7 +1,5 @@
 package com.platon.browser.req.staking;
 
-import lombok.Data;
-
 import com.platon.browser.req.PageReq;
 
 /**
@@ -11,8 +9,19 @@ import com.platon.browser.req.PageReq;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class DelegationListByStakingReq extends PageReq{
     private String nodeId;
     private String stakingBlockNum;
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+	public String getStakingBlockNum() {
+		return stakingBlockNum;
+	}
+	public void setStakingBlockNum(String stakingBlockNum) {
+		this.stakingBlockNum = stakingBlockNum;
+	}
 }

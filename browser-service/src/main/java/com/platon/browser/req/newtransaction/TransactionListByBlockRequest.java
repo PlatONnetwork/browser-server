@@ -2,8 +2,6 @@ package com.platon.browser.req.newtransaction;
 
 import com.platon.browser.req.PageReq;
 
-import lombok.Data;
-
 /**
  * 区块交易请求对象
  *  @file TransactionListByBlockRequest.java
@@ -11,8 +9,20 @@ import lombok.Data;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class TransactionListByBlockRequest extends PageReq{
     private Integer blockNumber;
     private String txType;
+	public Integer getBlockNumber() {
+		return blockNumber;
+	}
+	public void setBlockNumber(Integer blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+	public String getTxType() {
+		return txType;
+	}
+	public void setTxType(String txType) {
+		this.txType = txType;
+	}
+    
 }

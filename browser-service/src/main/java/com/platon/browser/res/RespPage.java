@@ -1,7 +1,6 @@
 package com.platon.browser.res;
 
 import com.github.pagehelper.Page;
-import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class RespPage<T> {
     /**相关的错误信息*/
     private String errMsg = "";
@@ -35,4 +33,53 @@ public class RespPage<T> {
         this.setDisplayTotalCount(page.getTotal());
         this.setData(data);
     }
+
+	public String getErrMsg() {
+		return errMsg;
+	}
+
+	public void setErrMsg(String errMsg) {
+		this.errMsg = errMsg;
+	}
+
+	public int getCode() {
+		return code;
+	}
+
+	public void setCode(int code) {
+		this.code = code;
+	}
+
+	public long getTotalCount() {
+		return totalCount;
+	}
+
+	public void setTotalCount(long totalCount) {
+		this.totalCount = totalCount;
+	}
+
+	public long getDisplayTotalCount() {
+		return displayTotalCount;
+	}
+
+	public void setDisplayTotalCount(long displayTotalCount) {
+		this.displayTotalCount = displayTotalCount;
+	}
+
+	public long getTotalPages() {
+		return totalPages;
+	}
+
+	public void setTotalPages(long totalPages) {
+		this.totalPages = totalPages;
+	}
+
+	public List<T> getData() {
+		return data;
+	}
+
+	public void setData(List<T> data) {
+		this.data = data;
+	}
+    
 }

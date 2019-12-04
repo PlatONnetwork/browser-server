@@ -1,7 +1,5 @@
 package com.platon.browser.req.staking;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -14,10 +12,22 @@ import com.platon.browser.req.PageReq;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class AliveStakingListReq extends PageReq{
     private String key;
     @NotBlank(message = "{queryStatus not null}")
     @Pattern(regexp = "all|active|candidate", message = "{queryStatus.illegal}")
     private String queryStatus;
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
+	public String getQueryStatus() {
+		return queryStatus;
+	}
+	public void setQueryStatus(String queryStatus) {
+		this.queryStatus = queryStatus;
+	}
+    
 }
