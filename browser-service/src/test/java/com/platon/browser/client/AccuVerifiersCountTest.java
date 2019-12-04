@@ -1,13 +1,11 @@
 package com.platon.browser.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class AccuVerifiersCountTest {
 
@@ -42,7 +40,7 @@ public class AccuVerifiersCountTest {
 
 	@Test
 	public void testProposalParticiantStat() {
-		ProposalParticiantStat proposalParticiantStat = new ProposalParticiantStat();
+		ProposalParticipantStat proposalParticiantStat = new ProposalParticipantStat();
 		proposalParticiantStat.setVoterCount(1l);
 		proposalParticiantStat.setSupportCount(1l);
 		proposalParticiantStat.setOpposeCount(1l);
@@ -52,16 +50,4 @@ public class AccuVerifiersCountTest {
 		assertEquals(proposalParticiantStat.getOpposeCount().longValue(), 1l);
 		assertEquals(proposalParticiantStat.getAbstainCount().longValue(), 1l);
 	}
-	
-	@Test
-	public void testLog() {
-		Log log = new Log();
-		log.setData("1");
-		log.setLogIndex(1);
-		log.setRemoved(true);
-		assertEquals(log.getData(), "1");
-		assertEquals(log.getLogIndex(), 1);
-		assertEquals(log.isRemoved(), true);
-	}
-	
 }

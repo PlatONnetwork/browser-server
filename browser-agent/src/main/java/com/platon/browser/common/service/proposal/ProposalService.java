@@ -1,7 +1,7 @@
 package com.platon.browser.common.service.proposal;
 
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.ProposalParticiantStat;
+import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -32,7 +32,7 @@ public class ProposalService {
      * @return
      * @throws Exception
      */
-    public ProposalParticiantStat getProposalParticipantStat (String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
+    public ProposalParticipantStat getProposalParticipantStat (String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
         return sca.getProposalParticipants(client.getWeb3jWrapper().getWeb3j(), proposalHash, blockHash);
     }
 

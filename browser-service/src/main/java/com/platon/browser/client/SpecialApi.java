@@ -204,7 +204,7 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-	public ProposalParticiantStat getProposalParticipants ( Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
+	public ProposalParticipantStat getProposalParticipants (Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
 
         final PlatOnFunction function = new PlatOnFunction(GET_PROPOSAL_RES_FUNC_TYPE,Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),new BytesType(Numeric.hexStringToByteArray(blockHash))));
         BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
@@ -228,7 +228,7 @@ public class SpecialApi {
                 opposeCount=a[2].trim();
                 abstainCount=a[3].trim();
             }
-            ProposalParticiantStat pps = new ProposalParticiantStat();
+            ProposalParticipantStat pps = new ProposalParticipantStat();
             pps.setVoterCount(Long.parseLong(voterCount));
             pps.setSupportCount(Long.parseLong(supportCount));
             pps.setOpposeCount(Long.parseLong(opposeCount));

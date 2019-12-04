@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.ProposalParticiantStat;
+import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.proposal.ProposalService;
 import com.platon.browser.common.utils.AppStatusUtil;
@@ -64,7 +64,7 @@ public class ProposalInfoTask {
 
             try {
                 //发送rpc请求查询提案结果
-                ProposalParticiantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
+                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
                 //设置参与人数
                 if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
                     // 有变更
