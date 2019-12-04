@@ -177,87 +177,87 @@ public class BlockChainConfig {
 
     private void updateWithEconomicConfig(EconomicConfig dec) {
         //【通用】每个验证人每个共识周期出块数量目标值
-        this.expectBlockCount=dec.getCommon().getPerRoundBlocks();
+        this.setExpectBlockCount(dec.getCommon().getPerRoundBlocks());
         //【通用】每个共识轮验证节点数量
-        this.consensusValidatorCount=dec.getCommon().getMaxConsensusVals();
+        this.setConsensusValidatorCount(dec.getCommon().getMaxConsensusVals());
         //【通用】每个结算周期验证节点数量
-        this.settlementValidatorCount=dec.getStaking().getMaxValidators();
+        this.setSettlementValidatorCount(dec.getStaking().getMaxValidators());
         //【通用】增发周期规定的分钟数
-        this.additionalCycleMinutes=dec.getCommon().getAdditionalCycleTime();
+        this.setAdditionalCycleMinutes(dec.getCommon().getAdditionalCycleTime());
         //【通用】每个结算周期的分钟数
-        this.settlementCycleMinutes=dec.getCommon().getMaxEpochMinutes();
+        this.setSettlementCycleMinutes(dec.getCommon().getMaxEpochMinutes());
         //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-        this.blockInterval=dec.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount);
+        this.setBlockInterval(dec.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount));
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
-        this.consensusPeriodBlockCount=this.expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals());
+        this.setConsensusPeriodBlockCount(this.expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals()));
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        this.settlePeriodBlockCount=settlementCycleMinutes
+        this.setSettlePeriodBlockCount(settlementCycleMinutes
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
-                .multiply(this.consensusPeriodBlockCount);
+                .multiply(this.consensusPeriodBlockCount));
         //【通用】每个增发周期区块总数=ROUND_DOWN(增发周期的时间x60/(出块间隔x结算周期区块数))x结算周期区块数
-        this.addIssuePeriodBlockCount=this.additionalCycleMinutes
+        this.setAddIssuePeriodBlockCount(this.additionalCycleMinutes
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.settlePeriodBlockCount))
-                .multiply(this.settlePeriodBlockCount);
+                .multiply(this.settlePeriodBlockCount));
         //【通用】每个增发周期内的结算周期数=增发周期区块数/结算周期区块数
-        this.settlePeriodCountPerIssue=this.addIssuePeriodBlockCount.divide(this.settlePeriodBlockCount);
+        this.setSettlePeriodCountPerIssue(this.addIssuePeriodBlockCount.divide(this.settlePeriodBlockCount));
         //【通用】PlatOn基金会账户地址
-        this.platOnFundAccount=dec.getInnerAcc().getPlatonFundAccount();
+        this.setPlatOnFundAccount(dec.getInnerAcc().getPlatonFundAccount());
         //【通用】PlatOn基金会账户初始余额
-        this.platOnFundInitAmount=new BigDecimal(dec.getInnerAcc().getPlatonFundBalance());
+        this.setPlatOnFundInitAmount(new BigDecimal(dec.getInnerAcc().getPlatonFundBalance()));
         //【通用】社区开发者激励基金账户地址
-        this.communityFundAccount=dec.getInnerAcc().getCdfAccount();
+        this.setCommunityFundAccount(dec.getInnerAcc().getCdfAccount());
         //【通用】社区开发者激励基金账户初始余额
-        this.communityFundInitAmount=new BigDecimal(dec.getInnerAcc().getCdfBalance());
+        this.setCommunityFundInitAmount(new BigDecimal(dec.getInnerAcc().getCdfBalance()));
 
         //【质押】创建验证人最低的质押Token数(VON)
-        this.stakeThreshold= new BigDecimal(dec.getStaking().getStakeThreshold());
+        this.setStakeThreshold(new BigDecimal(dec.getStaking().getStakeThreshold()));
         //【质押】委托人每次委托及赎回的最低Token数(VON)
-        this.delegateThreshold=new BigDecimal(dec.getStaking().getOperatingThreshold());
+        this.setDelegateThreshold(new BigDecimal(dec.getStaking().getOperatingThreshold()));
         //【质押】节点质押退回锁定的结算周期数
-        this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeDuration();
+        this.setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
         //【惩罚】双签奖励百分比
-        this.duplicateSignRewardRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        this.setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
         //【惩罚】双签处罚万分比
-        this.duplicateSignSlashRate=new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR);
+        this.setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【惩罚】举报证据有效周期数
-        this.evidenceValidEpoch=new BigDecimal(dec.getSlashing().getMaxEvidenceAge());
+        this.setEvidenceValidEpoch(new BigDecimal(dec.getSlashing().getMaxEvidenceAge()));
         //【惩罚】扣除区块奖励的个数
-        this.slashBlockRewardCount=new BigDecimal(dec.getSlashing().getSlashBlocksReward());
+        this.setSlashBlockRewardCount(new BigDecimal(dec.getSlashing().getSlashBlocksReward()));
 
         //【治理】文本提案参与率: >
-        this.minProposalTextParticipationRate=dec.getGov().getTextProposalVoteRate();
+        this.setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate());
         //【治理】文本提案支持率：>=
-        this.minProposalTextSupportRate=dec.getGov().getTextProposalSupportRate();
+        this.setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate());
         //【治理】取消提案参与率: >
-        this.minProposalCancelParticipationRate=dec.getGov().getCancelProposalVoteRate();
+        this.setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate());
         //【治理】取消提案支持率：>=
-        this.minProposalCancelSupportRate=dec.getGov().getCancelProposalSupportRate();
+        this.setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate());
         //【治理】升级提案通过率
-        this.minProposalUpgradePassRate=dec.getGov().getVersionProposalSupportRate();
+        this.setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate());
         //【治理】文本提案投票周期
-        this.proposalTextConsensusRounds=new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
+        this.setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
                 .divide(
                         new BigDecimal(
                                 this.blockInterval // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
                                         .multiply(dec.getCommon().getPerRoundBlocks())
                                         .multiply(this.consensusValidatorCount)) //每个共识轮验证节点数量
                         ,0,RoundingMode.FLOOR
-                );
+                ));
 
         //【治理】参数提案的投票持续最长的时间（单位：s）
-        this.paramProposalVoteDurationSeconds=dec.getGov().getParamProposalVoteDurationSeconds();
+        this.setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
         //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
-        this.paramProposalVoteRate=dec.getGov().getParamProposalVoteRate();
+        this.setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate());
         //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
-        this.paramProposalSupportRate=dec.getGov().getParamProposalSupportRate();
+        this.setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate());
 
         //【奖励】激励池分配给出块激励的比例
-        this.blockRewardRate=new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        this.setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
-        this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
+        this.setStakeRewardRate(BigDecimal.ONE.subtract(this.blockRewardRate));
         //【奖励】Platon基金会年限
-        this.platOnFoundationYear=dec.getReward().getPlatonFoundationYear();
+        this.setPlatOnFoundationYear(dec.getReward().getPlatonFoundationYear());
     }
 }
