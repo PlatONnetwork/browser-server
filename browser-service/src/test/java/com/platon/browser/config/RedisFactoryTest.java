@@ -1,16 +1,14 @@
 package com.platon.browser.config;
 
+import com.platon.browser.TestBase;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisFactoryTest {
+public class RedisFactoryTest extends TestBase {
 
     @Spy
     private RedisFactory target;

@@ -12,6 +12,7 @@ public class BlockChainConfigTest {
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException {
         BlockChainConfig blockChainConfig = new BlockChainConfig();
+        blockChainConfig.getInnerContractAddr();
         for(Method method:BlockChainConfig.class.getDeclaredMethods()){
             if(method.getName().contains("get")){
                 method.invoke(blockChainConfig);
