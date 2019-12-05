@@ -86,10 +86,9 @@ public class OnNewBlockConverterTest  extends AgentTestBase {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setBlockReward(new BigDecimal("200000"));
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .block(block)
-                .epochMessage(epochMessage)
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setBlock(block);
+        collectionEvent.setEpochMessage(epochMessage);
         target.convert(collectionEvent,block);
     }
 }

@@ -36,11 +36,10 @@ public class ComplementEventHandlerTest extends AgentTestBase {
 
     @Test(expected = Exception.class)
     public void test() throws Exception {
-        ComplementEvent event = ComplementEvent.builder()
-                .block(blockList.get(0))
-                .transactions(new ArrayList<>(transactionList))
-                .nodeOpts(nodeOptList)
-                .build();
+        ComplementEvent event = new ComplementEvent();
+        event.setBlock(blockList.get(0));
+        event.setTransactions(new ArrayList<>(transactionList));
+        event.setNodeOpts(nodeOptList);
         target.onEvent(event,33,false);
         verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
 

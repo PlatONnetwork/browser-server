@@ -6,9 +6,7 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,12 +14,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -69,9 +65,8 @@ public class StakeExitConverterTest extends AgentTestBase {
         }
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setSettleEpochRound(new BigInteger("13"));
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .epochMessage(epochMessage)
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setEpochMessage(epochMessage);
         target.convert(collectionEvent,tx);
     }
 }

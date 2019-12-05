@@ -62,11 +62,10 @@ public class BlockParameterServiceTest extends AgentTestBase {
     public void test() throws Exception {
         Block block = blockList.get(0);
         EpochMessage epochMessage=EpochMessage.newInstance();
-        CollectionEvent event = CollectionEvent.builder()
-                .block(block)
-                .transactions(new ArrayList<>(transactionList))
-                .epochMessage(epochMessage)
-                .build();
+        CollectionEvent event = new CollectionEvent();
+        event.setBlock(blockList.get(0));
+        event.setEpochMessage(EpochMessage.newInstance());
+        event.setTransactions(new ArrayList <>(transactionList));
 
         block.setNum(79L);
         epochMessage.setConsensusEpochRound(BigInteger.TEN);

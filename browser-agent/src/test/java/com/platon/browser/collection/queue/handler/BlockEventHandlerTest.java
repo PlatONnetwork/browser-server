@@ -45,11 +45,10 @@ public class BlockEventHandlerTest extends AgentTestBase {
     public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException {
         CompletableFuture<PlatonBlock> blockCF=getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF=getReceiptAsync(7000L);
-        BlockEvent blockEvent = BlockEvent.builder()
-                .blockCF(blockCF)
-                .receiptCF(receiptCF)
-                .epochMessage(EpochMessage.newInstance())
-                .build();
+        BlockEvent blockEvent = new BlockEvent();
+        blockEvent.setBlockCF(blockCF);
+        blockEvent.setReceiptCF(receiptCF);
+        blockEvent.setEpochMessage(EpochMessage.newInstance());
 
         target.onEvent(blockEvent,1,false);
 

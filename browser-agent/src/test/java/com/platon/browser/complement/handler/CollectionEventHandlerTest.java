@@ -72,11 +72,10 @@ public class CollectionEventHandlerTest extends AgentTestBase {
 
     @Test(expected = Exception.class)
     public void test() throws Exception {
-        CollectionEvent event = CollectionEvent.builder()
-                .block(blockList.get(0))
-                .transactions(new ArrayList<>(transactionList))
-                .epochMessage(EpochMessage.newInstance())
-                .build();
+        CollectionEvent event = new CollectionEvent();
+        event.setBlock(blockList.get(0));
+        event.setEpochMessage(EpochMessage.newInstance());
+        event.setTransactions(new ArrayList <>(transactionList));
         target.onEvent(event,33,false);
         verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
 

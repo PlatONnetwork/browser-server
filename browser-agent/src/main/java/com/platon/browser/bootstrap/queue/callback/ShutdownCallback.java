@@ -1,8 +1,5 @@
 package com.platon.browser.bootstrap.queue.callback;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -10,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author: chendongming@juzix.net
  * @create: 2019-11-07 15:07:57
  **/
-@Data
 @Slf4j
-@Builder
-@Accessors(chain = true)
 public class ShutdownCallback implements Callback {
     private boolean isDone;
     private long endBlockNum;
@@ -23,5 +17,21 @@ public class ShutdownCallback implements Callback {
             isDone=true;
             log.info("所有区块同步完成!");
         }
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
+    }
+
+    public long getEndBlockNum() {
+        return endBlockNum;
+    }
+
+    public void setEndBlockNum(long endBlockNum) {
+        this.endBlockNum = endBlockNum;
     }
 }

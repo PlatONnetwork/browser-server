@@ -5,25 +5,17 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.complement.converter.proposal.VersionDeclareConverter;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.VersionDeclareParam;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.stereotype.Service;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -56,9 +48,8 @@ public class VersionDeclareConverterTest extends AgentTestBase {
     @Test
     public void convert(){
         Block block = blockList.get(0);
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .block(block)
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setBlock(block);
         Transaction tx = new Transaction();
         for(CollectionTransaction collectionTransaction : transactionList){
             if(collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.VERSION_DECLARE)){

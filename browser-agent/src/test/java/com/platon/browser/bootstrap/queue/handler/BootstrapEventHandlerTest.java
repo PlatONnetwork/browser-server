@@ -60,11 +60,12 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException {
         CompletableFuture<PlatonBlock> blockCF=getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF=getReceiptAsync(7000L);
-        BootstrapEvent bootstrapEvent = BootstrapEvent.builder()
-                .blockCF(blockCF)
-                .receiptCF(receiptCF)
-                .callback(ShutdownCallback.builder().endBlockNum(7000L).build())
-                .build();
+        BootstrapEvent bootstrapEvent = new BootstrapEvent();
+        bootstrapEvent.setBlockCF(blockCF);
+        bootstrapEvent.setReceiptCF(receiptCF);
+        ShutdownCallback sc = new ShutdownCallback();
+        sc.setEndBlockNum(7000L);
+        bootstrapEvent.setCallback(sc);
 
         when(txBakMapper.selectByExample(any())).thenReturn(Collections.emptyList());
         target.onEvent(bootstrapEvent,1,false);

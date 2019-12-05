@@ -74,11 +74,10 @@ public class StatisticsNetworkConverterTest extends AgentTestBase {
         epochMessage.setSettleEpochRound(BigInteger.TEN);
         epochMessage.setCurrentBlockNumber(BigInteger.TEN);
         epochMessage.setConsensusEpochRound(BigInteger.TEN);
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .block(block)
-                .epochMessage(epochMessage)
-                .transactions(new ArrayList <>(transactionList))
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setBlock(block);
+        collectionEvent.setEpochMessage(epochMessage);
+        collectionEvent.setTransactions(new ArrayList <>(transactionList));
         target.convert(collectionEvent,block,epochMessage);
     }
 }

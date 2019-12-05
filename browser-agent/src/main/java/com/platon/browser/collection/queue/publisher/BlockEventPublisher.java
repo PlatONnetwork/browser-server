@@ -25,7 +25,11 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class BlockEventPublisher extends AbstractPublisher<BlockEvent> {
     private static final EventTranslatorThreeArg<BlockEvent,CompletableFuture<PlatonBlock>,CompletableFuture<ReceiptResult>,EpochMessage>
-    TRANSLATOR = (event, sequence, blockCF,receiptCF,epochMessage)->event.setBlockCF(blockCF).setReceiptCF(receiptCF).setEpochMessage(epochMessage);
+    TRANSLATOR = (event, sequence, blockCF,receiptCF,epochMessage)->{
+        event.setBlockCF(blockCF);
+        event.setReceiptCF(receiptCF);
+        event.setEpochMessage(epochMessage);
+    };
     @Value("${disruptor.queue.block.buffer-size}")
     private int ringBufferSize;
     @Override
@@ -33,7 +37,7 @@ public class BlockEventPublisher extends AbstractPublisher<BlockEvent> {
         return ringBufferSize;
     }
 
-    private EventFactory<BlockEvent> eventFactory = () -> BlockEvent.builder().build();
+    private EventFactory<BlockEvent> eventFactory = BlockEvent::new;
     @Autowired
     private BlockEventHandler handler;
 

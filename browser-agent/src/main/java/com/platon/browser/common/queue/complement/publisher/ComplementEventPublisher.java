@@ -25,14 +25,18 @@ import java.util.List;
 @Component
 public class ComplementEventPublisher extends AbstractPublisher<ComplementEvent> {
     private static final EventTranslatorThreeArg<ComplementEvent, Block,List<Transaction>,List<NodeOpt>>
-    TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->event.setBlock(block).setTransactions(transactions).setNodeOpts(nodeOpts);
+    TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->{
+        event.setBlock(block);
+        event.setTransactions(transactions);
+        event.setNodeOpts(nodeOpts);
+    };
     @Value("${disruptor.queue.complement.buffer-size}")
     private int ringBufferSize;
     @Override
     public int getRingBufferSize() {
         return ringBufferSize;
     }
-    private EventFactory<ComplementEvent> eventFactory = () -> ComplementEvent.builder().build();
+    private EventFactory<ComplementEvent> eventFactory = ComplementEvent::new;
     @Autowired
     private IComplementEventHandler handler;
 

@@ -26,7 +26,11 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
     private static final EventTranslatorThreeArg<BootstrapEvent,CompletableFuture<PlatonBlock>,CompletableFuture<ReceiptResult>, Callback>
-    TRANSLATOR = (event, sequence, blockCF,receiptCF,callback)->event.setBlockCF(blockCF).setReceiptCF(receiptCF).setCallback(callback);
+    TRANSLATOR = (event, sequence, blockCF,receiptCF,callback)->{
+        event.setBlockCF(blockCF);
+        event.setReceiptCF(receiptCF);
+        event.setCallback(callback);
+    };
     @Value("${disruptor.queue.block.buffer-size}")
     private int ringBufferSize;
     @Override
@@ -34,7 +38,7 @@ public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
         return ringBufferSize;
     }
 
-    private EventFactory<BootstrapEvent> eventFactory = () -> BootstrapEvent.builder().build();
+    private EventFactory<BootstrapEvent> eventFactory = BootstrapEvent::new;
     @Autowired
     private BootstrapEventHandler handler;
 

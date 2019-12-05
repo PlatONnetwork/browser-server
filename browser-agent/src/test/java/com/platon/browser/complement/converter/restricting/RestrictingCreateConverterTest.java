@@ -38,9 +38,8 @@ public class RestrictingCreateConverterTest extends AgentTestBase {
     @Test
     public void convert(){
         Block block = blockList.get(0);
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .block(block)
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setBlock(block);
         Transaction tx = new Transaction();
         for(CollectionTransaction collectionTransaction : transactionList){
             if(collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.RESTRICTING_CREATE)){

@@ -2,9 +2,6 @@ package com.platon.browser.bootstrap.queue.event;
 
 import com.platon.browser.bootstrap.queue.callback.Callback;
 import com.platon.browser.client.ReceiptResult;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;
@@ -12,9 +9,6 @@ import java.util.concurrent.CompletableFuture;
 /**
  * 自检事件
  */
-@Data
-@Builder
-@Accessors(chain = true)
 public class BootstrapEvent {
     // 当前原生区块的Future
     private CompletableFuture<PlatonBlock> blockCF;
@@ -22,4 +16,28 @@ public class BootstrapEvent {
     private CompletableFuture<ReceiptResult> receiptCF;
     // 处理完区块后的回调
     private Callback callback;
+
+    public CompletableFuture<PlatonBlock> getBlockCF() {
+        return blockCF;
+    }
+
+    public void setBlockCF(CompletableFuture<PlatonBlock> blockCF) {
+        this.blockCF = blockCF;
+    }
+
+    public CompletableFuture<ReceiptResult> getReceiptCF() {
+        return receiptCF;
+    }
+
+    public void setReceiptCF(CompletableFuture<ReceiptResult> receiptCF) {
+        this.receiptCF = receiptCF;
+    }
+
+    public Callback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
 }

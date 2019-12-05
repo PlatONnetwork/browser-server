@@ -14,7 +14,6 @@ import com.platon.browser.complement.converter.stake.StakeCreateConverter;
 import com.platon.browser.complement.converter.stake.StakeExitConverter;
 import com.platon.browser.complement.converter.stake.StakeIncreaseConverter;
 import com.platon.browser.complement.converter.stake.StakeModifyConverter;
-import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
@@ -94,11 +93,10 @@ public class TransactionParameterServiceTest extends AgentTestBase {
     public void test() throws Exception {
         Block block = blockList.get(0);
         EpochMessage epochMessage=EpochMessage.newInstance();
-        CollectionEvent event = CollectionEvent.builder()
-                .block(block)
-                .transactions(new ArrayList<>(transactionList))
-                .epochMessage(epochMessage)
-                .build();
+        CollectionEvent event = new CollectionEvent();
+        event.setBlock(blockList.get(0));
+        event.setEpochMessage(EpochMessage.newInstance());
+        event.setTransactions(new ArrayList <>(transactionList));
         Transaction tx = transactionList.get(0);
 
         tx.setStatus(Transaction.StatusEnum.SUCCESS.getCode());

@@ -9,8 +9,6 @@ import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -22,7 +20,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -75,10 +72,9 @@ public class ReportConverterTest extends AgentTestBase {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setSettleEpochRound(BigInteger.TEN);
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .block(block)
-                .epochMessage(epochMessage)
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setBlock(block);
+        collectionEvent.setEpochMessage(epochMessage);
         Transaction tx = new Transaction();
         for(CollectionTransaction collectionTransaction : transactionList){
             if(collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.REPORT)){

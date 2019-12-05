@@ -2,10 +2,8 @@ package com.platon.browser.persistence.queue.handler;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.queue.complement.event.ComplementEvent;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
-import com.platon.browser.persistence.handler.ComplementEventHandler;
 import com.platon.browser.persistence.queue.event.PersistenceEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,11 +44,10 @@ public class PersistenceEventHandlerTest extends AgentTestBase {
 
     @Test(expected = Exception.class)
     public void test() throws Exception {
-        PersistenceEvent event = PersistenceEvent.builder()
-                .block(blockList.get(0))
-                .transactions(new ArrayList<>(transactionList))
-                .nodeOpts(nodeOptList)
-                .build();
+        PersistenceEvent event = new PersistenceEvent();
+        event.setBlock(blockList.get(0));
+        event.setTransactions(new ArrayList<>(transactionList));
+        event.setNodeOpts(nodeOptList);
         target.setBatchSize(100);
         target.onEvent(event,33,false);
         target.setBatchSize(1);

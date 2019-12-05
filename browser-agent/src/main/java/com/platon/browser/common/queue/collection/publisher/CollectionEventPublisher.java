@@ -25,14 +25,18 @@ import java.util.List;
 @Component
 public class CollectionEventPublisher extends AbstractPublisher<CollectionEvent> {
     private static final EventTranslatorThreeArg<CollectionEvent, Block, List<Transaction>,EpochMessage>
-    TRANSLATOR = (event, sequence, block,transactions,epochMessage)->event.setBlock(block).setTransactions(transactions).setEpochMessage(epochMessage);
+    TRANSLATOR = (event, sequence, block,transactions,epochMessage)->{
+        event.setBlock(block);
+        event.setTransactions(transactions);
+        event.setEpochMessage(epochMessage);
+    };
     @Value("${disruptor.queue.collection.buffer-size}")
     private int ringBufferSize;
     @Override
     public int getRingBufferSize() {
         return ringBufferSize;
     }
-    private EventFactory<CollectionEvent> eventFactory = () -> CollectionEvent.builder().build();
+    private EventFactory<CollectionEvent> eventFactory = CollectionEvent::new;
     @Autowired
     private ICollectionEventHandler handler;
 

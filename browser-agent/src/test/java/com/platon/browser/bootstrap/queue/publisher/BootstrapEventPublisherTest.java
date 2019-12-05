@@ -40,9 +40,8 @@ public class BootstrapEventPublisherTest extends AgentTestBase {
     @Test
     public void test(){
         target.init();
-        ShutdownCallback shutdownCallback = ShutdownCallback.builder()
-                .endBlockNum(7000L)
-                .build();
+        ShutdownCallback shutdownCallback = new ShutdownCallback();
+        shutdownCallback.setEndBlockNum(7000L);
         target.publish(getBlockAsync(7000L),getReceiptAsync(7000L),shutdownCallback);
 
         target.shutdown();

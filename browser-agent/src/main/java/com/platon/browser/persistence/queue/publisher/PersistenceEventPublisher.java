@@ -25,14 +25,18 @@ import java.util.List;
 @Component
 public class PersistenceEventPublisher extends AbstractPublisher<PersistenceEvent> {
     private static final EventTranslatorThreeArg<PersistenceEvent, Block, List<Transaction>,List<NodeOpt>>
-    TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->event.setBlock(block).setTransactions(transactions).setNodeOpts(nodeOpts);
+    TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->{
+        event.setBlock(block);
+        event.setTransactions(transactions);
+        event.setNodeOpts(nodeOpts);
+    };
     @Value("${disruptor.queue.persistence.buffer-size}")
     private int ringBufferSize;
     @Override
     public int getRingBufferSize() {
         return ringBufferSize;
     }
-    private EventFactory<PersistenceEvent> eventFactory = () -> PersistenceEvent.builder().build();
+    private EventFactory<PersistenceEvent> eventFactory = PersistenceEvent::new;
     @Autowired
     private PersistenceEventHandler handler;
 

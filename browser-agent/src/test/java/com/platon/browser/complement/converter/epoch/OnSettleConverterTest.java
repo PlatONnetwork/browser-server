@@ -54,10 +54,9 @@ public class OnSettleConverterTest extends AgentTestBase {
         epochMessage.setCurVerifierList(verifierList);
         epochMessage.setStakeReward(new BigDecimal("10000"));
         epochMessage.setSettleEpochRound(BigInteger.TEN);
-        CollectionEvent collectionEvent = CollectionEvent.builder()
-                .block(block)
-                .epochMessage(epochMessage)
-                .build();
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setBlock(block);
+        collectionEvent.setEpochMessage(epochMessage);
         target.convert(collectionEvent,block);
     }
 

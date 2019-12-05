@@ -37,7 +37,7 @@ public class ConsistencyService {
     @Autowired
     private BootstrapEventPublisher bootstrapEventPublisher;
 
-    private ShutdownCallback shutdownCallback = ShutdownCallback.builder().build();
+    private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
     /**
      * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
