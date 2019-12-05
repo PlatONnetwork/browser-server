@@ -1,14 +1,12 @@
 package com.platon.browser.common.complement.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @Auther: dongqile
@@ -20,9 +18,9 @@ public class PeriodValueElementTest {
 
     @Test
     public void test(){
-        PeriodValueElement  profit = PeriodValueElement.builder()
-                .period(100L)
-                .value(BigDecimal.TEN)
-                .build();
+        PeriodValueElement  profit = new PeriodValueElement();
+        profit.setPeriod(100L);
+        profit.setValue(BigDecimal.TEN);
+        assertTrue(true);
     }
 }

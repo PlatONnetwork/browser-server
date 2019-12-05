@@ -144,7 +144,10 @@ public class CalculateUtils {
 
 		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
 		if(curSettingEpoch.longValue()==0) profit=BigDecimal.ZERO;
-		ari.getProfit().add(new PeriodValueElement(curSettingEpoch.longValue(),profit));
+		PeriodValueElement pve = new PeriodValueElement();
+		pve.setPeriod(curSettingEpoch.longValue());
+		pve.setValue(profit);
+		ari.getProfit().add(pve);
 		// +1: 保留指定周期数中最旧周期的前一周期收益，用作收益计算参考点
 		if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
 			// 按结算周期由大到小排序
@@ -165,7 +168,10 @@ public class CalculateUtils {
 		// 添加下一周期的质押成本
 		BigDecimal cost = staking.getStakingLocked().add(staking.getStakingHes());
 		if(curSettingEpoch.longValue()==0) cost=BigDecimal.ZERO;
-		ari.getCost().add(new PeriodValueElement(curSettingEpoch.longValue(),cost));
+		PeriodValueElement pve = new PeriodValueElement();
+		pve.setPeriod(curSettingEpoch.longValue());
+		pve.setValue(cost);
+		ari.getCost().add(pve);
 		// 保留指定数量最新的记录
 		if(ari.getCost().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
 			// 按结算周期由大到小排序

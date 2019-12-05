@@ -1,13 +1,7 @@
 package com.platon.browser.common.complement.dto;
 
-import com.alibaba.fastjson.JSON;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
@@ -26,33 +20,29 @@ public class AnnualizedRateInfoTest {
 
     @Test
     public void test(){
-        PeriodValueElement  profit = PeriodValueElement.builder()
-                .period(100L)
-                .value(BigDecimal.TEN)
-                .build();
+        PeriodValueElement  profit = new PeriodValueElement();
+        profit.setPeriod(100L);
+        profit.setValue(BigDecimal.TEN);
         List<PeriodValueElement> profitList = new ArrayList <>();
         profitList.add(profit);
-        PeriodValueElement cost = PeriodValueElement.builder()
-                .period(120L)
-                .value(BigDecimal.TEN)
-                .build();
+        PeriodValueElement cost = new PeriodValueElement();
+        cost.setPeriod(120L);
+        cost.setValue(BigDecimal.TEN);
         List<PeriodValueElement> costList = new ArrayList <>();
         costList.add(cost);
-        SlashInfo slash = SlashInfo.builder()
-                .slashTime(new Date())
-                .blockCount(BigInteger.ONE)
-                .blockNumber(BigInteger.ONE)
-                .kickOut(false)
-                .slashAmount(BigDecimal.TEN)
-                .slashBlockCount(BigInteger.ONE)
-                .build();
+        SlashInfo slash = new SlashInfo();
+        slash.setSlashTime(new Date());
+        slash.setBlockCount(BigInteger.ONE);
+        slash.setBlockNumber(BigInteger.ONE);
+        slash.setKickOut(false);
+        slash.setSlashAmount(BigDecimal.TEN);
+        slash.setSlashBlockCount(BigInteger.ONE);
         List<SlashInfo> slashList = new ArrayList <>();
         slashList.add(slash);
-        AnnualizedRateInfo annualizedRateInfo = AnnualizedRateInfo.builder()
-                .cost(profitList)
-                .profit(costList)
-                .slash(slashList)
-                .build();
+        AnnualizedRateInfo annualizedRateInfo = new AnnualizedRateInfo();
+        annualizedRateInfo.setCost(profitList);
+        annualizedRateInfo.setProfit(costList);
+        annualizedRateInfo.setSlash(slashList);
         String annuaString = annualizedRateInfo.toJSONString();
     }
 

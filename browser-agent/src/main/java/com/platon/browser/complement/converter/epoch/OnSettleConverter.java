@@ -81,11 +81,10 @@ public class OnSettleConverter {
             }
 
             //计算年化率
-            AnnualizedRateInfo ari = AnnualizedRateInfo.builder()
-                    .cost(new ArrayList<>())
-                    .profit(new ArrayList<>())
-                    .slash(new ArrayList<>())
-                    .build();
+            AnnualizedRateInfo ari = new AnnualizedRateInfo();
+            ari.setCost(new ArrayList<>());
+            ari.setProfit(new ArrayList<>());
+            ari.setSlash(new ArrayList<>());
             // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
             if(curVerifierList.contains(staking.getNodeId())){
                 String ariString = staking.getAnnualizedRateInfo();
@@ -98,10 +97,9 @@ public class OnSettleConverter {
             if(preVerifierList.contains(staking.getNodeId())){
                 if(ari.getProfit()==null||ari.getProfit().isEmpty()) {
                     // 设置0收益作为计算基础
-                    PeriodValueElement pv = PeriodValueElement.builder()
-                            .period(settle.getSettingEpoch()-2L)
-                            .value(BigDecimal.ZERO)
-                            .build();
+                    PeriodValueElement pv = new PeriodValueElement();
+                    pv.setPeriod(settle.getSettingEpoch()-2L);
+                    pv.setValue(BigDecimal.ZERO);
                     List<PeriodValueElement> profits = new ArrayList<>();
                     profits.add(pv);
                     ari.setProfit(profits);

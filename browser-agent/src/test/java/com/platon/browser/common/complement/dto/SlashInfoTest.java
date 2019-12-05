@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/4 13:53
@@ -17,13 +19,13 @@ import java.util.Date;
 public class SlashInfoTest {
     @Test
     public void test () {
-        SlashInfo slash = SlashInfo.builder()
-                .slashTime(new Date())
-                .blockCount(BigInteger.ONE)
-                .blockNumber(BigInteger.ONE)
-                .kickOut(false)
-                .slashAmount(BigDecimal.TEN)
-                .slashBlockCount(BigInteger.ONE)
-                .build();
+        SlashInfo slash = new SlashInfo();
+        slash.setSlashTime(new Date());
+        slash.setBlockCount(BigInteger.ONE);
+        slash.setBlockNumber(BigInteger.ONE);
+        slash.setKickOut(false);
+        slash.setSlashAmount(BigDecimal.TEN);
+        slash.setSlashBlockCount(BigInteger.ONE);
+        assertTrue(true);
     }
 }

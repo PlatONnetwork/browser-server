@@ -154,13 +154,11 @@ public class InitializationService {
             staking.setNodeName(nodeName);
 
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
-            PeriodValueElement pve = PeriodValueElement.builder()
-                    .period(0L)
-                    .value(BigDecimal.ZERO)
-                    .build();
-            AnnualizedRateInfo ari = AnnualizedRateInfo.builder()
-                    .cost(Collections.singletonList(pve))
-                    .build();
+            PeriodValueElement pve = new PeriodValueElement();
+            pve.setPeriod(0L);
+            pve.setValue(BigDecimal.ZERO);
+            AnnualizedRateInfo ari = new AnnualizedRateInfo();
+            ari.setCost(Collections.singletonList(pve));
             staking.setAnnualizedRateInfo(ari.toJSONString());
             staking.setPredictStakingReward(epochRetryService.getStakeReward());
 
