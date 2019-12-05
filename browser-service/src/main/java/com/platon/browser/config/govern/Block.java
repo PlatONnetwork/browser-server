@@ -1,7 +1,6 @@
 package com.platon.browser.config.govern;
 
 import lombok.Builder;
-import lombok.Data;
 
 import java.math.BigDecimal;
 
@@ -10,8 +9,16 @@ import java.math.BigDecimal;
  * @author: chendongming@juzix.net
  * @create: 2019-11-25 18:32:13
  **/
-@Data
 @Builder
 public class Block {
     private BigDecimal maxBlockGasLimit;
+
+	public BigDecimal getMaxBlockGasLimit() {
+		return maxBlockGasLimit;
+	}
+
+	public void setMaxBlockGasLimit(BigDecimal maxBlockGasLimit) {
+		this.maxBlockGasLimit = maxBlockGasLimit;
+	}
+    
 }

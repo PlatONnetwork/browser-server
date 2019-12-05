@@ -1,7 +1,6 @@
 package com.platon.browser.config.govern;
 
 import lombok.Builder;
-import lombok.Data;
 
 import java.math.BigDecimal;
 
@@ -10,11 +9,35 @@ import java.math.BigDecimal;
  * @author: chendongming@juzix.net
  * @create: 2019-11-25 18:30:11
  **/
-@Data
 @Builder
 public class Staking {
     private BigDecimal stakeThreshold;
     private BigDecimal operatingThreshold;
     private BigDecimal maxValidators;
     private BigDecimal unStakeFreezeDuration;
+	public BigDecimal getStakeThreshold() {
+		return stakeThreshold;
+	}
+	public void setStakeThreshold(BigDecimal stakeThreshold) {
+		this.stakeThreshold = stakeThreshold;
+	}
+	public BigDecimal getOperatingThreshold() {
+		return operatingThreshold;
+	}
+	public void setOperatingThreshold(BigDecimal operatingThreshold) {
+		this.operatingThreshold = operatingThreshold;
+	}
+	public BigDecimal getMaxValidators() {
+		return maxValidators;
+	}
+	public void setMaxValidators(BigDecimal maxValidators) {
+		this.maxValidators = maxValidators;
+	}
+	public BigDecimal getUnStakeFreezeDuration() {
+		return unStakeFreezeDuration;
+	}
+	public void setUnStakeFreezeDuration(BigDecimal unStakeFreezeDuration) {
+		this.unStakeFreezeDuration = unStakeFreezeDuration;
+	}
+    
 }

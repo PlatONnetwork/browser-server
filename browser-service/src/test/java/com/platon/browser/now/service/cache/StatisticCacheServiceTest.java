@@ -17,6 +17,8 @@ public class StatisticCacheServiceTest extends TestBase {
 
 	@Autowired
 	private StatisticCacheService statisticCacheService;
+	
+	
 
 	@Test
 	public void testGetBlockCache () {
@@ -35,6 +37,13 @@ public class StatisticCacheServiceTest extends TestBase {
 		TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(0, 10);
 		assertNotNull(transactionCacheDto);
 	}
+	
+	@Test
+	public void testGetBlockCacheByStartEnd () {
+		List<Block> blocks = statisticCacheService.getBlockCacheByStartEnd(1l, 10l);
+		assertNotNull(blocks);
+	}
+	
 }
 
 

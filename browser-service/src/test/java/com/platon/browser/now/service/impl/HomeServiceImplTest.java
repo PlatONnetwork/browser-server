@@ -3,8 +3,6 @@ package com.platon.browser.now.service.impl;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +10,6 @@ import com.platon.browser.TestBase;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.req.home.QueryNavigationRequest;
-import com.platon.browser.res.home.BlockListNewResp;
 import com.platon.browser.res.home.BlockStatisticNewResp;
 import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.QueryNavigationResp;

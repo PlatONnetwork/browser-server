@@ -1,7 +1,6 @@
 package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -12,7 +11,6 @@ import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.Response;
-import org.web3j.protocol.core.methods.response.DebugEconomicConfig;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +20,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlatOnClientTest {
 

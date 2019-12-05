@@ -3,7 +3,6 @@ package com.platon.browser.config.govern;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import lombok.Builder;
-import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
  * @author: chendongming@juzix.net
  * @create: 2019-11-25 17:34:20
  **/
-@Data
 @Builder
 public class ModifiableParam {
 
@@ -76,4 +74,29 @@ public class ModifiableParam {
         });
         return this;
     }
+
+	public Staking getStaking() {
+		return staking;
+	}
+
+	public void setStaking(Staking staking) {
+		this.staking = staking;
+	}
+
+	public Slashing getSlashing() {
+		return slashing;
+	}
+
+	public void setSlashing(Slashing slashing) {
+		this.slashing = slashing;
+	}
+
+	public Block getBlock() {
+		return block;
+	}
+
+	public void setBlock(Block block) {
+		this.block = block;
+	}
+    
 }

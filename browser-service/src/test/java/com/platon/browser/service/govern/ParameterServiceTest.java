@@ -6,8 +6,6 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
-import com.platon.browser.res.BaseResp;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +34,6 @@ import static org.mockito.Mockito.when;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-@Slf4j
 public class ParameterServiceTest {
 
     @Mock
