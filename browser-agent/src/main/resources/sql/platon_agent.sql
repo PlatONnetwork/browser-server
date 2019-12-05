@@ -32,6 +32,24 @@ CREATE TABLE `address` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Table structure for config
+-- ----------------------------
+DROP TABLE IF EXISTS `config`;
+CREATE TABLE `config` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `module` varchar(64) NOT NULL COMMENT '参数模块名',
+  `name` varchar(128) NOT NULL COMMENT '参数名',
+  `init_value` varchar(255) NOT NULL COMMENT '系统初始值',
+  `stale_value` varchar(255) NOT NULL COMMENT '旧值',
+  `value` varchar(255) NOT NULL COMMENT '新值',
+  `range_desc` varchar(255) NOT NULL COMMENT '参数取值范围描述',
+  `active_block` bigint(20) NOT NULL COMMENT '生效块高',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
 -- Table structure for delegation
 -- ----------------------------
 DROP TABLE IF EXISTS `delegation`;
@@ -164,7 +182,7 @@ CREATE TABLE `node` (
 DROP TABLE IF EXISTS `proposal`;
 CREATE TABLE `proposal` (
   `hash` varchar(66) NOT NULL COMMENT '提案交易hash',
-  `type` int(2) NOT NULL COMMENT '提案类型:1文本提案,2升级提案,4取消提案',
+  `type` int(2) NOT NULL COMMENT '提案类型:1文本提案,2升级提案,3参数提案,4取消提案',
   `node_id` varchar(130) NOT NULL COMMENT '提交提案验证人(节点ID)',
   `node_name` varchar(128) NOT NULL COMMENT '提交提案验证人名称(节点名称)',
   `url` varchar(255) NOT NULL COMMENT '提案URL',
@@ -187,6 +205,10 @@ CREATE TABLE `proposal` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `completion_flag` int(2) NOT NULL DEFAULT '2' COMMENT '提案相关数据是否补充完成标识:1是,2否',
+  `module` varchar(64) DEFAULT NULL COMMENT '参数模块(参数提案专有属性)',
+  `name` varchar(128) DEFAULT NULL COMMENT '参数名称(参数提案专有属性)',
+  `stale_value` varchar(255) DEFAULT NULL COMMENT '原参数值',
+  `new_value` varchar(255) DEFAULT NULL COMMENT '参数值(参数提案专有属性)',
   PRIMARY KEY (`hash`),
   KEY `type` (`type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
