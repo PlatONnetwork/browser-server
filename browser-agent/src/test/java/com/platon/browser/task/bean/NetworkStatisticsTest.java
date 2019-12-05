@@ -1,7 +1,6 @@
 package com.platon.browser.task.bean;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.task.bean.NetworkStatistics;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -18,13 +17,11 @@ public class NetworkStatisticsTest extends AgentTestBase {
 
     @Test
     public void test(){
-        NetworkStatistics statistics = NetworkStatistics.builder()
-                .stakingValue(null)
-                .totalValue(null)
-                .build();
+        NetworkStatistics statistics = new NetworkStatistics();
+        statistics.setStakingValue(null);
+        statistics.setTotalValue(null);
         statistics.setTotalValue(null);
         statistics.setStakingValue(null);
-
         statistics.getStakingValue();
         statistics.getTotalValue();
         assertTrue(true);

@@ -70,10 +70,9 @@ public class NetworkStatUpdateTaskTest extends AgentTestBase {
     public void test() throws BlockNumberException {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
 
-        NetworkStatistics networkStatistics = NetworkStatistics.builder()
-                .stakingValue(BigDecimal.TEN)
-                .totalValue(BigDecimal.TEN)
-                .build();
+        NetworkStatistics networkStatistics = new NetworkStatistics();
+        networkStatistics.setStakingValue(BigDecimal.TEN);
+        networkStatistics.setTotalValue(BigDecimal.TEN);
         when(statisticBusinessMapper.getNetworkStatisticsFromNode()).thenReturn(networkStatistics);
         target.cron();
         networkStatistics.setStakingValue(null);
