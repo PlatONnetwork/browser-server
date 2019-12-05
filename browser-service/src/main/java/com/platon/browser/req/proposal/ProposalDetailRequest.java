@@ -1,7 +1,5 @@
 package com.platon.browser.req.proposal;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -11,8 +9,16 @@ import javax.validation.constraints.NotBlank;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class ProposalDetailRequest {
     @NotBlank(message = "{proposalHash not null}")
     private String proposalHash;
+
+	public String getProposalHash() {
+		return proposalHash;
+	}
+
+	public void setProposalHash(String proposalHash) {
+		this.proposalHash = proposalHash;
+	}
+    
 }

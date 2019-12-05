@@ -2,8 +2,6 @@ package com.platon.browser.dto.elasticsearch;
 
 import org.elasticsearch.search.sort.SortOrder;
 
-import lombok.Data;
-
 /**
  * es传输排序dto
  *  @file ESSortDto.java
@@ -11,7 +9,6 @@ import lombok.Data;
  *	@author zhangrj
  *  @data 2019年10月31日
  */
-@Data
 public class ESSortDto {
 
 	private String sortName;
@@ -27,4 +24,21 @@ public class ESSortDto {
 		this.sortName = sortName;
 		this.sortOrder = sortOrder;
 	}
+
+	public String getSortName() {
+		return sortName;
+	}
+
+	public void setSortName(String sortName) {
+		this.sortName = sortName;
+	}
+
+	public SortOrder getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(SortOrder sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+	
 }

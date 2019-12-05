@@ -1,7 +1,5 @@
 package com.platon.browser.req.proposal;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
 
 import com.platon.browser.req.PageReq;
@@ -13,10 +11,26 @@ import com.platon.browser.req.PageReq;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class VoteListRequest extends PageReq{
 	@NotBlank
     private String proposalHash;
     
     private String option;
+
+	public String getProposalHash() {
+		return proposalHash;
+	}
+
+	public void setProposalHash(String proposalHash) {
+		this.proposalHash = proposalHash;
+	}
+
+	public String getOption() {
+		return option;
+	}
+
+	public void setOption(String option) {
+		this.option = option;
+	}
+    
 }

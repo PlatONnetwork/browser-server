@@ -37,7 +37,6 @@ public class StakingServiceImplTest extends TestBase{
 	@Test
 	public void aliveStakingList() {
 		AliveStakingListReq req = new AliveStakingListReq();
-		req.setKey("cdm-004");
 		req.setQueryStatus("all");
 		RespPage<AliveStakingListResp> resp = stakingService.aliveStakingList(req);
 		assertNotNull(resp);
@@ -54,7 +53,6 @@ public class StakingServiceImplTest extends TestBase{
 	@Test
 	public void historyStakingList() {
 		HistoryStakingListReq req = new HistoryStakingListReq();
-		req.setKey("cdm-004");
 		RespPage<HistoryStakingListResp> resp = stakingService.historyStakingList(req);
 		assertNotNull(resp);
 	}
@@ -70,7 +68,7 @@ public class StakingServiceImplTest extends TestBase{
 	@Test
 	public void stakingOptRecordList() {
 		StakingOptRecordListReq req = new StakingOptRecordListReq();
-		req.setNodeId("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc");
+		req.setNodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf");
 		RespPage<StakingOptRecordListResp> resp = stakingService.stakingOptRecordList(req);
 		assertNotNull(resp);
 	}
@@ -78,7 +76,7 @@ public class StakingServiceImplTest extends TestBase{
 	@Test
 	public void delegationListByStaking() {
 		DelegationListByStakingReq req = new DelegationListByStakingReq();
-		req.setNodeId("0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000");
+		req.setNodeId("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
 		req.setStakingBlockNum("53086");
 		RespPage<DelegationListByStakingResp> resp = stakingService.delegationListByStaking(req);
 		assertNotNull(resp);

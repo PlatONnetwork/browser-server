@@ -2,7 +2,7 @@
 # 应用版本
 version: 0.7.4.0
 # 当前激活的配置名称(请不要修改)
-profile: testsonar
+profile: testdelete
 # 密码加密配置
 jasypt:
   encryptor:
@@ -48,10 +48,10 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_testsonar
-      transactionIndexName: browser_transaction_testsonar
-      delegationIndexName: browser_delegation_testsonar
-      nodeOptIndexName: browser_nodeopt_testsonar
+      blockIndexName: browser_block_testdelete
+      transactionIndexName: browser_transaction_testdelete
+      delegationIndexName: browser_delegation_testdelete
+      nodeOptIndexName: browser_nodeopt_testdelete
 #redis配置
 redisCluster:
   configKey: DEFAULT

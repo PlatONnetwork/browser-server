@@ -50,7 +50,7 @@ public class HomeServiceImplTest extends TestBase {
 		resp = homeService.queryNavigation(req);
 		assertNotNull(resp);
 		
-		req.setParameter("cdm-004");
+		req.setParameter("platon");
 		resp = homeService.queryNavigation(req);
 		assertNotNull(resp);
 	}

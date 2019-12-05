@@ -30,13 +30,13 @@ public class ProposalServiceImplTest extends TestBase{
     @Test
     public void get() {
         ProposalDetailRequest request = new ProposalDetailRequest();
-        request.setProposalHash("0xf90e919f3a8d75557a3675b9c832bcd1f6d0531d4eb3730a2996be14fac5cb4f");
+        request.setProposalHash("0x529cddffab0b0a3b4c2c6df10a9fcbaa452d3ac20e987f9e5a1b11f5b15c3972");
         assertNotNull(proposalService.get(request));
     }
     @Test
     public void queryByProposal() {
         VoteListRequest request = new VoteListRequest();
-        request.setProposalHash("addvdfbnghm");
+        request.setProposalHash("0x529cddffab0b0a3b4c2c6df10a9fcbaa452d3ac20e987f9e5a1b11f5b15c3972");
         assertNotNull(voteService.queryByProposal(request));
     }
 }
