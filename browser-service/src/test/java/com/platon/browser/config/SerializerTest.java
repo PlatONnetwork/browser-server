@@ -1,7 +1,6 @@
 package com.platon.browser.config;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -51,7 +50,6 @@ public class SerializerTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		assertTrue(Boolean.TRUE);
 	}
 	
 }

@@ -233,16 +233,6 @@ public abstract class ESRepository {
 		return esResult;
 	}
 
-	/**
-	 * 更新索引配置
-	 */
-	public AcknowledgedResponse updateIndexSetting(Map<String,String> settingMap) throws IOException {
-		UpdateSettingsRequest request = new UpdateSettingsRequest(getIndexName());
-		Settings.Builder builder = Settings.builder();
-		settingMap.forEach(builder::put);
-		request.settings(builder.build());
-		return client.indices().putSettings(request, RequestOptions.DEFAULT);
-	}
 
 	/**
 	 * 搜索
