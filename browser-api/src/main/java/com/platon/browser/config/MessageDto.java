@@ -2,7 +2,6 @@ package com.platon.browser.config;
 
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.req.PageReq;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 /**
  * 获取message的dto
@@ -11,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
  *	@author zhangrj
  *  @data 2019年9月20日
  */
-@Data
 public class MessageDto extends PageReq{
 
 	private String userNo;
@@ -87,6 +85,30 @@ public class MessageDto extends PageReq{
 			this.setKey(message[4]);
 		}
 		return this;
+	}
+
+	public String getUserNo() {
+		return userNo;
+	}
+
+	public void setUserNo(String userNo) {
+		this.userNo = userNo;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getQueryStatus() {
+		return queryStatus;
+	}
+
+	public void setQueryStatus(String queryStatus) {
+		this.queryStatus = queryStatus;
 	}
 	
 }

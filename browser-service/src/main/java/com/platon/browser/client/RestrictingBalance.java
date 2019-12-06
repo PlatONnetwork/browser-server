@@ -1,6 +1,5 @@
 package com.platon.browser.client;
 
-import lombok.Data;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
@@ -10,7 +9,6 @@ import java.math.BigInteger;
  * @Date: 2019/8/15 19:27
  * @Description:
  */
-@Data
 public class RestrictingBalance {
     private String account;
     private BigInteger freeBalance;
@@ -28,4 +26,37 @@ public class RestrictingBalance {
     public void setPledgeBalance(String pledgeBalance) {
         this.pledgeBalance = Numeric.decodeQuantity(pledgeBalance);
     }
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+
+	public BigInteger getFreeBalance() {
+		return freeBalance;
+	}
+
+	public void setFreeBalance(BigInteger freeBalance) {
+		this.freeBalance = freeBalance;
+	}
+
+	public BigInteger getLockBalance() {
+		return lockBalance;
+	}
+
+	public void setLockBalance(BigInteger lockBalance) {
+		this.lockBalance = lockBalance;
+	}
+
+	public BigInteger getPledgeBalance() {
+		return pledgeBalance;
+	}
+
+	public void setPledgeBalance(BigInteger pledgeBalance) {
+		this.pledgeBalance = pledgeBalance;
+	}
+    
 }
