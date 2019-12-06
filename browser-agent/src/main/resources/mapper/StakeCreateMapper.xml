@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
-  <update id="create" parameterType="com.platon.browser.complement.dao.param.stake.StakeCreate">
-    insert into `staking`
-        (
+    <update id="create" parameterType="com.platon.browser.complement.dao.param.stake.StakeCreate">
+    /*1、staking新增*/
+    insert into `staking` (
         `node_id`,
         `staking_block_num`,
         `staking_tx_index`,
@@ -18,9 +18,7 @@
         `details`,
         `join_time`,
         `is_init`
-        )
-        values
-        (
+    ) values (
         #{nodeId},
         #{stakingBlockNum},
         #{stakingTxIndex},
@@ -35,10 +33,9 @@
         #{details},
         #{joinTime},
         #{isInit}
-        );
-
-    insert into `node`
-        (`node_id`,
+    );
+    /*2、node新增或更新*/
+    insert into `node` (`node_id`,
         `staking_block_num`,
         `staking_tx_index`,
         `staking_addr`,
@@ -53,9 +50,8 @@
         `join_time`,
         `is_init`,
         `total_value`
-        )
-        values
-        (#{nodeId},
+    ) values (
+        #{nodeId},
         #{stakingBlockNum},
         #{stakingTxIndex},
         #{stakingAddr},
@@ -70,8 +66,7 @@
         #{joinTime},
         #{isInit},
         #{stakingHes}
-        )
-        on duplicate key update
+    ) on duplicate key update
         `staking_block_num` =  #{stakingBlockNum},
         `staking_tx_index` = #{stakingTxIndex},
         `staking_addr` = #{stakingAddr},
@@ -91,6 +86,5 @@
         `is_settle` = '2',
         `annualized_rate` = '0',
         `total_value` = `total_value` + #{stakingHes};
-
   </update>
 </mapper>

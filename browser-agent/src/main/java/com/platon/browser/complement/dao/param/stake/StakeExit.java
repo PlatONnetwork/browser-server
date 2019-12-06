@@ -1,15 +1,14 @@
 package com.platon.browser.complement.dao.param.stake;
 
-import java.math.BigInteger;
-import java.util.Date;
-
-import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
-
+import com.platon.browser.complement.dao.param.BusinessParam;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+
+import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * @description: 退出质押 入库参数
@@ -21,24 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @Accessors(chain = true)
 public class StakeExit implements BusinessParam {
-    /**
-     * 节点id
-     */
+    //节点id
     private String nodeId;
-
-    /**
-     * 质押交易所在块高
-     */
+    //质押交易所在块高
     private BigInteger stakingBlockNum;
-
-    /**
-     * 时间
-     */
+    //时间
     private Date time;
-
-    /**
-     * 结算周期标识
-     */
+    //结算周期标识(撤销质押交易所在的结算周期轮数)
     private int stakingReductionEpoch;
 
     @Override

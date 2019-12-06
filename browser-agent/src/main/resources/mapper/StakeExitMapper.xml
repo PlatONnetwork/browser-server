@@ -12,52 +12,42 @@
 
 
 <update id="exit" parameterType="com.platon.browser.complement.dao.param.stake.StakeExit">
-
-		update `delegation` set
-			`delegate_released` = `delegate_hes` + `delegate_locked`,
-			`delegate_hes` = 0,
-			`delegate_locked` = 0
-		where
-			`node_id` = #{nodeId}
-		and
-			`staking_block_num` = #{stakingBlockNum}
-		and
-			`is_history` = 2;
-
-
-		update `node` set
-			`leave_time` = #{time},
-			`status` = if(`staking_locked` > 0 ,2,3),
-			`staking_reduction_epoch` = #{stakingReductionEpoch},
-			`staking_reduction` = `staking_locked`,
-			`total_value` = 0,
-			`staking_locked` = 0,
-			`staking_hes` = 0,
-			`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,
-			`stat_delegate_value` = 0,
-			`stat_valid_addrs` = 0,
-			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2),
-			`is_consensus` = 2
-		where
-			`node_id` = #{nodeId};
-
-
-		update `staking` set
-			`leave_time` = #{time},
-			`status` = if(`staking_locked` > 0,2,3),
-			`staking_reduction_epoch` = #{stakingReductionEpoch},
-			`staking_reduction` = `staking_locked`,
-			`staking_locked` = 0,
-			`staking_hes` = 0,
-			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
-			`stat_delegate_hes` = 0,
-			`stat_delegate_locked` = 0,
-			`is_consensus` = 2
-		where
-		 	`node_id` = #{nodeId}
-		and
-			`staking_block_num` = #{stakingBlockNum};
-
-
+	/*1、更新委托*/
+	update `delegation` set
+		`delegate_released` = `delegate_hes` + `delegate_locked`,
+		`delegate_hes` = 0,
+		`delegate_locked` = 0
+	where `node_id` = #{nodeId}
+	and `staking_block_num` = #{stakingBlockNum}
+	and `is_history` = 2;
+	/*2、更新节点*/
+	update `node` set
+		`leave_time` = #{time},
+		`status` = if(`staking_locked` > 0 ,2,3),
+		`staking_reduction_epoch` = #{stakingReductionEpoch},
+		`staking_reduction` = `staking_locked`,
+		`total_value` = 0,
+		`staking_locked` = 0,
+		`staking_hes` = 0,
+		`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,
+		`stat_delegate_value` = 0,
+		`stat_valid_addrs` = 0,
+		`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2),
+		`is_consensus` = 2
+	where `node_id` = #{nodeId};
+	/*3、更新质押*/
+	update `staking` set
+		`leave_time` = #{time},
+		`status` = if(`staking_locked` > 0,2,3),
+		`staking_reduction_epoch` = #{stakingReductionEpoch},
+		`staking_reduction` = `staking_locked`,
+		`staking_locked` = 0,
+		`staking_hes` = 0,
+		`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
+		`stat_delegate_hes` = 0,
+		`stat_delegate_locked` = 0,
+		`is_consensus` = 2
+	where `node_id` = #{nodeId}
+	and `staking_block_num` = #{stakingBlockNum};
 </update>
 </mapper>

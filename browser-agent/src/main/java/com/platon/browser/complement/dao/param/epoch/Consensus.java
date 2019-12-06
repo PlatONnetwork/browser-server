@@ -1,14 +1,13 @@
 package com.platon.browser.complement.dao.param.epoch;
 
-import java.math.BigInteger;
-import java.util.List;
-
-import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
-
+import com.platon.browser.complement.dao.param.BusinessParam;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.math.BigInteger;
+import java.util.List;
 
 /**
  * 共识周期变更消息 <br/>
@@ -33,15 +32,9 @@ where `status` = 1;
 @Builder
 @Accessors(chain = true)
 public class Consensus implements BusinessParam {
-
-    /**
-     * 每个验证人期望出块数 共识周期出块数/当轮验证人数量
-     */
+    //每个验证人期望出块数 共识周期出块数/当轮验证人数量
     private BigInteger expectBlockNum;
-
-    /**
-     * 当前共识周期验证人
-     */
+    //当前共识周期验证人
     private List<String> validatorList;
 
     @Override

@@ -2,9 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.ProposalBusinessMapper">
     <update id="parameter" parameterType="com.platon.browser.complement.dao.param.proposal.ProposalParameter">
-
-    insert into `proposal`
-    (
+    /*1、创建参数提案*/
+    insert into `proposal` (
         `hash`,
         `type`,
         `node_id`,
@@ -22,9 +21,7 @@
         `name`,
         `stale_value`,
         `new_value`
-    )
-    values
-    (
+    ) values (
         #{txHash},
         '3',
         #{nodeId},

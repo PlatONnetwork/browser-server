@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
 <update id="settle" parameterType="com.platon.browser.complement.dao.param.epoch.Settle">
-
+    /*1、更新质押*/
     <foreach collection="stakingList" item="staking">
         update `staking` set
         `staking_locked` = #{staking.stakingLocked},
@@ -16,7 +16,7 @@
         where `node_id` = #{staking.nodeId}
         and staking_block_num = #{staking.stakingBlockNum};
     </foreach>
-
+    /*2、更新节点*/
     <foreach collection="stakingList" item="staking">
       update `node` set
         `staking_locked` = #{staking.stakingLocked},
@@ -27,23 +27,18 @@
         `is_settle` = #{staking.isSettle},
         `annualized_rate` = #{staking.annualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo}
-      where
-        `node_id` =  #{staking.nodeId};
+      where `node_id` =  #{staking.nodeId};
     </foreach>
-
+    /*3、更新委托*/
     update `delegation` set
     	`delegate_locked` = `delegate_hes` + `delegate_locked`,
         `delegate_hes` = 0
-    where
-        `is_history` = 2
-    and
-        `delegate_hes` > 0;
-
+    where `is_history` = 2
+    and `delegate_hes` > 0;
+    /*4、更新质押*/
     update `staking` set
     	`stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`,
     	`stat_delegate_hes` = 0
-    where
-      `stat_delegate_hes` > 0;
-
+    where `stat_delegate_hes` > 0;
 </update>
 </mapper>

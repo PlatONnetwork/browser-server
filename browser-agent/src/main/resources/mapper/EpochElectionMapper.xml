@@ -3,31 +3,26 @@
 <mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
 
 <select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
-	select 
-		`node_id` as nodeId,
+	select  `node_id` as nodeId,
 		`staking_block_num` as stakingBlockNum
 	from staking
 	where `status` = 1
-		and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
-		and `pre_cons_block_qty` = 0;
+	and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
+	and `pre_cons_block_qty` = 0;
 </select>
 
 <update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
-
+	/*1、更新委托*/
 	<foreach collection="slashNodeList" item="item">
 		update `delegation` set
 			`delegate_released` = `delegate_hes` + `delegate_locked`,
 			`delegate_hes` = 0,
 			`delegate_locked` = 0
-		where
-			`node_id` = #{item.nodeId}
-		and
-			`staking_block_num` = #{item.stakingBlockNum}
-		and
-			`is_history` = 2;
+		where `node_id` = #{item.nodeId}
+		and `staking_block_num` = #{item.stakingBlockNum}
+		and `is_history` = 2;
     </foreach>
-
-
+	/*2、更新质押*/
 	update `staking` set
 		`leave_time` = #{time},
 		`status` = if(`staking_locked` > 0, 2, 3),
@@ -41,8 +36,8 @@
 		`is_consensus` = 2,
 		`is_settle` = 2
 	where `status` = 1
-		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
-
+	and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+	/*3、更新节点*/
 	update `node` n set
 		n.`leave_time` = #{time},
 		n.`status` = if(n.`staking_locked` > 0, 2, 3),

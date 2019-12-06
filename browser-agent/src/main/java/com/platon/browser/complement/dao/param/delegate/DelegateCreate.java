@@ -1,14 +1,13 @@
 package com.platon.browser.complement.dao.param.delegate;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
-
+import com.platon.browser.complement.dao.param.BusinessParam;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 
 /**
@@ -20,35 +19,17 @@ import lombok.experimental.Accessors;
 @Builder
 @Accessors(chain = true)
 public class DelegateCreate implements BusinessParam {
-
-    /**
-     * 节点id
-     */
+    //节点id
     private String nodeId;
-
-    /**
-     * 委托金额
-     */
+    //委托金额
     private BigDecimal amount;
-
-    /**
-     *  委托交易块高
-     */
+    //委托交易块高
     private BigInteger blockNumber;
-
-    /**
-     * 交易发送方
-     */
+    //交易发送方
     private String txFrom;
-
-    /**
-     * 交易序号
-     */
+    //交易序号
     private BigInteger sequence;
-
-    /**
-     * 节点质押快高
-     */
+    //节点质押快高
     private BigInteger stakingBlockNumber;
 
     @Override

@@ -19,36 +19,17 @@ import java.util.List;
 @Builder
 @Accessors(chain = true)
 public class Settle implements BusinessParam {
-
-    /**
-     * 当前结算周期验证人
-     */
+    //当前结算周期验证人
     private List<String> curVerifierList;
-
-    /**
-     * 上轮结算周期验证人
-     */
+    //上轮结算周期验证人
     private List<String> preVerifierList;
-
-    /**
-     * 质押奖励(von)
-     */
+    //质押奖励(von)
     private BigDecimal stakingReward;
-
-    /**
-     *  结算周期
-     */
+    //结算周期
     private int settingEpoch;
-
-    /**
-     * 解除质押锁定金额的轮数
-     */
+    //解除质押锁定金额的轮数
     private int stakingLockEpoch;
-
-
-    /**
-     * 候选中，退出中，列表
-     */
+    //候选中，退出中，列表
     private List<Staking> stakingList;
 
     @Override
