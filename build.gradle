@@ -106,6 +106,9 @@ subprojects {
 	    exclude '**/SlashContractTest.class'
 	    exclude '**/TransactionSender.class'
 	    exclude '**/CustomNodeMapperTest.class'
+	    exclude '**/*Application.class'
+	    exclude '**/WebSocketController.class'
+	    exclude '**/BrowserCache.class'
 	}
 }
 
