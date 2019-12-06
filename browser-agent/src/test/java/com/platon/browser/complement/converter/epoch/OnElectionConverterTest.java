@@ -58,6 +58,7 @@ public class OnElectionConverterTest extends AgentTestBase {
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
+        target.convert(collectionEvent,block);
     }
 	
 
