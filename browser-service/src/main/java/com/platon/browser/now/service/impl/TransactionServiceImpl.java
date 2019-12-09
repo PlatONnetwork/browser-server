@@ -57,7 +57,7 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -238,8 +238,8 @@ public class TransactionServiceImpl implements TransactionService {
         });
         /** 初始化输出流对象 */
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, Charset.defaultCharset());
-        logger.error("download Charset.defaultCharset():{}", Charset.defaultCharset());
+        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
+        logger.error("download Charset.defaultCharset():{}", StandardCharsets.UTF_8);
         try {
         	/** 设置导出的csv头，防止乱码 */
             outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));

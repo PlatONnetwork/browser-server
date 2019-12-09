@@ -42,7 +42,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -235,7 +235,7 @@ public class BlockServiceImpl implements BlockService {
 
         /** 初始化输出流对象 */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(baos, Charset.defaultCharset());
+        Writer outputWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
         try {
         	/** 设置返回的头，防止csv乱码 */
 			outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));

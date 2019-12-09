@@ -119,7 +119,8 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
+  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
