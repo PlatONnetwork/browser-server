@@ -2,6 +2,8 @@ package com.platon.browser.req.staking;
 
 import javax.validation.constraints.NotBlank;
 
+import com.platon.browser.utils.HexTool;
+
 /**
  * 验证人详情请求对象
  *  @file StakingDetailsReq.java
@@ -18,7 +20,7 @@ public class StakingDetailsReq {
 	}
 
 	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
+		this.nodeId = HexTool.prefix(nodeId.toLowerCase());
 	}
     
 }

@@ -234,15 +234,10 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(StakingDetailsReq req) {
-		/** 补充前缀 */
-		String nodeId = req.getNodeId();
-		if(!req.getNodeId().startsWith(BrowserConst.WALLET_PRX)) {
-			nodeId = BrowserConst.WALLET_PRX + nodeId ;
-		}
 		/**
 		 * 先查询是否活跃节点，查不到再查询是否历史汇总
 		 */
-		Node stakingNode = nodeMapper.selectByPrimaryKey(nodeId);
+		Node stakingNode = nodeMapper.selectByPrimaryKey(req.getNodeId());
 		StakingDetailsResp resp = new StakingDetailsResp();
 		// 只有一条数据
 		if (stakingNode != null) {

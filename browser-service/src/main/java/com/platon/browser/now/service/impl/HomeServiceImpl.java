@@ -19,6 +19,8 @@ import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.home.QueryNavigationRequest;
 import com.platon.browser.res.home.*;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.HexTool;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,9 +104,23 @@ public class HomeServiceImpl implements HomeService {
 			}
 		} else {
 			/* 为false则可能为区块交易hash或者为账户  */
-			if (keyword.length() <= 2)
+			if (keyword.length() <= 2) {
 				/* 小于两位的则认为不是正确hash */
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
+			}
+			if (keyword.length() == 40) {
+				/* 判断为合约或账户地址 */
+				result.setType("address");
+				queryNavigationStructResp.setAddress(HexTool.prefix(keyword));
+			}
+			if (keyword.length() == 128) {
+				/* 判断为节点Id */
+				Node node = nodeMapper.selectByPrimaryKey(HexTool.prefix(keyword.toLowerCase()));
+				if(node != null) {
+					result.setType("staking");
+					queryNavigationStructResp.setNodeId(HexTool.prefix(node.getNodeId()));
+				}
+			}
 			if (keyword.startsWith("0x")) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */

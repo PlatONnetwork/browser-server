@@ -24,6 +24,7 @@ import com.platon.browser.res.block.BlockListResp;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.HexTool;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
@@ -226,8 +227,8 @@ public class BlockServiceImpl implements BlockService {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
                     block.getTxQty(),
-                    EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
-                    EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)))
             };
             rows.add(row);
         });

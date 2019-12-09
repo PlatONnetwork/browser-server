@@ -1,6 +1,7 @@
 package com.platon.browser.req.newtransaction;
 
 import com.platon.browser.req.PageReq;
+import com.platon.browser.utils.HexTool;
 
 /**
  * 地址交易列表请求对象
@@ -16,7 +17,7 @@ public class TransactionListByAddressRequest extends PageReq{
 		return address;
 	}
 	public void setAddress(String address) {
-		this.address = address;
+		this.address = HexTool.prefix(address.toLowerCase());
 	}
 	public String getTxType() {
 		return txType;
