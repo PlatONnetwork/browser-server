@@ -39,24 +39,12 @@ public class RestrictingBalance {
 		return freeBalance;
 	}
 
-	public void setFreeBalance(BigInteger freeBalance) {
-		this.freeBalance = freeBalance;
-	}
-
 	public BigInteger getLockBalance() {
 		return lockBalance;
-	}
-
-	public void setLockBalance(BigInteger lockBalance) {
-		this.lockBalance = lockBalance;
 	}
 
 	public BigInteger getPledgeBalance() {
 		return pledgeBalance;
 	}
 
-	public void setPledgeBalance(BigInteger pledgeBalance) {
-		this.pledgeBalance = pledgeBalance;
-	}
-    
 }
