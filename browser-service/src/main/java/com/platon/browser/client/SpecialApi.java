@@ -2,12 +2,11 @@ package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.web3j.abi.datatypes.BytesType;
 import org.web3j.abi.datatypes.Utf8String;
@@ -53,6 +52,10 @@ public class SpecialApi {
      * 查询版本列表
      */
     public static final int GET_NODE_VERSION = 1108;
+    /**
+     * 查询版本列表
+     */
+    public static final int GET_HISTORY_REWARD = 1109;
     /**
      * 获取可用和锁仓余额
      */
@@ -193,6 +196,32 @@ public class SpecialApi {
         }else{
             String msg = JSON.toJSONString(br,true);
             throw new ContractInvokeException(String.format("【查询锁仓余额出错】地址:%s,返回数据:%s",addresses,msg));
+        }
+    }
+
+    /**
+     * 根据区块号获取历史周期信息
+     * @param blockNumber
+     * @return
+     * @throws Exception
+     */
+    public EpochInfo getEpochInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
+        final PlatOnFunction function = new PlatOnFunction(GET_HISTORY_REWARD,Collections.singletonList(new Uint256(blockNumber)));
+        BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.data==null){
+            throw new BlankResponseException(String.format("查询历史周期信息出错【blockNumber:%s)】,返回为空!",blockNumber));
+        }
+        if(br.isStatusOk()){
+            Object data = br.data;
+            if(data==null){
+                throw new BlankResponseException(BLANK_RES);
+            }
+            JSONObject jd = (JSONObject)data;
+            EpochInfo ei = jd.toJavaObject(EpochInfo.class);
+            return ei;
+        }else{
+            String msg = JSON.toJSONString(br,true);
+            throw new ContractInvokeException(String.format("【查询历史周期信息出错】区块号:%s,返回数据:%s",blockNumber,msg));
         }
     }
 

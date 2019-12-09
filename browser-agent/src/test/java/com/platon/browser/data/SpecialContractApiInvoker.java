@@ -1,6 +1,7 @@
 package com.platon.browser.data;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.SpecialApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,9 @@ public class SpecialContractApiInvoker {
 //        List<Node> nodes = nodeContract.getValidatorList().send().data;
 //        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
+
+        EpochInfo res = sca.getEpochInfo(web3j,BigInteger.valueOf(1));
+
         List<GovernParam> governParamList = proposalContract.getParamList("").send().data;
         String json = JSON.toJSONString(governParamList,true);
         logger.error("{}",json);
@@ -82,6 +86,7 @@ public class SpecialContractApiInvoker {
                 .send().getBalance();
 
         List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(40));
+        System.out.println();
 
 
         List<Node> curVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(6440L));
