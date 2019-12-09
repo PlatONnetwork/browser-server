@@ -8,13 +8,13 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
 
 import java.math.BigDecimal;
@@ -216,9 +216,9 @@ public class EpochRetryService {
     public List <Node> getCandidates () throws CandidateException {
         log.debug("获取实时候选人列表:{}()", Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
-            BaseResponse <List <Node>> br = platOnClient.getNodeContract().getCandidateList().send();
-            if (!br.isStatusOk()) throw new CandidateException(br.errMsg);
-            List <Node> candidates = br.data;
+            CallResponse<List <Node>> br = platOnClient.getNodeContract().getCandidateList().send();
+            if (!br.isStatusOk()) throw new CandidateException(br.getErrMsg());
+            List <Node> candidates = br.getData();
             if (candidates == null) throw new CandidateException("实时候选节点列表为空!");
             candidates.forEach(v -> v.setNodeId(HexTool.prefix(v.getNodeId())));
             return candidates;

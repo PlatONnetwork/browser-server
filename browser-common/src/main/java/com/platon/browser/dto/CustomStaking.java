@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,7 +74,7 @@ public class CustomStaking extends Staking {
      * 使用节点信息更新质押信息
      * @param verifier
      */
-    public void updateWithVerifier(org.web3j.platon.bean.Node verifier){
+    public void updateWithVerifier(Node verifier){
         // 质押区块高度
         if(verifier.getStakingBlockNum()!=null) this.setStakingBlockNum(verifier.getStakingBlockNum().longValue());
         // 质押节点地址
@@ -105,7 +106,7 @@ public class CustomStaking extends Staking {
      * 使用节点信息更新质押信息
      * @param candidate
      */
-    public void updateWithCandidate(org.web3j.platon.bean.Node candidate){
+    public void updateWithCandidate(Node candidate){
         // 设置节点名称
         String nodeName = candidate.getNodeName();
         if(StringUtils.isNotBlank(nodeName)) setNodeName(nodeName);

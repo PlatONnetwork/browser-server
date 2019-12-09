@@ -2,12 +2,12 @@ package com.platon.browser.client;
 
 import com.platon.browser.enums.Web3jProtocolEnum;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.sdk.contracts.ppos.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;

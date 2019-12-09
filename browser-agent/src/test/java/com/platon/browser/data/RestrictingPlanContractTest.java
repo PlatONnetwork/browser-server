@@ -1,12 +1,13 @@
 package com.platon.browser.data;
 
+import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
+import com.platon.sdk.contracts.ppos.dto.resp.RestrictingPlan;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.RestrictingItem;
-import org.web3j.platon.bean.RestrictingPlan;
-import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
@@ -52,7 +53,7 @@ public class RestrictingPlanContractTest {
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("600000000000000000")));
         try {
             PlatonSendTransaction platonSendTransaction = restrictingPlanContract.createRestrictingPlanReturnTransaction(benifitAddress, restrictingPlans).send();
-            BaseResponse<?> baseResponse = restrictingPlanContract.getCreateRestrictingPlanResult(platonSendTransaction).send();
+            TransactionResponse baseResponse = restrictingPlanContract.getTransactionResponse(platonSendTransaction).send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,7 +67,7 @@ public class RestrictingPlanContractTest {
     @Test
     public void getRestrictingPlanInfo() {
         try {
-            BaseResponse<RestrictingItem> baseResponse = restrictingPlanContract.getRestrictingInfo(benifitAddress).send();
+            CallResponse<RestrictingItem> baseResponse = restrictingPlanContract.getRestrictingInfo(benifitAddress).send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,11 +3,11 @@ package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.common.service.epoch.EpochService;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

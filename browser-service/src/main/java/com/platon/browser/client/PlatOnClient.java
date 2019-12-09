@@ -3,6 +3,8 @@ package com.platon.browser.client;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.sdk.contracts.ppos.*;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +14,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.bean.EconomicConfig;
-import org.web3j.platon.bean.Node;
-import org.web3j.platon.contracts.*;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class PlatOnClient {
 
     public List<Node> getLatestValidators() {
         try {
-            return getNodeContract().getValidatorList().send().data;
+            return getNodeContract().getValidatorList().send().getData();
         } catch (Exception e) {
            throw new BusinessException(e.getMessage());
         }
@@ -98,7 +98,7 @@ public class PlatOnClient {
 
     public List<Node> getLatestVerifiers() {
         try {
-            return getNodeContract().getVerifierList().send().data;
+            return getNodeContract().getVerifierList().send().getData();
         } catch (Exception e) {
             throw new BusinessException(e.getMessage());
         }

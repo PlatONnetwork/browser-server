@@ -7,6 +7,9 @@ import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.sdk.contracts.ppos.NodeContract;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,9 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.Node;
-import org.web3j.platon.contracts.NodeContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;
 
@@ -115,8 +115,8 @@ public class EpochRetryServiceTest extends AgentTestBase {
         when(platOnClient.getNodeContract()).thenReturn(nodeContract);
         RemoteCall call = mock(RemoteCall.class);
         when(nodeContract.getCandidateList()).thenReturn(call);
-        BaseResponse response = mock(BaseResponse.class);
-        response.data=candidateList;
+        CallResponse response = mock(CallResponse.class);
+        response.setData(candidateList);
         when(call.send()).thenReturn(response);
 
         when(response.isStatusOk()).thenReturn(true);
@@ -135,12 +135,12 @@ public class EpochRetryServiceTest extends AgentTestBase {
 
         RemoteCall call = mock(RemoteCall.class);
         when(nodeContract.getCandidateList()).thenReturn(call);
-        BaseResponse response = mock(BaseResponse.class);
-        response.data=candidateList;
+        CallResponse response = mock(CallResponse.class);
+        response.setData(candidateList);
         when(call.send()).thenReturn(response);
 
         when(response.isStatusOk()).thenReturn(true);
-        response.data=null;
+        response.setData(null);
         target.getCandidates();
     }
 }

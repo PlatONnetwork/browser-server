@@ -5,6 +5,9 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.sdk.contracts.ppos.ProposalContract;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,9 +15,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.TallyResult;
-import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;
 
@@ -34,7 +34,7 @@ public class ProposalServiceTest extends AgentTestBase {
     private ProposalService target;
 
     @Mock
-    private BaseResponse baseResponse;
+    private CallResponse baseResponse;
 
     @Before
     public void setup() throws Exception {
@@ -47,7 +47,7 @@ public class ProposalServiceTest extends AgentTestBase {
         when(sca.getProposalParticipants(any(),any(),any())).thenReturn(null);
         ProposalContract contract = mock(ProposalContract.class);
         when(client.getProposalContract()).thenReturn(contract);
-        RemoteCall<BaseResponse<TallyResult>> rcall = mock(RemoteCall.class);
+        RemoteCall<CallResponse<TallyResult>> rcall = mock(RemoteCall.class);
         when(contract.getTallyResult(any())).thenReturn(rcall);
         when(rcall.send()).thenReturn(baseResponse);
         when(baseResponse.isStatusOk()).thenReturn(true);
