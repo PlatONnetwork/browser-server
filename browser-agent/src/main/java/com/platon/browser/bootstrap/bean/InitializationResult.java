@@ -7,8 +7,16 @@ import lombok.Data;
  * @author: chendongming@juzix.net
  * @create: 2019-11-06 10:28:48
  **/
-@Data
+
 public class InitializationResult {
     // 已经采集过的区块号
     private Long collectedBlockNumber;
+
+    public Long getCollectedBlockNumber () {
+        return collectedBlockNumber;
+    }
+
+    public void setCollectedBlockNumber ( Long collectedBlockNumber ) {
+        this.collectedBlockNumber = collectedBlockNumber;
+    }
 }
