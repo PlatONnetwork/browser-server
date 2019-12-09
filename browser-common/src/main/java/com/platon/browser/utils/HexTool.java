@@ -16,4 +16,16 @@ public class HexTool {
         if(hexVal.startsWith("0x")) return hexVal;
         return "0x"+hexVal;
     }
+    
+    /**
+     * 后面拼接字符串
+     * @method String val
+     * @param val
+     * @return
+     */
+    public static String append(String val){
+    	StringBuffer sBuffer = new StringBuffer("\t");
+        sBuffer.append(val);
+        return sBuffer.append("\t").toString();
+    }
 }
