@@ -6,15 +6,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.sdk.contracts.ppos.abi.PlatOnFunction;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.datatypes.BytesType;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.ErrorCode;
-import org.web3j.platon.PlatOnFunction;
-import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteCall;
@@ -77,10 +77,10 @@ public class SpecialApi {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-	private BaseResponse<JSONArray> rpc(Web3j web3j,PlatOnFunction function,String from,String to) throws ContractInvokeException {
-        BaseResponse<JSONArray> br;
+	private CallResponse<JSONArray> rpc(Web3j web3j, PlatOnFunction function, String from, String to) throws ContractInvokeException {
+        CallResponse<JSONArray> br;
         try {
-            br = new RemoteCall<>((Callable<BaseResponse<JSONArray>>) () -> {
+            br = new RemoteCall<>((Callable<CallResponse<JSONArray>>) () -> {
                 PlatonCall ethCall = web3j.platonCall(
                         Transaction.createEthCallTransaction(from, to, function.getEncodeData()),
                         DefaultBlockParameterName.LATEST)
@@ -91,14 +91,14 @@ public class SpecialApi {
                 String value = ethCall.getValue();
                 if("0x".equals(value)){
                     // 证明没数据,返回空响应
-                    BaseResponse<JSONArray> data = new BaseResponse<>();
-                    data.data=new JSONArray();
-                    data.errMsg=null;
-                    data.code= ErrorCode.SUCCESS;
+                    CallResponse<JSONArray> data = new CallResponse<>();
+                    data.setData(new JSONArray());
+                    data.setErrMsg(null);
+                    data.setCode(ErrorCode.SUCCESS);
                     return data;
                 }
                 String decodedValue = new String(Numeric.hexStringToByteArray(value));
-                return JSONUtil.parseObject(decodedValue, BaseResponse.class);
+                return JSONUtil.parseObject(decodedValue, CallResponse.class);
             }).send();
         } catch (Exception e) {
         	log.error("get rpc error", e);
@@ -136,12 +136,12 @@ public class SpecialApi {
 
         final PlatOnFunction function = new PlatOnFunction(funcType, Collections.singletonList(new Uint256(blockNumber)));
 
-        BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if(br==null||br.data==null){
+        CallResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("【查询验证人出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(funcType),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
         if(br.isStatusOk()){
-            JSONArray data = br.data;
+            JSONArray data = br.getData();
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }
@@ -159,12 +159,12 @@ public class SpecialApi {
      */
     public List<NodeVersion> getNodeVersionList(Web3j web3j) throws ContractInvokeException, BlankResponseException {
         final PlatOnFunction function = new PlatOnFunction(GET_NODE_VERSION, Collections.emptyList());
-        BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if(br==null||br.data==null){
+        CallResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("【查询节点版本出错】函数类型:%s,返回为空!%s",GET_NODE_VERSION,JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
         if(br.isStatusOk()){
-            JSONArray data = br.data;
+            JSONArray data = br.getData();
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }
@@ -183,12 +183,12 @@ public class SpecialApi {
      */
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
         final PlatOnFunction function = new PlatOnFunction(GET_RESTRICTING_BALANCE_FUNC_TYPE,Collections.singletonList(new Utf8String(addresses)));
-        BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
-        if(br==null||br.data==null){
+        CallResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!",addresses));
         }
         if(br.isStatusOk()){
-            JSONArray data = br.data;
+            JSONArray data = br.getData();
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }
@@ -207,12 +207,12 @@ public class SpecialApi {
      */
     public EpochInfo getEpochInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         final PlatOnFunction function = new PlatOnFunction(GET_HISTORY_REWARD,Collections.singletonList(new Uint256(blockNumber)));
-        BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if(br==null||br.data==null){
+        CallResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询历史周期信息出错【blockNumber:%s)】,返回为空!",blockNumber));
         }
         if(br.isStatusOk()){
-            Object data = br.data;
+            Object data = br.getData();
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }
@@ -236,12 +236,12 @@ public class SpecialApi {
 	public ProposalParticipantStat getProposalParticipants (Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
 
         final PlatOnFunction function = new PlatOnFunction(GET_PROPOSAL_RES_FUNC_TYPE,Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),new BytesType(Numeric.hexStringToByteArray(blockHash))));
-        BaseResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
-        if(br==null||br.data==null){
+        CallResponse<JSONArray> br = rpc(web3j,function,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】",proposalHash,blockHash));
         }
         if(br.isStatusOk()){
-            JSONArray data = br.data;
+            JSONArray data = br.getData();
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }

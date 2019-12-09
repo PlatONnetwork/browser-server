@@ -1,16 +1,17 @@
 package com.platon.browser.data;
 
+import com.platon.sdk.contracts.ppos.ProposalContract;
+import com.platon.sdk.contracts.ppos.dto.BaseResponse;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
+import com.platon.sdk.contracts.ppos.dto.enums.VoteOption;
+import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
+import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
+import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.FunctionType;
-import org.web3j.platon.VoteOption;
-import org.web3j.platon.bean.GovernParam;
 import org.web3j.platon.bean.ProgramVersion;
-import org.web3j.platon.bean.Proposal;
-import org.web3j.platon.bean.TallyResult;
-import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
@@ -18,10 +19,6 @@ import org.web3j.protocol.http.HttpService;
 
 import java.math.BigInteger;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * 治理相关接口，包括， 提交文本提案 提交升级提案 提交参数提案 给提案投票 版本声明 查询提案 查询提案结果 查询提案列表 查询生效版本 查询节点代码版本
@@ -74,8 +71,7 @@ public class ProposalContractTest {
 			String pIDID = "1";
 			PlatonSendTransaction platonSendTransaction = proposalContract
 					.submitProposalReturnTransaction(Proposal.createSubmitTextProposalParam(nodeId, pIDID)).send();
-			BaseResponse<?> baseResponse = proposalContract
-					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_TEXT_FUNC_TYPE).send();
+			CallResponse<TallyResult> baseResponse = proposalContract.getTallyResult(platonSendTransaction.getTransactionHash()).send();
 
 			System.out.println("发起提案结果：" + baseResponse.toString());
 			voteForProposal(platonSendTransaction.getTransactionHash());
@@ -99,8 +95,7 @@ public class ProposalContractTest {
 			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
 					Proposal.createSubmitVersionProposalParam(nodeId, num, BigInteger.valueOf(2049), BigInteger.valueOf(4)))
 					.send();
-			BaseResponse<?> baseResponse = proposalContract
-					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
+			CallResponse<TallyResult> baseResponse = proposalContract.getTallyResult(platonSendTransaction.getTransactionHash()).send();
 			System.out.println("发起提案结果：" + baseResponse.toString());
 
 //			voteForProposal("0x4a042fae6c5b2599ada5db7baa47eac0318354ef0b0f01803c18276c9aca2f3d");
@@ -126,8 +121,7 @@ public class ProposalContractTest {
 			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
 					Proposal.createSubmitParamProposalParam(nodeId, num, "staking", "maxValidators", "20"))
 					.send();
-			BaseResponse<?> baseResponse = proposalContract
-					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
+			CallResponse<TallyResult> baseResponse = proposalContract.getTallyResult(platonSendTransaction.getTransactionHash()).send();
 			System.out.println("发起提案结果：" + baseResponse.toString());
 
 			voteForProposal(platonSendTransaction.getTransactionHash());
@@ -175,8 +169,11 @@ public class ProposalContractTest {
 			Web3j web3j = Web3j.build(new HttpService(nodeHost));
 			ProposalContract voteContract = ProposalContract.load(web3j, credentials, chainId);
 
-			ProgramVersion pv = voteContract.getProgramVersion();
-			BaseResponse<?> baseResponse = voteContract.vote(pv,voteOption,proposalID,nodeId).send();
+			CallResponse<BigInteger> version = voteContract.getActiveVersion().send();
+			ProgramVersion pv = new ProgramVersion();
+			pv.setVersion(version.getData());
+			pv.setSign("sfsdfsf");
+			TransactionResponse baseResponse = voteContract.vote(pv,voteOption,proposalID,nodeId).send();
 			System.out.println("投票结果：" + baseResponse.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -196,7 +193,7 @@ public class ProposalContractTest {
 			pv.setVersion(BigInteger.valueOf(1792));
 			pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
 
-			BaseResponse<?> baseResponse = proposalContract.vote(pv,VoteOption.YEAS,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9","25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d").send();
+			TransactionResponse baseResponse = proposalContract.vote(pv,VoteOption.YEAS,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9","25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d").send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,8 +214,8 @@ public class ProposalContractTest {
 
 	public void queryResult(String proposalID) {
 		try {
-			BaseResponse<Proposal> baseResponse = proposalContract.getProposal(proposalID).send();
-			System.out.println("提案信息：" + baseResponse.data.toString());
+			CallResponse<Proposal> baseResponse = proposalContract.getProposal(proposalID).send();
+			System.out.println("提案信息：" + baseResponse.getData().toString());
 //			BaseResponse<TallyResult> result = proposalContract.getTallyResult(proposalID).send();
 //			System.out.println("提案结果：" + result.data.toString());
 		} catch (Exception e) {
@@ -249,7 +246,7 @@ public class ProposalContractTest {
 	@Test
 	public void getActiveVersion() {
 		try {
-			BaseResponse<?> baseResponse = proposalContract.getActiveVersion().send();
+			CallResponse<?> baseResponse = proposalContract.getActiveVersion().send();
 			System.out.println(baseResponse.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -258,7 +255,7 @@ public class ProposalContractTest {
 
 	@Test
 	public void getParamList() throws Exception {
-		List<GovernParam> params = proposalContract.getParamList("").send().data;
+		List<GovernParam> params = proposalContract.getParamList("").send().getData();
 		System.out.println(params);
 	}
 
@@ -268,7 +265,7 @@ public class ProposalContractTest {
 		String name = "stakeThreshold";
 		String value = "1000000000000000000000001";
 		PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(Proposal.createSubmitParamProposalParam(nodeId, "00002", module, name, value)).send();
-		BaseResponse baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIR_PARAM_FUNCTION_TYPE).send();
+		BaseResponse baseResponse = proposalContract.getTallyResult(platonSendTransaction.getTransactionHash()).send();
 		System.out.println(baseResponse);
 	}
 
@@ -281,7 +278,7 @@ public class ProposalContractTest {
 			ProgramVersion pv = new ProgramVersion();
 			pv.setVersion(BigInteger.valueOf(1792));
 			pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
-			BaseResponse<?> baseResponse = proposalContract.declareVersion(pv,"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
+			TransactionResponse baseResponse = proposalContract.declareVersion(pv,"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
 					.send();
 			System.out.println(baseResponse.toString());
 		} catch (Exception e) {
@@ -292,15 +289,15 @@ public class ProposalContractTest {
 	/**
 	 * 查询节点代码版本
 	 */
-	@Test
-	public void getProgramVersion() {
-		try {
-			BigInteger baseResponse = proposalContract.getProgramVersion().getProgramVersion();
-			System.out.println(baseResponse);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	@Test
+//	public void getProgramVersion() {
+//		try {
+//			BigInteger baseResponse = proposalContract.getDeclareVersionGasProvider().getProgramVersion().getProgramVersion();
+//			System.out.println(baseResponse);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	/**
 	 * 查询提案列表
@@ -308,12 +305,12 @@ public class ProposalContractTest {
 	@Test
 	public void listProposal() {
 		try {
-			BaseResponse<List<Proposal>> baseResponse = proposalContract.getProposalList().send();
-			List<Proposal> proposalList = baseResponse.data;
+			CallResponse<List<Proposal>> baseResponse = proposalContract.getProposalList().send();
+			List<Proposal> proposalList = baseResponse.getData();
 			for (Proposal proposal : proposalList) {
-				BaseResponse<TallyResult> result = proposalContract.getTallyResult(proposal.getProposalId()).send();
+				CallResponse<TallyResult> result = proposalContract.getTallyResult(proposal.getProposalId()).send();
 				System.out.print(proposal);
-				System.out.println(result.data.toString());
+				System.out.println(result.getData().toString());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -338,7 +335,7 @@ public class ProposalContractTest {
 			Proposal proposal = Proposal.createSubmitCancelProposalParam(nodeId, "4", BigInteger.valueOf(1),
 					"0x3b26fd691c633a16d686b1400db5fddae210776141971e74b5df84b7f87876e1");
             PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(proposal).send();
-            BaseResponse<?> baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_CANCEL_FUNC_TYPE).send();
+            CallResponse<?> baseResponse = proposalContract.getTallyResult(platonSendTransaction.getTransactionHash()).send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,7 +348,7 @@ public class ProposalContractTest {
 			Proposal proposal = Proposal.createSubmitCancelProposalParam(nodeId, num, BigInteger.valueOf(1),
 					hash);
             PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(proposal).send();
-            BaseResponse<?> baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_CANCEL_FUNC_TYPE).send();
+            CallResponse<?> baseResponse = proposalContract.getTallyResult(platonSendTransaction.getTransactionHash()).send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();

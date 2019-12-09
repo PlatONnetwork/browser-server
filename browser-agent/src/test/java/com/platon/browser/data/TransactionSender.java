@@ -1,5 +1,18 @@
 package com.platon.browser.data;
 
+import com.platon.sdk.contracts.ppos.DelegateContract;
+import com.platon.sdk.contracts.ppos.NodeContract;
+import com.platon.sdk.contracts.ppos.ProposalContract;
+import com.platon.sdk.contracts.ppos.StakingContract;
+import com.platon.sdk.contracts.ppos.dto.BaseResponse;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
+import com.platon.sdk.contracts.ppos.dto.common.ProposalType;
+import com.platon.sdk.contracts.ppos.dto.enums.StakingAmountType;
+import com.platon.sdk.contracts.ppos.dto.req.StakingParam;
+import com.platon.sdk.contracts.ppos.dto.req.UpdateStakingParam;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,21 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.ProposalType;
-import org.web3j.platon.StakingAmountType;
-import org.web3j.platon.bean.Node;
-import org.web3j.platon.bean.Proposal;
-import org.web3j.platon.bean.StakingParam;
-import org.web3j.platon.bean.UpdateStakingParam;
-import org.web3j.platon.contracts.DelegateContract;
-import org.web3j.platon.contracts.NodeContract;
-import org.web3j.platon.contracts.ProposalContract;
-import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.Platon;
-import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
@@ -30,9 +30,7 @@ import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -123,10 +121,10 @@ public class TransactionSender {
                .setWebSite(webSite)
                .setDetails(details)
                .setBlsPubKey(stakingBlsKey)
-               .setProcessVersion(stakingContract.getProgramVersion())
-               .setBlsProof(stakingContract.getAdminSchnorrNIZKProve())
+//               .setProcessVersion(stakingContract.getProgramVersion())
+//               .setBlsProof(stakingContract.getAdminSchnorrNIZKProve())
                .build()).send();
-        BaseResponse<?> baseResponse = stakingContract.getStakingResult(platonSendTransaction).send();
+        TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
         System.out.println(baseResponse.toString());
         logger.debug("res:{}",baseResponse);
     }
@@ -143,7 +141,7 @@ public class TransactionSender {
     	uBuilder.setWebSite("WWW.CCC.COM");
     	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
     	UpdateStakingParam updateStakingParam = new UpdateStakingParam(uBuilder);
-        BaseResponse<?> res = stakingContract.updateStakingInfo(updateStakingParam).send();
+        TransactionResponse res = stakingContract.updateStakingInfo(updateStakingParam).send();
         logger.debug("res:{}",res);
     }
 
@@ -151,7 +149,7 @@ public class TransactionSender {
     @Test
     public void addStaking() throws Exception {
     	BigDecimal stakingAmount = Convert.toVon("5000000", Unit.LAT);
-        BaseResponse<?> res = stakingContract.addStaking(
+        TransactionResponse res = stakingContract.addStaking(
         		stakingPubKey,
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 stakingAmount.toBigInteger()
@@ -162,7 +160,7 @@ public class TransactionSender {
     // 撤销质押(退出验证人)
     @Test
     public void unStaking() throws Exception {
-        BaseResponse<?> res = stakingContract.unStaking(
+        TransactionResponse res = stakingContract.unStaking(
         		stakingPubKey
         ).send();
         logger.debug("res:{}",res);
@@ -172,7 +170,7 @@ public class TransactionSender {
     @Test
     public void delegate() throws Exception {
     	BigDecimal delegate = Convert.toVon("65000", Unit.LAT);
-        BaseResponse<?> res = delegateContract.delegate(
+        TransactionResponse res = delegateContract.delegate(
         		stakingPubKey,
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 delegate.toBigInteger()
@@ -205,7 +203,7 @@ public class TransactionSender {
             proposal.setName("maxValidators");
             proposal.setNewValue("26");
             BaseResponse baseResponse = proposalContract.submitProposal(proposal).send();
-            logger.debug("res:{}",baseResponse.code);
+            logger.debug("res:{}",baseResponse.getCode());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -216,7 +214,7 @@ public class TransactionSender {
     @Test
     public void unDelegate() throws Exception {
     	BigDecimal delegate = Convert.toVon("10000", Unit.LAT);
-        BaseResponse<?> res = delegateContract.unDelegate(
+        TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
                 BigInteger.valueOf(5576),
                 delegate.toBigInteger()
@@ -356,7 +354,7 @@ public class TransactionSender {
         logger.error("{}",blockNumber);
 
         try {
-            BaseResponse <List <Node>> result = nodeContract.getVerifierList().send();
+            CallResponse<List <Node>> result = nodeContract.getVerifierList().send();
             System.out.println(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -368,7 +366,7 @@ public class TransactionSender {
         bg = Convert.fromVon("10000000000000000000000000", Unit.LAT);
         System.out.println(bg);
 
-        BaseResponse<Node> nodes = stakingContract.getStakingInfo("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc").send();
+        CallResponse<Node> nodes = stakingContract.getStakingInfo("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc").send();
         System.out.println(nodes);
     }
 

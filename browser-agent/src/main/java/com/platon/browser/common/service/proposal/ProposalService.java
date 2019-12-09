@@ -5,11 +5,11 @@ import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.TallyResult;
 
 /**
  * @description: 提案服务
@@ -44,9 +44,9 @@ public class ProposalService {
      * @throws Exception
      */
     public TallyResult getTallyResult (String proposalHash ) throws Exception {
-        BaseResponse<TallyResult> result = client.getProposalContract().getTallyResult(proposalHash).send();
+        CallResponse<TallyResult> result = client.getProposalContract().getTallyResult(proposalHash).send();
         if (result.isStatusOk()) {
-            return result.data;
+            return result.getData();
         }
         throw new ContractInvokeException("查询不到提案[proposalHash=" + proposalHash + "]对应的投票结果!");
     }

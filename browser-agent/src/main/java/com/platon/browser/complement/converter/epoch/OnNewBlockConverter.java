@@ -16,10 +16,10 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.bean.TallyResult;
 
 import java.math.BigDecimal;
 import java.util.*;

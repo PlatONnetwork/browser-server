@@ -14,6 +14,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

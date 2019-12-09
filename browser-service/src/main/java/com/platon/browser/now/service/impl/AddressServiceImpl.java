@@ -24,13 +24,13 @@ import com.platon.browser.res.address.DetailsRPPlanResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.I18nUtil;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.RestrictingItem;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 
 import java.io.IOException;
@@ -119,14 +119,14 @@ public class AddressServiceImpl implements AddressService {
 			/**
 			 * 链上实时查询对应的锁仓信息
 			 */
-			BaseResponse<RestrictingItem> baseResponse = platonClient.getRestrictingPlanContract().getRestrictingInfo(req.getAddress()).send();
+			CallResponse<RestrictingItem> baseResponse = platonClient.getRestrictingPlanContract().getRestrictingInfo(req.getAddress()).send();
 			if(baseResponse.isStatusOk()) {
 				/**
 				 * 可用余额为balance减去质押金额
 				 */
-				queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(baseResponse.data.getBalance().subtract(baseResponse.data.getPledge())));
-				queryRPPlanDetailResp.setStakingValue(new BigDecimal(baseResponse.data.getPledge()));
-				queryRPPlanDetailResp.setUnderReleaseValue(new BigDecimal(baseResponse.data.getDebt()));
+				queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(baseResponse.getData().getBalance().subtract(baseResponse.getData().getPledge())));
+				queryRPPlanDetailResp.setStakingValue(new BigDecimal(baseResponse.getData().getPledge()));
+				queryRPPlanDetailResp.setUnderReleaseValue(new BigDecimal(baseResponse.getData().getDebt()));
 			}
 		} catch (Exception e) {
 			logger.error("rpplanDetail error", e);

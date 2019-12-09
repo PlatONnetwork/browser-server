@@ -6,6 +6,9 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
+import com.platon.sdk.contracts.ppos.ProposalContract;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.GovernParam;
-import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.protocol.core.RemoteCall;
 
 import java.math.BigDecimal;
@@ -173,11 +173,11 @@ public class ParameterServiceTest {
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"customConfigMapper",customConfigMapper);
         when(platOnClient.getProposalContract()).thenReturn(proposalContract);
-        RemoteCall <BaseResponse <List<GovernParam>>> baseResponseRemoteCall = mock(RemoteCall.class);
+        RemoteCall <CallResponse<List<GovernParam>>> baseResponseRemoteCall = mock(RemoteCall.class);
         when(proposalContract.getParamList("")).thenReturn(baseResponseRemoteCall);
-        BaseResponse <List<GovernParam>> baseResponse = mock(BaseResponse.class);
+        CallResponse <List<GovernParam>> baseResponse = mock(CallResponse.class);
         when(baseResponseRemoteCall.send()).thenReturn(baseResponse);
-        baseResponse.data = list;
+        baseResponse.setData(list);
 
         when(chainConfig.getStakeThreshold()).thenReturn(BigDecimal.TEN);
         when(chainConfig.getDelegateThreshold()).thenReturn(BigDecimal.TEN);

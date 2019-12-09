@@ -1,14 +1,5 @@
 package com.platon.browser.complement.converter.epoch;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.platon.bean.Node;
-
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -17,8 +8,15 @@ import com.platon.browser.complement.dao.param.epoch.Election;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service

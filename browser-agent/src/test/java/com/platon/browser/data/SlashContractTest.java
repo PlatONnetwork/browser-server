@@ -1,11 +1,12 @@
 package com.platon.browser.data;//package com.platon.browser.data;
 
+import com.platon.sdk.contracts.ppos.SlashContract;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
+import com.platon.sdk.contracts.ppos.dto.common.DuplicateSignType;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.DuplicateSignType;
-import org.web3j.platon.contracts.SlashContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
@@ -39,7 +40,7 @@ public class SlashContractTest {
 		try {
 			PlatonSendTransaction platonSendTransaction = slashContract
 					.reportDoubleSignReturnTransaction(DuplicateSignType.PREPARE_BLOCK, evidence).send();
-			BaseResponse<?> baseResponse = slashContract.getReportDoubleSignResult(platonSendTransaction).send();
+			TransactionResponse baseResponse = slashContract.getTransactionResponse(platonSendTransaction).send();
 			System.out.println(baseResponse.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -53,7 +54,7 @@ public class SlashContractTest {
 	@Test
 	public void checkDuplicateSign() {
 		try {
-			BaseResponse<?> baseResponse = slashContract.checkDoubleSign(DuplicateSignType.PREPARE_BLOCK,
+			CallResponse<?> baseResponse = slashContract.checkDoubleSign(DuplicateSignType.PREPARE_BLOCK,
 					"0xfa0974d4f6ec349206c1f7cea8dda465cbd17757", BigInteger.valueOf(500)).send();
 
 			System.out.println(baseResponse.toString());

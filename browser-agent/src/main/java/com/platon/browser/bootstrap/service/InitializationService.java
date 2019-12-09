@@ -19,11 +19,11 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

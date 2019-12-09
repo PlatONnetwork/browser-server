@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import org.web3j.platon.bean.Node;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;

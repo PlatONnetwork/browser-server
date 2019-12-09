@@ -1,6 +1,7 @@
 package com.platon.browser.enums;
 
-import org.web3j.platon.ContractAddress;
+
+import com.platon.sdk.contracts.ppos.dto.common.ContractAddress;
 
 import java.util.Arrays;
 import java.util.HashSet;

@@ -3,14 +3,14 @@ package com.platon.browser.data;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.SpecialApi;
+import com.platon.sdk.contracts.ppos.DelegateContract;
+import com.platon.sdk.contracts.ppos.NodeContract;
+import com.platon.sdk.contracts.ppos.ProposalContract;
+import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
+import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.platon.bean.GovernParam;
-import org.web3j.platon.bean.Node;
-import org.web3j.platon.contracts.DelegateContract;
-import org.web3j.platon.contracts.NodeContract;
-import org.web3j.platon.contracts.ProposalContract;
-import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.websocket.WebSocketService;
@@ -77,7 +77,7 @@ public class SpecialContractApiInvoker {
 
         EpochInfo res = sca.getEpochInfo(web3j,BigInteger.valueOf(1));
 
-        List<GovernParam> governParamList = proposalContract.getParamList("").send().data;
+        List<GovernParam> governParamList = proposalContract.getParamList("").send().getData();
         String json = JSON.toJSONString(governParamList,true);
         logger.error("{}",json);
         //BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();

@@ -7,10 +7,10 @@ import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.platon.bean.GovernParam;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,7 +40,7 @@ public class ParameterService {
      */
     public void initConfigTable() throws Exception {
         configMapper.deleteByExample(null);
-        List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().data;
+        List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().getData();
         List<Config> configList = new ArrayList<>();
         int id = 1;
         for (GovernParam gp : governParamList) {

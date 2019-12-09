@@ -14,6 +14,7 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.bean.TallyResult;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
