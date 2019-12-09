@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+/**
+ * 网络统计缓存
+ */
 @Component
 @Data
 public class NetworkStatCache {

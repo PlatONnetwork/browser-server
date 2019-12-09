@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 节点缓存
+ */
 @Component
 public class NodeCache {
     private static final Map<String,NodeItem> cache = new HashMap<>();
