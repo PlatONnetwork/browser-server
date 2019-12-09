@@ -1,18 +1,20 @@
 package com.platon.browser.common.complement.cache;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 地址统计缓存
+ */
 @Component
 public class AddressCache {
     private Map<String,Address> addressMap = new HashMap<>();
