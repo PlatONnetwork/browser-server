@@ -3,6 +3,7 @@ package com.platon.browser.common.service.epoch;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BusinessException;
@@ -65,6 +66,9 @@ public class EpochRetryService {
     @Getter
     private Long expectBlockCount = 0L; // 当前期望出块数
 
+    @Autowired
+    private NetworkStatCache networkStatCache;
+
     /**
      * 增发周期变更:
      * 必然伴随着结算周期和共识周期的变更
@@ -76,7 +80,8 @@ public class EpochRetryService {
         log.debug("增发周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
         try {
             // 上一增发周期最后一个块号
-            BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getAddIssuePeriodBlockCount());
+            BigInteger preIssueEpochLastBlockNumber = BigInteger.ZERO;
+            if(currentBlockNumber.longValue()!=0) preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getAddIssuePeriodBlockCount());
             // 从特殊接口获取
             EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(),preIssueEpochLastBlockNumber);
             // 区块奖励
@@ -93,6 +98,8 @@ public class EpochRetryService {
             configChange.setRemainEpoch(epochInfo.getRemainEpoch());
             configChange.setSettleStakeReward(epochInfo.getStakingReward());
             EPOCH_CHANGES.offer(configChange);
+
+            applyConfigChange();
         } catch (Exception e) {
             log.error("", e);
             throw new BusinessException(e.getMessage());
@@ -196,6 +203,8 @@ public class EpochRetryService {
             ConfigChange configChange = new ConfigChange();
             configChange.setStakeReward(stakeReward);
             EPOCH_CHANGES.offer(configChange);
+
+            applyConfigChange();
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
             log.error("", e);
@@ -225,5 +234,45 @@ public class EpochRetryService {
             log.error("", e);
             throw new CandidateException(e.getMessage());
         }
+    }
+
+    /**
+     * 应用配置变更
+     * 1、更新BlockChainConfig涉及的相关配置项
+     * 2、更新网络统计缓存涉及的相关数据项
+     */
+    public void applyConfigChange(){
+        ConfigChange summary = new ConfigChange();
+        while (EPOCH_CHANGES.peek()!=null){
+            ConfigChange configChange = EPOCH_CHANGES.poll();
+
+            if(configChange.getIssueEpoch()!=null){
+                // 更新增发周期轮数
+                chainConfig.setIssueEpochRound(configChange.getIssueEpoch());
+                summary.setIssueEpoch(configChange.getIssueEpoch());
+            }
+            if(configChange.getYearStartNum()!=null){
+                // 更新增发周期起始块号
+                chainConfig.setIssueEpochStartBlockNumber(configChange.getYearStartNum());
+                summary.setYearStartNum(configChange.getYearStartNum());
+            }
+            if(configChange.getYearEndNum()!=null){
+                // 更新增发周期结束块号
+                chainConfig.setIssueEpochEndBlockNumber(configChange.getYearEndNum());
+                summary.setYearEndNum(configChange.getYearEndNum());
+            }
+
+            if(configChange.getYearStartNum()!=null&&configChange.getYearEndNum()!=null){
+                // 更新增发周期区块数
+                chainConfig.setAddIssuePeriodBlockCount(configChange.getYearEndNum().subtract(configChange.getYearStartNum()).toBigInteger());
+                // 更新每个增发周期的结算周期数
+                chainConfig.setSettlePeriodCountPerIssue(chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount()));
+            }
+
+            if(configChange.getSettleStakeReward()!=null) summary.setSettleStakeReward(configChange.getSettleStakeReward());
+            if(configChange.getBlockReward()!=null) summary.setBlockReward(configChange.getBlockReward());
+            if(configChange.getStakeReward()!=null) summary.setStakeReward(configChange.getStakeReward());
+        }
+        networkStatCache.updateByEpochChange(summary);
     }
 }
