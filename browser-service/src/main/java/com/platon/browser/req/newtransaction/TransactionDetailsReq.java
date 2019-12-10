@@ -2,6 +2,8 @@ package com.platon.browser.req.newtransaction;
 
 import javax.validation.constraints.NotBlank;
 
+import com.platon.browser.utils.HexTool;
+
 /**
  * 交易详情请求对象
  *  @file TransactionDetailsReq.java
@@ -18,7 +20,7 @@ public class TransactionDetailsReq{
 	}
 
 	public void setTxHash(String txHash) {
-		this.txHash = txHash;
+		this.txHash = HexTool.prefix(txHash.toLowerCase());
 	}
     
 }

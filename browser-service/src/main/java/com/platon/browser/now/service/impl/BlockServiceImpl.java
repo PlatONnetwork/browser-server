@@ -24,6 +24,7 @@ import com.platon.browser.res.block.BlockListResp;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.HexTool;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
@@ -41,7 +42,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,15 +227,15 @@ public class BlockServiceImpl implements BlockService {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
                     block.getTxQty(),
-                    EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
-                    EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)))
             };
             rows.add(row);
         });
 
         /** 初始化输出流对象 */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(baos, Charset.defaultCharset());
+        Writer outputWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
         try {
         	/** 设置返回的头，防止csv乱码 */
 			outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));

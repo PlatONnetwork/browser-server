@@ -16,6 +16,8 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.HexTool;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +91,7 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public void addressTransactionDownload(String address, Long date, String local, String timeZone, HttpServletResponse response) {
+		address = HexTool.prefix(address.toLowerCase());
 		AccountDownload accountDownload = transactionService.transactionListByAddressDownload(address, date, local, timeZone);
 		try {
 			downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(), accountDownload.getData());

@@ -37,6 +37,7 @@ import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.*;
+import com.platon.browser.utils.HexTool;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +57,7 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -229,15 +230,16 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
-                    EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
-                    EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
-                    EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18))
             };
             rows.add(row);
         });
         /** 初始化输出流对象 */
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, Charset.defaultCharset());
+        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
+        logger.error("download Charset.defaultCharset():{}", StandardCharsets.UTF_8);
         try {
         	/** 设置导出的csv头，防止乱码 */
             outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));

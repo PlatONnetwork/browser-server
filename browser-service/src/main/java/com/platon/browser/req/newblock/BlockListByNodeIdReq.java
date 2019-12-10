@@ -3,6 +3,7 @@ package com.platon.browser.req.newblock;
 import javax.validation.constraints.NotBlank;
 
 import com.platon.browser.req.PageReq;
+import com.platon.browser.utils.HexTool;
 
 /**
  *  查询节点id请求对象
@@ -20,7 +21,7 @@ public class BlockListByNodeIdReq extends PageReq{
 	}
 
 	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
+		this.nodeId = HexTool.prefix(nodeId.toLowerCase());
 	}
 	
 }

@@ -2,6 +2,8 @@ package com.platon.browser.req.address;
 
 import javax.validation.constraints.NotBlank;
 
+import com.platon.browser.utils.HexTool;
+
 /**
  *  查询地址详情请求对象
  *  @file QueryDetailRequest.java
@@ -18,7 +20,7 @@ public class QueryDetailRequest {
 	}
 
 	public void setAddress(String address) {
-		this.address = address;
+		this.address = HexTool.prefix(address.toLowerCase());
 	}
     
 }

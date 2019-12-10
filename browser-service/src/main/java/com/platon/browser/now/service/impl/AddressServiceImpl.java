@@ -16,7 +16,9 @@ import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.now.service.AddressService;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
@@ -88,18 +90,15 @@ public class AddressServiceImpl implements AddressService {
         }
         /** 特殊账户余额直接查询链  */
 	  	try {
-			List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
-			if(restrictingBalances != null && !restrictingBalances.isEmpty()) {
-				resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
-				resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
-			}
-			/** 特殊账户余额直接查询链  */
-			if(BrowserConst.ACCOUNT.contains(req.getAddress())) {
-				BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
-				resp.setBalance(new BigDecimal(balance));
-			}
+	  		resp = this.getBalance(req, resp);
 	  	} catch (Exception e) {
-				logger.error("",e);
+	  		logger.error("getBalance error",e);
+	  		platonClient.updateCurrentWeb3jWrapper();
+	  		try {
+	  			resp = this.getBalance(req, resp);
+			} catch (Exception e1) {
+				logger.error("getBalance error again",e);
+			} 
 		}
         RpPlanExample rpPlanExample = new RpPlanExample();
 		RpPlanExample.Criteria criteria = rpPlanExample.createCriteria();
@@ -185,5 +184,19 @@ public class AddressServiceImpl implements AddressService {
 		 */
 		queryRPPlanDetailResp.setTotal(rpPlans.getTotal());
 		return queryRPPlanDetailResp;
+	}
+	
+	private QueryDetailResp getBalance(QueryDetailRequest req, QueryDetailResp resp) throws ContractInvokeException, BlankResponseException, IOException {
+		List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
+		if(restrictingBalances != null && !restrictingBalances.isEmpty()) {
+			resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
+			resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
+		}
+		/** 特殊账户余额直接查询链  */
+		if(BrowserConst.ACCOUNT.contains(req.getAddress())) {
+			BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
+			resp.setBalance(new BigDecimal(balance));
+		}
+		return resp;
 	}
 }

@@ -11,6 +11,7 @@ import com.platon.browser.dto.CustomStaking;
  */
 public enum StakingStatusEnum {
 	ALL("all", null),//全部
+	VERIFYING("verifying" ,6),//共识中中
 	CANDIDATE("candidate" ,1),//候选中
 	ACTIVE("active", 2),//活跃中
 	BLOCK("block", 3),//出块中
@@ -39,6 +40,10 @@ public enum StakingStatusEnum {
 	 */
 	public static Integer getCodeByStatus(Integer status, Integer isConsensus, Integer isSetting) {
 		if(CustomStaking.StatusEnum.CANDIDATE.getCode() == status) {
+			if(CustomStaking.YesNoEnum.YES.getCode() == isConsensus) {
+				/** 当状态既为候选中且在共识周期则认为节点为共识中*/
+				return StakingStatusEnum.VERIFYING.getCode();
+			}
 			if(CustomStaking.YesNoEnum.YES.getCode() == isSetting) {
 				/** 当状态既为候选中且在结算周期则认为节点为活跃中*/
 				return StakingStatusEnum.ACTIVE.getCode();
