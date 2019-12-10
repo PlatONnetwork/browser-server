@@ -1,5 +1,6 @@
 package com.platon.browser.common.complement.cache;
 
+import com.platon.browser.common.service.epoch.ConfigChange;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.Data;
@@ -63,6 +64,18 @@ public class NetworkStatCache {
 		networkStat.setAddressQty(addressQty);
 		networkStat.setDoingProposalQty(doingProposalQty);
 		networkStat.setStakingReward(stakingReward);
+	}
+
+	/**
+	 * 基于增发或结算周期变更更新网络统计信息
+	 */
+	public void updateByEpochChange(ConfigChange configChange) {
+		if(configChange.getBlockReward()!=null) networkStat.setBlockReward(configChange.getBlockReward());
+		if(configChange.getYearStartNum()!=null) networkStat.setAddIssueBegin(configChange.getYearStartNum().longValue());
+		if(configChange.getYearEndNum()!=null) networkStat.setAddIssueEnd(configChange.getYearEndNum().longValue());
+		if(configChange.getSettleStakeReward()!=null) networkStat.setSettleStakingReward(configChange.getSettleStakeReward());
+		if(configChange.getBlockReward()!=null) networkStat.setBlockReward(configChange.getBlockReward());
+		if(configChange.getStakeReward()!=null) networkStat.setStakingReward(configChange.getStakeReward());
 	}
 
     public void init(NetworkStat networkStat) {
