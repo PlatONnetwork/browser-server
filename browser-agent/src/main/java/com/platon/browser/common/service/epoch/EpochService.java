@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 
+import static com.platon.browser.common.service.epoch.EpochRetryService.EPOCH_CHANGES;
+
 /**
  * 周期切换服务
  *
@@ -79,4 +81,35 @@ public class EpochService {
                 .updateWithEpochService(this)
                 .updateWithEpochRetryService(epochRetryService);
     }
+
+    /**
+     * 更新区块链配置
+     */
+    private void updateBlockChainConfig(){
+//        // TODO: EpochInfo.YearEndNum-EpochInfo.YearStartNum
+//        this.setAddIssuePeriodBlockCount(this.additionalCycleMinutes
+//                .multiply(BigInteger.valueOf(60))
+//                .divide(this.blockInterval.multiply(this.settlePeriodBlockCount))
+//                .multiply(this.settlePeriodBlockCount));
+//        // TODO:每个结算周期切换时，增发周期区块数都可能会变
+//        this.setSettlePeriodCountPerIssue(this.addIssuePeriodBlockCount.divide(this.settlePeriodBlockCount));
+//        EPOCH_CHANGES.
+//        chainConfig.
+
+        while (EPOCH_CHANGES.peek()!=null){
+            ConfigChange configChange = EPOCH_CHANGES.poll();
+            if(configChange.getIssueEpoch()!=null){
+                chainConfig.setIssueEpochRound(configChange.getIssueEpoch());
+            }
+            if(configChange.getYearStartNum()!=null){
+                chainConfig.setIssueEpochStartBlockNumber(configChange.getYearStartNum());
+            }
+            if(configChange.getYearEndNum()!=null){
+                chainConfig.setIssueEpochEndBlockNumber(configChange.getYearEndNum());
+            }
+
+        }
+    }
+
+
 }

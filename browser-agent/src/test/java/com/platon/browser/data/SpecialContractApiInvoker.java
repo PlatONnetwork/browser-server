@@ -75,7 +75,7 @@ public class SpecialContractApiInvoker {
 //        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
 
 
-        EpochInfo res = sca.getEpochInfo(web3j,BigInteger.valueOf(1));
+        EpochInfo res = sca.getEpochInfo(web3j,BigInteger.valueOf(170000));
 
         List<GovernParam> governParamList = proposalContract.getParamList("").send().getData();
         String json = JSON.toJSONString(governParamList,true);

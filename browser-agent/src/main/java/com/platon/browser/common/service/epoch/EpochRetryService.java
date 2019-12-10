@@ -1,9 +1,9 @@
 package com.platon.browser.common.service.epoch;
 
+import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.exception.CandidateException;
-import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.EpochUtil;
@@ -20,9 +20,7 @@ import org.web3j.protocol.Web3j;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 奖励计算服务
@@ -40,24 +38,16 @@ import java.util.List;
 @Slf4j
 @Service
 public class EpochRetryService {
+    public static final Queue<ConfigChange> EPOCH_CHANGES = new LinkedList<>();
 
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
-    private AccountService accountService;
-    @Autowired
     private PlatOnClient platOnClient;
     @Autowired
     private SpecialApi specialApi;
-
-    @Getter
-    private BigDecimal inciteBalance = BigDecimal.ZERO; // 当前增发周期开始时的激励池余额 IB
-    @Getter
-    private BigDecimal inciteAmount4Block = BigDecimal.ZERO; // 前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
     @Getter
     private BigDecimal blockReward = BigDecimal.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
-    @Getter
-    private BigDecimal inciteAmount4Stake = BigDecimal.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
     @Getter
     private BigDecimal settleStakeReward = BigDecimal.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
     @Getter
@@ -85,20 +75,24 @@ public class EpochRetryService {
     public void issueChange ( BigInteger currentBlockNumber ) {
         log.debug("增发周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
         try {
-            // >>>>如果增发周期变更,则更新相应的奖励字段
-            // >>>>当前增发周期的初始激励池余额需要在上一增发周期最后一个块时候确定
             // 上一增发周期最后一个块号
             BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getAddIssuePeriodBlockCount());
-            // 当前增发周期开始时的激励池余额
-            inciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
-            // 激励池余额分给区块奖励部分
-            inciteAmount4Block = inciteBalance.multiply(chainConfig.getBlockRewardRate());
-            // 当前增发周期内每个区块的奖励
-            blockReward = inciteAmount4Block.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()), 10, RoundingMode.FLOOR);
-            // 激励池余额分给质押奖励部分
-            inciteAmount4Stake = inciteBalance.multiply(chainConfig.getStakeRewardRate());
+            // 从特殊接口获取
+            EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(),preIssueEpochLastBlockNumber);
+            // 区块奖励
+            blockReward=epochInfo.getPackageReward();
             // 当前增发周期内每个结算周期的质押奖励
-            settleStakeReward = inciteAmount4Stake.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()), 10, RoundingMode.FLOOR);
+            settleStakeReward = epochInfo.getStakingReward();
+
+            ConfigChange configChange = new ConfigChange();
+            configChange.setAvgPackTime(epochInfo.getAvgPackTime());
+            configChange.setBlockReward(epochInfo.getPackageReward());
+            configChange.setIssueEpoch(epochInfo.getYearNum());
+            configChange.setYearStartNum(epochInfo.getYearStartNum());
+            configChange.setYearEndNum(epochInfo.getYearEndNum());
+            configChange.setRemainEpoch(epochInfo.getRemainEpoch());
+            configChange.setSettleStakeReward(epochInfo.getStakingReward());
+            EPOCH_CHANGES.offer(configChange);
         } catch (Exception e) {
             log.error("", e);
             throw new BusinessException(e.getMessage());
@@ -198,6 +192,10 @@ public class EpochRetryService {
             preStakeReward = stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()), 10, RoundingMode.FLOOR);
+
+            ConfigChange configChange = new ConfigChange();
+            configChange.setStakeReward(stakeReward);
+            EPOCH_CHANGES.offer(configChange);
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
             log.error("", e);

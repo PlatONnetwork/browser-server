@@ -143,6 +143,13 @@ public class BlockChainConfig {
     //【奖励】Platon基金会年限
     private BigInteger platOnFoundationYear;
 
+    //【通用】当前增发周期轮数
+    private BigDecimal issueEpochRound;
+    //【通用】当前增发周期开始区块号
+    private BigDecimal issueEpochStartBlockNumber;
+    //【通用】当前增发周期结束区块号
+    private BigDecimal issueEpochEndBlockNumber;
+
     /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
@@ -195,13 +202,6 @@ public class BlockChainConfig {
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
                 .multiply(this.consensusPeriodBlockCount));
-        //【通用】每个增发周期区块总数=ROUND_DOWN(增发周期的时间x60/(出块间隔x结算周期区块数))x结算周期区块数
-        this.setAddIssuePeriodBlockCount(this.additionalCycleMinutes
-                .multiply(BigInteger.valueOf(60))
-                .divide(this.blockInterval.multiply(this.settlePeriodBlockCount))
-                .multiply(this.settlePeriodBlockCount));
-        //【通用】每个增发周期内的结算周期数=增发周期区块数/结算周期区块数
-        this.setSettlePeriodCountPerIssue(this.addIssuePeriodBlockCount.divide(this.settlePeriodBlockCount));
         //【通用】PlatOn基金会账户地址
         this.setPlatOnFundAccount(dec.getInnerAcc().getPlatonFundAccount());
         //【通用】PlatOn基金会账户初始余额
