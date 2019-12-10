@@ -49,7 +49,8 @@ public class NetworkStatUpdateTask {
 	protected void start (){
 		try {
 			Long curNumber = networkStatCache.getNetworkStat().getCurNumber();
-			BigInteger issueEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(curNumber),chainConfig.getAddIssuePeriodBlockCount());
+			//config中获取增发年份
+			BigDecimal issueEpochRound = chainConfig.getIssueEpochRound();
 			//获取激励池余额
 			BigDecimal inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(curNumber));
 			//获取质押余额
@@ -57,9 +58,9 @@ public class NetworkStatUpdateTask {
 			//获取锁仓余额
 			BigDecimal restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(curNumber));
 			//计算发行量
-			BigDecimal issueValue = CalculateUtils.calculationIssueValue(issueEpochRound,chainConfig,inciteBalance);
+			BigDecimal issueValue = CalculateUtils.calculationIssueValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance);
 			//计算流通量
-			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,issueEpochRound,inciteBalance,stakingBalance,restrictBalance);
+			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,new BigInteger(issueEpochRound.toString()),inciteBalance,stakingBalance,restrictBalance);
 			//获得节点相关的网络统计
 			NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
 			BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();
