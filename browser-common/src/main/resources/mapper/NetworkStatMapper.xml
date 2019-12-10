@@ -26,6 +26,7 @@
     <result column="node_opt_seq" jdbcType="BIGINT" property="nodeOptSeq" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="avg_pack_time" jdbcType="BIGINT" property="avgPackTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -89,7 +90,7 @@
     id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
     turn_value, staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, 
     address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
-    add_issue_end, next_settle, node_opt_seq, create_time, update_time
+    add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NetworkStatExample" resultMap="BaseResultMap">
     select
@@ -129,8 +130,8 @@
       doing_proposal_qty, proposal_qty, address_qty, 
       block_reward, staking_reward, settle_staking_reward, 
       add_issue_begin, add_issue_end, next_settle, 
-      node_opt_seq, create_time, update_time
-      )
+      node_opt_seq, create_time, update_time, 
+      avg_pack_time)
     values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
       #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, 
       #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, 
@@ -138,8 +139,8 @@
       #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, #{addressQty,jdbcType=INTEGER}, 
       #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, #{settleStakingReward,jdbcType=DECIMAL}, 
       #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, #{nextSettle,jdbcType=BIGINT}, 
-      #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{avgPackTime,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into network_stat
@@ -216,6 +217,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="avgPackTime != null">
+        avg_pack_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -289,6 +293,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="avgPackTime != null">
+        #{avgPackTime,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -373,6 +380,9 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.avgPackTime != null">
+        avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -403,7 +413,8 @@
       next_settle = #{record.nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -480,6 +491,9 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="avgPackTime != null">
+        avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -507,7 +521,8 @@
       next_settle = #{nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      avg_pack_time = #{avgPackTime,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -520,7 +535,8 @@
     (id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
       turn_value, staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, 
       address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
-      add_issue_end, next_settle, node_opt_seq, create_time, update_time)
+      add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
@@ -531,8 +547,8 @@
         #{item.proposalQty,jdbcType=INTEGER}, #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, 
         #{item.stakingReward,jdbcType=DECIMAL}, #{item.settleStakingReward,jdbcType=DECIMAL}, 
         #{item.addIssueBegin,jdbcType=BIGINT}, #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, 
-        #{item.nodeOptSeq,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
-        )
+        #{item.nodeOptSeq,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.avgPackTime,jdbcType=BIGINT})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -621,6 +637,9 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'avg_pack_time'.toString() == column.value">
+          #{item.avgPackTime,jdbcType=BIGINT}
         </if>
       </foreach>
       )

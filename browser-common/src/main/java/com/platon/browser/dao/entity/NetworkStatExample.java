@@ -1575,6 +1575,66 @@ public class NetworkStatExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andAvgPackTimeIsNull() {
+            addCriterion("avg_pack_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeIsNotNull() {
+            addCriterion("avg_pack_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeEqualTo(Long value) {
+            addCriterion("avg_pack_time =", value, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeNotEqualTo(Long value) {
+            addCriterion("avg_pack_time <>", value, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeGreaterThan(Long value) {
+            addCriterion("avg_pack_time >", value, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeGreaterThanOrEqualTo(Long value) {
+            addCriterion("avg_pack_time >=", value, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeLessThan(Long value) {
+            addCriterion("avg_pack_time <", value, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeLessThanOrEqualTo(Long value) {
+            addCriterion("avg_pack_time <=", value, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeIn(List<Long> values) {
+            addCriterion("avg_pack_time in", values, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeNotIn(List<Long> values) {
+            addCriterion("avg_pack_time not in", values, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeBetween(Long value1, Long value2) {
+            addCriterion("avg_pack_time between", value1, value2, "avgPackTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgPackTimeNotBetween(Long value1, Long value2) {
+            addCriterion("avg_pack_time not between", value1, value2, "avgPackTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

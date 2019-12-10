@@ -76,6 +76,7 @@ public class NetworkStatCache {
 		if(configChange.getSettleStakeReward()!=null) networkStat.setSettleStakingReward(configChange.getSettleStakeReward());
 		if(configChange.getBlockReward()!=null) networkStat.setBlockReward(configChange.getBlockReward());
 		if(configChange.getStakeReward()!=null) networkStat.setStakingReward(configChange.getStakeReward());
+		if(configChange.getAvgPackTime()!=null) networkStat.setAvgPackTime(configChange.getAvgPackTime().longValue());
 	}
 
     public void init(NetworkStat networkStat) {

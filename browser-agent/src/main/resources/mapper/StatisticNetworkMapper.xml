@@ -41,7 +41,8 @@
         `staking_value`,
         `doing_proposal_qty`,
         `address_qty`,
-        `settle_staking_reward`
+        `settle_staking_reward`,
+        `avg_pack_time`,
     )
     values
     (
@@ -66,7 +67,8 @@
         #{stakingValue},
         #{doingProposalQty},
         #{addressQty},
-        #{settleStakingReward}
+        #{settleStakingReward},
+        #{avgPackTime}
     )
     on duplicate
     key update
@@ -90,6 +92,8 @@
         `staking_value` = #{stakingValue},
         `doing_proposal_qty`= #{doingProposalQty},
         `address_qty` = #{addressQty},
-        `settle_staking_reward` = #{settleStakingReward};
+        `settle_staking_reward` = #{settleStakingReward},
+        `avg_pack_time` = #{avgPackTime}
+        ;
 </update>
 </mapper>
