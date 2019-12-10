@@ -272,6 +272,7 @@ public class EpochRetryService {
             if(configChange.getSettleStakeReward()!=null) summary.setSettleStakeReward(configChange.getSettleStakeReward());
             if(configChange.getBlockReward()!=null) summary.setBlockReward(configChange.getBlockReward());
             if(configChange.getStakeReward()!=null) summary.setStakeReward(configChange.getStakeReward());
+            if(configChange.getAvgPackTime()!=null) summary.setAvgPackTime(configChange.getAvgPackTime());
         }
         networkStatCache.updateByEpochChange(summary);
     }

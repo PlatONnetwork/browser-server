@@ -81,6 +81,7 @@ public class InitializationService {
             networkStat = CollectionNetworkStat.newInstance();
             networkStat.setId(1);
             networkStat.setCurNumber(-1L);
+            networkStat.setAvgPackTime(0L);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(-1L);
             // 删除节点表和质押表、地址表数据

@@ -42,7 +42,7 @@
         `doing_proposal_qty`,
         `address_qty`,
         `settle_staking_reward`,
-        `avg_pack_time`,
+        `avg_pack_time`
     )
     values
     (
