@@ -79,27 +79,7 @@ public class EpochRetryService {
     public void issueChange ( BigInteger currentBlockNumber ) {
         log.debug("增发周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
         try {
-            // 上一增发周期最后一个块号
-            BigInteger preIssueEpochLastBlockNumber = BigInteger.ZERO;
-            if(currentBlockNumber.longValue()!=0) preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getAddIssuePeriodBlockCount());
-            // 从特殊接口获取
-            EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(),preIssueEpochLastBlockNumber);
-            // 区块奖励
-            blockReward=epochInfo.getPackageReward();
-            // 当前增发周期内每个结算周期的质押奖励
-            settleStakeReward = epochInfo.getStakingReward();
 
-            ConfigChange configChange = new ConfigChange();
-            configChange.setAvgPackTime(epochInfo.getAvgPackTime());
-            configChange.setBlockReward(epochInfo.getPackageReward());
-            configChange.setIssueEpoch(epochInfo.getYearNum());
-            configChange.setYearStartNum(epochInfo.getYearStartNum());
-            configChange.setYearEndNum(epochInfo.getYearEndNum());
-            configChange.setRemainEpoch(epochInfo.getRemainEpoch());
-            configChange.setSettleStakeReward(epochInfo.getStakingReward());
-            EPOCH_CHANGES.offer(configChange);
-
-            applyConfigChange();
         } catch (Exception e) {
             log.error("", e);
             throw new BusinessException(e.getMessage());
@@ -195,12 +175,32 @@ public class EpochRetryService {
             curVerifiers.clear();
             curVerifiers.addAll(curNodes);
 
+
+
+            // 上一结算周期最后一个块号
+            BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getSettlePeriodBlockCount());
+            // 从特殊接口获取
+            EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(),preSettleEpochLastBlockNumber);
+            // 区块奖励
+            blockReward=epochInfo.getPackageReward();
+            // 当前增发周期内每个结算周期的质押奖励
+            settleStakeReward = epochInfo.getStakingReward();
+
+            ConfigChange configChange = new ConfigChange();
+            configChange.setAvgPackTime(epochInfo.getAvgPackTime());
+            configChange.setBlockReward(epochInfo.getPackageReward());
+            configChange.setIssueEpoch(epochInfo.getYearNum());
+            configChange.setYearStartNum(epochInfo.getYearStartNum());
+            configChange.setYearEndNum(epochInfo.getYearEndNum());
+            configChange.setRemainEpoch(epochInfo.getRemainEpoch());
+            configChange.setSettleStakeReward(epochInfo.getStakingReward());
+
+
             // 前一结算周期质押奖励轮换
             preStakeReward = stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()), 10, RoundingMode.FLOOR);
 
-            ConfigChange configChange = new ConfigChange();
             configChange.setStakeReward(stakeReward);
             EPOCH_CHANGES.offer(configChange);
 
