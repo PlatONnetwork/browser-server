@@ -169,10 +169,7 @@ public class ProposalContractTest {
 			Web3j web3j = Web3j.build(new HttpService(nodeHost));
 			ProposalContract voteContract = ProposalContract.load(web3j, credentials, chainId);
 
-			CallResponse<BigInteger> version = voteContract.getActiveVersion().send();
-			ProgramVersion pv = new ProgramVersion();
-			pv.setVersion(version.getData());
-			pv.setSign("sfsdfsf");
+			ProgramVersion pv = web3j.getProgramVersion().send().getAdminProgramVersion();
 			TransactionResponse baseResponse = voteContract.vote(pv,voteOption,proposalID,nodeId).send();
 			System.out.println("投票结果：" + baseResponse.toString());
 		} catch (Exception e) {
