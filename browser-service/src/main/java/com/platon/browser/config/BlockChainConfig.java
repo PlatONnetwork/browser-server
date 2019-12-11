@@ -240,7 +240,7 @@ public class BlockChainConfig {
         this.setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
                 .divide(
                         new BigDecimal(
-                                this.blockInterval // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
+                                BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
                                         .multiply(dec.getCommon().getPerRoundBlocks())
                                         .multiply(this.consensusValidatorCount)) //每个共识轮验证节点数量
                         ,0,RoundingMode.FLOOR

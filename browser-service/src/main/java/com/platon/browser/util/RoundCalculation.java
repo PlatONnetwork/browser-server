@@ -40,7 +40,7 @@ public class RoundCalculation {
             //【治理】参数提案的投票持续最长的时间（单位：s）
             BigDecimal paramProposalVoteDurationSeconds= new BigDecimal(chainConfig.getParamProposalVoteDurationSeconds());
             // 出块间隔
-            BigDecimal blockInterval = new BigDecimal(chainConfig.getBlockInterval());
+            BigDecimal blockInterval = BigDecimal.ONE;
             // 计算投票截止区块号：
             // (CEILING(参数提案所在区块号/结算周期块数)+FLOOR(参数提案的投票持续最长的时间/(出块间隔*结算周期块数)))*结算周期块数
             return txBlockNumber

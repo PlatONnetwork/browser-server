@@ -89,14 +89,14 @@ public class ProposalInfoTask {
                 }
 
                 //只有在结束快高之后才有返回提案结果
-                if (networkStatCache.getNetworkStat().getCurNumber() >= proposal.getEndVotingBlock()) {
+                //if (networkStatCache.getNetworkStat().getCurNumber() >= proposal.getEndVotingBlock()) {
                     //设置状态
                     int status = proposalService.getTallyResult(proposal.getHash()).getStatus();
                     if (status != proposal.getStatus()) {
                         // 有变更
                         proposal.setStatus(status);
                     }
-                }
+                //}
             }catch (Exception e){
                 log.error("提案投票信息更新出错:",e);
             }
