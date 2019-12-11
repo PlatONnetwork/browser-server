@@ -65,11 +65,11 @@ public class TransactionSender {
 //    private String stakingBlsKey = "4b86fc4f865658161d722937c48ac72e1d54d9e8afcbc2c78c5b84fb3ce0510187b5699beb9c91a130075b88cb00b90a2ec8c0c4715d084c7cc5fe734648eb8c935ef4660f7224abd4de28aae55cc25c34144f57a912204bf1eda85892392e13";
     public TransactionSender() throws IOException, CipherException {}
 
-    @Before
-	public void init() {
-    	HttpService httpService = new HttpService("http://192.168.112.172:8789");
-    	currentValidWeb3j = Web3j.build(httpService);
-    }
+//    @Before
+//	public void init() {
+//    	HttpService httpService = new HttpService("http://192.168.112.172:8789");
+//    	currentValidWeb3j = Web3j.build(httpService);
+//    }
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
@@ -121,8 +121,8 @@ public class TransactionSender {
                .setWebSite(webSite)
                .setDetails(details)
                .setBlsPubKey(stakingBlsKey)
-//               .setProcessVersion(stakingContract.getProgramVersion())
-//               .setBlsProof(stakingContract.getAdminSchnorrNIZKProve())
+               .setProcessVersion(currentValidWeb3j.getProgramVersion().send().getAdminProgramVersion())
+               .setBlsProof(currentValidWeb3j.getSchnorrNIZKProve().send().getAdminSchnorrNIZKProve())
                .build()).send();
         TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
         System.out.println(baseResponse.toString());

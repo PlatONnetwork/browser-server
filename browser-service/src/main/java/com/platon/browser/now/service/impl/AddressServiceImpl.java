@@ -8,6 +8,7 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
@@ -20,6 +21,7 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.now.service.AddressService;
+import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 import com.platon.browser.res.address.DetailsRPPlanResp;
@@ -76,6 +78,9 @@ public class AddressServiceImpl implements AddressService {
     
     @Autowired
     private SpecialApi specialApi;
+    
+    @Autowired
+    private StatisticCacheService statisticCacheService;
 
     @Override
     public QueryDetailResp getDetails(QueryDetailRequest req) {
@@ -166,8 +171,9 @@ public class AddressServiceImpl implements AddressService {
 				logger.error("获取区块错误。", e);
 			}
 			if(block!=null) {
-				detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval().multiply(BigInteger.valueOf(number - rPlan.getNumber()))
-						.multiply(BigInteger.valueOf(1000)).add(BigInteger.valueOf(block.getTime().getTime())).longValue());
+				NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+				detailsRPPlanResp.setEstimateTime(new BigDecimal(networkStat.getAvgPackTime()).multiply(BigDecimal.valueOf(number - rPlan.getNumber()))
+				.add(BigDecimal.valueOf(block.getTime().getTime())).longValue());
 			}
 			detailsRPPlanResps.add(detailsRPPlanResp);
 		}

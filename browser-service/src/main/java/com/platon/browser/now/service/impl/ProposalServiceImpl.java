@@ -106,7 +106,7 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setProposalHash(req.getProposalHash());
         proposalDetailsResp.setNodeId(proposal.getNodeId());
         proposalDetailsResp.setNodeName(proposal.getNodeName());
-        proposalDetailsResp.setDescription(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
+        proposalDetailsResp.setDescription(BrowserConst.INQUIRY.equals(proposal.getDescription())?"":proposal.getDescription());
         proposalDetailsResp.setCanceledTopic(BrowserConst.INQUIRY.equals(proposal.getCanceledTopic())?"":proposal.getCanceledTopic());
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
         proposalDetailsResp.setCurBlock(String.valueOf(networkStat.getCurNumber()));
@@ -132,10 +132,8 @@ public class ProposalServiceImpl implements ProposalService {
 		         */
 		        if(StringUtils.isBlank(proposalDetailsResp.getCanceledTopic())) {
 		        	Proposal cancelProposal = proposalMapper.selectByPrimaryKey(proposal.getCanceledPipId());
-		        	if (cancelProposal != null) {
-                        if (CustomProposal.TypeEnum.getEnum(cancelProposal.getType()) == CustomProposal.TypeEnum.UPGRADE) {
+		        	if (cancelProposal != null && CustomProposal.TypeEnum.getEnum(cancelProposal.getType()) == CustomProposal.TypeEnum.UPGRADE) {
                             proposalDetailsResp.setCanceledTopic("版本升级-V" + VerUtil.toVersion(new BigInteger(cancelProposal.getNewVersion())));
-                        }
 		        	}
 		        }
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelSupportRate().toString());
@@ -144,17 +142,9 @@ public class ProposalServiceImpl implements ProposalService {
 			default:
 				break;
 		}
-        /** 不为文本提案则有生效时间 */
-//        if(CustomProposal.TypeEnum.UPGRADE.getCode()==proposalDetailsResp.getType()){
-//	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposal.getBlockNumber())))
-//	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).multiply(new BigDecimal(1000))
-//	        		.add(new BigDecimal(proposal.getTimestamp().getTime()));
-//	        proposalDetailsResp.setActiveBlockTime(actvieTime.longValue());
-//        }
         /** 结束时间预估：（生效区块-当前区块）*出块间隔 + 现有时间 */
         BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposal.getBlockNumber())))
-        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).multiply(new BigDecimal(1000))
-        		.add(new BigDecimal(proposal.getTimestamp().getTime()));
+        		.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(proposal.getTimestamp().getTime()));
         proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
     	proposalDetailsResp.setInBlock(proposal.getBlockNumber());
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), proposalDetailsResp);
