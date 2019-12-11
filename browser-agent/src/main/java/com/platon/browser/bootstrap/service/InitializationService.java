@@ -21,6 +21,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -151,8 +152,7 @@ public class InitializationService {
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
             if (validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 
-            String nodeName="platon.node."+(index+1);
-            staking.setNodeName(nodeName);
+            if(StringUtils.isBlank(staking.getNodeName())) staking.setNodeName("platon.node."+(index+1));
 
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
             PeriodValueElement pve = new PeriodValueElement();
