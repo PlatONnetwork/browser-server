@@ -39,7 +39,7 @@ import java.util.*;
 @Slf4j
 @Service
 public class EpochRetryService {
-    public static final Queue<ConfigChange> EPOCH_CHANGES = new LinkedList<>();
+    private Queue<ConfigChange> epochChanges = new LinkedList<>();
 
     @Autowired
     private BlockChainConfig chainConfig;
@@ -202,7 +202,7 @@ public class EpochRetryService {
             stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()), 10, RoundingMode.FLOOR);
 
             configChange.setStakeReward(stakeReward);
-            EPOCH_CHANGES.offer(configChange);
+            epochChanges.offer(configChange);
 
             applyConfigChange();
         } catch (Exception e) {
@@ -243,8 +243,8 @@ public class EpochRetryService {
      */
     public void applyConfigChange(){
         ConfigChange summary = new ConfigChange();
-        while (EPOCH_CHANGES.peek()!=null){
-            ConfigChange configChange = EPOCH_CHANGES.poll();
+        while (epochChanges.peek()!=null){
+            ConfigChange configChange = epochChanges.poll();
 
             if(configChange.getIssueEpoch()!=null){
                 // 更新增发周期轮数
