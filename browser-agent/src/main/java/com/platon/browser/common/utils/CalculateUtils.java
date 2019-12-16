@@ -166,7 +166,11 @@ public class CalculateUtils {
 	 */
 	public static void rotateCost(Staking staking,BigInteger curSettingEpoch,AnnualizedRateInfo ari,BlockChainConfig chainConfig) {
 		// 添加下一周期的质押成本
-		BigDecimal cost = staking.getStakingLocked().add(staking.getStakingHes());
+		//
+		BigDecimal cost = staking.getStakingLocked() // 锁定的质押金
+				.add(staking.getStakingHes()) // 犹豫期的质押金
+				.add(staking.getStatDelegateHes()) // 犹豫期的委托金
+				.add(staking.getStatDelegateLocked()); // 锁定的委托金
 		if(curSettingEpoch.longValue()==0) cost=BigDecimal.ZERO;
 		PeriodValueElement pve = new PeriodValueElement();
 		pve.setPeriod(curSettingEpoch.longValue());

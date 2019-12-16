@@ -12,7 +12,8 @@ import com.platon.browser.res.proposal.ProposalListResp;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProposalServiceImplTest extends TestBase{
     @Autowired

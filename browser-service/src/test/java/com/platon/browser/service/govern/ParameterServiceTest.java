@@ -9,6 +9,8 @@ import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.sdk.contracts.ppos.ProposalContract;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
+import com.platon.sdk.contracts.ppos.dto.resp.ParamItem;
+import com.platon.sdk.contracts.ppos.dto.resp.ParamValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -206,6 +209,27 @@ public class ParameterServiceTest {
 
         when(configMapper.selectByExample(null)).thenReturn(configList);
 
+        ProposalContract proposalContract = mock(ProposalContract.class);
+        when(platOnClient.getProposalContract()).thenReturn(proposalContract);
+        RemoteCall remoteCall = mock(RemoteCall.class);
+        when(proposalContract.getParamList(any())).thenReturn(remoteCall);
+        CallResponse response = mock(CallResponse.class);
+        when(remoteCall.send()).thenReturn(response);
+
+        List<GovernParam> governParamList = new ArrayList<>();
+        GovernParam gp = new GovernParam();
+        ParamItem pi = new ParamItem();
+        pi.setName("maxValidators");
+        pi.setModule("staking");
+        pi.setDesc("staking");
+        gp.setParamItem(pi);
+        ParamValue pv = new ParamValue();
+        pv.setActiveBlock("3333");
+        pv.setStaleValue("5555");
+        pv.setValue("3333");
+        gp.setParamValue(pv);
+        governParamList.add(gp);
+        when(response.getData()).thenReturn(governParamList);
     }
 
     @Test
