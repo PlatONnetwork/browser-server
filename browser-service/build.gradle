@@ -25,6 +25,8 @@ sonarqube {
                 "**/JdkSerializer.java,**/JedisClusterManager.java," +
                 "**/JedisHelper.java,**/SerializerUtils.java,**/*Application.java," +
                 "**/BusinessException.java,**/I18nUtil.java,**/HttpUtil.java," +
-                "**/RedisStatisticService.java,**/RedisService.java"
+                "**/RedisStatisticService.java,**/RedisService.java,**/JedisSerializeUtil.java," +
+                "**/PlatOnClient.java,**/RetryableClient.java,**/SleepUtil.java," +
+                "**/CacheBase.java,**/NullStringJsonSerializer.java,**/RoundCalculation.java"
     }
 }
