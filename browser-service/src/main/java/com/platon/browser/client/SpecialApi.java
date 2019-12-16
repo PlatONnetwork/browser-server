@@ -76,7 +76,6 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
 	private CallResponse<String> rpc(Web3j web3j, PlatOnFunction function, String from, String to) throws ContractInvokeException {
         CallResponse<String> br;
         try {

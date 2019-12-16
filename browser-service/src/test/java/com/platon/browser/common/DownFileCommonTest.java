@@ -1,25 +1,29 @@
 package com.platon.browser.common;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class DownFileCommonTest {
 
-	@Mock
-	private DownFileCommon downFileCommon;
-	
 	@Test
 	public void testDownload() throws IOException {
-		HttpServletResponse httpServletResponse = Mockito.mock(HttpServletResponse.class);
+		DownFileCommon downFileCommon = new DownFileCommon();
+		HttpServletResponse httpServletResponse = EasyMock.createMock(HttpServletResponse.class);
 		byte[] data = new byte[0];
-		downFileCommon.download(httpServletResponse, "1.csv", 0, data);
+		try {
+			downFileCommon.download(httpServletResponse, "1.csv", 0, data);
+		} catch (Exception e) {
+			assertEquals(e.getMessage(), null);
+		}
+		
 	}
 }

@@ -75,6 +75,7 @@ subprojects {
     sonarqube {
         properties {
             property "sonar.sources", "src/main/java"
+            property "sonar.exclusions", "**/*Application.java,**/WebSocketController.java,**/BrowserCache.java,**/JedisNoResultCall.java"
         }
     }
 
@@ -106,9 +107,6 @@ subprojects {
 	    exclude '**/SlashContractTest.class'
 	    exclude '**/TransactionSender.class'
 	    exclude '**/CustomNodeMapperTest.class'
-	    exclude '**/*Application.class'
-	    exclude '**/WebSocketController.class'
-	    exclude '**/BrowserCache.class'
 	}
 }
 

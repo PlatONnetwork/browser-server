@@ -12,6 +12,7 @@ import com.platon.browser.BrowserServiceApplication;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.DelegationESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=testdelete")
@@ -32,6 +33,17 @@ public class ESQueryServiceImplTest {
 			blockESRepository.createIndex(null);
 		}
 		if(blockESRepository.existsIndex()) {
+			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+			constructor.setDesc("num");
+			constructor.setFrom(1);
+			constructor.setSize(10);
+			constructor.mustNot(new ESQueryBuilders().term("num", "1"));
+			constructor.should(new ESQueryBuilders().term("nodeId", "0x"));
+			try {
+				blockESRepository.search(constructor, Block.class, 1, 100);
+			} catch (IOException e) {
+				
+			}
 			blockESRepository.deleteIndex();
 		}
 	}

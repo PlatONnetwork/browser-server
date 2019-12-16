@@ -1,7 +1,6 @@
 package com.platon.browser.elasticsearch;
 
 import com.platon.browser.elasticsearch.BlockESRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.when;
  * @Date: 2019/12/4
  * @Description: elasticsearch通用操作测试类
  */
-@Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockESRepositoryTest {
     @Mock

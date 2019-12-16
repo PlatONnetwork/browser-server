@@ -9,8 +9,8 @@ import com.platon.browser.now.service.VoteService;
 import com.platon.browser.req.proposal.VoteListRequest;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.VoteListResp;
-import com.platon.browser.util.BeanConvertUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -49,7 +49,8 @@ public class VoteServiceImpl implements VoteService {
         if (!CollectionUtils.isEmpty(votes)) {
             List<VoteListResp> voteListResps = new ArrayList<>(votes.size());
             votes.forEach(vote -> {
-                VoteListResp resp = BeanConvertUtil.beanConvert(vote, VoteListResp.class);
+                VoteListResp resp = new VoteListResp();
+                BeanUtils.copyProperties(vote, resp);
                 resp.setVoter(vote.getNodeId());
                 resp.setVoterName(vote.getNodeName());
                 resp.setTxHash(vote.getHash());

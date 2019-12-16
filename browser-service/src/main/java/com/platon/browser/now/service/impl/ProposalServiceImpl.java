@@ -20,7 +20,6 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
-import com.platon.browser.util.BeanConvertUtil;
 import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.VerUtil;
@@ -28,6 +27,7 @@ import com.platon.browser.utils.VerUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -76,7 +76,8 @@ public class ProposalServiceImpl implements ProposalService {
         if (!CollectionUtils.isEmpty(list)) {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());
             for (Proposal proposal : list) {
-                ProposalListResp proposalListResp = BeanConvertUtil.beanConvert(proposal, ProposalListResp.class);
+            	ProposalListResp proposalListResp = new ProposalListResp();
+                BeanUtils.copyProperties(proposal, proposalListResp);
                 proposalListResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
                 proposalListResp.setProposalHash(proposal.getHash());
                 /** 获取统计的最新块高 */
@@ -101,7 +102,8 @@ public class ProposalServiceImpl implements ProposalService {
             logger.error("## ERROR # get record not exist proposalHash:{}", req.getProposalHash());
             return BaseResp.build(ErrorCodeEnum.RECORD_NOT_EXIST.getCode(), i18n.i(I18nEnum.RECORD_NOT_EXIST, req.getProposalHash()), null);
         }
-        ProposalDetailsResp proposalDetailsResp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
+        ProposalDetailsResp proposalDetailsResp = new ProposalDetailsResp();
+        BeanUtils.copyProperties(proposal, proposalDetailsResp);
         proposalDetailsResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
         proposalDetailsResp.setProposalHash(req.getProposalHash());
         proposalDetailsResp.setNodeId(proposal.getNodeId());

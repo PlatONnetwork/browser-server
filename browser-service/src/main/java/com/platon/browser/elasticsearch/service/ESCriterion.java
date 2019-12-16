@@ -18,19 +18,19 @@ public interface ESCriterion {
         TERM, TERMS, RANGE, FUZZY, QUERY_STRING, MISSING
     }
 	
-	/**
-	 * match枚举
-	 */
-	public enum MatchMode {  
-		START, END, ANYWHERE
-	}  
-	
-	/**
-	 * 算法枚举
-	 */
-	public enum Projection {
-		MAX, MIN, AVG, LENGTH, SUM, COUNT
-	}
+//	/**
+//	 * match枚举
+//	 */
+//	public enum MatchMode {  
+//		START, END, ANYWHERE
+//	}  
+//	
+//	/**
+//	 * 算法枚举
+//	 */
+//	public enum Projection {
+//		MAX, MIN, AVG, LENGTH, SUM, COUNT
+//	}
 
 	public List<QueryBuilder> listBuilders();
 }
