@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +71,10 @@ public class ProposalVoteConverterTest extends AgentTestBase {
 				tx = collectionTransaction;
 			}
 		}
+		tx.setStatus(Transaction.StatusEnum.FAILURE.getCode());
 		target.convert(collectionEvent,tx);
+		tx.setStatus(Transaction.StatusEnum.SUCCESS.getCode());
+		target.convert(collectionEvent,tx);
+		assertTrue(true);
 	}
 }
