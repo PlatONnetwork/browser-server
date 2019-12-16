@@ -19,7 +19,7 @@ public class VoteServiceImplTest extends TestBase{
 	@Test
 	public void queryByProposal() {
 		VoteListRequest request = new VoteListRequest();
-		request.setProposalHash("0x529cddffab0b0a3b4c2c6df10a9fcbaa452d3ac20e987f9e5a1b11f5b15c3972");
+		request.setProposalHash("0xb851e45c6894ecd2737aad0112001d64fd8e14877010767406665f5efe9f45e7");
 		RespPage<VoteListResp> resp = voteService.queryByProposal(request);
 		assertNotNull(resp);
 	}

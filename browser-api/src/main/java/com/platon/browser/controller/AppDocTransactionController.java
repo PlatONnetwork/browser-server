@@ -2,6 +2,7 @@ package com.platon.browser.controller;
 
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.DownFileCommon;
+import com.platon.browser.config.CommonMethod;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -23,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.WebAsyncTask;
-
-import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -54,10 +53,7 @@ public class AppDocTransactionController implements AppDocTransaction {
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionList(@Valid PageReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> transactionService.getTransactionList(req));
-        webAsyncTask.onTimeout(() -> {
-            // 超时的时候，直接抛异常，让外层统一处理超时异常
-            throw new TimeoutException("System busy!");
-        });
+        CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
 
@@ -65,10 +61,7 @@ public class AppDocTransactionController implements AppDocTransaction {
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@Valid TransactionListByBlockRequest req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> transactionService.getTransactionListByBlock(req));
-        webAsyncTask.onTimeout(() -> {
-            // 超时的时候，直接抛异常，让外层统一处理超时异常
-            throw new TimeoutException("System busy!");
-        });
+        CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
 
@@ -76,10 +69,7 @@ public class AppDocTransactionController implements AppDocTransaction {
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@Valid TransactionListByAddressRequest req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> transactionService.getTransactionListByAddress(req));
-        webAsyncTask.onTimeout(() -> {
-            // 超时的时候，直接抛异常，让外层统一处理超时异常
-            throw new TimeoutException("System busy!");
-        });
+        CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
 
@@ -102,10 +92,7 @@ public class AppDocTransactionController implements AppDocTransaction {
             TransactionDetailsResp transactionDetailsResp = transactionService.transactionDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailsResp);
         });
-        webAsyncTask.onTimeout(() -> {
-            // 超时的时候，直接抛异常，让外层统一处理超时异常
-            throw new TimeoutException("System busy!");
-        });
+        CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
 

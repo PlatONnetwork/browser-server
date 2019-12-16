@@ -15,12 +15,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
+
 public class ProposalServiceImplTest extends TestBase{
     @Autowired
     private ProposalService proposalService;
     @Autowired
     private VoteService voteService;
+    
+    private String proHash = "";
 
+    @Before
+	public void init() {
+    	PageReq pageReq = new PageReq();
+    	RespPage<ProposalListResp> pages = proposalService.list(pageReq);
+    	if(pages.getData().size()>0) {
+    		proHash = pages.getData().get(0).getProposalHash();
+    	}
+    }
+    
     @Test
     public void list() {
         PageReq pageReq = new PageReq();
@@ -32,6 +45,8 @@ public class ProposalServiceImplTest extends TestBase{
     public void get() {
         ProposalDetailRequest request = new ProposalDetailRequest();
         request.setProposalHash("0x529cddffab0b0a3b4c2c6df10a9fcbaa452d3ac20e987f9e5a1b11f5b15c3972");
+        assertNotNull(proposalService.get(request));
+        request.setProposalHash(proHash);
         assertNotNull(proposalService.get(request));
     }
     @Test

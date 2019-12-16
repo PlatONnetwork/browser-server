@@ -2,8 +2,6 @@ package com.platon.browser.now.service.impl;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Date;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,7 +56,7 @@ public class TransactionServiceImplTest extends TestBase{
 	@Test
 	public void transactionListByAddressDownload() {
 		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
-		AccountDownload accountDownload = this.transactionService.transactionListByAddressDownload(address, new Date().getTime(), "en", "+8");
+		AccountDownload accountDownload = this.transactionService.transactionListByAddressDownload(address, 1560099928000l, "en", "+8");
 		assertNotNull(accountDownload.getData());
 	}
 	
