@@ -32,7 +32,7 @@ import java.util.*;
  * @Date: 2019/8/10 16:12
  * @Description:
  */
-@Data
+
 @Slf4j
 @Configuration
 @ConfigurationProperties(prefix="platon")
@@ -259,5 +259,421 @@ public class BlockChainConfig {
         this.setStakeRewardRate(BigDecimal.ONE.subtract(this.blockRewardRate));
         //【奖励】Platon基金会年限
         this.setPlatOnFoundationYear(dec.getReward().getPlatonFoundationYear());
+    }
+
+    public ConfigMapper getConfigMapper () {
+        return configMapper;
+    }
+
+    public void setConfigMapper ( ConfigMapper configMapper ) {
+        this.configMapper = configMapper;
+    }
+
+    public PlatOnClient getClient () {
+        return client;
+    }
+
+    public void setClient ( PlatOnClient client ) {
+        this.client = client;
+    }
+
+    public BigDecimal getMaxBlockGasLimit () {
+        return maxBlockGasLimit;
+    }
+
+    public void setMaxBlockGasLimit ( BigDecimal maxBlockGasLimit ) {
+        this.maxBlockGasLimit = maxBlockGasLimit;
+    }
+
+    public BigInteger getExpectBlockCount () {
+        return expectBlockCount;
+    }
+
+    public void setExpectBlockCount ( BigInteger expectBlockCount ) {
+        this.expectBlockCount = expectBlockCount;
+    }
+
+    public BigInteger getConsensusValidatorCount () {
+        return consensusValidatorCount;
+    }
+
+    public void setConsensusValidatorCount ( BigInteger consensusValidatorCount ) {
+        this.consensusValidatorCount = consensusValidatorCount;
+    }
+
+    public BigInteger getSettlementValidatorCount () {
+        return settlementValidatorCount;
+    }
+
+    public void setSettlementValidatorCount ( BigInteger settlementValidatorCount ) {
+        this.settlementValidatorCount = settlementValidatorCount;
+    }
+
+    public BigInteger getAdditionalCycleMinutes () {
+        return additionalCycleMinutes;
+    }
+
+    public void setAdditionalCycleMinutes ( BigInteger additionalCycleMinutes ) {
+        this.additionalCycleMinutes = additionalCycleMinutes;
+    }
+
+    public BigInteger getSettlementCycleMinutes () {
+        return settlementCycleMinutes;
+    }
+
+    public void setSettlementCycleMinutes ( BigInteger settlementCycleMinutes ) {
+        this.settlementCycleMinutes = settlementCycleMinutes;
+    }
+
+    public BigInteger getSettlePeriodCountPerIssue () {
+        return settlePeriodCountPerIssue;
+    }
+
+    public void setSettlePeriodCountPerIssue ( BigInteger settlePeriodCountPerIssue ) {
+        this.settlePeriodCountPerIssue = settlePeriodCountPerIssue;
+    }
+
+    public BigInteger getBlockInterval () {
+        return blockInterval;
+    }
+
+    public void setBlockInterval ( BigInteger blockInterval ) {
+        this.blockInterval = blockInterval;
+    }
+
+    public BigInteger getConsensusPeriodBlockCount () {
+        return consensusPeriodBlockCount;
+    }
+
+    public void setConsensusPeriodBlockCount ( BigInteger consensusPeriodBlockCount ) {
+        this.consensusPeriodBlockCount = consensusPeriodBlockCount;
+    }
+
+    public BigInteger getSettlePeriodBlockCount () {
+        return settlePeriodBlockCount;
+    }
+
+    public void setSettlePeriodBlockCount ( BigInteger settlePeriodBlockCount ) {
+        this.settlePeriodBlockCount = settlePeriodBlockCount;
+    }
+
+    public BigInteger getAddIssuePeriodBlockCount () {
+        return addIssuePeriodBlockCount;
+    }
+
+    public void setAddIssuePeriodBlockCount ( BigInteger addIssuePeriodBlockCount ) {
+        this.addIssuePeriodBlockCount = addIssuePeriodBlockCount;
+    }
+
+    public String getPlatOnFundAccount () {
+        return platOnFundAccount;
+    }
+
+    public void setPlatOnFundAccount ( String platOnFundAccount ) {
+        this.platOnFundAccount = platOnFundAccount;
+    }
+
+    public BigDecimal getPlatOnFundInitAmount () {
+        return platOnFundInitAmount;
+    }
+
+    public void setPlatOnFundInitAmount ( BigDecimal platOnFundInitAmount ) {
+        this.platOnFundInitAmount = platOnFundInitAmount;
+    }
+
+    public String getCommunityFundAccount () {
+        return communityFundAccount;
+    }
+
+    public void setCommunityFundAccount ( String communityFundAccount ) {
+        this.communityFundAccount = communityFundAccount;
+    }
+
+    public BigDecimal getCommunityFundInitAmount () {
+        return communityFundInitAmount;
+    }
+
+    public void setCommunityFundInitAmount ( BigDecimal communityFundInitAmount ) {
+        this.communityFundInitAmount = communityFundInitAmount;
+    }
+
+    public BigDecimal getStakeThreshold () {
+        return stakeThreshold;
+    }
+
+    public void setStakeThreshold ( BigDecimal stakeThreshold ) {
+        this.stakeThreshold = stakeThreshold;
+    }
+
+    public BigDecimal getDelegateThreshold () {
+        return delegateThreshold;
+    }
+
+    public void setDelegateThreshold ( BigDecimal delegateThreshold ) {
+        this.delegateThreshold = delegateThreshold;
+    }
+
+    public BigInteger getUnStakeRefundSettlePeriodCount () {
+        return unStakeRefundSettlePeriodCount;
+    }
+
+    public void setUnStakeRefundSettlePeriodCount ( BigInteger unStakeRefundSettlePeriodCount ) {
+        this.unStakeRefundSettlePeriodCount = unStakeRefundSettlePeriodCount;
+    }
+
+    public BigDecimal getDuplicateSignRewardRate () {
+        return duplicateSignRewardRate;
+    }
+
+    public void setDuplicateSignRewardRate ( BigDecimal duplicateSignRewardRate ) {
+        this.duplicateSignRewardRate = duplicateSignRewardRate;
+    }
+
+    public BigDecimal getDuplicateSignSlashRate () {
+        return duplicateSignSlashRate;
+    }
+
+    public void setDuplicateSignSlashRate ( BigDecimal duplicateSignSlashRate ) {
+        this.duplicateSignSlashRate = duplicateSignSlashRate;
+    }
+
+    public BigDecimal getEvidenceValidEpoch () {
+        return evidenceValidEpoch;
+    }
+
+    public void setEvidenceValidEpoch ( BigDecimal evidenceValidEpoch ) {
+        this.evidenceValidEpoch = evidenceValidEpoch;
+    }
+
+    public BigDecimal getSlashBlockRewardCount () {
+        return slashBlockRewardCount;
+    }
+
+    public void setSlashBlockRewardCount ( BigDecimal slashBlockRewardCount ) {
+        this.slashBlockRewardCount = slashBlockRewardCount;
+    }
+
+    public BigDecimal getMinProposalTextParticipationRate () {
+        return minProposalTextParticipationRate;
+    }
+
+    public void setMinProposalTextParticipationRate ( BigDecimal minProposalTextParticipationRate ) {
+        this.minProposalTextParticipationRate = minProposalTextParticipationRate;
+    }
+
+    public BigDecimal getMinProposalTextSupportRate () {
+        return minProposalTextSupportRate;
+    }
+
+    public void setMinProposalTextSupportRate ( BigDecimal minProposalTextSupportRate ) {
+        this.minProposalTextSupportRate = minProposalTextSupportRate;
+    }
+
+    public BigDecimal getMinProposalCancelParticipationRate () {
+        return minProposalCancelParticipationRate;
+    }
+
+    public void setMinProposalCancelParticipationRate ( BigDecimal minProposalCancelParticipationRate ) {
+        this.minProposalCancelParticipationRate = minProposalCancelParticipationRate;
+    }
+
+    public BigDecimal getMinProposalCancelSupportRate () {
+        return minProposalCancelSupportRate;
+    }
+
+    public void setMinProposalCancelSupportRate ( BigDecimal minProposalCancelSupportRate ) {
+        this.minProposalCancelSupportRate = minProposalCancelSupportRate;
+    }
+
+    public BigDecimal getMinProposalUpgradePassRate () {
+        return minProposalUpgradePassRate;
+    }
+
+    public void setMinProposalUpgradePassRate ( BigDecimal minProposalUpgradePassRate ) {
+        this.minProposalUpgradePassRate = minProposalUpgradePassRate;
+    }
+
+    public BigDecimal getProposalTextConsensusRounds () {
+        return proposalTextConsensusRounds;
+    }
+
+    public void setProposalTextConsensusRounds ( BigDecimal proposalTextConsensusRounds ) {
+        this.proposalTextConsensusRounds = proposalTextConsensusRounds;
+    }
+
+    public BigDecimal getVersionProposalActiveConsensusRounds () {
+        return versionProposalActiveConsensusRounds;
+    }
+
+    public void setVersionProposalActiveConsensusRounds ( BigDecimal versionProposalActiveConsensusRounds ) {
+        this.versionProposalActiveConsensusRounds = versionProposalActiveConsensusRounds;
+    }
+
+    public BigInteger getParamProposalVoteDurationSeconds () {
+        return paramProposalVoteDurationSeconds;
+    }
+
+    public void setParamProposalVoteDurationSeconds ( BigInteger paramProposalVoteDurationSeconds ) {
+        this.paramProposalVoteDurationSeconds = paramProposalVoteDurationSeconds;
+    }
+
+    public BigDecimal getParamProposalVoteRate () {
+        return paramProposalVoteRate;
+    }
+
+    public void setParamProposalVoteRate ( BigDecimal paramProposalVoteRate ) {
+        this.paramProposalVoteRate = paramProposalVoteRate;
+    }
+
+    public BigDecimal getParamProposalSupportRate () {
+        return paramProposalSupportRate;
+    }
+
+    public void setParamProposalSupportRate ( BigDecimal paramProposalSupportRate ) {
+        this.paramProposalSupportRate = paramProposalSupportRate;
+    }
+
+    public BigDecimal getBlockRewardRate () {
+        return blockRewardRate;
+    }
+
+    public void setBlockRewardRate ( BigDecimal blockRewardRate ) {
+        this.blockRewardRate = blockRewardRate;
+    }
+
+    public BigDecimal getStakeRewardRate () {
+        return stakeRewardRate;
+    }
+
+    public void setStakeRewardRate ( BigDecimal stakeRewardRate ) {
+        this.stakeRewardRate = stakeRewardRate;
+    }
+
+    public BigInteger getPlatOnFoundationYear () {
+        return platOnFoundationYear;
+    }
+
+    public void setPlatOnFoundationYear ( BigInteger platOnFoundationYear ) {
+        this.platOnFoundationYear = platOnFoundationYear;
+    }
+
+    public BigDecimal getIssueEpochRound () {
+        return issueEpochRound;
+    }
+
+    public void setIssueEpochRound ( BigDecimal issueEpochRound ) {
+        this.issueEpochRound = issueEpochRound;
+    }
+
+    public BigDecimal getIssueEpochStartBlockNumber () {
+        return issueEpochStartBlockNumber;
+    }
+
+    public void setIssueEpochStartBlockNumber ( BigDecimal issueEpochStartBlockNumber ) {
+        this.issueEpochStartBlockNumber = issueEpochStartBlockNumber;
+    }
+
+    public BigDecimal getIssueEpochEndBlockNumber () {
+        return issueEpochEndBlockNumber;
+    }
+
+    public void setIssueEpochEndBlockNumber ( BigDecimal issueEpochEndBlockNumber ) {
+        this.issueEpochEndBlockNumber = issueEpochEndBlockNumber;
+    }
+
+    public BigInteger getMaxSettlePeriodCount4AnnualizedRateStat () {
+        return maxSettlePeriodCount4AnnualizedRateStat;
+    }
+
+    public void setMaxSettlePeriodCount4AnnualizedRateStat ( BigInteger maxSettlePeriodCount4AnnualizedRateStat ) {
+        this.maxSettlePeriodCount4AnnualizedRateStat = maxSettlePeriodCount4AnnualizedRateStat;
+    }
+
+    public BigDecimal getInitIssueAmount () {
+        return initIssueAmount;
+    }
+
+    public void setInitIssueAmount ( BigDecimal initIssueAmount ) {
+        this.initIssueAmount = initIssueAmount;
+    }
+
+    public BigDecimal getAddIssueRate () {
+        return addIssueRate;
+    }
+
+    public void setAddIssueRate ( BigDecimal addIssueRate ) {
+        this.addIssueRate = addIssueRate;
+    }
+
+    public BigDecimal getIncentiveRateFromIssue () {
+        return incentiveRateFromIssue;
+    }
+
+    public void setIncentiveRateFromIssue ( BigDecimal incentiveRateFromIssue ) {
+        this.incentiveRateFromIssue = incentiveRateFromIssue;
+    }
+
+    public BigInteger getElectionBackwardBlockCount () {
+        return electionBackwardBlockCount;
+    }
+
+    public void setElectionBackwardBlockCount ( BigInteger electionBackwardBlockCount ) {
+        this.electionBackwardBlockCount = electionBackwardBlockCount;
+    }
+
+    public Map <Integer, BigDecimal> getFoundationSubsidies () {
+        return foundationSubsidies;
+    }
+
+    public void setFoundationSubsidies ( Map <Integer, BigDecimal> foundationSubsidies ) {
+        this.foundationSubsidies = foundationSubsidies;
+    }
+
+    public String getProposalUrlTemplate () {
+        return proposalUrlTemplate;
+    }
+
+    public void setProposalUrlTemplate ( String proposalUrlTemplate ) {
+        this.proposalUrlTemplate = proposalUrlTemplate;
+    }
+
+    public String getProposalPipNumTemplate () {
+        return proposalPipNumTemplate;
+    }
+
+    public void setProposalPipNumTemplate ( String proposalPipNumTemplate ) {
+        this.proposalPipNumTemplate = proposalPipNumTemplate;
+    }
+
+    public String getKeyBase () {
+        return keyBase;
+    }
+
+    public void setKeyBase ( String keyBase ) {
+        this.keyBase = keyBase;
+    }
+
+    public String getKeyBaseApi () {
+        return keyBaseApi;
+    }
+
+    public void setKeyBaseApi ( String keyBaseApi ) {
+        this.keyBaseApi = keyBaseApi;
+    }
+
+    public BigDecimal getDefaultStakingLockedAmount () {
+        return defaultStakingLockedAmount;
+    }
+
+    public void setDefaultStakingLockedAmount ( BigDecimal defaultStakingLockedAmount ) {
+        this.defaultStakingLockedAmount = defaultStakingLockedAmount;
+    }
+
+    public List <CustomStaking> getDefaultStakingList () {
+        return defaultStakingList;
+    }
+
+    public void setDefaultStakingList ( List <CustomStaking> defaultStakingList ) {
+        this.defaultStakingList = defaultStakingList;
     }
 }
