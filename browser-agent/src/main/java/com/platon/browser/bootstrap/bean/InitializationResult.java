@@ -1,7 +1,5 @@
 package com.platon.browser.bootstrap.bean;
 
-import lombok.Data;
-
 /**
  * @description: 初始化结果
  * @author: chendongming@juzix.net

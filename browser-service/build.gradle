@@ -17,3 +17,14 @@ dependencies {
     compile group: 'redis.clients', name: 'jedis', version: '3.1.0'
 
 }
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "**/KeyBaseAnalysis.java," +
+                "**/SpecialApi.java,**/JedisNoResultCall.java," +
+                "**/JdkSerializer.java,**/JedisClusterManager.java," +
+                "**/JedisHelper.java,**/SerializerUtils.java,**/*Application.java," +
+                "**/BusinessException.java,**/I18nUtil.java,**/HttpUtil.java," +
+                "**/RedisStatisticService.java,**/RedisService.java"
+    }
+}

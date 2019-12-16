@@ -18,6 +18,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public class InitializationService {
     private ParamProposalCache paramProposalCache;
 
     @Transactional
-    public InitializationResult init() throws Exception {
+    public InitializationResult init() {
         // 初始化参数提案缓存：把所有状态为投票中的参数提案缓存到内存中
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
@@ -76,7 +77,12 @@ public class InitializationService {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if(networkStat==null){
             // 确保chainConfig先就绪
-            parameterService.initConfigTable();
+            try {
+                parameterService.initConfigTable();
+            } catch (Exception e) {
+                log.error("",e);
+                throw new BusinessException("初始化错误:"+e.getMessage());
+            }
 
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
@@ -123,7 +129,7 @@ public class InitializationService {
      * 初始化入库内部质押节点
      * @throws Exception
      */
-    private List<com.platon.browser.dao.entity.Node> initInnerStake() throws Exception {
+    private List<com.platon.browser.dao.entity.Node> initInnerStake() {
         epochRetryService.issueChange(BigInteger.ZERO);
         epochRetryService.settlementChange(BigInteger.ZERO);
         epochRetryService.consensusChange(BigInteger.ZERO);

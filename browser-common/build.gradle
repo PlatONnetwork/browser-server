@@ -18,6 +18,10 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "src/main/java/**/dao/**,src/main/java/**/param/**,src/main/java/**/dto/**,src/main/java/**/utils/ClassUtil.java"
+        property "sonar.exclusions", "src/main/java/**/dao/**," +
+                "src/main/java/**/param/**," +
+                "src/main/java/**/dto/**," +
+                "src/main/java/**/utils/ClassUtil.java," +
+                "**/RedisImportService.java"
     }
 }

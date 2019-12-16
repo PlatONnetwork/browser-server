@@ -20,14 +20,6 @@ dependencies {
     testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
 }
 
-sonarqube {
-    properties {
-        property "sonar.exclusions", "src/main/java/**/dao/param**,**/*Mapper.java," +
-                "**/*Application.java,**/NodeUpdateTask.java,**/NetworkStatUpdateTask.java," +
-                "**/ProposalInfoTask.java,**/AddressUpdateTask.java,**/EpochMessage.java," +
-                "**/NetworkStatCache.java,**/ShutdownCallback.java,**/AccountService.java"
-    }
-}
 //判断 build命令是否指定属性 profile。
 //例如 gradle buildTar -xtest -Pprofile=online
 
@@ -131,3 +123,13 @@ task buildTar(dependsOn: [
         monitorDistTar
 ]){}
 
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "src/main/java/**/dao/param**,**/*Mapper.java," +
+                "**/*Application.java,**/NodeUpdateTask.java,**/NetworkStatUpdateTask.java," +
+                "**/ProposalInfoTask.java,**/AddressUpdateTask.java,**/EpochMessage.java," +
+                "**/NetworkStatCache.java,**/ShutdownCallback.java,**/AccountService.java," +
+                "**/OnSettleConverter.java"
+    }
+}
