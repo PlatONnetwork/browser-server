@@ -1,10 +1,12 @@
 package com.platon.browser.client;
 
+
 /**
  * @Auther: dongqile
  * @Date: 2019/9/6
  * @Description:
  */
+
 public class AccuVerifiersCount {
     private Integer accuVerifiers = 0 ;
     private Integer yeas = 0 ;
@@ -18,36 +20,35 @@ public class AccuVerifiersCount {
         this.setAbstentions(Integer.valueOf(abstentions));
     }
 
-	public Integer getAccuVerifiers() {
+	public Integer getAccuVerifiers () {
 		return accuVerifiers;
 	}
 
-	public void setAccuVerifiers(Integer accuVerifiers) {
+	public void setAccuVerifiers ( Integer accuVerifiers ) {
 		this.accuVerifiers = accuVerifiers;
 	}
 
-	public Integer getYeas() {
+	public Integer getYeas () {
 		return yeas;
 	}
 
-	public void setYeas(Integer yeas) {
+	public void setYeas ( Integer yeas ) {
 		this.yeas = yeas;
 	}
 
-	public Integer getNays() {
+	public Integer getNays () {
 		return nays;
 	}
 
-	public void setNays(Integer nays) {
+	public void setNays ( Integer nays ) {
 		this.nays = nays;
 	}
 
-	public Integer getAbstentions() {
+	public Integer getAbstentions () {
 		return abstentions;
 	}
 
-	public void setAbstentions(Integer abstentions) {
+	public void setAbstentions ( Integer abstentions ) {
 		this.abstentions = abstentions;
 	}
-    
 }
