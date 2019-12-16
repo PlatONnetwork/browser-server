@@ -1,7 +1,6 @@
 package com.platon.browser.client;
 
 import com.platon.browser.utils.HexTool;
-import lombok.Data;
 import org.web3j.protocol.core.Response;
 
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
-@Data
 public class ReceiptResult extends Response<List<Receipt>> {
     private Map<String,Receipt> map = new ConcurrentHashMap<>();
 
@@ -33,4 +31,13 @@ public class ReceiptResult extends Response<List<Receipt>> {
         });
         latch.await();
     }
+
+	public Map<String, Receipt> getMap() {
+		return map;
+	}
+
+	public void setMap(Map<String, Receipt> map) {
+		this.map = map;
+	}
+    
 }

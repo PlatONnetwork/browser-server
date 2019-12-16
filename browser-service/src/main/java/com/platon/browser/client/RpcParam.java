@@ -1,13 +1,11 @@
 package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
-import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@Data
 public class RpcParam {
     private static final Random r = new Random();
     private int id;
@@ -20,4 +18,32 @@ public class RpcParam {
     public String toJsonString(){
         return JSON.toJSONString(this);
     }
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getJsonrpc() {
+		return jsonrpc;
+	}
+	public void setJsonrpc(String jsonrpc) {
+		this.jsonrpc = jsonrpc;
+	}
+	public String getMethod() {
+		return method;
+	}
+	public void setMethod(String method) {
+		this.method = method;
+	}
+	public List<Long> getParams() {
+		return params;
+	}
+	public void setParams(List<Long> params) {
+		this.params = params;
+	}
+	public static Random getR() {
+		return r;
+	}
+    
 }

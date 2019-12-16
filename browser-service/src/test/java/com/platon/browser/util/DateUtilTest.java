@@ -48,4 +48,15 @@ public class DateUtilTest {
 		assertTrue("Tue Sep 10 2019 02:50:46".equals(gmtStr));
 	}
 
+	@Test
+	public void testTimeZoneTransfer(){
+		Date date = new Date(1568083846564L);
+		String dataStr = DateUtil.timeZoneTransfer(date, "0", "+8");
+		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
+		dataStr = DateUtil.timeZoneTransfer(date, "EEE MMM dd yyyy HH:mm:ss", "0", "+8");
+		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
+		dataStr = DateUtil.timeZoneTransferUTC(date, "EEE MMM dd yyyy HH:mm:ss");
+		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
+	}
+	
 }

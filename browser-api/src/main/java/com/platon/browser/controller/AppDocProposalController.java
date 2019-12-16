@@ -55,8 +55,6 @@ public class AppDocProposalController implements AppDocProposal {
 		// 5s钟没返回，则认为超时
 		WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> proposalService.get(req));
-		webAsyncTask.onCompletion(() -> {
-		});
 		webAsyncTask.onTimeout(() -> {
 			// 超时的时候，直接抛异常，让外层统一处理超时异常
 			throw new TimeoutException("System busy!");
@@ -69,8 +67,6 @@ public class AppDocProposalController implements AppDocProposal {
 		// 5s钟没返回，则认为超时
 		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
 			return voteService.queryByProposal(req);
-		});
-		webAsyncTask.onCompletion(() -> {
 		});
 		webAsyncTask.onTimeout(() -> {
 			// 超时的时候，直接抛异常，让外层统一处理超时异常

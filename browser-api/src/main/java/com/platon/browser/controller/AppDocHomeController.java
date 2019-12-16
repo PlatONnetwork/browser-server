@@ -44,8 +44,6 @@ public class AppDocHomeController implements AppDocHome {
                  throw new ResponseException(be.getErrorMessage());
              }
         });
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -60,11 +58,6 @@ public class AppDocHomeController implements AppDocHome {
             BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
         });
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -78,8 +71,6 @@ public class AppDocHomeController implements AppDocHome {
         WebAsyncTask<BaseResp<ChainStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
-        });
-        webAsyncTask.onCompletion(() -> {
         });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
@@ -98,8 +89,6 @@ public class AppDocHomeController implements AppDocHome {
              */
             stakingListNewResp.setIsRefresh(true);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
-        });
-        webAsyncTask.onCompletion(() -> {
         });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常

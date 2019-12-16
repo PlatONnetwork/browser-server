@@ -52,8 +52,6 @@ public class AppDocStakingController implements AppDocStaking {
 	public WebAsyncTask<RespPage<AliveStakingListResp>> aliveStakingList(@Valid AliveStakingListReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.aliveStakingList(req));
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -65,8 +63,6 @@ public class AppDocStakingController implements AppDocStaking {
 	public WebAsyncTask<RespPage<HistoryStakingListResp>> historyStakingList(@Valid HistoryStakingListReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<HistoryStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.historyStakingList(req));
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -78,8 +74,6 @@ public class AppDocStakingController implements AppDocStaking {
 	public WebAsyncTask<BaseResp<StakingDetailsResp>> stakingDetails(@Valid StakingDetailsReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.stakingDetails(req));
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -91,8 +85,6 @@ public class AppDocStakingController implements AppDocStaking {
 	public WebAsyncTask<RespPage<StakingOptRecordListResp>> stakingOptRecordList(@Valid StakingOptRecordListReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.stakingOptRecordList(req));
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -104,8 +96,6 @@ public class AppDocStakingController implements AppDocStaking {
 	public WebAsyncTask<RespPage<DelegationListByStakingResp>> delegationListByStaking(@Valid DelegationListByStakingReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.delegationListByStaking(req));
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -117,8 +107,6 @@ public class AppDocStakingController implements AppDocStaking {
 	public WebAsyncTask<RespPage<DelegationListByAddressResp>> delegationListByAddress(@Valid DelegationListByAddressReq req) {
 		// 5s钟没返回，则认为超时  
         WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> stakingService.delegationListByAddress(req));
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");

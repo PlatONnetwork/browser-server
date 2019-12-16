@@ -54,8 +54,6 @@ public class AppDocBlockController implements AppDocBlock {
             RespPage<BlockListResp> blockListResps = blockService.blockList(req);
             return blockListResps;
         });
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -70,8 +68,6 @@ public class AppDocBlockController implements AppDocBlock {
             RespPage<BlockListResp> blockListResps = blockService.blockListByNodeId(req);
             return blockListResps;
         });
-        webAsyncTask.onCompletion(() -> {
-        });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");
@@ -85,7 +81,7 @@ public class AppDocBlockController implements AppDocBlock {
 		try {
 			downFileCommon.download(response, blockDownload.getFilename(), blockDownload.getLength(), blockDownload.getData());
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("download error", e);
             throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
 		}
 	}
@@ -96,8 +92,6 @@ public class AppDocBlockController implements AppDocBlock {
         WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             BlockDetailResp blockDetailResp = blockService.blockDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
-        });
-        webAsyncTask.onCompletion(() -> {
         });
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
@@ -113,11 +107,6 @@ public class AppDocBlockController implements AppDocBlock {
             BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
         });
-        webAsyncTask.onCompletion(new Runnable() {  
-            @Override  
-            public void run() {  
-            }  
-        });  
         webAsyncTask.onTimeout(() -> {
             // 超时的时候，直接抛异常，让外层统一处理超时异常
             throw new TimeoutException("System busy!");

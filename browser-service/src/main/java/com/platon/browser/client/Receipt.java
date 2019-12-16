@@ -1,6 +1,5 @@
 package com.platon.browser.client;
 
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.rlp.RlpDecoder;
@@ -12,7 +11,6 @@ import org.web3j.utils.Numeric;
 import java.math.BigInteger;
 import java.util.List;
 
-@Data
 public class Receipt {
     private static final int SUCCESS = 1;
     private static final int FAILURE = 2;
@@ -63,4 +61,69 @@ public class Receipt {
             logStatus=FAILURE;
         }
     }
+
+	public Long getBlockNumber() {
+		return blockNumber;
+	}
+
+	public void setBlockNumber(Long blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+
+	public List<Log> getLogs() {
+		return logs;
+	}
+
+	public void setLogs(List<Log> logs) {
+		this.logs = logs;
+	}
+
+	public String getTransactionHash() {
+		return transactionHash;
+	}
+
+	public void setTransactionHash(String transactionHash) {
+		this.transactionHash = transactionHash;
+	}
+
+	public String getTransactionIndex() {
+		return transactionIndex;
+	}
+
+	public void setTransactionIndex(String transactionIndex) {
+		this.transactionIndex = transactionIndex;
+	}
+
+	public int getLogStatus() {
+		return logStatus;
+	}
+
+	public void setLogStatus(int logStatus) {
+		this.logStatus = logStatus;
+	}
+
+	public String getFailReason() {
+		return failReason;
+	}
+
+	public void setFailReason(String failReason) {
+		this.failReason = failReason;
+	}
+
+	public static int getSuccess() {
+		return SUCCESS;
+	}
+
+	public static int getFailure() {
+		return FAILURE;
+	}
+
+	public void setGasUsed(String gasUsed) {
+		this.gasUsed = gasUsed;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+    
 }
