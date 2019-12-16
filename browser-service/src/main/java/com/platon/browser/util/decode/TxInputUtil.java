@@ -29,7 +29,9 @@ public class TxInputUtil {
                 List <RlpType> rlpTypes = rlpList.getValues();
 
                 if(rlpTypes.size() == 1 && rlpTypes.get(0).getClass().equals(RlpString.class)) {
-                    result.setParam(OthersTxParam.builder().data(((RlpString)rlpTypes.get(0)).asString()).build());
+                    OthersTxParam txParam=new OthersTxParam();
+                    txParam.setData(((RlpString)rlpTypes.get(0)).asString());
+                    result.setParam(txParam);
                     return result;
                 }
 
