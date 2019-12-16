@@ -138,10 +138,6 @@ public class CalculateUtils {
 	 */
 	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig chainConfig)  {
 		// 添加上一周期的收益
-		if(staking.getNodeId().equals("0xff40ac420279ddbe58e1bf1cfe19f4b5978f86e7c483223be26e80ac9790e855cb5d7bd743d94b9bd72be79f01ee068bc1fefe79c06ba9cd49fa96f52c7bdce0")){
-			log.debug("结算周期:{}\n节点ID:{}\n质押奖励:{}\n区块奖励:{}\n交易手续费:{}",curSettingEpoch,staking.getNodeId(),staking.getStakingRewardValue(),staking.getBlockRewardValue(),staking.getFeeRewardValue());
-		}
-
 		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
 		if(curSettingEpoch.longValue()==0) profit=BigDecimal.ZERO;
 		PeriodValueElement pve = new PeriodValueElement();

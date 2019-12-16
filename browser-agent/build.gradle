@@ -22,7 +22,7 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "src/main/java/**/dao/param**"
+        property "sonar.exclusions", "src/main/java/**/dao/param**,**/*Mapper.java,**/*Application.java"
     }
 }
 //判断 build命令是否指定属性 profile。

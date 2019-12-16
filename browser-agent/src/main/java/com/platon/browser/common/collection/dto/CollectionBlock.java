@@ -7,8 +7,6 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
@@ -18,9 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Data
 @Slf4j
-@Accessors(chain = true)
 public class CollectionBlock extends Block {
     private CollectionBlock(){}
     public static CollectionBlock newInstance(){

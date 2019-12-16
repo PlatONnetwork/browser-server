@@ -6,16 +6,12 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.util.decode.DecodedResult;
 import com.platon.browser.util.decode.TxInputUtil;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Data
 @Slf4j
-@Accessors(chain = true)
 public class CollectionTransaction extends Transaction {
     private CollectionTransaction(){}
     public static CollectionTransaction newInstance(){

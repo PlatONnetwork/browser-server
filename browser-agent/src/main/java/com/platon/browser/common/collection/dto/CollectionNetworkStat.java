@@ -1,8 +1,6 @@
 package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.dao.entity.NetworkStat;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -13,9 +11,7 @@ import java.util.Date;
  * @author: chendongming@juzix.net
  * @create: 2019-11-06 10:33:32
  **/
-@Data
 @Slf4j
-@Accessors(chain = true)
 public class CollectionNetworkStat extends NetworkStat {
     private CollectionNetworkStat(){}
     public static CollectionNetworkStat newInstance(){
