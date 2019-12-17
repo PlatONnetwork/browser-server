@@ -1,6 +1,7 @@
 package com.platon.browser.common.complement.cache;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
@@ -20,5 +21,21 @@ public class AddressCacheTest extends AgentTestBase {
         addressCache.update(transactionList.get(0));
         addressCache.getAll();
         addressCache.cleanAll();
+
+        Transaction tx = transactionList.get(0);
+        tx.setType(Transaction.TypeEnum.TRANSFER.getCode());
+        addressCache.update(tx);
+
+        tx.setType(Transaction.TypeEnum.DELEGATE_EXIT.getCode());
+        addressCache.update(tx);
+
+        tx.setType(Transaction.TypeEnum.VERSION_DECLARE.getCode());
+        addressCache.update(tx);
+
+        tx.setFrom("0xddd");
+        tx.setTo("0xddd");
+        addressCache.update(tx);
+
+
     }
 }
