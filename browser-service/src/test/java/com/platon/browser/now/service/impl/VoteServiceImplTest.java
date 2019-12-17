@@ -1,27 +1,58 @@
 package com.platon.browser.now.service.impl;
 
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.platon.browser.TestBase;
+import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dao.mapper.VoteMapper;
 import com.platon.browser.now.service.VoteService;
 import com.platon.browser.req.proposal.VoteListRequest;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.VoteListResp;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
-public class VoteServiceImplTest extends TestBase{
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-	@Autowired
-	private VoteService voteService;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.Silent.class)
+public class VoteServiceImplTest{
+	@Mock
+	private VoteMapper voteMapper;
+
+	@Spy
+	private VoteServiceImpl target;
 
 	@Test
 	public void queryByProposal() {
+		ReflectionTestUtils.setField(target,"voteMapper",voteMapper);
+
+		List<Vote> voteList = new ArrayList<>();
+		Vote vote = new Vote();
+		vote.setCreateTime(new Date());
+		vote.setHash("0xsfsdf");
+		vote.setNodeId("0xsfsfs");
+		vote.setNodeName("test");
+		vote.setOption(3);
+		vote.setProposalHash("0xfsdf");
+		vote.setTimestamp(new Date());
+		vote.setUpdateTime(new Date());
+		voteList.add(vote);
+		when(voteMapper.selectByExample(any())).thenReturn(voteList);
+
 		VoteListRequest request = new VoteListRequest();
+		request.setOption("33");
 		request.setProposalHash("0xb851e45c6894ecd2737aad0112001d64fd8e14877010767406665f5efe9f45e7");
-		RespPage<VoteListResp> resp = voteService.queryByProposal(request);
+		RespPage<VoteListResp> resp = target.queryByProposal(request);
 		assertNotNull(resp);
+
+
 	}
 
 }
