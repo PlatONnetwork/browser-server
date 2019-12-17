@@ -64,14 +64,15 @@ public class BlockParameterServiceTest extends AgentTestBase {
         EpochMessage epochMessage=EpochMessage.newInstance();
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
-        event.setEpochMessage(EpochMessage.newInstance());
+        event.setEpochMessage(epochMessage);
         event.setTransactions(new ArrayList <>(transactionList));
 
         block.setNum(79L);
         epochMessage.setConsensusEpochRound(BigInteger.TEN);
         target.getParameters(event);
-        block.setNum(80L);
+        block.setNum(81L);
         target.getParameters(event);
-        verify(target, times(2)).getParameters(any());
+
+
     }
 }
