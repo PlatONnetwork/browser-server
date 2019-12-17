@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
@@ -41,6 +42,10 @@ public class ReceiptTest {
         receipt.getStatus();
         receipt.getTransactionHash();
         receipt.getTransactionIndex();
+
+        ReceiptResult receiptResult = new ReceiptResult();
+        receiptResult.setMap(Collections.emptyMap());
+        receiptResult.getMap();
 
         assertTrue(true);
     }
