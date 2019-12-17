@@ -60,7 +60,8 @@ public interface AppDocProposal {
      *         "newVersion":"",        //升级提案升级的版本
      *         "paramName":"",         //参数名
      *         "timestamp":123123879,   //提案时间
-     *         "pipNum":1212 //pip num
+     *         "pipNum":1212， //pip num
+     *         "inBlock":""   //所在块高
      *      }
      *   ]
      * }

@@ -54,6 +54,8 @@ public class VoteServiceImpl implements VoteService {
                 resp.setVoter(vote.getNodeId());
                 resp.setVoterName(vote.getNodeName());
                 resp.setTxHash(vote.getHash());
+                resp.setTimestamp(vote.getTimestamp().getTime());
+                resp.setOption(String.valueOf(vote.getOption()));
                 voteListResps.add(resp);
             });
             respPage.setTotalPages(page.getPages());

@@ -80,6 +80,11 @@ public class ProposalServiceImpl implements ProposalService {
                 BeanUtils.copyProperties(proposal, proposalListResp);
                 proposalListResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
                 proposalListResp.setProposalHash(proposal.getHash());
+                proposalListResp.setEndVotingBlock(String.valueOf(proposal.getEndVotingBlock()));
+                proposalListResp.setType(String.valueOf(proposal.getType()));
+                proposalListResp.setStatus(String.valueOf(proposal.getStatus()));
+                proposalListResp.setTimestamp(proposal.getTimestamp().getTime());
+                proposalListResp.setInBlock(proposal.getBlockNumber());
                 /** 获取统计的最新块高 */
                 NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
                 if (networkStatRedis != null) {
@@ -110,6 +115,13 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setNodeName(proposal.getNodeName());
         proposalDetailsResp.setDescription(BrowserConst.INQUIRY.equals(proposal.getDescription())?"":proposal.getDescription());
         proposalDetailsResp.setCanceledTopic(BrowserConst.INQUIRY.equals(proposal.getCanceledTopic())?"":proposal.getCanceledTopic());
+        proposalDetailsResp.setEndVotingBlock(String.valueOf(proposal.getEndVotingBlock()));
+        proposalDetailsResp.setAccuVerifiers(String.valueOf(proposal.getAccuVerifiers()));
+        proposalDetailsResp.setAbstentions(proposal.getAbstentions().intValue());
+        proposalDetailsResp.setActiveBlock(String.valueOf(proposal.getActiveBlock()));
+        proposalDetailsResp.setNays(proposal.getNays().intValue());
+        proposalDetailsResp.setTimestamp(proposal.getTimestamp().getTime());
+        proposalDetailsResp.setYeas(proposal.getYeas().intValue());
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
         proposalDetailsResp.setCurBlock(String.valueOf(networkStat.getCurNumber()));
         /** 不同的类型有不同的通过率 */

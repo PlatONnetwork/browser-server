@@ -25,6 +25,7 @@ public class ProposalListResp {
 	private String newVersion; // 升级提案升级的版本
 	private String paramName; // 参数名
 	private Long timestamp; // 提案时间
+	private Long inBlock; // 提案所在区块
 	public String getPipNum() {
 		return pipNum;
 	}
@@ -97,6 +98,12 @@ public class ProposalListResp {
 	}
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
+	}
+	public Long getInBlock() {
+		return inBlock;
+	}
+	public void setInBlock(Long inBlock) {
+		this.inBlock = inBlock;
 	}
 	
 }
