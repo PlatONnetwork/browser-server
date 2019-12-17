@@ -27,11 +27,18 @@ public class ReceiptTest {
         log.setBlockNumber("");
         log.setTransactionHash("0x22988d54c85c358f83d80e062e4ed0540fd33ce7e9a8267a438be01af987fcfb");
         logs.add(log);
+
         receipt.setLogs(logs);
         receipt.setLogStatus(1);
         receipt.setStatus("0x01");
         receipt.setTransactionHash("0xd34343");
         receipt.setTransactionIndex("98");
+
+        log.setData(null);
+        receipt.decodeLogs();
+
+        receipt.setLogs(null);
+        receipt.decodeLogs();
 
 
         receipt.getBlockNumber();
@@ -42,6 +49,8 @@ public class ReceiptTest {
         receipt.getStatus();
         receipt.getTransactionHash();
         receipt.getTransactionIndex();
+        Receipt.getFailure();
+        Receipt.getSuccess();
 
         ReceiptResult receiptResult = new ReceiptResult();
         receiptResult.setMap(Collections.emptyMap());
