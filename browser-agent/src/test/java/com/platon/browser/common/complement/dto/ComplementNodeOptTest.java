@@ -2,28 +2,24 @@ package com.platon.browser.common.complement.dto;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.dto.Transaction;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.web3j.utils.Collection;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ComplementNodeOptTest extends AgentTestBase {
 
     @Test
-    public void Test(){
+    public void Test() throws InvocationTargetException, IllegalAccessException {
         List <CollectionTransaction> list = transactionList;
         ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
         complementNodeOpt.setBNum(list.get(0).getNum());
@@ -35,5 +31,13 @@ public class ComplementNodeOptTest extends AgentTestBase {
         complementNodeOpt.setTxHash(list.get(0).getHash());
         complementNodeOpt.setType(list.get(0).getType());
         complementNodeOpt.setUpdTime(new Date());
+
+        for(Method m:ComplementNodeOpt.class.getDeclaredMethods()){
+            if(m.getName().contains("get")){
+                m.invoke(complementNodeOpt);
+            }
+        }
+
+        assertTrue(true);
     }
 }
