@@ -38,6 +38,12 @@ public class EsBlockServiceTest extends AgentTestBase {
     public void save() throws IOException {
         target.save(Collections.emptySet());
         Set<Block> data = new HashSet<>();
+        Block block = new Block();
+        block.setNum(33L);
+        data.add(block);
+        target.save(data);
+
+        data.clear();
         data.add(new Block());
         target.save(data);
         doThrow(new RuntimeException("")).when(blockESRepository).bulkAddOrUpdate(anyMap());
