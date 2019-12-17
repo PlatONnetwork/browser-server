@@ -38,6 +38,12 @@ public class EsNodeOptServiceTest extends AgentTestBase {
     public void save() throws IOException {
         target.save(Collections.emptySet());
         Set<NodeOpt> data = new HashSet<>();
+        NodeOpt nodeOpt = new NodeOpt();
+        nodeOpt.setId(888L);
+        data.add(nodeOpt);
+        target.save(data);
+
+        data.clear();
         data.add(new NodeOpt());
         target.save(data);
         doThrow(new RuntimeException("")).when(nodeOptESRepository).bulkAddOrUpdate(anyMap());

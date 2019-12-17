@@ -84,10 +84,4 @@ public class TxInputUtil {
         }
         return result;
     }
-
-    public static void main ( String[] args ) {
-        String date = "0xf889838207d2b842b840e0b6af6cc2e10b2b74540b87098083d48343805a3ff09c655eab0b20dba2b2851aea79ee75b6e150bde58ead0be03ee4a8619ea1dfaf529cbb8ff55ca23531ed8c8b2d3138363034333634313488877374616b696e678f8e7374616b655468726573686f6c649a9931303030303030303030303030303030303030303030303031";
-        DecodedResult res = TxInputUtil.decode(date);
-        log.info("{}",res.getParam().toJSONString());
-    }
 }
