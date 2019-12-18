@@ -27,6 +27,6 @@ sonarqube {
                 "**/BusinessException.java,**/I18nUtil.java,**/HttpUtil.java," +
                 "**/RedisStatisticService.java,**/RedisService.java,**/JedisSerializeUtil.java," +
                 "**/PlatOnClient.java,**/RetryableClient.java,**/SleepUtil.java," +
-                "**/CacheBase.java,**/NullStringJsonSerializer.java,**/RoundCalculation.java"
+                "**/CacheBase.java,**/NullStringJsonSerializer.java,**/RoundCalculation.java,**/DownFileCommon.java"
     }
 }

@@ -78,7 +78,7 @@ subprojects {
             property "sonar.exclusions", "**/*Application.java," +
                     "**/WebSocketController.java,**/BrowserCache.java," +
                     "**/JedisNoResultCall.java,**/CommonMethod.java," +
-                    "**/NullStringJsonSerializer.java,**/DownFileCommon.java"
+                    "**/NullStringJsonSerializer.java"
         }
     }
 
