@@ -170,10 +170,15 @@ public class AddressServiceImpl implements AddressService {
 			} catch (IOException e) {
 				logger.error("获取区块错误。", e);
 			}
+			BigDecimal diff = BigDecimal.valueOf(number - rPlan.getNumber());
 			if(block!=null) {
-				NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-				detailsRPPlanResp.setEstimateTime(new BigDecimal(networkStat.getAvgPackTime()).multiply(BigDecimal.valueOf(number - rPlan.getNumber()))
-				.add(BigDecimal.valueOf(block.getTime().getTime())).longValue());
+				if(diff.compareTo(BigDecimal.ZERO) > 0) {
+					NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+					detailsRPPlanResp.setEstimateTime(new BigDecimal(networkStat.getAvgPackTime()).multiply(diff)
+					.add(BigDecimal.valueOf(block.getTime().getTime())).longValue());
+				} else {
+					detailsRPPlanResp.setEstimateTime(block.getTime().getTime());
+				}
 			}
 			detailsRPPlanResps.add(detailsRPPlanResp);
 		}

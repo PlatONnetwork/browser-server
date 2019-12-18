@@ -238,14 +238,14 @@ public class TransactionServiceImpl implements TransactionService {
         });
         /** 初始化输出流对象 */
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
-        logger.error("download Charset.defaultCharset():{}", StandardCharsets.UTF_8);
         try {
         	/** 设置导出的csv头，防止乱码 */
-            outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
+        	byteArrayOutputStream.write(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF });
         } catch (IOException e) {
         	logger.error("输出数据错误:",e);
         }
+        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
+        logger.error("download Charset.defaultCharset():{}", StandardCharsets.UTF_8);
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         /** 设置导出表的表头 */
         writer.writeHeaders(

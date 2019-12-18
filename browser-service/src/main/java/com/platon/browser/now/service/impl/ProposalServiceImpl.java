@@ -9,6 +9,8 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -58,6 +61,8 @@ public class ProposalServiceImpl implements ProposalService {
     private StatisticCacheService statisticCacheService;
     @Autowired
     private BlockChainConfig blockChainConfig;
+    @Autowired
+    private BlockESRepository blockESRepository;
 
 
     @Override
@@ -156,10 +161,29 @@ public class ProposalServiceImpl implements ProposalService {
 			default:
 				break;
 		}
-        /** 结束时间预估：（生效区块-当前区块）*出块间隔 + 现有时间 */
-        BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposal.getBlockNumber())))
-        		.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(proposal.getTimestamp().getTime()));
-        proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
+        /**
+         * 如果结束区块跟当前区块差值大于0则按照区块时间进行计算，否则直接获取已结束区块的时间
+         */
+        BigDecimal diff = new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()));
+        Block block = null;
+        if(diff.compareTo(BigDecimal.ZERO) > 0) {
+        	/** 结束时间预估：（生效区块-当前区块）*出块间隔 + 区块现有时间 */
+    		try {
+    			block = blockESRepository.get(proposalDetailsResp.getCurBlock(), Block.class);
+    		} catch (IOException e) {
+    			logger.error("获取区块错误。", e);
+    		}
+            BigDecimal endTime = diff.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(block.getTime().getTime()));
+            proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
+        } else {
+    		try {
+    			block = blockESRepository.get(proposalDetailsResp.getEndVotingBlock(), Block.class);
+    		} catch (IOException e) {
+    			logger.error("获取区块错误。", e);
+    		}
+            proposalDetailsResp.setEndVotingBlockTime(block.getTime().getTime());
+        }
+        
     	proposalDetailsResp.setInBlock(proposal.getBlockNumber());
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), proposalDetailsResp);
     }
