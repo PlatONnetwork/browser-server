@@ -130,6 +130,6 @@ sonarqube {
                 "**/*Application.java,**/NodeUpdateTask.java,**/NetworkStatUpdateTask.java," +
                 "**/ProposalInfoTask.java,**/AddressUpdateTask.java,**/EpochMessage.java," +
                 "**/NetworkStatCache.java,**/ShutdownCallback.java,**/AccountService.java," +
-                "**/OnSettleConverter.java"
+                "**/OnSettleConverter.java,**/PersistenceEvent.java"
     }
 }
