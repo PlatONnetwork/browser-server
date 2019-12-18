@@ -18,8 +18,10 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -59,25 +61,43 @@ public class DelegateExitConverterTest extends AgentTestBase {
                 .nodeName("integration-node1")
                 .stakingBlockNum(new BigInteger("88602"))
                 .build();
-        CustomDelegation delegation = new CustomDelegation();
-        for(CustomDelegation  delegations: delegationList){
-            if(delegations.getDelegateAddr().equals("0xaef5c047712d9f4e2c8696b23c73ca34c431b060"))
-                delegation=delegations;
-        }
-        when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegation);
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
         blockChainConfig.getDelegateThreshold();
         when(chainConfig.getDelegateThreshold()).thenReturn(blockChainConfig.getDelegateThreshold());
+
 
     }
 
     @Test
     public void convert() throws Exception {
+        CustomDelegation delegation = new CustomDelegation();
+        for(CustomDelegation  delegations: delegationList){
+            if(delegations.getDelegateAddr().equals("0xaef5c047712d9f4e2c8696b23c73ca34c431b060"))
+                delegation=delegations;
+        }
+        delegation.setDelegateReleased(BigDecimal.ONE);
+        when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegation);
+
         CollectionTransaction tx = null;
         for (CollectionTransaction collectionTransaction : transactionList) {
             if(collectionTransaction.getTypeEnum()== Transaction.TypeEnum.DELEGATE_EXIT)
                 tx=collectionTransaction;
         }
         target.convert(collectionEvent,tx);
+
+        delegation.setDelegateHes(new BigDecimal("500000000000000000000000"));
+        delegation.setDelegateLocked(new BigDecimal("500000000000000000000000"));
+        delegation.setDelegateReleased(new BigDecimal("500000000000000000000000"));
+        when(chainConfig.getDelegateThreshold()).thenReturn(BigDecimal.ONE);
+
+        target.convert(collectionEvent,tx);
+        delegation.setDelegateReleased(BigDecimal.ZERO);
+        delegation.setDelegateHes(new BigDecimal("900000000000000000000000"));
+        target.convert(collectionEvent,tx);
+
+        delegation.setDelegateHes(new BigDecimal("200000000000000000000000"));
+        target.convert(collectionEvent,tx);
+
+        assertTrue(true);
     }
 }
