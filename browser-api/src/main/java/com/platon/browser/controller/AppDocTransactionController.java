@@ -51,7 +51,9 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionList(@Valid PageReq req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> transactionService.getTransactionList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
@@ -59,7 +61,9 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@Valid TransactionListByBlockRequest req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> transactionService.getTransactionListByBlock(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
@@ -67,7 +71,9 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@Valid TransactionListByAddressRequest req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> transactionService.getTransactionListByAddress(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
@@ -75,6 +81,9 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public void addressTransactionDownload(String address, Long date, String local, String timeZone, HttpServletResponse response) {
+		/**
+		 * 对地址进行补充前缀
+		 */
 		address = HexTool.prefix(address.toLowerCase());
 		AccountDownload accountDownload = transactionService.transactionListByAddressDownload(address, date, local, timeZone);
 		try {
@@ -87,7 +96,9 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public WebAsyncTask<BaseResp<TransactionDetailsResp>> transactionDetails(@Valid TransactionDetailsReq req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<TransactionDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             TransactionDetailsResp transactionDetailsResp = transactionService.transactionDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailsResp);

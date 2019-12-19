@@ -68,8 +68,6 @@ public class ProposalServiceImpl implements ProposalService {
     @Override
     public RespPage<ProposalListResp> list(PageReq req) {
         RespPage<ProposalListResp> respPage = new RespPage<>();
-        respPage.setTotalCount(0);
-        respPage.setTotalPages(0);
         req = req == null ? new PageReq() : req;
         Page<?> page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         /** 暂时不显示总人数为0的数据，不然页面展示投票百分比事会出错   */
@@ -81,6 +79,9 @@ public class ProposalServiceImpl implements ProposalService {
         if (!CollectionUtils.isEmpty(list)) {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());
             for (Proposal proposal : list) {
+            	/**
+            	 * 循环转换数据
+            	 */
             	ProposalListResp proposalListResp = new ProposalListResp();
                 BeanUtils.copyProperties(proposal, proposalListResp);
                 proposalListResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
@@ -97,9 +98,7 @@ public class ProposalServiceImpl implements ProposalService {
                 }
                 listResps.add(proposalListResp);
             }
-            respPage.setData(listResps);
-            respPage.setTotalPages(page.getPages());
-            respPage.setTotalCount(page.getTotal());
+            respPage.init(listResps, page.getTotal(), page.getTotal(), page.getPages());
         }
         return respPage;
     }
@@ -131,13 +130,22 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setCurBlock(String.valueOf(networkStat.getCurNumber()));
         /** 不同的类型有不同的通过率 */
         switch (CustomProposal.TypeEnum.getEnum(proposal.getType())) {
+        	/**
+         	* 文本提案
+         	*/
 			case TEXT:
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalTextSupportRate().toString());
 				proposalDetailsResp.setParticipationRate(blockChainConfig.getMinProposalTextParticipationRate().toString());
 				break;
+			/**
+         	* 升级提案
+         	*/
 			case UPGRADE:
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalUpgradePassRate().toString());
 				break;
+			/**
+         	* 参数提案
+         	*/
 			case PARAMETER:
 				proposalDetailsResp.setParamName(ConvertUtil.captureName(proposal.getName()));
 				proposalDetailsResp.setCurrentValue(proposal.getStaleValue());
@@ -145,6 +153,9 @@ public class ProposalServiceImpl implements ProposalService {
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getParamProposalSupportRate().toString());
 				proposalDetailsResp.setParticipationRate(blockChainConfig.getParamProposalVoteRate().toString());
 				break;
+			/**
+         	* 取消提案
+         	*/
 			case CANCEL:
 				 /**
 		         * 如果被取消的提案标题没有就查询对应的提案确认返回的交易标题

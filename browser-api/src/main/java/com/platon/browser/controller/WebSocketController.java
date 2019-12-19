@@ -18,7 +18,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-
+/**
+ * 验证节点的web连接controller
+ *  @file WebSocketController.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年12月19日
+ */
 @RestController
 @ServerEndpoint("/websocket/{message}")
 @CrossOrigin

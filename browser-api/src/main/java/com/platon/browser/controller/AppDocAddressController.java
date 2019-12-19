@@ -37,7 +37,9 @@ public class AppDocAddressController implements AppDocAddress {
 
 	@Override
 	public WebAsyncTask<BaseResp<QueryDetailResp>> details(@Valid QueryDetailRequest req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<QueryDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             QueryDetailResp queryDetailResp = addressService.getDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), queryDetailResp);
@@ -48,7 +50,9 @@ public class AppDocAddressController implements AppDocAddress {
 
 	@Override
 	public WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> rpplanDetail(@Valid QueryRPPlanDetailRequest req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<QueryRPPlanDetailResp>>() {  
             @Override  
             public BaseResp<QueryRPPlanDetailResp> call() throws Exception {  

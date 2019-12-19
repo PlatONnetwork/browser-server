@@ -35,7 +35,9 @@ public class AppDocHomeController implements AppDocHome {
 	
 	@Override
 	public WebAsyncTask<BaseResp<QueryNavigationResp>> queryNavigation(@Valid QueryNavigationRequest req) {
-     // 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<QueryNavigationResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
              try{
                  QueryNavigationResp queryNavigationResp = homeService.queryNavigation(req);
@@ -50,7 +52,9 @@ public class AppDocHomeController implements AppDocHome {
 
 	@Override
 	public WebAsyncTask<BaseResp<BlockStatisticNewResp>> blockStatisticNew() {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<BlockStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
@@ -61,7 +65,9 @@ public class AppDocHomeController implements AppDocHome {
 
 	@Override
 	public WebAsyncTask<BaseResp<ChainStatisticNewResp>> chainStatisticNew() {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<ChainStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
@@ -72,7 +78,9 @@ public class AppDocHomeController implements AppDocHome {
 
 	@Override
 	public WebAsyncTask<BaseResp<StakingListNewResp>> stakingListNew() {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<StakingListNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             StakingListNewResp stakingListNewResp = homeService.stakingListNew();
             /**

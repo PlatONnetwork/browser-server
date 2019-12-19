@@ -35,7 +35,9 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public WebAsyncTask<BaseResp<StakingStatisticNewResp>> stakingStatisticNew() {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<BaseResp<StakingStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> {
 					StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
@@ -48,7 +50,9 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public WebAsyncTask<RespPage<AliveStakingListResp>> aliveStakingList(@Valid AliveStakingListReq req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> stakingService.aliveStakingList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
@@ -66,7 +70,9 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public WebAsyncTask<BaseResp<StakingDetailsResp>> stakingDetails(@Valid StakingDetailsReq req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> stakingService.stakingDetails(req));
 		CommonMethod.onTimeOut(webAsyncTask);
@@ -75,7 +81,9 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public WebAsyncTask<RespPage<StakingOptRecordListResp>> stakingOptRecordList(@Valid StakingOptRecordListReq req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> stakingService.stakingOptRecordList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
@@ -85,7 +93,9 @@ public class AppDocStakingController implements AppDocStaking {
 	@Override
 	public WebAsyncTask<RespPage<DelegationListByStakingResp>> delegationListByStaking(
 			@Valid DelegationListByStakingReq req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> stakingService.delegationListByStaking(req));
 		CommonMethod.onTimeOut(webAsyncTask);
@@ -95,7 +105,9 @@ public class AppDocStakingController implements AppDocStaking {
 	@Override
 	public WebAsyncTask<RespPage<DelegationListByAddressResp>> delegationListByAddress(
 			@Valid DelegationListByAddressReq req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> stakingService.delegationListByAddress(req));
 		CommonMethod.onTimeOut(webAsyncTask);

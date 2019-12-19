@@ -49,7 +49,9 @@ public class AppDocBlockController implements AppDocBlock {
 	
 	@Override
 	public WebAsyncTask<RespPage<BlockListResp>> blockList(@Valid PageReq req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             RespPage<BlockListResp> blockListResps = blockService.blockList(req);
             return blockListResps;
@@ -60,7 +62,9 @@ public class AppDocBlockController implements AppDocBlock {
 
 	@Override
 	public WebAsyncTask<RespPage<BlockListResp>> blockListByNodeId(@Valid BlockListByNodeIdReq req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             RespPage<BlockListResp> blockListResps = blockService.blockListByNodeId(req);
             return blockListResps;
@@ -82,7 +86,9 @@ public class AppDocBlockController implements AppDocBlock {
 
 	@Override
 	public WebAsyncTask<BaseResp<BlockDetailResp>> blockDetails(@Valid BlockDetailsReq req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             BlockDetailResp blockDetailResp = blockService.blockDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
@@ -93,7 +99,9 @@ public class AppDocBlockController implements AppDocBlock {
 
 	@Override
 	public WebAsyncTask<BaseResp<BlockDetailResp>> blockDetailNavigate(@Valid BlockDetailNavigateReq req) {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
             BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);

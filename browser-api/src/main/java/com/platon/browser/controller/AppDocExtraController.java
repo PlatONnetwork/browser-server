@@ -31,7 +31,9 @@ public class AppDocExtraController implements AppDocExtra {
 	
 	@Override
 	public WebAsyncTask<BaseResp<QueryConfigResp>> queryConfig() {
-		// 5s钟没返回，则认为超时  
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
         WebAsyncTask<BaseResp<QueryConfigResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
         	QueryConfigResp queryConfigResp = extraService.queryConfig();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), queryConfigResp);

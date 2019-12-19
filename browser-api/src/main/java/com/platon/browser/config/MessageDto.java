@@ -25,6 +25,7 @@ public class MessageDto extends PageReq{
 		StringBuilder sb = new StringBuilder();
 		/**
 		 * 如果为null则填空
+		 * 分隔符拼接
 		 */
 		if(this.getPageNo() != null) {
 			sb.append(this.getPageNo());
@@ -52,6 +53,9 @@ public class MessageDto extends PageReq{
 	 */
 	public MessageDto analysisKey (String data) {
 		String[] message = data.split(BrowserConst.OPT_SPILT);
+		/**
+		 * 当key长度大于2才认为合法请求
+		 */
 		if(message.length > 2) {
 			this.setPageNo(Integer.parseInt(message[0]));
 			this.setPageSize(Integer.parseInt(message[1]));
@@ -68,6 +72,9 @@ public class MessageDto extends PageReq{
 	 * @return
 	 */
 	public MessageDto analysisData (String data) {
+		/**
+		 * 根据分隔符设置参数值
+		 */
 		String[] message = data.split(BrowserConst.HTTP_SPILT);
 		if(message.length > 0) {
 			this.setUserNo(message[0]);

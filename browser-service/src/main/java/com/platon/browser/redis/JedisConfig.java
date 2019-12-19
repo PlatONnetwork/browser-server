@@ -72,6 +72,9 @@ public class JedisConfig {
         this.jedisClusterNodes = jedisClusterNodes;
     }
 
+    /**
+     * 重写tostring方法
+     */
     @Override
     public String toString() {
         return "JedisConfig{" +

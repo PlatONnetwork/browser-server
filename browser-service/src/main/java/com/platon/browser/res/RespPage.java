@@ -33,6 +33,14 @@ public class RespPage<T> {
         this.setDisplayTotalCount(page.getTotal());
         this.setData(data);
     }
+    
+    /** 初始化数据 */
+    public void init( List<T> data, long totalCount, long displayTotalCount, long totalPages){
+        this.setTotalCount(totalCount);
+        this.setTotalPages(totalPages);
+        this.setDisplayTotalCount(displayTotalCount);
+        this.setData(data);
+    }
 
 	public String getErrMsg() {
 		return errMsg;

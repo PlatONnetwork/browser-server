@@ -59,6 +59,9 @@ public class BrowserCache {
 
 	public static void sendMessage(String key,String message)  {
 		try {
+			/**
+			 * 往指定的socket连接上发送信息
+			 */
 			BrowserCache.getWebSocketSet().get(key).getBasicRemote().sendText(message);
 		} catch (Exception e) {
 			logger.error("sendMessage error", e);

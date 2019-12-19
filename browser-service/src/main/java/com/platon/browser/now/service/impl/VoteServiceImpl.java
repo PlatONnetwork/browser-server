@@ -33,10 +33,10 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public RespPage<VoteListResp> queryByProposal(VoteListRequest voteListRequest) {
-        RespPage<VoteListResp> respPage = new RespPage<>();
-        respPage.setTotalCount(0);
-        respPage.setTotalPages(0);
         Page<?> page = PageHelper.startPage(voteListRequest.getPageNo(), voteListRequest.getPageSize(), true);
+        /**
+         * 根据时间戳倒序查询hash值
+         */
         VoteExample voteExample = new VoteExample();
         voteExample.setOrderByClause(" timestamp desc");
         VoteExample.Criteria criteria = voteExample.createCriteria();
@@ -46,9 +46,13 @@ public class VoteServiceImpl implements VoteService {
         }
         /** 分页根据提案hash查询投票列表 */
         List<Vote> votes = voteMapper.selectByExample(voteExample);
+        RespPage<VoteListResp> respPage = new RespPage<>();
         if (!CollectionUtils.isEmpty(votes)) {
             List<VoteListResp> voteListResps = new ArrayList<>(votes.size());
             votes.forEach(vote -> {
+            	/**
+            	 * 循环匹配数据
+            	 */
                 VoteListResp resp = new VoteListResp();
                 BeanUtils.copyProperties(vote, resp);
                 resp.setVoter(vote.getNodeId());
@@ -58,9 +62,7 @@ public class VoteServiceImpl implements VoteService {
                 resp.setOption(String.valueOf(vote.getOption()));
                 voteListResps.add(resp);
             });
-            respPage.setTotalPages(page.getPages());
-            respPage.setTotalCount(page.getTotal());
-            respPage.setData(voteListResps);
+            respPage.init(voteListResps, page.getTotal(), page.getTotal(), page.getPages());
         }
         return respPage;
     }

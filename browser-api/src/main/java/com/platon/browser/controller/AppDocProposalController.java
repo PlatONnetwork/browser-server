@@ -38,7 +38,9 @@ public class AppDocProposalController implements AppDocProposal {
 
 	@Override
 	public WebAsyncTask<RespPage<ProposalListResp>> proposalList(@Valid PageReq req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<RespPage<ProposalListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> proposalService.list(req));
 		CommonMethod.onTimeOut(webAsyncTask);
@@ -47,7 +49,9 @@ public class AppDocProposalController implements AppDocProposal {
 
 	@Override
 	public WebAsyncTask<BaseResp<ProposalDetailsResp>> proposalDetails(@Valid ProposalDetailRequest req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
 				() -> proposalService.get(req));
 		CommonMethod.onTimeOut(webAsyncTask);
@@ -56,7 +60,9 @@ public class AppDocProposalController implements AppDocProposal {
 
 	@Override
 	public WebAsyncTask<RespPage<VoteListResp>> voteList(@Valid VoteListRequest req) {
-		// 5s钟没返回，则认为超时
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
 		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
 			return voteService.queryByProposal(req);
 		});

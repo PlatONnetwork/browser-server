@@ -100,14 +100,12 @@ public class TransactionServiceImpl implements TransactionService {
         /** 分页查询redis交易数据 */
         TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
         List<Transaction> items = transactionCacheDto.getTransactionList();
+        /**
+         * 数据转换
+         */
         List<TransactionListResp> lists = this.transferList(items);
-        Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
-        result.init(page, lists);
-        
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-        result.setDisplayTotalCount(transactionCacheDto.getPage().getTotalCount());
-        result.setTotalCount(networkStat.getTxQty());
-        result.setTotalPages(transactionCacheDto.getPage().getTotalPages());
+        result.init(lists, networkStat.getTxQty(), transactionCacheDto.getPage().getTotalCount(), transactionCacheDto.getPage().getTotalPages());
         return result;
     }
 
@@ -328,7 +326,9 @@ public class TransactionServiceImpl implements TransactionService {
     		if(transaction.getId() == 1) {
     			resp.setFirst(true);
     		} else {
-    			/** 根据id查询具体的交易数据 */
+    			/** 
+    			 * 根据id查询是否有上一条数据交易数据 
+    			*/
         		constructor = new ESQueryBuilderConstructor();
         		constructor.must(new ESQueryBuilders().term("id", transaction.getId()-1));
         		ESResult<Transaction> first = new ESResult<>();
@@ -341,7 +341,9 @@ public class TransactionServiceImpl implements TransactionService {
     		}
     		
     		resp.setLast(true);
-    		/** 根据id查询具体的交易数据 */
+    		/**
+    		 *  根据id查询是否有下一条
+    		 * */
     		constructor = new ESQueryBuilderConstructor();
     		constructor.must(new ESQueryBuilders().term("id", transaction.getId()+1));
     		ESResult<Transaction> last = new ESResult<>();
@@ -372,7 +374,9 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setTxAmount(createValidatorParam.getAmount());
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
-					//编辑验证人
+					/**
+					 * 编辑验证人
+					 */
 					case STAKE_MODIFY:
 						StakeModifyParam editValidatorParam = JSON.parseObject(txInfo, StakeModifyParam.class);
 						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
@@ -383,14 +387,21 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setNodeName(commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
 						resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
-					//增加质押
+					/**
+					 * 增加质押
+					 */
 					case STAKE_INCREASE:
 						StakeIncreaseParam increaseStakingParam = JSON.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
 						resp.setTxAmount(increaseStakingParam.getAmount());
+						/**
+						 * 节点名称设置
+						 */
 						resp.setNodeName(commonService.getNodeName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
 						break;
-					//退出验证人
+					/**
+					 * 退出验证人
+					 */
 					case STAKE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
 						StakeExitParam exitValidatorParam = JSON.parseObject(txInfo, StakeExitParam.class);
@@ -409,25 +420,32 @@ public class TransactionServiceImpl implements TransactionService {
 							} else {
 								resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
 							}
-							//（math.ceil（现有区块/结算周期区块数） + 锁定周期数） +* 结算周期区块数
-							//提案交易所在块高%共识周期块数,交易所在第几个共识轮
+							/*
+							 * 提案交易所在块高%共识周期块数,交易所在第几个共识轮
+							 */
 				            BigDecimal[] belongToConList = new BigDecimal(resp.getBlockNumber())
 				            		.divideAndRemainder(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
 				            BigDecimal belongToCon = belongToConList[0];
-				            
+				            /**
+				             * 预计退出区块数=（math.ceil（现有区块/结算周期区块数） + 锁定周期数） +* 结算周期区块数
+				             */
 							BigDecimal blockNum = (belongToCon.add(new BigDecimal(1)).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
 									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
 							resp.setRedeemUnLockedBlock(blockNum.toString());
 						}
 						break;
-						//委托
+						/**
+						 * 委托
+						 */
 					case DELEGATE_CREATE:
 						DelegateCreateParam delegateParam = JSON.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
 						resp.setTxAmount(delegateParam.getAmount());
 						resp.setNodeName(commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
 						break;
-					//委托赎回
+					/**
+					 * 委托赎回
+					 */
 					case DELEGATE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
 						// 通过txHash关联un_delegation表
@@ -437,6 +455,9 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setTxAmount(unDelegateParam.getAmount());
 						resp.setNodeName(commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						break;
+						/**
+						 * 文本提案
+						 */
 					case PROPOSAL_TEXT:
 						ProposalTextParam createProposalTextParam = JSON.parseObject(txInfo, ProposalTextParam.class);
 						if(StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
@@ -448,6 +469,9 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
+						/**
+						 * 升级提案
+						 */
 					case PROPOSAL_UPGRADE:
 						ProposalUpgradeParam createProposalUpgradeParam = JSON.parseObject(txInfo, ProposalUpgradeParam.class);
 						resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
@@ -460,6 +484,9 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
+						/**
+						 * 参数提案
+						 */
 					case PROPOSAL_PARAMETER:
 						ProposalParameterParam proposalParameterParam = JSON.parseObject(txInfo, ProposalParameterParam.class);
 						if(StringUtils.isNotBlank(proposalParameterParam.getPIDID())) {
@@ -471,6 +498,9 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
+						/**
+						 * 取消提案
+						 */
 					case PROPOSAL_CANCEL:
 						ProposalCancelParam cancelProposalParam = JSON.parseObject(txInfo, ProposalCancelParam.class);
 						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
@@ -482,6 +512,9 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
+						/**
+						 * 提案投票
+						 */
 					case PROPOSAL_VOTE:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
 						ProposalVoteParam votingProposalParam = JSON.parseObject(txInfo, ProposalVoteParam.class);
@@ -505,13 +538,18 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setProposalOption(String.valueOf(proposal.getType()));
 						}
 						break;
-						//版本申明
+						/**
+						 * 版本申明
+						 */
 					case VERSION_DECLARE:
 						VersionDeclareParam declareVersionParam = JSON.parseObject(txInfo, VersionDeclareParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 						resp.setNodeName(commonService.getNodeName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
 						break;
+						/**
+						 * 举报双签
+						 */
 					case REPORT:
 						ReportParam reportValidatorParam = JSON.parseObject(txInfo, ReportParam.class);
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
@@ -523,11 +561,17 @@ public class TransactionServiceImpl implements TransactionService {
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 						if(slash != null) {
 							resp.setReportRewards(slash.getReward());
+							/**
+							 * 查看举报之后是否退出来判断是否交易正确
+							 */
 							resp.setReportStatus(slash.getIsQuit() == 1?2:1);
 						}
 						resp.setReportType(reportValidatorParam.getType().intValue());
 						resp.setEvidences(transactionDetailsEvidencesResps);
 						break;
+						/**
+						 * 创建锁仓
+						 */
 					case RESTRICTING_CREATE:
 						// RPAccount + value + RPPlan
 						RestrictingCreateParam createRestrictingParam = JSON.parseObject(txInfo, RestrictingCreateParam.class);
