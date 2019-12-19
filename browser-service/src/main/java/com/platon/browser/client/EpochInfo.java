@@ -5,67 +5,67 @@ import org.web3j.utils.Numeric;
 import java.math.BigDecimal;
 
 public class EpochInfo {
-    private BigDecimal PackageReward; // 出块奖励
-    private BigDecimal StakingReward; // 结算周期质押奖励
-    private BigDecimal YearNum; // 当前增发周期
-    private BigDecimal YearStartNum; // 当前增发周期开始区块号
-    private BigDecimal YearEndNum; // 当前增发周期结束区块号
-    private BigDecimal RemainEpoch; // 当前增发周期剩下的结算周期数
-    private BigDecimal AvgPackTime; // 平均出块时间
+    private BigDecimal packageReward; // 出块奖励
+    private BigDecimal stakingReward; // 结算周期质押奖励
+    private BigDecimal yearNum; // 当前增发周期
+    private BigDecimal yearStartNum; // 当前增发周期开始区块号
+    private BigDecimal yearEndNum; // 当前增发周期结束区块号
+    private BigDecimal remainEpoch; // 当前增发周期剩下的结算周期数
+    private BigDecimal avgPackTime; // 平均出块时间
 
     public BigDecimal getPackageReward() {
-        return PackageReward;
+        return packageReward;
     }
 
     public void setPackageReward(String packageReward) {
-        PackageReward = new BigDecimal(Numeric.decodeQuantity(packageReward));
+        this.packageReward = new BigDecimal(Numeric.decodeQuantity(packageReward));
     }
 
     public BigDecimal getStakingReward() {
-        return StakingReward;
+        return stakingReward;
     }
 
     public void setStakingReward(String stakingReward) {
-        StakingReward = new BigDecimal(Numeric.decodeQuantity(stakingReward));
+        this.stakingReward = new BigDecimal(Numeric.decodeQuantity(stakingReward));
     }
 
     public BigDecimal getYearNum() {
-        return YearNum;
+        return yearNum;
     }
 
     public void setYearNum(BigDecimal yearNum) {
-        YearNum = yearNum;
+        this.yearNum = yearNum;
     }
 
     public BigDecimal getYearStartNum() {
-        return YearStartNum;
+        return yearStartNum;
     }
 
     public void setYearStartNum(BigDecimal yearStartNum) {
-        YearStartNum = yearStartNum;
+        this.yearStartNum = yearStartNum;
     }
 
     public BigDecimal getYearEndNum() {
-        return YearEndNum;
+        return yearEndNum;
     }
 
     public void setYearEndNum(BigDecimal yearEndNum) {
-        YearEndNum = yearEndNum;
+        this.yearEndNum = yearEndNum;
     }
 
     public BigDecimal getRemainEpoch() {
-        return RemainEpoch;
+        return remainEpoch;
     }
 
     public void setRemainEpoch(BigDecimal remainEpoch) {
-        RemainEpoch = remainEpoch;
+        this.remainEpoch = remainEpoch;
     }
 
     public BigDecimal getAvgPackTime() {
-        return AvgPackTime;
+        return avgPackTime;
     }
 
     public void setAvgPackTime(BigDecimal avgPackTime) {
-        AvgPackTime = avgPackTime;
+        this.avgPackTime = avgPackTime;
     }
 }

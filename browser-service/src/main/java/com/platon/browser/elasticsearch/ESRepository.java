@@ -52,7 +52,7 @@ public abstract class ESRepository {
 
 	public abstract String getIndexName();
 	
-	private final static String CONSUME_TIME_TIPS="处理耗时:{} ms";
+	private static final String CONSUME_TIME_TIPS="处理耗时:{} ms";
 
 	/**
 	 * 创建索引
@@ -213,9 +213,7 @@ public abstract class ESRepository {
 			filter.forEach((term, value) -> searchSourceBuilder.query(QueryBuilders.matchQuery(term, value)));
 		}
 		if(esSortDtos != null) {
-			esSortDtos.forEach(esSortDto -> {
-				searchSourceBuilder.sort(esSortDto.getSortName(), esSortDto.getSortOrder());
-			});
+			esSortDtos.forEach(esSortDto -> searchSourceBuilder.sort(esSortDto.getSortName(), esSortDto.getSortOrder()));
 		}
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);

@@ -19,7 +19,7 @@ public class ProposalCancel implements BusinessParam {
     private String pIDID;
     //提案url
     private String url;
-    //PIP-{pip_id}
+    //PIP-pip_id
     private String pipNum;
     //投票结束快高
     private BigInteger endVotingBlock;

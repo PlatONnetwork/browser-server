@@ -74,6 +74,8 @@ public class BlockServiceImpl implements BlockService {
 	@Autowired
 	private CommonService commonService;
 
+	private static final String ERROR_TIPS = "获取区块错误。";
+
 	@Override
 	public RespPage<BlockListResp> blockList(PageReq req) {
 		long startTime = System.currentTimeMillis();
@@ -83,12 +85,12 @@ public class BlockServiceImpl implements BlockService {
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Long bNumber = networkStatRedis.getCurNumber();
 		/** 小于50万条查询redis */
-		if (req.getPageNo().intValue() * req.getPageSize().intValue() < BrowserConst.MAX_NUM) {
+		if (req.getPageNo() * req.getPageSize() < BrowserConst.MAX_NUM) {
 			/**
 			 * 当页号等于1，重新获取数据，与首页保持一致
 			 */
 			List<Block> items;
-			if(req.getPageNo().intValue() == 1) {
+			if(req.getPageNo() == 1) {
 				/** 查询缓存最新的八条区块信息 */
 				items = statisticCacheService.getBlockCache(0,1);
 				if(!items.isEmpty()) {
@@ -114,12 +116,11 @@ public class BlockServiceImpl implements BlockService {
 			try {
 				blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 			} catch (IOException e) {
-				logger.error("获取区块错误。", e);
+				logger.error(ERROR_TIPS, e);
 			}
 			lists.addAll(this.transferBlockListResp(blocks.getRsData()));
 			
 		}
-//		bNumber = lists.get(0).getNumber();
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(networkStatRedis.getCurNumber());
 		respPage.init(page, lists);
@@ -132,7 +133,6 @@ public class BlockServiceImpl implements BlockService {
 	/**
 	 * 区块列表统一转换
 	 * @method transferBlockListResp
-	 * @param block
 	 * @return
 	 */
 	private List<BlockListResp> transferBlockListResp(List<Block> blocks) {
@@ -162,7 +162,7 @@ public class BlockServiceImpl implements BlockService {
 			}
 			blockListResps.add(blockListResp);
 		}
-		nodes = null;
+		nodes.clear();
 		return blockListResps;
 	}
 
@@ -176,7 +176,7 @@ public class BlockServiceImpl implements BlockService {
 		try {
 			blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
 		/** 初始化返回对象 */
 		RespPage<BlockListResp> respPage = new RespPage<>();
@@ -206,7 +206,8 @@ public class BlockServiceImpl implements BlockService {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
 		String msg = dateFormat.format(now);
-        logger.info("导出数据起始日期：{},结束时间：{}",dateFormat.format(new Date(date)),msg);
+		String msg2 = dateFormat.format(new Date(date));
+        logger.info("导出数据起始日期：{},结束时间：{}",msg2,msg);
         /** 限制最多导出3万条记录 */
         /** 设置根据时间和nodeId查询数据 */
 		
@@ -218,7 +219,7 @@ public class BlockServiceImpl implements BlockService {
 		try {
 			blockList = blockESRepository.search(constructor, Block.class, 1, 30000);
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
         /** 将查询数据转成对应list */
         List<Object[]> rows = new ArrayList<>();
@@ -285,7 +286,7 @@ public class BlockServiceImpl implements BlockService {
 		try {
 			block = blockESRepository.get(String.valueOf(blockNumber), Block.class);
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {

@@ -34,9 +34,9 @@ public class TransactionDetailsResp {
     private Boolean first;            //是否第一条记录
     private Boolean last;              //是否最后一条记录
     private String receiveType;  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
-    private String RPAccount;           //锁仓计划的地址
-    private BigDecimal RPNum;
-    private List<TransactionDetailsRPPlanResp> RPPlan;
+    private String rPAccount;           //锁仓计划的地址
+    private BigDecimal rPNum;
+    private List<TransactionDetailsRPPlanResp> rPPlan;
     private List<TransactionDetailsEvidencesResp> evidences;
     private String nodeId;              //节点id
     private String nodeName;            //节点名称
@@ -191,23 +191,23 @@ public class TransactionDetailsResp {
 		this.receiveType = receiveType;
 	}
 	public String getRPAccount() {
-		return RPAccount;
+		return rPAccount;
 	}
 	public void setRPAccount(String rPAccount) {
-		RPAccount = rPAccount;
+		this.rPAccount = rPAccount;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getRPNum() {
-		return RPNum;
+		return rPNum;
 	}
 	public void setRPNum(BigDecimal rPNum) {
-		RPNum = rPNum;
+		this.rPNum = rPNum;
 	}
 	public List<TransactionDetailsRPPlanResp> getRPPlan() {
-		return RPPlan;
+		return rPPlan;
 	}
 	public void setRPPlan(List<TransactionDetailsRPPlanResp> rPPlan) {
-		RPPlan = rPPlan;
+		this.rPPlan = rPPlan;
 	}
 	public List<TransactionDetailsEvidencesResp> getEvidences() {
 		return evidences;

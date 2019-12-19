@@ -18,13 +18,12 @@ public class TpsCalcCache {
 
     // <出块秒数,交易数>
     private Map<Long,Long> cacheMap = new HashMap<>();
-    private Long now = 0L;
 
     private int tps=0;
 
     public void update(Block block){
         BigDecimal seconds = BigDecimal.valueOf(block.getTime().getTime()).divide(BigDecimal.valueOf(1000),0, RoundingMode.CEILING);
-        now = seconds.longValue();
+        Long now = seconds.longValue();
         cacheMap.putIfAbsent(now, 0L);
         cacheMap.put(now,cacheMap.get(now)+block.getTransactions().size());
         // 离now时间差大于等于10秒的都需要清理

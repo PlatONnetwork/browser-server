@@ -230,8 +230,7 @@ public class SpecialApi {
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }
-            EpochInfo ei = JSON.parseObject(data,EpochInfo.class);
-            return ei;
+            return JSON.parseObject(data,EpochInfo.class);
         }else{
             String msg = JSON.toJSONString(br,true);
             throw new ContractInvokeException(String.format("【查询历史周期信息出错】区块号:%s,返回数据:%s",blockNumber,msg));
@@ -282,7 +281,7 @@ public class SpecialApi {
     }
 
     public ReceiptResult getReceiptResult(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws IOException {
-        Request<?, ReceiptResult> request = new Request<Object, ReceiptResult>(
+        Request<?, ReceiptResult> request = new Request<>(
                 "platon_getTransactionByBlock",
                 Arrays.asList(blockNumber),
                 web3jWrapper.getWeb3jService(),
