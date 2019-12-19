@@ -235,14 +235,14 @@ public class BlockServiceImpl implements BlockService {
 
         /** 初始化输出流对象 */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
         try {
         	/** 设置返回的头，防止csv乱码 */
-			outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
+        	baos.write(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF });
 		} catch (IOException e) {
         	logger.error("数据输出错误:",e);
 		}
-        /** 厨师书writer对象 */
+        Writer outputWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
+        /** 初始化writer对象 */
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         writer.writeHeaders(
                 i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
