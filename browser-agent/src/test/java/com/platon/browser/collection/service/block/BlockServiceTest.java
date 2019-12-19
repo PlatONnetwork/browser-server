@@ -33,14 +33,14 @@ public class BlockServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "retryService", retryService);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void test() throws IOException, CollectionBlockException {
         target.getBlockAsync(1L);
         when(retryService.getBlock(any())).thenThrow(new RuntimeException(""));
         target.getBlockAsync(1L);
 
         target.checkBlockNumber(1L);
-        doThrow(new Exception("")).when(retryService).checkBlockNumber(anyLong());
+        doThrow(new RuntimeException("")).when(retryService).checkBlockNumber(anyLong());
         target.checkBlockNumber(1L);
 
     }
