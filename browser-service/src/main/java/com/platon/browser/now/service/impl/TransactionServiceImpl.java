@@ -93,6 +93,7 @@ public class TransactionServiceImpl implements TransactionService {
 	private CommonService commonService;
     @Autowired
     private RedisFactory redisFactory;
+    private static final String ERROR_TIPS="获取区块错误。";
 
     @Override
     public RespPage<TransactionListResp> getTransactionList( PageReq req) {
@@ -123,7 +124,7 @@ public class TransactionServiceImpl implements TransactionService {
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
         List<TransactionListResp> lists = this.transferList(items.getRsData());
         /** 统计交易信息 */
@@ -149,7 +150,7 @@ public class TransactionServiceImpl implements TransactionService {
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
         List<TransactionListResp> lists = this.transferList(items.getRsData());
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -205,7 +206,7 @@ public class TransactionServiceImpl implements TransactionService {
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, 1, 3000);
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
         List<Object[]> rows = new ArrayList<>();
         items.getRsData().forEach(transaction -> {
@@ -215,8 +216,8 @@ public class TransactionServiceImpl implements TransactionService {
         	 * 如果为from地址则导出报表为支出金额
         	*/
             boolean toIsAddress = address.equals(transaction.getTo());
-            String valueIn = toIsAddress? transaction.getValue().toString() : "0";
-            String valueOut = !toIsAddress? transaction.getValue().toString() : "0";
+            String valueIn = toIsAddress? transaction.getValue() : "0";
+            String valueOut = !toIsAddress? transaction.getValue() : "0";
             Object[] row = {
                     transaction.getHash(),
                     transaction.getNum(),
@@ -275,7 +276,7 @@ public class TransactionServiceImpl implements TransactionService {
 		try {
 			transaction = transactionESRepository.get(req.getTxHash(), Transaction.class);
 		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+			logger.error(ERROR_TIPS, e);
 		}
     	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(transaction != null) {

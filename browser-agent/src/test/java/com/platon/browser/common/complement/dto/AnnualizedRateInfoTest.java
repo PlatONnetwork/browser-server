@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/12/5 15:09
@@ -25,6 +27,7 @@ public class AnnualizedRateInfoTest {
         profit.setValue(BigDecimal.TEN);
         List<PeriodValueElement> profitList = new ArrayList <>();
         profitList.add(profit);
+        assertEquals(profit.getPeriod().longValue(),100L);
         PeriodValueElement cost = new PeriodValueElement();
         cost.setPeriod(120L);
         cost.setValue(BigDecimal.TEN);
@@ -43,7 +46,7 @@ public class AnnualizedRateInfoTest {
         annualizedRateInfo.setCost(profitList);
         annualizedRateInfo.setProfit(costList);
         annualizedRateInfo.setSlash(slashList);
-        String annuaString = annualizedRateInfo.toJSONString();
+
     }
 
 

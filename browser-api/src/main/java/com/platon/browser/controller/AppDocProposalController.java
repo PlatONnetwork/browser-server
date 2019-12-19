@@ -63,9 +63,7 @@ public class AppDocProposalController implements AppDocProposal {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-			return voteService.queryByProposal(req);
-		});
+		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> voteService.queryByProposal(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
 	}

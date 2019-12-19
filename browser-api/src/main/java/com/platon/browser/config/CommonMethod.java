@@ -12,7 +12,7 @@ import org.springframework.web.context.request.async.WebAsyncTask;
  *  @data 2019年12月19日
  */
 public class CommonMethod {
-
+	private CommonMethod(){}
 	/**
 	 * web异步请求超时方法调用
 	 * @method onTimeOut

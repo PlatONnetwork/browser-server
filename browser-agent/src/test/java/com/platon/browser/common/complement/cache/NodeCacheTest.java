@@ -11,6 +11,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class NodeCacheTest extends AgentTestBase {
 
@@ -26,5 +28,6 @@ public class NodeCacheTest extends AgentTestBase {
                 .build();
         nodeCache.addNode(nodeItem);
         nodeCache.getNode("0xsfsf233r");
+        assertEquals(nodeCache.getNode("0xsfsf233r"),nodeItem);
     }
 }

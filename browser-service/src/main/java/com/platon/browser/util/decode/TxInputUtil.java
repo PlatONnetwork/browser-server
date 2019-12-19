@@ -21,6 +21,7 @@ import java.util.List;
  */
 @Slf4j
 public class TxInputUtil {
+    private TxInputUtil(){}
     public static DecodedResult decode(String txInput) {
         DecodedResult result = new DecodedResult();
         try {

@@ -52,9 +52,9 @@ public class SerializerUtils {
     //序列化集合
     @SuppressWarnings({"unchecked"})
     public static <T extends Collection<?>> T deserializeValues(Collection<byte[]> rawValues, Class<T> type,
-                                                                JedisSerializer<?> REDIS_SERIALIZER) {
+                                                                JedisSerializer<?> redisSerializer) {
 
-        if (REDIS_SERIALIZER == null) {
+        if (redisSerializer == null) {
             return (T) rawValues;
         }
         // connection in pipeline/multi mode
@@ -62,10 +62,10 @@ public class SerializerUtils {
             return null;
         }
 
-        Collection<Object> values = (List.class.isAssignableFrom(type) ? new ArrayList<Object>(rawValues.size())
-                : new LinkedHashSet<Object>(rawValues.size()));
+        Collection<Object> values = (List.class.isAssignableFrom(type) ? new ArrayList<>(rawValues.size())
+                : new LinkedHashSet<>(rawValues.size()));
         for (byte[] bs : rawValues) {
-            values.add(REDIS_SERIALIZER.deserialize(bs));
+            values.add(redisSerializer.deserialize(bs));
         }
 
         return (T) values;

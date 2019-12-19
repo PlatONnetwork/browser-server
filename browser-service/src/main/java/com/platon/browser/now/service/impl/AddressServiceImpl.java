@@ -95,12 +95,12 @@ public class AddressServiceImpl implements AddressService {
         }
         /** 特殊账户余额直接查询链  */
 	  	try {
-	  		resp = this.getBalance(req, resp);
+	  		getBalance(req, resp);
 	  	} catch (Exception e) {
 	  		logger.error("getBalance error",e);
 	  		platonClient.updateCurrentWeb3jWrapper();
 	  		try {
-	  			resp = this.getBalance(req, resp);
+	  			getBalance(req, resp);
 			} catch (Exception e1) {
 				logger.error("getBalance error again",e);
 			} 

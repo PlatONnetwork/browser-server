@@ -78,12 +78,6 @@ public class EpochRetryService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void issueChange ( BigInteger currentBlockNumber ) {
         log.debug("增发周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
-        try {
-
-        } catch (Exception e) {
-            log.error("", e);
-            throw new BusinessException(e.getMessage());
-        }
     }
 
     /**

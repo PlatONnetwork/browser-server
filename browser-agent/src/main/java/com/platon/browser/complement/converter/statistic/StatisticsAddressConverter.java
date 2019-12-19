@@ -38,7 +38,7 @@ public class StatisticsAddressConverter {
 
 		List<AddressStatItem> addressStatItemList =   addressCache.getAll()
             	.stream()
-            	.map(address->{ return AddressStatItem.builder()
+            	.map(address->  AddressStatItem.builder()
             			.address(address.getAddress())
             			.type(address.getType())
             			.txQty(address.getTxQty())
@@ -49,9 +49,8 @@ public class StatisticsAddressConverter {
             			.contractName(address.getContractName())
             			.contractCreate(address.getContractCreate())
             			.contractCreatehash(address.getContractCreatehash())
-            			.build();
-            	})
-            	.collect(Collectors.toList());
+            			.build()
+            	).collect(Collectors.toList());
 
 		List<String> modifyAddList = new ArrayList <>();
 		addressStatItemList.forEach(addressStatItem -> modifyAddList.add(addressStatItem.getAddress()));
@@ -61,9 +60,7 @@ public class StatisticsAddressConverter {
 		List<Address> addressList = addressMapper.selectByExample(addressExample);
 
 		Map <String,Address> dbMap = new HashMap <>();
-		addressList.forEach(address -> {
-			dbMap.put(address.getAddress(),address);
-		});
+		addressList.forEach(address -> dbMap.put(address.getAddress(),address));
 		addressStatItemList.forEach(address -> {
 			Address dbAddres =  dbMap.get(address.getAddress());
 			if(null != dbAddres){

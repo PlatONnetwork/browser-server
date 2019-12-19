@@ -60,11 +60,11 @@ public class PageReq {
 		this.pageSize = pageSize;
 	}
 
-	public Page<?> getPager() {
+	public Page getPager() {
 		return pager;
 	}
 
-	public void setPager(Page<?> pager) {
+	public void setPager(Page pager) {
 		this.pager = pager;
 	}
     

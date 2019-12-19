@@ -67,6 +67,11 @@ public class HomeServiceImpl implements HomeService {
 	/** 记录最新块高 */
 	private static Long newBlockNum = 0L;
 
+	private static final String STAKING_TYPE="staking";
+	private static final String BLOCK_TYPE="block";
+	private static final String ADDRESS_TYPE="address";
+	private static final String TRANSACTION_TYPE="transaction";
+
 	@Override
 	public QueryNavigationResp queryNavigation(QueryNavigationRequest req) {
 		/* 以太坊内部和外部账户都是20个字节，0x开头，string长度40,加上0x，【外部账户-钱包地址，内部账户-合约地址】
@@ -99,7 +104,7 @@ public class HomeServiceImpl implements HomeService {
 				log.error(BLOCK_ERR_TIPS, e);
 			}
 			if(block != null) {
-				result.setType("block");
+				result.setType(BLOCK_TYPE);
 				queryNavigationStructResp.setNumber(number);
 			}
 		} else {
@@ -110,28 +115,28 @@ public class HomeServiceImpl implements HomeService {
 			}
 			if (keyword.length() == 40) {
 				/* 判断为合约或账户地址 */
-				result.setType("address");
+				result.setType(ADDRESS_TYPE);
 				queryNavigationStructResp.setAddress(HexTool.prefix(keyword));
 			}
 			if (keyword.length() == 128) {
 				/* 判断为节点Id */
 				Node node = nodeMapper.selectByPrimaryKey(HexTool.prefix(keyword.toLowerCase()));
 				if(node != null) {
-					result.setType("staking");
+					result.setType(STAKING_TYPE);
 					queryNavigationStructResp.setNodeId(HexTool.prefix(node.getNodeId()));
 				}
 			}
 			if (keyword.startsWith("0x")) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */
-					result.setType("address");
+					result.setType(ADDRESS_TYPE);
 					queryNavigationStructResp.setAddress(keyword);
 				}
 				if (keyword.length() == 130) {
 					/* 判断为节点Id */
 					Node node = nodeMapper.selectByPrimaryKey(keyword);
 					if(node != null) {
-						result.setType("staking");
+						result.setType(STAKING_TYPE);
 						queryNavigationStructResp.setNodeId(node.getNodeId());
 					}
 				}
@@ -149,7 +154,7 @@ public class HomeServiceImpl implements HomeService {
 						log.error(BLOCK_ERR_TIPS, e);
 					}
 					if(items.getTotal().intValue() > 0) {
-						result.setType("transaction");
+						result.setType(TRANSACTION_TYPE);
 						queryNavigationStructResp.setTxHash(keyword);
 					} else {
 						log.debug("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...", keyword, keyword);
@@ -164,7 +169,7 @@ public class HomeServiceImpl implements HomeService {
 						}
 						if (blockList.getTotal() > 0l) {
 							/*  如果找到区块信息，则构造结果并返回  */
-							result.setType("block");
+							result.setType(BLOCK_TYPE);
 							queryNavigationStructResp.setNumber(blockList.getRsData().get(0).getNum());
 						}
 					}
@@ -176,7 +181,7 @@ public class HomeServiceImpl implements HomeService {
 				criteria.andNodeNameEqualTo(keyword);
 				List<Node> nodes = nodeMapper.selectByExample(nodeExample);
 				if(!nodes.isEmpty()) {
-					result.setType("staking");
+					result.setType(STAKING_TYPE);
 					queryNavigationStructResp.setNodeId(nodes.get(0).getNodeId());
 				}
 			}
