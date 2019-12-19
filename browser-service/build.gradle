@@ -28,6 +28,8 @@ sonarqube {
                 "**/RedisStatisticService.java,**/RedisService.java,**/JedisSerializeUtil.java," +
                 "**/PlatOnClient.java,**/RetryableClient.java,**/SleepUtil.java," +
                 "**/CacheBase.java,**/NullStringJsonSerializer.java,**/RoundCalculation.java," +
-                "**/DownFileCommon.java,**/AccountDownload.java,**/BlockDownload.java"
+                "**/DownFileCommon.java,**/AccountDownload.java,**/BlockDownload.java," +
+                "**/BrowserCache.java,**/JedisNoResultCall.java,**/CommonMethod.java," +
+                "**/NullStringJsonSerializer.java"
     }
 }

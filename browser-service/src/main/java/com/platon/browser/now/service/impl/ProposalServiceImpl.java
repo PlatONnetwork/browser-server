@@ -165,23 +165,23 @@ public class ProposalServiceImpl implements ProposalService {
          * 如果结束区块跟当前区块差值大于0则按照区块时间进行计算，否则直接获取已结束区块的时间
          */
         BigDecimal diff = new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()));
-        Block block = null;
+        Block block;
         if(diff.compareTo(BigDecimal.ZERO) > 0) {
         	/** 结束时间预估：（生效区块-当前区块）*出块间隔 + 区块现有时间 */
     		try {
     			block = blockESRepository.get(proposalDetailsResp.getCurBlock(), Block.class);
+                BigDecimal endTime = diff.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(block.getTime().getTime()));
+                proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
     		} catch (IOException e) {
     			logger.error("获取区块错误。", e);
     		}
-            BigDecimal endTime = diff.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(block.getTime().getTime()));
-            proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
         } else {
     		try {
     			block = blockESRepository.get(proposalDetailsResp.getEndVotingBlock(), Block.class);
+                proposalDetailsResp.setEndVotingBlockTime(block.getTime().getTime());
     		} catch (IOException e) {
     			logger.error("获取区块错误。", e);
     		}
-            proposalDetailsResp.setEndVotingBlockTime(block.getTime().getTime());
         }
         
     	proposalDetailsResp.setInBlock(proposal.getBlockNumber());

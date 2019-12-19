@@ -120,3 +120,14 @@ task buildTar(dependsOn: [
         monitorDistTar
 ]){}
 
+//sonar扫描的路径
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main/java"
+        property "sonar.exclusions", "**/*Application.java," +
+                "**/WebSocketController.java,**/BrowserCache.java," +
+                "**/JedisNoResultCall.java,**/CommonMethod.java," +
+                "**/NullStringJsonSerializer.java,**/NullArrayJsonSerializer.java"
+    }
+}
+

@@ -6,6 +6,8 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.util.I18nUtil;
@@ -17,6 +19,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -34,6 +37,8 @@ public class ProposalServiceTest {
     private StatisticCacheService statisticCacheService;
     @Mock
     private BlockChainConfig blockChainConfig;
+    @Mock
+    private BlockESRepository blockESRepository;
     @Spy
     private ProposalServiceImpl target;
 
@@ -43,6 +48,7 @@ public class ProposalServiceTest {
         ReflectionTestUtils.setField(target,"proposalMapper",proposalMapper);
         ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
+        ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
         when(blockChainConfig.getMinProposalTextSupportRate()).thenReturn(BigDecimal.ONE);
         when(blockChainConfig.getMinProposalTextParticipationRate()).thenReturn(BigDecimal.ONE);
         when(blockChainConfig.getMinProposalUpgradePassRate()).thenReturn(BigDecimal.ONE);
@@ -53,7 +59,7 @@ public class ProposalServiceTest {
     }
     
     @Test
-    public void test() {
+    public void test() throws IOException {
         ProposalDetailRequest req = new ProposalDetailRequest();
 
         when(proposalMapper.selectByPrimaryKey(any())).thenReturn(null);
@@ -75,6 +81,9 @@ public class ProposalServiceTest {
         networkStat.setAvgPackTime(33L);
         when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStat);
 
+        Block block = new Block();
+        block.setTime(new Date());
+        when(blockESRepository.get(any(),any())).thenReturn(block);
         proposal.setType(CustomProposal.TypeEnum.TEXT.getCode());
         target.get(req);
 
