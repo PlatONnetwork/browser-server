@@ -9,6 +9,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ParamProposalCacheTest extends AgentTestBase {
 
@@ -19,5 +21,6 @@ public class ParamProposalCacheTest extends AgentTestBase {
         paramProposalCache.init(new ArrayList<>(proposalList));
         paramProposalCache.add(4444L,"0xsfsfdsf");
         paramProposalCache.get(4444L);
+        //assertEquals(paramProposalCache.get(444L),"0xsfsfdsf");
     }
 }
