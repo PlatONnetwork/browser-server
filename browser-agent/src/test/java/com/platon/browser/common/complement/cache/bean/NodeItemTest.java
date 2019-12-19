@@ -9,6 +9,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigInteger;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class NodeItemTest {
 

@@ -8,6 +8,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class NetworkStatCacheTest extends AgentTestBase {
 
@@ -18,7 +20,9 @@ public class NetworkStatCacheTest extends AgentTestBase {
         networkStatCache.init(networkStatList.get(0));
         TpsCalcCache tpsCalcCache = new TpsCalcCache();
         networkStatCache.setTpsCalcCache(tpsCalcCache);
+        assertEquals(networkStatCache.getTpsCalcCache(),tpsCalcCache);
         networkStatCache.setNetworkStat(networkStatList.get(0));
+        assertEquals(networkStatCache.getNetworkStat(),networkStatList.get(0));
         networkStatCache.updateByBlock(blockList.get(0),333);
         networkStatCache.updateByTask(BigDecimal.TEN,BigDecimal.ONE,BigDecimal.TEN,BigDecimal.ONE,33,33,BigDecimal.TEN);
         networkStatCache.getNetworkStat();
