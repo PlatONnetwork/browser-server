@@ -50,10 +50,7 @@ public class AppDocBlockController implements AppDocBlock {
 	@Override
 	public WebAsyncTask<RespPage<BlockListResp>> blockList(@Valid PageReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-            RespPage<BlockListResp> blockListResps = blockService.blockList(req);
-            return blockListResps;
-        });
+        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> blockService.blockList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
@@ -61,10 +58,7 @@ public class AppDocBlockController implements AppDocBlock {
 	@Override
 	public WebAsyncTask<RespPage<BlockListResp>> blockListByNodeId(@Valid BlockListByNodeIdReq req) {
 		// 5s钟没返回，则认为超时  
-        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-            RespPage<BlockListResp> blockListResps = blockService.blockListByNodeId(req);
-            return blockListResps;
-        });
+        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> blockService.blockListByNodeId(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}

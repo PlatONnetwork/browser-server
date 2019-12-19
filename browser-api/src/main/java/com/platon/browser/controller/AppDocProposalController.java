@@ -57,9 +57,7 @@ public class AppDocProposalController implements AppDocProposal {
 	@Override
 	public WebAsyncTask<RespPage<VoteListResp>> voteList(@Valid VoteListRequest req) {
 		// 5s钟没返回，则认为超时
-		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-			return voteService.queryByProposal(req);
-		});
+		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> voteService.queryByProposal(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
 	}
