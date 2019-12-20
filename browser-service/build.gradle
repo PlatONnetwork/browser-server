@@ -30,6 +30,7 @@ sonarqube {
                 "**/CacheBase.java,**/NullStringJsonSerializer.java,**/RoundCalculation.java," +
                 "**/DownFileCommon.java,**/AccountDownload.java,**/BlockDownload.java," +
                 "**/BrowserCache.java,**/JedisNoResultCall.java,**/CommonMethod.java," +
-                "**/NullStringJsonSerializer.java"
+                "**/NullStringJsonSerializer.java,**/AccuVerifiersCount.java,**/BlockListResp.java," +
+                "**/AliveStakingListResp.java,**/QueryDetailResp.java"
     }
 }

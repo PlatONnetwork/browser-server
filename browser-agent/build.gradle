@@ -131,6 +131,6 @@ sonarqube {
                 "**/ProposalInfoTask.java,**/AddressUpdateTask.java,**/EpochMessage.java," +
                 "**/NetworkStatCache.java,**/ShutdownCallback.java,**/AccountService.java," +
                 "**/OnSettleConverter.java,**/PersistenceEvent.java,**/AddressTypeEnum.java," +
-                "**/ConfigChange.java,**/AccuVerifiersCount.java"
+                "**/ConfigChange.java"
     }
 }
