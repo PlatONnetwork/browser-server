@@ -20,13 +20,15 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class AddressHandler  implements EventHandler <AddressEvent> {
+public class AddressHandler extends AbstractHandler implements EventHandler <AddressEvent> {
 
     @Autowired
     private AddressMapper addressMapper;
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) throws Exception {
+        long startTime = System.currentTimeMillis();
+
         List <Address> addresses = event.getAddressList();
         addresses.forEach(address -> {
             address.setBalance(BigDecimal.ZERO);
@@ -48,5 +50,7 @@ public class AddressHandler  implements EventHandler <AddressEvent> {
             address.setType(1);
         });
         addressMapper.batchInsert(addresses);
+        long endTime = System.currentTimeMillis();
+        printTps("地址",addresses.size(),startTime,endTime);
     }
 }

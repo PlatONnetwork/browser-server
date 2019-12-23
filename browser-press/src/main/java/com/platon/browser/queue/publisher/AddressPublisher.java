@@ -9,10 +9,13 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.event.AddressEvent;
 import com.platon.browser.queue.event.BlockEvent;
+import com.platon.browser.queue.handler.AbstractHandler;
 import com.platon.browser.queue.handler.AddressHandler;
 import com.platon.browser.queue.handler.BlockHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -22,7 +25,9 @@ import java.util.List;
  * @Date: 2019/12/23
  * @Description:
  */
-public class AddressPublisher {
+@Slf4j
+@Component
+public class AddressPublisher extends AbstractPublisher {
     private static final EventTranslatorOneArg<AddressEvent,List<Address>>
             TRANSLATOR = (event, sequence, addressList)->{
         event.setAddressList(addressList);
@@ -33,6 +38,8 @@ public class AddressPublisher {
     private EventFactory<AddressEvent> eventFactory = AddressEvent::new;
     @Autowired
     private AddressHandler handler;
+    @Override
+    public AbstractHandler getHandler(){return handler;}
 
     @PostConstruct
     private void init(){
