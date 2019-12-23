@@ -36,7 +36,7 @@ public class NodeHandler extends AbstractHandler implements EventHandler<NodeEve
 
     @Setter
     @Getter
-    @Value("${disruptor.queue.transaction.batch-size}")
+    @Value("${disruptor.queue.node.batch-size}")
     private volatile int batchSize;
 
     private List<Node> nodeStage = new ArrayList<>();

@@ -33,7 +33,7 @@ public class StakeHandler extends AbstractHandler implements EventHandler<StakeE
 
     @Setter
     @Getter
-    @Value("${disruptor.queue.transaction.batch-size}")
+    @Value("${disruptor.queue.stake.batch-size}")
     private volatile int batchSize;
 
     private List<Staking> stakingStage = new ArrayList<>();
