@@ -22,17 +22,12 @@ import java.util.List;
 @Service
 public class StakeGenService {
 
-    @Value("${platon.stakingSumQty}")
-    private String stakingSumQty;
-
     public List<Staking> buildStakeInfo ( List <Node> nodeList, Long nowQty ) {
         List<Staking> stakings  = new ArrayList <>();
         for(Node node : nodeList){
-            if (Long.parseLong(stakingSumQty) >= nowQty) {
-                Staking staking = new Staking();
-                BeanUtils.copyProperties(node,staking);
-                stakings.add(staking);
-            }
+            Staking staking = new Staking();
+            BeanUtils.copyProperties(node,staking);
+            stakings.add(staking);
         }
         return stakings;
     }
