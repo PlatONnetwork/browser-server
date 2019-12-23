@@ -1,9 +1,12 @@
 package com.platon.browser.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.queue.event.AddressEvent;
 import com.platon.browser.queue.event.TransactionEvent;
+import com.platon.browser.queue.publisher.AddressPublisher;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
 import lombok.Getter;
@@ -16,9 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 区块事件处理器
@@ -31,6 +32,9 @@ public class TransactionHandler  extends AbstractHandler implements EventHandler
     private EsImportService esImportService;
     @Autowired
     private RedisImportService redisImportService;
+
+    @Autowired
+    private AddressPublisher addressPublisher;
 
     @Setter
     @Getter
@@ -65,6 +69,17 @@ public class TransactionHandler  extends AbstractHandler implements EventHandler
 
             long endTime = System.currentTimeMillis();
             printTps("交易",transactionStage.size(),startTime,endTime);
+
+            List <Address> addresses = new ArrayList <>();
+            event.getTransactionList().forEach(tx->{
+                Address address=new Address();
+                address.setAddress(tx.getFrom());
+                addresses.add(address);
+                address=new Address();
+                address.setAddress(tx.getTo());
+                addresses.add(address);
+            });
+            addressPublisher.publish(addresses);
 
             transactionStage.clear();
         }catch (Exception e){
