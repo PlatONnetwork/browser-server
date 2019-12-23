@@ -98,3 +98,9 @@ platon:
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
+  #节点条数
+  nodeSumQty: 600
+  #质押条数
+  stakingSumQty: 1200
+  #委托条数
+  delegateSumQty: 6000

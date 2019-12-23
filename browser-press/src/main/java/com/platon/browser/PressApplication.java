@@ -1,13 +1,14 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.exception.GracefullyShutdownException;
-import com.platon.browser.queue.publisher.AddressPublisher;
-import com.platon.browser.queue.publisher.BlockPublisher;
-import com.platon.browser.queue.publisher.NodeOptPublisher;
-import com.platon.browser.queue.publisher.TransactionPublisher;
+import com.platon.browser.queue.publisher.*;
 import com.platon.browser.service.BlockResult;
 import com.platon.browser.service.DataGenService;
+import com.platon.browser.service.NodeGenService;
+import com.platon.browser.service.StakeGenService;
 import com.platon.browser.utils.CounterBean;
 import com.platon.browser.utils.GracefullyUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @EnableRetry
@@ -43,9 +45,18 @@ public class PressApplication implements ApplicationRunner {
     private NodeOptPublisher nodeOptPublisher;
     @Autowired
     private AddressPublisher addressPublisher;
+    @Autowired
+    private NodePublisher nodePublisher;
 
     @Autowired
     private DataGenService dataGenService;
+    @Autowired
+    private NodeGenService nodeGenService;
+    @Autowired
+    private StakeGenService stakeGenService;
+
+    private static Long nodeQty = 0L;
+    private static Long stakeQty = 0L;
     public static void main ( String[] args ) {
         SpringApplication.run(PressApplication.class, args);
     }
@@ -94,7 +105,19 @@ public class PressApplication implements ApplicationRunner {
             transactionPublisher.publish(blockResult.getTransactionList());
             nodeOptPublisher.publish(blockResult.getNodeOptList());
 
+            List <Node> nodeList = nodeGenService.buildNodeInfo(blockResult.getTransactionList(),nodeQty);
+            nodeQty = nodeQty + nodeList.size();
+            if(nodeList.size()>0){
+                nodePublisher.publish(nodeList);
+                List<Staking> stakings = stakeGenService.buildStakeInfo(nodeList,stakeQty);
+                stakeQty = stakeQty + stakings.size();
+
+            }
             blockNumber=blockNumber.add(BigInteger.ONE);
+
+
         }
+
+
     }
 }

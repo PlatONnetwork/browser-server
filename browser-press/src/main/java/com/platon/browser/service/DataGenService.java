@@ -89,6 +89,7 @@ public class DataGenService {
 
         String nodeId = randomNodeId();
         br.buildAssociation(blockNumber,nodeId,++nodeOptMaxId);
+
         return br;
     }
 

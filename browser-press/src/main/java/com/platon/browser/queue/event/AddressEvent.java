@@ -1,7 +1,6 @@
 package com.platon.browser.queue.event;
 
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.elasticsearch.dto.Block;
 
 import java.util.List;
 

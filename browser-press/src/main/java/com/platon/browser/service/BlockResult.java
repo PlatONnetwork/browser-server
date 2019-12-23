@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 public class BlockResult {
 
+
     static class AddressCount {
         private String address;
         private Integer count=0;
