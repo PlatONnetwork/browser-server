@@ -61,6 +61,6 @@ public class AddressHandler extends AbstractHandler implements EventHandler <Add
         List<Address> addressList = new ArrayList<>(addressMap.values());
         addressMapper.batchInsert(addressList);
         long endTime = System.currentTimeMillis();
-        printTps("地址",addresses.size(),startTime,endTime);
+        printTps("地址",addressList.size(),startTime,endTime);
     }
 }

@@ -3,6 +3,10 @@
 version: 0.7.5.0
 # 当前激活的配置名称(请不要修改)
 profile: press
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #Spring框架内部配置
 spring:
   #数据源配置
