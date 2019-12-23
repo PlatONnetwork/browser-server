@@ -2,6 +2,7 @@ package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.GracefullyShutdownException;
+import com.platon.browser.queue.publisher.AddressPublisher;
 import com.platon.browser.queue.publisher.BlockPublisher;
 import com.platon.browser.queue.publisher.NodeOptPublisher;
 import com.platon.browser.queue.publisher.TransactionPublisher;
@@ -11,6 +12,7 @@ import com.platon.browser.utils.CounterBean;
 import com.platon.browser.utils.GracefullyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -29,6 +31,7 @@ import java.util.Arrays;
 @Slf4j
 @EnableRetry
 @EnableScheduling
+@MapperScan(basePackages = {"com.platon.browser.dao.mapper"})
 @SpringBootApplication
 public class PressApplication implements ApplicationRunner {
 
@@ -38,6 +41,8 @@ public class PressApplication implements ApplicationRunner {
     private TransactionPublisher transactionPublisher;
     @Autowired
     private NodeOptPublisher nodeOptPublisher;
+    @Autowired
+    private AddressPublisher addressPublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -58,6 +63,7 @@ public class PressApplication implements ApplicationRunner {
             transactionPublisher.setTotalCount(counterBean.getTransactionCount());
             nodeOptPublisher.setTotalCount(counterBean.getNodeOptCount());
             dataGenService.setNodeOptMaxId(counterBean.getNodeOptMaxId());
+            addressPublisher.setTotalCount(counterBean.getAddressCount());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
         }
@@ -73,6 +79,7 @@ public class PressApplication implements ApplicationRunner {
                 counter.setTransactionCount(transactionPublisher.getTotalCount());
                 counter.setNodeOptCount(nodeOptPublisher.getTotalCount());
                 counter.setNodeOptMaxId(dataGenService.getNodeOptMaxId());
+                counter.setAddressCount(addressPublisher.getTotalCount());
                 String status = JSON.toJSONString(counter,true);
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
                     bw.write(status);

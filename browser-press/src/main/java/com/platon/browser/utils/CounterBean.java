@@ -10,4 +10,5 @@ public class CounterBean {
     private long transactionCount;
     private long nodeOptCount;
     private long nodeOptMaxId;
+    private long addressCount;
 }

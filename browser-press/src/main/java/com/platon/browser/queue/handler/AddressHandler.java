@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Auther: dongqile
@@ -24,13 +24,18 @@ public class AddressHandler extends AbstractHandler implements EventHandler <Add
 
     @Autowired
     private AddressMapper addressMapper;
+    @PostConstruct
+    private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
 
         List <Address> addresses = event.getAddressList();
-        addresses.forEach(address -> {
+        Map<String,Address> addressMap = new HashMap<>();
+
+        addresses.forEach(address -> addressMap.put(address.getAddress(),address));
+        addressMap.values().forEach(address -> {
             address.setBalance(BigDecimal.ZERO);
             address.setCandidateCount(0);
             address.setCreateTime(new Date());
@@ -48,8 +53,13 @@ public class AddressHandler extends AbstractHandler implements EventHandler <Add
             address.setTxQty(0);
             address.setUpdateTime(new Date());
             address.setType(1);
+            address.setContractName("");
+            address.setContractCreate("");
+            address.setContractCreatehash("");
         });
-        addressMapper.batchInsert(addresses);
+
+        List<Address> addressList = new ArrayList<>(addressMap.values());
+        addressMapper.batchInsert(addressList);
         long endTime = System.currentTimeMillis();
         printTps("地址",addresses.size(),startTime,endTime);
     }
