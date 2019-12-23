@@ -58,10 +58,10 @@ public class NodeOptHandler  extends AbstractHandler implements EventHandler<Nod
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
-            nodeOptStage.clear();
-
             long endTime = System.currentTimeMillis();
             printTps("日志",nodeOptStage.size(),startTime,endTime);
+
+            nodeOptStage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

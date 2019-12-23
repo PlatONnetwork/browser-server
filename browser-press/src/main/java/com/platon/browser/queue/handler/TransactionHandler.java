@@ -58,10 +58,11 @@ public class TransactionHandler  extends AbstractHandler implements EventHandler
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             redisImportService.batchImport(Collections.emptySet(),transactionStage,statistics);
-            transactionStage.clear();
 
             long endTime = System.currentTimeMillis();
             printTps("交易",transactionStage.size(),startTime,endTime);
+
+            transactionStage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

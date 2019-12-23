@@ -58,10 +58,10 @@ public class BlockHandler extends AbstractHandler implements EventHandler<BlockE
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             redisImportService.batchImport(blockStage,Collections.emptySet(),statistics);
-            blockStage.clear();
-
             long endTime = System.currentTimeMillis();
             printTps("区块",blockStage.size(),startTime,endTime);
+
+            blockStage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;
