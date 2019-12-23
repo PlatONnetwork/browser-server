@@ -55,13 +55,13 @@ public class NodeOptHandler  extends AbstractHandler implements EventHandler<Nod
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(Collections.emptySet(), Collections.emptySet(),nodeOptStage);
 
+            // 入库Redis 更新Redis中的统计记录
+            Set<NetworkStat> statistics = new HashSet<>();
+            redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
+            nodeOptStage.clear();
+
             long endTime = System.currentTimeMillis();
             printTps("日志",nodeOptStage.size(),startTime,endTime);
-
-            // 入库Redis 更新Redis中的统计记录
-//            Set<NetworkStat> statistics = new HashSet<>();
-//            redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
-            nodeOptStage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

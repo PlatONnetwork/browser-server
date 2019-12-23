@@ -5,6 +5,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import jnr.x86asm.CONDITION;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,9 +37,9 @@ public class DataGenService {
     }
 
 
-    private static List<Block> blockList;
-    private static List<Transaction> transactionList;
-    private static List<NodeOpt> nodeOptList;
+    private static String blockListStr;
+    private static String transactionListStr;
+    private static String nodeOptListStr;
 
     static {
         URL dirUrl = DataGenService.class.getClassLoader().getResource("data");
@@ -49,17 +50,17 @@ public class DataGenService {
                 String content = FileUtils.readFileToString(file,"UTF-8");
                 switch (file.getName()){
                     case "block.json":
-                        blockList = JSON.parseArray(content,Block.class);
+                        blockListStr = content;
                         break;
                     case "transaction.json":
-                        transactionList = JSON.parseArray(content,Transaction.class);
+                        transactionListStr = content;
                         break;
                     case "nodeopt.json":
-                        nodeOptList = JSON.parseArray(content,NodeOpt.class);
+                        nodeOptListStr = content;
                         break;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("读取文件内容出错",e);
             }
         });
     }
@@ -71,8 +72,14 @@ public class DataGenService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BlockResult get(BigInteger blockNumber){
         BlockResult br = new BlockResult();
-        br.setBlock(blockList.get(0));
+
+        Block block = JSON.parseObject(blockListStr,Block.class);
+        br.setBlock(block);
+
+        List<Transaction> transactionList = JSON.parseArray(transactionListStr,Transaction.class);
         br.setTransactionList(transactionList);
+
+        List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr,NodeOpt.class);
         br.setNodeOptList(nodeOptList);
 
         String nodeId = randomNodeId();
