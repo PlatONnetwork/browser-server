@@ -41,15 +41,15 @@ disruptor:
     block:
       gen-size: 100
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 4096
     transaction:
       gen-size: 100
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 4096
     nodeopt:
       gen-size: 100
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 4096
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数

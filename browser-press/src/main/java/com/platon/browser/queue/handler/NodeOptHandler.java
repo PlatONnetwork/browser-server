@@ -24,7 +24,7 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class NodeOptHandler implements EventHandler<NodeOptEvent> {
+public class NodeOptHandler  extends AbstractHandler implements EventHandler<NodeOptEvent> {
 
     @Autowired
     private EsImportService esImportService;
@@ -54,6 +54,10 @@ public class NodeOptHandler implements EventHandler<NodeOptEvent> {
 
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(Collections.emptySet(), Collections.emptySet(),nodeOptStage);
+
+            long endTime = System.currentTimeMillis();
+            printTps("日志",nodeOptStage.size(),startTime,endTime);
+
             // 入库Redis 更新Redis中的统计记录
 //            Set<NetworkStat> statistics = new HashSet<>();
 //            redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
@@ -62,7 +66,5 @@ public class NodeOptHandler implements EventHandler<NodeOptEvent> {
             log.error("",e);
             throw e;
         }
-
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }

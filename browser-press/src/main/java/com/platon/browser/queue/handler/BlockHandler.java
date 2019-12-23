@@ -24,7 +24,7 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class BlockHandler implements EventHandler<BlockEvent> {
+public class BlockHandler extends AbstractHandler implements EventHandler<BlockEvent> {
 
     @Autowired
     private EsImportService esImportService;
@@ -54,6 +54,10 @@ public class BlockHandler implements EventHandler<BlockEvent> {
 
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(blockStage, Collections.emptySet(),Collections.emptySet());
+
+            long endTime = System.currentTimeMillis();
+            printTps("区块",blockStage.size(),startTime,endTime);
+
             // 入库Redis 更新Redis中的统计记录
 //            Set<NetworkStat> statistics = new HashSet<>();
 //            redisImportService.batchImport(blockStage,Collections.emptySet(),statistics);
@@ -62,7 +66,5 @@ public class BlockHandler implements EventHandler<BlockEvent> {
             log.error("",e);
             throw e;
         }
-
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }

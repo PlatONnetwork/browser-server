@@ -24,7 +24,7 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class TransactionHandler implements EventHandler<TransactionEvent> {
+public class TransactionHandler  extends AbstractHandler implements EventHandler<TransactionEvent> {
 
     @Autowired
     private EsImportService esImportService;
@@ -54,6 +54,9 @@ public class TransactionHandler implements EventHandler<TransactionEvent> {
 
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(Collections.emptySet(),transactionStage,Collections.emptySet());
+
+            long endTime = System.currentTimeMillis();
+            printTps("交易",transactionStage.size(),startTime,endTime);
             // 入库Redis 更新Redis中的统计记录
 //            Set<NetworkStat> statistics = new HashSet<>();
 //            redisImportService.batchImport(Collections.emptySet(),transactionStage,statistics);
@@ -62,7 +65,5 @@ public class TransactionHandler implements EventHandler<TransactionEvent> {
             log.error("",e);
             throw e;
         }
-
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }
