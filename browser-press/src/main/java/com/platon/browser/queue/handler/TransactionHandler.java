@@ -55,8 +55,8 @@ public class TransactionHandler implements EventHandler<TransactionEvent> {
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(Collections.emptySet(),transactionStage,Collections.emptySet());
             // 入库Redis 更新Redis中的统计记录
-            Set<NetworkStat> statistics = new HashSet<>();
-            redisImportService.batchImport(Collections.emptySet(),transactionStage,statistics);
+//            Set<NetworkStat> statistics = new HashSet<>();
+//            redisImportService.batchImport(Collections.emptySet(),transactionStage,statistics);
             transactionStage.clear();
         }catch (Exception e){
             log.error("",e);

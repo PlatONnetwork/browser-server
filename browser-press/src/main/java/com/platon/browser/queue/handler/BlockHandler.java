@@ -55,8 +55,8 @@ public class BlockHandler implements EventHandler<BlockEvent> {
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(blockStage, Collections.emptySet(),Collections.emptySet());
             // 入库Redis 更新Redis中的统计记录
-            Set<NetworkStat> statistics = new HashSet<>();
-            redisImportService.batchImport(blockStage,Collections.emptySet(),statistics);
+//            Set<NetworkStat> statistics = new HashSet<>();
+//            redisImportService.batchImport(blockStage,Collections.emptySet(),statistics);
             blockStage.clear();
         }catch (Exception e){
             log.error("",e);
