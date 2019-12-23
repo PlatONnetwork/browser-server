@@ -1,7 +1,7 @@
 package com.platon.browser.queue.event;
 
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Staking;
+import lombok.Data;
 
 import java.util.List;
 
@@ -10,14 +10,7 @@ import java.util.List;
  * @Date: 2019/12/23
  * @Description:
  */
+@Data
 public class StakeEvent {
     private List <Staking> stakingList;
-
-    public List<Staking> getStakingList() {
-        return stakingList;
-    }
-
-    public void setStakingList(List<Staking> stakingList) {
-        this.stakingList = stakingList;
-    }
 }
