@@ -103,8 +103,8 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
   #节点条数
-  nodeSumQty: 600
+  nodeMaxCount: 600
   #质押条数
-  stakingSumQty: 1200
+  stakeMaxCount: 1200
   #委托条数
-  delegateSumQty: 6000
+  delegateMaxCount: 6000

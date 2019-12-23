@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -54,9 +55,16 @@ public class PressApplication implements ApplicationRunner {
     private NodeGenService nodeGenService;
     @Autowired
     private StakeGenService stakeGenService;
+    @Value("${platon.nodeMaxCount}")
+    private long nodeMaxCount;
+    @Value("${platon.stakeMaxCount}")
+    private long stakeMaxCount;
+    @Value("${platon.delegateMaxCount}")
+    private long delegateMaxCount;
 
-    private static Long nodeQty = 0L;
-    private static Long stakeQty = 0L;
+    private long currentNodeSum = 0L;
+    private long currentStakeSum = 0L;
+
     public static void main ( String[] args ) {
         SpringApplication.run(PressApplication.class, args);
     }
@@ -105,17 +113,21 @@ public class PressApplication implements ApplicationRunner {
             transactionPublisher.publish(blockResult.getTransactionList());
             nodeOptPublisher.publish(blockResult.getNodeOptList());
 
-            List <Node> nodeList = nodeGenService.buildNodeInfo(blockResult.getTransactionList(),nodeQty);
-            nodeQty = nodeQty + nodeList.size();
-            if(nodeList.size()>0){
+
+            // 构造节点和质押记录并入库
+            if(currentNodeSum<nodeMaxCount){
+                List <Node> nodeList = nodeGenService.buildNodeInfo(blockResult.getTransactionList(),currentNodeSum);
+                currentNodeSum = currentNodeSum + nodeList.size();
                 nodePublisher.publish(nodeList);
-                List<Staking> stakings = stakeGenService.buildStakeInfo(nodeList,stakeQty);
-                stakeQty = stakeQty + stakings.size();
 
+                if(currentStakeSum<stakeMaxCount){
+                    List <Staking> stakingList = stakeGenService.buildStakeInfo(nodeList,currentStakeSum);
+                    currentStakeSum = currentStakeSum + stakingList.size();
+                    //.publish(nodeList);
+                }
             }
+
             blockNumber=blockNumber.add(BigInteger.ONE);
-
-
         }
 
 

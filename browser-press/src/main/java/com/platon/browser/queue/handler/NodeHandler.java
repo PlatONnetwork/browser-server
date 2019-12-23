@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.event.NodeEvent;
 import com.platon.browser.queue.event.TransactionEvent;
@@ -38,11 +39,23 @@ public class NodeHandler extends AbstractHandler implements EventHandler<NodeEve
     @Value("${disruptor.queue.transaction.batch-size}")
     private volatile int batchSize;
 
+    private List<Node> nodeStage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent ( NodeEvent event, long sequence, boolean endOfBatch ) throws Exception {
-        nodeMapper.batchInsert(event.getNodeList());
+        long startTime = System.currentTimeMillis();
+        try {
+            nodeStage.addAll(event.getNodeList());
+            if(nodeStage.size()<batchSize) return;
+            nodeMapper.batchInsert(nodeStage);
+            long endTime = System.currentTimeMillis();
+            printTps("节点",nodeStage.size(),startTime,endTime);
+            nodeStage.clear();
+        }catch (Exception e){
+            log.error("",e);
+            throw e;
+        }
     }
 }
