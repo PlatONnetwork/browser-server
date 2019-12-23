@@ -16,7 +16,8 @@ public class BlockResult {
     private Block block;
     private List<Transaction> transactionList=new ArrayList<>();
     private List<NodeOpt> nodeOptList=new ArrayList<>();
-    public void buildAssociation(BigInteger blockNumber, String nodeId){
+
+    public void buildAssociation(BigInteger blockNumber, String nodeId,long nodeOptId){
         block.setNum(blockNumber.longValue());
         block.setNodeId(nodeId);
         String blockHash = HexTool.prefix(DigestUtils.sha256Hex(block.toString()));
@@ -35,9 +36,10 @@ public class BlockResult {
             i++;
         }
 
-        nodeOptList.forEach(nodeOpt -> {
+        for (NodeOpt nodeOpt : nodeOptList) {
+            nodeOpt.setId(nodeOptId++);
             nodeOpt.setNodeId(nodeId);
             nodeOpt.setBNum(blockNumber.longValue());
-        });
+        }
     }
 }

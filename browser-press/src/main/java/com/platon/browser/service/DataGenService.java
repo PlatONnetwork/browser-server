@@ -6,8 +6,10 @@ import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import jnr.x86asm.CONDITION;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.asn1.cms.PasswordRecipientInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 @Slf4j
+@Data
 @Service
 public class DataGenService {
 
@@ -69,6 +72,8 @@ public class DataGenService {
     @Value("${disruptor.queue.block.gen-size}")
     private int blockGenSize;
 
+    private long nodeOptMaxId = 0L;
+
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BlockResult get(BigInteger blockNumber){
         BlockResult br = new BlockResult();
@@ -83,7 +88,7 @@ public class DataGenService {
         br.setNodeOptList(nodeOptList);
 
         String nodeId = randomNodeId();
-        br.buildAssociation(blockNumber,nodeId);
+        br.buildAssociation(blockNumber,nodeId,++nodeOptMaxId);
         return br;
     }
 

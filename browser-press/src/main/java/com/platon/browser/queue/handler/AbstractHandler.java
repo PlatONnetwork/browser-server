@@ -1,14 +1,17 @@
 package com.platon.browser.queue.handler;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@Slf4j
-public class AbstractHandler {
-
-    protected long totalCount = 0L;
+@Data
+public abstract class AbstractHandler {
+    private Logger logger;
+    private long totalCount = 0L;
 
     protected double printTps(String name,long recordCount,long startTimeMillis,long endTimeMillis){
         totalCount = totalCount+recordCount;
@@ -18,7 +21,7 @@ public class AbstractHandler {
         BigDecimal tps = BigDecimal.valueOf(recordCount)
                 .divide(timeDiffSecond,16, RoundingMode.FLOOR);
         double dtps = tps.setScale(2,RoundingMode.FLOOR).doubleValue();
-        log.info("{}总量:{},当前量:{},入库耗时:{}s,tps:{}",name,totalCount,recordCount,timeDiffSecond,dtps);
+        logger.info("{}总量:{},当前量:{},入库耗时:{}s,tps:{}",name,totalCount,recordCount,timeDiffSecond,dtps);
         return dtps;
     }
 }

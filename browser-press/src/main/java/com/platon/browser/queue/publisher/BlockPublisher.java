@@ -7,6 +7,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.event.BlockEvent;
+import com.platon.browser.queue.handler.AbstractHandler;
 import com.platon.browser.queue.handler.BlockHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class BlockPublisher {
+public class BlockPublisher extends AbstractPublisher {
     private static final EventTranslatorOneArg<BlockEvent,List<Block>>
     TRANSLATOR = (event, sequence, blockList)->{
         event.setBlockList(blockList);
@@ -32,6 +33,8 @@ public class BlockPublisher {
     private EventFactory<BlockEvent> eventFactory = BlockEvent::new;
     @Autowired
     private BlockHandler handler;
+    @Override
+    public AbstractHandler getHandler(){return handler;}
 
     @PostConstruct
     private void init(){

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,6 +38,9 @@ public class TransactionHandler  extends AbstractHandler implements EventHandler
     private volatile int batchSize;
 
     private Set<Transaction> transactionStage = new HashSet<>();
+
+    @PostConstruct
+    private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(TransactionEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {

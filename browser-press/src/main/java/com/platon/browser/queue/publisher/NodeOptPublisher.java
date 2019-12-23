@@ -7,6 +7,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.event.NodeOptEvent;
+import com.platon.browser.queue.handler.AbstractHandler;
 import com.platon.browser.queue.handler.NodeOptHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class NodeOptPublisher {
+public class NodeOptPublisher extends AbstractPublisher {
     private static final EventTranslatorOneArg<NodeOptEvent,List<NodeOpt>>
     TRANSLATOR = (event, sequence, nodeOptList)->{
         event.setNodeOptList(nodeOptList);
@@ -32,6 +33,8 @@ public class NodeOptPublisher {
     private EventFactory<NodeOptEvent> eventFactory = NodeOptEvent::new;
     @Autowired
     private NodeOptHandler handler;
+    @Override
+    public AbstractHandler getHandler(){return handler;}
 
     @PostConstruct
     private void init(){
@@ -43,5 +46,10 @@ public class NodeOptPublisher {
 
     public void publish(List<NodeOpt> nodeOptList){
         ringBuffer.publishEvent(TRANSLATOR,nodeOptList);
+    }
+
+    @Override
+    public long getTotalCount() {
+        return handler.getTotalCount();
     }
 }
