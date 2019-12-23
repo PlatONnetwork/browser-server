@@ -2,7 +2,7 @@
 # 应用版本
 version: 0.7.5.0
 # 当前激活的配置名称(请不要修改)
-profile: cdmpress
+profile: press
 #Spring框架内部配置
 spring:
   #Redis配置
@@ -41,15 +41,15 @@ disruptor:
     block:
       gen-size: 100
       buffer-size: 1024
-      batch-size: 4096
+      batch-size: 1024
     transaction:
       gen-size: 100
       buffer-size: 1024
-      batch-size: 4096
+      batch-size: 8192
     nodeopt:
       gen-size: 100
       buffer-size: 1024
-      batch-size: 4096
+      batch-size: 1024
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数
