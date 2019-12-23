@@ -48,6 +48,8 @@ public class PressApplication implements ApplicationRunner {
     private AddressPublisher addressPublisher;
     @Autowired
     private NodePublisher nodePublisher;
+    @Autowired
+    private StakePublisher stakePublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -123,7 +125,7 @@ public class PressApplication implements ApplicationRunner {
                 if(currentStakeSum<stakeMaxCount){
                     List <Staking> stakingList = stakeGenService.buildStakeInfo(nodeList,currentStakeSum);
                     currentStakeSum = currentStakeSum + stakingList.size();
-                    //.publish(nodeList);
+                    stakePublisher.publish(stakingList);
                 }
             }
 
