@@ -32,20 +32,20 @@ public class AddressHandler extends AbstractHandler implements EventHandler <Add
         List <Address> addresses = event.getAddressList();
         addresses.forEach(address -> {
             address.setBalance(BigDecimal.ZERO);
-            address.setCandidateCount(new Integer(0));
+            address.setCandidateCount(0);
             address.setCreateTime(new Date());
             address.setDelegateHes(BigDecimal.ZERO);
             address.setDelegateLocked(BigDecimal.ZERO);
-            address.setDelegateQty(new Integer(0));
+            address.setDelegateQty(0);
             address.setDelegateReleased(BigDecimal.ZERO);
             address.setDelegateValue(BigDecimal.ZERO);
-            address.setProposalQty(new Integer(0));
+            address.setProposalQty(0);
             address.setRedeemedValue(BigDecimal.ZERO);
             address.setRestrictingBalance(BigDecimal.ZERO);
-            address.setStakingQty(new Integer(0));
+            address.setStakingQty(0);
             address.setStakingValue(BigDecimal.ZERO);
-            address.setTransferQty(new Integer(0));
-            address.setTxQty(new Integer(0));
+            address.setTransferQty(0);
+            address.setTxQty(0);
             address.setUpdateTime(new Date());
             address.setType(1);
         });
