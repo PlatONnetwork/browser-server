@@ -41,7 +41,7 @@ public class NodeGenService {
                 node.setStakingLocked(BigDecimal.ZERO);
                 node.setStakingReduction(BigDecimal.ZERO);
                 node.setStakingReductionEpoch(1);
-                node.setNodeName(t.getBHash());
+                node.setNodeName("Node-"+nowQty);
                 node.setNodeIcon("nope");
                 node.setExternalId("Ga");
                 node.setStakingAddr(t.getFrom());
@@ -72,6 +72,8 @@ public class NodeGenService {
                 node.setPredictStakingReward(new BigDecimal("1000"));
                 node.setCreateTime(new Date());
                 node.setUpdateTime(new Date());
+                node.setStatVerifierTime(2);
+                node.setDetails("balabala");
                 nodes.add(node);
             }
         }
