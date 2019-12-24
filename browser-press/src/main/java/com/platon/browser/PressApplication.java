@@ -219,26 +219,35 @@ public class PressApplication implements ApplicationRunner {
      * 构造节点&质押
      * @param blockResult
      */
+    private boolean nodeSatisfied = false;
+    private boolean stakeSatisfied = false;
     private void makeStake(BlockResult blockResult) throws BlockNumberException {
         List <Node> nodeList = new ArrayList<>();
         List <Staking> stakingList = new ArrayList<>();
         for (Transaction tx : blockResult.getTransactionList()) {
             if(
+                (
                     tx.getTypeEnum()== Transaction.TypeEnum.STAKE_CREATE||
-                            tx.getTypeEnum()==Transaction.TypeEnum.STAKE_MODIFY||
-                            tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
-                            tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
+                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_MODIFY||
+                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
+                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
+                ) &&
+                (!nodeSatisfied||!stakeSatisfied)
             ){
                 StakeResult stakeResult = dataGenService.getStakeResult(tx);
                 if(currentNodeSum<nodeMaxCount){
                     // 构造指定数量的节点记录并入库
                     nodeList.add(stakeResult.getNode());
                     currentNodeSum++;
+                }else {
+                    nodeSatisfied=true;
                 }
                 if(currentStakeSum<stakeMaxCount){
                     // 构造指定数量的质押记录并入库
                     stakingList.add(stakeResult.getStaking());
                     currentStakeSum++;
+                }else {
+                    stakeSatisfied=true;
                 }
             }
         }
