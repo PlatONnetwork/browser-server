@@ -30,17 +30,19 @@ import java.util.*;
 @Data
 @Service
 public class DataGenService {
+    private static final Random random = new Random();
 
     private static final List<String> PROPOSAL_HASH = new ArrayList<>();
-    private static final List<String> NODE_ID = new ArrayList<>();
+    private static final List<String> NODE_IDS = new ArrayList<>();
     private static final List<String> ADDRESS = new ArrayList<>();
 
     @Autowired
     private NodeMapper nodeMapper;
 
-    private static final List<String> NODE_IDS=new ArrayList<>();
     static {
-            NODE_IDS.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
+        PROPOSAL_HASH.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
+        NODE_IDS.add(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
+        ADDRESS.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
     }
 
     static class Status{
@@ -64,10 +66,24 @@ public class DataGenService {
             new Status(3,2,2,2),
             new Status(3,1,2,2),
     };
+    private Status randomStatus(){
+        Status status = STATUSES_ARR[random.nextInt(STATUSES_ARR.length)];
+        return status;
+    }
 
-    private static final Random random = new Random();
-    public static String randomNodeId(){
-        return NODE_IDS.get(random.nextInt(NODE_IDS.size()));
+    private String randomNodeId(){
+        String nodeId = NODE_IDS.get(random.nextInt(NODE_IDS.size()));
+        return nodeId;
+    }
+
+    private String randomAddress(){
+        String address = ADDRESS.get(random.nextInt(ADDRESS.size()));
+        return address;
+    }
+
+    private String randomProposalHash(){
+        String hash = PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size()));
+        return hash;
     }
 
     private String blockListStr;
@@ -164,20 +180,20 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public StakeResult getStakeResult(Transaction tx,Long nodeSum,Long stakeSum) throws BlockNumberException {
+    public StakeResult getStakeResult(Transaction tx) throws BlockNumberException {
         Node node = JSON.parseObject(nodeStr,Node.class);
         node.setStakingBlockNum(tx.getNum());
-        node.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(stakeSum.toString())));
+        node.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
         node.setNodeIcon(node.getNodeId().substring(0,6));
         node.setNodeName(node.getNodeId().substring(7,10));
 
-        Status status = STATUSES_ARR[random.nextInt(STATUSES_ARR.length)];
+        Status status = randomStatus();
         node.setStatus(status.status);
         node.setIsConsensus(status.isConsensus);
         node.setIsSettle(status.isSettle);
         node.setIsInit(status.isInit);
         node.setStakingTxIndex(tx.getIndex());
-        node.setStakingAddr(HexTool.prefix(DigestUtils.sha1Hex(stakeSum.toString())));
+        node.setStakingAddr(randomAddress());
         node.setStatVerifierTime(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN).intValue());
 
         if(ADDRESS.size()<5000&&!ADDRESS.contains(tx.getFrom())){
@@ -196,19 +212,19 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Delegation getDelegation(Transaction tx,Long totalCount){
+    public Delegation getDelegation(Transaction tx){
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
         copy.setStakingBlockNum(tx.getNum());
-        copy.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(totalCount.toString())));
-        copy.setDelegateAddr(ADDRESS.get(random.nextInt(ADDRESS.size())));
+        copy.setNodeId(randomNodeId());
+        copy.setDelegateAddr(randomAddress());
         return copy;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Proposal getProposal(Transaction tx,Long totalCount){
+    public Proposal getProposal(Transaction tx){
         Proposal copy = JSON.parseObject(proposalStr, Proposal.class);
         copy.setHash(tx.getHash());
-        copy.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(totalCount.toString())));
+        copy.setNodeId(randomNodeId());
         copy.setNodeName(copy.getNodeId().substring(7,10));
         copy.setName(copy.getNodeId().substring(0,6));
         // 1文本提案,2升级提案,3参数提案,4取消提案
@@ -228,35 +244,34 @@ public class DataGenService {
         }
         copy.setBlockNumber(tx.getNum());
         PROPOSAL_HASH.add(copy.getHash());
-        NODE_ID.add(copy.getNodeId());
         return copy;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Vote getVote(Transaction tx,Long totalCount){
+    public Vote getVote(Transaction tx){
         Vote copy = JSON.parseObject(voteStr, Vote.class);
-        copy.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(totalCount.toString())));
+        copy.setNodeId(randomNodeId());
         copy.setNodeName(copy.getNodeId().substring(7,10));
         copy.setHash(tx.getHash());
-        copy.setProposalHash(PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size())));
+        copy.setProposalHash(randomProposalHash());
         return copy;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public RpPlan getRpPlan(Transaction tx,Long totalCount) throws BlockNumberException {
+    public RpPlan getRpPlan(Transaction tx) throws BlockNumberException {
         RpPlan copy = JSON.parseObject(rpPlanStr, RpPlan.class);
         copy.setId(null);
         copy.setEpoch(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN).longValue());
-        copy.setAddress(ADDRESS.get(random.nextInt(ADDRESS.size())));
+        copy.setAddress(randomAddress());
         return copy;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Slash getSlash(Transaction tx,Long totalCount){
+    public Slash getSlash(Transaction tx){
         Slash copy = JSON.parseObject(slashStr, Slash.class);
         copy.setHash(tx.getHash());
-        copy.setBenefitAddr(ADDRESS.get(random.nextInt(ADDRESS.size())));
-        copy.setNodeId(NODE_ID.get(random.nextInt(NODE_ID.size())));
+        copy.setBenefitAddr(randomAddress());
+        copy.setNodeId(randomNodeId());
         return copy;
     }
 }

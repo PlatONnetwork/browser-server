@@ -229,7 +229,9 @@ public class PressApplication implements ApplicationRunner {
                             tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
                             tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
             ){
-                StakeResult stakeResult = dataGenService.getStakeResult(tx,currentNodeSum++,currentStakeSum++);
+                StakeResult stakeResult = dataGenService.getStakeResult(tx);
+                currentNodeSum++;
+                currentStakeSum++;
                 if(currentNodeSum<nodeMaxCount){
                     // 构造指定数量的节点记录并入库
                     nodeList.add(stakeResult.getNode());
@@ -258,7 +260,8 @@ public class PressApplication implements ApplicationRunner {
                         tx.getTypeEnum()== Transaction.TypeEnum.DELEGATE_CREATE||
                                 tx.getTypeEnum()==Transaction.TypeEnum.DELEGATE_EXIT
                 ){
-                    delegationList.add(dataGenService.getDelegation(tx, currentDelegationSum++));
+                    delegationList.add(dataGenService.getDelegation(tx));
+                    currentDelegationSum++;
                 }
             }
             delegationPublisher.publish(delegationList);
@@ -280,7 +283,8 @@ public class PressApplication implements ApplicationRunner {
                     tx.getTypeEnum()==Transaction.TypeEnum.PROPOSAL_PARAMETER||
                     tx.getTypeEnum()==Transaction.TypeEnum.PROPOSAL_UPGRADE
                 ){
-                    proposalList.add(dataGenService.getProposal(tx, currentProposalSum++));
+                    proposalList.add(dataGenService.getProposal(tx));
+                    currentProposalSum++;
                 }
             }
             proposalPublisher.publish(proposalList);
@@ -299,7 +303,8 @@ public class PressApplication implements ApplicationRunner {
                 if(
                     tx.getTypeEnum()== Transaction.TypeEnum.PROPOSAL_VOTE
                 ){
-                    voteList.add(dataGenService.getVote(tx, currentVoteSum++));
+                    voteList.add(dataGenService.getVote(tx));
+                    currentVoteSum++;
                 }
             }
             votePublisher.publish(voteList);
@@ -318,7 +323,8 @@ public class PressApplication implements ApplicationRunner {
                 if(
                         tx.getTypeEnum()== Transaction.TypeEnum.REPORT
                 ){
-                    slashList.add(dataGenService.getSlash(tx, currentSlashSum++));
+                    slashList.add(dataGenService.getSlash(tx));
+                    currentSlashSum++;
                 }
             }
             slashPublisher.publish(slashList);
@@ -337,7 +343,8 @@ public class PressApplication implements ApplicationRunner {
                 if(
                         tx.getTypeEnum()== Transaction.TypeEnum.RESTRICTING_CREATE
                 ){
-                    rpPlanList.add(dataGenService.getRpPlan(tx, currentRpplanSum++));
+                    rpPlanList.add(dataGenService.getRpPlan(tx));
+                    currentRpplanSum++;
                 }
             }
             rpPlanPublisher.publish(rpPlanList);
