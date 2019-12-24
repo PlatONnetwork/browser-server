@@ -1,15 +1,14 @@
 package com.platon.browser.queue.handler;
 
+import com.lmax.disruptor.EventHandler;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Data
-public abstract class AbstractHandler {
+public abstract class AbstractHandler<T> implements EventHandler<T> {
     private Logger logger;
     private long totalCount = 0L;
 

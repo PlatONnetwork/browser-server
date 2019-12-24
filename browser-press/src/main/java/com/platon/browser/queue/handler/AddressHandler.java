@@ -1,11 +1,13 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.queue.event.AddressEvent;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -20,21 +22,27 @@ import java.util.*;
  */
 @Slf4j
 @Component
-public class AddressHandler extends AbstractHandler implements EventHandler <AddressEvent> {
+public class AddressHandler extends AbstractHandler<AddressEvent> {
 
     @Autowired
     private AddressMapper addressMapper;
     @PostConstruct
     private void init(){this.setLogger(log);}
 
+    @Setter
+    @Getter
+    @Value("${disruptor.queue.address.batch-size}")
+    private volatile int batchSize;
+
+    private Set<Address> stage = new HashSet<>();
+
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
-
-        List <Address> addresses = event.getAddressList();
+        stage.addAll(event.getAddressList());
+        if(stage.size()<batchSize) return;
         Map<String,Address> addressMap = new HashMap<>();
-
-        addresses.forEach(address -> addressMap.put(address.getAddress(),address));
+        stage.forEach(address -> addressMap.put(address.getAddress(),address));
         addressMap.values().forEach(address -> {
             address.setBalance(BigDecimal.ZERO);
             address.setCandidateCount(0);

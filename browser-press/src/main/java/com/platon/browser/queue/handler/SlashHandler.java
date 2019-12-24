@@ -1,6 +1,5 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.queue.event.SlashEvent;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class SlashHandler extends AbstractHandler implements EventHandler<SlashEvent> {
+public class SlashHandler extends AbstractHandler<SlashEvent> {
 
     @Autowired
     private SlashMapper slashMapper;
@@ -31,20 +30,20 @@ public class SlashHandler extends AbstractHandler implements EventHandler<SlashE
     @Value("${disruptor.queue.slash.batch-size}")
     private volatile int batchSize;
 
-    private List<Slash> slashStage = new ArrayList<>();
+    private List<Slash> stage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent (SlashEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent (SlashEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         try {
-            slashStage.addAll(event.getSlashList());
-            if(slashStage.size()<batchSize) return;
-            slashMapper.batchInsert(slashStage);
+            stage.addAll(event.getSlashList());
+            if(stage.size()<batchSize) return;
+            slashMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("惩罚",slashStage.size(),startTime,endTime);
-            slashStage.clear();
+            printTps("惩罚",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

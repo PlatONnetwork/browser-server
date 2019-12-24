@@ -1,11 +1,7 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
-import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.queue.event.DelegationEvent;
 import com.platon.browser.queue.event.ProposalEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class ProposalHandler extends AbstractHandler implements EventHandler<ProposalEvent> {
+public class ProposalHandler extends AbstractHandler<ProposalEvent> {
 
     @Autowired
     private ProposalMapper proposalMapper;
@@ -34,20 +30,20 @@ public class ProposalHandler extends AbstractHandler implements EventHandler<Pro
     @Value("${disruptor.queue.proposal.batch-size}")
     private volatile int batchSize;
 
-    private List<Proposal> proposalStage = new ArrayList<>();
+    private List<Proposal> stage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent (ProposalEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent (ProposalEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         try {
-            proposalStage.addAll(event.getProposalList());
-            if(proposalStage.size()<batchSize) return;
-            proposalMapper.batchInsert(proposalStage);
+            stage.addAll(event.getProposalList());
+            if(stage.size()<batchSize) return;
+            proposalMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("提案",proposalStage.size(),startTime,endTime);
-            proposalStage.clear();
+            printTps("提案",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

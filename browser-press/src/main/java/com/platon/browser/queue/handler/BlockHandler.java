@@ -1,6 +1,5 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.event.BlockEvent;
@@ -15,7 +14,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +23,7 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class BlockHandler extends AbstractHandler implements EventHandler<BlockEvent> {
+public class BlockHandler extends AbstractHandler<BlockEvent> {
 
     @Autowired
     private EsImportService esImportService;
@@ -37,34 +35,23 @@ public class BlockHandler extends AbstractHandler implements EventHandler<BlockE
     @Value("${disruptor.queue.block.batch-size}")
     private volatile int batchSize;
 
-    private Set<Block> blockStage = new HashSet<>();
+    private Set<Block> stage = new HashSet<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws InterruptedException {
         long startTime = System.currentTimeMillis();
-
-        log.debug("BlockEvent处理:{}(event(blockList({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlockList().size());
         try {
-            blockStage.addAll(event.getBlockList());
-
-            // 如区块暂存区的区块数量达不到批量入库大小,则返回
-            if(blockStage.size()<batchSize) {
-                return;
-            }
-
-            // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(blockStage, Collections.emptySet(),Collections.emptySet());
-
+            stage.addAll(event.getBlockList());
+            if(stage.size()<batchSize) return;
+            esImportService.batchImport(stage, Collections.emptySet(),Collections.emptySet());
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
-            redisImportService.batchImport(blockStage,Collections.emptySet(),statistics);
+            redisImportService.batchImport(stage,Collections.emptySet(),statistics);
             long endTime = System.currentTimeMillis();
-            printTps("区块",blockStage.size(),startTime,endTime);
-
-            blockStage.clear();
+            printTps("区块",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

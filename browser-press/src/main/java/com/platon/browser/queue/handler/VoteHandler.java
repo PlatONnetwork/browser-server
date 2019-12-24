@@ -1,6 +1,5 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.VoteMapper;
 import com.platon.browser.queue.event.VoteEvent;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class VoteHandler extends AbstractHandler implements EventHandler<VoteEvent> {
+public class VoteHandler extends AbstractHandler<VoteEvent> {
 
     @Autowired
     private VoteMapper voteMapper;
@@ -31,20 +30,20 @@ public class VoteHandler extends AbstractHandler implements EventHandler<VoteEve
     @Value("${disruptor.queue.vote.batch-size}")
     private volatile int batchSize;
 
-    private List<Vote> voteStage = new ArrayList<>();
+    private List<Vote> stage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent (VoteEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent (VoteEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         try {
-            voteStage.addAll(event.getVoteList());
-            if(voteStage.size()<batchSize) return;
-            voteMapper.batchInsert(voteStage);
+            stage.addAll(event.getVoteList());
+            if(stage.size()<batchSize) return;
+            voteMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("投票",voteStage.size(),startTime,endTime);
-            voteStage.clear();
+            printTps("投票",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

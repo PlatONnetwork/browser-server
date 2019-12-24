@@ -2,9 +2,6 @@ package com.platon.browser.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.event.NodeOptEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
@@ -14,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -23,33 +19,26 @@ import java.util.List;
 @Slf4j
 @Component
 public class NodeOptPublisher extends AbstractPublisher {
-    private static final EventTranslatorOneArg<NodeOptEvent,List<NodeOpt>>
-    TRANSLATOR = (event, sequence, nodeOptList)->{
-        event.setNodeOptList(nodeOptList);
-    };
-    @Value("${disruptor.queue.nodeopt.buffer-size}")
-    private int ringBufferSize;
-    protected RingBuffer ringBuffer;
-    private EventFactory<NodeOptEvent> eventFactory = NodeOptEvent::new;
+    private static final EventTranslatorOneArg<NodeOptEvent, List<NodeOpt>> TRANSLATOR = (event, sequence, msg)->event.setNodeOptList(msg);
+    @Override
+    EventTranslatorOneArg getTranslator() {
+        return TRANSLATOR;
+    }
+
     @Autowired
     private NodeOptHandler handler;
     @Override
     public AbstractHandler getHandler(){return handler;}
 
-    @PostConstruct
-    private void init(){
-        Disruptor<NodeOptEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
-        disruptor.handleEventsWith(handler);
-        disruptor.start();
-        ringBuffer = disruptor.getRingBuffer();
-    }
-
-    public void publish(List<NodeOpt> nodeOptList){
-        ringBuffer.publishEvent(TRANSLATOR,nodeOptList);
+    @Value("${disruptor.queue.nodeopt.buffer-size}")
+    private int ringBufferSize;
+    @Override
+    int getRingBufferSize() {
+        return ringBufferSize;
     }
 
     @Override
-    public long getTotalCount() {
-        return handler.getTotalCount();
+    EventFactory getEventFactory() {
+        return NodeOptEvent::new;
     }
 }

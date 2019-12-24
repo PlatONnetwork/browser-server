@@ -2,9 +2,6 @@ package com.platon.browser.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.queue.event.VoteEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
@@ -14,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -25,28 +21,26 @@ import java.util.List;
 @Slf4j
 @Component
 public class VotePublisher extends AbstractPublisher {
-    private static final EventTranslatorOneArg<VoteEvent,List<Vote>>
-            TRANSLATOR = (event, sequence, voteList)->{
-        event.setVoteList(voteList);
-    };
-    @Value("${disruptor.queue.vote.buffer-size}")
-    private int ringBufferSize;
-    protected RingBuffer ringBuffer;
-    private EventFactory<VoteEvent> eventFactory = VoteEvent::new;
+    private static final EventTranslatorOneArg<VoteEvent, List<Vote>> TRANSLATOR = (event, sequence, msg)->event.setVoteList(msg);
+    @Override
+    EventTranslatorOneArg getTranslator() {
+        return TRANSLATOR;
+    }
+
     @Autowired
     private VoteHandler handler;
     @Override
     public AbstractHandler getHandler(){return handler;}
 
-    @PostConstruct
-    private void init(){
-        Disruptor<VoteEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
-        disruptor.handleEventsWith(handler);
-        disruptor.start();
-        ringBuffer = disruptor.getRingBuffer();
+    @Value("${disruptor.queue.vote.buffer-size}")
+    private int ringBufferSize;
+    @Override
+    int getRingBufferSize() {
+        return ringBufferSize;
     }
 
-    public void publish(List<Vote> voteList){
-        ringBuffer.publishEvent(TRANSLATOR,voteList);
+    @Override
+    EventFactory getEventFactory() {
+        return VoteEvent::new;
     }
 }

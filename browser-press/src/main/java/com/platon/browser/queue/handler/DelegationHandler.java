@@ -1,6 +1,5 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.queue.event.DelegationEvent;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class DelegationHandler extends AbstractHandler implements EventHandler<DelegationEvent> {
+public class DelegationHandler extends AbstractHandler<DelegationEvent> {
 
     @Autowired
     private DelegationMapper delegationMapper;
@@ -31,20 +30,20 @@ public class DelegationHandler extends AbstractHandler implements EventHandler<D
     @Value("${disruptor.queue.delegation.batch-size}")
     private volatile int batchSize;
 
-    private List<Delegation> delegationStage = new ArrayList<>();
+    private List<Delegation> stage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent ( DelegationEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent ( DelegationEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         try {
-            delegationStage.addAll(event.getDelegationList());
-            if(delegationStage.size()<batchSize) return;
-            delegationMapper.batchInsert(delegationStage);
+            stage.addAll(event.getDelegationList());
+            if(stage.size()<batchSize) return;
+            delegationMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("委托",delegationStage.size(),startTime,endTime);
-            delegationStage.clear();
+            printTps("委托",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

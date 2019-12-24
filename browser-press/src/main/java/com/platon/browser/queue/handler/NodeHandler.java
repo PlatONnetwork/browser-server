@@ -1,17 +1,8 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.event.NodeEvent;
-import com.platon.browser.queue.event.TransactionEvent;
-import com.platon.browser.queue.publisher.AddressPublisher;
-import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.redis.RedisImportService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +12,15 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 节点事件处理器
  */
 @Slf4j
 @Component
-public class NodeHandler extends AbstractHandler implements EventHandler<NodeEvent> {
+public class NodeHandler extends AbstractHandler<NodeEvent> {
 
     @Autowired
     private NodeMapper nodeMapper;
@@ -39,20 +30,20 @@ public class NodeHandler extends AbstractHandler implements EventHandler<NodeEve
     @Value("${disruptor.queue.node.batch-size}")
     private volatile int batchSize;
 
-    private List<Node> nodeStage = new ArrayList<>();
+    private List<Node> stage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent ( NodeEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent ( NodeEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         try {
-            nodeStage.addAll(event.getNodeList());
-            if(nodeStage.size()<batchSize) return;
-            nodeMapper.batchInsert(nodeStage);
+            stage.addAll(event.getNodeList());
+            if(stage.size()<batchSize) return;
+            nodeMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("节点",nodeStage.size(),startTime,endTime);
-            nodeStage.clear();
+            printTps("节点",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

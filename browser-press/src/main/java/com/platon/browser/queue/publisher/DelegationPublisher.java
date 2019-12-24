@@ -6,8 +6,11 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.queue.event.BlockEvent;
 import com.platon.browser.queue.event.DelegationEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
+import com.platon.browser.queue.handler.BlockHandler;
 import com.platon.browser.queue.handler.DelegationHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,28 +28,26 @@ import java.util.List;
 @Slf4j
 @Component
 public class DelegationPublisher extends AbstractPublisher {
-    private static final EventTranslatorOneArg<DelegationEvent,List<Delegation>>
-            TRANSLATOR = (event, sequence, delegationList)->{
-        event.setDelegationList(delegationList);
-    };
-    @Value("${disruptor.queue.delegation.buffer-size}")
-    private int ringBufferSize;
-    protected RingBuffer ringBuffer;
-    private EventFactory<DelegationEvent> eventFactory = DelegationEvent::new;
+    private static final EventTranslatorOneArg<DelegationEvent,List<Delegation>> TRANSLATOR = (event, sequence, msg)->event.setDelegationList(msg);
+    @Override
+    EventTranslatorOneArg getTranslator() {
+        return TRANSLATOR;
+    }
+
     @Autowired
     private DelegationHandler handler;
     @Override
     public AbstractHandler getHandler(){return handler;}
 
-    @PostConstruct
-    private void init(){
-        Disruptor<DelegationEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
-        disruptor.handleEventsWith(handler);
-        disruptor.start();
-        ringBuffer = disruptor.getRingBuffer();
+    @Value("${disruptor.queue.delegation.buffer-size}")
+    private int ringBufferSize;
+    @Override
+    int getRingBufferSize() {
+        return ringBufferSize;
     }
 
-    public void publish(List<Delegation> delegationList){
-        ringBuffer.publishEvent(TRANSLATOR,delegationList);
+    @Override
+    EventFactory getEventFactory() {
+        return DelegationEvent::new;
     }
 }

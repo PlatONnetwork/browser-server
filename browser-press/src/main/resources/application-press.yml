@@ -77,6 +77,9 @@ disruptor:
     slash:
       buffer-size: 1024
       batch-size: 3
+    address:
+      buffer-size: 1024
+      batch-size: 1024
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数

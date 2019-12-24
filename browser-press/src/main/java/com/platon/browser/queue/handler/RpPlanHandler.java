@@ -1,6 +1,5 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.queue.event.RpPlanEvent;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class RpPlanHandler extends AbstractHandler implements EventHandler<RpPlanEvent> {
+public class RpPlanHandler extends AbstractHandler<RpPlanEvent> {
 
     @Autowired
     private RpPlanMapper rpPlanMapper;
@@ -31,20 +30,20 @@ public class RpPlanHandler extends AbstractHandler implements EventHandler<RpPla
     @Value("${disruptor.queue.rpplan.batch-size}")
     private volatile int batchSize;
 
-    private List<RpPlan> rpPlanStage = new ArrayList<>();
+    private List<RpPlan> stage = new ArrayList<>();
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent (RpPlanEvent event, long sequence, boolean endOfBatch ) throws Exception {
+    public void onEvent (RpPlanEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         try {
-            rpPlanStage.addAll(event.getRpPlanList());
-            if(rpPlanStage.size()<batchSize) return;
-            rpPlanMapper.batchInsert(rpPlanStage);
+            stage.addAll(event.getRpPlanList());
+            if(stage.size()<batchSize) return;
+            rpPlanMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("锁仓",rpPlanStage.size(),startTime,endTime);
-            rpPlanStage.clear();
+            printTps("锁仓",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

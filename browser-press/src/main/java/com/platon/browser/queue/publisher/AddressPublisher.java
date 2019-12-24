@@ -2,22 +2,15 @@ package com.platon.browser.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.event.AddressEvent;
-import com.platon.browser.queue.event.BlockEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
 import com.platon.browser.queue.handler.AddressHandler;
-import com.platon.browser.queue.handler.BlockHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -28,28 +21,26 @@ import java.util.List;
 @Slf4j
 @Component
 public class AddressPublisher extends AbstractPublisher {
-    private static final EventTranslatorOneArg<AddressEvent,List<Address>>
-            TRANSLATOR = (event, sequence, addressList)->{
-        event.setAddressList(addressList);
-    };
-    @Value("${disruptor.queue.block.buffer-size}")
-    private int ringBufferSize;
-    protected RingBuffer ringBuffer;
-    private EventFactory<AddressEvent> eventFactory = AddressEvent::new;
+    private static final EventTranslatorOneArg<AddressEvent,List<Address>> TRANSLATOR = (event, sequence, msg)->event.setAddressList(msg);
+    @Override
+    EventTranslatorOneArg getTranslator() {
+        return TRANSLATOR;
+    }
+
     @Autowired
     private AddressHandler handler;
     @Override
     public AbstractHandler getHandler(){return handler;}
 
-    @PostConstruct
-    private void init(){
-        Disruptor<AddressEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
-        disruptor.handleEventsWith(handler);
-        disruptor.start();
-        ringBuffer = disruptor.getRingBuffer();
+    @Value("${disruptor.queue.block.buffer-size}")
+    private int ringBufferSize;
+    @Override
+    int getRingBufferSize() {
+        return ringBufferSize;
     }
 
-    public void publish(List<Address> addressList){
-        ringBuffer.publishEvent(TRANSLATOR,addressList);
+    @Override
+    EventFactory getEventFactory() {
+        return AddressEvent::new;
     }
 }

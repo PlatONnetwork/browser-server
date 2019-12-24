@@ -1,6 +1,5 @@
 package com.platon.browser.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.event.NodeOptEvent;
@@ -15,7 +14,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +23,7 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class NodeOptHandler  extends AbstractHandler implements EventHandler<NodeOptEvent> {
+public class NodeOptHandler  extends AbstractHandler<NodeOptEvent> {
 
     @Autowired
     private EsImportService esImportService;
@@ -37,35 +35,23 @@ public class NodeOptHandler  extends AbstractHandler implements EventHandler<Nod
     @Value("${disruptor.queue.nodeopt.batch-size}")
     private volatile int batchSize;
 
-    private Set<NodeOpt> nodeOptStage = new HashSet<>();
+    private Set<NodeOpt> stage = new HashSet<>();
 
     @PostConstruct
     private void init(){this.setLogger(log);}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent(NodeOptEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    public void onEvent(NodeOptEvent event, long sequence, boolean endOfBatch) throws InterruptedException {
         long startTime = System.currentTimeMillis();
-
-        log.debug("NodeOptEvent处理:{}(event(nodeOptList({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getNodeOptList().size());
         try {
-            nodeOptStage.addAll(event.getNodeOptList());
-
-            // 如区块暂存区的区块数量达不到批量入库大小,则返回
-            if(nodeOptStage.size()<batchSize) {
-                return;
-            }
-
-            // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(Collections.emptySet(), Collections.emptySet(),nodeOptStage);
-
-            // 入库Redis 更新Redis中的统计记录
+            stage.addAll(event.getNodeOptList());
+            if(stage.size()<batchSize) return;
+            esImportService.batchImport(Collections.emptySet(), Collections.emptySet(),stage);
             Set<NetworkStat> statistics = new HashSet<>();
             redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
             long endTime = System.currentTimeMillis();
-            printTps("日志",nodeOptStage.size(),startTime,endTime);
-
-            nodeOptStage.clear();
+            printTps("日志",stage.size(),startTime,endTime);
+            stage.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

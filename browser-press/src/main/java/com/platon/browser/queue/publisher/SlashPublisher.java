@@ -2,9 +2,6 @@ package com.platon.browser.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.queue.event.SlashEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
@@ -14,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -25,28 +21,26 @@ import java.util.List;
 @Slf4j
 @Component
 public class SlashPublisher extends AbstractPublisher {
-    private static final EventTranslatorOneArg<SlashEvent,List<Slash>>
-            TRANSLATOR = (event, sequence, slashList)->{
-        event.setSlashList(slashList);
-    };
-    @Value("${disruptor.queue.slash.buffer-size}")
-    private int ringBufferSize;
-    protected RingBuffer ringBuffer;
-    private EventFactory<SlashEvent> eventFactory = SlashEvent::new;
+    private static final EventTranslatorOneArg<SlashEvent, List<Slash>> TRANSLATOR = (event, sequence, msg)->event.setSlashList(msg);
+    @Override
+    EventTranslatorOneArg getTranslator() {
+        return TRANSLATOR;
+    }
+
     @Autowired
     private SlashHandler handler;
     @Override
     public AbstractHandler getHandler(){return handler;}
 
-    @PostConstruct
-    private void init(){
-        Disruptor<SlashEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
-        disruptor.handleEventsWith(handler);
-        disruptor.start();
-        ringBuffer = disruptor.getRingBuffer();
+    @Value("${disruptor.queue.slash.buffer-size}")
+    private int ringBufferSize;
+    @Override
+    int getRingBufferSize() {
+        return ringBufferSize;
     }
 
-    public void publish(List<Slash> slashList){
-        ringBuffer.publishEvent(TRANSLATOR,slashList);
+    @Override
+    EventFactory getEventFactory() {
+        return SlashEvent::new;
     }
 }

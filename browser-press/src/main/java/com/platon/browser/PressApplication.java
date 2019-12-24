@@ -166,6 +166,7 @@ public class PressApplication implements ApplicationRunner {
         configMapper.deleteByExample(null);
         configMapper.batchInsert(dataGenService.getConfigList());
         // 初始化网络统计表
+        networkStatMapper.deleteByExample(null);
         dataGenService.getNetworkStat().setCurNumber(0L);
         networkStatMapper.insert(dataGenService.getNetworkStat());
 
@@ -228,7 +229,7 @@ public class PressApplication implements ApplicationRunner {
                             tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
                             tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
             ){
-                StakeResult stakeResult = dataGenService.getStakeResult(tx,currentNodeSum++);
+                StakeResult stakeResult = dataGenService.getStakeResult(tx,currentNodeSum++,currentStakeSum++);
                 if(currentNodeSum<nodeMaxCount){
                     // 构造指定数量的节点记录并入库
                     nodeList.add(stakeResult.getNode());
@@ -236,7 +237,6 @@ public class PressApplication implements ApplicationRunner {
                 if(currentStakeSum<stakeMaxCount){
                     // 构造指定数量的质押记录并入库
                     stakingList.add(stakeResult.getStaking());
-                    currentStakeSum++;
                 }
             }
         }

@@ -160,10 +160,10 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public StakeResult getStakeResult(Transaction tx,Long totalCount) throws BlockNumberException {
+    public StakeResult getStakeResult(Transaction tx,Long nodeSum,Long stakeSum) throws BlockNumberException {
         Node node = JSON.parseObject(nodeStr,Node.class);
         node.setStakingBlockNum(tx.getNum());
-        node.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        node.setNodeId(DigestUtils.sha512Hex(stakeSum.toString()));
         node.setNodeIcon(node.getNodeId().substring(0,6));
         node.setNodeName(node.getNodeId().substring(7,10));
 
@@ -173,7 +173,7 @@ public class DataGenService {
         node.setIsSettle(status.isSettle);
         node.setIsInit(status.isInit);
         node.setStakingTxIndex(tx.getIndex());
-        node.setStakingAddr(DigestUtils.sha1Hex(totalCount.toString()));
+        node.setStakingAddr(DigestUtils.sha1Hex(stakeSum.toString()));
         node.setStatVerifierTime(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN).intValue());
 
         if(ADDRESS.size()<5000&&!ADDRESS.contains(tx.getFrom())){
