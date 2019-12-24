@@ -18,8 +18,8 @@ public class BlockResult {
     static class AddressCount {
         private String address;
         private Integer count=0;
-        public String get(String newAddress){
-            if(count==0||count>=100)  {
+        public String get(String newAddress,int addressReusedTimes){
+            if(count==0||count>=addressReusedTimes)  {
                 address = newAddress;
                 count=1;
                 return address;
@@ -35,7 +35,7 @@ public class BlockResult {
     private List<Transaction> transactionList=new ArrayList<>();
     private List<NodeOpt> nodeOptList=new ArrayList<>();
 
-    public void buildAssociation(BigInteger blockNumber, String nodeId,long nodeOptId){
+    public void buildAssociation(BigInteger blockNumber, String nodeId,long nodeOptId,int addressReusedTimes){
         block.setNum(blockNumber.longValue());
         block.setNodeId(nodeId);
         String blockHash = HexTool.prefix(DigestUtils.sha256Hex(block.toString()));
@@ -47,9 +47,9 @@ public class BlockResult {
             String txHash = HexTool.prefix(DigestUtils.sha256Hex(tx.toString()));
             tx.setHash(txHash);
             String from = HexTool.prefix(DigestUtils.sha1Hex(tx.toString()));
-            tx.setFrom(FROM_ADDRESS.get(from));
+            tx.setFrom(FROM_ADDRESS.get(from,addressReusedTimes));
             String to = HexTool.prefix(DigestUtils.sha1Hex(tx.toString()));
-            tx.setTo(TO_ADDRESS.get(to));
+            tx.setTo(TO_ADDRESS.get(to,addressReusedTimes));
             tx.setIndex(i);
             i++;
         }

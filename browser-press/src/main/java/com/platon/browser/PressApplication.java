@@ -5,10 +5,12 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.GracefullyShutdownException;
 import com.platon.browser.queue.publisher.*;
 import com.platon.browser.service.BlockResult;
 import com.platon.browser.service.DataGenService;
+import com.platon.browser.service.StakeResult;
 import com.platon.browser.utils.CounterBean;
 import com.platon.browser.utils.GracefullyUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +63,10 @@ public class PressApplication implements ApplicationRunner {
     private ProposalPublisher proposalPublisher;
     @Autowired
     private VotePublisher votePublisher;
+    @Autowired
+    private RpPlanPublisher rpPlanPublisher;
+    @Autowired
+    private SlashPublisher slashPublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -80,37 +86,52 @@ public class PressApplication implements ApplicationRunner {
     private long proposalMaxCount;
     @Value("${platon.voteMaxCount}")
     private long voteMaxCount;
+    @Value("${platon.rpplanMaxCount}")
+    private long rpplanMaxCount;
+    @Value("${platon.slashMaxCount}")
+    private long slashMaxCount;
 
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
     private long currentDelegationSum = 0L;
     private long currentProposalSum = 0L;
     private long currentVoteSum = 0L;
+    private long currentRpplanSum = 0L;
+    private long currentSlashSum = 0L;
 
     public static void main ( String[] args ) {
         SpringApplication.run(PressApplication.class, args);
     }
     @Override
-    public void run ( ApplicationArguments args ) throws IOException {
+    public void run ( ApplicationArguments args ) throws IOException, BlockNumberException {
         BigInteger blockNumber = init();
+        NetworkStatExample networkStatExample = new NetworkStatExample();
+        networkStatExample.createCriteria().andIdEqualTo(1);
         while (true){
             // 检查应用状态
             checkAppStatus(blockNumber);
             // 构造【区块&交易&操作日志】数据
             BlockResult blockResult = makeBlock(blockNumber);
-            // 构造【节点】数据
-            makeNode(blockResult);
-            // 构造【质押】数据
-            makeStaking(blockResult);
+            // 构造【节点&质押】数据
+            makeStake(blockResult);
             // 构造【委托】数据
             makeDelegation(blockResult);
             // 构造【提案】数据
             makeProposal(blockResult);
+            // 构造【投票】数据
+            makeVote(blockResult);
+            // 构造【rpplan】数据
+            makeRpPlan(blockResult);
+            // 构造【slash】数据
+            makeSlash(blockResult);
             // 区块号累加
             blockNumber=blockNumber.add(BigInteger.ONE);
             // 更新网络统计表
             dataGenService.getNetworkStat().setCurNumber(blockNumber.longValue());
-            EXECUTOR_SERVICE.submit(()->networkStatMapper.updateByPrimaryKey(dataGenService.getNetworkStat()));
+            EXECUTOR_SERVICE.submit(()->{
+                NetworkStat networkStat=dataGenService.getNetworkStat();
+                networkStatMapper.updateByExample(networkStat,networkStatExample);
+            });
         }
     }
 
@@ -133,6 +154,8 @@ public class PressApplication implements ApplicationRunner {
             currentDelegationSum=counterBean.getDelegationCount();
             currentProposalSum=counterBean.getProposalCount();
             currentVoteSum=counterBean.getVoteCount();
+            currentRpplanSum=counterBean.getRpplanCount();
+            currentSlashSum=counterBean.getSlashCount();
             blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -142,6 +165,9 @@ public class PressApplication implements ApplicationRunner {
         // 初始化配置表
         configMapper.deleteByExample(null);
         configMapper.batchInsert(dataGenService.getConfigList());
+        // 初始化网络统计表
+        dataGenService.getNetworkStat().setCurNumber(0L);
+        networkStatMapper.insert(dataGenService.getNetworkStat());
 
         return blockNumber;
     }
@@ -163,6 +189,8 @@ public class PressApplication implements ApplicationRunner {
             counter.setDelegationCount(currentDelegationSum);
             counter.setProposalCount(currentProposalSum);
             counter.setVoteCount(currentVoteSum);
+            counter.setRpplanCount(currentRpplanSum);
+            counter.setSlashCount(currentSlashSum);
             String status = JSON.toJSONString(counter,true);
             File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
@@ -179,7 +207,7 @@ public class PressApplication implements ApplicationRunner {
      * @return
      */
     private BlockResult makeBlock(BigInteger blockNumber){
-        BlockResult blockResult = dataGenService.getBlock(blockNumber);
+        BlockResult blockResult = dataGenService.getBlockResult(blockNumber);
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
         transactionPublisher.publish(blockResult.getTransactionList());
         nodeOptPublisher.publish(blockResult.getNodeOptList());
@@ -187,47 +215,34 @@ public class PressApplication implements ApplicationRunner {
     }
 
     /**
-     * 构造节点
+     * 构造节点&质押
      * @param blockResult
      */
-    private void makeNode(BlockResult blockResult){
-        if(currentNodeSum<nodeMaxCount){
-            // 构造指定数量的节点记录并入库
-            List <Node> nodeList = new ArrayList<>();
-            for (Transaction tx : blockResult.getTransactionList()) {
-                if(
+    private void makeStake(BlockResult blockResult) throws BlockNumberException {
+        List <Node> nodeList = new ArrayList<>();
+        List <Staking> stakingList = new ArrayList<>();
+        for (Transaction tx : blockResult.getTransactionList()) {
+            if(
                     tx.getTypeEnum()== Transaction.TypeEnum.STAKE_CREATE||
-                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_MODIFY||
-                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
-                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
-                ){
-                    nodeList.add(dataGenService.getNode(tx, currentNodeSum++));
+                            tx.getTypeEnum()==Transaction.TypeEnum.STAKE_MODIFY||
+                            tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
+                            tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
+            ){
+                StakeResult stakeResult = dataGenService.getStakeResult(tx,currentNodeSum++);
+                if(currentNodeSum<nodeMaxCount){
+                    // 构造指定数量的节点记录并入库
+                    nodeList.add(stakeResult.getNode());
+                }
+                if(currentStakeSum<stakeMaxCount){
+                    // 构造指定数量的质押记录并入库
+                    stakingList.add(stakeResult.getStaking());
+                    currentStakeSum++;
                 }
             }
-            nodePublisher.publish(nodeList);
         }
-    }
 
-    /**
-     * 构造质押
-     * @param blockResult
-     */
-    private void makeStaking(BlockResult blockResult){
-        if(currentStakeSum<stakeMaxCount){
-            // 构造指定数量的质押记录并入库
-            List <Staking> stakingList = new ArrayList<>();
-            for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                        tx.getTypeEnum()== Transaction.TypeEnum.STAKE_CREATE||
-                                tx.getTypeEnum()==Transaction.TypeEnum.STAKE_MODIFY||
-                                tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
-                                tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
-                ){
-                    stakingList.add(dataGenService.getStaking(tx, currentStakeSum++));
-                }
-            }
-            stakePublisher.publish(stakingList);
-        }
+        if(!nodeList.isEmpty()) nodePublisher.publish(nodeList);
+        if(!stakingList.isEmpty()) stakePublisher.publish(stakingList);
     }
 
     /**
@@ -288,6 +303,44 @@ public class PressApplication implements ApplicationRunner {
                 }
             }
             votePublisher.publish(voteList);
+        }
+    }
+
+    /**
+     * 构造Slash
+     * @param blockResult
+     */
+    private void makeSlash(BlockResult blockResult) {
+        if(currentSlashSum<slashMaxCount){
+            // 构造指定数量的Slash记录并入库
+            List <Slash> slashList = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                if(
+                        tx.getTypeEnum()== Transaction.TypeEnum.REPORT
+                ){
+                    slashList.add(dataGenService.getSlash(tx, currentSlashSum++));
+                }
+            }
+            slashPublisher.publish(slashList);
+        }
+    }
+
+    /**
+     * 构造RpPlan
+     * @param blockResult
+     */
+    private void makeRpPlan(BlockResult blockResult) throws BlockNumberException {
+        if(currentRpplanSum<rpplanMaxCount){
+            // 构造指定数量的RpPlan记录并入库
+            List <RpPlan> rpPlanList = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                if(
+                        tx.getTypeEnum()== Transaction.TypeEnum.RESTRICTING_CREATE
+                ){
+                    rpPlanList.add(dataGenService.getRpPlan(tx, currentRpplanSum++));
+                }
+            }
+            rpPlanPublisher.publish(rpPlanList);
         }
     }
 }

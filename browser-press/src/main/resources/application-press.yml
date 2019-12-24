@@ -48,35 +48,33 @@ paging:
 disruptor:
   queue:
     block:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 1024
     transaction:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 8192
     nodeopt:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 1024
     node:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 3
     stake:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 3
     delegation:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 3
     proposal:
-      gen-size: 100
       buffer-size: 1024
       batch-size: 3
     vote:
-      gen-size: 100
+      buffer-size: 1024
+      batch-size: 3
+    rpplan:
+      buffer-size: 1024
+      batch-size: 3
+    slash:
       buffer-size: 1024
       batch-size: 3
 #PlatOn相关配置
@@ -122,6 +120,8 @@ platon:
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
+  # 地址重复使用的最大次数
+  addressReusedTimes: 50
   #节点条数
   nodeMaxCount: 600
   #质押条数
@@ -129,6 +129,10 @@ platon:
   #委托条数
   delegateMaxCount: 6000
   #提案条数
-  proposalMaxCount: 6000
+  proposalMaxCount: 600
   #投票条数
-  voteMaxCount: 6000
+  voteMaxCount: 600
+  #rpplan条数
+  rpplanMaxCount: 600
+  #slash条数
+  slashMaxCount: 600

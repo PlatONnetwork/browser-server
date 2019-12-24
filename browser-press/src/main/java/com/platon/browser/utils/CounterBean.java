@@ -14,6 +14,8 @@ public class CounterBean {
     private long delegationCount;
     private long proposalCount;
     private long voteCount;
+    private long rpplanCount;
+    private long slashCount;
     private long nodeOptMaxId;
     private long addressCount;
     private long lastBlockNumber;
