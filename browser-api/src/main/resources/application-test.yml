@@ -130,3 +130,4 @@ system.username: admin
 system.password: admin
 client.username: guest
 client.password: guest
+recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s

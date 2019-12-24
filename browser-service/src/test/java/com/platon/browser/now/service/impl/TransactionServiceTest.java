@@ -136,15 +136,16 @@ public class TransactionServiceTest {
 
 		transaction.setType(Transaction.TypeEnum.PROPOSAL_CANCEL.getCode());
 		transaction.setInfo("{\"canceledProposalID\":\"0x7cb32dc2cc4202388b04641bd5d13372cc0a9a0a7b0d05dcd509232f07493a52\",\"endVotingRound\":12,\"nodeName\":\"sansan33\",\"pIDID\":\"asdfrrrrr\",\"verifier\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\"}");
-		target.transactionDetails(req);
-
-		transaction.setType(Transaction.TypeEnum.PROPOSAL_VOTE.getCode());
-		transaction.setInfo("{\"nodeName\":\"sansan33\",\"option\":\"2\",\"pIDID\":\"c4\",\"programVersion\":\"1797\",\"proposalId\":\"0xa5abb6a7ebc1b7f5c24952f489c4a95c8091710109cac35ecee1e6c35f33a5af\",\"proposalType\":\"3\",\"verifier\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"versionSign\":\"0xb109d4db2991b0c35d0d1a70b02032eefefc820a7c8077e43859c0799ddf9c681e2a2f316ff9d1f055ea266e5a04a3b9bee2a01f00f3f4da7d3e4e3404b446fa00\"}");
-		target.transactionDetails(req);
-
-		transaction.setType(Transaction.TypeEnum.PROPOSAL_VOTE.getCode());
-		transaction.setInfo("{\"nodeName\":\"sansan33\",\"option\":\"2\",\"pIDID\":\"c4\",\"programVersion\":\"1797\",\"proposalId\":\"0xa5abb6a7ebc1b7f5c24952f489c4a95c8091710109cac35ecee1e6c35f33a5af\",\"proposalType\":\"3\",\"verifier\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"versionSign\":\"0xb109d4db2991b0c35d0d1a70b02032eefefc820a7c8077e43859c0799ddf9c681e2a2f316ff9d1f055ea266e5a04a3b9bee2a01f00f3f4da7d3e4e3404b446fa00\"}");
 		Proposal proposal = mock(Proposal.class);
+		when(proposalMapper.selectByPrimaryKey(anyString())).thenReturn(proposal);
+		target.transactionDetails(req);
+
+		transaction.setType(Transaction.TypeEnum.PROPOSAL_VOTE.getCode());
+		transaction.setInfo("{\"nodeName\":\"sansan33\",\"option\":\"2\",\"pIDID\":\"c4\",\"programVersion\":\"1797\",\"proposalId\":\"0xa5abb6a7ebc1b7f5c24952f489c4a95c8091710109cac35ecee1e6c35f33a5af\",\"proposalType\":\"3\",\"verifier\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"versionSign\":\"0xb109d4db2991b0c35d0d1a70b02032eefefc820a7c8077e43859c0799ddf9c681e2a2f316ff9d1f055ea266e5a04a3b9bee2a01f00f3f4da7d3e4e3404b446fa00\"}");
+		target.transactionDetails(req);
+
+		transaction.setType(Transaction.TypeEnum.PROPOSAL_VOTE.getCode());
+		transaction.setInfo("{\"nodeName\":\"sansan33\",\"option\":\"2\",\"pIDID\":\"c4\",\"programVersion\":\"1797\",\"proposalId\":\"0xa5abb6a7ebc1b7f5c24952f489c4a95c8091710109cac35ecee1e6c35f33a5af\",\"proposalType\":\"3\",\"verifier\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"versionSign\":\"0xb109d4db2991b0c35d0d1a70b02032eefefc820a7c8077e43859c0799ddf9c681e2a2f316ff9d1f055ea266e5a04a3b9bee2a01f00f3f4da7d3e4e3404b446fa00\"}");
 		when(proposalMapper.selectByPrimaryKey(anyString())).thenReturn(proposal);
 		target.transactionDetails(req);
 

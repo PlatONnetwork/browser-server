@@ -157,7 +157,8 @@ public interface AppDocTransaction {
     void addressTransactionDownload(@ApiParam(value = "address ", required = false)@RequestParam(value = "address", required = false)String address,
     		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)Long date, 
     		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true) String local,
-    		@ApiParam(value = "time zone", required = true)@RequestParam(value = "timeZone", required = true) String timeZone,HttpServletResponse response);
+    		@ApiParam(value = "time zone", required = true)@RequestParam(value = "timeZone", required = true) String timeZone,
+    		@ApiParam(value = "token", required = false)@RequestParam(value = "token", required = false) String token,HttpServletResponse response);
 	
     /**
      * @api {post} transaction/transactionDetails e.交易详情 

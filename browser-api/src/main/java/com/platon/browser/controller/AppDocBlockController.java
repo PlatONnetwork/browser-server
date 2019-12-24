@@ -47,6 +47,9 @@ public class AppDocBlockController implements AppDocBlock {
 	@Autowired
 	private DownFileCommon downFileCommon;
 	
+	@Autowired
+	private CommonMethod commonMethod;
+	
 	@Override
 	public WebAsyncTask<RespPage<BlockListResp>> blockList(@Valid PageReq req) {
 		/**
@@ -68,7 +71,11 @@ public class AppDocBlockController implements AppDocBlock {
 	}
 
 	@Override
-	public void blockListByNodeIdDownload(String nodeId, Long date, String local,String timeZone, HttpServletResponse response) {
+	public void blockListByNodeIdDownload(String nodeId, Long date, String local,String timeZone,String token, HttpServletResponse response) {
+		/**
+		 * 鉴权
+		 */
+		commonMethod.recaptchaAuth(token);
 		BlockDownload blockDownload = blockService.blockListByNodeIdDownload(nodeId, date, local, timeZone);
 		try {
 			downFileCommon.download(response, blockDownload.getFilename(), blockDownload.getLength(), blockDownload.getData());

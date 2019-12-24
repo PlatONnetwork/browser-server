@@ -48,6 +48,9 @@ public class AppDocTransactionController implements AppDocTransaction {
 	
 	@Autowired
 	private DownFileCommon downFileCommon;
+	
+	@Autowired
+	private CommonMethod commonMethod;
 
 	@Override
 	public WebAsyncTask<RespPage<TransactionListResp>> transactionList(@Valid PageReq req) {
@@ -80,7 +83,11 @@ public class AppDocTransactionController implements AppDocTransaction {
 	}
 
 	@Override
-	public void addressTransactionDownload(String address, Long date, String local, String timeZone, HttpServletResponse response) {
+	public void addressTransactionDownload(String address, Long date, String local, String timeZone, String token, HttpServletResponse response) {
+		/**
+		 * 鉴权
+		 */
+		commonMethod.recaptchaAuth(token);
 		/**
 		 * 对地址进行补充前缀
 		 */
