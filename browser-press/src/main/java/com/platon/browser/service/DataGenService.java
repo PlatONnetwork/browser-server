@@ -7,6 +7,7 @@ import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -163,7 +164,7 @@ public class DataGenService {
     public StakeResult getStakeResult(Transaction tx,Long nodeSum,Long stakeSum) throws BlockNumberException {
         Node node = JSON.parseObject(nodeStr,Node.class);
         node.setStakingBlockNum(tx.getNum());
-        node.setNodeId(DigestUtils.sha512Hex(stakeSum.toString()));
+        node.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(stakeSum.toString())));
         node.setNodeIcon(node.getNodeId().substring(0,6));
         node.setNodeName(node.getNodeId().substring(7,10));
 
@@ -193,7 +194,7 @@ public class DataGenService {
     public Delegation getDelegation(Transaction tx,Long totalCount){
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
         copy.setStakingBlockNum(tx.getNum());
-        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(totalCount.toString())));
         copy.setDelegateAddr(ADDRESS.get(random.nextInt(ADDRESS.size())));
         return copy;
     }
@@ -202,7 +203,7 @@ public class DataGenService {
     public Proposal getProposal(Transaction tx,Long totalCount){
         Proposal copy = JSON.parseObject(proposalStr, Proposal.class);
         copy.setHash(tx.getHash());
-        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(totalCount.toString())));
         copy.setNodeName(copy.getNodeId().substring(7,10));
         copy.setName(copy.getNodeId().substring(0,6));
         // 1文本提案,2升级提案,3参数提案,4取消提案
@@ -229,7 +230,7 @@ public class DataGenService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public Vote getVote(Transaction tx,Long totalCount){
         Vote copy = JSON.parseObject(voteStr, Vote.class);
-        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(totalCount.toString())));
         copy.setNodeName(copy.getNodeId().substring(7,10));
         copy.setHash(tx.getHash());
         copy.setProposalHash(PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size())));
