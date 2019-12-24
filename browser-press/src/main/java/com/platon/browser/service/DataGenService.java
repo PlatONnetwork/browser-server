@@ -24,10 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @Data
@@ -43,7 +40,7 @@ public class DataGenService {
 
     private static final List<String> NODE_IDS=new ArrayList<>();
     static {
-            NODE_IDS.add("0x00193cef7c6ca8e461a1a37602be6717a8c98d8b7db7dd931c90dca7d36168660781e0d606df7f3b3aca70e2e9d0eee193f83d8fd4039fc7953f636ee5462610");
+            NODE_IDS.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
     }
 
     static class Status{

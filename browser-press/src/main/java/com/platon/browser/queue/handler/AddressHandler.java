@@ -1,6 +1,7 @@
 package com.platon.browser.queue.handler;
 
 import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.queue.event.AddressEvent;
 import lombok.Getter;
@@ -66,8 +67,16 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
             address.setContractCreatehash("");
         });
 
+        AddressExample example = new AddressExample();
+        example.createCriteria().andAddressIn(new ArrayList<>(addressMap.keySet()));
+        List<Address> existList = addressMapper.selectByExample(example);
+        List<String> existAddresses = new ArrayList<>();
+        existList.forEach(address -> existAddresses.add(address.getAddress()));
+
+        addressMap.keySet().removeAll(existAddresses);
         List<Address> addressList = new ArrayList<>(addressMap.values());
-        addressMapper.batchInsert(addressList);
+
+        if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
         long endTime = System.currentTimeMillis();
         printTps("地址",addressList.size(),startTime,endTime);
         stage.clear();

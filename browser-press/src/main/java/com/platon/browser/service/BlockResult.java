@@ -46,9 +46,9 @@ public class BlockResult {
             tx.setNum(blockNumber.longValue());
             String txHash = HexTool.prefix(DigestUtils.sha256Hex(tx.toString()));
             tx.setHash(txHash);
-            String from = HexTool.prefix(DigestUtils.sha1Hex(tx.toString()));
+            String from = HexTool.prefix(DigestUtils.sha1Hex(blockNumber.toString()));
             tx.setFrom(FROM_ADDRESS.get(from,addressReusedTimes));
-            String to = HexTool.prefix(DigestUtils.sha1Hex(tx.toString()));
+            String to = HexTool.prefix(DigestUtils.sha1Hex(from));
             tx.setTo(TO_ADDRESS.get(to,addressReusedTimes));
             tx.setIndex(i);
             i++;
