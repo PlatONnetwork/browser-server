@@ -3,6 +3,7 @@ package com.platon.browser.queue.handler;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.event.NodeOptEvent;
+import com.platon.browser.service.DataGenService;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class NodeOptHandler  extends AbstractHandler<NodeOptEvent> {
     @Autowired
     private RedisImportService redisImportService;
 
+    @Autowired
+    private DataGenService dataGenService;
+
     @Setter
     @Getter
     @Value("${disruptor.queue.nodeopt.batch-size}")
@@ -48,6 +52,7 @@ public class NodeOptHandler  extends AbstractHandler<NodeOptEvent> {
             if(stage.size()<batchSize) return;
             esImportService.batchImport(Collections.emptySet(), Collections.emptySet(),stage);
             Set<NetworkStat> statistics = new HashSet<>();
+            statistics.add(dataGenService.getNetworkStat());
             redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
             long endTime = System.currentTimeMillis();
             printTps("日志",stage.size(),startTime,endTime);
