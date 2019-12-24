@@ -230,15 +230,15 @@ public class PressApplication implements ApplicationRunner {
                             tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
             ){
                 StakeResult stakeResult = dataGenService.getStakeResult(tx);
-                currentNodeSum++;
-                currentStakeSum++;
                 if(currentNodeSum<nodeMaxCount){
                     // 构造指定数量的节点记录并入库
                     nodeList.add(stakeResult.getNode());
+                    currentNodeSum++;
                 }
                 if(currentStakeSum<stakeMaxCount){
                     // 构造指定数量的质押记录并入库
                     stakingList.add(stakeResult.getStaking());
+                    currentStakeSum++;
                 }
             }
         }
