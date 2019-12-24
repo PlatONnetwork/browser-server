@@ -67,7 +67,15 @@ disruptor:
       gen-size: 100
       buffer-size: 1024
       batch-size: 3
-    delegate:
+    delegation:
+      gen-size: 100
+      buffer-size: 1024
+      batch-size: 3
+    proposal:
+      gen-size: 100
+      buffer-size: 1024
+      batch-size: 3
+    vote:
       gen-size: 100
       buffer-size: 1024
       batch-size: 3
@@ -120,3 +128,7 @@ platon:
   stakeMaxCount: 1200
   #委托条数
   delegateMaxCount: 6000
+  #提案条数
+  proposalMaxCount: 6000
+  #投票条数
+  voteMaxCount: 6000

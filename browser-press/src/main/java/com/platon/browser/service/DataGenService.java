@@ -1,23 +1,24 @@
 package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-import jnr.x86asm.CONDITION;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
-import org.bouncycastle.asn1.cms.PasswordRecipientInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -26,6 +27,8 @@ import java.util.Random;
 @Data
 @Service
 public class DataGenService {
+
+    private static final List<String> PROPOSAL_HASH = new ArrayList<>();
 
     private static final String [] NODE_IDS={
             "0x459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",
@@ -39,12 +42,20 @@ public class DataGenService {
         return NODE_IDS[random.nextInt(NODE_IDS.length)];
     }
 
+    private String blockListStr;
+    private String transactionListStr;
+    private String nodeOptListStr;
+    private String nodeStr;
+    private String stakingStr;
+    private String delegationStr;
+    private String proposalStr;
+    private String voteStr;
 
-    private static String blockListStr;
-    private static String transactionListStr;
-    private static String nodeOptListStr;
+    private NetworkStat networkStat;
+    private List<Config> configList;
 
-    static {
+    @PostConstruct
+    private void init() {
         URL dirUrl = DataGenService.class.getClassLoader().getResource("data");
         String dirPath = dirUrl.getPath();
         File dir = new File(dirPath);
@@ -61,6 +72,27 @@ public class DataGenService {
                     case "nodeopt.json":
                         nodeOptListStr = content;
                         break;
+                    case "node.json":
+                        nodeStr=content;
+                        break;
+                    case "staking.json":
+                        stakingStr=content;
+                        break;
+                    case "networkstat.json":
+                        networkStat=JSON.parseObject(content, NetworkStat.class);
+                        break;
+                    case "delegation.json":
+                        delegationStr=content;
+                        break;
+                    case "config.json":
+                        configList=JSON.parseArray(content,Config.class);
+                        break;
+                    case "proposal.json":
+                        proposalStr=content;
+                        break;
+                    case "vote.json":
+                        voteStr=content;
+                        break;
                 }
             } catch (IOException e) {
                 log.error("读取文件内容出错",e);
@@ -75,7 +107,7 @@ public class DataGenService {
     private long nodeOptMaxId = 0L;
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BlockResult get(BigInteger blockNumber){
+    public BlockResult getBlock(BigInteger blockNumber){
         BlockResult br = new BlockResult();
 
         Block block = JSON.parseObject(blockListStr,Block.class);
@@ -93,4 +125,73 @@ public class DataGenService {
         return br;
     }
 
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Node getNode(Transaction tx,Long totalCount){
+        Node copy = JSON.parseObject(nodeStr,Node.class);
+        copy.setStakingBlockNum(tx.getNum());
+        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeIcon(copy.getNodeId().substring(0,6));
+        copy.setNodeName(copy.getNodeId().substring(7,10));
+        copy.setStakingTxIndex(tx.getIndex());
+        copy.setStakingAddr(DigestUtils.sha1Hex(totalCount.toString()));
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Staking getStaking(Transaction tx,Long totalCount){
+        Staking copy = JSON.parseObject(stakingStr,Staking.class);
+        copy.setStakingBlockNum(tx.getNum());
+        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeIcon(copy.getNodeId().substring(0,6));
+        copy.setNodeName(copy.getNodeId().substring(7,10));
+        copy.setStakingTxIndex(tx.getIndex());
+        copy.setStakingAddr(DigestUtils.sha1Hex(totalCount.toString()));
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Delegation getDelegation(Transaction tx,Long totalCount){
+        Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
+        copy.setStakingBlockNum(tx.getNum());
+        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setDelegateAddr(tx.getTo());
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Proposal getProposal(Transaction tx,Long totalCount){
+        Proposal copy = JSON.parseObject(proposalStr, Proposal.class);
+        copy.setHash(tx.getHash());
+        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeName(copy.getNodeId().substring(7,10));
+        copy.setName(copy.getNodeId().substring(0,6));
+        // 1文本提案,2升级提案,3参数提案,4取消提案
+        switch (tx.getTypeEnum()){
+            case PROPOSAL_TEXT:
+                copy.setType(1);
+                break;
+            case PROPOSAL_CANCEL:
+                copy.setType(4);
+                break;
+            case PROPOSAL_PARAMETER:
+                copy.setType(3);
+                break;
+            case PROPOSAL_UPGRADE:
+                copy.setType(2);
+                break;
+        }
+        copy.setBlockNumber(tx.getNum());
+        PROPOSAL_HASH.add(copy.getHash());
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Vote getVote(Transaction tx,Long totalCount){
+        Vote copy = JSON.parseObject(voteStr, Vote.class);
+        copy.setNodeId(DigestUtils.sha512Hex(totalCount.toString()));
+        copy.setNodeName(copy.getNodeId().substring(7,10));
+        copy.setHash(tx.getHash());
+        copy.setProposalHash(PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size())));
+        return copy;
+    }
 }
