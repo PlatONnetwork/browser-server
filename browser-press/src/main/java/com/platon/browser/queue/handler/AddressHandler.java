@@ -70,5 +70,6 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         addressMapper.batchInsert(addressList);
         long endTime = System.currentTimeMillis();
         printTps("地址",addressList.size(),startTime,endTime);
+        stage.clear();
     }
 }
