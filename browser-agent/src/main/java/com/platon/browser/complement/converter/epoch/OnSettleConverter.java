@@ -61,7 +61,8 @@ public class OnSettleConverter {
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
         stakingList.forEach(staking -> {
 
-            // 为计算年化率,保留当前质押记录前一个质押金累计金额，防止被质押奖励发放操作覆盖
+            // 特别注意：为计算年化率,保留当前质押记录前一个质押金累计金额，
+            // 防止被质押奖励发放操作覆盖（因为质押奖励发放是把当前周期质押奖励传到SQL语句中，由SQL语句做累加操作）
             BigDecimal preStakeSumAmount = staking.getStakingRewardValue();
 
             //犹豫期金额变成锁定金额
