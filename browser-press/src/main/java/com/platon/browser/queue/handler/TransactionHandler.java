@@ -33,13 +33,6 @@ public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
     @Autowired
     private AddressPublisher addressPublisher;
 
-    @Value("${platon.addressMaxCount}")
-    private long addressMaxCount;
-
-    @Getter
-    @Setter
-    private long currentAddressSum = 0L;
-
     @Setter
     @Getter
     @Value("${disruptor.queue.transaction.batch-size}")
@@ -68,20 +61,18 @@ public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
             long endTime = System.currentTimeMillis();
             printTps("交易",stage.size(),startTime,endTime);
 
-            if(currentAddressSum<addressMaxCount){
-                // 地址数量未达到指定数量，则继续入库
-                List<Address> addressList = new ArrayList<>();
-                stage.forEach(tx->{
-                    Address address=new Address();
-                    address.setAddress(tx.getFrom());
-                    addressList.add(address);
-                    address=new Address();
-                    address.setAddress(tx.getTo());
-                    addressList.add(address);
-                });
-                addressPublisher.publish(addressList);
-                currentAddressSum=currentAddressSum+addressList.size();
-            }
+            // 地址数量未达到指定数量，则继续入库
+            List<Address> addressList = new ArrayList<>();
+            stage.forEach(tx->{
+                Address address=new Address();
+                address.setAddress(tx.getFrom());
+                addressList.add(address);
+                address=new Address();
+                address.setAddress(tx.getTo());
+                addressList.add(address);
+            });
+            addressPublisher.publish(addressList);
+
             stage.clear();
         }catch (Exception e){
             log.error("",e);

@@ -35,13 +35,26 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
     @Value("${disruptor.queue.address.batch-size}")
     private volatile int batchSize;
 
+    @Value("${platon.addressMaxCount}")
+    private long addressMaxCount;
+
+    @Getter
+    @Setter
+    private long currentAddressSum = 0L;
+
     private Set<Address> stage = new HashSet<>();
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         stage.addAll(event.getAddressList());
-        if(stage.size()<batchSize) return;
+        if(stage.size()<batchSize){
+            // 如果暂存数量小于批次
+            if(currentAddressSum>addressMaxCount){
+                // 且当前地址数未达到指定数量
+                return;
+            }
+        }
         Map<String,Address> addressMap = new HashMap<>();
         stage.forEach(address -> addressMap.put(address.getAddress(),address));
         addressMap.values().forEach(address -> {
@@ -76,9 +89,12 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         addressMap.keySet().removeAll(existAddresses);
         List<Address> addressList = new ArrayList<>(addressMap.values());
 
-        if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
-        long endTime = System.currentTimeMillis();
-        printTps("地址",addressList.size(),startTime,endTime);
+        if(currentAddressSum<addressMaxCount){
+            if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
+            long endTime = System.currentTimeMillis();
+            printTps("地址",addressList.size(),startTime,endTime);
+            currentAddressSum=currentAddressSum+addressList.size();
+        }
         stage.clear();
     }
 }
