@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.web3j.utils.TXTypeEnum;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -108,8 +107,7 @@ public class DataGenService {
 
     @PostConstruct
     private void init() {
-        URL dirUrl = DataGenService.class.getClassLoader().getResource("data");
-        String dirPath = dirUrl.getPath();
+        String dirPath = System.getProperty("user.dir")+File.separator+"template-data";
         File dir = new File(dirPath);
         Arrays.asList(dir.listFiles()).forEach(file -> {
             try {
