@@ -10,6 +10,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class BlockResult {
@@ -44,9 +45,9 @@ public class BlockResult {
         for (Transaction tx : transactionList) {
             tx.setBHash(blockHash);
             tx.setNum(blockNumber.longValue());
-            String txHash = HexTool.prefix(DigestUtils.sha256Hex(tx.toString()));
+            String txHash = HexTool.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
             tx.setHash(txHash);
-            String from = HexTool.prefix(DigestUtils.sha1Hex(blockNumber.toString()));
+            String from = HexTool.prefix(DigestUtils.sha1Hex(txHash));
             tx.setFrom(FROM_ADDRESS.get(from,addressReusedTimes));
             String to = HexTool.prefix(DigestUtils.sha1Hex(from));
             tx.setTo(TO_ADDRESS.get(to,addressReusedTimes));

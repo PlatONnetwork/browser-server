@@ -91,6 +91,9 @@ public class PressApplication implements ApplicationRunner {
     @Value("${platon.slashMaxCount}")
     private long slashMaxCount;
 
+    @Value("${platon.blockMaxCount}")
+    private long blockMaxCount;
+
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
     private long currentDelegationSum = 0L;
@@ -108,6 +111,13 @@ public class PressApplication implements ApplicationRunner {
         NetworkStatExample networkStatExample = new NetworkStatExample();
         networkStatExample.createCriteria().andIdEqualTo(1);
         while (true){
+
+            if(blockPublisher.getTotalCount()>blockMaxCount){
+                log.warn("区块已达到指定数量：{}",blockMaxCount);
+                System.exit(0);
+                break;
+            }
+
             // 检查应用状态
             checkAppStatus(blockNumber);
             // 构造【区块&交易&操作日志】数据

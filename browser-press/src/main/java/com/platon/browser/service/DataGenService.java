@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.web3j.utils.TXTypeEnum;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -99,6 +100,11 @@ public class DataGenService {
 
     private NetworkStat networkStat;
     private List<Config> configList;
+    private String transferTxStr;
+
+
+    @Value("${platon.txCountPerBlock}")
+    private long txCountPerBlock;
 
     @PostConstruct
     private void init() {
@@ -114,6 +120,12 @@ public class DataGenService {
                         break;
                     case "transaction.json":
                         transactionListStr = content;
+                        List<Transaction> transactionList = JSON.parseArray(content,Transaction.class);
+                        transactionList.forEach(tx->{
+                            if(tx.getTypeEnum()==Transaction.TypeEnum.TRANSFER){
+                                transferTxStr=JSON.toJSONString(tx);
+                            }
+                        });
                         break;
                     case "nodeopt.json":
                         nodeOptListStr = content;
@@ -168,6 +180,12 @@ public class DataGenService {
         br.setBlock(block);
 
         List<Transaction> transactionList = JSON.parseArray(transactionListStr,Transaction.class);
+
+        for(int i=transactionList.size();i<txCountPerBlock;i++){
+            Transaction tx = JSON.parseObject(transferTxStr,Transaction.class);
+            transactionList.add(tx);
+        }
+
         br.setTransactionList(transactionList);
 
         List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr,NodeOpt.class);

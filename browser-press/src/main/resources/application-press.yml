@@ -140,4 +140,8 @@ platon:
   #slash最大条数
   slashMaxCount: 600
   #地址最大条数
-  addressMaxCount: 50
+  addressMaxCount: 1500000
+  #区块最大条数
+  blockMaxCount: 100
+  #每个区块的交易数
+  txCountPerBlock: 100
