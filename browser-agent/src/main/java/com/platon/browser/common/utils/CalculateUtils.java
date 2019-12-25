@@ -55,34 +55,25 @@ public class CalculateUtils {
 	 * @return
 	 */
     public static BigDecimal calculateAnnualizedRate(AnnualizedRateInfo ari, BlockChainConfig chainConfig){
-        // 年化率推算信息
-        BigDecimal profitSum=BigDecimal.ZERO;
-        BigDecimal costSum=BigDecimal.ZERO;
-        
-        // 利润=最新的收益累计-最旧的收益收益累计
-		long profitMaxPeriod=0;
-        if(!ari.getProfit().isEmpty()) {
-            PeriodValueElement latest=ari.getProfit().get(0);
-            PeriodValueElement oldest=latest;
-            for (PeriodValueElement pve:ari.getProfit()){
-                if(latest==null||latest.getPeriod().compareTo(pve.getPeriod())<0) latest=pve;
-                if(oldest==null||latest.getPeriod().compareTo(pve.getPeriod())>0) oldest=pve;
-                if(pve.getPeriod()>profitMaxPeriod) profitMaxPeriod=pve.getPeriod();
-            }
-            if (latest==oldest) profitSum=latest.getValue();
-            if (latest!=oldest) profitSum=latest.getValue().subtract(oldest.getValue());
-        }
+        // 最新利润累计
+		PeriodValueElement latestProfit=ari.getProfit().get(0);
+		// 最旧利润累计
+		PeriodValueElement oldestProfit=ari.getProfit().get(ari.getProfit().size()-1);
+		// 利润=最新的收益累计-最旧的收益收益累计
+		BigDecimal profitSum=latestProfit.getValue().subtract(oldestProfit.getValue());
 
+		BigDecimal costSum=BigDecimal.ZERO;
 		for (PeriodValueElement cost : ari.getCost()) {
-			// 凡是小于或等于收益记录中最大周期的成本都累加起来
-			if (cost.getPeriod() <= profitMaxPeriod) {
-				costSum= costSum.add(cost.getValue());
-			}
+			// 跳过大于利润所在最大结算周期的成本周期
+			if(cost.getPeriod()>latestProfit.getPeriod()) continue;
+			costSum = costSum.add(cost.getValue());
 		}
         
         if(costSum.compareTo(BigDecimal.ZERO)==0) {
             return BigDecimal.ZERO;
         }
+
+        // 年化率=(利润/成本)x每个增发周期的结算周期数x100
         BigDecimal rate = profitSum
                 .divide(costSum,16,RoundingMode.FLOOR) // 除总成本
                 .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
