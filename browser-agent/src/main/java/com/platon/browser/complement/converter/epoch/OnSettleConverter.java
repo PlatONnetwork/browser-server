@@ -75,7 +75,7 @@ public class OnSettleConverter {
             }
             //当前质押是上轮结算周期验证人,发放质押奖励
             if(preVerifierList.contains(staking.getNodeId())){
-                // 把当前结算周期质押奖励设置到当前质押staking bean的stakingRewardValue属性，
+                // 特别注意：把当前结算周期质押奖励设置到当前质押staking bean的stakingRewardValue属性，
                 // 由mapper xml中的sql语句做累加操作：
                 // staking表：【`staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue}】
                 // node表：【`stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue}】
