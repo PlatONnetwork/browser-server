@@ -55,17 +55,19 @@ public class CalculateUtils {
 	 * @return
 	 */
     public static BigDecimal calculateAnnualizedRate(AnnualizedRateInfo ari, BlockChainConfig chainConfig){
+		ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+		ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
         // 最新利润累计
-		PeriodValueElement latestProfit=ari.getProfit().get(0);
+		PeriodValueElement last=ari.getProfit().get(0);
 		// 最旧利润累计
-		PeriodValueElement oldestProfit=ari.getProfit().get(ari.getProfit().size()-1);
+		PeriodValueElement first=ari.getProfit().get(ari.getProfit().size()-1);
 		// 利润=最新的收益累计-最旧的收益收益累计
-		BigDecimal profitSum=latestProfit.getValue().subtract(oldestProfit.getValue());
+		BigDecimal profitSum=last.getValue().subtract(first.getValue()).abs();
 
 		BigDecimal costSum=BigDecimal.ZERO;
 		for (PeriodValueElement cost : ari.getCost()) {
 			// 跳过大于利润所在最大结算周期的成本周期
-			if(cost.getPeriod()>latestProfit.getPeriod()) continue;
+			if(cost.getPeriod()>last.getPeriod()) continue;
 			costSum = costSum.add(cost.getValue());
 		}
         

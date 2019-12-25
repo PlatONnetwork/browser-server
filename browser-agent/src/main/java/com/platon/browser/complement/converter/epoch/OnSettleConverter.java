@@ -102,7 +102,7 @@ public class OnSettleConverter {
             ari.setCost(new ArrayList<>());
             ari.setProfit(new ArrayList<>());
             ari.setSlash(new ArrayList<>());
-            // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
+            // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的成本
             if(curVerifierList.contains(staking4Ari.getNodeId())){
                 String ariString = staking4Ari.getAnnualizedRateInfo();
                 if(StringUtils.isNotBlank(ariString)){
