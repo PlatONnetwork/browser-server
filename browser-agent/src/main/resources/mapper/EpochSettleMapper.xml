@@ -9,7 +9,7 @@
         `staking_hes` = #{staking.stakingHes},
         `staking_reduction` = #{staking.stakingReduction},
         `status` = #{staking.status},
-        `staking_reward_value` =  #{staking.stakingRewardValue},
+        `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue},
         `is_settle` = #{staking.isSettle},
         `annualized_rate` = #{staking.annualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo}

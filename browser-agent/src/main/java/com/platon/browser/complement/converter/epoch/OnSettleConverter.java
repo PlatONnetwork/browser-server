@@ -59,17 +59,21 @@ public class OnSettleConverter {
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
         stakingList.forEach(staking -> {
-            //犹豫期金额
+            //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
             staking.setStakingHes(BigDecimal.ZERO);
-            //退出中记录状态设置
+            //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
             if(staking.getStatus() == 2 && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(3);
             }
             //当前质押是上轮结算周期验证人,发放质押奖励
             if(preVerifierList.contains(staking.getNodeId())){
-                staking.setStakingRewardValue(staking.getStakingRewardValue().add(settle.getStakingReward()));
+                // 把当前结算周期质押奖励设置到当前质押staking bean的stakingRewardValue属性，
+                // 由mapper xml中的sql语句做累加操作：
+                // staking表：【`staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue}】
+                // node表：【`stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue}】
+                staking.setStakingRewardValue(settle.getStakingReward());
             }else {
                 staking.setStakingRewardValue(BigDecimal.ZERO);
             }
