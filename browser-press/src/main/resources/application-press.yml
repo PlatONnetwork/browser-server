@@ -133,9 +133,11 @@ platon:
   delegateMaxCount: 6000
   #提案条数
   proposalMaxCount: 600
-  #投票条数
+  #投票最大条数
   voteMaxCount: 600
-  #rpplan条数
+  #rpplan最大条数
   rpplanMaxCount: 600
-  #slash条数
+  #slash最大条数
   slashMaxCount: 600
+  #地址最大条数
+  addressMaxCount: 50

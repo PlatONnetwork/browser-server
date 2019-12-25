@@ -41,4 +41,11 @@ public class TransactionPublisher extends AbstractPublisher {
     EventFactory getEventFactory() {
         return TransactionEvent::new;
     }
+
+    public void setCurrentAddressSum(long addressSum){
+        handler.setCurrentAddressSum(addressSum);
+    }
+    public long getCurrentAddressSum(){
+        return handler.getCurrentAddressSum();
+    }
 }

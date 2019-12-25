@@ -156,6 +156,7 @@ public class PressApplication implements ApplicationRunner {
             currentVoteSum=counterBean.getVoteCount();
             currentRpplanSum=counterBean.getRpplanCount();
             currentSlashSum=counterBean.getSlashCount();
+            transactionPublisher.setCurrentAddressSum(counterBean.getAddressSum());
             blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -192,6 +193,7 @@ public class PressApplication implements ApplicationRunner {
             counter.setVoteCount(currentVoteSum);
             counter.setRpplanCount(currentRpplanSum);
             counter.setSlashCount(currentSlashSum);
+            counter.setAddressCount(transactionPublisher.getCurrentAddressSum());
             String status = JSON.toJSONString(counter,true);
             File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
