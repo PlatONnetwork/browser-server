@@ -63,8 +63,8 @@ public class ExportService {
         constructor.setDesc("seq");
         // 分页查询区块数据
         ESResult<Transaction> esResult=null;
-        long totalCount = 0L;
-        for (int pageNo = 0; pageNo*transactionPageSize <= totalCount; pageNo++) {
+        long maxCount = 400000L;
+        for (int pageNo = 0; pageNo*transactionPageSize <= maxCount; pageNo++) {
             try {
                 esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
             } catch (Exception e) {
@@ -81,7 +81,6 @@ public class ExportService {
             List<Transaction> txList = esResult.getRsData();
             try{
                 txList.forEach(tx->csvRows.add(new Object[]{tx.getHash()}));
-                totalCount+=txList.size();
                 log.info("【exportTxHash()】第{}页,{}条记录",pageNo,txList.size());
             }catch (Exception e){
                 log.error("【exportTxHash()】导出出错:",e);
