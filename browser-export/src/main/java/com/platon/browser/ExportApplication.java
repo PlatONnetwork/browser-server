@@ -19,15 +19,15 @@ import java.util.concurrent.Executors;
 public class ExportApplication implements ApplicationRunner {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
     @Autowired
-    private ExportService syncService;
+    private ExportService exportService;
     public static void main ( String[] args ) {
         SpringApplication.run(ExportApplication.class, args);
     }
     @Override
     public void run ( ApplicationArguments args ) {
-        EXECUTOR_SERVICE.submit(()->syncService.syncBlock());
-        EXECUTOR_SERVICE.submit(()->syncService.syncTransaction());
-        while (!ExportService.isBlockSyncDone()||!ExportService.isTransactionSyncDone()){
+        EXECUTOR_SERVICE.submit(()->exportService.exportTxHash());
+        EXECUTOR_SERVICE.submit(()->exportService.exportAddress());
+        while (!ExportService.isTxHashExportDone()||!ExportService.isAddressExportDone()){
             SleepUtil.sleep(1L);
         }
         log.info("数据同步完成!");

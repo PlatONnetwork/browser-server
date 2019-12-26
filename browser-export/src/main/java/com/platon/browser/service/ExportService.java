@@ -6,7 +6,7 @@ import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
-import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -29,10 +30,10 @@ import java.util.List;
 public class ExportService {
     @Getter
     @Setter
-    private static volatile boolean blockSyncDone =false;
+    private static volatile boolean txHashExportDone =false;
     @Getter
     @Setter
-    private static volatile boolean transactionSyncDone =false;
+    private static volatile boolean addressExportDone =false;
 
     @Autowired
     private TransactionESRepository transactionESRepository;
@@ -56,13 +57,16 @@ public class ExportService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportTxHash(){
+        String fileName = "txhash.csv";
+        List<Object[]> csvRows = new ArrayList<>();
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-        constructor.setDesc("num");
+        constructor.setDesc("seq");
         // 分页查询区块数据
-        ESResult<Block> esResult=null;
-        /*for (int pageNo = 0; pageNo <= blockPageCount; pageNo++) {
+        ESResult<Transaction> esResult=null;
+        long totalCount = 0L;
+        for (int pageNo = 0; pageNo*transactionPageSize <= totalCount; pageNo++) {
             try {
-                esResult = blockESRepository.search(blockConstructor, Block.class, pageNo, blockPageSize);
+                esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
             } catch (Exception e) {
                 if(e.getMessage().contains("all shards failed")) {
                     break;
@@ -74,18 +78,18 @@ public class ExportService {
                 // 如果查询结果为空则结束
                 break;
             }
-            List<Block> blocks = esResult.getRsData();
+            List<Transaction> txList = esResult.getRsData();
             try{
-                redisBlockService.save(new HashSet<>(blocks),false);
-                log.info("【syncBlock()】第{}页,{}条记录",pageNo,blocks.size());
+                txList.forEach(tx->csvRows.add(new Object[]{tx.getHash()}));
+                totalCount+=txList.size();
+                log.info("【exportTxHash()】第{}页,{}条记录",pageNo,txList.size());
             }catch (Exception e){
-                log.error("【syncBlock()】同步区块到Redis出错:",e);
+                log.error("【exportTxHash()】导出出错:",e);
                 throw e;
             }
-            // 所有数据不够一页大小，退出
-            if(blocks.size()<blockPageSize) break;
-        }*/
-        //txSyncDone=true;
+        }
+        buildFile(fileName,csvRows,null);
+        txHashExportDone=true;
     }
 
     /**
@@ -93,7 +97,23 @@ public class ExportService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportAddress(){
-
+        long totalCount = 0L;
+//        for (int pageNo = 0; pageNo*transactionPageSize <= totalCount; pageNo++) {
+//
+//            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
+//                // 如果查询结果为空则结束
+//                break;
+//            }
+//            List<Transaction> txList = esResult.getRsData();
+//            try{
+//                txList.forEach(tx->csvRows.add(new Object[]{tx.getHash()}));
+//                log.info("【exportTxHash()】第{}页,{}条记录",pageNo,txList.size());
+//            }catch (Exception e){
+//                log.error("【exportTxHash()】导出出错:",e);
+//                throw e;
+//            }
+//        }
+//        buildFile(fileName,csvRows,null);
     }
 
     /**
