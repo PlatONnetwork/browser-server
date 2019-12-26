@@ -8,6 +8,8 @@ import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -119,5 +127,25 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportDelegationNodeId(){
 
+    }
+
+    @Value("${fileUrl}")
+    private int fileUrl;
+    public void buildFile(String fileName, List<Object[]> rows, String[] headers) {
+        try {
+            /** 初始化输出流对象 */
+            FileOutputStream fis=new FileOutputStream(fileUrl + fileName);
+            /** 设置返回的头，防止csv乱码 */
+            fis.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+            OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
+            /** 厨师书writer对象 */
+            CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+            writer.writeHeaders(headers);
+            writer.writeRowsAndClose(rows);
+        } catch (IOException e) {
+            log.error("数据输出错误:", e);
+            return;
+        }
+        log.info("导出报表成功，路径：{}", fileUrl + fileName);
     }
 }
