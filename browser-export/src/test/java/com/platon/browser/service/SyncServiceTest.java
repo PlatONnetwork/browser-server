@@ -35,7 +35,7 @@ public class SyncServiceTest {
     private RedisTransactionService redisTransactionService;
 
     @Spy
-    private SyncService target;
+    private ExportService target;
 
     @Before
     public void setup() throws IOException {
@@ -100,7 +100,7 @@ public class SyncServiceTest {
     public void test2() throws IOException {
         doThrow(new Exception("")).when(redisBlockService).save(anySet(),anyBoolean());
         target.syncBlock();
-        SyncService.isTransactionSyncDone();
-        SyncService.isBlockSyncDone();
+        ExportService.isTransactionSyncDone();
+        ExportService.isBlockSyncDone();
     }
 }

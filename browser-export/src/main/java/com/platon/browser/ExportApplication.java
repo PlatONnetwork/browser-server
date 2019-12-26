@@ -1,6 +1,6 @@
 package com.platon.browser;
 
-import com.platon.browser.service.SyncService;
+import com.platon.browser.service.ExportService;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 public class ExportApplication implements ApplicationRunner {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
     @Autowired
-    private SyncService syncService;
+    private ExportService syncService;
     public static void main ( String[] args ) {
         SpringApplication.run(ExportApplication.class, args);
     }
@@ -27,7 +27,7 @@ public class ExportApplication implements ApplicationRunner {
     public void run ( ApplicationArguments args ) {
         EXECUTOR_SERVICE.submit(()->syncService.syncBlock());
         EXECUTOR_SERVICE.submit(()->syncService.syncTransaction());
-        while (!SyncService.isBlockSyncDone()||!SyncService.isTransactionSyncDone()){
+        while (!ExportService.isBlockSyncDone()||!ExportService.isTransactionSyncDone()){
             SleepUtil.sleep(1L);
         }
         log.info("数据同步完成!");
