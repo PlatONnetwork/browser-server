@@ -35,9 +35,11 @@ public class ExportApplication implements ApplicationRunner {
 		EXECUTOR_SERVICE.submit(() -> exportService.exportNodeId());
 		EXECUTOR_SERVICE.submit(() -> exportService.exportRpPlanAddress());
 		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationInfo());
+		EXECUTOR_SERVICE.submit(() -> exportService.exportProposal());
+		EXECUTOR_SERVICE.submit(() -> exportService.exportVote());
 		while (!ExportService.isTxHashExportDone() || !ExportService.isAddressExportDone()
 				|| !ExportService.isRpplanExportDone() || !ExportService.isDelegationExportDone()
-				|| !ExportService.isNodeExportDone()) {
+				|| !ExportService.isNodeExportDone()|| !ExportService.isProposalExportDone()|| !ExportService.isVoteExportDone()) {
 			SleepUtil.sleep(1L);
 		}
 		log.info("数据导出完成!");

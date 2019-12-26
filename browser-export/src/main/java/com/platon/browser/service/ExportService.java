@@ -5,13 +5,16 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.RpPlan;
+import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
+import com.platon.browser.dao.mapper.VoteMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -50,11 +53,15 @@ public class ExportService {
     @Getter
     @Setter
     private static volatile boolean delegationExportDone =false;
+    @Getter
+    @Setter
+    private static volatile boolean proposalExportDone =false;
+    @Getter
+    @Setter
+    private static volatile boolean voteExportDone =false;
 
     @Autowired
     private TransactionESRepository transactionESRepository;
-    @Autowired
-    private NodeOptESRepository nodeOptESRepository;
     @Autowired
     private AddressMapper addressMapper;
     @Autowired
@@ -63,6 +70,10 @@ public class ExportService {
     private RpPlanMapper rpPlanMapper;
     @Autowired
     private DelegationMapper delegationMapper;
+    @Autowired
+    private ProposalMapper proposalMapper;
+    @Autowired
+    private VoteMapper voteMapper;
 
 
     @Value("${paging.pageSize}")
@@ -117,6 +128,9 @@ public class ExportService {
     	for(int pageNo=1;pageNo*transactionPageSize < maxCount;pageNo++) {
     		PageHelper.startPage(pageNo, transactionPageSize);
         	List<Address> addresses = addressMapper.selectByExample(null);
+        	if(addresses.size() == 0) {
+        		break;
+        	}
         	for(Address d:addresses) {
         		Object[] row = new Object[1];
         		row[0] = d.getAddress();
@@ -152,6 +166,54 @@ public class ExportService {
     	this.buildFile("rpplan.csv", rows, null);
     	rpplanExportDone = true;
     }
+    
+    /**
+     * 导出提案hash
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public void exportProposal(){
+    	List<Object[]> rows = new ArrayList<>();
+		for(int pageNo=1;pageNo<200;pageNo++) {
+			PageHelper.startPage(pageNo, 1000);
+			List<Proposal> proposals = proposalMapper.selectByExample(null);
+			if(proposals.size() == 0) {
+				break;
+			}
+	    	for(Proposal d:proposals) {
+	    		Object[] row = new Object[1];
+	    		row[1] = d.getHash();
+	    		rows.add(row);
+	    	}
+	    	log.info("【exportProposal()】第{}页,{}条记录",pageNo,rows.size());
+		}
+		log.info("proposals 导出成功。总共行数：{}", rows.size());
+    	this.buildFile("proposals.csv", rows, null);
+    	proposalExportDone = true;
+    }
+    
+    /**
+     * 导出vote hash
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public void exportVote(){
+    	List<Object[]> rows = new ArrayList<>();
+		for(int pageNo=1;pageNo<200;pageNo++) {
+			PageHelper.startPage(pageNo, 1000);
+			List<Vote> votes = voteMapper.selectByExample(null);
+			if(votes.size() == 0) {
+				break;
+			}
+	    	for(Vote d:votes) {
+	    		Object[] row = new Object[1];
+	    		row[1] = d.getHash();
+	    		rows.add(row);
+	    	}
+	    	log.info("【exportVote()】第{}页,{}条记录",pageNo,rows.size());
+		}
+		log.info("vote 导出成功。总共行数：{}", rows.size());
+    	this.buildFile("votes.csv", rows, null);
+    	voteExportDone = true;
+    }
 
     /**
      * 导出节点表地址
@@ -163,7 +225,7 @@ public class ExportService {
     	List<Node> nodes = nodeMapper.selectByExample(null);
     	for(Node d:nodes) {
     		Object[] row = new Object[1];
-    		row[1] = d.getNodeId();
+    		row[0] = d.getNodeId();
     		rows.add(row);
     	}
     	log.info("node 导出成功。总共行数：{}", rows.size());
@@ -177,19 +239,27 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportDelegationInfo(){
     	List<Object[]> rows = new ArrayList<>();
-    	for(int pageNo=1;pageNo*transactionPageSize < maxCount;pageNo++) {
-    		PageHelper.startPage(pageNo, transactionPageSize);
-        	DelegationExample delegationExample = new DelegationExample();
-        	delegationExample.setOrderByClause(" sequence desc");
-        	List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
-        	for(Delegation d:delegations) {
-        		Object[] row = new Object[2];
-        		row[0] = d.getDelegateAddr();
-        		row[1] = d.getNodeId();
-        		rows.add(row);
+    	try {
+    		for(int pageNo=1;pageNo*transactionPageSize < maxCount;pageNo++) {
+        		PageHelper.startPage(pageNo, transactionPageSize);
+            	DelegationExample delegationExample = new DelegationExample();
+            	delegationExample.setOrderByClause(" sequence desc");
+            	List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
+            	if(delegations.size() == 0) {
+            		break;
+            	}
+            	for(Delegation d:delegations) {
+            		Object[] row = new Object[2];
+            		row[0] = d.getDelegateAddr();
+            		row[1] = d.getNodeId();
+            		rows.add(row);
+            	}
+            	log.info("【exportDelegationInfo()】第{}页,{}条记录",pageNo,rows.size());
         	}
-        	log.info("【exportDelegationInfo()】第{}页,{}条记录",pageNo,rows.size());
-    	}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
     	log.info("degation 导出成功。总共行数：{}", rows.size());
     	this.buildFile("delegation.csv", rows, null);
     	delegationExportDone = true;
