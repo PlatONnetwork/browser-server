@@ -8,6 +8,9 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisBlockService;
 import com.platon.browser.service.redis.RedisTransactionService;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 
@@ -48,6 +55,8 @@ public class SyncService {
     private int transactionPageSize;
     @Value("${paging.transaction.page-count}")
     private int transactionPageCount;
+    @Value("${fileUrl}")
+    private int fileUrl;
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void syncBlock(){
@@ -116,4 +125,22 @@ public class SyncService {
         }
         transactionSyncDone=true;
     }
+    
+    public void buildFile(String fileName, List<Object[]> rows, String[] headers) {
+		try {
+			/** 初始化输出流对象 */
+			FileOutputStream fis=new FileOutputStream(fileUrl + fileName);
+			/** 设置返回的头，防止csv乱码 */
+			fis.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+			OutputStreamWriter  outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
+			/** 厨师书writer对象 */
+			CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+			writer.writeHeaders(headers);
+			writer.writeRowsAndClose(rows);
+		} catch (IOException e) {
+			log.error("数据输出错误:", e);
+			return;
+		}
+		log.info("导出报表成功，路径：{}", fileUrl + fileName);
+	}
 }
