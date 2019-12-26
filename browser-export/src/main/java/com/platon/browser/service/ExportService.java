@@ -2,11 +2,9 @@ package com.platon.browser.service;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
@@ -15,7 +13,7 @@ import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
-import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -39,10 +37,19 @@ import java.util.List;
 public class ExportService {
     @Getter
     @Setter
-    private static volatile boolean blockSyncDone =false;
+    private static volatile boolean txHashExportDone =false;
     @Getter
     @Setter
-    private static volatile boolean transactionSyncDone =false;
+    private static volatile boolean addressExportDone =false;
+    @Getter
+    @Setter
+    private static volatile boolean rpplanExportDone =false;
+    @Getter
+    @Setter
+    private static volatile boolean nodeExportDone =false;
+    @Getter
+    @Setter
+    private static volatile boolean delegationExportDone =false;
 
     @Autowired
     private TransactionESRepository transactionESRepository;
@@ -58,23 +65,25 @@ public class ExportService {
     private DelegationMapper delegationMapper;
 
 
-    @Value("${paging.transaction.page-size}")
+    @Value("${paging.pageSize}")
     private int transactionPageSize;
-    @Value("${paging.transaction.page-count}")
-    private int transactionPageCount;
+    @Value("${paging.maxCount}")
+    private int maxCount;
 
     /**
      * 导出交易表交易hash
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportTxHash(){
+        String fileName = "txhash.csv";
+        List<Object[]> csvRows = new ArrayList<>();
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-        constructor.setDesc("num");
+        constructor.setDesc("seq");
         // 分页查询区块数据
-        ESResult<Block> esResult=null;
-        /*for (int pageNo = 0; pageNo <= blockPageCount; pageNo++) {
+        ESResult<Transaction> esResult=null;
+        for (int pageNo = 0; pageNo*transactionPageSize <= maxCount; pageNo++) {
             try {
-                esResult = blockESRepository.search(blockConstructor, Block.class, pageNo, blockPageSize);
+                esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
             } catch (Exception e) {
                 if(e.getMessage().contains("all shards failed")) {
                     break;
@@ -82,22 +91,21 @@ public class ExportService {
                     log.error("【syncBlock()】查询ES出错:",e);
                 }
             }
-            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0){
+            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0||esResult.getRsData().size()==0){
                 // 如果查询结果为空则结束
                 break;
             }
-            List<Block> blocks = esResult.getRsData();
+            List<Transaction> txList = esResult.getRsData();
             try{
-                redisBlockService.save(new HashSet<>(blocks),false);
-                log.info("【syncBlock()】第{}页,{}条记录",pageNo,blocks.size());
+                txList.forEach(tx->csvRows.add(new Object[]{tx.getHash()}));
+                log.info("【exportTxHash()】第{}页,{}条记录",pageNo,txList.size());
             }catch (Exception e){
-                log.error("【syncBlock()】同步区块到Redis出错:",e);
+                log.error("【exportTxHash()】导出出错:",e);
                 throw e;
             }
-            // 所有数据不够一页大小，退出
-            if(blocks.size()<blockPageSize) break;
-        }*/
-        //txSyncDone=true;
+        }
+        buildFile(fileName,csvRows,null);
+        txHashExportDone=true;
     }
 
     /**
@@ -106,17 +114,19 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportAddress(){
     	List<Object[]> rows = new ArrayList<>();
-    	for(int i=0;i*transactionPageSize < transactionPageCount;i++) {
-    		PageHelper.startPage(i, transactionPageSize);
+    	for(int pageNo=1;pageNo*transactionPageSize < maxCount;pageNo++) {
+    		PageHelper.startPage(pageNo, transactionPageSize);
         	List<Address> addresses = addressMapper.selectByExample(null);
         	for(Address d:addresses) {
         		Object[] row = new Object[1];
         		row[0] = d.getAddress();
         		rows.add(row);
         	}
+        	log.info("【exportAddress()】第{}页,{}条记录",pageNo,rows.size());
     	}
     	log.info("address 导出成功。总共行数：{}", rows.size());
     	this.buildFile("address.csv", rows, null);
+    	addressExportDone = true;
     }
 
     /**
@@ -125,8 +135,8 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportRpPlanAddress(){
     	List<Object[]> rows = new ArrayList<>();
-		for(int i=0;i<20;i++) {
-			PageHelper.startPage(i, 1000);
+		for(int pageNo=1;pageNo<20;pageNo++) {
+			PageHelper.startPage(pageNo, 1000);
 			List<RpPlan> rpPlans = rpPlanMapper.selectByExample(null);
 			if(rpPlans.size() == 0) {
 				break;
@@ -136,9 +146,11 @@ public class ExportService {
 	    		row[1] = d.getAddress();
 	    		rows.add(row);
 	    	}
+	    	log.info("【exportRpPlanAddress()】第{}页,{}条记录",pageNo,rows.size());
 		}
 		log.info("rpplan 导出成功。总共行数：{}", rows.size());
     	this.buildFile("rpplan.csv", rows, null);
+    	rpplanExportDone = true;
     }
 
     /**
@@ -156,6 +168,7 @@ public class ExportService {
     	}
     	log.info("node 导出成功。总共行数：{}", rows.size());
     	this.buildFile("node.csv", rows, null);
+    	nodeExportDone = true;
     }
 
     /**
@@ -164,8 +177,8 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportDelegationInfo(){
     	List<Object[]> rows = new ArrayList<>();
-    	for(int i=0;i*transactionPageSize < transactionPageCount;i++) {
-    		PageHelper.startPage(i, transactionPageSize);
+    	for(int pageNo=1;pageNo*transactionPageSize < maxCount;pageNo++) {
+    		PageHelper.startPage(pageNo, transactionPageSize);
         	DelegationExample delegationExample = new DelegationExample();
         	delegationExample.setOrderByClause(" sequence desc");
         	List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
@@ -175,14 +188,16 @@ public class ExportService {
         		row[1] = d.getNodeId();
         		rows.add(row);
         	}
+        	log.info("【exportDelegationInfo()】第{}页,{}条记录",pageNo,rows.size());
     	}
     	log.info("degation 导出成功。总共行数：{}", rows.size());
     	this.buildFile("delegation.csv", rows, null);
+    	delegationExportDone = true;
     }
 
 
     @Value("${fileUrl}")
-    private int fileUrl;
+    private String fileUrl;
     public void buildFile(String fileName, List<Object[]> rows, String[] headers) {
         try {
             /** 初始化输出流对象 */
