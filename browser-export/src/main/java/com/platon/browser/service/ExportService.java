@@ -1,6 +1,15 @@
 package com.platon.browser.service;
 
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.DelegationExample;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
@@ -22,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -44,6 +54,8 @@ public class ExportService {
     private NodeMapper nodeMapper;
     @Autowired
     private RpPlanMapper rpPlanMapper;
+    @Autowired
+    private DelegationMapper delegationMapper;
 
 
     @Value("${paging.transaction.page-size}")
@@ -93,7 +105,18 @@ public class ExportService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportAddress(){
-
+    	List<Object[]> rows = new ArrayList<>();
+    	for(int i=0;i*transactionPageSize < transactionPageCount;i++) {
+    		PageHelper.startPage(i, transactionPageSize);
+        	List<Address> addresses = addressMapper.selectByExample(null);
+        	for(Address d:addresses) {
+        		Object[] row = new Object[1];
+        		row[0] = d.getAddress();
+        		rows.add(row);
+        	}
+    	}
+    	log.info("address 导出成功。总共行数：{}", rows.size());
+    	this.buildFile("address.csv", rows, null);
     }
 
     /**
@@ -101,7 +124,21 @@ public class ExportService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportRpPlanAddress(){
-
+    	List<Object[]> rows = new ArrayList<>();
+		for(int i=0;i<20;i++) {
+			PageHelper.startPage(i, 1000);
+			List<RpPlan> rpPlans = rpPlanMapper.selectByExample(null);
+			if(rpPlans.size() == 0) {
+				break;
+			}
+	    	for(RpPlan d:rpPlans) {
+	    		Object[] row = new Object[1];
+	    		row[1] = d.getAddress();
+	    		rows.add(row);
+	    	}
+		}
+		log.info("rpplan 导出成功。总共行数：{}", rows.size());
+    	this.buildFile("rpplan.csv", rows, null);
     }
 
     /**
@@ -109,25 +146,40 @@ public class ExportService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportNodeId(){
-
+    	List<Object[]> rows = new ArrayList<>();
+		PageHelper.startPage(1, 1500);
+    	List<Node> nodes = nodeMapper.selectByExample(null);
+    	for(Node d:nodes) {
+    		Object[] row = new Object[1];
+    		row[1] = d.getNodeId();
+    		rows.add(row);
+    	}
+    	log.info("node 导出成功。总共行数：{}", rows.size());
+    	this.buildFile("node.csv", rows, null);
     }
 
     /**
-     * 导出委托表地址
+     * 导出委托表地址和节点id
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void exportDelegationAddress(){
-
+    public void exportDelegationInfo(){
+    	List<Object[]> rows = new ArrayList<>();
+    	for(int i=0;i*transactionPageSize < transactionPageCount;i++) {
+    		PageHelper.startPage(i, transactionPageSize);
+        	DelegationExample delegationExample = new DelegationExample();
+        	delegationExample.setOrderByClause(" sequence desc");
+        	List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
+        	for(Delegation d:delegations) {
+        		Object[] row = new Object[2];
+        		row[0] = d.getDelegateAddr();
+        		row[1] = d.getNodeId();
+        		rows.add(row);
+        	}
+    	}
+    	log.info("degation 导出成功。总共行数：{}", rows.size());
+    	this.buildFile("delegation.csv", rows, null);
     }
 
-
-    /**
-     * 导出委托表节点ID
-     */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void exportDelegationNodeId(){
-
-    }
 
     @Value("${fileUrl}")
     private int fileUrl;
@@ -140,7 +192,9 @@ public class ExportService {
             OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
             /** 厨师书writer对象 */
             CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-            writer.writeHeaders(headers);
+            if(headers!=null) {
+            	writer.writeHeaders(headers);
+            }
             writer.writeRowsAndClose(rows);
         } catch (IOException e) {
             log.error("数据输出错误:", e);
