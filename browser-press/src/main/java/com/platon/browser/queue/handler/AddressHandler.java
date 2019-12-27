@@ -38,10 +38,6 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
     @Value("${platon.addressMaxCount}")
     private long addressMaxCount;
 
-    @Getter
-    @Setter
-    private long currentAddressSum = 0L;
-
     private Set<Address> stage = new HashSet<>();
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
@@ -50,7 +46,7 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         stage.addAll(event.getAddressList());
         if(stage.size()<batchSize){
             // 如果暂存数量小于批次
-            if(currentAddressSum>addressMaxCount){
+            if(getTotalCount()>addressMaxCount){
                 // 且当前地址数未达到指定数量
                 return;
             }
@@ -89,11 +85,10 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         addressMap.keySet().removeAll(existAddresses);
         List<Address> addressList = new ArrayList<>(addressMap.values());
 
-        if(currentAddressSum<addressMaxCount){
+        if(getTotalCount()<addressMaxCount){
             if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
             long endTime = System.currentTimeMillis();
             printTps("地址",addressList.size(),startTime,endTime);
-            currentAddressSum=currentAddressSum+addressList.size();
         }
         stage.clear();
     }

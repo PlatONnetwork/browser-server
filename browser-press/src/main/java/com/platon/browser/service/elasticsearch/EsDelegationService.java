@@ -2,6 +2,7 @@ package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -9,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @Auther: Chendongming
@@ -19,17 +22,36 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class EsDelegationService implements EsService<Delegation> {
+public class EsDelegationService extends EsService<Delegation> {
     @Autowired
     private DelegationESRepository delegationESRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void save(Set<Delegation> delegations) throws IOException {
-        if(delegations.isEmpty()) return;
+    public void save(StageCache<Delegation> stage) throws IOException, InterruptedException {
+        Set<Delegation> data = stage.getData();
+        if(data.isEmpty()) return;
+        int size = data.size()/POOL_SIZE;
+        Set<Map<String, Delegation>> groups = new HashSet<>();
         try {
-            Map<String,Delegation> delegationMap = new HashMap<>();
-            // 使用(<节点ID>-<质押区块号>-<委托人地址>)作ES的docId
-            delegations.forEach(d->delegationMap.put(d.getNodeId()+"-"+d.getStakingBlockNum()+"-"+d.getDelegateAddr(),d));
-            delegationESRepository.bulkAddOrUpdate(delegationMap);
+            Map<String,Delegation> group = new HashMap<>();
+            for (Delegation e : data) {
+                // 使用(<节点ID>-<质押区块号>-<委托人地址>)作ES的docId
+                group.put(e.getNodeId()+"-"+e.getStakingBlockNum()+"-"+e.getDelegateAddr(),e);
+                if(group.size()>=size){
+                    groups.add(group);
+                    group=new HashMap<>();
+                }
+            }
+            if(group.size()>0) groups.add(group);
+
+            CountDownLatch latch = new CountDownLatch(groups.size());
+            for (Map<String, Delegation> g : groups) {
+                try {
+                    delegationESRepository.bulkAddOrUpdate(g);
+                } finally {
+                    latch.countDown();
+                }
+            }
+            latch.await();
         }catch (Exception e){
             log.error("",e);
             throw e;

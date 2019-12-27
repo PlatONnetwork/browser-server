@@ -46,7 +46,7 @@ public class GracefullyUtil {
             status=status.trim();
             AppStatusEnum statusEnum = AppStatusEnum.valueOf(status.toUpperCase());
             GracefullyUtil.status=statusEnum;
-            //logger.info("Update app status:{}",statusEnum.name());
+            logger.info("Update app status:{}",statusEnum.name());
         } catch (Exception e) {
             logger.error("无效状态,状态可取值:{}", Arrays.asList(AppStatusEnum.values()));
         }

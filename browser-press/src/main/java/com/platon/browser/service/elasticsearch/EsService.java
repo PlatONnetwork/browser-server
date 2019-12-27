@@ -1,8 +1,14 @@
 package com.platon.browser.service.elasticsearch;
 
-import java.io.IOException;
-import java.util.Set;
+import com.platon.browser.queue.handler.StageCache;
+import lombok.Data;
 
-public interface EsService<T> {
-    void save(Set<T> data) throws IOException;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+@Data
+public abstract class EsService<T> {
+    protected static final int POOL_SIZE = 8;
+    protected ExecutorService THREAD_POOL = Executors.newFixedThreadPool(POOL_SIZE);
+    abstract void save(StageCache<T> stage) throws IOException, InterruptedException;
 }

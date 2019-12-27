@@ -1,12 +1,12 @@
 package com.platon.browser.queue.handler;
 
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.event.TransactionEvent;
 import com.platon.browser.queue.publisher.AddressPublisher;
-import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.redis.RedisImportService;
+import com.platon.browser.service.elasticsearch.EsTransactionService;
+import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,11 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 区块事件处理器
@@ -26,9 +30,9 @@ import java.util.*;
 public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
 
     @Autowired
-    private EsImportService esImportService;
+    private EsTransactionService esTransactionService;
     @Autowired
-    private RedisImportService redisImportService;
+    private RedisTransactionService redisTransactionService;
 
     @Autowired
     private AddressPublisher addressPublisher;
@@ -38,32 +42,28 @@ public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
     @Value("${disruptor.queue.transaction.batch-size}")
     private volatile int batchSize;
 
-    private Set<Transaction> stage = new HashSet<>();
-
+    private StageCache<Transaction> stage = new StageCache<>();
     @PostConstruct
-    private void init(){this.setLogger(log);}
+    private void init(){
+        stage.setBatchSize(batchSize);
+        this.setLogger(log);
+    }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent(TransactionEvent event, long sequence, boolean endOfBatch) throws InterruptedException {
+    public void onEvent(TransactionEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
-
+        Set<Transaction> cache = stage.getData();
         try {
-            stage.addAll(event.getTransactionList());
-            if(stage.size()<batchSize) return;
-
-            // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(Collections.emptySet(),stage,Collections.emptySet());
-
-            // 入库Redis 更新Redis中的统计记录
-            Set<NetworkStat> statistics = new HashSet<>();
-            redisImportService.batchImport(Collections.emptySet(),stage,statistics);
-
+            cache.addAll(event.getTransactionList());
+            if(cache.size()<batchSize) return;
+            esTransactionService.save(stage);
+            redisTransactionService.save(cache,false);
             long endTime = System.currentTimeMillis();
-            printTps("交易",stage.size(),startTime,endTime);
+            printTps("交易",cache.size(),startTime,endTime);
 
             // 地址数量未达到指定数量，则继续入库
             List<Address> addressList = new ArrayList<>();
-            stage.forEach(tx->{
+            cache.forEach(tx->{
                 Address address=new Address();
                 address.setAddress(tx.getFrom());
                 addressList.add(address);
@@ -73,7 +73,7 @@ public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
             });
             addressPublisher.publish(addressList);
 
-            stage.clear();
+            cache.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

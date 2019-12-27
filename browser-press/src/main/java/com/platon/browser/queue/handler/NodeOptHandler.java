@@ -1,11 +1,8 @@
 package com.platon.browser.queue.handler;
 
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.event.NodeOptEvent;
-import com.platon.browser.service.DataGenService;
-import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.redis.RedisImportService;
+import com.platon.browser.service.elasticsearch.EsNodeOptService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +12,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -27,36 +23,31 @@ import java.util.Set;
 public class NodeOptHandler  extends AbstractHandler<NodeOptEvent> {
 
     @Autowired
-    private EsImportService esImportService;
-    @Autowired
-    private RedisImportService redisImportService;
-
-    @Autowired
-    private DataGenService dataGenService;
+    private EsNodeOptService esNodeOptService;
 
     @Setter
     @Getter
     @Value("${disruptor.queue.nodeopt.batch-size}")
     private volatile int batchSize;
 
-    private Set<NodeOpt> stage = new HashSet<>();
-
+    private StageCache<NodeOpt> stage = new StageCache<>();
     @PostConstruct
-    private void init(){this.setLogger(log);}
+    private void init(){
+        stage.setBatchSize(batchSize);
+        this.setLogger(log);
+    }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent(NodeOptEvent event, long sequence, boolean endOfBatch) throws InterruptedException {
+    public void onEvent(NodeOptEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
+        Set<NodeOpt> cache = stage.getData();
         try {
-            stage.addAll(event.getNodeOptList());
-            if(stage.size()<batchSize) return;
-            esImportService.batchImport(Collections.emptySet(), Collections.emptySet(),stage);
-            Set<NetworkStat> statistics = new HashSet<>();
-            statistics.add(dataGenService.getNetworkStat());
-            redisImportService.batchImport(Collections.emptySet(),Collections.emptySet(),statistics);
+            cache.addAll(event.getNodeOptList());
+            if(cache.size()<batchSize) return;
+            esNodeOptService.save(stage);
             long endTime = System.currentTimeMillis();
-            printTps("日志",stage.size(),startTime,endTime);
-            stage.clear();
+            printTps("日志",cache.size(),startTime,endTime);
+            cache.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;
