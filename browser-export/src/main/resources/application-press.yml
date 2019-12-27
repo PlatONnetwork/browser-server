@@ -2,7 +2,7 @@
 # 应用版本
 version: 0.7.5.0
 # 当前激活的配置名称(请不要修改)
-profile: test
+profile: press
 # 密码加密配置
 jasypt:
   encryptor:
@@ -14,8 +14,6 @@ spring:
     url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
     username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
     password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
     #下面为连接池的补充设置，应用到上面所有数据源中
     #初始化大小，最小，最大
     initialSize: 5
@@ -46,10 +44,10 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_aton_${profile}
-      transactionIndexName: browser_transaction_aton_${profile}
-      delegationIndexName: browser_delegation_aton_${profile}
-      nodeOptIndexName: browser_nodeopt_aton_${profile}
+      blockIndexName: browser_block_${profile}
+      transactionIndexName: browser_transaction_${profile}
+      delegationIndexName: browser_delegation_${profile}
+      nodeOptIndexName: browser_nodeopt_${profile}
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
