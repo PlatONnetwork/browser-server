@@ -90,9 +90,10 @@ public class PressApplication implements ApplicationRunner {
     private long rpplanMaxCount;
     @Value("${platon.slashMaxCount}")
     private long slashMaxCount;
-
     @Value("${platon.blockMaxCount}")
     private long blockMaxCount;
+    @Value("${platon.nodeoptMaxCount}")
+    private long nodeoptMaxCount;
 
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
@@ -221,7 +222,10 @@ public class PressApplication implements ApplicationRunner {
         BlockResult blockResult = dataGenService.getBlockResult(blockNumber);
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
         transactionPublisher.publish(blockResult.getTransactionList());
-        nodeOptPublisher.publish(blockResult.getNodeOptList());
+        if(nodeOptPublisher.getTotalCount()<=nodeoptMaxCount){
+            //如果日志记录达到指定数量则停止入库ES
+            nodeOptPublisher.publish(blockResult.getNodeOptList());
+        }
         return blockResult;
     }
 
