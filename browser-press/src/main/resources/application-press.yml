@@ -143,5 +143,7 @@ platon:
   addressMaxCount: 1500000
   #区块最大条数
   blockMaxCount: 1000000000
+  #日志最大条数
+  nodeoptMaxCount: 500
   #每个区块的交易数
   txCountPerBlock: 100

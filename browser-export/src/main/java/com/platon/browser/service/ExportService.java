@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -81,12 +83,18 @@ public class ExportService {
     @Value("${paging.maxCount}")
     private int maxCount;
 
+    @PostConstruct
+    private void init(){
+        File destDir =new File(fileUrl);
+        if(destDir.exists()) destDir.delete();
+        if (!destDir.exists()) destDir.mkdirs();
+    }
+
     /**
      * 导出交易表交易hash
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportTxHash(){
-        String fileName = "txhash.csv";
         List<Object[]> csvRows = new ArrayList<>();
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.setDesc("seq");
@@ -102,7 +110,7 @@ public class ExportService {
                     log.error("【syncBlock()】查询ES出错:",e);
                 }
             }
-            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0||esResult.getRsData().size()==0){
+            if(esResult==null||esResult.getRsData()==null||esResult.getTotal()==0||esResult.getRsData().isEmpty()){
                 // 如果查询结果为空则结束
                 break;
             }
@@ -115,7 +123,8 @@ public class ExportService {
                 throw e;
             }
         }
-        buildFile(fileName,csvRows,null);
+        buildFile("txhash.csv",csvRows,null);
+        log.info("交易HASH导出成功,总行数：{}", csvRows.size());
         txHashExportDone=true;
     }
 
@@ -127,19 +136,13 @@ public class ExportService {
     	List<Object[]> rows = new ArrayList<>();
     	for(int pageNo=1;pageNo*transactionPageSize < maxCount;pageNo++) {
     		PageHelper.startPage(pageNo, transactionPageSize);
-        	List<Address> addresses = addressMapper.selectByExample(null);
-        	if(addresses.size() == 0) {
-        		break;
-        	}
-        	for(Address d:addresses) {
-        		Object[] row = new Object[1];
-        		row[0] = d.getAddress();
-        		rows.add(row);
-        	}
+        	List<Address> data = addressMapper.selectByExample(null);
+        	if(data.isEmpty()) break;
+            data.forEach(e -> rows.add(new Object[]{e.getAddress()}));
         	log.info("【exportAddress()】第{}页,{}条记录",pageNo,rows.size());
     	}
-    	log.info("address 导出成功。总共行数：{}", rows.size());
     	this.buildFile("address.csv", rows, null);
+        log.info("地址表导出成功,总行数：{}", rows.size());
     	addressExportDone = true;
     }
 
@@ -169,6 +172,7 @@ public class ExportService {
 		
 		log.info("rpplan 导出成功。总共行数：{}", rows.size());
     	this.buildFile("rpplan.csv", rows, null);
+        log.info("rpplan导出成功,总行数：{}", rows.size());
     	rpplanExportDone = true;
     }
     
@@ -198,6 +202,7 @@ public class ExportService {
 		
 		log.info("proposals 导出成功。总共行数：{}", rows.size());
     	this.buildFile("proposals.csv", rows, null);
+        log.info("proposals导出成功,总行数：{}", rows.size());
     	proposalExportDone = true;
     }
     
@@ -224,8 +229,8 @@ public class ExportService {
 		} catch (Exception e) {
 			log.error("导出vote失败", e);
 		}
-		log.info("vote 导出成功。总共行数：{}", rows.size());
     	this.buildFile("votes.csv", rows, null);
+        log.info("votes导出成功,总行数：{}", rows.size());
     	voteExportDone = true;
     }
 
@@ -236,14 +241,10 @@ public class ExportService {
     public void exportNodeId(){
     	List<Object[]> rows = new ArrayList<>();
 		PageHelper.startPage(1, 1500);
-    	List<Node> nodes = nodeMapper.selectByExample(null);
-    	for(Node d:nodes) {
-    		Object[] row = new Object[1];
-    		row[0] = d.getNodeId();
-    		rows.add(row);
-    	}
-    	log.info("node 导出成功。总共行数：{}", rows.size());
+    	List<Node> data = nodeMapper.selectByExample(null);
+        data.forEach(e -> rows.add(new Object[]{e.getNodeId()}));
     	this.buildFile("node.csv", rows, null);
+        log.info("nodes导出成功,总行数：{}", rows.size());
     	nodeExportDone = true;
     }
 
@@ -273,9 +274,8 @@ public class ExportService {
 		} catch (Exception e) {
 			log.error("导出委托失败", e);
 		}
-    	
-    	log.info("degation 导出成功。总共行数：{}", rows.size());
     	this.buildFile("delegation.csv", rows, null);
+        log.info("delegations导出成功,总行数：{}", rows.size());
     	delegationExportDone = true;
     }
 

@@ -1,10 +1,11 @@
 package com.platon.browser.queue.handler;
 
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.event.BlockEvent;
-import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.redis.RedisImportService;
+import com.platon.browser.service.DataGenService;
+import com.platon.browser.service.elasticsearch.EsBlockService;
+import com.platon.browser.service.redis.RedisBlockService;
+import com.platon.browser.service.redis.RedisStatisticService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,32 +27,39 @@ import java.util.Set;
 public class BlockHandler extends AbstractHandler<BlockEvent> {
 
     @Autowired
-    private EsImportService esImportService;
+    private EsBlockService esBlockService;
     @Autowired
-    private RedisImportService redisImportService;
+    private RedisBlockService redisBlockService;
+    @Autowired
+    private RedisStatisticService redisStatisticService;
+    @Autowired
+    private DataGenService dataGenService;
 
     @Setter
     @Getter
     @Value("${disruptor.queue.block.batch-size}")
     private volatile int batchSize;
 
-    private Set<Block> stage = new HashSet<>();
+    private StageCache<Block> stage = new StageCache<>();
     @PostConstruct
-    private void init(){this.setLogger(log);}
+    private void init(){
+        stage.setBatchSize(batchSize);
+        this.setLogger(log);
+    }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws InterruptedException {
+    public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
+        Set<Block> cache = stage.getData();
         try {
-            stage.addAll(event.getBlockList());
-            if(stage.size()<batchSize) return;
-            esImportService.batchImport(stage, Collections.emptySet(),Collections.emptySet());
-            // 入库Redis 更新Redis中的统计记录
-            Set<NetworkStat> statistics = new HashSet<>();
-            redisImportService.batchImport(stage,Collections.emptySet(),statistics);
+            cache.addAll(event.getBlockList());
+            if(cache.size()<batchSize) return;
+            esBlockService.save(stage);
+            redisBlockService.save(stage.getData(),false);
+            redisStatisticService.save(Collections.singleton(dataGenService.getNetworkStat()),true);
             long endTime = System.currentTimeMillis();
-            printTps("区块",stage.size(),startTime,endTime);
-            stage.clear();
+            printTps("区块",cache.size(),startTime,endTime);
+            cache.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

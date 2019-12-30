@@ -90,9 +90,10 @@ public class PressApplication implements ApplicationRunner {
     private long rpplanMaxCount;
     @Value("${platon.slashMaxCount}")
     private long slashMaxCount;
-
     @Value("${platon.blockMaxCount}")
     private long blockMaxCount;
+    @Value("${platon.nodeoptMaxCount}")
+    private long nodeoptMaxCount;
 
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
@@ -136,12 +137,12 @@ public class PressApplication implements ApplicationRunner {
             makeSlash(blockResult);
             // 区块号累加
             blockNumber=blockNumber.add(BigInteger.ONE);
-            // 更新网络统计表
+            /*// 更新网络统计表
             dataGenService.getNetworkStat().setCurNumber(blockNumber.longValue());
             EXECUTOR_SERVICE.submit(()->{
                 NetworkStat networkStat=dataGenService.getNetworkStat();
                 networkStatMapper.updateByExample(networkStat,networkStatExample);
-            });
+            });*/
         }
     }
 
@@ -166,7 +167,6 @@ public class PressApplication implements ApplicationRunner {
             currentVoteSum=counterBean.getVoteCount();
             currentRpplanSum=counterBean.getRpplanCount();
             currentSlashSum=counterBean.getSlashCount();
-            addressPublisher.setCurrentAddressSum(counterBean.getAddressSum());
             blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -203,7 +203,6 @@ public class PressApplication implements ApplicationRunner {
             counter.setVoteCount(currentVoteSum);
             counter.setRpplanCount(currentRpplanSum);
             counter.setSlashCount(currentSlashSum);
-            counter.setAddressCount(addressPublisher.getCurrentAddressSum());
             String status = JSON.toJSONString(counter,true);
             File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
@@ -223,7 +222,10 @@ public class PressApplication implements ApplicationRunner {
         BlockResult blockResult = dataGenService.getBlockResult(blockNumber);
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
         transactionPublisher.publish(blockResult.getTransactionList());
-        nodeOptPublisher.publish(blockResult.getNodeOptList());
+        if(nodeOptPublisher.getTotalCount()<=nodeoptMaxCount){
+            //如果日志记录达到指定数量则停止入库ES
+            nodeOptPublisher.publish(blockResult.getNodeOptList());
+        }
         return blockResult;
     }
 

@@ -43,11 +43,4 @@ public class AddressPublisher extends AbstractPublisher {
     EventFactory getEventFactory() {
         return AddressEvent::new;
     }
-
-    public void setCurrentAddressSum(long addressSum){
-        handler.setCurrentAddressSum(addressSum);
-    }
-    public long getCurrentAddressSum(){
-        return handler.getCurrentAddressSum();
-    }
 }
