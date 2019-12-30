@@ -70,7 +70,10 @@ public class TransactionDetailsResp {
     private String preHash;// 上一条记录
     private String nextHash;// 下一条记录
     
-    private BigDecimal txAmount; //惨剧费用
+    private BigDecimal txAmount; //交易费用
+    
+    private String delegationRatio; //委托比例
+    private List<TransactionDetailsRewardsResp> rewards;
     
 
 	public String getTxHash() {
@@ -395,6 +398,36 @@ public class TransactionDetailsResp {
 	}
 	public void setExternalUrl(String externalUrl) {
 		this.externalUrl = externalUrl;
+	}
+	public String getrPAccount() {
+		return rPAccount;
+	}
+	public void setrPAccount(String rPAccount) {
+		this.rPAccount = rPAccount;
+	}
+	public BigDecimal getrPNum() {
+		return rPNum;
+	}
+	public void setrPNum(BigDecimal rPNum) {
+		this.rPNum = rPNum;
+	}
+	public List<TransactionDetailsRPPlanResp> getrPPlan() {
+		return rPPlan;
+	}
+	public void setrPPlan(List<TransactionDetailsRPPlanResp> rPPlan) {
+		this.rPPlan = rPPlan;
+	}
+	public String getDelegationRatio() {
+		return delegationRatio;
+	}
+	public void setDelegationRatio(String delegationRatio) {
+		this.delegationRatio = delegationRatio;
+	}
+	public List<TransactionDetailsRewardsResp> getRewards() {
+		return rewards;
+	}
+	public void setRewards(List<TransactionDetailsRewardsResp> rewards) {
+		this.rewards = rewards;
 	}
 
 }

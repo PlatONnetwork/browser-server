@@ -361,6 +361,7 @@ public class TransactionServiceImpl implements TransactionService {
     		String txInfo = transaction.getInfo();
     		/** 根据不同交易类型判断逻辑 */
     		if(StringUtils.isNotBlank(txInfo) || (!"null".equals(txInfo))) {
+    			//TODO 创建验证人、编辑验证人增加比例。增加交易领取奖励
 	    		switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
 		    		/** 创建验证人 */
 					case STAKE_CREATE:
@@ -593,6 +594,10 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setRPNum(amountSum);
 						resp.setRPPlan(rpPlanResps);
 						break;
+						/**
+						 * 领取奖励
+						 */
+					case CLAIM_REWARDS:
 				default:
 					break;
 				}

@@ -14,6 +14,7 @@ import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.I18nUtil;
@@ -112,6 +113,13 @@ public class AppDocTransactionController implements AppDocTransaction {
         });
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
+	}
+
+	@Override
+	public WebAsyncTask<RespPage<QueryClaimByAddressResp>> queryClaimByAddress(
+			@Valid TransactionListByAddressRequest req) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

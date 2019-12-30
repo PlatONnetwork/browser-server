@@ -63,6 +63,7 @@ public enum ReqTransactionTypeEnum {
 		if(ReqTransactionTypeEnum.TRANSACTION_DELEGATE.getName().equals(typeName)) {
 			list.add(String.valueOf(TypeEnum.DELEGATE_CREATE.getCode()));
 			list.add(String.valueOf(TypeEnum.DELEGATE_EXIT.getCode()));
+			list.add(String.valueOf(TypeEnum.CLAIM_REWARDS.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_STAKING.getName().equals(typeName)) {
 			list.add(String.valueOf(TypeEnum.STAKE_CREATE.getCode()));

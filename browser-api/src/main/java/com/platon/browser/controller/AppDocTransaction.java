@@ -6,6 +6,7 @@ import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import io.swagger.annotations.Api;
@@ -65,6 +66,7 @@ public interface AppDocTransaction {
      *                                 2000: 提交文本提案 (创建提案)2001: 提交升级提案(提交提案) 2002: 提交参数提案(提交提案-去除暂时不要) 2003: 给提案投票(提案投票) 2004: 版本声明  2005: 取消提案
      *                                 3000: 举报多签(举报验证人)
      *                                 4000: 创建锁仓计划(创建锁仓)
+     *                                 5000: 领取奖励
      *         "serverTime"1123123,    //服务器时间
      *         "timestamp":18080899999,//出块时间
      *         "blockNumber":"15566",  //交易所在区块高度
@@ -78,7 +80,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionList", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionList", produces = { "application/json" })
-	WebAsyncTask<RespPage<TransactionListResp>> transactionList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
+	WebAsyncTask<RespPage<TransactionListResp>> transactionList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
 		
 	
     /**
@@ -107,7 +109,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionListByBlock", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionListByBlock", produces = { "application/json" })
-	WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@ApiParam(value = "TransactionListByBlockRequest ", required = true)@Valid @RequestBody TransactionListByBlockRequest req);
+	WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@ApiParam(value = "TransactionListByBlockRequest", required = true)@Valid @RequestBody TransactionListByBlockRequest req);
 	
     /**
      * @api {post} /transaction/transactionListByAddress c.地址的交易列表
@@ -135,7 +137,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionListByAddress", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionListByAddress", produces = { "application/json" })
-	WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
+	WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 	
     /**
      * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date&local=:en d.导出地址交易列表
@@ -261,13 +263,59 @@ public interface AppDocTransaction {
      *       "pipNum":"",//提案pip编号
      *       "proposalStatus":"",//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
      *       "proposalTitle":"",//提案标题
-     *       "txAmount" : ""  //交易金额包括质押数量
-     *       "voteStatus";      //投票选项 1:支持  2:反对 3:弃权
+     *       "txAmount" : "", //交易金额包括质押数量
+     *       "voteStatus":"",      //投票选项 1:支持  2:反对 3:弃权
+     *       "delegationRatio":"",//委托比例
+     *       "rewards":[             //领取奖励
+     *          {
+     *             "verify":"",        //节点id
+     *             "nodeName":"",       //节点名称
+     *             "reward":""       //领取的奖励
+     *          }
+     *        ],
      *        --可选信息结束
      * }
      */	
 	@ApiOperation(value = "transaction/transactionDetails", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionDetails", produces = { "application/json" })
-	WebAsyncTask<BaseResp<TransactionDetailsResp>> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
+	WebAsyncTask<BaseResp<TransactionDetailsResp>> transactionDetails(@ApiParam(value = "TransactionDetailsReq", required = true)@Valid @RequestBody TransactionDetailsReq req);
+
+	/**
+     * @api {post} /transaction/queryClaimByAddress f.地址的领取奖励列表
+     * @apiVersion 1.0.0
+     * @apiName queryClaimByAddress
+     * @apiGroup transaction
+     * @apiDescription
+     * 1. 功能：地址的领取奖励列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询es中领取奖励表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *    "pageNo":1,                  //页数(必填)
+     *    "pageSize":10,               //页大小(必填)
+     *    "address":"0x"              //地址(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *    "errMsg":"",                 //描述信息
+     *    "code":0,                    //成功（0），失败则由相关失败码
+     *    "data":{
+     *       "txHash":"0x234234",      //交易hash
+     *       "allRewards":"",//总奖励
+     *       "timestamp":123123879,    //交易时间
+     *       "rewardsDetails":[             //领取奖励
+     *          {
+     *             "verify":"",        //节点id
+     *             "nodeName":"",       //节点名称
+     *             "reward":""       //领取的奖励
+     *          }
+     *        ]
+     * }
+     * 
+     */
+	@ApiOperation(value = "transaction/queryClaimByAddress", nickname = "", notes = "", response = QueryClaimByAddressResp.class, tags = { "Transaction" })
+	@PostMapping(value = "transaction/queryClaimByAddress", produces = { "application/json" })
+	WebAsyncTask<RespPage<QueryClaimByAddressResp>> queryClaimByAddress(@ApiParam(value = "TransactionListByAddressRequest", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 
 }

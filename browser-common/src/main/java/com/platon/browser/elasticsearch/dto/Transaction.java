@@ -65,6 +65,7 @@ public class Transaction {
         VERSION_DECLARE(2004,"版本声明"),
         REPORT(3000,"举报多签(举报验证人)"),
         RESTRICTING_CREATE(4000,"创建锁仓计划(创建锁仓)"),
+        CLAIM_REWARDS(5000,"领取奖励"),
         MULTI_SIGN(11,"区块双签"),
         ;
         private static Map<Integer, TypeEnum> map = new HashMap<>();

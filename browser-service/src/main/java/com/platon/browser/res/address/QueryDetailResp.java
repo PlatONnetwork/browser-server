@@ -28,7 +28,9 @@ public class QueryDetailResp {
     private BigDecimal delegateHes;         //未锁定委托（LAT）
     private BigDecimal delegateLocked;      //已锁定委托（LAT）
     private BigDecimal delegateUnlock;      //已解除委托（LAT）   
-    private BigDecimal delegateReleased;    //待赎回委托（LAT）   
+    private BigDecimal delegateReleased;    //待赎回委托（LAT）  
+    private BigDecimal delegateClaim;    //待提取委托（LAT）  
+    private BigDecimal delegateDraw;    //已提取委托（LAT）  
     private String contractName;        //合约名称
     private String contractCreate;      //合约创建者地址
     private String contractCreateHash; //合约创建哈希
@@ -161,6 +163,20 @@ public class QueryDetailResp {
 	}
 	public void setIsRestricting(Integer isRestricting) {
 		this.isRestricting = isRestricting;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public BigDecimal getDelegateClaim() {
+		return delegateClaim;
+	}
+	public void setDelegateClaim(BigDecimal delegateClaim) {
+		this.delegateClaim = delegateClaim;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public BigDecimal getDelegateDraw() {
+		return delegateDraw;
+	}
+	public void setDelegateDraw(BigDecimal delegateDraw) {
+		this.delegateDraw = delegateDraw;
 	}
     
 }
