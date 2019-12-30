@@ -2,7 +2,7 @@
 # 应用版本
 version: 0.7.5.0
 # 当前激活的配置名称(请不要修改)
-profile: dev
+profile: test
 # 密码加密配置
 jasypt:
   encryptor:

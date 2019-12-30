@@ -161,11 +161,21 @@ public class InitializationService {
             if(StringUtils.isBlank(staking.getNodeName())) staking.setNodeName("platon.node."+(index+1));
 
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
+            List<PeriodValueElement> pveList = new ArrayList<>();
             PeriodValueElement pve = new PeriodValueElement();
             pve.setPeriod(0L);
             pve.setValue(BigDecimal.ZERO);
+            pveList.add(pve);
+            pve=new PeriodValueElement();
+            pve.setPeriod(1L);
+            BigDecimal cost = staking.getStakingLocked() // 锁定的质押金
+                    .add(staking.getStakingHes()) // 犹豫期的质押金
+                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
+                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
+            pve.setValue(cost);
+            pveList.add(pve);
             AnnualizedRateInfo ari = new AnnualizedRateInfo();
-            ari.setCost(Collections.singletonList(pve));
+            ari.setCost(pveList);
             staking.setAnnualizedRateInfo(ari.toJSONString());
             staking.setPredictStakingReward(epochRetryService.getStakeReward());
 

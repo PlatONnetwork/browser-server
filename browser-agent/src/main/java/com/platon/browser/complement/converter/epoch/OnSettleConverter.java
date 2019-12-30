@@ -14,6 +14,7 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,17 +60,26 @@ public class OnSettleConverter {
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
         stakingList.forEach(staking -> {
-            //犹豫期金额
+
+            // 特别注意：为计算年化率,保留当前质押记录前一个质押金累计金额，
+            // 防止被质押奖励发放操作覆盖（因为质押奖励发放是把当前周期质押奖励传到SQL语句中，由SQL语句做累加操作）
+            BigDecimal preStakeSumAmount = staking.getStakingRewardValue();
+
+            //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
             staking.setStakingHes(BigDecimal.ZERO);
-            //退出中记录状态设置
+            //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
             if(staking.getStatus() == 2 && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(3);
             }
             //当前质押是上轮结算周期验证人,发放质押奖励
             if(preVerifierList.contains(staking.getNodeId())){
-                staking.setStakingRewardValue(staking.getStakingRewardValue().add(settle.getStakingReward()));
+                // 特别注意：把当前结算周期质押奖励设置到当前质押staking bean的stakingRewardValue属性，
+                // 由mapper xml中的sql语句做累加操作：
+                // staking表：【`staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue}】
+                // node表：【`stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue}】
+                staking.setStakingRewardValue(settle.getStakingReward());
             }else {
                 staking.setStakingRewardValue(BigDecimal.ZERO);
             }
@@ -80,21 +90,28 @@ public class OnSettleConverter {
                 staking.setIsSettle(2);
             }
 
+
+
+            /*-----------------------------------------拷贝一份质押记录，恢复其累加的质押奖励，然后计算年化率 START-------------------------------------------*/
+            Staking staking4Ari = new Staking();
+            BeanUtils.copyProperties(staking,staking4Ari);
+            // 设置发放质押奖励后的金额，用于年化率计算
+            staking4Ari.setStakingRewardValue(staking4Ari.getStakingRewardValue().add(preStakeSumAmount));
             //计算年化率
             AnnualizedRateInfo ari = new AnnualizedRateInfo();
             ari.setCost(new ArrayList<>());
             ari.setProfit(new ArrayList<>());
             ari.setSlash(new ArrayList<>());
-            // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
-            if(curVerifierList.contains(staking.getNodeId())){
-                String ariString = staking.getAnnualizedRateInfo();
+            // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的成本
+            if(curVerifierList.contains(staking4Ari.getNodeId())){
+                String ariString = staking4Ari.getAnnualizedRateInfo();
                 if(StringUtils.isNotBlank(ariString)){
                     ari = JSON.parseObject(ariString,AnnualizedRateInfo.class);
                 }
-                CalculateUtils.rotateCost(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
+                CalculateUtils.rotateCost(staking4Ari,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
             }
             // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
-            if(preVerifierList.contains(staking.getNodeId())){
+            if(preVerifierList.contains(staking4Ari.getNodeId())){
                 if(ari.getProfit()==null||ari.getProfit().isEmpty()) {
                     // 设置0收益作为计算基础
                     PeriodValueElement pv = new PeriodValueElement();
@@ -106,10 +123,14 @@ public class OnSettleConverter {
                 }
                 if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
                 // 对超出数量的收益轮换
-                CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()-1L),ari,chainConfig);
+                CalculateUtils.rotateProfit(staking4Ari,BigInteger.valueOf(settle.getSettingEpoch()-1L),ari,chainConfig);
                 BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari,chainConfig);
+            /*-----------------------------------------拷贝一份质押记录，恢复其累加的质押奖励，然后计算年化率 END-------------------------------------------*/
+
+                // 设置年化率
                 staking.setAnnualizedRate(annualizedRate.doubleValue());
             }
+            // 设置年化率计算原始数据
             staking.setAnnualizedRateInfo(ari.toJSONString());
         });
         settle.setStakingList(stakingList);
