@@ -37,6 +37,9 @@
     <result column="pre_cons_block_qty" jdbcType="BIGINT" property="preConsBlockQty" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delegate_annualized_rate" jdbcType="DOUBLE" property="delegateAnnualizedRate" />
+    <result column="stat_delegate_reward_value" jdbcType="DECIMAL" property="statDelegateRewardValue" />
+    <result column="delegate_reward_ratio" jdbcType="DOUBLE" property="delegateRewardRatio" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Staking">
     <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
@@ -105,7 +108,8 @@
     benefit_addr, annualized_rate, program_version, big_version, web_site, details, join_time, 
     leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, stat_delegate_locked, 
     stat_delegate_released, block_reward_value, predict_staking_reward, staking_reward_value, 
-    fee_reward_value, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time
+    fee_reward_value, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time, 
+    delegate_annualized_rate, stat_delegate_reward_value, delegate_reward_ratio
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -173,7 +177,9 @@
       block_reward_value, predict_staking_reward, 
       staking_reward_value, fee_reward_value, cur_cons_block_qty, 
       pre_cons_block_qty, create_time, update_time, 
-      annualized_rate_info)
+      delegate_annualized_rate, stat_delegate_reward_value, 
+      delegate_reward_ratio, annualized_rate_info
+      )
     values (#{nodeId,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{stakingTxIndex,jdbcType=INTEGER}, 
       #{stakingHes,jdbcType=DECIMAL}, #{stakingLocked,jdbcType=DECIMAL}, #{stakingReduction,jdbcType=DECIMAL}, 
       #{stakingReductionEpoch,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, #{nodeIcon,jdbcType=VARCHAR}, 
@@ -186,7 +192,9 @@
       #{blockRewardValue,jdbcType=DECIMAL}, #{predictStakingReward,jdbcType=DECIMAL}, 
       #{stakingRewardValue,jdbcType=DECIMAL}, #{feeRewardValue,jdbcType=DECIMAL}, #{curConsBlockQty,jdbcType=BIGINT}, 
       #{preConsBlockQty,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
+      #{delegateAnnualizedRate,jdbcType=DOUBLE}, #{statDelegateRewardValue,jdbcType=DECIMAL}, 
+      #{delegateRewardRatio,jdbcType=DOUBLE}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Staking">
     insert into staking
@@ -295,6 +303,15 @@
       </if>
       <if test="updateTime != null">
         update_time,
+      </if>
+      <if test="delegateAnnualizedRate != null">
+        delegate_annualized_rate,
+      </if>
+      <if test="statDelegateRewardValue != null">
+        stat_delegate_reward_value,
+      </if>
+      <if test="delegateRewardRatio != null">
+        delegate_reward_ratio,
       </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info,
@@ -405,6 +422,15 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delegateAnnualizedRate != null">
+        #{delegateAnnualizedRate,jdbcType=DOUBLE},
+      </if>
+      <if test="statDelegateRewardValue != null">
+        #{statDelegateRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="delegateRewardRatio != null">
+        #{delegateRewardRatio,jdbcType=DOUBLE},
       </if>
       <if test="annualizedRateInfo != null">
         #{annualizedRateInfo,jdbcType=LONGVARCHAR},
@@ -525,6 +551,15 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.delegateAnnualizedRate != null">
+        delegate_annualized_rate = #{record.delegateAnnualizedRate,jdbcType=DOUBLE},
+      </if>
+      <if test="record.statDelegateRewardValue != null">
+        stat_delegate_reward_value = #{record.statDelegateRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.delegateRewardRatio != null">
+        delegate_reward_ratio = #{record.delegateRewardRatio,jdbcType=DOUBLE},
+      </if>
       <if test="record.annualizedRateInfo != null">
         annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -570,6 +605,9 @@
       pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      delegate_annualized_rate = #{record.delegateAnnualizedRate,jdbcType=DOUBLE},
+      stat_delegate_reward_value = #{record.statDelegateRewardValue,jdbcType=DECIMAL},
+      delegate_reward_ratio = #{record.delegateRewardRatio,jdbcType=DOUBLE},
       annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -611,7 +649,10 @@
       cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
       pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      delegate_annualized_rate = #{record.delegateAnnualizedRate,jdbcType=DOUBLE},
+      stat_delegate_reward_value = #{record.statDelegateRewardValue,jdbcType=DECIMAL},
+      delegate_reward_ratio = #{record.delegateRewardRatio,jdbcType=DOUBLE}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -718,6 +759,15 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="delegateAnnualizedRate != null">
+        delegate_annualized_rate = #{delegateAnnualizedRate,jdbcType=DOUBLE},
+      </if>
+      <if test="statDelegateRewardValue != null">
+        stat_delegate_reward_value = #{statDelegateRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="delegateRewardRatio != null">
+        delegate_reward_ratio = #{delegateRewardRatio,jdbcType=DOUBLE},
+      </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -760,6 +810,9 @@
       pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
+      delegate_annualized_rate = #{delegateAnnualizedRate,jdbcType=DOUBLE},
+      stat_delegate_reward_value = #{statDelegateRewardValue,jdbcType=DECIMAL},
+      delegate_reward_ratio = #{delegateRewardRatio,jdbcType=DOUBLE},
       annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
       and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
@@ -798,7 +851,10 @@
       cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
       pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      delegate_annualized_rate = #{delegateAnnualizedRate,jdbcType=DOUBLE},
+      stat_delegate_reward_value = #{statDelegateRewardValue,jdbcType=DECIMAL},
+      delegate_reward_ratio = #{delegateRewardRatio,jdbcType=DOUBLE}
     where node_id = #{nodeId,jdbcType=VARCHAR}
       and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </update>
@@ -815,7 +871,8 @@
       join_time, leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, 
       stat_delegate_locked, stat_delegate_released, block_reward_value, predict_staking_reward, 
       staking_reward_value, fee_reward_value, cur_cons_block_qty, pre_cons_block_qty, 
-      create_time, update_time, annualized_rate_info)
+      create_time, update_time, delegate_annualized_rate, stat_delegate_reward_value, 
+      delegate_reward_ratio, annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
@@ -831,8 +888,9 @@
         #{item.predictStakingReward,jdbcType=DECIMAL}, #{item.stakingRewardValue,jdbcType=DECIMAL}, 
         #{item.feeRewardValue,jdbcType=DECIMAL}, #{item.curConsBlockQty,jdbcType=BIGINT}, 
         #{item.preConsBlockQty,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
-        )
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.delegateAnnualizedRate,jdbcType=DOUBLE}, 
+        #{item.statDelegateRewardValue,jdbcType=DECIMAL}, #{item.delegateRewardRatio,jdbcType=DOUBLE}, 
+        #{item.annualizedRateInfo,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -954,6 +1012,15 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'delegate_annualized_rate'.toString() == column.value">
+          #{item.delegateAnnualizedRate,jdbcType=DOUBLE}
+        </if>
+        <if test="'stat_delegate_reward_value'.toString() == column.value">
+          #{item.statDelegateRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'delegate_reward_ratio'.toString() == column.value">
+          #{item.delegateRewardRatio,jdbcType=DOUBLE}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}

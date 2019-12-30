@@ -2315,6 +2315,186 @@ public class StakingExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andDelegateAnnualizedRateIsNull() {
+            addCriterion("delegate_annualized_rate is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateIsNotNull() {
+            addCriterion("delegate_annualized_rate is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateEqualTo(Double value) {
+            addCriterion("delegate_annualized_rate =", value, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateNotEqualTo(Double value) {
+            addCriterion("delegate_annualized_rate <>", value, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateGreaterThan(Double value) {
+            addCriterion("delegate_annualized_rate >", value, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateGreaterThanOrEqualTo(Double value) {
+            addCriterion("delegate_annualized_rate >=", value, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateLessThan(Double value) {
+            addCriterion("delegate_annualized_rate <", value, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateLessThanOrEqualTo(Double value) {
+            addCriterion("delegate_annualized_rate <=", value, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateIn(List<Double> values) {
+            addCriterion("delegate_annualized_rate in", values, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateNotIn(List<Double> values) {
+            addCriterion("delegate_annualized_rate not in", values, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateBetween(Double value1, Double value2) {
+            addCriterion("delegate_annualized_rate between", value1, value2, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateAnnualizedRateNotBetween(Double value1, Double value2) {
+            addCriterion("delegate_annualized_rate not between", value1, value2, "delegateAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueIsNull() {
+            addCriterion("stat_delegate_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueIsNotNull() {
+            addCriterion("stat_delegate_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueEqualTo(BigDecimal value) {
+            addCriterion("stat_delegate_reward_value =", value, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueNotEqualTo(BigDecimal value) {
+            addCriterion("stat_delegate_reward_value <>", value, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueGreaterThan(BigDecimal value) {
+            addCriterion("stat_delegate_reward_value >", value, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("stat_delegate_reward_value >=", value, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueLessThan(BigDecimal value) {
+            addCriterion("stat_delegate_reward_value <", value, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("stat_delegate_reward_value <=", value, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueIn(List<BigDecimal> values) {
+            addCriterion("stat_delegate_reward_value in", values, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueNotIn(List<BigDecimal> values) {
+            addCriterion("stat_delegate_reward_value not in", values, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("stat_delegate_reward_value between", value1, value2, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatDelegateRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("stat_delegate_reward_value not between", value1, value2, "statDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioIsNull() {
+            addCriterion("delegate_reward_ratio is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioIsNotNull() {
+            addCriterion("delegate_reward_ratio is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioEqualTo(Double value) {
+            addCriterion("delegate_reward_ratio =", value, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioNotEqualTo(Double value) {
+            addCriterion("delegate_reward_ratio <>", value, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioGreaterThan(Double value) {
+            addCriterion("delegate_reward_ratio >", value, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioGreaterThanOrEqualTo(Double value) {
+            addCriterion("delegate_reward_ratio >=", value, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioLessThan(Double value) {
+            addCriterion("delegate_reward_ratio <", value, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioLessThanOrEqualTo(Double value) {
+            addCriterion("delegate_reward_ratio <=", value, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioIn(List<Double> values) {
+            addCriterion("delegate_reward_ratio in", values, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioNotIn(List<Double> values) {
+            addCriterion("delegate_reward_ratio not in", values, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioBetween(Double value1, Double value2) {
+            addCriterion("delegate_reward_ratio between", value1, value2, "delegateRewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateRewardRatioNotBetween(Double value1, Double value2) {
+            addCriterion("delegate_reward_ratio not between", value1, value2, "delegateRewardRatio");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
