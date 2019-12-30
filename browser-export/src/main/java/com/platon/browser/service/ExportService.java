@@ -149,19 +149,24 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportRpPlanAddress(){
     	List<Object[]> rows = new ArrayList<>();
-		for(int pageNo=1;pageNo<20;pageNo++) {
-			PageHelper.startPage(pageNo, 1000);
-			List<RpPlan> rpPlans = rpPlanMapper.selectByExample(null);
-			if(rpPlans.size() == 0) {
-				break;
-			}
-	    	for(RpPlan d:rpPlans) {
-	    		Object[] row = new Object[1];
-	    		row[1] = d.getAddress();
-	    		rows.add(row);
-	    	}
-	    	log.info("【exportRpPlanAddress()】第{}页,{}条记录",pageNo,rows.size());
+    	try {
+    		for(int pageNo=1;pageNo<20;pageNo++) {
+    			PageHelper.startPage(pageNo, 1000);
+    			List<RpPlan> rpPlans = rpPlanMapper.selectByExample(null);
+    			if(rpPlans == null ||rpPlans.size() == 0) {
+    				break;
+    			}
+    	    	for(RpPlan d:rpPlans) {
+    	    		Object[] row = new Object[1];
+    	    		row[0] = d.getAddress();
+    	    		rows.add(row);
+    	    	}
+    	    	log.info("【exportRpPlanAddress()】第{}页,{}条记录",pageNo,rows.size());
+    		}
+		} catch (Exception e) {
+			log.error("导出rpplan失败", e);
 		}
+		
 		log.info("rpplan 导出成功。总共行数：{}", rows.size());
     	this.buildFile("rpplan.csv", rows, null);
     	rpplanExportDone = true;
@@ -173,19 +178,24 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportProposal(){
     	List<Object[]> rows = new ArrayList<>();
-		for(int pageNo=1;pageNo<200;pageNo++) {
-			PageHelper.startPage(pageNo, 1000);
-			List<Proposal> proposals = proposalMapper.selectByExample(null);
-			if(proposals.size() == 0) {
-				break;
-			}
-	    	for(Proposal d:proposals) {
-	    		Object[] row = new Object[1];
-	    		row[1] = d.getHash();
-	    		rows.add(row);
-	    	}
-	    	log.info("【exportProposal()】第{}页,{}条记录",pageNo,rows.size());
+    	try {
+    		for(int pageNo=1;pageNo<200;pageNo++) {
+    			PageHelper.startPage(pageNo, 1000);
+    			List<Proposal> proposals = proposalMapper.selectByExample(null);
+    			if(proposals == null || proposals.size() == 0) {
+    				break;
+    			}
+    	    	for(Proposal d:proposals) {
+    	    		Object[] row = new Object[1];
+    	    		row[0] = d.getHash();
+    	    		rows.add(row);
+    	    	}
+    	    	log.info("【exportProposal()】第{}页,{}条记录",pageNo,rows.size());
+    		}
+		} catch (Exception e) {
+			log.error("导出proposals失败", e);
 		}
+		
 		log.info("proposals 导出成功。总共行数：{}", rows.size());
     	this.buildFile("proposals.csv", rows, null);
     	proposalExportDone = true;
@@ -197,18 +207,22 @@ public class ExportService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void exportVote(){
     	List<Object[]> rows = new ArrayList<>();
-		for(int pageNo=1;pageNo<200;pageNo++) {
-			PageHelper.startPage(pageNo, 1000);
-			List<Vote> votes = voteMapper.selectByExample(null);
-			if(votes.size() == 0) {
-				break;
-			}
-	    	for(Vote d:votes) {
-	    		Object[] row = new Object[1];
-	    		row[1] = d.getHash();
-	    		rows.add(row);
-	    	}
-	    	log.info("【exportVote()】第{}页,{}条记录",pageNo,rows.size());
+    	try {
+    		for(int pageNo=1;pageNo<200;pageNo++) {
+    			PageHelper.startPage(pageNo, 1000);
+    			List<Vote> votes = voteMapper.selectByExample(null);
+    			if(votes == null || votes.size() == 0) {
+    				break;
+    			}
+    	    	for(Vote d:votes) {
+    	    		Object[] row = new Object[1];
+    	    		row[0] = d.getHash();
+    	    		rows.add(row);
+    	    	}
+    	    	log.info("【exportVote()】第{}页,{}条记录",pageNo,rows.size());
+    		}
+		} catch (Exception e) {
+			log.error("导出vote失败", e);
 		}
 		log.info("vote 导出成功。总共行数：{}", rows.size());
     	this.buildFile("votes.csv", rows, null);
@@ -245,7 +259,7 @@ public class ExportService {
             	DelegationExample delegationExample = new DelegationExample();
             	delegationExample.setOrderByClause(" sequence desc");
             	List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
-            	if(delegations.size() == 0) {
+            	if(delegations ==  null|delegations.size() == 0) {
             		break;
             	}
             	for(Delegation d:delegations) {
@@ -257,7 +271,7 @@ public class ExportService {
             	log.info("【exportDelegationInfo()】第{}页,{}条记录",pageNo,rows.size());
         	}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("导出委托失败", e);
 		}
     	
     	log.info("degation 导出成功。总共行数：{}", rows.size());
