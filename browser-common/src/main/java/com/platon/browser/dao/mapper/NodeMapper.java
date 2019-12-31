@@ -1,5 +1,6 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface NodeMapper {
 
     List<Node> selectByExampleWithBLOBs(NodeExample example);
 
-    List<Node> selectByExample(NodeExample example);
+    Page<Node> selectByExample(NodeExample example);
 
     Node selectByPrimaryKey(String nodeId);
 

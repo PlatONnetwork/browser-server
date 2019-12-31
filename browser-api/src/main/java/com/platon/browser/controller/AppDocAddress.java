@@ -61,7 +61,7 @@ public interface AppDocAddress {
      *       "delegateUnlock":"",      //已解除委托（LAT）   
      *       "delegateReleased":"",    //待赎回委托（LAT）   
      *       "delegateClaim":"",      //待领取奖励（LAT）   
-     *       "delegateDraw":"",      //累积领取委托奖励（LAT）   
+     *       "haveReward":"",      //累积领取委托奖励（LAT）   
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希

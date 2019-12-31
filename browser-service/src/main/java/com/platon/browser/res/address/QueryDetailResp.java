@@ -30,7 +30,7 @@ public class QueryDetailResp {
     private BigDecimal delegateUnlock;      //已解除委托（LAT）   
     private BigDecimal delegateReleased;    //待赎回委托（LAT）  
     private BigDecimal delegateClaim;    //待提取委托（LAT）  
-    private BigDecimal delegateDraw;    //已提取委托（LAT）  
+    private BigDecimal haveReward;    //已提取委托（LAT）  
     private String contractName;        //合约名称
     private String contractCreate;      //合约创建者地址
     private String contractCreateHash; //合约创建哈希
@@ -172,11 +172,11 @@ public class QueryDetailResp {
 		this.delegateClaim = delegateClaim;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public BigDecimal getDelegateDraw() {
-		return delegateDraw;
+	public BigDecimal getHaveReward() {
+		return haveReward;
 	}
-	public void setDelegateDraw(BigDecimal delegateDraw) {
-		this.delegateDraw = delegateDraw;
+	public void setHaveReward(BigDecimal haveReward) {
+		this.haveReward = haveReward;
 	}
     
 }
