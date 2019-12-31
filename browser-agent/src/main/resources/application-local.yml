@@ -30,6 +30,7 @@ spring:
       transactionIndexName: browser_transaction_local
       delegationIndexName: browser_delegation_local
       nodeOptIndexName: browser_nodeopt_local
+      delegationRewardIndexName: browser_delegation_reward_local
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

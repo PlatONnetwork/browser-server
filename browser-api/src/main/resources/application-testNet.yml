@@ -46,6 +46,7 @@ spring:
       transactionIndexName: browser_transaction_1
       delegationIndexName: browser_delegation_1
       nodeOptIndexName: browser_nodeopt_1
+      delegationRewardIndexName: browser_delegation_reward_1
 #redis配置
 redisCluster:
   configKey: DEFAULT

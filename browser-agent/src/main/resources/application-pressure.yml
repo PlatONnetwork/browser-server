@@ -30,6 +30,7 @@ spring:
       transactionIndexName: browser_transaction_pressure
       delegationIndexName: browser_delegation_pressure
       nodeOptIndexName: browser_nodeopt_pressure
+      delegationRewardIndexName: browser_delegation_reward_pressure
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

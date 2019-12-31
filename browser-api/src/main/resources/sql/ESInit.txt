@@ -320,3 +320,98 @@ PUT /_template/nodeopt_template
     }
   }
 }
+
+#节点操作模板索引建立：
+PUT /_template/nodeopt_template
+{
+  "index_patterns": [
+    "browser_nodeopt_*"
+  ],
+  "settings": {
+    "number_of_shards": 5,
+    "number_of_replicas": 1,
+    "max_result_window": 2000000000
+  },
+  "mappings": {
+    "properties": {
+      "node_id": {
+        "type": "keyword"
+      },
+      "type": {
+        "type": "integer"
+      },
+      "tx_hash": {
+        "type": "text"
+      },
+      "b_num": {
+        "type": "long"
+      },
+      "time": {
+        "type": "date",
+		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      },
+      "desc": {
+        "type": "text",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
+      "cre_time": {
+        "type": "date",
+		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      },
+      "upd_time": {
+        "type": "date",
+		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      }
+    }
+  }
+}
+
+#收益明细表
+PUT /_template/delegation_reward_template
+{
+  "index_patterns": [
+    "browser_delegation_reward_*"
+  ],
+  "settings": {
+    "number_of_shards": 5,
+    "number_of_replicas": 1,
+    "max_result_window": 2000000000
+  },
+  "mappings": {
+    "properties": {
+      "hash": {
+        "type": "keyword"
+      },
+      "addr": {
+        "type": "keyword"
+      },
+
+      "node_name": {
+        "type": "text"
+      },
+      "node_id": {
+        "type": "keyword"
+      },
+      "reward": {
+        "type": "text",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
+      "time": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      },
+      "cre_time": {
+        "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      },
+      "upd_time": {
+        "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      }
+    }
+  }
+}
