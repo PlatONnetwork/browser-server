@@ -121,13 +121,5 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
-        <table tableName="address" domainObjectName="Address">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-        <table tableName="delegation" domainObjectName="Delegation">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
     </context>
 </generatorConfiguration>
