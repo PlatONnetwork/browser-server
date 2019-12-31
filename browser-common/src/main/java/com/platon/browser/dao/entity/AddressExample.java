@@ -1405,6 +1405,126 @@ public class AddressExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andPendingRedeemDelegateValueIsNull() {
+            addCriterion("pending_redeem_delegate_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueIsNotNull() {
+            addCriterion("pending_redeem_delegate_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueEqualTo(BigDecimal value) {
+            addCriterion("pending_redeem_delegate_value =", value, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueNotEqualTo(BigDecimal value) {
+            addCriterion("pending_redeem_delegate_value <>", value, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueGreaterThan(BigDecimal value) {
+            addCriterion("pending_redeem_delegate_value >", value, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("pending_redeem_delegate_value >=", value, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueLessThan(BigDecimal value) {
+            addCriterion("pending_redeem_delegate_value <", value, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("pending_redeem_delegate_value <=", value, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueIn(List<BigDecimal> values) {
+            addCriterion("pending_redeem_delegate_value in", values, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueNotIn(List<BigDecimal> values) {
+            addCriterion("pending_redeem_delegate_value not in", values, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("pending_redeem_delegate_value between", value1, value2, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andPendingRedeemDelegateValueNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("pending_redeem_delegate_value not between", value1, value2, "pendingRedeemDelegateValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueIsNull() {
+            addCriterion("unclaimed_delegate_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueIsNotNull() {
+            addCriterion("unclaimed_delegate_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueEqualTo(BigDecimal value) {
+            addCriterion("unclaimed_delegate_reward_value =", value, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueNotEqualTo(BigDecimal value) {
+            addCriterion("unclaimed_delegate_reward_value <>", value, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueGreaterThan(BigDecimal value) {
+            addCriterion("unclaimed_delegate_reward_value >", value, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("unclaimed_delegate_reward_value >=", value, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueLessThan(BigDecimal value) {
+            addCriterion("unclaimed_delegate_reward_value <", value, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("unclaimed_delegate_reward_value <=", value, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueIn(List<BigDecimal> values) {
+            addCriterion("unclaimed_delegate_reward_value in", values, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueNotIn(List<BigDecimal> values) {
+            addCriterion("unclaimed_delegate_reward_value not in", values, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("unclaimed_delegate_reward_value between", value1, value2, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnclaimedDelegateRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("unclaimed_delegate_reward_value not between", value1, value2, "unclaimedDelegateRewardValue");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

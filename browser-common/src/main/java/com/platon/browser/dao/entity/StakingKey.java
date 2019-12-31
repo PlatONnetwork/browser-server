@@ -67,6 +67,11 @@ public class StakingKey {
         preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        delegateAnnualizedRate("delegate_annualized_rate", "delegateAnnualizedRate", "DOUBLE", false),
+        statDelegateRewardValue("stat_delegate_reward_value", "statDelegateRewardValue", "DECIMAL", false),
+        delegateRewardRatio("delegate_reward_ratio", "delegateRewardRatio", "DOUBLE", false),
+        preStakeDelegateReward("pre_stake_delegate_reward", "preStakeDelegateReward", "DECIMAL", false),
+        claimedDelegateRewardValue("claimed_delegate_reward_value", "claimedDelegateRewardValue", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**
