@@ -94,6 +94,10 @@ public class Node {
 
     private Double delegateRewardRatio;
 
+    private BigDecimal preStakeDelegateReward;
+
+    private BigDecimal claimedDelegateRewardValue;
+
     private String annualizedRateInfo;
 
     public String getNodeId() {
@@ -448,6 +452,22 @@ public class Node {
         this.delegateRewardRatio = delegateRewardRatio;
     }
 
+    public BigDecimal getPreStakeDelegateReward() {
+        return preStakeDelegateReward;
+    }
+
+    public void setPreStakeDelegateReward(BigDecimal preStakeDelegateReward) {
+        this.preStakeDelegateReward = preStakeDelegateReward;
+    }
+
+    public BigDecimal getClaimedDelegateRewardValue() {
+        return claimedDelegateRewardValue;
+    }
+
+    public void setClaimedDelegateRewardValue(BigDecimal claimedDelegateRewardValue) {
+        this.claimedDelegateRewardValue = claimedDelegateRewardValue;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -508,6 +528,8 @@ public class Node {
         delegateAnnualizedRate("delegate_annualized_rate", "delegateAnnualizedRate", "DOUBLE", false),
         statDelegateRewardValue("stat_delegate_reward_value", "statDelegateRewardValue", "DECIMAL", false),
         delegateRewardRatio("delegate_reward_ratio", "delegateRewardRatio", "DOUBLE", false),
+        preStakeDelegateReward("pre_stake_delegate_reward", "preStakeDelegateReward", "DECIMAL", false),
+        claimedDelegateRewardValue("claimed_delegate_reward_value", "claimedDelegateRewardValue", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

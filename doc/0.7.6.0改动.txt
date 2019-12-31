@@ -57,7 +57,7 @@
 1、MySQL:
 	a、address: +【待赎回委托】、+【待领取委托奖励】；
 	b、delegation: +【待领取奖励】
-	c、node&staking: +【预计委托收益率】、+【累计委托奖励】、【前一次质押的累计委托奖励】、+【委托奖励比例】
+	c、node&staking: +【预计委托收益率】、+【累计委托奖励】、+【前一次质押的累计委托奖励】、+【委托奖励比例】、+【已领取委托奖励】
 2、ES结构：
 	a、transaction: +【领取奖励】类型
 	b、delegation: 同MySQL

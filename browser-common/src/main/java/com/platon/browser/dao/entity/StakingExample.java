@@ -2495,6 +2495,126 @@ public class StakingExample {
             addCriterion("delegate_reward_ratio not between", value1, value2, "delegateRewardRatio");
             return (Criteria) this;
         }
+
+        public Criteria andPreStakeDelegateRewardIsNull() {
+            addCriterion("pre_stake_delegate_reward is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardIsNotNull() {
+            addCriterion("pre_stake_delegate_reward is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardEqualTo(BigDecimal value) {
+            addCriterion("pre_stake_delegate_reward =", value, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardNotEqualTo(BigDecimal value) {
+            addCriterion("pre_stake_delegate_reward <>", value, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardGreaterThan(BigDecimal value) {
+            addCriterion("pre_stake_delegate_reward >", value, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("pre_stake_delegate_reward >=", value, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardLessThan(BigDecimal value) {
+            addCriterion("pre_stake_delegate_reward <", value, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("pre_stake_delegate_reward <=", value, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardIn(List<BigDecimal> values) {
+            addCriterion("pre_stake_delegate_reward in", values, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardNotIn(List<BigDecimal> values) {
+            addCriterion("pre_stake_delegate_reward not in", values, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("pre_stake_delegate_reward between", value1, value2, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreStakeDelegateRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("pre_stake_delegate_reward not between", value1, value2, "preStakeDelegateReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueIsNull() {
+            addCriterion("claimed_delegate_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueIsNotNull() {
+            addCriterion("claimed_delegate_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueEqualTo(BigDecimal value) {
+            addCriterion("claimed_delegate_reward_value =", value, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueNotEqualTo(BigDecimal value) {
+            addCriterion("claimed_delegate_reward_value <>", value, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueGreaterThan(BigDecimal value) {
+            addCriterion("claimed_delegate_reward_value >", value, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("claimed_delegate_reward_value >=", value, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueLessThan(BigDecimal value) {
+            addCriterion("claimed_delegate_reward_value <", value, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("claimed_delegate_reward_value <=", value, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueIn(List<BigDecimal> values) {
+            addCriterion("claimed_delegate_reward_value in", values, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueNotIn(List<BigDecimal> values) {
+            addCriterion("claimed_delegate_reward_value not in", values, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("claimed_delegate_reward_value between", value1, value2, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andClaimedDelegateRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("claimed_delegate_reward_value not between", value1, value2, "claimedDelegateRewardValue");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
