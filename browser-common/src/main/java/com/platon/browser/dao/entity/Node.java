@@ -88,15 +88,13 @@ public class Node {
 
     private Date updateTime;
 
-    private Double delegateAnnualizedRate;
+    private Integer rewardPer;
 
-    private BigDecimal statDelegateRewardValue;
+    private BigDecimal haveDeleReward;
 
-    private Double delegateRewardRatio;
+    private Double deleAnnualizedRate;
 
-    private BigDecimal preStakeDelegateReward;
-
-    private BigDecimal claimedDelegateRewardValue;
+    private BigDecimal totalDeleReward;
 
     private String annualizedRateInfo;
 
@@ -428,44 +426,36 @@ public class Node {
         this.updateTime = updateTime;
     }
 
-    public Double getDelegateAnnualizedRate() {
-        return delegateAnnualizedRate;
+    public Integer getRewardPer() {
+        return rewardPer;
     }
 
-    public void setDelegateAnnualizedRate(Double delegateAnnualizedRate) {
-        this.delegateAnnualizedRate = delegateAnnualizedRate;
+    public void setRewardPer(Integer rewardPer) {
+        this.rewardPer = rewardPer;
     }
 
-    public BigDecimal getStatDelegateRewardValue() {
-        return statDelegateRewardValue;
+    public BigDecimal getHaveDeleReward() {
+        return haveDeleReward;
     }
 
-    public void setStatDelegateRewardValue(BigDecimal statDelegateRewardValue) {
-        this.statDelegateRewardValue = statDelegateRewardValue;
+    public void setHaveDeleReward(BigDecimal haveDeleReward) {
+        this.haveDeleReward = haveDeleReward;
     }
 
-    public Double getDelegateRewardRatio() {
-        return delegateRewardRatio;
+    public Double getDeleAnnualizedRate() {
+        return deleAnnualizedRate;
     }
 
-    public void setDelegateRewardRatio(Double delegateRewardRatio) {
-        this.delegateRewardRatio = delegateRewardRatio;
+    public void setDeleAnnualizedRate(Double deleAnnualizedRate) {
+        this.deleAnnualizedRate = deleAnnualizedRate;
     }
 
-    public BigDecimal getPreStakeDelegateReward() {
-        return preStakeDelegateReward;
+    public BigDecimal getTotalDeleReward() {
+        return totalDeleReward;
     }
 
-    public void setPreStakeDelegateReward(BigDecimal preStakeDelegateReward) {
-        this.preStakeDelegateReward = preStakeDelegateReward;
-    }
-
-    public BigDecimal getClaimedDelegateRewardValue() {
-        return claimedDelegateRewardValue;
-    }
-
-    public void setClaimedDelegateRewardValue(BigDecimal claimedDelegateRewardValue) {
-        this.claimedDelegateRewardValue = claimedDelegateRewardValue;
+    public void setTotalDeleReward(BigDecimal totalDeleReward) {
+        this.totalDeleReward = totalDeleReward;
     }
 
     public String getAnnualizedRateInfo() {
@@ -525,11 +515,10 @@ public class Node {
         predictStakingReward("predict_staking_reward", "predictStakingReward", "DECIMAL", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        delegateAnnualizedRate("delegate_annualized_rate", "delegateAnnualizedRate", "DOUBLE", false),
-        statDelegateRewardValue("stat_delegate_reward_value", "statDelegateRewardValue", "DECIMAL", false),
-        delegateRewardRatio("delegate_reward_ratio", "delegateRewardRatio", "DOUBLE", false),
-        preStakeDelegateReward("pre_stake_delegate_reward", "preStakeDelegateReward", "DECIMAL", false),
-        claimedDelegateRewardValue("claimed_delegate_reward_value", "claimedDelegateRewardValue", "DECIMAL", false),
+        rewardPer("reward_per", "rewardPer", "INTEGER", false),
+        haveDeleReward("have_dele_reward", "haveDeleReward", "DECIMAL", false),
+        deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
+        totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

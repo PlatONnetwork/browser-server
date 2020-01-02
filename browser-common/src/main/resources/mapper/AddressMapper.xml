@@ -23,8 +23,7 @@
     <result column="contract_createHash" jdbcType="VARCHAR" property="contractCreatehash" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="pending_redeem_delegate_value" jdbcType="DECIMAL" property="pendingRedeemDelegateValue" />
-    <result column="unclaimed_delegate_reward_value" jdbcType="DECIMAL" property="unclaimedDelegateRewardValue" />
+    <result column="have_reward" jdbcType="DECIMAL" property="haveReward" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -88,7 +87,7 @@
     address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
     tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes, 
     delegate_locked, delegate_released, contract_name, contract_create, contract_createHash, 
-    create_time, update_time, pending_redeem_delegate_value, unclaimed_delegate_reward_value
+    create_time, update_time, have_reward
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.AddressExample" resultMap="BaseResultMap">
     select
@@ -128,8 +127,7 @@
       candidate_count, delegate_hes, delegate_locked, 
       delegate_released, contract_name, contract_create, 
       contract_createHash, create_time, update_time, 
-      pending_redeem_delegate_value, unclaimed_delegate_reward_value
-      )
+      have_reward)
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
       #{restrictingBalance,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{delegateValue,jdbcType=DECIMAL}, 
       #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
@@ -137,8 +135,7 @@
       #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, 
       #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, #{contractCreate,jdbcType=VARCHAR}, 
       #{contractCreatehash,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{pendingRedeemDelegateValue,jdbcType=DECIMAL}, #{unclaimedDelegateRewardValue,jdbcType=DECIMAL}
-      )
+      #{haveReward,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Address">
     insert into address
@@ -206,11 +203,8 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="pendingRedeemDelegateValue != null">
-        pending_redeem_delegate_value,
-      </if>
-      <if test="unclaimedDelegateRewardValue != null">
-        unclaimed_delegate_reward_value,
+      <if test="haveReward != null">
+        have_reward,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -277,11 +271,8 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="pendingRedeemDelegateValue != null">
-        #{pendingRedeemDelegateValue,jdbcType=DECIMAL},
-      </if>
-      <if test="unclaimedDelegateRewardValue != null">
-        #{unclaimedDelegateRewardValue,jdbcType=DECIMAL},
+      <if test="haveReward != null">
+        #{haveReward,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -357,11 +348,8 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.pendingRedeemDelegateValue != null">
-        pending_redeem_delegate_value = #{record.pendingRedeemDelegateValue,jdbcType=DECIMAL},
-      </if>
-      <if test="record.unclaimedDelegateRewardValue != null">
-        unclaimed_delegate_reward_value = #{record.unclaimedDelegateRewardValue,jdbcType=DECIMAL},
+      <if test="record.haveReward != null">
+        have_reward = #{record.haveReward,jdbcType=DECIMAL},
       </if>
     </set>
     <if test="_parameter != null">
@@ -391,8 +379,7 @@
       contract_createHash = #{record.contractCreatehash,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      pending_redeem_delegate_value = #{record.pendingRedeemDelegateValue,jdbcType=DECIMAL},
-      unclaimed_delegate_reward_value = #{record.unclaimedDelegateRewardValue,jdbcType=DECIMAL}
+      have_reward = #{record.haveReward,jdbcType=DECIMAL}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -460,11 +447,8 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="pendingRedeemDelegateValue != null">
-        pending_redeem_delegate_value = #{pendingRedeemDelegateValue,jdbcType=DECIMAL},
-      </if>
-      <if test="unclaimedDelegateRewardValue != null">
-        unclaimed_delegate_reward_value = #{unclaimedDelegateRewardValue,jdbcType=DECIMAL},
+      <if test="haveReward != null">
+        have_reward = #{haveReward,jdbcType=DECIMAL},
       </if>
     </set>
     where address = #{address,jdbcType=VARCHAR}
@@ -491,8 +475,7 @@
       contract_createHash = #{contractCreatehash,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      pending_redeem_delegate_value = #{pendingRedeemDelegateValue,jdbcType=DECIMAL},
-      unclaimed_delegate_reward_value = #{unclaimedDelegateRewardValue,jdbcType=DECIMAL}
+      have_reward = #{haveReward,jdbcType=DECIMAL}
     where address = #{address,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -505,8 +488,7 @@
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
       tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
       delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
-      contract_createHash, create_time, update_time, pending_redeem_delegate_value, unclaimed_delegate_reward_value
-      )
+      contract_createHash, create_time, update_time, have_reward)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
@@ -517,8 +499,8 @@
         #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
         #{item.delegateReleased,jdbcType=DECIMAL}, #{item.contractName,jdbcType=VARCHAR}, 
         #{item.contractCreate,jdbcType=VARCHAR}, #{item.contractCreatehash,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.pendingRedeemDelegateValue,jdbcType=DECIMAL}, 
-        #{item.unclaimedDelegateRewardValue,jdbcType=DECIMAL})
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -599,15 +581,11 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'pending_redeem_delegate_value'.toString() == column.value">
-          #{item.pendingRedeemDelegateValue,jdbcType=DECIMAL}
-        </if>
-        <if test="'unclaimed_delegate_reward_value'.toString() == column.value">
-          #{item.unclaimedDelegateRewardValue,jdbcType=DECIMAL}
+        <if test="'have_reward'.toString() == column.value">
+          #{item.haveReward,jdbcType=DECIMAL}
         </if>
       </foreach>
       )
     </foreach>
   </insert>
-
 </mapper>
