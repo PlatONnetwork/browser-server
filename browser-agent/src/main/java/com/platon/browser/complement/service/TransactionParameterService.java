@@ -5,6 +5,7 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.delegate.DelegateCreateConverter;
 import com.platon.browser.complement.converter.delegate.DelegateExitConverter;
+import com.platon.browser.complement.converter.delegate.DelegateRewardClaimConverter;
 import com.platon.browser.complement.converter.proposal.*;
 import com.platon.browser.complement.converter.restricting.RestrictingCreateConverter;
 import com.platon.browser.complement.converter.slash.ReportConverter;
@@ -61,6 +62,8 @@ public class TransactionParameterService {
     private VersionDeclareConverter proposalVersionConverter;
     @Autowired
     private RestrictingCreateConverter restrictingCreateConverter;
+    @Autowired
+    private DelegateRewardClaimConverter delegateRewardClaimConverter;
     @Autowired
     private NetworkStatCache networkStatCache;
     @Autowired
@@ -143,6 +146,10 @@ public class TransactionParameterService {
                         break;
                     case RESTRICTING_CREATE: // 4000
                     	restrictingCreateConverter.convert(event,tx);
+                        break;
+                    case CLAIM_REWARDS: // 5000
+                        // TODO：领取委托奖励交易参数解析
+                        delegateRewardClaimConverter.convert(event,tx);
                         break;
                     default:
                         break;

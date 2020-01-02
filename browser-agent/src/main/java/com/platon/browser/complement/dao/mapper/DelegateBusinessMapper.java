@@ -21,4 +21,12 @@ public interface DelegateBusinessMapper {
      */
     @Transactional
     void exit ( BusinessParam param );
+
+    /**
+     * // TODO: 编写领取委托奖励入库业务逻辑SQL
+     * 领取委托奖励
+     * @param param
+     */
+    @Transactional
+    void claim(BusinessParam param);
 }

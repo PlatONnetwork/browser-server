@@ -119,6 +119,9 @@ public abstract class BusinessParamConverter<T> {
                     break;
                 case RESTRICTING_CREATE: // 4000
                     break;
+                case CLAIM_REWARDS: // 5000
+
+                    break;
                 default:
                     break;
             }
