@@ -1,6 +1,6 @@
 package com.platon.browser.util.decode;
 
-import com.platon.browser.param.DelegateCreateParam;
+import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -31,7 +31,7 @@ class DelegateRewardClaimDecoder {
         //委托的金额
         BigInteger amount = bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
-        return DelegateCreateParam.builder()
+        return DelegateRewardClaimParam.builder()
                 .type(type.intValue())
                 .nodeId(nodeId)
                 .amount(new BigDecimal(amount))
