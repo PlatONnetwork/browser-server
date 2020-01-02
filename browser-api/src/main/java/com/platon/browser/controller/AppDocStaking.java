@@ -100,7 +100,8 @@ public interface AppDocStaking {
      *         "blockQty":11,          //产生的区块数
      *         "expectedIncome":"",    //预计年收化率（从验证人加入时刻开始计算）
      *         "isRecommend":true,     //是否官方推荐
-     *         "isInit":true           //是否为初始节点 
+     *         "isInit":true ,          //是否为初始节点 
+     *         "deleAnnualizedRate":""    //预计委托年化率
      *      }
      *   ]
      * }
@@ -194,7 +195,12 @@ public interface AppDocStaking {
      *       "externalUrl":"",          //身份证url
      *       "stakingBlockNum":"",     //最新的质押交易块高
      *       "statDelegateReduction":"",//待提取的委托
-     *       "isInit":true           //是否为初始节点 
+     *       "isInit":true,           //是否为初始节点 
+     *       "rewardPer":"",           //委托奖励比例
+     *       "haveReward":true,           //已领取奖励
+     *       "deleAnnualizedRate":"",    //预计委托年化率
+     *       "deleReward":"",    //累积委托奖励
+     *       "deleAnnualizedRate":"",    //预计委托年化率
      *    }
      * }
      */	

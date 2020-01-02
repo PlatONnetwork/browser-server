@@ -4,8 +4,11 @@ import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
+import com.platon.browser.req.staking.QueryClaimByStakingReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.staking.DelegationListByAddressResp;
+import com.platon.browser.res.staking.QueryClaimByStakingResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
@@ -317,5 +320,41 @@ public interface AppDocTransaction {
 	@ApiOperation(value = "transaction/queryClaimByAddress", nickname = "", notes = "", response = QueryClaimByAddressResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/queryClaimByAddress", produces = { "application/json" })
 	WebAsyncTask<RespPage<QueryClaimByAddressResp>> queryClaimByAddress(@ApiParam(value = "TransactionListByAddressRequest", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
+
+	/**
+     * @api {post} /transaction/queryClaimByStaking g.节点相关的领取奖励列表
+     * @apiVersion 1.0.0
+     * @apiName queryClaimByStaking
+     * @apiGroup transaction
+     * @apiDescription
+     * 1. 功能：节点相关的领取奖励列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询es中delegation_reward
+     * @apiParamExample {json} Request-Example:
+     * {
+     *    "pageNo":1,                  //页数(必填)
+     *    "pageSize":10,               //页大小(必填)
+     *    "nodeId":"0x1111"                //节点id(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "errMsg":"",                  //描述信息
+     *   "code":0,                     //成功（0），失败则由相关失败码
+     *   "totalCount":18,              //总数
+     *   "totalPages":1,               //总页数
+     *   "data":[
+     *      {
+     *         "nodeId":"",            //节点id
+     *         "addr":"",          //委托者地址
+     *         "time":"",     //领取时间
+     *         "reward":""       //领取奖励
+     *      }
+     *   ]
+     * }
+     */
+	@ApiOperation(value = "transaction/queryClaimByStaking", nickname = "", notes = "", response = DelegationListByAddressResp.class, tags = { "Transaction" })
+	@PostMapping(value = "transaction/queryClaimByStaking", produces = { "application/json" })
+	WebAsyncTask<RespPage<QueryClaimByStakingResp>> queryClaimByStaking(@ApiParam(value = "QueryClaimByStakingReq", required = true)@Valid @RequestBody QueryClaimByStakingReq req);
 
 }

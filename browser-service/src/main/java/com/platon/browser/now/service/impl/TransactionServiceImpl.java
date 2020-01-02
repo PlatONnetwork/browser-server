@@ -31,7 +31,10 @@ import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
+import com.platon.browser.req.staking.QueryClaimByStakingReq;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
@@ -677,5 +680,17 @@ public class TransactionServiceImpl implements TransactionService {
 		}
     	return null;
     }
+
+	@Override
+	public RespPage<QueryClaimByAddressResp> queryClaimByAddress(TransactionListByAddressRequest req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RespPage<QueryClaimByStakingResp> queryClaimByStaking(QueryClaimByStakingReq req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

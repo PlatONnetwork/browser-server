@@ -5,7 +5,10 @@ import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
+import com.platon.browser.req.staking.QueryClaimByStakingReq;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 
@@ -58,4 +61,20 @@ public interface TransactionService {
      * @return
      */
 	TransactionDetailsResp transactionDetails( TransactionDetailsReq req);
+	
+	/**
+	 * 根据地址查询委托奖励提取
+	 * @method queryClaimByStaking
+	 * @param req
+	 * @return
+	 */
+	 RespPage<QueryClaimByAddressResp> queryClaimByAddress( TransactionListByAddressRequest req);
+	
+	 /**
+	 * 根据质押查询委托奖励提取
+	 * @method queryClaimByStaking
+	 * @param req
+	 * @return
+	 */
+	 RespPage<QueryClaimByStakingResp> queryClaimByStaking( QueryClaimByStakingReq req);
 }

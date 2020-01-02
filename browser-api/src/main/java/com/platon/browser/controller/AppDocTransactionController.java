@@ -12,8 +12,10 @@ import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
+import com.platon.browser.req.staking.QueryClaimByStakingReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.staking.QueryClaimByStakingResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
@@ -118,8 +120,26 @@ public class AppDocTransactionController implements AppDocTransaction {
 	@Override
 	public WebAsyncTask<RespPage<QueryClaimByAddressResp>> queryClaimByAddress(
 			@Valid TransactionListByAddressRequest req) {
-		// TODO Auto-generated method stub
-		return null;
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
+        WebAsyncTask<RespPage<QueryClaimByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> 
+            transactionService.queryClaimByAddress(req)
+        );
+        CommonMethod.onTimeOut(webAsyncTask);
+        return webAsyncTask;  
+	}
+
+	@Override
+	public WebAsyncTask<RespPage<QueryClaimByStakingResp>> queryClaimByStaking(@Valid QueryClaimByStakingReq req) {
+		/**
+		 * 异步调用，超时则进入timeout  
+		 */
+        WebAsyncTask<RespPage<QueryClaimByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> 
+            transactionService.queryClaimByStaking(req)
+        );
+        CommonMethod.onTimeOut(webAsyncTask);
+        return webAsyncTask; 
 	}
 
 }
