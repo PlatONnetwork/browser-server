@@ -2,11 +2,16 @@ package com.platon.browser.util.decode;
 
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
+import org.web3j.protocol.core.methods.response.Log;
+import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
+import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
 import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
 import static com.platon.browser.util.decode.Decoder.stringResolver;
@@ -19,24 +24,65 @@ import static com.platon.browser.util.decode.Decoder.stringResolver;
 class DelegateRewardClaimDecoder {
     private DelegateRewardClaimDecoder(){}
 
-    static TxParam decode(RlpList rootList) {
+    static TxParam decode(RlpList rootList,List<Log> logs) {
+
+        String logData = logs.get(0).getData();
+        RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
+        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+        int statusCode = Integer.parseInt(decodedStatus);
 
         // TODO: 补充领取委托奖励交易输入参数解码逻辑
+        ((RlpList)RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())
+                .getValues()
+                .get(0))
+                .getValues()
+                .forEach(rl -> {
+                    RlpList rlpL = (RlpList)rl;
+                    System.out.println("NodeID="+((RlpString)rlpL.getValues().get(0)).asString());
+                    System.out.println("StakingNum="+((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
+                    System.out.println("Reward="+((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
+                });
+        return  DelegateRewardClaimParam.builder().build();
+    }
 
-        // 发起委托
-        //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
-        BigInteger type =  bigIntegerResolver((RlpString) rootList.getValues().get(1));
-        //被质押的节点的NodeId
-        String nodeId = stringResolver((RlpString) rootList.getValues().get(2));
-        //委托的金额
-        BigInteger amount = bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
-        return DelegateRewardClaimParam.builder()
-                .type(type.intValue())
-                .nodeId(nodeId)
-                .amount(new BigDecimal(amount))
-                .nodeName("")
-                .stakingBlockNum(null)
-                .build();
+    public static  void  test1005(){
+        String logData = "0xc23064";
+
+        RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
+        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+        int statusCode = Integer.parseInt(decodedStatus);
+
+        BigInteger bigInteger = ((RlpString)rlpList.get(1)).asPositiveBigInteger();
+
+        System.out.println("status="+statusCode+"  value="+bigInteger);
+    }
+
+
+    public static  void  test5000(){
+        String logData = "0xf84e30b84bf849f847b840362003c50ed3a523cdede37a001803b8f0fed27cb402b3d6127a1a96661ec202318f68f4c76d9b0bfbabfd551a178d4335eaeaa9b7981a4df30dfc8c0bfe3384830f424064";
+
+        RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
+        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+        int statusCode = Integer.parseInt(decodedStatus);
+
+        ((RlpList)((RlpList)RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())).getValues().get(0)).getValues()
+                .stream()
+                .forEach(rl -> {
+                    RlpList rlpL = (RlpList)rl;
+                    System.out.println("NodeID="+((RlpString)rlpL.getValues().get(0)).asString());
+                    System.out.println("StakingNum="+((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
+                    System.out.println("Reward="+((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
+                });
+
+        System.out.println("status="+statusCode);
+    }
+
+    public static void main(String[] args) {
+        test1005();
+        test5000();
     }
 }

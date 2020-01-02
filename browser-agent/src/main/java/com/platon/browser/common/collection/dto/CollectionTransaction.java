@@ -60,7 +60,7 @@ public class CollectionTransaction extends Transaction {
 
         try {
             // 解析交易的输入信息
-            DecodedResult decodedResult = TxInputUtil.decode(getInput());
+            DecodedResult decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
             // 参数信息
             String info = decodedResult.getParam().toJSONString();
             int type = decodedResult.getTypeEnum().getCode();

@@ -5,6 +5,7 @@ import com.platon.browser.param.OthersTxParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -22,7 +23,7 @@ import java.util.List;
 @Slf4j
 public class TxInputUtil {
     private TxInputUtil(){}
-    public static DecodedResult decode(String txInput) {
+    public static DecodedResult decode(String txInput,List<Log> logs) {
         DecodedResult result = new DecodedResult();
         try {
             if (StringUtils.isNotEmpty(txInput) && !txInput.equals("0x")) {
@@ -77,7 +78,7 @@ public class TxInputUtil {
                     case RESTRICTING_CREATE: // 4000 创建锁仓计划
                         return result.setParam(RestrictingCreateDecoder.decode(rootList));
                     case CLAIM_REWARDS: // 5000 领取委托奖励
-                        return result.setParam(DelegateRewardClaimDecoder.decode(rootList));
+                        return result.setParam(DelegateRewardClaimDecoder.decode(rootList,logs));
 				default:
 					break;
                 }
