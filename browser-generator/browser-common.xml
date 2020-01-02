@@ -113,13 +113,17 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>-->
-        <table tableName="address" domainObjectName="Address">
+        <!--<table tableName="address" domainObjectName="Address">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
         <table tableName="node" domainObjectName="Node">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
         <table tableName="staking" domainObjectName="Staking">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>-->
+
+        <table tableName="staking_history" domainObjectName="StakingHistory">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>

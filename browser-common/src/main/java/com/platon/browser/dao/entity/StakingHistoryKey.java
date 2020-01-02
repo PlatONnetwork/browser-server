@@ -67,6 +67,10 @@ public class StakingHistoryKey {
         preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        rewardPer("reward_per", "rewardPer", "INTEGER", false),
+        haveDeleReward("have_dele_reward", "haveDeleReward", "DECIMAL", false),
+        deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
+        totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

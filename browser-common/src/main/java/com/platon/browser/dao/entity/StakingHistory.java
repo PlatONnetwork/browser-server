@@ -72,6 +72,14 @@ public class StakingHistory extends StakingHistoryKey {
 
     private Date updateTime;
 
+    private Integer rewardPer;
+
+    private BigDecimal haveDeleReward;
+
+    private Double deleAnnualizedRate;
+
+    private BigDecimal totalDeleReward;
+
     private String annualizedRateInfo;
 
     public Integer getStakingTxIndex() {
@@ -338,6 +346,38 @@ public class StakingHistory extends StakingHistoryKey {
         this.updateTime = updateTime;
     }
 
+    public Integer getRewardPer() {
+        return rewardPer;
+    }
+
+    public void setRewardPer(Integer rewardPer) {
+        this.rewardPer = rewardPer;
+    }
+
+    public BigDecimal getHaveDeleReward() {
+        return haveDeleReward;
+    }
+
+    public void setHaveDeleReward(BigDecimal haveDeleReward) {
+        this.haveDeleReward = haveDeleReward;
+    }
+
+    public Double getDeleAnnualizedRate() {
+        return deleAnnualizedRate;
+    }
+
+    public void setDeleAnnualizedRate(Double deleAnnualizedRate) {
+        this.deleAnnualizedRate = deleAnnualizedRate;
+    }
+
+    public BigDecimal getTotalDeleReward() {
+        return totalDeleReward;
+    }
+
+    public void setTotalDeleReward(BigDecimal totalDeleReward) {
+        this.totalDeleReward = totalDeleReward;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -389,6 +429,10 @@ public class StakingHistory extends StakingHistoryKey {
         preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        rewardPer("reward_per", "rewardPer", "INTEGER", false),
+        haveDeleReward("have_dele_reward", "haveDeleReward", "DECIMAL", false),
+        deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
+        totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

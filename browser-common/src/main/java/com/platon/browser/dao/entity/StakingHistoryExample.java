@@ -2315,6 +2315,246 @@ public class StakingHistoryExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andRewardPerIsNull() {
+            addCriterion("reward_per is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerIsNotNull() {
+            addCriterion("reward_per is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerEqualTo(Integer value) {
+            addCriterion("reward_per =", value, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerNotEqualTo(Integer value) {
+            addCriterion("reward_per <>", value, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerGreaterThan(Integer value) {
+            addCriterion("reward_per >", value, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerGreaterThanOrEqualTo(Integer value) {
+            addCriterion("reward_per >=", value, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerLessThan(Integer value) {
+            addCriterion("reward_per <", value, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerLessThanOrEqualTo(Integer value) {
+            addCriterion("reward_per <=", value, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerIn(List<Integer> values) {
+            addCriterion("reward_per in", values, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerNotIn(List<Integer> values) {
+            addCriterion("reward_per not in", values, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerBetween(Integer value1, Integer value2) {
+            addCriterion("reward_per between", value1, value2, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardPerNotBetween(Integer value1, Integer value2) {
+            addCriterion("reward_per not between", value1, value2, "rewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardIsNull() {
+            addCriterion("have_dele_reward is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardIsNotNull() {
+            addCriterion("have_dele_reward is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardEqualTo(BigDecimal value) {
+            addCriterion("have_dele_reward =", value, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardNotEqualTo(BigDecimal value) {
+            addCriterion("have_dele_reward <>", value, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardGreaterThan(BigDecimal value) {
+            addCriterion("have_dele_reward >", value, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("have_dele_reward >=", value, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardLessThan(BigDecimal value) {
+            addCriterion("have_dele_reward <", value, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("have_dele_reward <=", value, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardIn(List<BigDecimal> values) {
+            addCriterion("have_dele_reward in", values, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardNotIn(List<BigDecimal> values) {
+            addCriterion("have_dele_reward not in", values, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("have_dele_reward between", value1, value2, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andHaveDeleRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("have_dele_reward not between", value1, value2, "haveDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateIsNull() {
+            addCriterion("dele_annualized_rate is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateIsNotNull() {
+            addCriterion("dele_annualized_rate is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateEqualTo(Double value) {
+            addCriterion("dele_annualized_rate =", value, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateNotEqualTo(Double value) {
+            addCriterion("dele_annualized_rate <>", value, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateGreaterThan(Double value) {
+            addCriterion("dele_annualized_rate >", value, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateGreaterThanOrEqualTo(Double value) {
+            addCriterion("dele_annualized_rate >=", value, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateLessThan(Double value) {
+            addCriterion("dele_annualized_rate <", value, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateLessThanOrEqualTo(Double value) {
+            addCriterion("dele_annualized_rate <=", value, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateIn(List<Double> values) {
+            addCriterion("dele_annualized_rate in", values, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateNotIn(List<Double> values) {
+            addCriterion("dele_annualized_rate not in", values, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateBetween(Double value1, Double value2) {
+            addCriterion("dele_annualized_rate between", value1, value2, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeleAnnualizedRateNotBetween(Double value1, Double value2) {
+            addCriterion("dele_annualized_rate not between", value1, value2, "deleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardIsNull() {
+            addCriterion("total_dele_reward is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardIsNotNull() {
+            addCriterion("total_dele_reward is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardEqualTo(BigDecimal value) {
+            addCriterion("total_dele_reward =", value, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardNotEqualTo(BigDecimal value) {
+            addCriterion("total_dele_reward <>", value, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardGreaterThan(BigDecimal value) {
+            addCriterion("total_dele_reward >", value, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("total_dele_reward >=", value, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardLessThan(BigDecimal value) {
+            addCriterion("total_dele_reward <", value, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("total_dele_reward <=", value, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardIn(List<BigDecimal> values) {
+            addCriterion("total_dele_reward in", values, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardNotIn(List<BigDecimal> values) {
+            addCriterion("total_dele_reward not in", values, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("total_dele_reward between", value1, value2, "totalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalDeleRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("total_dele_reward not between", value1, value2, "totalDeleReward");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
