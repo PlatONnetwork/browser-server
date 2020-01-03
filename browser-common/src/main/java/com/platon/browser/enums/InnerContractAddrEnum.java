@@ -8,11 +8,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * \*
- * \* User: dongqile
- * \* Date: 2019/8/12
- * \* Time: 16:48
- * \
+ *
+ * User: dongqile
+ * Date: 2019/8/12
+ * Time: 16:48
+ *
  */
 public enum InnerContractAddrEnum {
     RESTRICTING_PLAN_CONTRACT(ContractAddress.RESTRICTING_PLAN_CONTRACT_ADDRESS,"锁仓合约"),
@@ -21,8 +21,8 @@ public enum InnerContractAddrEnum {
     SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"惩罚合约"),
     PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"治理(提案)合约"),
     INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"激励池合约"),
-    NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约");
-    // TODO：添加提取奖励交易的TO内置地址
+    NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约"),
+    REWARD_CONTRACT(ContractAddress.REWARD_CONTRACT_ADDRESS,"领取奖励合约");
 
     private String address;
     private String desc;

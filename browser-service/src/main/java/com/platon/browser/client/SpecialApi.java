@@ -5,10 +5,11 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.sdk.contracts.ppos.BaseContract;
-import com.platon.sdk.contracts.ppos.abi.PlatOnFunction;
+import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.datatypes.BytesType;
@@ -76,12 +77,12 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-	private CallResponse<String> rpc(Web3j web3j, PlatOnFunction function, String from, String to) throws ContractInvokeException {
+	private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to) throws ContractInvokeException {
         CallResponse<String> br;
         try {
-            br = new RemoteCall<>((Callable<CallResponse<String>>) () -> {
+            br = new RemoteCall<>(() -> {
                 PlatonCall ethCall = web3j.platonCall(
-                        Transaction.createEthCallTransaction(from, to, function.getEncodeData()),
+                        Transaction.createEthCallTransaction(from, to, EncoderUtils.functionEncoder(function)),
                         DefaultBlockParameterName.LATEST)
                         .send();
                 if(ethCall.hasError()) {
@@ -148,7 +149,7 @@ public class SpecialApi {
      */
 	private List<Node> nodeCall(Web3j web3j,BigInteger blockNumber,int funcType) throws ContractInvokeException, BlankResponseException {
 
-        final PlatOnFunction function = new PlatOnFunction(funcType, Collections.singletonList(new Uint256(blockNumber)));
+        final Function function = new Function(funcType, Collections.singletonList(new Uint256(blockNumber)));
 
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.getData()==null){
@@ -172,7 +173,7 @@ public class SpecialApi {
      * @throws Exception
      */
     public List<NodeVersion> getNodeVersionList(Web3j web3j) throws ContractInvokeException, BlankResponseException {
-        final PlatOnFunction function = new PlatOnFunction(GET_NODE_VERSION, Collections.emptyList());
+        final Function function = new Function(GET_NODE_VERSION, Collections.emptyList());
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("【查询节点版本出错】函数类型:%s,返回为空!%s",GET_NODE_VERSION,JSON.toJSONString(Thread.currentThread().getStackTrace())));
@@ -196,7 +197,7 @@ public class SpecialApi {
      * @throws Exception
      */
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
-        final PlatOnFunction function = new PlatOnFunction(GET_RESTRICTING_BALANCE_FUNC_TYPE,Collections.singletonList(new Utf8String(addresses)));
+        final Function function = new Function(GET_RESTRICTING_BALANCE_FUNC_TYPE,Collections.singletonList(new Utf8String(addresses)));
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
         if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!",addresses));
@@ -220,7 +221,7 @@ public class SpecialApi {
      * @throws Exception
      */
     public EpochInfo getEpochInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
-        final PlatOnFunction function = new PlatOnFunction(GET_HISTORY_REWARD,Collections.singletonList(new Uint256(blockNumber)));
+        final Function function = new Function(GET_HISTORY_REWARD,Collections.singletonList(new Uint256(blockNumber)));
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询历史周期信息出错【blockNumber:%s)】,返回为空!",blockNumber));
@@ -247,7 +248,7 @@ public class SpecialApi {
      */
 	public ProposalParticipantStat getProposalParticipants (Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
 
-        final PlatOnFunction function = new PlatOnFunction(GET_PROPOSAL_RES_FUNC_TYPE,Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),new BytesType(Numeric.hexStringToByteArray(blockHash))));
+        final Function function = new Function(GET_PROPOSAL_RES_FUNC_TYPE,Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),new BytesType(Numeric.hexStringToByteArray(blockHash))));
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
         if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】",proposalHash,blockHash));
