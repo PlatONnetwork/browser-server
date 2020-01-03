@@ -2,12 +2,12 @@ package com.platon.browser.complement.dao.param.delegate;
 
 import com.platon.browser.common.enums.BusinessType;
 import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.param.claim.Reward;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.List;
 
 
 /**
@@ -20,18 +20,8 @@ import java.math.BigInteger;
 @Builder
 @Accessors(chain = true)
 public class DelegateRewardClaim implements BusinessParam {
-    //节点id
-    private String nodeId;
-    //委托金额
-    private BigDecimal amount;
-    //委托交易块高
-    private BigInteger blockNumber;
-    //交易发送方
-    private String txFrom;
-    //交易序号
-    private BigInteger sequence;
-    //节点质押快高
-    private BigInteger stakingBlockNumber;
+    // 奖励信息列表
+    private List<Reward> reward;
 
     @Override
     public BusinessType getBusinessType() {

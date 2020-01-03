@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 /**
  * @description: 领取委托奖励业务参数转换器
@@ -46,12 +47,7 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
 
         // TODO: 从交易中解析并抽取入库参数：更改address表、node表、staking表
         DelegateRewardClaim businessParam= DelegateRewardClaim.builder()
-        		.nodeId(txParam.getNodeId())
-        		.amount(txParam.getAmount())
-        		.blockNumber(BigInteger.valueOf(tx.getNum()))
-        		.txFrom(tx.getFrom())
-        		.sequence(BigInteger.valueOf(tx.getSeq()))
-        		.stakingBlockNumber(txParam.getStakingBlockNum())
+                .reward(txParam.getRewards())
                 .build();
 
         delegateBusinessMapper.claim(businessParam);
