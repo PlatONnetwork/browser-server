@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
     <update id="create" parameterType="com.platon.browser.complement.dao.param.stake.StakeCreate">
+    /*取当前节点最近一条质押的【已领取委托奖励】作为当前质押的【已领取委托奖励】初始值*/
+    SET @haveDeleReward = (SELECT `have_dele_reward` FROM staking WHERE `node_id` = #{nodeId} ORDER BY `staking_block_num` DESC LIMIT 1);
+    SET @initHaveDeleReward = (SELECT CASE WHEN @haveDeleReward IS NULL THEN 0 ELSE @haveDeleReward END);
+
+    /*取当前节点最近一条质押的【节点总的委托奖励】作为当前质押的【节点总的委托奖励】初始值*/
+    SET @totalDeleReward = (SELECT `total_dele_reward` FROM staking WHERE `node_id` = #{nodeId} ORDER BY `staking_block_num` DESC LIMIT 1);
+    SET @initTotalDeleReward = (SELECT CASE WHEN @totalDeleReward IS NULL THEN 0 ELSE @totalDeleReward END);
+
     /*1、staking新增*/
     insert into `staking` (
         `node_id`,
@@ -17,7 +25,10 @@
         `web_site`,
         `details`,
         `join_time`,
-        `is_init`
+        `is_init`,
+        `reward_per`,
+        `have_dele_reward`,
+        `total_dele_reward`
     ) values (
         #{nodeId},
         #{stakingBlockNum},
@@ -32,7 +43,10 @@
         #{webSite},
         #{details},
         #{joinTime},
-        #{isInit}
+        #{isInit},
+        #{delegateRewardPer},
+        @initHaveDeleReward,
+        @initTotalDeleReward
     );
     /*2、node新增或更新*/
     insert into `node` (`node_id`,
@@ -49,7 +63,10 @@
         `details`,
         `join_time`,
         `is_init`,
-        `total_value`
+        `total_value`,
+        `reward_per`,
+        `have_dele_reward`,
+        `total_dele_reward`
     ) values (
         #{nodeId},
         #{stakingBlockNum},
@@ -65,7 +82,10 @@
         #{details},
         #{joinTime},
         #{isInit},
-        #{stakingHes}
+        #{stakingHes},
+        #{delegateRewardPer},
+        @initHaveDeleReward,
+        @initTotalDeleReward
     ) on duplicate key update
         `staking_block_num` =  #{stakingBlockNum},
         `staking_tx_index` = #{stakingTxIndex},
@@ -85,6 +105,9 @@
         `is_consensus` = '2',
         `is_settle` = '2',
         `annualized_rate` = '0',
-        `total_value` = `total_value` + #{stakingHes};
+        `total_value` = `total_value` + #{stakingHes},
+        `reward_per` = #{delegateRewardPer},
+        `have_dele_reward` = @initHaveDeleReward,
+        `total_dele_reward` = @initTotalDeleReward;
   </update>
 </mapper>

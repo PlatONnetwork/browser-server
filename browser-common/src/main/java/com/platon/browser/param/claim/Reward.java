@@ -14,6 +14,7 @@ import java.math.BigInteger;
 @Accessors(chain = true)
 public class Reward {
     private String nodeId;
+    private String nodeName;
     private BigInteger stakingNum;
     private BigDecimal reward;
 }

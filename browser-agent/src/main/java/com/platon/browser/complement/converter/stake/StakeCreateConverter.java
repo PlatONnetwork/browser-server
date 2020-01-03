@@ -58,9 +58,10 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOp
         		.stakingTxIndex(tx.getIndex())
         		.stakingAddr(tx.getFrom())
         		.joinTime(tx.getTime())
-        		.txHash(tx.getHash())               
+        		.txHash(tx.getHash())
+				.delegateRewardPer(txParam.getDelegateRewardPer())
                 .build();
-        
+
         stakeBusinessMapper.create(businessParam);
         
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);

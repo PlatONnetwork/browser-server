@@ -9,7 +9,8 @@
 		`benefit_addr` = #{benefitAddr},
 		`web_site` = #{webSite},
 		`details` = #{details},
-		`is_init` =  #{isInit}
+		`is_init` =  #{isInit},
+		`reward_per` = #{delegateRewardPer}
 	 where `node_id` = #{nodeId} and `staking_block_num` = #{stakingBlockNum};
 	/*2、node 更新*/
 	update `node` set
@@ -18,7 +19,8 @@
 	    `benefit_addr` = #{benefitAddr},
 		`web_site` = #{webSite},
 		`details` = #{details},
-		`is_init` = #{isInit}
+		`is_init` = #{isInit},
+		`reward_per` = #{delegateRewardPer}
 	where `node_id` = #{nodeId};
 </update>
 </mapper>

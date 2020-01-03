@@ -50,6 +50,7 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
         		.details(txParam.getDetails())
         		.isInit(isInit(txParam.getBenefitAddress())) 
         		.stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
+                .delegateRewardPer(txParam.getDelegateRewardPer())
                 .build();
         
         stakeBusinessMapper.modify(businessParam);

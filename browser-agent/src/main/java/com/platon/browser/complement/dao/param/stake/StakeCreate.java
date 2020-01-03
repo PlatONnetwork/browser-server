@@ -51,6 +51,8 @@ public class StakeCreate implements BusinessParam {
     private Date joinTime;
     //质押交易hash
     private String txHash;
+    //委托奖励比例
+    private int delegateRewardPer;
 
     @Override
     public BusinessType getBusinessType() {

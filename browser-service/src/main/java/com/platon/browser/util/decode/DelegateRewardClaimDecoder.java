@@ -35,8 +35,6 @@ class DelegateRewardClaimDecoder {
         String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
         int statusCode = Integer.parseInt(decodedStatus);
 
-        // TODO: 补充领取委托奖励交易输入参数解码逻辑
-
         DelegateRewardClaimParam param = DelegateRewardClaimParam.builder()
                 .rewards(new ArrayList<>())
                 .build();

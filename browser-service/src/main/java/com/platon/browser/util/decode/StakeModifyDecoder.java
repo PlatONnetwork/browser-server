@@ -41,6 +41,7 @@ public class StakeModifyDecoder {
                 .nodeName(nodeName)
                 .website(website)
                 .details(detail)
+                .delegateRewardPer(0/*TODO:需要解析出委托奖励比例*/) // 非必填
                 .build();
     }
 }

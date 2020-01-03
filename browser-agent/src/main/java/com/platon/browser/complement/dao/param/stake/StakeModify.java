@@ -35,6 +35,8 @@ public class StakeModify implements BusinessParam {
     private int isInit;
     //质押所在区块号
     private BigInteger stakingBlockNum;
+    //委托奖励比例
+    private int delegateRewardPer;
 
     @Override
     public BusinessType getBusinessType() {

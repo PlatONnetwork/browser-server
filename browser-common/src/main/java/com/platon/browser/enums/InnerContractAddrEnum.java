@@ -22,6 +22,7 @@ public enum InnerContractAddrEnum {
     PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"治理(提案)合约"),
     INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"激励池合约"),
     NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约");
+    // TODO：添加提取奖励交易的TO内置地址
 
     private String address;
     private String desc;

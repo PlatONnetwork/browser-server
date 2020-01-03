@@ -54,6 +54,7 @@ class StakeCreateDecoder {
                 .details(details)
                 .amount(new BigDecimal(amount))
                 .programVersion(version)
+                .delegateRewardPer(0/*TODO:需要解析出委托奖励比例*/) // 必填
                 .build();
     }
 }

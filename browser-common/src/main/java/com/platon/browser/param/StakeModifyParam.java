@@ -60,4 +60,9 @@ public class StakeModifyParam extends TxParam{
     private BigInteger blockNumber;
 
     private String perNodeName;
+
+    /**
+     * 委托奖励比例
+     */
+    private int delegateRewardPer;
 }

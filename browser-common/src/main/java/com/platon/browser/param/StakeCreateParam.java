@@ -75,4 +75,8 @@ public class StakeCreateParam extends TxParam{
      * blockNumber
      */
     private BigInteger blockNumber;
+    /**
+     * 委托奖励比例
+     */
+    private int delegateRewardPer;
 }
