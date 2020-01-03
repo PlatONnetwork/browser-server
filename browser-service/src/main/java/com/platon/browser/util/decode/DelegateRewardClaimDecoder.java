@@ -2,6 +2,8 @@ package com.platon.browser.util.decode;
 
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
+import com.platon.browser.param.claim.Reward;
+import com.platon.browser.utils.HexTool;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -11,6 +13,7 @@ import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.platon.browser.util.decode.Decoder.bigIntegerResolver;
@@ -33,17 +36,29 @@ class DelegateRewardClaimDecoder {
         int statusCode = Integer.parseInt(decodedStatus);
 
         // TODO: 补充领取委托奖励交易输入参数解码逻辑
+
+        DelegateRewardClaimParam param = DelegateRewardClaimParam.builder()
+                .rewards(new ArrayList<>())
+                .build();
         ((RlpList)RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())
                 .getValues()
                 .get(0))
                 .getValues()
                 .forEach(rl -> {
                     RlpList rlpL = (RlpList)rl;
-                    System.out.println("NodeID="+((RlpString)rlpL.getValues().get(0)).asString());
-                    System.out.println("StakingNum="+((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
-                    System.out.println("Reward="+((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
+
+                    String nodeId = ((RlpString)rlpL.getValues().get(0)).asString();
+                    BigInteger stakingNum = ((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger();
+                    BigInteger amount = ((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger();
+
+                    Reward reward = Reward.builder()
+                            .nodeId(HexTool.prefix(nodeId))
+                            .stakingNum(stakingNum)
+                            .reward(new BigDecimal(amount))
+                            .build();
+                    param.getRewards().add(reward);
                 });
-        return  DelegateRewardClaimParam.builder().build();
+        return param;
     }
 
 

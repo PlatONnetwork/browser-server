@@ -98,6 +98,7 @@ public class CollectionTransaction extends Transaction {
                 break;
             case DELEGATE_CREATE:// 发起委托
             case DELEGATE_EXIT:// 撤销委托
+            case CLAIM_REWARDS: // 领取委托奖励
                 block.setDQty(block.getDQty()+1);
                 break;
             case PROPOSAL_TEXT:// 创建文本提案
