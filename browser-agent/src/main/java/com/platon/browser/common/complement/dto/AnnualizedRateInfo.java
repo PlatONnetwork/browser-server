@@ -10,25 +10,43 @@ import java.util.List;
  * @Description: 年化率信息bean
  */
 public class AnnualizedRateInfo {
-    private List<PeriodValueElement> profit;
-    private List<PeriodValueElement> cost;
+    private List<PeriodValueElement> stakeProfit;
+    private List<PeriodValueElement> stakeCost;
+    private List<PeriodValueElement> delegateProfit;
+    private List<PeriodValueElement> delegateCost;
     private List<SlashInfo> slash;
     public String toJSONString(){return JSON.toJSONString(this);}
 
-    public List<PeriodValueElement> getProfit() {
-        return profit;
+    public List<PeriodValueElement> getStakeProfit() {
+        return stakeProfit;
     }
 
-    public void setProfit(List<PeriodValueElement> profit) {
-        this.profit = profit;
+    public void setStakeProfit(List<PeriodValueElement> stakeProfit) {
+        this.stakeProfit = stakeProfit;
     }
 
-    public List<PeriodValueElement> getCost() {
-        return cost;
+    public List<PeriodValueElement> getStakeCost() {
+        return stakeCost;
     }
 
-    public void setCost(List<PeriodValueElement> cost) {
-        this.cost = cost;
+    public void setStakeCost(List<PeriodValueElement> stakeCost) {
+        this.stakeCost = stakeCost;
+    }
+
+    public List<PeriodValueElement> getDelegateProfit() {
+        return delegateProfit;
+    }
+
+    public void setDelegateProfit(List<PeriodValueElement> delegateProfit) {
+        this.delegateProfit = delegateProfit;
+    }
+
+    public List<PeriodValueElement> getDelegateCost() {
+        return delegateCost;
+    }
+
+    public void setDelegateCost(List<PeriodValueElement> delegateCost) {
+        this.delegateCost = delegateCost;
     }
 
     public List<SlashInfo> getSlash() {

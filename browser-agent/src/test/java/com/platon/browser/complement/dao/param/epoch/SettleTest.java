@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class SettleTest extends AgentTestBase {
 
-    @Test
+   /* @Test
     public void test(){
         Settle target = Settle.builder()
                 .curVerifierList(Collections.emptyList())
@@ -49,6 +49,6 @@ public class SettleTest extends AgentTestBase {
         target.getPreVerifierList();
         target.getBusinessType();
         assertTrue(true);
-    }
+    }*/
 
 }

@@ -161,21 +161,24 @@ public class InitializationService {
             if(StringUtils.isBlank(staking.getNodeName())) staking.setNodeName("platon.node."+(index+1));
 
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
-            List<PeriodValueElement> pveList = new ArrayList<>();
-            PeriodValueElement pve = new PeriodValueElement();
-            pve.setPeriod(0L);
-            pve.setValue(BigDecimal.ZERO);
-            pveList.add(pve);
-            pve=new PeriodValueElement();
-            pve.setPeriod(1L);
-            BigDecimal cost = staking.getStakingLocked() // 锁定的质押金
+            AnnualizedRateInfo ari = new AnnualizedRateInfo();
+            // |- 质押的成本
+            List<PeriodValueElement> stakeCosts = new ArrayList<>();
+            stakeCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
+            BigDecimal stakeCostVal = staking.getStakingLocked() // 锁定的质押金
                     .add(staking.getStakingHes()) // 犹豫期的质押金
                     .add(staking.getStatDelegateHes()) // 犹豫期的委托金
                     .add(staking.getStatDelegateLocked()); // 锁定的委托金
-            pve.setValue(cost);
-            pveList.add(pve);
-            AnnualizedRateInfo ari = new AnnualizedRateInfo();
-            ari.setCost(pveList);
+            stakeCosts.add(new PeriodValueElement().setPeriod(1L).setValue(stakeCostVal));
+            ari.setStakeCost(stakeCosts);
+            // |- 委托的成本
+            List<PeriodValueElement> delegateCosts = new ArrayList<>();
+            delegateCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
+            BigDecimal delegateCostVal = staking.getStatDelegateLocked() // 锁定的委托金
+                    .add(staking.getStatDelegateHes()); // 犹豫期的委托金
+            delegateCosts.add(new PeriodValueElement().setPeriod(1L).setValue(delegateCostVal));
+            ari.setDelegateCost(delegateCosts);
+
             staking.setAnnualizedRateInfo(ari.toJSONString());
             staking.setPredictStakingReward(epochRetryService.getStakeReward());
 

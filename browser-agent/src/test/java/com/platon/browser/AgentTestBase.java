@@ -153,7 +153,7 @@ public class AgentTestBase extends AgentTestData {
         return consensus;
     }
 
-    public Settle settleParam () {
+    /*public Settle settleParam () {
         List <String> curVerifierList = new ArrayList <>();
         curVerifierList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
         curVerifierList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
@@ -170,7 +170,7 @@ public class AgentTestBase extends AgentTestData {
                 .stakingReward(new BigDecimal("100000000000"))
                 .build();
         return settle;
-    }
+    }*/
 
     public Election electionSlashNodeParam () {
         List <Staking> slashNodeList = new ArrayList <>();

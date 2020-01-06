@@ -15,15 +15,17 @@ public class PeriodValueElement {
         return period;
     }
 
-    public void setPeriod(Long period) {
+    public PeriodValueElement setPeriod(Long period) {
         this.period = period;
+        return this;
     }
 
     public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(BigDecimal value) {
+    public PeriodValueElement setValue(BigDecimal value) {
         this.value = value;
+        return this;
     }
 }

@@ -10,6 +10,7 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -47,41 +48,6 @@ public class CalculateUtils {
 	public static Long calculateNextSetting(BigInteger settlePeriodBlockCount, BigInteger curSettingEpoch, BigInteger curBlockNumber) {
 		return settlePeriodBlockCount.multiply(curSettingEpoch).subtract(curBlockNumber).longValue();
 	}
-	  
-	/**
-	 * 年化率计算
-	 * @param ari 年化率信息
-	 * @param chainConfig 链配置
-	 * @return
-	 */
-    public static BigDecimal calculateAnnualizedRate(AnnualizedRateInfo ari, BlockChainConfig chainConfig){
-		ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-		ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-        // 最新利润累计
-		PeriodValueElement last=ari.getProfit().get(0);
-		// 最旧利润累计
-		PeriodValueElement first=ari.getProfit().get(ari.getProfit().size()-1);
-		// 利润=最新的收益累计-最旧的收益收益累计
-		BigDecimal profitSum=last.getValue().subtract(first.getValue()).abs();
-
-		BigDecimal costSum=BigDecimal.ZERO;
-		for (PeriodValueElement cost : ari.getCost()) {
-			// 跳过大于利润所在最大结算周期的成本周期
-			if(cost.getPeriod()>last.getPeriod()) continue;
-			costSum = costSum.add(cost.getValue());
-		}
-        
-        if(costSum.compareTo(BigDecimal.ZERO)==0) {
-            return BigDecimal.ZERO;
-        }
-
-        // 年化率=(利润/成本)x每个增发周期的结算周期数x100
-        BigDecimal rate = profitSum
-                .divide(costSum,16,RoundingMode.FLOOR) // 除总成本
-                .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
-                .multiply(BigDecimal.valueOf(100));
-        return rate.setScale(2,RoundingMode.FLOOR);
-    }
 
 	public static BigDecimal calculationIssueValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
 		Map <Integer, BigDecimal> subsidiesMap = chainConfig.getFoundationSubsidies();
@@ -126,52 +92,89 @@ public class CalculateUtils {
 	}
 
 	/**
-	 * 轮换记录利润
-	 * @param staking
+	 * 轮换利润
+	 * @param profits 利润列表
+	 * @param curSettleProfit 当前结算周期的业务【质押/委托】利润
+	 * @param curSettleEpoch 当前结算周期轮数
+	 * @param chainConfig 链配置
 	 */
-	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig chainConfig)  {
+	public static void rotateProfit(List<PeriodValueElement> profits,BigDecimal curSettleProfit,BigInteger curSettleEpoch,BlockChainConfig chainConfig)  {
 		// 添加上一周期的收益
-		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
-		if(curSettingEpoch.longValue()==0) profit=BigDecimal.ZERO;
+		if(curSettleEpoch.longValue()==0) curSettleProfit=BigDecimal.ZERO; // 如果当前结算周期是0则利润为0
 		PeriodValueElement pve = new PeriodValueElement();
-		pve.setPeriod(curSettingEpoch.longValue());
-		pve.setValue(profit);
-		ari.getProfit().add(pve);
+		pve.setPeriod(curSettleEpoch.longValue());
+		pve.setValue(curSettleProfit);
+		profits.add(pve);
 		// +1: 保留指定周期数中最旧周期的前一周期收益，用作收益计算参考点
-		if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
+		if(profits.size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
 			// 按结算周期由大到小排序
-			ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+			profits.sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
 			// 删除多余的元素, +1:保留指定周期数中最旧周期的前一周期收益，用作收益计算参考点
-			for (int i=ari.getProfit().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getProfit().remove(i);
+			// 从后往前删除，防止出错
+			for (int i=profits.size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) profits.remove(i);
 		}
 	}
 
 	/**
-	 * 轮换记录成本
-	 * @param staking
-	 * @param curSettingEpoch
-	 * @param ari
-	 * @param chainConfig
+	 * 轮换成本
+	 * @param costs 成本列表
+	 * @param curSettleCost 当前结算周期的业务【质押/委托】成本
+	 * @param curSettleEpoch 当前结算周期轮数
+	 * @param chainConfig 链配置
 	 */
-	public static void rotateCost(Staking staking,BigInteger curSettingEpoch,AnnualizedRateInfo ari,BlockChainConfig chainConfig) {
+	public static void rotateCost(List<PeriodValueElement> costs,BigDecimal curSettleCost,BigInteger curSettleEpoch,BlockChainConfig chainConfig) {
 		// 添加下一周期的质押成本
-		//
-		BigDecimal cost = staking.getStakingLocked() // 锁定的质押金
-				.add(staking.getStakingHes()) // 犹豫期的质押金
-				.add(staking.getStatDelegateHes()) // 犹豫期的委托金
-				.add(staking.getStatDelegateLocked()); // 锁定的委托金
-		if(curSettingEpoch.longValue()==0) cost=BigDecimal.ZERO;
+		if(curSettleEpoch.longValue()==0) curSettleCost=BigDecimal.ZERO; // 如果当前结算周期是0则成本为0
 		PeriodValueElement pve = new PeriodValueElement();
-		pve.setPeriod(curSettingEpoch.longValue());
-		pve.setValue(cost);
-		ari.getCost().add(pve);
+		pve.setPeriod(curSettleEpoch.longValue());
+		pve.setValue(curSettleCost);
+		costs.add(pve);
 		// 保留指定数量最新的记录
-		if(ari.getCost().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
+		if(costs.size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
 			// 按结算周期由大到小排序
-			ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+			costs.sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
 			// 删除多余的元素
-			for (int i=ari.getCost().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
+			for (int i=costs.size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) costs.remove(i);
 		}
+	}
+
+	/**
+	 * 计算年化率
+	 * @param profits 利润列表
+	 * @param costs 成本列表
+	 * @param chainConfig 链配置
+	 * @return
+	 */
+	public static BigDecimal calculateAnnualizedRate(
+			List<PeriodValueElement> profits,
+			List<PeriodValueElement> costs,
+			BlockChainConfig chainConfig){
+		profits.sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+		costs.sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+		// 最新利润累计
+		PeriodValueElement last=profits.get(0);
+		// 最旧利润累计
+		PeriodValueElement first=profits.get(profits.size()-1);
+		// 利润=最新的收益累计-最旧的收益收益累计
+		BigDecimal profitSum=last.getValue().subtract(first.getValue()).abs();
+
+		BigDecimal costSum=BigDecimal.ZERO;
+		for (PeriodValueElement cost : costs) {
+			// 跳过大于利润所在最大结算周期的成本周期
+			if(cost.getPeriod()>last.getPeriod()) continue;
+			costSum = costSum.add(cost.getValue());
+		}
+
+		if(costSum.compareTo(BigDecimal.ZERO)==0) {
+			return BigDecimal.ZERO;
+		}
+
+		// 年化率=(利润/成本)x每个增发周期的结算周期数x100
+		BigDecimal rate = profitSum
+				.divide(costSum,16,RoundingMode.FLOOR) // 除总成本
+				.multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
+				.multiply(BigDecimal.valueOf(100));
+		return rate.setScale(2,RoundingMode.FLOOR);
 	}
 
 }

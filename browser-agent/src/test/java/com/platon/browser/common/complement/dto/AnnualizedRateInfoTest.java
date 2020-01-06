@@ -43,8 +43,8 @@ public class AnnualizedRateInfoTest {
         List<SlashInfo> slashList = new ArrayList <>();
         slashList.add(slash);
         AnnualizedRateInfo annualizedRateInfo = new AnnualizedRateInfo();
-        annualizedRateInfo.setCost(profitList);
-        annualizedRateInfo.setProfit(costList);
+        annualizedRateInfo.setStakeCost(profitList);
+        annualizedRateInfo.setStakeProfit(costList);
         annualizedRateInfo.setSlash(slashList);
 
     }

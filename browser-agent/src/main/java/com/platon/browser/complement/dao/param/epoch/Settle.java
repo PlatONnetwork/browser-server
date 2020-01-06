@@ -1,7 +1,7 @@
 package com.platon.browser.complement.dao.param.epoch;
 
-import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
+import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.dao.entity.Staking;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Auther: dongqile
@@ -20,9 +21,9 @@ import java.util.List;
 @Accessors(chain = true)
 public class Settle implements BusinessParam {
     //当前结算周期验证人
-    private List<String> curVerifierList;
+    private Set<String> curVerifierSet;
     //上轮结算周期验证人
-    private List<String> preVerifierList;
+    private Set<String> preVerifierSet;
     //质押奖励(von)
     private BigDecimal stakingReward;
     //结算周期
