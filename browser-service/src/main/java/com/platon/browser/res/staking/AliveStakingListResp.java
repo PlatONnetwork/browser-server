@@ -26,7 +26,7 @@ public class AliveStakingListResp {
 	private String expectedIncome;    //预计年收化率（从验证人加入时刻开始计算）
 	private Boolean isRecommend;     //是否官方推荐
 	private Boolean isInit;          //是否为初始节点 
-	private String deleAnnualizedRate;  //预计质押年化率（从验证人加入时刻开始计算）
+	private String deleAnnualizedRate;  //预计委托年化率（从验证人加入时刻开始计算）
 	public Integer getRanking() {
 		return ranking;
 	}

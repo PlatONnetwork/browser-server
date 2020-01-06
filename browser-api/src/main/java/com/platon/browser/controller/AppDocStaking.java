@@ -197,10 +197,11 @@ public interface AppDocStaking {
      *       "statDelegateReduction":"",//待提取的委托
      *       "isInit":true,           //是否为初始节点 
      *       "rewardPer":"",           //委托奖励比例
-     *       "haveReward":true,           //已领取奖励
+     *       "haveDeleReward":true,           //已领取委托奖励
      *       "deleAnnualizedRate":"",    //预计委托年化率
-     *       "deleReward":"",    //累积委托奖励
+     *       "totalDeleReward":"",    //累积委托奖励
      *       "deleAnnualizedRate":"",    //预计委托年化率
+     *       "deleRewardRed":""    //待领取委托奖励
      *    }
      * }
      */	
@@ -244,7 +245,9 @@ public interface AppDocStaking {
      *         "amount":"" , //处罚金额
      *         "isFire":"", //是否踢出列表  0-否，1-是
      *         "version":"" ,//版本号
-     *         "proposalType":""   //提案类型 
+     *         "proposalType":"",  //提案类型 
+     *         "beforeRate":"", //原委托奖励比例
+     *         "afterRate":"" //修改后委托奖励比例
      *      }
      *   ]
      * }

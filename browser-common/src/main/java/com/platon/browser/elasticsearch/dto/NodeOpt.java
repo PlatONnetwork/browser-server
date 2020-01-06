@@ -32,7 +32,7 @@ public class NodeOpt {
      */
     public enum TypeEnum{
         CREATE("1", "创建",""),
-        MODIFY("2", "修改",""),
+        MODIFY("2", "修改","BEFORERATE|AFTERRATE"),
         QUIT("3", "退出",""),
         PROPOSALS("4", "提案","ID|TITLE|TYPE|VERSION"),
         PARAMETER("9", "参数提案","ID|TITLE|TYPE|MODULE|NAME|VALUE"),

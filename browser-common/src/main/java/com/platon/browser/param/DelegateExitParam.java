@@ -42,6 +42,10 @@ public class DelegateExitParam extends TxParam{
      * 真正减持的委托金额(按照最小单位算，1LAT = 10**18 von)
      */
     private BigDecimal realAmount;
+    /**
+     * 委托金额对应的奖励数(按照最小单位算，1LAT = 10**18 von)
+     */
+    private BigDecimal reward;
 
     /**
      * 被质押节点的名称(有长度限制，表示该节点的名称)

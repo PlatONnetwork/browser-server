@@ -39,6 +39,11 @@ public class StakingDetailsResp {
     private BigDecimal statDelegateReduction;//待提取的委托
     private Long leaveTime;  //退出时间
     private Boolean isInit;          //是否为初始节点 
+    private String deleAnnualizedRate;      //预计委托年收化率（从委托开始计算）
+    private String rewardPer;      //委托奖励比例
+    private BigDecimal haveDeleReward;      //节点当前质押已领取委托奖励
+    private BigDecimal totalDeleReward;      //节点当前质押累积委托奖励
+    private BigDecimal deleRewardRed;      //节点当前质押待领取委托奖励
 	public String getNodeName() {
 		return nodeName;
 	}
@@ -199,6 +204,36 @@ public class StakingDetailsResp {
 	}
 	public void setExternalUrl(String externalUrl) {
 		this.externalUrl = externalUrl;
+	}
+	public String getDeleAnnualizedRate() {
+		return deleAnnualizedRate;
+	}
+	public void setDeleAnnualizedRate(String deleAnnualizedRate) {
+		this.deleAnnualizedRate = deleAnnualizedRate;
+	}
+	public String getRewardPer() {
+		return rewardPer;
+	}
+	public void setRewardPer(String rewardPer) {
+		this.rewardPer = rewardPer;
+	}
+	public BigDecimal getHaveDeleReward() {
+		return haveDeleReward;
+	}
+	public void setHaveDeleReward(BigDecimal haveDeleReward) {
+		this.haveDeleReward = haveDeleReward;
+	}
+	public BigDecimal getTotalDeleReward() {
+		return totalDeleReward;
+	}
+	public void setTotalDeleReward(BigDecimal totalDeleReward) {
+		this.totalDeleReward = totalDeleReward;
+	}
+	public BigDecimal getDeleRewardRed() {
+		return deleRewardRed;
+	}
+	public void setDeleRewardRed(BigDecimal deleRewardRed) {
+		this.deleRewardRed = deleRewardRed;
 	}
     
 }

@@ -11,15 +11,17 @@ import java.util.Date;
 public class DelegationReward {
     private String hash;
     private String addr;
-    private String nodeName;
-    private String nodeId;
-    private String reward;
     private Date time;
     private Date creTime;
     private Date updTime;
     private String extra;
-
-    /********把字符串类数值转换为大浮点数的便捷方法********/
-    public BigDecimal decimalReward(){return new BigDecimal(this.getReward());}
-
+    
+    @Data
+    public class Extra {
+	    private String nodeName;
+	    private String nodeId;
+	    private String reward;
+	    /********把字符串类数值转换为大浮点数的便捷方法********/
+	    public BigDecimal decimalReward(){return new BigDecimal(this.getReward());}
+    }
 }

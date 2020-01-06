@@ -266,7 +266,7 @@ public interface AppDocTransaction {
      *       "pipNum":"",//提案pip编号
      *       "proposalStatus":"",//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
      *       "proposalTitle":"",//提案标题
-     *       "txAmount" : "", //交易金额包括质押数量
+     *       "txAmount" : "", //交易金额包括质押数量、提取数量
      *       "voteStatus":"",      //投票选项 1:支持  2:反对 3:弃权
      *       "delegationRatio":"",//委托比例
      *       "rewards":[             //领取奖励
@@ -303,7 +303,7 @@ public interface AppDocTransaction {
      * {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
-     *    "data":{
+     *    "data":[{
      *       "txHash":"0x234234",      //交易hash
      *       "allRewards":"",//总奖励
      *       "timestamp":123123879,    //交易时间
@@ -314,7 +314,7 @@ public interface AppDocTransaction {
      *             "reward":""       //领取的奖励
      *          }
      *        ]
-     * }
+     * }]
      * 
      */
 	@ApiOperation(value = "transaction/queryClaimByAddress", nickname = "", notes = "", response = QueryClaimByAddressResp.class, tags = { "Transaction" })

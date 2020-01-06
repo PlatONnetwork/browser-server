@@ -176,6 +176,7 @@ public class StakingServiceImpl implements StakingService {
 			String totalValue = stakings.get(i).getStakingHes().add(stakings.get(i).getStakingLocked())
 					.add(stakings.get(i).getStatDelegateValue()).toString();
 			aliveStakingListResp.setTotalValue(totalValue);
+			aliveStakingListResp.setDeleAnnualizedRate(stakings.get(i).getDeleAnnualizedRate().toString());
 			lists.add(aliveStakingListResp);
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
@@ -252,6 +253,12 @@ public class StakingServiceImpl implements StakingService {
 			resp.setJoinTime(stakingNode.getJoinTime().getTime());
 			resp.setDenefitAddr(stakingNode.getBenefitAddr());
 			resp.setStakingIcon(stakingNode.getNodeIcon());
+			resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
+			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(new BigDecimal(10000)).toString());
+			/**
+			 * 待领取奖励等于 累积委托奖励减去已领取委托奖励
+			 */
+			resp.setDeleRewardRed(stakingNode.getTotalDeleReward().subtract(stakingNode.getHaveDeleReward()));
 			/** 只有不是内置节点才计算年化率  */
 			if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
 				resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
@@ -333,6 +340,14 @@ public class StakingServiceImpl implements StakingService {
 				String[] desces = nodeOpt.getDesc().split(BrowserConst.OPT_SPILT);
 				/** 根据不同类型组合返回 */
 				switch (NodeOpt.TypeEnum.getEnum(String.valueOf(nodeOpt.getType()))) {
+					/**
+					 *修改验证人
+					 */
+					case MODIFY:
+						if(desces.length > 1) {
+							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(new BigDecimal(10000)).toString());
+							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(new BigDecimal(10000)).toString());
+						}
 					/** 提案类型 */
 					case PROPOSALS:
 						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);

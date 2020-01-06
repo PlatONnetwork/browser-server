@@ -1,6 +1,7 @@
 package com.platon.browser.now.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
@@ -14,8 +15,11 @@ import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
+import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.DelegationReward.Extra;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -27,6 +31,7 @@ import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.param.*;
+import com.platon.browser.param.claim.Reward;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
@@ -38,6 +43,7 @@ import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
+import com.platon.browser.res.transaction.TransactionDetailsRewardsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.*;
 import com.platon.browser.utils.HexTool;
@@ -80,6 +86,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
     @Autowired
     private TransactionESRepository transactionESRepository;
+    @Autowired
+    private DelegationRewardESRepository delegationRewardESRepository;
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -273,8 +281,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDetailsResp transactionDetails( TransactionDetailsReq req) {
     	/** 根据hash查询具体的交易数据 */
-		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
 		Transaction transaction = null;
 		try {
 			transaction = transactionESRepository.get(req.getTxHash(), Transaction.class);
@@ -333,7 +339,7 @@ public class TransactionServiceImpl implements TransactionService {
     			/** 
     			 * 根据id查询是否有上一条数据交易数据 
     			*/
-        		constructor = new ESQueryBuilderConstructor();
+    			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         		constructor.must(new ESQueryBuilders().term("id", transaction.getId()-1));
         		ESResult<Transaction> first = new ESResult<>();
         		try {
@@ -348,7 +354,7 @@ public class TransactionServiceImpl implements TransactionService {
     		/**
     		 *  根据id查询是否有下一条
     		 * */
-    		constructor = new ESQueryBuilderConstructor();
+    		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
     		constructor.must(new ESQueryBuilders().term("id", transaction.getId()+1));
     		ESResult<Transaction> last = new ESResult<>();
     		try {
@@ -364,7 +370,6 @@ public class TransactionServiceImpl implements TransactionService {
     		String txInfo = transaction.getInfo();
     		/** 根据不同交易类型判断逻辑 */
     		if(StringUtils.isNotBlank(txInfo) || (!"null".equals(txInfo))) {
-    			//TODO 创建验证人、编辑验证人增加比例。增加交易领取奖励
 	    		switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
 		    		/** 创建验证人 */
 					case STAKE_CREATE:
@@ -378,6 +383,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
 						resp.setTxAmount(createValidatorParam.getAmount());
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
+						resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(new BigDecimal(10000)).toString());
 						break;
 					/**
 					 * 编辑验证人
@@ -391,6 +397,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setDetails(editValidatorParam.getDetails());
 						resp.setNodeName(commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
 						resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
+						resp.setDelegationRatio(new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(new BigDecimal(10000)).toString());
 						break;
 					/**
 					 * 增加质押
@@ -457,7 +464,7 @@ public class TransactionServiceImpl implements TransactionService {
 						DelegateExitParam unDelegateParam = JSON.parseObject(txInfo, DelegateExitParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
 						resp.setApplyAmount(unDelegateParam.getAmount());
-						resp.setTxAmount(unDelegateParam.getAmount());
+						resp.setTxAmount(unDelegateParam.getReward());
 						resp.setNodeName(commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						break;
 						/**
@@ -601,6 +608,17 @@ public class TransactionServiceImpl implements TransactionService {
 						 * 领取奖励
 						 */
 					case CLAIM_REWARDS:
+						DelegateRewardClaimParam delegateRewardClaimParam  = JSON.parseObject(txInfo, DelegateRewardClaimParam.class);
+						List<TransactionDetailsRewardsResp> rewards = new ArrayList<>();
+						for(Reward reward:delegateRewardClaimParam.getRewards()) {
+							TransactionDetailsRewardsResp transactionDetailsRewardsResp = new TransactionDetailsRewardsResp();
+							transactionDetailsRewardsResp.setVerify(reward.getNodeId());
+							transactionDetailsRewardsResp.setNodeName(reward.getNodeName());
+							transactionDetailsRewardsResp.setReward(reward.getReward());
+							rewards.add(transactionDetailsRewardsResp);
+						}
+						resp.setRewards(rewards);
+						break;
 				default:
 					break;
 				}
@@ -683,8 +701,47 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public RespPage<QueryClaimByAddressResp> queryClaimByAddress(TransactionListByAddressRequest req) {
-		// TODO Auto-generated method stub
-		return null;
+		/** 根据地址查询具体的领取奖励数据 */
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("addr", req.getAddress()));
+		ESResult<DelegationReward> delegationRewards = null;
+		try {
+			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
+		} catch (IOException e) {
+			logger.error(ERROR_TIPS, e);
+		}
+		List<QueryClaimByAddressResp> queryClaimByAddressResps = new ArrayList<>();
+		for(DelegationReward delegationReward:delegationRewards.getRsData()) {
+			QueryClaimByAddressResp queryClaimByAddressResp = new QueryClaimByAddressResp();
+			queryClaimByAddressResp.setTxHash(delegationReward.getHash());
+			queryClaimByAddressResp.setTimestamp(delegationReward.getTime().getTime());
+			List<TransactionDetailsRewardsResp> rewardsDetails = new ArrayList<>();
+			/**
+			 * 解析json获取具体提取奖励的数据
+			 */
+			List<Extra> extras = JSONObject.parseArray(delegationReward.getExtra(), DelegationReward.Extra.class);
+			BigDecimal allRewards = BigDecimal.ZERO;
+			/**
+			 * 设置每一个领取奖励从哪个节点上获取
+			 */
+			for(Extra extra : extras) {
+				TransactionDetailsRewardsResp transactionDetailsRewardsResp = new TransactionDetailsRewardsResp();
+				transactionDetailsRewardsResp.setVerify(extra.getNodeId());
+				transactionDetailsRewardsResp.setNodeName(extra.getNodeName());
+				transactionDetailsRewardsResp.setReward(new BigDecimal(extra.getReward()));
+				allRewards = allRewards.add(new BigDecimal(extra.getReward()));
+				rewardsDetails.add(transactionDetailsRewardsResp);
+			}
+			/**
+			 * 根据交易累加所有的奖励
+			 */
+			queryClaimByAddressResp.setAllRewards(allRewards);
+			queryClaimByAddressResps.add(queryClaimByAddressResp);
+		}
+		
+		RespPage<QueryClaimByAddressResp> result = new RespPage<>();
+		result.init(queryClaimByAddressResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
+		return result;
 	}
 
 	@Override

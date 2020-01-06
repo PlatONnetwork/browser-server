@@ -27,6 +27,8 @@ public class StakingOptRecordListResp {
     private Integer isFire;  //是否踢出列表  0-否，1-是
     private String version;  //版本号
     private String proposalType;  //提案类型  1：文本提案； 2：升级提案；  3参数提案。
+    private String beforeRate; //原委托奖励比例
+    private String afterRate; //修改后委托奖励比例
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -106,6 +108,18 @@ public class StakingOptRecordListResp {
 	}
 	public void setProposalType(String proposalType) {
 		this.proposalType = proposalType;
+	}
+	public String getBeforeRate() {
+		return beforeRate;
+	}
+	public void setBeforeRate(String beforeRate) {
+		this.beforeRate = beforeRate;
+	}
+	public String getAfterRate() {
+		return afterRate;
+	}
+	public void setAfterRate(String afterRate) {
+		this.afterRate = afterRate;
 	}
     
 }
