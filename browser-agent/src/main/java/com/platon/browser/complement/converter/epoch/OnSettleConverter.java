@@ -86,9 +86,7 @@ public class OnSettleConverter {
 
             // 设置当前质押的总委托奖励，从节点上取出来的委托总奖励就是当前质押获取的总委托奖励
             Node node = preVerifierMap.get(staking.getNodeId());
-            staking.setTotalDeleReward(new BigDecimal(node.getDelegateRewardTotal()));
-            // 当前结算周期奖励分成比例
-            staking.setRewardPer(node.getRewardPer().intValue());
+            if(node!=null) staking.setTotalDeleReward(new BigDecimal(node.getDelegateRewardTotal()));
 
             // 计算节点质押年化率
             calcStakeAnnualizedRate(staking,curSettleStakeReward,settle);
