@@ -43,7 +43,7 @@ public class ComplementEventHandlerTest extends AgentTestBase {
         target.onEvent(event,33,false);
         verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
 
-        doThrow(new RuntimeException("")).when(persistenceEventPublisher).publish(any(),anyList(),anyList());
+        doThrow(new RuntimeException("")).when(persistenceEventPublisher).publish(any(),anyList(),anyList(),anyList());
         target.onEvent(event,33,false);
     }
 }

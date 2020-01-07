@@ -1,20 +1,26 @@
 package com.platon.browser.complement.converter.delegate;
 
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @description: 领取委托奖励业务参数转换器
@@ -23,7 +29,7 @@ import java.util.ArrayList;
  **/
 @Slf4j
 @Service
-public class DelegateRewardClaimConverter extends BusinessParamConverter<DelegateRewardClaim> {
+public class DelegateRewardClaimConverter extends BusinessParamConverter<DelegationReward> {
 	
     @Autowired
     private AddressMapper addressMapper;
@@ -33,9 +39,11 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
     private NodeMapper nodeMapper;
     @Autowired
     private DelegateBusinessMapper delegateBusinessMapper;
+    @Autowired
+    private AddressCache addressCache;
 
     @Override
-    public DelegateRewardClaim convert(CollectionEvent event, Transaction tx) {
+    public DelegationReward convert(CollectionEvent event, Transaction tx) {
         // 发起委托
         DelegateRewardClaimParam txParam = tx.getTxParam(DelegateRewardClaimParam.class);
         // 补充节点名称
@@ -45,14 +53,38 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
 
         long startTime = System.currentTimeMillis();
 
-        // TODO: 从交易中解析并抽取入库参数：更改address表、node表、staking表
         DelegateRewardClaim businessParam= DelegateRewardClaim.builder()
-                .reward(txParam.getRewards())
+                .address(tx.getFrom()) // 领取者地址
+                .rewardList(txParam.getRewardList()) // 领取的奖励列表
                 .build();
+
+        addressCache.update(businessParam);
 
         delegateBusinessMapper.claim(businessParam);
 
+        DelegationReward delegationReward = new DelegationReward();
+        delegationReward.setHash(tx.getHash());
+        delegationReward.setAddr(tx.getFrom());
+        delegationReward.setTime(tx.getTime());
+        delegationReward.setCreTime(new Date());
+        delegationReward.setUpdTime(new Date());
+
+        List<DelegationReward.Extra> extraList = new ArrayList<>();
+        businessParam.getRewardList().forEach(reward -> {
+            DelegationReward.Extra extra = new DelegationReward.Extra();
+            extra.setNodeId(reward.getNodeId());
+            String nodeName = "Unknown";
+            try {
+                nodeName = nodeCache.getNode(reward.getNodeId()).getNodeName();
+            } catch (NoSuchBeanException e) {
+                e.printStackTrace();
+            }
+            extra.setNodeName(nodeName);
+            extra.setReward(reward.getReward().toString());
+        });
+        delegationReward.setExtra(JSON.toJSONString(extraList));
+
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
-        return businessParam;
+        return delegationReward;
     }
 }

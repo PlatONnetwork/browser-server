@@ -7,6 +7,7 @@ import com.platon.browser.common.service.redis.RedisImportService;
 import com.platon.browser.common.utils.BakDataDeleteUtil;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.persistence.queue.event.PersistenceEvent;
@@ -49,18 +50,21 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private Set<Block> blockStage = new HashSet<>();
     private Set<Transaction> transactionStage = new HashSet<>();
     private Set<NodeOpt> nodeOptStage = new HashSet<>();
+    private Set<DelegationReward> delegationRewardStage = new HashSet<>();
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "PersistenceEventHandler")
     public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        log.debug("PersistenceEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
+        log.debug("PersistenceEvent处理:{}(event(block({}),transactions({}),nodeOpts({}),delegateRewards({})),sequence({}),endOfBatch({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),
+                event.getNodeOpts().size(),event.getDelegationRewards().size(),sequence,endOfBatch);
         try {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
             nodeOptStage.addAll(event.getNodeOpts());
+            delegationRewardStage.addAll(event.getDelegationRewards());
 
             // 把区块的交易列表属性置为null,防止把交易信息存储到区块信息中
             event.getBlock().setTransactions(null);
@@ -72,7 +76,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             }
 
             // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(blockStage,transactionStage,nodeOptStage);
+            esImportService.batchImport(blockStage,transactionStage,nodeOptStage,delegationRewardStage);
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             statistics.add(networkStatCache.getNetworkStat());
@@ -80,6 +84,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             blockStage.clear();
             transactionStage.clear();
             nodeOptStage.clear();
+            delegationRewardStage.clear();
 
             // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
             Long txMaxId = 0L;

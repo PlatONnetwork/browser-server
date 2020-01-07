@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -21,7 +22,9 @@ import java.util.List;
 @Accessors(chain = true)
 public class DelegateRewardClaim implements BusinessParam {
     // 奖励信息列表
-    private List<Reward> reward;
+    private List<Reward> rewardList;
+    // 领取者地址
+    private String address;
 
     @Override
     public BusinessType getBusinessType() {

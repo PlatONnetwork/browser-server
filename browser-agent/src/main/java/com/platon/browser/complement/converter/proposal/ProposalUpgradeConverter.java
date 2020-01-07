@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Optional;
 
 /**
  * @description: 委托业务参数转换器
@@ -27,7 +26,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class ProposalUpgradeConverter extends BusinessParamConverter<NodeOpt> {
 
     @Autowired
     private BlockChainConfig chainConfig;
@@ -37,12 +36,12 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
     private NetworkStatCache networkStatCache;
 	
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
 		ProposalUpgradeParam txParam = tx.getTxParam(ProposalUpgradeParam.class);
 		// 补充节点名称
 		updateTxInfo(txParam,tx);
 		// 失败的交易不分析业务数据
-		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
 		BigInteger voteNum = RoundCalculation.endBlockNumCal(tx.getNum().toString(),txParam.getEndVotingRound(),chainConfig).toBigInteger();
 		long startTime = System.currentTimeMillis();
@@ -84,6 +83,6 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

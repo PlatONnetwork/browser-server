@@ -23,7 +23,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
 
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
@@ -31,13 +31,13 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>
     private NetworkStatCache networkStatCache;
 	
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
         // 撤销质押
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         // 补充节点名称
         updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -70,6 +70,6 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>
         nodeOpt.setTime(tx.getTime());
 
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

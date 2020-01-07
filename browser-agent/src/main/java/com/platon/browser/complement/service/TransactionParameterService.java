@@ -3,6 +3,8 @@ package com.platon.browser.complement.service;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.bean.DelegateExitResult;
+import com.platon.browser.complement.bean.TxAnalyseResult;
 import com.platon.browser.complement.converter.delegate.DelegateCreateConverter;
 import com.platon.browser.complement.converter.delegate.DelegateExitConverter;
 import com.platon.browser.complement.converter.delegate.DelegateRewardClaimConverter;
@@ -14,6 +16,7 @@ import com.platon.browser.complement.converter.stake.StakeExitConverter;
 import com.platon.browser.complement.converter.stake.StakeIncreaseConverter;
 import com.platon.browser.complement.converter.stake.StakeModifyConverter;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
@@ -77,13 +80,17 @@ public class TransactionParameterService {
      * @param event
      * @return
      */
-    public List<NodeOpt> getParameters(CollectionEvent event){
+    public TxAnalyseResult getParameters(CollectionEvent event){
         long startTime = System.currentTimeMillis();
 
-        List<Transaction> transactions = event.getTransactions();
-        List<NodeOpt> nodeOptList = new ArrayList<>();
+        TxAnalyseResult tar = TxAnalyseResult.builder()
+                .nodeOptList(new ArrayList<>())
+                .delegationRewardList(new ArrayList<>())
+                .build();
 
-        if(event.getBlock().getNum()==0) return nodeOptList;
+        List<Transaction> transactions = event.getTransactions();
+
+        if(event.getBlock().getNum()==0) return tar;
 
         int proposalQty = 0;
 
@@ -91,7 +98,8 @@ public class TransactionParameterService {
         	addressCache.update(tx);
             try{
                 // 调用交易分析引擎分析交易，以补充相关数据
-                Optional<NodeOpt> nodeOpt = Optional.ofNullable(null);
+                NodeOpt nodeOpt = null;
+                DelegationReward delegationReward = null;
                 switch (tx.getTypeEnum()) {
                     case STAKE_CREATE: // 1000 创建验证人
                     	nodeOpt = stakeCreateConverter.convert(event,tx);
@@ -109,7 +117,8 @@ public class TransactionParameterService {
                     	delegateCreateConverter.convert(event,tx);
                         break;
                     case DELEGATE_EXIT: // 1005
-                    	delegateExitConverter.convert(event,tx);
+                    	DelegateExitResult der = delegateExitConverter.convert(event,tx);
+                    	delegationReward=der.getDelegationReward();
                         break;
                     case PROPOSAL_TEXT: // 2000
                     	nodeOpt = proposalTextConverter.convert(event,tx);
@@ -148,15 +157,13 @@ public class TransactionParameterService {
                     	restrictingCreateConverter.convert(event,tx);
                         break;
                     case CLAIM_REWARDS: // 5000
-                        // TODO：领取委托奖励交易参数解析
-                        delegateRewardClaimConverter.convert(event,tx);
+                        delegationReward = delegateRewardClaimConverter.convert(event,tx);
                         break;
                     default:
                         break;
                 }
-                
-                nodeOpt.ifPresent(nodeOptList::add);
-                
+                if(nodeOpt!=null) tar.getNodeOptList().add(nodeOpt);
+                if(delegationReward!=null) tar.getDelegationRewardList().add(delegationReward);
             }catch (BusinessException | NoSuchBeanException e){
                 log.debug("",e);
             }
@@ -166,13 +173,13 @@ public class TransactionParameterService {
         Block block = event.getBlock();
         // 如果当前区块号与前一个一样，证明这是重复处理的块(例如:某部分业务处理失败，由于重试机制进来此处)
         // 防止重复计算
-        if(block.getNum()==preBlockNumber) return nodeOptList;
+        if(block.getNum()==preBlockNumber) return tar;
         networkStatCache.updateByBlock(event.getBlock(), proposalQty);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
         preBlockNumber=block.getNum();
 
-        return nodeOptList;
+        return tar;
     }
 }

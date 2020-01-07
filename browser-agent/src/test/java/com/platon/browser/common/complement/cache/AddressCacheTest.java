@@ -19,7 +19,7 @@ public class AddressCacheTest extends AgentTestBase {
     @Test
     public void test(){
         addressCache.init(new ArrayList<>(addressList));
-        addressCache.initOnFrist();
+        addressCache.initOnFirstStart();
         addressCache.update(transactionList.get(0));
         addressCache.getAll();
         addressCache.cleanAll();

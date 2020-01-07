@@ -17,7 +17,7 @@ public class DelegationReward {
     private String extra;
     
     @Data
-    public class Extra {
+    public static class Extra {
 	    private String nodeName;
 	    private String nodeId;
 	    private String reward;

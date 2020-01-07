@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 
 
 /**
@@ -26,7 +25,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
 	
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
@@ -34,9 +33,9 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOp
     private NetworkStatCache networkStatCache;
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
 		// 失败的交易不分析业务数据
-		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
 		long startTime = System.currentTimeMillis();
 
@@ -76,6 +75,6 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOp
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

@@ -27,7 +27,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class ReportConverter extends BusinessParamConverter<NodeOpt> {
 	
     @Autowired
     private BlockChainConfig chainConfig;
@@ -40,13 +40,13 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
     private NetworkStatCache networkStatCache;
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
-        if(null==txParam) return Optional.ofNullable(null);
+        if(null==txParam) return null;
         updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -104,6 +104,6 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

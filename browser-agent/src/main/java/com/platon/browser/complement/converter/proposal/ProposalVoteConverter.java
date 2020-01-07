@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * @description: 委托业务参数转换器
@@ -27,7 +26,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class ProposalVoteConverter extends BusinessParamConverter<NodeOpt> {
 	
     @Autowired
     private ProposalBusinessMapper proposalBusinessMapper;
@@ -38,7 +37,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
         ProposalVoteParam txParam = tx.getTxParam(ProposalVoteParam.class);
         
         String proposalId = "";
@@ -60,7 +59,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
         updateTxInfo(txParam,tx);
         
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -103,6 +102,6 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

@@ -6,6 +6,9 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeModify;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -15,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @description: 修改验证人业务参数转换器
  * @author: chendongming@juzix.net
@@ -24,20 +25,22 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
 	
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private StakingMapper stakingMapper;
 
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
         // 修改质押信息
         StakeModifyParam txParam = tx.getTxParam(StakeModifyParam.class);
 
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -52,11 +55,22 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
         		.stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
                 .delegateRewardPer(txParam.getDelegateRewardPer())
                 .build();
-        
+
+        StakingKey stakingKey = new StakingKey();
+        stakingKey.setNodeId(txParam.getNodeId());
+        stakingKey.setStakingBlockNum(businessParam.getStakingBlockNum().longValue());
+        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+        String preDelegateRewardRate = "0";
+        if(staking!=null) preDelegateRewardRate = staking.getRewardPer().toString();
+
         stakeBusinessMapper.modify(businessParam);
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
-        
+
+        String desc = NodeOpt.TypeEnum.MODIFY.getTpl()
+                .replace("BEFORERATE",preDelegateRewardRate)
+                .replace("AFTERRATE",String.valueOf(businessParam.getDelegateRewardPer()));
+
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		nodeOpt.setNodeId(txParam.getNodeId());
@@ -64,9 +78,10 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
 		nodeOpt.setTxHash(tx.getHash());
 		nodeOpt.setBNum(tx.getNum());
 		nodeOpt.setTime(tx.getTime());
+		nodeOpt.setDesc(desc);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

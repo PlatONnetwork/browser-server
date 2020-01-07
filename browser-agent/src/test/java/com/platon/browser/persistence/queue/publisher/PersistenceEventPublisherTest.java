@@ -16,9 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -48,12 +51,12 @@ public class PersistenceEventPublisherTest extends AgentTestBase {
         Block block = blockList.get(0);
         List<Transaction> transactions = new ArrayList<>(transactionList);
 
-        target.publish(block,transactions,nodeOptList);
+        target.publish(block,transactions,nodeOptList, Collections.emptyList());
         target.getRingBufferSize();
         target.info();
         target.getPublisherMap();
         target.register(target.getClass().getSimpleName(),target);
         target.unregister(target.getClass().getSimpleName());
-        verify(target, times(1)).publish(any(),any(),any());
+        verify(target, times(1)).publish(any(),any(),any(),any());
     }
 }

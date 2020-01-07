@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class StatisticsAddressConverter {
@@ -33,48 +32,51 @@ public class StatisticsAddressConverter {
 	
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage){
 		long startTime = System.currentTimeMillis();
-
 		log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",block.getNum(),event.getTransactions().size(),epochMessage.getConsensusEpochRound(),epochMessage.getSettleEpochRound(),epochMessage.getIssueEpochRound());
-
-		List<AddressStatItem> addressStatItemList =   addressCache.getAll()
-            	.stream()
-            	.map(address->  AddressStatItem.builder()
-            			.address(address.getAddress())
-            			.type(address.getType())
-            			.txQty(address.getTxQty())
-            			.transferQty(address.getTransferQty())
-            			.delegateQty(address.getDelegateQty())
-            			.stakingQty(address.getStakingQty())
-            			.proposalQty(address.getProposalQty())
-            			.contractName(address.getContractName())
-            			.contractCreate(address.getContractCreate())
-            			.contractCreatehash(address.getContractCreatehash())
-            			.build()
-            	).collect(Collectors.toList());
-
-		List<String> modifyAddList = new ArrayList <>();
-		addressStatItemList.forEach(addressStatItem -> modifyAddList.add(addressStatItem.getAddress()));
+		// 使用缓存中的地址统计信息构造入库参数列表
+		List<AddressStatItem> itemFromCache = new ArrayList<>();
+		List<String> addresses = new ArrayList <>();
+		addressCache.getAll().forEach(cache->{
+			AddressStatItem item = AddressStatItem.builder()
+					.address(cache.getAddress())
+					.type(cache.getType())
+					.txQty(cache.getTxQty())
+					.transferQty(cache.getTransferQty())
+					.delegateQty(cache.getDelegateQty())
+					.stakingQty(cache.getStakingQty())
+					.proposalQty(cache.getProposalQty())
+					.contractName(cache.getContractName())
+					.contractCreate(cache.getContractCreate())
+					.contractCreatehash(cache.getContractCreatehash())
+					.haveReward(cache.getHaveReward())
+					.build();
+			itemFromCache.add(item);
+			addresses.add(cache.getAddress());
+		});
+		// 清空地址缓存
 		addressCache.cleanAll();
-		AddressExample addressExample = new AddressExample();
-		addressExample.createCriteria().andAddressIn(modifyAddList);
-		List<Address> addressList = addressMapper.selectByExample(addressExample);
-
+		// 从数据库中查询出与缓存中对应的地址信息
+		AddressExample condition = new AddressExample();
+		condition.createCriteria().andAddressIn(addresses);
+		List<Address> itemFromDb = addressMapper.selectByExample(condition);
+		// 地址与详情进行映射
 		Map <String,Address> dbMap = new HashMap <>();
-		addressList.forEach(address -> dbMap.put(address.getAddress(),address));
-		addressStatItemList.forEach(address -> {
-			Address dbAddres =  dbMap.get(address.getAddress());
-			if(null != dbAddres){
-				address.setTxQty(dbAddres.getTxQty() + address.getTxQty());
-				address.setTransferQty(dbAddres.getTransferQty() + address.getTransferQty());
-				address.setDelegateQty(dbAddres.getDelegateQty() + address.getDelegateQty());
-				address.setStakingQty(dbAddres.getStakingQty() + address.getStakingQty());
-				address.setProposalQty(dbAddres.getProposalQty() + address.getProposalQty());
+		itemFromDb.forEach(item -> dbMap.put(item.getAddress(),item));
+		// 合并数据库与缓存中的值
+		itemFromCache.forEach(fromCache -> {
+			Address fromDb =  dbMap.get(fromCache.getAddress());
+			if(null != fromDb){
+				fromCache.setTxQty(fromDb.getTxQty() + fromCache.getTxQty()); // 交易数量
+				fromCache.setTransferQty(fromDb.getTransferQty() + fromCache.getTransferQty()); // 转账数量
+				fromCache.setDelegateQty(fromDb.getDelegateQty() + fromCache.getDelegateQty()); // 委托数量
+				fromCache.setStakingQty(fromDb.getStakingQty() + fromCache.getStakingQty()); // 质押数量
+				fromCache.setProposalQty(fromDb.getProposalQty() + fromCache.getProposalQty()); // 提案数量
+				fromCache.setHaveReward(fromDb.getHaveReward().add(fromCache.getHaveReward())); // 已领取委托奖励总额
 			}
 		});
-
-
+		// 使用合并后的信息构造地址入库参数
         AddressStatChange addressStatChange = AddressStatChange.builder()
-        		.addressStatItemList(addressStatItemList)
+        		.addressStatItemList(itemFromCache)
         		.build();
         statisticBusinessMapper.addressChange(addressStatChange);
 

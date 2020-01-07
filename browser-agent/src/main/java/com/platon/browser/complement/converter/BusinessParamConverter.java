@@ -120,7 +120,11 @@ public abstract class BusinessParamConverter<T> {
                 case RESTRICTING_CREATE: // 4000
                     break;
                 case CLAIM_REWARDS: // 5000
-
+                    // TODO: 把交易回执里的领取奖励数量设置到TxInfo
+//                    DelegateRewardClaimParam drcp = (DelegateRewardClaimParam)txParam;
+//                    nodeItem = nodeCache.getNode(drcp.getVerify());
+//                    rp.setNodeName(nodeItem.getNodeName())
+//                            .setStakingBlockNum(nodeItem.getStakingBlockNum());
                     break;
                 default:
                     break;

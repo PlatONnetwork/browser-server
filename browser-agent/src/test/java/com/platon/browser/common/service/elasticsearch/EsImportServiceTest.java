@@ -9,6 +9,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.mockito.Mockito.*;
@@ -36,7 +37,7 @@ public class EsImportServiceTest extends AgentTestBase {
      */
     @Test
     public void batchImport() throws InterruptedException {
-        target.batchImport(Collections.emptySet(),Collections.emptySet(),Collections.emptySet());
-        verify(target, times(1)).batchImport(anySet(),anySet(),anySet());
+        target.batchImport(Collections.emptySet(),Collections.emptySet(),Collections.emptySet(), Collections.emptySet());
+        verify(target, times(1)).batchImport(anySet(),anySet(),anySet(),anySet());
     }
 }

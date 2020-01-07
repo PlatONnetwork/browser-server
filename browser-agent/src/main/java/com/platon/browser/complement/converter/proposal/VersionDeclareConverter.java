@@ -8,8 +8,6 @@ import com.platon.browser.param.VersionDeclareParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @description: 委托业务参数转换器
  * @author: chendongming@juzix.net
@@ -17,21 +15,21 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class VersionDeclareConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class VersionDeclareConverter extends BusinessParamConverter<NodeOpt> {
 	
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
         VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
         // 补充节点名称
         updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(null);
+        return null;
     }
 }

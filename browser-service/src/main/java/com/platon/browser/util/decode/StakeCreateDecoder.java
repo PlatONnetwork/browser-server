@@ -16,6 +16,20 @@ import static com.platon.browser.util.decode.Decoder.stringResolver;
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
+ *
+ * return Arrays.<Type>asList(new Uint16(stakingAmountType.getValue()) 1
+ *         , new BytesType(Numeric.hexStringToByteArray(benifitAddress)) 2
+ *         , new BytesType(Numeric.hexStringToByteArray(nodeId)) 3
+ *         , new Utf8String(externalId) 4
+ *         , new Utf8String(nodeName) 5
+ *         , new Utf8String(webSite) 6
+ *         , new Utf8String(details) 7
+ *         , new Int256(amount) 8
+ *         , new Uint16(rewardPer) 9
+ *         , new Uint32(processVersion.getProgramVersion()) 10
+ *         , new BytesType(Numeric.hexStringToByteArray(processVersion.getProgramVersionSign())) 11
+ *         , new BytesType(Numeric.hexStringToByteArray(blsPubKey)) 12
+ *         , new BytesType(Numeric.hexStringToByteArray(blsProof)) 13
  **/
 class StakeCreateDecoder {
     private StakeCreateDecoder(){}
@@ -42,7 +56,9 @@ class StakeCreateDecoder {
         //质押的von amount programVersion
         BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(8));
         //程序的真实版本，治理rpc获取
-        BigInteger version =  bigIntegerResolver((RlpString) rootList.getValues().get(9));
+        BigInteger rewardPer =  bigIntegerResolver((RlpString) rootList.getValues().get(9));
+        //程序的真实版本，治理rpc获取
+        BigInteger version =  bigIntegerResolver((RlpString) rootList.getValues().get(10));
 
         return StakeCreateParam.builder()
                 .type(type.intValue())
@@ -54,7 +70,7 @@ class StakeCreateDecoder {
                 .details(details)
                 .amount(new BigDecimal(amount))
                 .programVersion(version)
-                .delegateRewardPer(0/*TODO:需要解析出委托奖励比例*/) // 必填
+                .delegateRewardPer(rewardPer.intValue()) // 必填
                 .build();
     }
 }

@@ -102,7 +102,7 @@ public class InitializationService {
             // 初始化网络缓存
             networkStatCache.init(networkStat);
             // 初始化内置地址
-            addressCache.initOnFrist();
+            addressCache.initOnFirstStart();
 
             return initialResult;
         }

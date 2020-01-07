@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Optional;
 
 /**
  * @description: 参数提案业务参数转换器
@@ -29,7 +28,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class ProposalParameterConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class ProposalParameterConverter extends BusinessParamConverter<NodeOpt> {
 
     @Autowired
     private BlockChainConfig chainConfig;
@@ -43,12 +42,12 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
 	private ParameterService parameterService;
 	
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
 		ProposalParameterParam txParam = tx.getTxParam(ProposalParameterParam.class);
 		// 补充节点名称
 		updateTxInfo(txParam,tx);
 		// 失败的交易不分析业务数据
-		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
 		long startTime = System.currentTimeMillis();
 
@@ -99,6 +98,6 @@ public class ProposalParameterConverter extends BusinessParamConverter<Optional<
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

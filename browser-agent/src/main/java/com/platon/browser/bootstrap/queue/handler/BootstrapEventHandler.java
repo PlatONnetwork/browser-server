@@ -100,7 +100,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
                 nodeOpts.add(no);
             }
 
-            esImportService.batchImport(blocks,transactions,nodeOpts);
+            esImportService.batchImport(blocks,transactions,nodeOpts,Collections.emptySet());
             redisImportService.batchImport(blocks,transactions, Collections.emptySet());
             // 更新已处理的最大ID, 方便删除任务删除已用完的数据
             BakDataDeleteUtil.updateTxBakMaxId(txMaxId);

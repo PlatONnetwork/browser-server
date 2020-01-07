@@ -19,5 +19,5 @@ import java.util.List;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class DelegateRewardClaimParam extends TxParam{
-    private List<Reward> rewards;
+    private List<Reward> rewardList;
 }

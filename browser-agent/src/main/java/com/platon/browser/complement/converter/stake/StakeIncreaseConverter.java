@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @description: 增持质押业务参数转换器
  * @author: chendongming@juzix.net
@@ -22,7 +20,7 @@ import java.util.Optional;
  **/
 @Slf4j
 @Service
-public class StakeIncreaseConverter extends BusinessParamConverter<Optional<NodeOpt>> {
+public class StakeIncreaseConverter extends BusinessParamConverter<NodeOpt> {
 
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
@@ -30,13 +28,13 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
     private NetworkStatCache networkStatCache;
     
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+    public NodeOpt convert(CollectionEvent event, Transaction tx) {
         // 增持质押
         StakeIncreaseParam txParam = tx.getTxParam(StakeIncreaseParam.class);
         // 补充节点名称
         updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -60,6 +58,6 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
         nodeOpt.setTime(tx.getTime());
 
 
-        return Optional.ofNullable(nodeOpt);
+        return nodeOpt;
     }
 }

@@ -5,6 +5,7 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
 import com.platon.browser.common.utils.BakDataDeleteUtil;
+import com.platon.browser.complement.bean.TxAnalyseResult;
 import com.platon.browser.complement.service.BlockParameterService;
 import com.platon.browser.complement.service.StatisticParameterService;
 import com.platon.browser.complement.service.TransactionParameterService;
@@ -70,14 +71,13 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockParameterService.getParameters(event);
             // 根据交易解析出业务参数
-            List<NodeOpt> nodeOpts2 = transactionParameterService.getParameters(event);
+            TxAnalyseResult txAnalyseResult = transactionParameterService.getParameters(event);
             // 统计业务参数
             statisticParameterService.getParameters(event);
           
-            nodeOpts1.addAll(nodeOpts2);
+            if(!txAnalyseResult.getNodeOptList().isEmpty()) nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
-            complementEventPublisher.publish(event.getBlock(),transactions,nodeOpts1);
-
+            complementEventPublisher.publish(event.getBlock(),transactions,nodeOpts1,txAnalyseResult.getDelegationRewardList());
 
             txDeleteBatchCount++;
             optDeleteBatchCount++;

@@ -4,12 +4,22 @@ import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.util.decode.DecodedResult;
 import com.platon.browser.util.decode.TxInputUtil;
+import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.web3j.protocol.core.methods.response.Log;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
+import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 public class CollectionTransaction extends Transaction {
@@ -97,7 +107,16 @@ public class CollectionTransaction extends Transaction {
                 block.setSQty(block.getSQty()+1);
                 break;
             case DELEGATE_CREATE:// 发起委托
+                block.setDQty(block.getDQty()+1);
+                break;
             case DELEGATE_EXIT:// 撤销委托
+                // 设置委托奖励提取额
+                DelegateExitParam param = getTxParam(DelegateExitParam.class);
+                BigDecimal reward = new BigDecimal(getDelegateReward(receipt.getLogs()));
+                param.setReward(reward);
+                setInfo(param.toJSONString());
+                block.setDQty(block.getDQty()+1);
+                break;
             case CLAIM_REWARDS: // 领取委托奖励
                 block.setDQty(block.getDQty()+1);
                 break;
@@ -116,5 +135,24 @@ public class CollectionTransaction extends Transaction {
         // 累加当前交易的能量限制到当前区块的txGasLimit
         block.setTxGasLimit(block.decimalTxGasLimit().add(decimalGasLimit()).toString());
         return this;
+    }
+
+    /**
+     *  获得解除委托时所提取的委托收益
+     */
+    public BigInteger getDelegateReward(List<Log> logs) {
+        if(logs==null||logs.isEmpty()) return BigInteger.ZERO;
+
+        String logData = logs.get(0).getData();
+        if(null == logData || "".equals(logData) ) return BigInteger.ZERO;
+
+        RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
+        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+        int statusCode = Integer.parseInt(decodedStatus);
+
+        if(statusCode != ErrorCode.SUCCESS) return BigInteger.ZERO;
+
+        return ((RlpString)(RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())).getValues().get(0)).asPositiveBigInteger();
     }
 }

@@ -23,7 +23,7 @@ public class ComplementEventHandler implements IComplementEventHandler {
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
         try {
             // 发布至持久化队列
-            persistenceEventPublisher.publish(event.getBlock(),event.getTransactions(),event.getNodeOpts());
+            persistenceEventPublisher.publish(event.getBlock(),event.getTransactions(),event.getNodeOpts(),event.getDelegationRewards());
         }catch (Exception e){
             log.error("",e);
             throw e;

@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @Accessors(chain = true)
@@ -57,5 +59,9 @@ public class AddressStatItem {
 	 * 创建合约的交易Hash
 	 */
     private String contractCreatehash;
-	
+
+	/**
+	 * 已领取委托奖励
+	 */
+	private BigDecimal haveReward;
 }

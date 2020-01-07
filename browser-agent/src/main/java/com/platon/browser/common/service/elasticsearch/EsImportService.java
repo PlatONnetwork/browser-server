@@ -1,6 +1,7 @@
 package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,10 @@ public class EsImportService {
     private EsTransactionService transactionService;
     @Autowired
     private EsNodeOptService nodeOptService;
-    private static final int SERVICE_COUNT = 3;
+    @Autowired
+    private EsDelegateRewardService delegateRewardService;
+
+    private static final int SERVICE_COUNT = 4;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
@@ -45,15 +49,16 @@ public class EsImportService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NodeOpt> nodeOpts) throws InterruptedException {
-        log.debug("ES批量导入:{}(blocks({}),transactions({}),nodeOpts({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),nodeOpts.size());
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
+        log.debug("ES批量导入:{}(blocks({}),transactions({}),nodeOpts({}),delegationRewards({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),nodeOpts.size(),delegationRewards.size());
         long startTime = System.currentTimeMillis();
         try{
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
             submit(blockService,blocks,latch);
             submit(transactionService,transactions,latch);
             submit(nodeOptService,nodeOpts,latch);
+            submit(delegateRewardService,delegationRewards,latch);
             latch.await();
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         }catch (Exception e){

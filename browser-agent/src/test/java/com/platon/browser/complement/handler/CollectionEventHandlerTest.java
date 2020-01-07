@@ -5,6 +5,7 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
+import com.platon.browser.complement.bean.TxAnalyseResult;
 import com.platon.browser.complement.service.BlockParameterService;
 import com.platon.browser.complement.service.StatisticParameterService;
 import com.platon.browser.complement.service.TransactionParameterService;
@@ -65,7 +66,11 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         when(networkStatCache.getNetworkStat()).thenReturn(networkStat);
         when(networkStat.getTxQty()).thenReturn(1000);
         when(blockParameterService.getParameters(any())).thenReturn(nodeOptList);
-        when(transactionParameterService.getParameters(any())).thenReturn(nodeOptList);
+        TxAnalyseResult txAnalyseResult = TxAnalyseResult.builder()
+                .nodeOptList(nodeOptList)
+                .delegationRewardList(new ArrayList<>())
+                .build();
+        when(transactionParameterService.getParameters(any())).thenReturn(txAnalyseResult);
         when(txBakMapper.deleteByExample(any())).thenReturn(100);
         when(nOptBakMapper.deleteByExample(any())).thenReturn(100);
     }

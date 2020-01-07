@@ -610,7 +610,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case CLAIM_REWARDS:
 						DelegateRewardClaimParam delegateRewardClaimParam  = JSON.parseObject(txInfo, DelegateRewardClaimParam.class);
 						List<TransactionDetailsRewardsResp> rewards = new ArrayList<>();
-						for(Reward reward:delegateRewardClaimParam.getRewards()) {
+						for(Reward reward:delegateRewardClaimParam.getRewardList()) {
 							TransactionDetailsRewardsResp transactionDetailsRewardsResp = new TransactionDetailsRewardsResp();
 							transactionDetailsRewardsResp.setVerify(reward.getNodeId());
 							transactionDetailsRewardsResp.setNodeName(reward.getNodeName());

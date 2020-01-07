@@ -1,12 +1,15 @@
 package com.platon.browser.common.complement.cache;
 
 import com.platon.browser.common.enums.AddressTypeEnum;
+import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.param.claim.Reward;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +58,7 @@ public class AddressCache {
 		    break;
 		case DELEGATE_CREATE:// 发起委托
 		case DELEGATE_EXIT:// 撤销委托
+			case CLAIM_REWARDS:// 领取委托奖励
 			 address.setDelegateQty(address.getDelegateQty()+1);
 		    break;
 		case PROPOSAL_TEXT:// 创建文本提案
@@ -113,9 +117,27 @@ public class AddressCache {
 	/**
 	 * 第一次启动初始化
 	 */
-	public void initOnFrist() {
+	public void initOnFirstStart() {
 		for(ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
 			addressMap.put(contractDescEnum.getAddress(), createDefaultAddress(contractDescEnum.getAddress()));
 		}
+	}
+
+	/**
+	 * 更新已领取的委托奖励字段
+	 * @param drc
+	 */
+	public void update(DelegateRewardClaim drc) {
+		Address cache = addressMap.get(drc.getAddress());
+		if(cache == null) {
+			cache = createDefaultAddress(drc.getAddress());
+			addressMap.put(drc.getAddress(), cache);
+		}
+		// 统计当前交易from地址的【已领取委托奖励】
+		BigDecimal totalAmount = BigDecimal.ZERO;
+		for (Reward reward : drc.getRewardList()) {
+			totalAmount = totalAmount.add(reward.getReward());
+		}
+		cache.setHaveReward(cache.getHaveReward().add(totalAmount));
 	}
 }

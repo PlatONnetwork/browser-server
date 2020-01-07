@@ -64,7 +64,7 @@ public class PersistenceEventHandlerTest extends AgentTestBase {
 
 
 
-        doThrow(new RuntimeException("")).when(esImportService).batchImport(any(),anySet(),anySet());
+        doThrow(new RuntimeException("")).when(esImportService).batchImport(any(),anySet(),anySet(),anySet());
         target.onEvent(event,33,false);
     }
 }

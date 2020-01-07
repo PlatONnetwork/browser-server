@@ -1,6 +1,7 @@
 package com.platon.browser.common.queue.complement.event;
 
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 
@@ -11,8 +12,10 @@ public class ComplementEvent {
     private Block block;
     // 交易列表
     private List<Transaction> transactions;
-    // 交易列表
+    // 日志列表
     private List<NodeOpt> nodeOpts;
+    // 奖励列表
+    private List<DelegationReward> delegationRewards;
 
     public Block getBlock() {
         return block;
@@ -36,5 +39,13 @@ public class ComplementEvent {
 
     public void setNodeOpts(List<NodeOpt> nodeOpts) {
         this.nodeOpts = nodeOpts;
+    }
+
+    public List<DelegationReward> getDelegationRewards() {
+        return delegationRewards;
+    }
+
+    public void setDelegationRewards(List<DelegationReward> delegationRewards) {
+        this.delegationRewards = delegationRewards;
     }
 }
