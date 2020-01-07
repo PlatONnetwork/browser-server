@@ -3,6 +3,7 @@ package com.platon.browser.data;
 import com.platon.sdk.contracts.ppos.DelegateContract;
 import com.platon.sdk.contracts.ppos.NodeContract;
 import com.platon.sdk.contracts.ppos.ProposalContract;
+import com.platon.sdk.contracts.ppos.RewardContract;
 import com.platon.sdk.contracts.ppos.StakingContract;
 import com.platon.sdk.contracts.ppos.dto.BaseResponse;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
@@ -53,6 +54,7 @@ public class TransactionSender {
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
+    RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);
     ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
     private String stakingPubKey = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
     private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
@@ -217,9 +219,16 @@ public class TransactionSender {
     	BigDecimal delegate = Convert.toVon("10000", Unit.LAT);
         TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
-                BigInteger.valueOf(5576),
+                BigInteger.valueOf(221),
                 delegate.toBigInteger()
         ).send();
+        logger.debug("res:{}",res);
+    }
+    
+ // 发送解委托奖励提取交易
+    @Test
+    public void withdrawReward() throws Exception {
+        TransactionResponse res = rewardContract.withdrawDelegateReward().send();
         logger.debug("res:{}",res);
     }
     
