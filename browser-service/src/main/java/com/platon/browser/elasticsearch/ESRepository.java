@@ -256,6 +256,7 @@ public abstract class ESRepository {
         if(constructor.getResult() != null ) {
         	searchSourceBuilder.fetchSource(constructor.getResult(), null);
         }
+     // 设置SearchSourceBuilder查询属性
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 		ESResult<T> esResult = new ESResult<>();

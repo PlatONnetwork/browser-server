@@ -388,17 +388,8 @@ PUT /_template/delegation_reward_template
         "type": "keyword"
       },
 
-      "node_name": {
+      "extra": {
         "type": "text"
-      },
-      "node_id": {
-        "type": "keyword"
-      },
-      "reward": {
-        "type": "text",
-        "index": false,
-        "doc_values": false,
-        "norms": false
       },
       "time": {
         "type": "date",

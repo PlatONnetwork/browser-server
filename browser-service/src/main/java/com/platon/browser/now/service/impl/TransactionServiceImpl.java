@@ -746,8 +746,41 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public RespPage<QueryClaimByStakingResp> queryClaimByStaking(QueryClaimByStakingReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		/** 根据地址查询具体的领取奖励数据 */
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().fuzzy("extra", req.getNodeId()));
+		ESResult<DelegationReward> delegationRewards = null;
+		try {
+			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
+		} catch (IOException e) {
+			logger.error(ERROR_TIPS, e);
+		}
+		List<QueryClaimByStakingResp> queryClaimByStakingResps = new ArrayList<>();
+		for(DelegationReward delegationReward:delegationRewards.getRsData()) {
+			QueryClaimByStakingResp queryClaimByStakingResp = new QueryClaimByStakingResp();
+			BeanUtils.copyProperties(delegationReward, queryClaimByStakingResp);
+			queryClaimByStakingResp.setTime(delegationReward.getTime().getTime());
+			/**
+			 * 解析json获取具体提取奖励的数据
+			 */
+			List<Extra> extras = JSONObject.parseArray(delegationReward.getExtra(), DelegationReward.Extra.class);
+			BigDecimal allRewards = BigDecimal.ZERO;
+			/**
+			 * 累积交易的所有领取奖励
+			 */
+			for(Extra extra : extras) {
+				allRewards = allRewards.add(new BigDecimal(extra.getReward()));
+			}
+			/**
+			 * 根据交易累加所有的奖励
+			 */
+			queryClaimByStakingResp.setReward(allRewards);
+			queryClaimByStakingResps.add(queryClaimByStakingResp);
+		}
+		
+		RespPage<QueryClaimByStakingResp> result = new RespPage<>();
+		result.init(queryClaimByStakingResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
+		return result;
 	}
 
 }

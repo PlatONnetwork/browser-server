@@ -14,7 +14,6 @@ import com.platon.sdk.contracts.ppos.dto.req.UpdateStakingParam;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +122,7 @@ public class TransactionSender {
                .setBlsPubKey(stakingBlsKey)
                .setProcessVersion(currentValidWeb3j.getProgramVersion().send().getAdminProgramVersion())
                .setBlsProof(currentValidWeb3j.getSchnorrNIZKProve().send().getAdminSchnorrNIZKProve())
+               .setRewardPer(new BigInteger("100"))
                .build()).send();
         TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
         System.out.println(baseResponse.toString());
@@ -140,6 +140,7 @@ public class TransactionSender {
     	uBuilder.setNodeName("cdm-004");
     	uBuilder.setWebSite("WWW.CCC.COM");
     	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+    	uBuilder.setRewardPer(new BigInteger("500"));
     	UpdateStakingParam updateStakingParam = new UpdateStakingParam(uBuilder);
         TransactionResponse res = stakingContract.updateStakingInfo(updateStakingParam).send();
         logger.debug("res:{}",res);
