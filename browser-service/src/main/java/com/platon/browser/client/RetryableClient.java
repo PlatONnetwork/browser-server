@@ -54,6 +54,9 @@ public class RetryableClient {
     // 质押合约接口
     private StakingContract stakingContract;
     public StakingContract getStakingContract(){return stakingContract;}
+ // 委托奖励合约接口
+    private RewardContract rewardContract;
+    public RewardContract getRewardContract(){return rewardContract;}
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void init() throws ConfigLoadingException {
@@ -109,6 +112,7 @@ public class RetryableClient {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     private void updateContract(){
+    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j());
         delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j());
         nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j());
         proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j());

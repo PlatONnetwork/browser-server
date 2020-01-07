@@ -49,6 +49,7 @@ public class PlatOnClient {
     public RestrictingPlanContract getRestrictingPlanContract(){return retryableClient.getRestrictingPlanContract();}
     public SlashContract getSlashContract(){return retryableClient.getSlashContract();}
     public StakingContract getStakingContract(){return retryableClient.getStakingContract();}
+    public RewardContract getRewardContract(){return retryableClient.getRewardContract();}
 
     @PostConstruct
     private void init() throws ConfigLoadingException {

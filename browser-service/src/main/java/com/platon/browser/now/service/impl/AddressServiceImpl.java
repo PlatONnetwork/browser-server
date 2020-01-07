@@ -17,9 +17,7 @@ import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.now.service.AddressService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.address.QueryDetailRequest;
@@ -30,6 +28,8 @@ import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.I18nUtil;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
+import com.platon.sdk.contracts.ppos.dto.resp.Reward;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -95,12 +95,12 @@ public class AddressServiceImpl implements AddressService {
         }
         /** 特殊账户余额直接查询链  */
 	  	try {
-	  		getBalance(req, resp);
+	  		this.getAddressInfo(req, resp);
 	  	} catch (Exception e) {
 	  		logger.error("getBalance error",e);
 	  		platonClient.updateCurrentWeb3jWrapper();
 	  		try {
-	  			getBalance(req, resp);
+	  			this.getAddressInfo(req, resp);
 			} catch (Exception e1) {
 				logger.error("getBalance error again",e);
 			} 
@@ -197,7 +197,7 @@ public class AddressServiceImpl implements AddressService {
 		return queryRPPlanDetailResp;
 	}
 	
-	private QueryDetailResp getBalance(QueryDetailRequest req, QueryDetailResp resp) throws ContractInvokeException, BlankResponseException, IOException {
+	private QueryDetailResp getAddressInfo(QueryDetailRequest req, QueryDetailResp resp) throws Exception {
 		List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
 		if(restrictingBalances != null && !restrictingBalances.isEmpty()) {
 			resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
@@ -208,6 +208,15 @@ public class AddressServiceImpl implements AddressService {
 			BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
 			resp.setBalance(new BigDecimal(balance));
 		}
+		/**
+		 * 查询所有的交易金额进行汇总
+		 */
+		List<Reward> rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), null).send().getData();
+		BigDecimal allRewards = BigDecimal.ZERO;
+		for(Reward reward : rewards) {
+			allRewards = allRewards.add(new BigDecimal(reward.getReward()));
+		}
+		resp.setDelegateClaim(allRewards);
 		return resp;
 	}
 }

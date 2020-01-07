@@ -20,6 +20,7 @@ public class DelegationListByAddressResp {
     private BigDecimal delegateLocked;    //已锁定委托（LAT）
     private BigDecimal delegateUnlock;    //已解除委托（LAT） 
     private BigDecimal delegateReleased;  //赎回中委托（LAT） 
+    private BigDecimal delegateClaim;    //待提取委托（LAT） 
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -67,7 +68,12 @@ public class DelegationListByAddressResp {
 	public void setDelegateReleased(BigDecimal delegateReleased) {
 		this.delegateReleased = delegateReleased;
 	}
-	
-    
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public BigDecimal getDelegateClaim() {
+		return delegateClaim;
+	}
+	public void setDelegateClaim(BigDecimal delegateClaim) {
+		this.delegateClaim = delegateClaim;
+	}
     
 }

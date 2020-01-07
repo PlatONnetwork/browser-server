@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
@@ -25,6 +26,8 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
+import com.platon.sdk.contracts.ppos.dto.resp.Reward;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +75,9 @@ public class StakingServiceImpl implements StakingService {
 	@Autowired
     private BlockChainConfig blockChainConfig;
 
+	@Autowired
+    private PlatOnClient platonClient;
+	
 	@Override
 	public StakingStatisticNewResp stakingStatisticNew() {
 		/** 获取统计信息 */
@@ -437,7 +443,22 @@ public class StakingServiceImpl implements StakingService {
 		/** 根据地址分页查询委托列表 */
 		Page<DelegationAddress> delegationAddresses =
 				customDelegationMapper.selectAddressByAddr(req.getAddress());
-
+		/**
+		 * 初始化奖励节点id列表，用来后续查询对应的待领取奖励使用
+		 */
+		List<String> nodes = new ArrayList<>();
+		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
+			nodes.add(delegationAddress.getNodeId());
+		}
+		/**
+		 * 获取每一个节点的待领取奖励
+		 */
+		List<Reward> rewards = new ArrayList<>();
+		try {
+			rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationAddress, byAddressResp);
@@ -447,6 +468,17 @@ public class StakingServiceImpl implements StakingService {
 					.add(byAddressResp.getDelegateLocked());
 			byAddressResp.setDelegateValue(deleValue);
 			byAddressResp.setDelegateUnlock(delegationAddress.getDelegateHes());
+			/**
+			 * 循环获取奖励
+			 */
+			for(Reward reward: rewards) {
+				/**
+				 * 匹配成功之后设置金额
+				 */
+				if(delegationAddress.getNodeId().equals(reward.getNodeId())) {
+					byAddressResp.setDelegateClaim(new BigDecimal(reward.getReward()));
+				}
+			}
 			lists.add(byAddressResp);
 		}
 		/** 统计总数 */

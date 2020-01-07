@@ -326,7 +326,8 @@ public interface AppDocStaking {
      *         "delegateHas":"",       //未锁定委托（LAT） 如果关联的验证人状态正常则正常显示，如果其他情况则为零 （delegation）
      *         "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
      *         "delegateUnlock":"",    //已解除委托（LAT）  如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation）
-     *         "delegateReleased":""  //待赎回委托（LAT） delegation
+     *         "delegateReleased":"",  //待赎回委托（LAT） delegation
+     *         "delegateClaim":""  //待领取委托（LAT） 
      *      }
      *   ]
      * }

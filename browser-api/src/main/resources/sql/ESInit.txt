@@ -387,7 +387,6 @@ PUT /_template/delegation_reward_template
       "addr": {
         "type": "keyword"
       },
-
       "extra": {
         "type": "text"
       },
