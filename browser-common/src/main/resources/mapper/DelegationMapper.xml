@@ -13,7 +13,6 @@
     <result column="cur_delegation_block_num" jdbcType="BIGINT" property="curDelegationBlockNum" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="unclaimed_delegate_reward_value" jdbcType="DECIMAL" property="unclaimedDelegateRewardValue" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -75,7 +74,7 @@
   </sql>
   <sql id="Base_Column_List">
     delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released, 
-    is_history, `sequence`, cur_delegation_block_num, create_time, update_time, unclaimed_delegate_reward_value
+    is_history, `sequence`, cur_delegation_block_num, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.DelegationExample" resultMap="BaseResultMap">
     select
@@ -115,13 +114,11 @@
     insert into delegation (delegate_addr, staking_block_num, node_id, 
       delegate_hes, delegate_locked, delegate_released, 
       is_history, `sequence`, cur_delegation_block_num, 
-      create_time, update_time, unclaimed_delegate_reward_value
-      )
+      create_time, update_time)
     values (#{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, 
       #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, #{delegateReleased,jdbcType=DECIMAL}, 
       #{isHistory,jdbcType=INTEGER}, #{sequence,jdbcType=BIGINT}, #{curDelegationBlockNum,jdbcType=BIGINT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{unclaimedDelegateRewardValue,jdbcType=DECIMAL}
-      )
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Delegation">
     insert into delegation
@@ -159,9 +156,6 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="unclaimedDelegateRewardValue != null">
-        unclaimed_delegate_reward_value,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="delegateAddr != null">
@@ -196,9 +190,6 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="unclaimedDelegateRewardValue != null">
-        #{unclaimedDelegateRewardValue,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -244,9 +235,6 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.unclaimedDelegateRewardValue != null">
-        unclaimed_delegate_reward_value = #{record.unclaimedDelegateRewardValue,jdbcType=DECIMAL},
-      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -264,8 +252,7 @@
       `sequence` = #{record.sequence,jdbcType=BIGINT},
       cur_delegation_block_num = #{record.curDelegationBlockNum,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      unclaimed_delegate_reward_value = #{record.unclaimedDelegateRewardValue,jdbcType=DECIMAL}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -297,9 +284,6 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="unclaimedDelegateRewardValue != null">
-        unclaimed_delegate_reward_value = #{unclaimedDelegateRewardValue,jdbcType=DECIMAL},
-      </if>
     </set>
     where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
       and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
@@ -314,8 +298,7 @@
       `sequence` = #{sequence,jdbcType=BIGINT},
       cur_delegation_block_num = #{curDelegationBlockNum,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      unclaimed_delegate_reward_value = #{unclaimedDelegateRewardValue,jdbcType=DECIMAL}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
       and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
       and node_id = #{nodeId,jdbcType=VARCHAR}
@@ -328,16 +311,14 @@
     -->
     insert into delegation
     (delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released, 
-      is_history, `sequence`, cur_delegation_block_num, create_time, update_time, unclaimed_delegate_reward_value
-      )
+      is_history, `sequence`, cur_delegation_block_num, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
         #{item.nodeId,jdbcType=VARCHAR}, #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
         #{item.delegateReleased,jdbcType=DECIMAL}, #{item.isHistory,jdbcType=INTEGER}, 
         #{item.sequence,jdbcType=BIGINT}, #{item.curDelegationBlockNum,jdbcType=BIGINT}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.unclaimedDelegateRewardValue,jdbcType=DECIMAL}
-        )
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -388,12 +369,8 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'unclaimed_delegate_reward_value'.toString() == column.value">
-          #{item.unclaimedDelegateRewardValue,jdbcType=DECIMAL}
-        </if>
       </foreach>
       )
     </foreach>
   </insert>
-
 </mapper>

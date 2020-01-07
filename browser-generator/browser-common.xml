@@ -123,8 +123,10 @@
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>-->
 
-        <table tableName="staking_history" domainObjectName="StakingHistory">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
+
+        <table tableName="delegation" domainObjectName="Delegation">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
         </table>
     </context>
 </generatorConfiguration>

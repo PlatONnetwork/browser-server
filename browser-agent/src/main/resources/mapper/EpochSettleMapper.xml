@@ -17,7 +17,7 @@
         where `node_id` = #{staking.nodeId}
         and staking_block_num = #{staking.stakingBlockNum};
         /*2、更新节点*/
-        SET @preStakeTotalDeleReward = (SELECT `total_dele_reward` FROM staking WHERE `node_id` = #{nodeId} ORDER BY `staking_block_num` DESC LIMIT 1,1);
+        SET @preStakeTotalDeleReward = (SELECT `total_dele_reward` FROM staking WHERE `node_id` = #{staking.nodeId} ORDER BY `staking_block_num` DESC LIMIT 1,1);
         SET @baseTotalDeleReward = (SELECT CASE WHEN @preStakeTotalDeleReward IS NULL THEN 0 ELSE @preStakeTotalDeleReward END);
         update `node` set
         `staking_locked` = #{staking.stakingLocked},
