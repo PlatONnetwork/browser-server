@@ -151,7 +151,7 @@ public class ProposalContractTest {
 			"http://192.168.112.171:7789", VoteOption.YEAS, superCredentials);
 
         vote(proposalID,
-        		"4fcc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba4150f",
+        		"ed52e1686606c6b496bf220c0e450003763a9258cdf3111579cb0d2c2a1b89ea84ec38116f53c4d2fda9860c78de5693d11517228eec9c651fad132b15e12d29",
         		"http://192.168.112.171:6789", VoteOption.YEAS, superCredentials);
 
         vote(proposalID,
@@ -272,9 +272,7 @@ public class ProposalContractTest {
 	@Test
 	public void declareVersion() {
 		try {
-			ProgramVersion pv = new ProgramVersion();
-			pv.setVersion(BigInteger.valueOf(1792));
-			pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
+			ProgramVersion pv = web3j.getProgramVersion().send().getAdminProgramVersion();
 			TransactionResponse baseResponse = proposalContract.declareVersion(pv,"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
 					.send();
 			System.out.println(baseResponse.toString());
