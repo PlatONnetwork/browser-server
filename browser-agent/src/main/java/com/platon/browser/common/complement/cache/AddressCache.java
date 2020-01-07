@@ -101,6 +101,7 @@ public class AddressCache {
         address.setStakingQty(0);
         address.setDelegateQty(0);
         address.setProposalQty(0);
+        address.setHaveReward(BigDecimal.ZERO);
     	return address;
     }
 
