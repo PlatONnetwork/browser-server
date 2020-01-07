@@ -182,6 +182,11 @@ public class InitializationService {
             staking.setAnnualizedRateInfo(ari.toJSONString());
             staking.setPredictStakingReward(epochRetryService.getStakeReward());
 
+            staking.setRewardPer(0);
+            staking.setDeleAnnualizedRate(0.0);
+            staking.setHaveDeleReward(BigDecimal.ZERO);
+            staking.setTotalDeleReward(BigDecimal.ZERO);
+
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();
             node.updateWithCustomStaking(staking);
