@@ -116,6 +116,18 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
+        <if test="'reward_per'.toString() == column.value">
+          #{item.rewardPer,jdbcType=INTEGER}
+        </if>
+        <if test="'have_dele_reward'.toString() == column.value">
+          #{item.haveDeleReward,jdbcType=DECIMAL}
+        </if>
+        <if test="'dele_annualized_rate'.toString() == column.value">
+          #{item.deleAnnualizedRate,jdbcType=DOUBLE}
+        </if>
+        <if test="'total_dele_reward'.toString() == column.value">
+          #{item.totalDeleReward,jdbcType=DECIMAL}
+        </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         </if>
