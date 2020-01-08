@@ -34,7 +34,7 @@ public class ComplementEventHandlerTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "persistenceEventPublisher", persistenceEventPublisher);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void test() throws Exception {
         ComplementEvent event = new ComplementEvent();
         event.setBlock(blockList.get(0));
@@ -42,8 +42,5 @@ public class ComplementEventHandlerTest extends AgentTestBase {
         event.setNodeOpts(nodeOptList);
         target.onEvent(event,33,false);
         verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
-
-        doThrow(new RuntimeException("")).when(persistenceEventPublisher).publish(any(),anyList(),anyList(),anyList());
-        target.onEvent(event,33,false);
     }
 }

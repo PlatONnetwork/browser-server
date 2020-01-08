@@ -25,19 +25,19 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class SettleTest extends AgentTestBase {
 
-   /* @Test
+    @Test
     public void test(){
         Settle target = Settle.builder()
-                .curVerifierList(Collections.emptyList())
-                .preVerifierList(Collections.emptyList())
+                .curVerifierSet(Collections.emptySet())
+                .preVerifierSet(Collections.emptySet())
                 .settingEpoch(3)
                 .stakingLockEpoch(3)
                 .stakingReward(BigDecimal.TEN)
                 .stakingList(Collections.emptyList())
                 .build();
         target.setStakingList(Collections.emptyList())
-                .setCurVerifierList(Collections.emptyList())
-                .setPreVerifierList(Collections.emptyList())
+                .setCurVerifierSet(Collections.emptySet())
+                .setPreVerifierSet(Collections.emptySet())
                 .setSettingEpoch(3)
                 .setStakingLockEpoch(3)
                 .setStakingReward(null);
@@ -45,10 +45,10 @@ public class SettleTest extends AgentTestBase {
         target.getStakingLockEpoch();
         target.getStakingReward();
         target.getStakingList();
-        target.getCurVerifierList();
-        target.getPreVerifierList();
+        target.getCurVerifierSet();
+        target.getPreVerifierSet();
         target.getBusinessType();
         assertTrue(true);
-    }*/
+    }
 
 }

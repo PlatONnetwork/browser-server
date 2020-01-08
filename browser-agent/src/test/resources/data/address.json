@@ -20,7 +20,8 @@
 "contract_create":"system",
 "contract_createHash":"",
 "create_time":"2019-11-13 19:01:31",
-"update_time":"2019-11-13 19:01:31"
+"update_time":"2019-11-13 19:01:31",
+  "have_reward": 333
 },
 { 
 "address":"0x1000000000000000000000000000000000000005",
@@ -43,7 +44,8 @@
 "contract_create":"system",
 "contract_createHash":"",
 "create_time":"2019-11-13 19:01:25",
-"update_time":"2019-11-13 19:01:25"
+"update_time":"2019-11-13 19:01:25",
+  "have_reward": 333
 },
 { 
 "address":"0x2e95e3ce0a54951eb9a99152a6d5827872dfb4fd",
@@ -66,7 +68,8 @@
 "contract_create":"",
 "contract_createHash":"",
 "create_time":"2019-11-13 19:01:31",
-"update_time":"2019-11-13 19:01:35"
+"update_time":"2019-11-13 19:01:35",
+  "have_reward": 333
 },
 { 
 "address":"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
@@ -89,7 +92,8 @@
 "contract_create":"",
 "contract_createHash":"",
 "create_time":"2019-11-13 19:00:08",
-"update_time":"2019-11-13 19:00:10"
+"update_time":"2019-11-13 19:00:10",
+  "have_reward": 333
 },
 { 
 "address":"0x77b9c165b208dac4894daa9fdf558e55b538d044",
@@ -112,7 +116,8 @@
 "contract_create":"",
 "contract_createHash":"",
 "create_time":"2019-11-13 19:01:25",
-"update_time":"2019-11-13 20:59:10"
+"update_time":"2019-11-13 20:59:10",
+  "have_reward": 333
 },
 { 
 "address":"0x7cc27a18b7e33871acf4cd82e879c3ab2462caa9",
@@ -135,5 +140,6 @@
 "contract_create":"",
 "contract_createHash":"",
 "create_time":"2019-11-13 19:01:31",
-"update_time":"2019-11-13 19:01:35"
+"update_time":"2019-11-13 19:01:35",
+  "have_reward": 333
 }]

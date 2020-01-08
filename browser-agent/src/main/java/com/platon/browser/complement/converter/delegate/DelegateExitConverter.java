@@ -144,6 +144,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         }
         extra.setNodeName(nodeName);
         extra.setReward(txParam.getReward().toString());
+        extraList.add(extra);
         delegationReward.setExtra(JSON.toJSONString(extraList));
 
         der.setDelegationReward(delegationReward);

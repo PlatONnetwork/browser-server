@@ -3,6 +3,7 @@ package com.platon.browser.data;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.sdk.contracts.ppos.DelegateContract;
 import com.platon.sdk.contracts.ppos.NodeContract;
 import com.platon.sdk.contracts.ppos.ProposalContract;
@@ -49,31 +50,11 @@ public class SpecialContractApiInvoker {
     private static SpecialApi sca = new SpecialApi();
 
     public static void main(String args[]) throws Exception {
+        List<Node> ver = nodeContract.getVerifierList().send().getData();
+        List<Node> hver = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(1660));
 
-
-        //TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x6d73ce6d593b39a4cd47971a8f7be7e9b1df70fce2975945a910738f00513b8d").send().getTransactionReceipt().get();
-
-       /* Web3jWrapper web3jWrapper = Web3jWrapper.builder()
-                .web3j(web3j)
-                .web3jService(service)
-                .address("http://192.168.120.151:6789")
-                .build();
-        ReceiptResult receiptResult = sca.getReceiptResult(web3jWrapper,BigInteger.valueOf(85087));
-        receiptResult.resolve();
-        TransactionReceipt tr = web3j.platonGetTransactionReceipt("0x8e464b64554e572ba7c53a6fca539c93f615c98d86c079706d1fee3efb685173").send().getTransactionReceipt().get();
-
-        boolean ok = tr.isStatusOK();
-        logger.error("{}",tr.isStatusOK());
-*/
-//        List<NodeVersion> versions = sca.getNodeVersionList(web3j);
-//
-//        logger.error("");
-//
-//        proposalContract.getParamList("");
-//        List<Node> nodes = nodeContract.getVerifierList().send().data;
-//        List<Node> nodes = nodeContract.getValidatorList().send().data;
-//        List<Node> nodes1 = nodeContract.getCandidateList().send().data;
-
+//        List<Node> val = nodeContract.getValidatorList().send().getData();
+//        List<Node> hval = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(1660));
 
         EpochInfo res = sca.getEpochInfo(web3j,BigInteger.valueOf(170000));
 
