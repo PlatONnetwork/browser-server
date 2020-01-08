@@ -704,6 +704,7 @@ public class TransactionServiceImpl implements TransactionService {
 		/** 根据地址查询具体的领取奖励数据 */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("addr", req.getAddress()));
+		constructor.setDesc("time");
 		ESResult<DelegationReward> delegationRewards = null;
 		try {
 			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
@@ -732,6 +733,7 @@ public class TransactionServiceImpl implements TransactionService {
 				allRewards = allRewards.add(new BigDecimal(extra.getReward()));
 				rewardsDetails.add(transactionDetailsRewardsResp);
 			}
+			queryClaimByAddressResp.setRewardsDetails(rewardsDetails);
 			/**
 			 * 根据交易累加所有的奖励
 			 */
@@ -749,6 +751,7 @@ public class TransactionServiceImpl implements TransactionService {
 		/** 根据地址查询具体的领取奖励数据 */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().fuzzy("extra", req.getNodeId()));
+		constructor.setDesc("time");
 		ESResult<DelegationReward> delegationRewards = null;
 		try {
 			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
