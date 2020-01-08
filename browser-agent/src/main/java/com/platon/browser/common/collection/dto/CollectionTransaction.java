@@ -5,6 +5,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.DelegateExitParam;
+import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.util.decode.DecodedResult;
 import com.platon.browser.util.decode.TxInputUtil;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
@@ -68,9 +69,10 @@ public class CollectionTransaction extends Transaction {
             status=receipt.getLogStatus();
         }
 
+        DecodedResult decodedResult;
         try {
-            // 解析交易的输入信息
-            DecodedResult decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
+            // 解析交易的输入及交易回执log信息
+            decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
             // 参数信息
             String info = decodedResult.getParam().toJSONString();
             int type = decodedResult.getTypeEnum().getCode();
@@ -118,6 +120,8 @@ public class CollectionTransaction extends Transaction {
                 block.setDQty(block.getDQty()+1);
                 break;
             case CLAIM_REWARDS: // 领取委托奖励
+                DelegateRewardClaimParam fromLog = (DelegateRewardClaimParam) decodedResult.getParam();
+                setInfo(fromLog.toJSONString());
                 block.setDQty(block.getDQty()+1);
                 break;
             case PROPOSAL_TEXT:// 创建文本提案

@@ -4,6 +4,7 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -120,11 +121,18 @@ public abstract class BusinessParamConverter<T> {
                 case RESTRICTING_CREATE: // 4000
                     break;
                 case CLAIM_REWARDS: // 5000
-                    // TODO: 把交易回执里的领取奖励数量设置到TxInfo
-//                    DelegateRewardClaimParam drcp = (DelegateRewardClaimParam)txParam;
-//                    nodeItem = nodeCache.getNode(drcp.getVerify());
-//                    rp.setNodeName(nodeItem.getNodeName())
-//                            .setStakingBlockNum(nodeItem.getStakingBlockNum());
+                    // 把交易回执里的领取奖励数量设置到TxInfo
+                    DelegateRewardClaimParam drcp = (DelegateRewardClaimParam)txParam;
+                    drcp.getRewardList().forEach(reward -> {
+                        String nodeName = "Unknown";
+                        try {
+                            NodeItem node = nodeCache.getNode(reward.getNodeId());
+                            nodeName=node.getNodeName();
+                        } catch (NoSuchBeanException e) {
+                            e.printStackTrace();
+                        }
+                        reward.setNodeName(nodeName);
+                    });
                     break;
                 default:
                     break;

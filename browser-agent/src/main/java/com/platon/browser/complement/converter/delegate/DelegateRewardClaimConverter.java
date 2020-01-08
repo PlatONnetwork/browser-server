@@ -73,14 +73,9 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
         businessParam.getRewardList().forEach(reward -> {
             DelegationReward.Extra extra = new DelegationReward.Extra();
             extra.setNodeId(reward.getNodeId());
-            String nodeName = "Unknown";
-            try {
-                nodeName = nodeCache.getNode(reward.getNodeId()).getNodeName();
-            } catch (NoSuchBeanException e) {
-                e.printStackTrace();
-            }
-            extra.setNodeName(nodeName);
+            extra.setNodeName(reward.getNodeName());
             extra.setReward(reward.getReward().toString());
+            extraList.add(extra);
         });
         delegationReward.setExtra(JSON.toJSONString(extraList));
 

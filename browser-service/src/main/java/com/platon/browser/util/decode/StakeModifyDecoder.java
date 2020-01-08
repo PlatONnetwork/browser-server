@@ -15,21 +15,7 @@ import static com.platon.browser.util.decode.Decoder.stringResolver;
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:13:04
- *
- *  return Arrays.<Type>asList(new Uint16(stakingAmountType.getValue()) 1
- *          , new BytesType(Numeric.hexStringToByteArray(benifitAddress)) 2
- *          , new BytesType(Numeric.hexStringToByteArray(nodeId)) 3
- *          , new Utf8String(externalId) 4
- *          , new Utf8String(nodeName) 5
- *          , new Utf8String(webSite) 6
- *          , new Utf8String(details) 7
- *          , new Int256(amount) 8
- *          , new Uint16(rewardPer) 9
- *          , new Uint32(processVersion.getProgramVersion()) 10
- *          , new BytesType(Numeric.hexStringToByteArray(processVersion.getProgramVersionSign())) 11
- *          , new BytesType(Numeric.hexStringToByteArray(blsPubKey)) 12
- *          , new BytesType(Numeric.hexStringToByteArray(blsProof)) 13
- **/
+ */
 public class StakeModifyDecoder {
     private StakeModifyDecoder(){}
     static TxParam decode(RlpList rootList) {
