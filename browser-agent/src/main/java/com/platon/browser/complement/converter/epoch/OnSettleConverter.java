@@ -170,7 +170,8 @@ public class OnSettleConverter {
         if(settle.getCurVerifierSet().contains(staking.getNodeId())){
             // 计算当前委托成本
             BigDecimal curSettleCost = staking.getStatDelegateLocked() // 锁定的委托
-                    .add(staking.getStatDelegateHes()); // 犹豫期的委托金
+                    .add(staking.getStatDelegateHes()) // +犹豫期的委托金
+                    .add(staking.getStatDelegateReleased()); // +待提取的委托金
             CalculateUtils.rotateCost(ari.getDelegateCost(),curSettleCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
         }
         // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
