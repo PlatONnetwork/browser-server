@@ -12,6 +12,7 @@
         `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue},
         `is_settle` = #{staking.isSettle},
         `annualized_rate` = #{staking.annualizedRate},
+        `dele_annualized_rate` = #{staking.deleAnnualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo},
         `total_dele_reward` = #{staking.totalDeleReward}
         where `node_id` = #{staking.nodeId}
@@ -27,6 +28,7 @@
         `stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue},
         `is_settle` = #{staking.isSettle},
         `annualized_rate` = #{staking.annualizedRate},
+        `dele_annualized_rate` = #{staking.deleAnnualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo},
         `total_dele_reward` = @baseTotalDeleReward + #{staking.totalDeleReward}
         where `node_id` =  #{staking.nodeId};
