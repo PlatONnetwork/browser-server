@@ -2,6 +2,7 @@ package com.platon.browser.complement.converter.delegate;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -45,6 +47,8 @@ public class DelegateExitConverterTest extends AgentTestBase {
     private DelegationMapper delegationMapper;
     @Mock
     private BlockChainConfig chainConfig;
+    @Mock
+    private AddressCache addressCache;
     @Spy
     private DelegateExitConverter target;
 
@@ -56,6 +60,7 @@ public class DelegateExitConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         ReflectionTestUtils.setField(target,"delegationMapper",delegationMapper);
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
+        ReflectionTestUtils.setField(target,"addressCache",addressCache);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")

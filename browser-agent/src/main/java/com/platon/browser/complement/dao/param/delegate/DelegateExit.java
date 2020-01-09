@@ -43,6 +43,9 @@ public class DelegateExit implements BusinessParam {
     private BigDecimal codeRealAmount;
     //节点是否退出
     private boolean codeNodeIsLeave;
+    //全部退出时获得的奖励
+    private BigDecimal delegateReward;
+
 
     @Override
     public BusinessType getBusinessType() {
