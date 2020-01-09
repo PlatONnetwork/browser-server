@@ -6,13 +6,11 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +56,6 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
                 .rewardList(txParam.getRewardList()) // 领取的奖励列表
                 .build();
 
-        addressCache.update(businessParam);
-
         delegateBusinessMapper.claim(businessParam);
 
         DelegationReward delegationReward = new DelegationReward();
@@ -78,6 +74,8 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
             extraList.add(extra);
         });
         delegationReward.setExtra(JSON.toJSONString(extraList));
+
+        addressCache.update(businessParam);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return delegationReward;

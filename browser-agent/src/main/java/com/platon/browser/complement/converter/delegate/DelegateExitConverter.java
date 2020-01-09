@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.delegate;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.bean.DelegateExitResult;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -42,6 +43,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private DelegateBusinessMapper delegateBusinessMapper;
     @Autowired
     private DelegationMapper delegationMapper;
+    @Autowired
+    private AddressCache addressCache;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -76,6 +79,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .codeDelegateHes(BigDecimal.ZERO)
                 .codeDelegateLocked(BigDecimal.ZERO)
                 .codeDelegateReleased(BigDecimal.ZERO)
+                .delegateReward(txParam.getReward())
                 .build();
 
         boolean isRefundAll = delegation.getDelegateHes() // 犹豫期金额
@@ -148,6 +152,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         delegationReward.setExtra(JSON.toJSONString(extraList));
 
         der.setDelegationReward(delegationReward);
+
+        addressCache.update(businessParam);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return der;
