@@ -354,6 +354,7 @@ public class StakingServiceImpl implements StakingService {
 							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(new BigDecimal(10000)).toString());
 							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(new BigDecimal(10000)).toString());
 						}
+						break;
 					/** 提案类型 */
 					case PROPOSALS:
 						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);

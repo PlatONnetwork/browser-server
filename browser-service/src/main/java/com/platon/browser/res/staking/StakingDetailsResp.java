@@ -217,18 +217,21 @@ public class StakingDetailsResp {
 	public void setRewardPer(String rewardPer) {
 		this.rewardPer = rewardPer;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getHaveDeleReward() {
 		return haveDeleReward;
 	}
 	public void setHaveDeleReward(BigDecimal haveDeleReward) {
 		this.haveDeleReward = haveDeleReward;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getTotalDeleReward() {
 		return totalDeleReward;
 	}
 	public void setTotalDeleReward(BigDecimal totalDeleReward) {
 		this.totalDeleReward = totalDeleReward;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDeleRewardRed() {
 		return deleRewardRed;
 	}

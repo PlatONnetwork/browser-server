@@ -92,6 +92,7 @@ public class AddressServiceImpl implements AddressService {
         	resp.setDelegateUnlock(item.getDelegateHes());
         	/** 预先设置是否展示锁仓 */
         	resp.setIsRestricting(0);
+        	resp.setStakingValue(item.getStakingValue().add(item.getDelegateValue()));
         }
         /** 特殊账户余额直接查询链  */
 	  	try {

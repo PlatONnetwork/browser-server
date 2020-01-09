@@ -176,7 +176,7 @@ public interface AppDocStaking {
      *       "status":"",              //状态   1:候选中  2:活跃中  3:出块中
      *       "totalValue":"",          //质押总数=有效的质押+委托
      *       "delegateValue":"",       //委托总数
-     *       "stakingValue":"",        //质押总数
+     *       "stakingValue":"",        //自有质押（有效的质押数）
      *       "delegateQty":"",         //委托人数
      *       "slashLowQty":11,         //低出块率举报次数
      *       "slashMultiQty":11,       //多签举报次数
@@ -194,13 +194,12 @@ public interface AppDocStaking {
      *       "externalId":"",          //身份证id
      *       "externalUrl":"",          //身份证url
      *       "stakingBlockNum":"",     //最新的质押交易块高
-     *       "statDelegateReduction":"",//待提取的委托
+     *       "statDelegateReduction":"",//待赎回委托数
      *       "isInit":true,           //是否为初始节点 
      *       "rewardPer":"",           //委托奖励比例
-     *       "haveDeleReward":true,           //已领取委托奖励
+     *       "haveDeleReward":"",           //已领取委托奖励
      *       "deleAnnualizedRate":"",    //预计委托年化率
      *       "totalDeleReward":"",    //累积委托奖励
-     *       "deleAnnualizedRate":"",    //预计委托年化率
      *       "deleRewardRed":""    //待领取委托奖励
      *    }
      * }
