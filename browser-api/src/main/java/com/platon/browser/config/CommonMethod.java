@@ -53,7 +53,7 @@ public class CommonMethod {
 			if(!recaptchaDto.getSuccess().booleanValue()) {
 				throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
 			}
-		} catch (HttpRequestException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 	}
