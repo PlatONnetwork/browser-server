@@ -160,6 +160,7 @@ public class OnSettleConverter {
     /**
      * 计算委托年化率
      * @param staking 当前质押记录
+     * @param curTotalDelegateCost 节点在当前结算周期的总委托数额
      * @param settle 周期切换业务参数
      */
     private void calcDelegateAnnualizedRate(Staking staking,BigDecimal curTotalDelegateCost,Settle settle){
