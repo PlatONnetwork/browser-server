@@ -127,7 +127,8 @@ sonarqube {
         property "sonar.exclusions", "**/*Application.java," +
                 "**/WebSocketController.java,**/BrowserCache.java," +
                 "**/JedisNoResultCall.java,**/CommonMethod.java," +
-                "**/NullStringJsonSerializer.java,**/NullArrayJsonSerializer.java"
+                "**/NullStringJsonSerializer.java,**/NullArrayJsonSerializer.java," +
+                "**/RecaptchaDto.java"
     }
 }
 
