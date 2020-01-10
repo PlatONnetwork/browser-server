@@ -14,13 +14,13 @@ import com.platon.browser.config.CustomLatSerializer;
  */
 public class QueryClaimByStakingResp {
 
-	public String hash;
+	private String hash;
 	
-	public String addr;
+	private String addr;
 	
-	public Long time;
+	private Long time;
 	
-	public BigDecimal reward;
+	private BigDecimal reward;
 
 	public String getHash() {
 		return hash;

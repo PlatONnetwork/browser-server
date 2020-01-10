@@ -144,7 +144,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         try {
             nodeName = nodeCache.getNode(businessParam.getNodeId()).getNodeName();
         } catch (NoSuchBeanException e) {
-            e.printStackTrace();
+            log.error("{}",e.getMessage());
         }
         extra.setNodeName(nodeName);
         extra.setReward(txParam.getReward().toString());

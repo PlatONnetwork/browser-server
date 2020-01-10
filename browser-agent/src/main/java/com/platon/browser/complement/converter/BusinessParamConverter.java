@@ -129,7 +129,7 @@ public abstract class BusinessParamConverter<T> {
                             NodeItem node = nodeCache.getNode(reward.getNodeId());
                             nodeName=node.getNodeName();
                         } catch (NoSuchBeanException e) {
-                            e.printStackTrace();
+                            log.error("{}",e.getMessage());
                         }
                         reward.setNodeName(nodeName);
                     });

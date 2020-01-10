@@ -11,7 +11,7 @@ import com.platon.browser.req.PageReq;
  */
 public class QueryClaimByStakingReq extends PageReq {
 
-	public String nodeId;
+	private String nodeId;
 
 	public String getNodeId() {
 		return nodeId;
