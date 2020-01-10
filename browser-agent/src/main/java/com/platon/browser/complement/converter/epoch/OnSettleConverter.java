@@ -86,12 +86,16 @@ public class OnSettleConverter {
 
             // 设置当前质押的总委托奖励，从节点上取出来的委托总奖励就是当前质押获取的总委托奖励
             Node node = preVerifierMap.get(staking.getNodeId());
-            if(node!=null) staking.setTotalDeleReward(new BigDecimal(node.getDelegateRewardTotal()));
+            BigDecimal curTotalDelegateCost = BigDecimal.ZERO;
+            if(node!=null) {
+                staking.setTotalDeleReward(new BigDecimal(node.getDelegateRewardTotal()));
+                curTotalDelegateCost = new BigDecimal(node.getDelegateTotal());
+            }
 
             // 计算节点质押年化率
             calcStakeAnnualizedRate(staking,curSettleStakeReward,settle);
             // 计算委托年化率
-            calcDelegateAnnualizedRate(staking,settle);
+            calcDelegateAnnualizedRate(staking,curTotalDelegateCost,settle);
         });
         settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
@@ -158,7 +162,7 @@ public class OnSettleConverter {
      * @param staking 当前质押记录
      * @param settle 周期切换业务参数
      */
-    private void calcDelegateAnnualizedRate(Staking staking,Settle settle){
+    private void calcDelegateAnnualizedRate(Staking staking,BigDecimal curTotalDelegateCost,Settle settle){
         //计算委托年化率
         // 解析年化率信息对象
         String ariString = staking.getAnnualizedRateInfo();
@@ -168,11 +172,7 @@ public class OnSettleConverter {
 
         // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的委托成本
         if(settle.getCurVerifierSet().contains(staking.getNodeId())){
-            // 计算当前委托成本
-            BigDecimal curSettleCost = staking.getStatDelegateLocked() // 锁定的委托
-                    .add(staking.getStatDelegateHes()) // +犹豫期的委托金
-                    .add(staking.getStatDelegateReleased()); // +待提取的委托金
-            CalculateUtils.rotateCost(ari.getDelegateCost(),curSettleCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
+            CalculateUtils.rotateCost(ari.getDelegateCost(),curTotalDelegateCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
         }
         // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
         if(settle.getPreVerifierSet().contains(staking.getNodeId())){
@@ -190,7 +190,9 @@ public class OnSettleConverter {
             BigDecimal curSettleDelegateProfit = staking.getTotalDeleReward();
             CalculateUtils.rotateProfit(ari.getDelegateProfit(),curSettleDelegateProfit,BigInteger.valueOf(settle.getSettingEpoch()-1L),chainConfig);
             BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari.getDelegateProfit(),ari.getDelegateCost(),chainConfig);
-            // 设置年化率
+            // 把前一周期的委托奖励年化率设置至preDeleAnnualizedRate字段
+            staking.setPreDeleAnnualizedRate(staking.getDeleAnnualizedRate());
+            // 设置当前质押记录的委托奖励年化率
             staking.setDeleAnnualizedRate(annualizedRate.doubleValue());
         }
         // 设置年化率计算原始数据

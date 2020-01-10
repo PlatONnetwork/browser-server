@@ -76,6 +76,8 @@ public class Staking extends StakingKey {
 
     private BigDecimal haveDeleReward;
 
+    private Double preDeleAnnualizedRate;
+
     private Double deleAnnualizedRate;
 
     private BigDecimal totalDeleReward;
@@ -362,6 +364,14 @@ public class Staking extends StakingKey {
         this.haveDeleReward = haveDeleReward;
     }
 
+    public Double getPreDeleAnnualizedRate() {
+        return preDeleAnnualizedRate;
+    }
+
+    public void setPreDeleAnnualizedRate(Double preDeleAnnualizedRate) {
+        this.preDeleAnnualizedRate = preDeleAnnualizedRate;
+    }
+
     public Double getDeleAnnualizedRate() {
         return deleAnnualizedRate;
     }
@@ -431,6 +441,7 @@ public class Staking extends StakingKey {
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         rewardPer("reward_per", "rewardPer", "INTEGER", false),
         haveDeleReward("have_dele_reward", "haveDeleReward", "DECIMAL", false),
+        preDeleAnnualizedRate("pre_dele_annualized_rate", "preDeleAnnualizedRate", "DOUBLE", false),
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);

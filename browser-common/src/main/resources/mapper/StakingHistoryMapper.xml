@@ -39,6 +39,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="reward_per" jdbcType="INTEGER" property="rewardPer" />
     <result column="have_dele_reward" jdbcType="DECIMAL" property="haveDeleReward" />
+    <result column="pre_dele_annualized_rate" jdbcType="DOUBLE" property="preDeleAnnualizedRate" />
     <result column="dele_annualized_rate" jdbcType="DOUBLE" property="deleAnnualizedRate" />
     <result column="total_dele_reward" jdbcType="DECIMAL" property="totalDeleReward" />
   </resultMap>
@@ -110,7 +111,7 @@
     leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, stat_delegate_locked, 
     stat_delegate_released, block_reward_value, fee_reward_value, staking_reward_value, 
     predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time, 
-    reward_per, have_dele_reward, dele_annualized_rate, total_dele_reward
+    reward_per, have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -178,8 +179,9 @@
       block_reward_value, fee_reward_value, staking_reward_value, 
       predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, 
       create_time, update_time, reward_per, 
-      have_dele_reward, dele_annualized_rate, total_dele_reward, 
-      annualized_rate_info)
+      have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, 
+      total_dele_reward, annualized_rate_info
+      )
     values (#{nodeId,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{stakingTxIndex,jdbcType=INTEGER}, 
       #{stakingHes,jdbcType=DECIMAL}, #{stakingLocked,jdbcType=DECIMAL}, #{stakingReduction,jdbcType=DECIMAL}, 
       #{stakingReductionEpoch,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, #{nodeIcon,jdbcType=VARCHAR}, 
@@ -192,8 +194,9 @@
       #{blockRewardValue,jdbcType=DECIMAL}, #{feeRewardValue,jdbcType=DECIMAL}, #{stakingRewardValue,jdbcType=DECIMAL}, 
       #{predictStakingReward,jdbcType=DECIMAL}, #{curConsBlockQty,jdbcType=BIGINT}, #{preConsBlockQty,jdbcType=BIGINT}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rewardPer,jdbcType=INTEGER}, 
-      #{haveDeleReward,jdbcType=DECIMAL}, #{deleAnnualizedRate,jdbcType=DOUBLE}, #{totalDeleReward,jdbcType=DECIMAL}, 
-      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
+      #{haveDeleReward,jdbcType=DECIMAL}, #{preDeleAnnualizedRate,jdbcType=DOUBLE}, #{deleAnnualizedRate,jdbcType=DOUBLE}, 
+      #{totalDeleReward,jdbcType=DECIMAL}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.StakingHistory">
     insert into staking_history
@@ -308,6 +311,9 @@
       </if>
       <if test="haveDeleReward != null">
         have_dele_reward,
+      </if>
+      <if test="preDeleAnnualizedRate != null">
+        pre_dele_annualized_rate,
       </if>
       <if test="deleAnnualizedRate != null">
         dele_annualized_rate,
@@ -430,6 +436,9 @@
       </if>
       <if test="haveDeleReward != null">
         #{haveDeleReward,jdbcType=DECIMAL},
+      </if>
+      <if test="preDeleAnnualizedRate != null">
+        #{preDeleAnnualizedRate,jdbcType=DOUBLE},
       </if>
       <if test="deleAnnualizedRate != null">
         #{deleAnnualizedRate,jdbcType=DOUBLE},
@@ -562,6 +571,9 @@
       <if test="record.haveDeleReward != null">
         have_dele_reward = #{record.haveDeleReward,jdbcType=DECIMAL},
       </if>
+      <if test="record.preDeleAnnualizedRate != null">
+        pre_dele_annualized_rate = #{record.preDeleAnnualizedRate,jdbcType=DOUBLE},
+      </if>
       <if test="record.deleAnnualizedRate != null">
         dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
       </if>
@@ -615,6 +627,7 @@
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       reward_per = #{record.rewardPer,jdbcType=INTEGER},
       have_dele_reward = #{record.haveDeleReward,jdbcType=DECIMAL},
+      pre_dele_annualized_rate = #{record.preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{record.totalDeleReward,jdbcType=DECIMAL},
       annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
@@ -661,6 +674,7 @@
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       reward_per = #{record.rewardPer,jdbcType=INTEGER},
       have_dele_reward = #{record.haveDeleReward,jdbcType=DECIMAL},
+      pre_dele_annualized_rate = #{record.preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{record.totalDeleReward,jdbcType=DECIMAL}
     <if test="_parameter != null">
@@ -775,6 +789,9 @@
       <if test="haveDeleReward != null">
         have_dele_reward = #{haveDeleReward,jdbcType=DECIMAL},
       </if>
+      <if test="preDeleAnnualizedRate != null">
+        pre_dele_annualized_rate = #{preDeleAnnualizedRate,jdbcType=DOUBLE},
+      </if>
       <if test="deleAnnualizedRate != null">
         dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
       </if>
@@ -825,6 +842,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       reward_per = #{rewardPer,jdbcType=INTEGER},
       have_dele_reward = #{haveDeleReward,jdbcType=DECIMAL},
+      pre_dele_annualized_rate = #{preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{totalDeleReward,jdbcType=DECIMAL},
       annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
@@ -868,6 +886,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       reward_per = #{rewardPer,jdbcType=INTEGER},
       have_dele_reward = #{haveDeleReward,jdbcType=DECIMAL},
+      pre_dele_annualized_rate = #{preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{totalDeleReward,jdbcType=DECIMAL}
     where node_id = #{nodeId,jdbcType=VARCHAR}
@@ -886,8 +905,8 @@
       join_time, leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, 
       stat_delegate_locked, stat_delegate_released, block_reward_value, fee_reward_value, 
       staking_reward_value, predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, 
-      create_time, update_time, reward_per, have_dele_reward, dele_annualized_rate, total_dele_reward, 
-      annualized_rate_info)
+      create_time, update_time, reward_per, have_dele_reward, pre_dele_annualized_rate, 
+      dele_annualized_rate, total_dele_reward, annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
@@ -904,8 +923,9 @@
         #{item.predictStakingReward,jdbcType=DECIMAL}, #{item.curConsBlockQty,jdbcType=BIGINT}, 
         #{item.preConsBlockQty,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, 
         #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardPer,jdbcType=INTEGER}, #{item.haveDeleReward,jdbcType=DECIMAL}, 
-        #{item.deleAnnualizedRate,jdbcType=DOUBLE}, #{item.totalDeleReward,jdbcType=DECIMAL}, 
-        #{item.annualizedRateInfo,jdbcType=LONGVARCHAR})
+        #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}, #{item.deleAnnualizedRate,jdbcType=DOUBLE}, 
+        #{item.totalDeleReward,jdbcType=DECIMAL}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -1033,6 +1053,9 @@
         </if>
         <if test="'have_dele_reward'.toString() == column.value">
           #{item.haveDeleReward,jdbcType=DECIMAL}
+        </if>
+        <if test="'pre_dele_annualized_rate'.toString() == column.value">
+          #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}
         </if>
         <if test="'dele_annualized_rate'.toString() == column.value">
           #{item.deleAnnualizedRate,jdbcType=DOUBLE}

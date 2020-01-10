@@ -184,6 +184,7 @@ public class InitializationService {
 
             staking.setRewardPer(0);
             staking.setDeleAnnualizedRate(0.0);
+            staking.setPreDeleAnnualizedRate(0.0);
             staking.setHaveDeleReward(BigDecimal.ZERO);
             staking.setTotalDeleReward(BigDecimal.ZERO);
 

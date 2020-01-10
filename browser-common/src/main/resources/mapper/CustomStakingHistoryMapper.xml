@@ -122,6 +122,9 @@
         <if test="'have_dele_reward'.toString() == column.value">
           #{item.haveDeleReward,jdbcType=DECIMAL}
         </if>
+        <if test="'pre_dele_annualized_rate'.toString() == column.value">
+          #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}
+        </if>
         <if test="'dele_annualized_rate'.toString() == column.value">
           #{item.deleAnnualizedRate,jdbcType=DOUBLE}
         </if>

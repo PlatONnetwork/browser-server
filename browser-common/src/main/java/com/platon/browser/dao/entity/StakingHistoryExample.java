@@ -2436,6 +2436,66 @@ public class StakingHistoryExample {
             return (Criteria) this;
         }
 
+        public Criteria andPreDeleAnnualizedRateIsNull() {
+            addCriterion("pre_dele_annualized_rate is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateIsNotNull() {
+            addCriterion("pre_dele_annualized_rate is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateEqualTo(Double value) {
+            addCriterion("pre_dele_annualized_rate =", value, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateNotEqualTo(Double value) {
+            addCriterion("pre_dele_annualized_rate <>", value, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateGreaterThan(Double value) {
+            addCriterion("pre_dele_annualized_rate >", value, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateGreaterThanOrEqualTo(Double value) {
+            addCriterion("pre_dele_annualized_rate >=", value, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateLessThan(Double value) {
+            addCriterion("pre_dele_annualized_rate <", value, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateLessThanOrEqualTo(Double value) {
+            addCriterion("pre_dele_annualized_rate <=", value, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateIn(List<Double> values) {
+            addCriterion("pre_dele_annualized_rate in", values, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateNotIn(List<Double> values) {
+            addCriterion("pre_dele_annualized_rate not in", values, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateBetween(Double value1, Double value2) {
+            addCriterion("pre_dele_annualized_rate between", value1, value2, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreDeleAnnualizedRateNotBetween(Double value1, Double value2) {
+            addCriterion("pre_dele_annualized_rate not between", value1, value2, "preDeleAnnualizedRate");
+            return (Criteria) this;
+        }
+
         public Criteria andDeleAnnualizedRateIsNull() {
             addCriterion("dele_annualized_rate is null");
             return (Criteria) this;
