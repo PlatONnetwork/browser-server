@@ -68,10 +68,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 交易方法逻辑实现
@@ -711,6 +708,12 @@ public class TransactionServiceImpl implements TransactionService {
 		} catch (IOException e) {
 			logger.error(ERROR_TIPS, e);
 		}
+		if(delegationRewards==null){
+			// 防止空指异常
+			delegationRewards = new ESResult<>();
+			delegationRewards.setTotal(0L);
+			delegationRewards.setRsData(Collections.emptyList());
+		}
 		List<QueryClaimByAddressResp> queryClaimByAddressResps = new ArrayList<>();
 		for(DelegationReward delegationReward:delegationRewards.getRsData()) {
 			QueryClaimByAddressResp queryClaimByAddressResp = new QueryClaimByAddressResp();
@@ -757,6 +760,12 @@ public class TransactionServiceImpl implements TransactionService {
 			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
 		} catch (IOException e) {
 			logger.error(ERROR_TIPS, e);
+		}
+		if(delegationRewards==null){
+			// 防止空指异常
+			delegationRewards = new ESResult<>();
+			delegationRewards.setTotal(0L);
+			delegationRewards.setRsData(Collections.emptyList());
 		}
 		List<QueryClaimByStakingResp> queryClaimByStakingResps = new ArrayList<>();
 		for(DelegationReward delegationReward:delegationRewards.getRsData()) {
