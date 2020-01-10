@@ -1,6 +1,6 @@
 # ***************************测试配置**************************** #
 # 应用版本
-version: 0.7.5.0
+version: 0.7.6.0
 # 当前激活的配置名称(请不要修改)
 profile: testsonar
 # 密码加密配置
@@ -52,6 +52,7 @@ spring:
       transactionIndexName: browser_transaction_testsonar
       delegationIndexName: browser_delegation_testsonar
       nodeOptIndexName: browser_nodeopt_testsonar
+      delegationRewardIndexName: browser_delegation_reward_testsonar
 #redis配置
 redisCluster:
   configKey: DEFAULT

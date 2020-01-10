@@ -89,6 +89,10 @@ public class StakingServiceTest {
         staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
         staking.setIsConsensus(2);
         staking.setIsSettle(2);
+        staking.setDeleAnnualizedRate(9.3);
+        staking.setTotalDeleReward(BigDecimal.ONE);
+        staking.setHaveDeleReward(BigDecimal.TEN);
+        staking.setRewardPer(333);
         stakings.add(staking);
         when(nodeMapper.selectByExample(any())).thenReturn(stakings);
 

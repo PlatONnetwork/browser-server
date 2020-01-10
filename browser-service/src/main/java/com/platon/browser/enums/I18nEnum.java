@@ -122,6 +122,7 @@ public enum I18nEnum {
     REPORT,
     RESTRICTING_CREATE,
     MULTI_SIGN,
+    CLAIM_REWARDS,
     
     CODE0,
     CODE1,
