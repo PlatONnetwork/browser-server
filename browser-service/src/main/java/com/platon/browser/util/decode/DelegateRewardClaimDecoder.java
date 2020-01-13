@@ -44,7 +44,7 @@ class DelegateRewardClaimDecoder {
 
                     String nodeId = ((RlpString)rlpL.getValues().get(0)).asString();
                     BigInteger stakingNum = ((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger();
-                    BigInteger amount = ((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger();
+                    BigInteger amount = ((RlpString)rlpL.getValues().get(2)).asPositiveBigInteger();
 
                     Reward reward = Reward.builder()
                             .nodeId(HexTool.prefix(nodeId))
