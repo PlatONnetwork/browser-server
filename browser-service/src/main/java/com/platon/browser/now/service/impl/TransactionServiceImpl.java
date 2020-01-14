@@ -380,7 +380,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
 						resp.setTxAmount(createValidatorParam.getAmount());
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-						resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(new BigDecimal(10000)).toString());
+						resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
 						break;
 					/**
 					 * 编辑验证人
@@ -394,7 +394,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setDetails(editValidatorParam.getDetails());
 						resp.setNodeName(commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
 						resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-						resp.setDelegationRatio(new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(new BigDecimal(10000)).toString());
+						resp.setDelegationRatio(new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
 						break;
 					/**
 					 * 增加质押
@@ -607,13 +607,16 @@ public class TransactionServiceImpl implements TransactionService {
 					case CLAIM_REWARDS:
 						DelegateRewardClaimParam delegateRewardClaimParam  = JSON.parseObject(txInfo, DelegateRewardClaimParam.class);
 						List<TransactionDetailsRewardsResp> rewards = new ArrayList<>();
+						BigDecimal rewardSum = BigDecimal.ZERO;
 						for(Reward reward:delegateRewardClaimParam.getRewardList()) {
 							TransactionDetailsRewardsResp transactionDetailsRewardsResp = new TransactionDetailsRewardsResp();
 							transactionDetailsRewardsResp.setVerify(reward.getNodeId());
 							transactionDetailsRewardsResp.setNodeName(reward.getNodeName());
 							transactionDetailsRewardsResp.setReward(reward.getReward());
+							rewardSum = rewardSum.add(reward.getReward());
 							rewards.add(transactionDetailsRewardsResp);
 						}
+						resp.setTxAmount(rewardSum);
 						resp.setRewards(rewards);
 						break;
 				default:

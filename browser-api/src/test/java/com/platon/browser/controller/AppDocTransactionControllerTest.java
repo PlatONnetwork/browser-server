@@ -60,7 +60,7 @@ public class AppDocTransactionControllerTest {
     
     @Test
     public void transactionListByAddress() throws Exception{
-    	String requestBody = "{\"address\":\"0x\"}";;
+    	String requestBody = "{\"address\":\"0x\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/transaction/transactionListByAddress")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes()))
@@ -91,11 +91,28 @@ public class AppDocTransactionControllerTest {
     
     @Test
     public void transactionDetails() throws Exception{
-    	String requestBody = "{\"txHash\":\"0x10eab2c84392db35f9caf87c19c183a19f12462c0935a5b9a2f502ef32773d19\"}";;
+    	String requestBody = "{\"txHash\":\"0x10eab2c84392db35f9caf87c19c183a19f12462c0935a5b9a2f502ef32773d19\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/transaction/transactionDetails")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes()))
     		.andExpect(status().isOk()).andDo(print());
     }
     
+    @Test
+    public void queryClaimByAddress() throws Exception{
+    	String requestBody = "{\"address\":\"0x\",\"pageNo\":\"1\",\"pageSize\":\"20\"}";
+    	mockMvc.perform(MockMvcRequestBuilders.post("/transaction/queryClaimByAddress")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)
+    		.content(requestBody.getBytes()))
+    		.andExpect(status().isOk()).andDo(print());
+    }
+    
+    @Test
+    public void queryClaimByStaking() throws Exception{
+    	String requestBody = "{\"nodeId\":\"0x\",\"pageNo\":\"1\",\"pageSize\":\"20\"}";
+    	mockMvc.perform(MockMvcRequestBuilders.post("/transaction/queryClaimByStaking")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)
+    		.content(requestBody.getBytes()))
+    		.andExpect(status().isOk()).andDo(print());
+    }
 }
