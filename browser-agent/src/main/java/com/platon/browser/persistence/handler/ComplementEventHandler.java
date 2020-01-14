@@ -5,11 +5,13 @@ import com.platon.browser.common.queue.complement.handler.IComplementEventHandle
 import com.platon.browser.persistence.queue.publisher.PersistenceEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 区块事件处理器
  */
 @Slf4j
+@Component
 public class ComplementEventHandler implements IComplementEventHandler {
 
     @Autowired
