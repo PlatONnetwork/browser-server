@@ -212,7 +212,8 @@ public class AddressServiceImpl implements AddressService {
 		/**
 		 * 查询所有的交易金额进行汇总
 		 */
-		List<Reward> rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), null).send().getData();
+		List<String> nodes = new ArrayList<>();
+		List<Reward> rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
 		BigDecimal allRewards = BigDecimal.ZERO;
 		for(Reward reward : rewards) {
 			allRewards = allRewards.add(new BigDecimal(reward.getReward()));

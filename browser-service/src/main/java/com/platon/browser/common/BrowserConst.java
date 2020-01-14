@@ -1,5 +1,7 @@
 package com.platon.browser.common;
 
+import java.math.BigDecimal;
+
 /**
  * 统一const定义
  *  @file BrowserConst.java
@@ -48,5 +50,8 @@ public class BrowserConst {
 	
 	/**百分比转换的name名*/
 	public static final String EXTRA_PECENT_PARAM = "slashFractionDuplicateSign,duplicateSignReportReward";
+	
+	/**被除参数*/
+	public static final BigDecimal PERCENTAGE = new BigDecimal(100);
 	
 }
