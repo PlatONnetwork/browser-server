@@ -202,6 +202,15 @@ PUT /_template/transaction_template
       "to_type": {
         "type": "integer"
       },
+      "contract_Type": {
+        "type": "integer"
+      },
+      "method": {
+        "type": "text",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
       "seq": {
         "type": "long"
       },

@@ -44,7 +44,7 @@ public interface AppDocAddress {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "type":"",                //地址详情  1：账号   2：合约   3：内置合约
+     *       "type":"",                //地址类型  1：账号    2：内置合约  3：evm合约  4:wasm合约
      *       "balance":"",             //余额(单位:LAT)
      *       "restrictingBalance":"",  //锁仓余额(单位:LAT)
      *       "stakingValue":"",        //质押的金额
@@ -65,6 +65,7 @@ public interface AppDocAddress {
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希
+     *       "contractBin":"",  //合约bin
      *       "isRestricting":""  //是否有锁仓交易 0-无  1-有
      *    }
      * }

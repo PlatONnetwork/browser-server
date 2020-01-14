@@ -34,6 +34,7 @@ public class QueryDetailResp {
     private String contractName;        //合约名称
     private String contractCreate;      //合约创建者地址
     private String contractCreateHash; //合约创建哈希
+    private String contractBin; //合约bin
     private Integer isRestricting; //是否锁仓
 	public Integer getType() {
 		return type;
@@ -177,6 +178,12 @@ public class QueryDetailResp {
 	}
 	public void setHaveReward(BigDecimal haveReward) {
 		this.haveReward = haveReward;
+	}
+	public String getContractBin() {
+		return contractBin;
+	}
+	public void setContractBin(String contractBin) {
+		this.contractBin = contractBin;
 	}
     
 }

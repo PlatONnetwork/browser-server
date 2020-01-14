@@ -52,7 +52,7 @@ public interface AppDocHome {
      *    "errMsg": "",                //描述信息
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data":{
-     *       "type":"",                //block：区块；  transaction：交易；  address：地址； staking：验证人
+     *       "type":"",                //block：区块；  transaction：交易；  address：地址； staking：验证人；  contract：合约地址
      *       "struct":{
      *          "number":17888,        //区块高度
      *          "txHash":"",           //交易hash

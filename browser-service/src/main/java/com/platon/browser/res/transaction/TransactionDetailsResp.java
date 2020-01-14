@@ -34,6 +34,8 @@ public class TransactionDetailsResp {
     private Boolean first;            //是否第一条记录
     private Boolean last;              //是否最后一条记录
     private String receiveType;  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
+    private Integer contractType; //合约类型  1-evm合约  2-wasm合约
+    private String method; //合约调用函数
     private String rPAccount;           //锁仓计划的地址
     private BigDecimal rPNum;
     private List<TransactionDetailsRPPlanResp> rPPlan;
@@ -428,6 +430,18 @@ public class TransactionDetailsResp {
 	}
 	public void setRewards(List<TransactionDetailsRewardsResp> rewards) {
 		this.rewards = rewards;
+	}
+	public Integer getContractType() {
+		return contractType;
+	}
+	public void setContractType(Integer contractType) {
+		this.contractType = contractType;
+	}
+	public String getMethod() {
+		return method;
+	}
+	public void setMethod(String method) {
+		this.method = method;
 	}
 
 }

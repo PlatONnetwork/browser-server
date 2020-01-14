@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.elasticsearch.ESResult;
@@ -55,6 +56,8 @@ public class HomeServiceImpl implements HomeService {
 	@Autowired
 	private NodeMapper nodeMapper;
 	@Autowired
+	private AddressMapper addressMapper;
+	@Autowired
 	private BlockChainConfig blockChainConfig;
 	@Autowired
 	private CommonService commonService;
@@ -70,6 +73,7 @@ public class HomeServiceImpl implements HomeService {
 	private static final String STAKING_TYPE="staking";
 	private static final String BLOCK_TYPE="block";
 	private static final String ADDRESS_TYPE="address";
+	private static final String CONTRACT_TYPE="contract";
 	private static final String TRANSACTION_TYPE="transaction";
 
 	@Override
@@ -95,8 +99,6 @@ public class HomeServiceImpl implements HomeService {
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
 			}
 			/* 存在区块信息则返回区块号 */
-			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-			constructor.must(new ESQueryBuilders().term("num", number));
 			Block block = null;
 			try {
 				block = blockESRepository.get(String.valueOf(number), Block.class);
@@ -115,7 +117,12 @@ public class HomeServiceImpl implements HomeService {
 			}
 			if (keyword.length() == 40) {
 				/* 判断为合约或账户地址 */
-				result.setType(ADDRESS_TYPE);
+				Address address = addressMapper.selectByPrimaryKey(HexTool.prefix(keyword));
+				if(address != null && address.getType().intValue() != 1) {
+					result.setType(CONTRACT_TYPE);
+				} else {
+					result.setType(ADDRESS_TYPE);
+				}
 				queryNavigationStructResp.setAddress(HexTool.prefix(keyword));
 			}
 			if (keyword.length() == 128) {
@@ -145,15 +152,13 @@ public class HomeServiceImpl implements HomeService {
 					 * 交易hash或者区块hash 逻辑分析 1、优先查询已完成交易 2、已完成交易查询无记录，则查询区块
 					 * 4、以上都无记录，则返回空结果
 					 */
-					ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-					constructor.must(new ESQueryBuilders().term("hash", keyword));
-					ESResult<Transaction> items = new ESResult<>();
+					Transaction transaction = null;
 					try {
-						items = transactionESRepository.search(constructor, Transaction.class, 1, 1);
+						transaction = transactionESRepository.get(keyword, Transaction.class);
 					} catch (IOException e) {
 						log.error(BLOCK_ERR_TIPS, e);
 					}
-					if(items.getTotal().intValue() > 0) {
+					if(transaction != null) {
 						result.setType(TRANSACTION_TYPE);
 						queryNavigationStructResp.setTxHash(keyword);
 					} else {

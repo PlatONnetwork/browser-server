@@ -619,6 +619,19 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setTxAmount(rewardSum);
 						resp.setRewards(rewards);
 						break;
+						/**
+						 * 合约创建
+						 */
+					case CONTRACT_CREATE:
+						
+						
+						break;
+						/**
+						 * 合约执行
+						 */
+					case CONTRACT_EXEC:
+						
+						break;
 				default:
 					break;
 				}
