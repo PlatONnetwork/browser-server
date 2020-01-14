@@ -3,21 +3,6 @@
 <mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
 <update id="settle" parameterType="com.platon.browser.complement.dao.param.epoch.Settle">
     <foreach collection="stakingList" item="staking">
-        /*1、更新质押*/
-        update `staking` set
-        `staking_locked` = #{staking.stakingLocked},
-        `staking_hes` = #{staking.stakingHes},
-        `staking_reduction` = #{staking.stakingReduction},
-        `status` = #{staking.status},
-        `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue},
-        `is_settle` = #{staking.isSettle},
-        `annualized_rate` = #{staking.annualizedRate},
-        `pre_dele_annualized_rate` = #{staking.preDeleAnnualizedRate},
-        `dele_annualized_rate` = #{staking.deleAnnualizedRate},
-        `annualized_rate_info` = #{staking.annualizedRateInfo},
-        `total_dele_reward` = #{staking.totalDeleReward}
-        where `node_id` = #{staking.nodeId}
-        and staking_block_num = #{staking.stakingBlockNum};
         /*2、更新节点*/
         SET @preStakeTotalDeleReward = (SELECT `total_dele_reward` FROM staking WHERE `node_id` = #{staking.nodeId} ORDER BY `staking_block_num` DESC LIMIT 1,1);
         SET @baseTotalDeleReward = (SELECT CASE WHEN @preStakeTotalDeleReward IS NULL THEN 0 ELSE @preStakeTotalDeleReward END);
@@ -34,6 +19,21 @@
         `annualized_rate_info` = #{staking.annualizedRateInfo},
         `total_dele_reward` = @baseTotalDeleReward + #{staking.totalDeleReward}
         where `node_id` =  #{staking.nodeId};
+        /*1、更新质押*/
+        update `staking` set
+        `staking_locked` = #{staking.stakingLocked},
+        `staking_hes` = #{staking.stakingHes},
+        `staking_reduction` = #{staking.stakingReduction},
+        `status` = #{staking.status},
+        `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue},
+        `is_settle` = #{staking.isSettle},
+        `annualized_rate` = #{staking.annualizedRate},
+        `pre_dele_annualized_rate` = #{staking.preDeleAnnualizedRate},
+        `dele_annualized_rate` = #{staking.deleAnnualizedRate},
+        `annualized_rate_info` = #{staking.annualizedRateInfo},
+        `total_dele_reward` = #{staking.totalDeleReward}
+        where `node_id` = #{staking.nodeId}
+        and staking_block_num = #{staking.stakingBlockNum};
     </foreach>
     /*3、更新委托*/
     update `delegation` set
