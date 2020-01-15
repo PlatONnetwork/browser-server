@@ -144,28 +144,31 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         der.setDelegateExit(businessParam);
 
-        DelegationReward delegationReward = new DelegationReward();
-        delegationReward.setHash(tx.getHash());
-        delegationReward.setAddr(tx.getFrom());
-        delegationReward.setTime(tx.getTime());
-        delegationReward.setCreTime(new Date());
-        delegationReward.setUpdTime(new Date());
+        if(txParam.getReward().compareTo(BigDecimal.ZERO)==0){
+            // 如果委托奖励为0，则无需记录领取记录
+            DelegationReward delegationReward = new DelegationReward();
+            delegationReward.setHash(tx.getHash());
+            delegationReward.setAddr(tx.getFrom());
+            delegationReward.setTime(tx.getTime());
+            delegationReward.setCreTime(new Date());
+            delegationReward.setUpdTime(new Date());
 
-        List<DelegationReward.Extra> extraList = new ArrayList<>();
-        DelegationReward.Extra extra = new DelegationReward.Extra();
-        extra.setNodeId(businessParam.getNodeId());
-        String nodeName = "Unknown";
-        try {
-            nodeName = nodeCache.getNode(businessParam.getNodeId()).getNodeName();
-        } catch (NoSuchBeanException e) {
-            log.error("{}",e.getMessage());
+            List<DelegationReward.Extra> extraList = new ArrayList<>();
+            DelegationReward.Extra extra = new DelegationReward.Extra();
+            extra.setNodeId(businessParam.getNodeId());
+            String nodeName = "Unknown";
+            try {
+                nodeName = nodeCache.getNode(businessParam.getNodeId()).getNodeName();
+            } catch (NoSuchBeanException e) {
+                log.error("{}",e.getMessage());
+            }
+            extra.setNodeName(nodeName);
+            extra.setReward(txParam.getReward().toString());
+            extraList.add(extra);
+            delegationReward.setExtra(JSON.toJSONString(extraList));
+
+            der.setDelegationReward(delegationReward);
         }
-        extra.setNodeName(nodeName);
-        extra.setReward(txParam.getReward().toString());
-        extraList.add(extra);
-        delegationReward.setExtra(JSON.toJSONString(extraList));
-
-        der.setDelegationReward(delegationReward);
 
         addressCache.update(businessParam);
 
