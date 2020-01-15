@@ -14,6 +14,8 @@ import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationKey;
+import com.platon.browser.dao.entity.GasEstimateLog;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -50,6 +52,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private AddressCache addressCache;
     @Autowired
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -176,6 +180,16 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         epoches.add(epoch);
         // 消息唯一序号
         Long seq = tx.getNum()*10000+tx.getIndex();
+
+        // 入库mysql
+        List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
+        GasEstimateLog gsl = new GasEstimateLog();
+        gsl.setSeq(seq);
+        gsl.setJson(JSON.toJSONString(epoches));
+        gasEstimateLogs.add(gsl);
+        customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
+
+        // 发布至ES入库队列
         gasEstimateEventPublisher.publish(seq, gasEstimateAction,epoches);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);

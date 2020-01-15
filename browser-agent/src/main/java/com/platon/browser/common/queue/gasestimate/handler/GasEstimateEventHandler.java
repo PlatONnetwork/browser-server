@@ -2,7 +2,9 @@ package com.platon.browser.common.queue.gasestimate.handler;
 
 import com.platon.browser.common.queue.gasestimate.event.GasEstimateEvent;
 import com.platon.browser.common.service.elasticsearch.EsGasEstimateEpochService;
+import com.platon.browser.dao.entity.GasEstimateLogExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class GasEstimateEventHandler implements IGasEstimateEventHandler {
     private DelegationMapper delegationMapper;
     @Autowired
     private EsGasEstimateEpochService esGasEstimateEpochService;
+    @Autowired
+    private GasEstimateLogMapper gasEstimateLogMapper;
 
     @Override
     public void onEvent(GasEstimateEvent event, long sequence, boolean endOfBatch) {
@@ -38,6 +42,8 @@ public class GasEstimateEventHandler implements IGasEstimateEventHandler {
                     esGasEstimateEpochService.delete(new HashSet<>(event.getEpoches()));
                     break;
             }
+            // es入库完成后删除mysql中的记录
+            gasEstimateLogMapper.deleteByPrimaryKey(event.getSeq());
         }catch (Exception e){
             log.error("",e);
         }
