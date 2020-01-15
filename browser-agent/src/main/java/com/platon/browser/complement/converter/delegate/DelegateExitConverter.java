@@ -3,8 +3,6 @@ package com.platon.browser.complement.converter.delegate;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.common.queue.gasestimate.event.ActionEnum;
-import com.platon.browser.common.queue.gasestimate.event.GasEstimateEpoch;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.bean.DelegateExitResult;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -12,11 +10,11 @@ import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.DelegationKey;
-import com.platon.browser.dao.entity.GasEstimateLog;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -54,6 +52,10 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Autowired
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
+    @Autowired
+    private CustomGasEstimateMapper customGasEstimateMapper;
+    @Autowired
+    private GasEstimateMapper gasEstimateMapper;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -100,11 +102,10 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             businessParam.setCodeNodeIsLeave(true);
         }
 
-        ActionEnum gasEstimateAction = ActionEnum.ADD;
+        boolean needDeleteGasEstimate = false;
 
         if(isRefundAll){
-            gasEstimateAction = ActionEnum.DELETE;
-
+            needDeleteGasEstimate = true;
             // 如果全部退回
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()) // 委托状态置为历史
                 .setCodeRealAmount(delegation.getDelegateHes().add(delegation.getDelegateLocked()).add(delegation.getDelegateReleased())) // 真实退回金额=犹豫+锁定+已解锁
@@ -144,7 +145,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         der.setDelegateExit(businessParam);
 
-        if(txParam.getReward().compareTo(BigDecimal.ZERO)==0){
+        if(txParam.getReward().compareTo(BigDecimal.ZERO)>0){
             // 如果委托奖励为0，则无需记录领取记录
             DelegationReward delegationReward = new DelegationReward();
             delegationReward.setHash(tx.getHash());
@@ -172,28 +173,24 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         addressCache.update(businessParam);
 
-        // gas price估算数据信息
-        List<GasEstimateEpoch> epoches = new ArrayList<>();
-        GasEstimateEpoch epoch = GasEstimateEpoch.builder()
-                .addr(tx.getFrom())
-                .nodeId(txParam.getNodeId())
-                .sbn(txParam.getStakingBlockNum().toString())
-                .epoch(0L)
-                .build();
-        epoches.add(epoch);
-        // 消息唯一序号
-        Long seq = tx.getNum()*10000+tx.getIndex();
-
-        // 入库mysql
-        List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
-        GasEstimateLog gsl = new GasEstimateLog();
-        gsl.setSeq(seq);
-        gsl.setJson(JSON.toJSONString(epoches));
-        gasEstimateLogs.add(gsl);
-        customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
-
-        // 发布至ES入库队列
-        gasEstimateEventPublisher.publish(seq, gasEstimateAction,epoches);
+        if(needDeleteGasEstimate){
+            // 1. 全部赎回： 删除对应记录
+            GasEstimateKey gek = new GasEstimateKey();
+            gek.setNodeId(txParam.getNodeId());
+            gek.setAddr(tx.getFrom());
+            gek.setSbn(txParam.getStakingBlockNum().longValue());
+            gasEstimateMapper.deleteByPrimaryKey(gek);
+        }else{
+            // 2. 部分赎回：1. 新增 委托未计算周期  记录， epoch = 0
+            List<GasEstimate> estimates = new ArrayList<>();
+            GasEstimate estimate = new GasEstimate();
+            estimate.setNodeId(txParam.getNodeId());
+            estimate.setSbn(txParam.getStakingBlockNum().longValue());
+            estimate.setAddr(tx.getFrom());
+            estimate.setEpoch(0L);
+            estimates.add(estimate);
+            customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
+        }
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return der;

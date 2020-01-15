@@ -5,10 +5,9 @@ import com.lmax.disruptor.EventTranslatorVararg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.common.queue.AbstractPublisher;
-import com.platon.browser.common.queue.gasestimate.event.ActionEnum;
-import com.platon.browser.common.queue.gasestimate.event.GasEstimateEpoch;
 import com.platon.browser.common.queue.gasestimate.event.GasEstimateEvent;
 import com.platon.browser.common.queue.gasestimate.handler.IGasEstimateEventHandler;
+import com.platon.browser.dao.entity.GasEstimate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +25,7 @@ public class GasEstimateEventPublisher extends AbstractPublisher<GasEstimateEven
     private static final EventTranslatorVararg<GasEstimateEvent>
     TRANSLATOR = (event, sequence,args)->{
         event.setSeq((Long) args[0]);
-        event.setAction((ActionEnum) args[1]);
-        event.setEpoches((List<GasEstimateEpoch>)args[2]);
+        event.setEstimateList((List<GasEstimate>) args[1]);
     };
     @Value("${disruptor.queue.gasestimate.buffer-size}")
     private int ringBufferSize;
@@ -48,7 +46,7 @@ public class GasEstimateEventPublisher extends AbstractPublisher<GasEstimateEven
         register(GasEstimateEventPublisher.class.getSimpleName(),this);
     }
 
-    public void publish(Long seq,ActionEnum action,List<GasEstimateEpoch> epoches) {
-        ringBuffer.publishEvent(TRANSLATOR, seq,action,epoches);
+    public void publish(Long seq,List<GasEstimate> estimateList) {
+        ringBuffer.publishEvent(TRANSLATOR, seq,estimateList);
     }
 }

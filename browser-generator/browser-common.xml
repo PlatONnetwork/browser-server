@@ -127,7 +127,7 @@
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>-->
 
-        <table tableName="gas_estimate_log" domainObjectName="GasEstimateLog">
+        <table tableName="gas_estimate" domainObjectName="GasEstimate">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
 
