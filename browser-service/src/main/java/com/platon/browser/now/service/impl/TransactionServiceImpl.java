@@ -152,7 +152,7 @@ public class TransactionServiceImpl implements TransactionService {
 		if (req.getTxType() != null && !req.getTxType().isEmpty()) {
 			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
 		}
-		constructor.build(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
+		constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
 				.should(QueryBuilders.termQuery("to", req.getAddress())));
 		constructor.setDesc("seq");
 		try {
@@ -207,7 +207,7 @@ public class TransactionServiceImpl implements TransactionService {
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().range("time", new Date(date).getTime(), currentServerTime.getTime()));
-		constructor.build(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
+		constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
 				.should(QueryBuilders.termQuery("to", address)));
 		ESResult<Transaction> items = new ESResult<>();
 		constructor.setDesc("seq");
