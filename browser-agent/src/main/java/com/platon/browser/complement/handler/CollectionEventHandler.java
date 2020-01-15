@@ -31,7 +31,6 @@ import java.util.List;
  * 区块事件处理器
  */
 @Slf4j
-@Component
 public class CollectionEventHandler implements ICollectionEventHandler {
 
     @Autowired

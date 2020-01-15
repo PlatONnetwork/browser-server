@@ -27,4 +27,12 @@ public class GasEstimateEvent {
     public void setEpoches(List<GasEstimateEpoch> epoches) {
         this.epoches = epoches;
     }
+
+    public Long getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Long seq) {
+        this.seq = seq;
+    }
 }

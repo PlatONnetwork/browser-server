@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.event.GasEstimateEpoch;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
@@ -35,6 +37,8 @@ public class OnSettleConverter {
     private EpochBusinessMapper epochBusinessMapper;
     @Autowired
     private StakingMapper stakingMapper;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
 
 	public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
@@ -99,6 +103,7 @@ public class OnSettleConverter {
         });
         settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
+
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}

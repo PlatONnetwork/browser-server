@@ -8,9 +8,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -30,6 +28,18 @@ public class EsGasEstimateEpochService implements EsService<GasEstimateEpoch>{
             // 使用(<nodeId+sbn+addr>)作ES的docId
             data.forEach(e->map.put(e.getNodeId()+e.getSbn()+e.getAddr(),e));
             gasEstimateEpochESRepository.bulkAddOrUpdate(map);
+        }catch (Exception e){
+            log.error("",e);
+            throw e;
+        }
+    }
+
+    public void delete(Set<GasEstimateEpoch> data) throws IOException {
+        if(data.isEmpty()) return;
+        try {
+            List<String> docIds = new ArrayList<>();
+            data.forEach(e->docIds.add(e.getNodeId()+e.getSbn()+e.getAddr()));
+            gasEstimateEpochESRepository.bulkDelete(docIds);
         }catch (Exception e){
             log.error("",e);
             throw e;

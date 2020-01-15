@@ -1,6 +1,10 @@
 package com.platon.browser.complement.converter.delegate;
 
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.event.ActionEnum;
+import com.platon.browser.common.queue.gasestimate.event.GasEstimateEpoch;
+import com.platon.browser.common.queue.gasestimate.event.GasEstimateEvent;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
@@ -11,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: 委托业务参数转换器
@@ -23,6 +29,9 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
 	
     @Autowired
     private DelegateBusinessMapper delegateBusinessMapper;
+
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
 
     @Override
     public DelegateCreate convert(CollectionEvent event, Transaction tx) {
@@ -45,6 +54,19 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
                 .build();
 
         delegateBusinessMapper.create(businessParam);
+
+        // gas price估算数据信息
+        List<GasEstimateEpoch> epoches = new ArrayList<>();
+        GasEstimateEpoch epoch = GasEstimateEpoch.builder()
+                .addr(tx.getFrom())
+                .nodeId(txParam.getNodeId())
+                .sbn(txParam.getStakingBlockNum().toString())
+                .epoch(0L)
+                .build();
+        epoches.add(epoch);
+        // 消息唯一序号
+        Long seq = tx.getNum()*10000+tx.getIndex();
+        gasEstimateEventPublisher.publish(seq,ActionEnum.ADD,epoches);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return businessParam;

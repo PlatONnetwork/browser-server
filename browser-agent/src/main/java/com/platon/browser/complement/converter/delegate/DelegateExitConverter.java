@@ -3,6 +3,9 @@ package com.platon.browser.complement.converter.delegate;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.event.ActionEnum;
+import com.platon.browser.common.queue.gasestimate.event.GasEstimateEpoch;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.bean.DelegateExitResult;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
@@ -45,6 +48,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private DelegationMapper delegationMapper;
     @Autowired
     private AddressCache addressCache;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -90,7 +95,12 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             // 如果待提取金额大于0,则把节点置为已退出
             businessParam.setCodeNodeIsLeave(true);
         }
+
+        ActionEnum gasEstimateAction = ActionEnum.ADD;
+
         if(isRefundAll){
+            gasEstimateAction = ActionEnum.DELETE;
+
             // 如果全部退回
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()) // 委托状态置为历史
                 .setCodeRealAmount(delegation.getDelegateHes().add(delegation.getDelegateLocked()).add(delegation.getDelegateReleased())) // 真实退回金额=犹豫+锁定+已解锁
@@ -154,6 +164,19 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         der.setDelegationReward(delegationReward);
 
         addressCache.update(businessParam);
+
+        // gas price估算数据信息
+        List<GasEstimateEpoch> epoches = new ArrayList<>();
+        GasEstimateEpoch epoch = GasEstimateEpoch.builder()
+                .addr(tx.getFrom())
+                .nodeId(txParam.getNodeId())
+                .sbn(txParam.getStakingBlockNum().toString())
+                .epoch(0L)
+                .build();
+        epoches.add(epoch);
+        // 消息唯一序号
+        Long seq = tx.getNum()*10000+tx.getIndex();
+        gasEstimateEventPublisher.publish(seq, gasEstimateAction,epoches);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return der;
