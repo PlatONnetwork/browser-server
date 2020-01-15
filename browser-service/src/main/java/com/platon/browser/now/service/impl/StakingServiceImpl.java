@@ -26,6 +26,7 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.HexTool;
 import com.platon.sdk.contracts.ppos.dto.resp.Reward;
 
 import org.apache.commons.lang3.StringUtils;
@@ -478,7 +479,7 @@ public class StakingServiceImpl implements StakingService {
 				/**
 				 * 匹配成功之后设置金额
 				 */
-				if(delegationAddress.getNodeId().equals(reward.getNodeId())) {
+				if(delegationAddress.getNodeId().equals(HexTool.prefix(reward.getNodeId()))) {
 					byAddressResp.setDelegateClaim(new BigDecimal(reward.getReward()));
 				}
 			}

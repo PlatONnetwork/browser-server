@@ -130,7 +130,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         der.setDelegateExit(businessParam);
 
-        if(txParam.getReward().compareTo(BigDecimal.ZERO)==0){
+        if(txParam.getReward().compareTo(BigDecimal.ZERO)>0){
             // 如果委托奖励为0，则无需记录领取记录
             DelegationReward delegationReward = new DelegationReward();
             delegationReward.setHash(tx.getHash());
