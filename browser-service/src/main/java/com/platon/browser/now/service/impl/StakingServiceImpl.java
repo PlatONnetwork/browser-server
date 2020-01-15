@@ -260,7 +260,7 @@ public class StakingServiceImpl implements StakingService {
 			resp.setDenefitAddr(stakingNode.getBenefitAddr());
 			resp.setStakingIcon(stakingNode.getNodeIcon());
 			resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
-			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(new BigDecimal(10000)).toString());
+			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
 			/**
 			 * 待领取奖励等于 累积委托奖励减去已领取委托奖励
 			 */
@@ -351,8 +351,8 @@ public class StakingServiceImpl implements StakingService {
 					 */
 					case MODIFY:
 						if(desces.length > 1) {
-							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(new BigDecimal(10000)).toString());
-							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(new BigDecimal(10000)).toString());
+							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(BrowserConst.PERCENTAGE).toString());
+							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(BrowserConst.PERCENTAGE).toString());
 						}
 						break;
 					/** 提案类型 */

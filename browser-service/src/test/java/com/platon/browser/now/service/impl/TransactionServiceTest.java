@@ -10,12 +10,16 @@ import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.RedisCommands;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
+import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
+import com.platon.browser.req.staking.QueryClaimByStakingReq;
 import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +47,8 @@ public class TransactionServiceTest {
 	@Mock
 	private TransactionESRepository transactionESRepository;
 	@Mock
+	private DelegationRewardESRepository delegationRewardESRepository;
+	@Mock
 	private I18nUtil i18n;
 	@Mock
 	private StakingMapper stakingMapper;
@@ -65,6 +71,7 @@ public class TransactionServiceTest {
 	@Before
 	public void setup() {
 		ReflectionTestUtils.setField(target,"transactionESRepository",transactionESRepository);
+		ReflectionTestUtils.setField(target,"delegationRewardESRepository",delegationRewardESRepository);
 		ReflectionTestUtils.setField(target,"i18n",i18n);
 		ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
 		ReflectionTestUtils.setField(target,"slashMapper",slashMapper);
@@ -99,8 +106,8 @@ public class TransactionServiceTest {
 		transaction.setValue("4333");
 		transaction.setStatus(Transaction.StatusEnum.FAILURE.getCode());
 		when(transactionESRepository.get(any(),any())).thenReturn(transaction);
-		ESResult first = new ESResult<>();
-		List<Transaction> transactionList = new ArrayList<>();
+		ESResult<Object> first = new ESResult<>();
+		List<Object> transactionList = new ArrayList<>();
 		transactionList.add(transaction);
 		first.setRsData(transactionList);
 		first.setTotal(33L);
@@ -162,6 +169,35 @@ public class TransactionServiceTest {
 		transaction.setInfo("{\"account\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"plans\":[{\"amount\":5000000000000000000,\"epoch\":1},{\"amount\":600000000000000000,\"epoch\":2}]}");
 		target.transactionDetails(req);
 
+		assertTrue(true);
+	}
+	
+	@Test
+	public void testQueryClaimByAddress() throws IOException {
+		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
+		TransactionListByAddressRequest req = new TransactionListByAddressRequest();
+		req.setAddress(address);
+		req.setPageNo(1);
+		req.setPageSize(20);
+		ESResult<Object> delegationRewards = new ESResult<>();
+		List<Object> lists = new ArrayList<>();
+		DelegationReward delegationReward = new DelegationReward();
+		delegationReward.setAddr(address);
+		delegationReward.setHash("0x1");
+		delegationReward.setCreTime(new Date());
+		delegationReward.setExtra("[{\"nodeId\":\"0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050\",\"nodeName\":\"chendai-node3\",\"reward\":\"0\"}]");
+		delegationReward.setTime(new Date());
+		lists.add(delegationReward);
+		delegationRewards.setRsData(lists);
+		delegationRewards.setTotal(1l);
+		when(delegationRewardESRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(delegationRewards);
+		target.queryClaimByAddress(req);
+		QueryClaimByStakingReq queryClaimByStakingReq = new QueryClaimByStakingReq();
+		queryClaimByStakingReq.setNodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050");
+		queryClaimByStakingReq.setPageNo(1);
+		queryClaimByStakingReq.setPageSize(10);
+		target.queryClaimByStaking(queryClaimByStakingReq);
+		
 		assertTrue(true);
 	}
 }
