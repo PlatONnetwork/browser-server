@@ -4,22 +4,31 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.event.ActionEnum;
 import com.platon.browser.common.queue.gasestimate.event.GasEstimateEpoch;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.elasticsearch.GasEstimateEpochESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -39,8 +48,12 @@ public class OnSettleConverter {
     private StakingMapper stakingMapper;
     @Autowired
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private GasEstimateEpochESRepository gasEstimateEpochESRepository;
+    @Autowired
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
-	public void convert(CollectionEvent event, Block block) {
+	public void convert(CollectionEvent event, Block block) throws IOException {
         long startTime = System.currentTimeMillis();
 	    if(block.getNum()==1) return;
 
@@ -66,6 +79,10 @@ public class OnSettleConverter {
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
+
+        // 查询ES中的gas price估算数据的条件
+        ESQueryBuilderConstructor esCondition = new ESQueryBuilderConstructor();
+
         stakingList.forEach(staking -> {
             //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
@@ -100,10 +117,32 @@ public class OnSettleConverter {
             calcStakeAnnualizedRate(staking,curSettleStakeReward,settle);
             // 计算委托年化率
             calcDelegateAnnualizedRate(staking,curTotalDelegateCost,settle);
+
+            esCondition.buildShould(
+                new BoolQueryBuilder()
+                .must(QueryBuilders.termQuery("nodeId", staking.getNodeId()))
+                .must(QueryBuilders.termQuery("sbn", staking.getStakingBlockNum().toString()))
+            );
         });
         settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
 
+        // 1、通过：【（nodeId && sbn）|| （nodeId && sbn）】 查询es中 委托未计算周期 列表
+        ESResult<GasEstimateEpoch> esResult = gasEstimateEpochESRepository.search(esCondition,GasEstimateEpoch.class,0,1000);
+        if(!esResult.getRsData().isEmpty()){
+            // 2. epoch +1
+            esResult.getRsData().forEach(e->e.setEpoch(e.getEpoch()+1));
+            // 3、入库mysql
+            Long seq = block.getNum()*10000;
+            List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
+            GasEstimateLog gel = new GasEstimateLog();
+            gel.setSeq(seq);
+            gel.setJson(JSON.toJSONString(esResult.getRsData()));
+            gasEstimateLogs.add(gel);
+            customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs);
+            // 4. 更新到es中
+            gasEstimateEventPublisher.publish(seq, ActionEnum.UPDATE,esResult.getRsData());
+        }
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}

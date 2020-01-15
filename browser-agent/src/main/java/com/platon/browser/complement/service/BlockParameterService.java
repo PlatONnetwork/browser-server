@@ -1,5 +1,6 @@
 package com.platon.browser.complement.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,7 @@ public class BlockParameterService {
      * 解析区块, 构造业务入库参数信息
      * @return
      */
-    public List<NodeOpt> getParameters(CollectionEvent event) throws NoSuchBeanException {
+    public List<NodeOpt> getParameters(CollectionEvent event) throws NoSuchBeanException, IOException {
         long startTime = System.currentTimeMillis();
 
         List<NodeOpt> nodeOptList = new ArrayList<>();
