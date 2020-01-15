@@ -4,8 +4,6 @@
 <update id="settle" parameterType="com.platon.browser.complement.dao.param.epoch.Settle">
     <foreach collection="stakingList" item="staking">
         /*2、更新节点*/
-        SET @preStakeTotalDeleReward = (SELECT `total_dele_reward` FROM staking WHERE `node_id` = #{staking.nodeId} ORDER BY `staking_block_num` DESC LIMIT 1,1);
-        SET @baseTotalDeleReward = (SELECT CASE WHEN @preStakeTotalDeleReward IS NULL THEN 0 ELSE @preStakeTotalDeleReward END);
         update `node` set
         `staking_locked` = #{staking.stakingLocked},
         `staking_hes` = #{staking.stakingHes},
@@ -17,7 +15,7 @@
         `dele_annualized_rate` = #{staking.deleAnnualizedRate},
         `annualized_rate` = #{staking.annualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo},
-        `total_dele_reward` = @baseTotalDeleReward + #{staking.totalDeleReward}
+        `total_dele_reward` = #{staking.totalDeleReward}
         where `node_id` =  #{staking.nodeId};
         /*1、更新质押*/
         update `staking` set

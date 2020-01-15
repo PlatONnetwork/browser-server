@@ -195,6 +195,7 @@ public class InitializationService {
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
             node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
             node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
+            node.setPreTotalDeleReward(BigDecimal.ZERO);
 
             nodes.add(node);
             stakingList.add(staking);
