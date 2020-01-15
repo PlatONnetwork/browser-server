@@ -64,6 +64,9 @@ public class StakingServiceImpl implements StakingService {
 	private CustomDelegationMapper customDelegationMapper;
 	
 	@Autowired
+	private CustomNodeMapper customNodeMapper;
+	
+	@Autowired
 	private NodeMapper nodeMapper;
 
 	@Autowired
@@ -150,7 +153,7 @@ public class StakingServiceImpl implements StakingService {
 		}
 		nodeExample.or(criteria2);
 		
-		Page<Node> stakingPage = nodeMapper.selectByExample(nodeExample);
+		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
 		List<Node> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
@@ -179,9 +182,7 @@ public class StakingServiceImpl implements StakingService {
 				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus(), stakings.get(i).getIsSettle()));
 			}
 			/** 质押总数=有效的质押+委托 */
-			String totalValue = stakings.get(i).getStakingHes().add(stakings.get(i).getStakingLocked())
-					.add(stakings.get(i).getStatDelegateValue()).toString();
-			aliveStakingListResp.setTotalValue(totalValue);
+			aliveStakingListResp.setTotalValue(stakings.get(i).getTotalValue().toString());
 			aliveStakingListResp.setDeleAnnualizedRate(stakings.get(i).getDeleAnnualizedRate().toString());
 			lists.add(aliveStakingListResp);
 		}
@@ -213,7 +214,7 @@ public class StakingServiceImpl implements StakingService {
 		if(StringUtils.isNotBlank(req.getKey())) {
 			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
-		Page<Node> stakings = nodeMapper.selectByExample(nodeExample);
+		Page<Node> stakings = customNodeMapper.selectListByExample(nodeExample);
 		
 		for (Node stakingNode:stakings.getResult()) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
@@ -261,10 +262,11 @@ public class StakingServiceImpl implements StakingService {
 			resp.setStakingIcon(stakingNode.getNodeIcon());
 			resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
 			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
+			resp.setTotalDeleReward(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()));
 			/**
-			 * 待领取奖励等于 累积委托奖励减去已领取委托奖励
+			 * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
 			 */
-			resp.setDeleRewardRed(stakingNode.getTotalDeleReward().subtract(stakingNode.getHaveDeleReward()));
+			resp.setDeleRewardRed(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()).subtract(stakingNode.getHaveDeleReward()));
 			/** 只有不是内置节点才计算年化率  */
 			if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
 				resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
