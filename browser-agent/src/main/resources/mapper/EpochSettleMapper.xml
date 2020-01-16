@@ -51,4 +51,13 @@
             update `gas_estimate` set `epoch` = `epoch`+1 where `node_id`= #{item.nodeId} and `sbn`=#{item.sbn}
         </foreach>
     </update>
+
+    <update id="rotateDelegateReward">
+        <foreach collection="list" item="nodeId">
+            /*1、更新节点*/
+            update `node` set
+            `pre_total_dele_reward` = `pre_total_dele_reward`+`total_dele_reward`
+            where `node_id` =  #{nodeId};
+        </foreach>
+    </update>
 </mapper>

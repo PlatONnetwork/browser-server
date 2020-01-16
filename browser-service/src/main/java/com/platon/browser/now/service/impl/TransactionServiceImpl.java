@@ -708,7 +708,7 @@ public class TransactionServiceImpl implements TransactionService {
 		ESResult<DelegationReward> delegationRewards = null;
 		try {
 			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
 		}
 		if(delegationRewards==null){
@@ -761,7 +761,7 @@ public class TransactionServiceImpl implements TransactionService {
 		ESResult<DelegationReward> delegationRewards = null;
 		try {
 			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
 		}
 		if(delegationRewards==null){

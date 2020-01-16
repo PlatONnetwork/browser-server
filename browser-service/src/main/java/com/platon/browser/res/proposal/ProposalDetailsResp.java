@@ -35,7 +35,8 @@ public class ProposalDetailsResp {
     private String accuVerifiers;        //总人数
     private Long activeBlockTime;      //生效块高预计时间  (activeBlock-curBlock)*period
     private Long endVotingBlockTime;    //投票块高的时间   (endVotingBlock-curBlock)*period
-    private String supportRateThreshold;   //通过率
+    private String supportRateThreshold;   //通过条件率
+    private String yesRateThreshold;   //通过率
     private String opposeRateThreshold;   //反对率
     private String abstainRateThreshold;   //弃权率
     private Long inBlock;   //所在块高
@@ -227,6 +228,12 @@ public class ProposalDetailsResp {
 	}
 	public void setType(Integer type) {
 		this.type = type;
+	}
+	public String getYesRateThreshold() {
+		return yesRateThreshold;
+	}
+	public void setYesRateThreshold(String yesRateThreshold) {
+		this.yesRateThreshold = yesRateThreshold;
 	}
     
 }
