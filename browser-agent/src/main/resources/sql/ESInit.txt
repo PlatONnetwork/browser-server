@@ -358,3 +358,39 @@ PUT /_template/delegation_reward_template
     }
   }
 }
+#gas参数表
+PUT /_template/browser_gas_estimate_epoch_template
+{
+  "index_patterns": [
+    "browser_gas_estimate_epoch_*"
+  ],
+  "settings": {
+    "number_of_shards": 5,
+    "number_of_replicas": 1,
+    "max_result_window": 2000000000
+  },
+  "mappings": {
+    "properties": {
+      "nodeId": {
+        "type": "keyword",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
+      "sbn": {
+        "type": "keyword",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
+      "addr": {
+        "type": "keyword",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
+      "epoch": {
+        "type": "long"
+      }
+    }
+  }

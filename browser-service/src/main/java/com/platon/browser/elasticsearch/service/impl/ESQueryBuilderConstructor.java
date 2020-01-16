@@ -31,12 +31,13 @@ public class ESQueryBuilderConstructor {
 	private List<ESCriterion> mustCriterions = new ArrayList<>();
 	private List<ESCriterion> shouldCriterions = new ArrayList<>();
 	private List<ESCriterion> mustNotCriterions = new ArrayList<>();
-	private List<BoolQueryBuilder> queryBuilders = new ArrayList<>();
+	private List<BoolQueryBuilder> queryMustBuilders = new ArrayList<>();
+	private List<BoolQueryBuilder> queryShouldBuilders = new ArrayList<>();
 	private String[] result ;
 
 	//构造builder
     public QueryBuilder listBuilders() {
-		int count = mustCriterions.size() + shouldCriterions.size() + mustNotCriterions.size() + queryBuilders.size();
+		int count = mustCriterions.size() + shouldCriterions.size() + mustNotCriterions.size() + queryMustBuilders.size() + queryShouldBuilders.size();
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 		QueryBuilder queryBuilder = null;
 
@@ -67,9 +68,15 @@ public class ESQueryBuilderConstructor {
 				}
 			}
 			
-			if (!CollectionUtils.isEmpty(queryBuilders)) {
-				for (BoolQueryBuilder boolQueryBuilder2  : queryBuilders) {
+			if (!CollectionUtils.isEmpty(queryMustBuilders)) {
+				for (BoolQueryBuilder boolQueryBuilder2  : queryMustBuilders) {
 					queryBuilder = boolQueryBuilder.must(boolQueryBuilder2);
+				}
+			}
+			
+			if (!CollectionUtils.isEmpty(queryShouldBuilders)) {
+				for (BoolQueryBuilder boolQueryBuilder2  : queryShouldBuilders) {
+					queryBuilder = boolQueryBuilder.should(boolQueryBuilder2);
 				}
 			}
 			return queryBuilder;
@@ -109,13 +116,23 @@ public class ESQueryBuilderConstructor {
     /**
      * 增加复杂条件表达式
      */
-    public ESQueryBuilderConstructor build(BoolQueryBuilder boolQueryBuilder){
+    public ESQueryBuilderConstructor buildMust(BoolQueryBuilder boolQueryBuilder){
         if(boolQueryBuilder!=null){
-        	queryBuilders.add(boolQueryBuilder);
+        	queryMustBuilders.add(boolQueryBuilder);
 		}
 		return this;
 	}
 
+    /**
+     * 增加复杂条件表达式
+     */
+    public ESQueryBuilderConstructor buildShould(BoolQueryBuilder boolQueryBuilder){
+        if(boolQueryBuilder!=null){
+        	queryShouldBuilders.add(boolQueryBuilder);
+		}
+		return this;
+	}
+    
 	public int getSize() {
 		return size;
 	}

@@ -51,7 +51,7 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]) throws Exception {
         List<Node> ver = nodeContract.getVerifierList().send().getData();
-        List<Node> hver = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(0));
+        List<Node> hver = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(43520));
 
 //        List<Node> val = nodeContract.getValidatorList().send().getData();
 //        List<Node> hval = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(1660));

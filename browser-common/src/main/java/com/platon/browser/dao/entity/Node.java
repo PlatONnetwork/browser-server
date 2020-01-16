@@ -98,6 +98,8 @@ public class Node {
 
     private BigDecimal totalDeleReward;
 
+    private BigDecimal preTotalDeleReward;
+
     private String annualizedRateInfo;
 
     public String getNodeId() {
@@ -468,6 +470,14 @@ public class Node {
         this.totalDeleReward = totalDeleReward;
     }
 
+    public BigDecimal getPreTotalDeleReward() {
+        return preTotalDeleReward;
+    }
+
+    public void setPreTotalDeleReward(BigDecimal preTotalDeleReward) {
+        this.preTotalDeleReward = preTotalDeleReward;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -530,6 +540,7 @@ public class Node {
         preDeleAnnualizedRate("pre_dele_annualized_rate", "preDeleAnnualizedRate", "DOUBLE", false),
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
+        preTotalDeleReward("pre_total_dele_reward", "preTotalDeleReward", "DECIMAL", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

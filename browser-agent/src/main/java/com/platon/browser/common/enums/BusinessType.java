@@ -23,5 +23,9 @@ public enum BusinessType {
     // 网络统计、地址统计
     NETWORK_STATISTIC, ADDRESS_STATISTIC,
     // 领取奖励
-    CLAIM_REWARD
+    CLAIM_REWARD,
+    // 合约创建
+    CONTRACT_CREATE,
+    // 合约执行
+    CONTRACT_EXECUTE
 }

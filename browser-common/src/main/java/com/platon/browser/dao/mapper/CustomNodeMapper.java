@@ -1,5 +1,9 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+
 public interface CustomNodeMapper {
 	/**
 	 * 根据nodeId查询nodeName
@@ -8,4 +12,12 @@ public interface CustomNodeMapper {
 	 * @return
 	 */
     String findNameById(String nodeId);
+    
+    /**
+     * 根据条件查询列表
+     * @method selectByExample
+     * @param example
+     * @return
+     */
+    Page<Node> selectListByExample(NodeExample example);
 }

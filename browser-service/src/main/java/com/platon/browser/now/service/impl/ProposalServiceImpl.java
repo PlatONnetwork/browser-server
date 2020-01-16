@@ -72,6 +72,7 @@ public class ProposalServiceImpl implements ProposalService {
         Page<?> page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         /** 暂时不显示总人数为0的数据，不然页面展示投票百分比事会出错   */
         ProposalExample proposalExample = new ProposalExample();
+        proposalExample.setOrderByClause(" timestamp desc");
         ProposalExample.Criteria criteria = proposalExample.createCriteria();
         criteria.andAccuVerifiersNotEqualTo(0l);
         List<Proposal> list = proposalMapper.selectByExample(proposalExample);

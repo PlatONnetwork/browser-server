@@ -4,13 +4,19 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.elasticsearch.GasEstimateEpochESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +41,14 @@ public class OnSettleConverter {
     private EpochBusinessMapper epochBusinessMapper;
     @Autowired
     private StakingMapper stakingMapper;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private GasEstimateEpochESRepository gasEstimateEpochESRepository;
+    @Autowired
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
-	public void convert(CollectionEvent event, Block block) {
+    public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
 	    if(block.getNum()==1) return;
 
@@ -56,20 +68,23 @@ public class OnSettleConverter {
                 .build();
 
         List<Integer> statusList = new ArrayList <>();
-        statusList.add(1);
-        statusList.add(2);
+        statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        statusList.add(CustomStaking.StatusEnum.EXITING.getCode());
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
+        List<String> exitedNodeIds = new ArrayList<>();
         stakingList.forEach(staking -> {
             //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
             staking.setStakingHes(BigDecimal.ZERO);
+
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
-            if(staking.getStatus() == 2 && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
+            if(staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
-                staking.setStatus(3);
+                staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+                exitedNodeIds.add(staking.getNodeId());
             }
             //当前质押是上轮结算周期验证人,发放本结算周期的质押奖励, 奖励金额暂存至stakeReward变量
             BigDecimal curSettleStakeReward = BigDecimal.ZERO;
@@ -79,9 +94,9 @@ public class OnSettleConverter {
 
             //当前质押是下轮结算周期验证人
             if(settle.getCurVerifierSet().contains(staking.getNodeId())){
-                staking.setIsSettle(1);
+                staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
             }else {
-                staking.setIsSettle(2);
+                staking.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
             }
 
             // 设置当前质押的总委托奖励，从节点上取出来的委托总奖励就是当前质押获取的总委托奖励
@@ -98,7 +113,27 @@ public class OnSettleConverter {
             calcDelegateAnnualizedRate(staking,curTotalDelegateCost,settle);
         });
         settle.setStakingList(stakingList);
+        settle.setExitNodeList(exitedNodeIds);
         epochBusinessMapper.settle(settle);
+
+        List<GasEstimate> gasEstimates = new ArrayList<>();
+        preVerifierMap.forEach((k,v)->{
+            GasEstimate ge = new GasEstimate();
+            ge.setNodeId(v.getNodeId());
+            ge.setSbn(v.getStakingBlockNum().longValue());
+            gasEstimates.add(ge);
+        });
+
+        // 1、把周期数需要自增1的节点质押先入mysql数据库
+        Long seq = block.getNum()*10000;
+        List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
+        GasEstimateLog gasEstimateLog = new GasEstimateLog();
+        gasEstimateLog.setSeq(seq);
+        gasEstimateLog.setJson(JSON.toJSONString(gasEstimates));
+        gasEstimateLogs.add(gasEstimateLog);
+        customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs,GasEstimateLog.Column.values());
+        // 2、发布到操作队列
+        gasEstimateEventPublisher.publish(seq,gasEstimates);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}

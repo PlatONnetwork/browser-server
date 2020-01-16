@@ -111,7 +111,8 @@ public interface AppDocProposal {
      *       "accuVerifiers":"",        //总人数
      *       "activeBlockTime":"",      //生效块高预计时间  (activeBlock-curBlock)*period
      *       "endVotingBlockTime":"",    //投票块高的时间   (endVotingBlock-curBlock)*period
-     *       "supportRateThreshold":"",   //通过率
+     *       "supportRateThreshold":"",   //通过条件率
+     *       "yesRateThreshold":"",   //通过率
 	 *       "opposeRateThreshold":"",   //反对率
 	 *       "abstainRateThreshold:"",   //弃权率
 	 *		 "pipNum":121, //pip num

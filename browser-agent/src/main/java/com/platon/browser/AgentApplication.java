@@ -11,6 +11,8 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
+import com.platon.browser.common.queue.gasestimate.handler.GasEstimateEventHandler;
+import com.platon.browser.common.queue.gasestimate.handler.IGasEstimateEventHandler;
 import com.platon.browser.common.service.epoch.EpochService;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.handler.CollectionEventHandler;
@@ -65,6 +67,10 @@ public class AgentApplication implements ApplicationRunner {
 	@Bean
 	public IComplementEventHandler complementEventHandler(){
 		return new ComplementEventHandler();
+	}
+	@Bean
+	public IGasEstimateEventHandler gasEstimateEventHandler(){
+		return new GasEstimateEventHandler();
 	}
 
 	public static void main(String[] args) {

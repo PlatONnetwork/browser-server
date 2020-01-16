@@ -312,4 +312,5 @@ public abstract class ESRepository {
 
 		log.debug("bulkDelete:{}", JSON.toJSONString(response, true));
 	}
+
 }

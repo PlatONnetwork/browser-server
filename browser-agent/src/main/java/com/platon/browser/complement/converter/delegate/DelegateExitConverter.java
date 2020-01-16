@@ -3,15 +3,18 @@ package com.platon.browser.complement.converter.delegate;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.bean.DelegateExitResult;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.DelegationKey;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -45,6 +48,14 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private DelegationMapper delegationMapper;
     @Autowired
     private AddressCache addressCache;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
+    @Autowired
+    private CustomGasEstimateMapper customGasEstimateMapper;
+    @Autowired
+    private GasEstimateMapper gasEstimateMapper;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -90,7 +101,11 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             // 如果待提取金额大于0,则把节点置为已退出
             businessParam.setCodeNodeIsLeave(true);
         }
+
+        boolean needDeleteGasEstimate = false;
+
         if(isRefundAll){
+            needDeleteGasEstimate = true;
             // 如果全部退回
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()) // 委托状态置为历史
                 .setCodeRealAmount(delegation.getDelegateHes().add(delegation.getDelegateLocked()).add(delegation.getDelegateReleased())) // 真实退回金额=犹豫+锁定+已解锁
@@ -130,30 +145,52 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         der.setDelegateExit(businessParam);
 
-        DelegationReward delegationReward = new DelegationReward();
-        delegationReward.setHash(tx.getHash());
-        delegationReward.setAddr(tx.getFrom());
-        delegationReward.setTime(tx.getTime());
-        delegationReward.setCreTime(new Date());
-        delegationReward.setUpdTime(new Date());
+        if(txParam.getReward().compareTo(BigDecimal.ZERO)>0){
+            // 如果委托奖励为0，则无需记录领取记录
+            DelegationReward delegationReward = new DelegationReward();
+            delegationReward.setHash(tx.getHash());
+            delegationReward.setAddr(tx.getFrom());
+            delegationReward.setTime(tx.getTime());
+            delegationReward.setCreTime(new Date());
+            delegationReward.setUpdTime(new Date());
 
-        List<DelegationReward.Extra> extraList = new ArrayList<>();
-        DelegationReward.Extra extra = new DelegationReward.Extra();
-        extra.setNodeId(businessParam.getNodeId());
-        String nodeName = "Unknown";
-        try {
-            nodeName = nodeCache.getNode(businessParam.getNodeId()).getNodeName();
-        } catch (NoSuchBeanException e) {
-            log.error("{}",e.getMessage());
+            List<DelegationReward.Extra> extraList = new ArrayList<>();
+            DelegationReward.Extra extra = new DelegationReward.Extra();
+            extra.setNodeId(businessParam.getNodeId());
+            String nodeName = "Unknown";
+            try {
+                nodeName = nodeCache.getNode(businessParam.getNodeId()).getNodeName();
+            } catch (NoSuchBeanException e) {
+                log.error("{}",e.getMessage());
+            }
+            extra.setNodeName(nodeName);
+            extra.setReward(txParam.getReward().toString());
+            extraList.add(extra);
+            delegationReward.setExtra(JSON.toJSONString(extraList));
+
+            der.setDelegationReward(delegationReward);
         }
-        extra.setNodeName(nodeName);
-        extra.setReward(txParam.getReward().toString());
-        extraList.add(extra);
-        delegationReward.setExtra(JSON.toJSONString(extraList));
-
-        der.setDelegationReward(delegationReward);
 
         addressCache.update(businessParam);
+
+        if(needDeleteGasEstimate){
+            // 1. 全部赎回： 删除对应记录
+            GasEstimateKey gek = new GasEstimateKey();
+            gek.setNodeId(txParam.getNodeId());
+            gek.setAddr(tx.getFrom());
+            gek.setSbn(txParam.getStakingBlockNum().longValue());
+            gasEstimateMapper.deleteByPrimaryKey(gek);
+        }else{
+            // 2. 部分赎回：1. 新增 委托未计算周期  记录， epoch = 0
+            List<GasEstimate> estimates = new ArrayList<>();
+            GasEstimate estimate = new GasEstimate();
+            estimate.setNodeId(txParam.getNodeId());
+            estimate.setSbn(txParam.getStakingBlockNum().longValue());
+            estimate.setAddr(tx.getFrom());
+            estimate.setEpoch(0L);
+            estimates.add(estimate);
+            customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
+        }
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return der;
