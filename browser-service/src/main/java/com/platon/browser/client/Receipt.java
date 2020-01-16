@@ -21,6 +21,7 @@ public class Receipt {
     private String transactionHash;
     private String transactionIndex;
     private String status;
+    private String contractAddress;
 
     private int logStatus;
 

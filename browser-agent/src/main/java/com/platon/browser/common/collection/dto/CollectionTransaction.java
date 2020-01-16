@@ -73,8 +73,7 @@ public class CollectionTransaction extends Transaction {
         try {
             // 解析交易的输入及交易回执log信息
             decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
-            // 参数信息
-            String info = decodedResult.getParam().toJSONString();
+            // 交易类型
             int type = decodedResult.getTypeEnum().getCode();
             int toType = ToTypeEnum.CONTRACT.getCode();
             if (getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(getTo())) {
@@ -82,6 +81,8 @@ public class CollectionTransaction extends Transaction {
                 toType = ToTypeEnum.ACCOUNT.getCode();
             }
 
+            // 交易信息
+            String info = decodedResult.getParam().toJSONString();
             this.setGasUsed(receipt.getGasUsed().toString())
                     .setCost(decimalGasUsed().multiply(decimalGasPrice()).toString())
                     .setFailReason(receipt.getFailReason())
@@ -137,6 +138,12 @@ public class CollectionTransaction extends Transaction {
             case PROPOSAL_CANCEL:// 取消提案
             case VERSION_DECLARE:// 版本声明
                 block.setPQty(block.getPQty()+1);
+                break;
+            case CONTRACT_CREATE:// 创建合约
+
+                break;
+            case CONTRACT_EXEC:// 合约执行
+
                 break;
             default:
         }

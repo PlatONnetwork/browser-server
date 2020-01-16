@@ -81,6 +81,10 @@ public class TxInputUtil {
                         // 如果日志为空则不解析
                         if(logs.isEmpty()) return result;
                         return result.setParam(DelegateRewardClaimDecoder.decode(rootList,logs));
+                    case CONTRACT_CREATE: // 合约创建
+                        return result.setParam(ContractCreateDecoder.decode(rootList,logs));
+                    case CONTRACT_EXEC: // 合约执行
+                        return result.setParam(ContractExecDecoder.decode(rootList,logs));
 				default:
 					break;
                 }
