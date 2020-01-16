@@ -33,6 +33,8 @@ public class Settle implements BusinessParam {
     //候选中，退出中，列表
     private List<Staking> stakingList;
 
+    private List<String> exitNodeList;
+
     @Override
     public BusinessType getBusinessType () {
         return BusinessType.SETTLE_EPOCH;
