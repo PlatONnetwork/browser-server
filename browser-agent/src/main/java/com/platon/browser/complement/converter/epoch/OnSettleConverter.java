@@ -5,7 +5,6 @@ import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
-import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
@@ -49,7 +48,7 @@ public class OnSettleConverter {
     @Autowired
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
-    public void convert(CollectionEvent event, Block block) throws IOException {
+    public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
 	    if(block.getNum()==1) return;
 
