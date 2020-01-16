@@ -73,13 +73,20 @@ public class CollectionTransaction extends Transaction {
         try {
             // 解析交易的输入及交易回执log信息
             decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
+
+            // =========TODO:交易类型&to地址类型判断 START==========
             // 交易类型
             int type = decodedResult.getTypeEnum().getCode();
             int toType = ToTypeEnum.CONTRACT.getCode();
+
+
             if (getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(getTo())) {
+                // 如果交易value不为空，且to不是内置合约地址，则交易类型设置为转账，to地址设置为账户类型
                 type = TypeEnum.TRANSFER.getCode();
                 toType = ToTypeEnum.ACCOUNT.getCode();
             }
+
+            // =========交易类型&to地址类型判断 END==========
 
             // 交易信息
             String info = decodedResult.getParam().toJSONString();
@@ -140,10 +147,10 @@ public class CollectionTransaction extends Transaction {
                 block.setPQty(block.getPQty()+1);
                 break;
             case CONTRACT_CREATE:// 创建合约
-
+                //TODO: 创建合约
                 break;
             case CONTRACT_EXEC:// 合约执行
-
+                //TODO: 合约执行
                 break;
             default:
         }
