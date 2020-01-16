@@ -23,6 +23,7 @@ import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.HexTool;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,14 +117,8 @@ public class HomeServiceImpl implements HomeService {
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
 			}
 			if (keyword.length() == 40) {
-				/* 判断为合约或账户地址 */
-				Address address = addressMapper.selectByPrimaryKey(HexTool.prefix(keyword));
-				if(address != null && address.getType().intValue() != 1) {
-					result.setType(CONTRACT_TYPE);
-				} else {
-					result.setType(ADDRESS_TYPE);
-				}
-				queryNavigationStructResp.setAddress(HexTool.prefix(keyword));
+				/* 长度为40则拼接0x*/
+				keyword = HexTool.prefix(keyword);
 			}
 			if (keyword.length() == 128) {
 				/* 判断为节点Id */
@@ -136,7 +131,12 @@ public class HomeServiceImpl implements HomeService {
 			if (keyword.startsWith("0x")) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */
-					result.setType(ADDRESS_TYPE);
+					Address address = addressMapper.selectByPrimaryKey(keyword);
+					if(address != null && address.getType().intValue() != 1) {
+						result.setType(CONTRACT_TYPE);
+					} else {
+						result.setType(ADDRESS_TYPE);
+					}
 					queryNavigationStructResp.setAddress(keyword);
 				}
 				if (keyword.length() == 130) {
@@ -152,13 +152,13 @@ public class HomeServiceImpl implements HomeService {
 					 * 交易hash或者区块hash 逻辑分析 1、优先查询已完成交易 2、已完成交易查询无记录，则查询区块
 					 * 4、以上都无记录，则返回空结果
 					 */
-					Transaction transaction = null;
+					Transaction items = null;
 					try {
-						transaction = transactionESRepository.get(keyword, Transaction.class);
+						items = transactionESRepository.get(keyword, Transaction.class);
 					} catch (IOException e) {
 						log.error(BLOCK_ERR_TIPS, e);
 					}
-					if(transaction != null) {
+					if(items != null) {
 						result.setType(TRANSACTION_TYPE);
 						queryNavigationStructResp.setTxHash(keyword);
 					} else {

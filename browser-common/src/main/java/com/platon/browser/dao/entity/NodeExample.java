@@ -2955,6 +2955,66 @@ public class NodeExample {
             addCriterion("total_dele_reward not between", value1, value2, "totalDeleReward");
             return (Criteria) this;
         }
+
+        public Criteria andPreTotalDeleRewardIsNull() {
+            addCriterion("pre_total_dele_reward is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardIsNotNull() {
+            addCriterion("pre_total_dele_reward is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardEqualTo(BigDecimal value) {
+            addCriterion("pre_total_dele_reward =", value, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardNotEqualTo(BigDecimal value) {
+            addCriterion("pre_total_dele_reward <>", value, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardGreaterThan(BigDecimal value) {
+            addCriterion("pre_total_dele_reward >", value, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("pre_total_dele_reward >=", value, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardLessThan(BigDecimal value) {
+            addCriterion("pre_total_dele_reward <", value, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("pre_total_dele_reward <=", value, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardIn(List<BigDecimal> values) {
+            addCriterion("pre_total_dele_reward in", values, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardNotIn(List<BigDecimal> values) {
+            addCriterion("pre_total_dele_reward not in", values, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("pre_total_dele_reward between", value1, value2, "preTotalDeleReward");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreTotalDeleRewardNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("pre_total_dele_reward not between", value1, value2, "preTotalDeleReward");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

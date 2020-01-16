@@ -78,6 +78,8 @@ public class TxInputUtil {
                     case RESTRICTING_CREATE: // 4000 创建锁仓计划
                         return result.setParam(RestrictingCreateDecoder.decode(rootList));
                     case CLAIM_REWARDS: // 5000 领取委托奖励
+                        // 如果日志为空则不解析
+                        if(logs.isEmpty()) return result;
                         return result.setParam(DelegateRewardClaimDecoder.decode(rootList,logs));
 				default:
 					break;

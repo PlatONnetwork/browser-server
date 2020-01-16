@@ -112,16 +112,22 @@ public class CollectionTransaction extends Transaction {
                 block.setDQty(block.getDQty()+1);
                 break;
             case DELEGATE_EXIT:// 撤销委托
-                // 设置委托奖励提取额
-                DelegateExitParam param = getTxParam(DelegateExitParam.class);
-                BigDecimal reward = new BigDecimal(getDelegateReward(receipt.getLogs()));
-                param.setReward(reward);
-                setInfo(param.toJSONString());
+                if(status==Receipt.getSuccess()){
+                    // 成功的领取交易才解析info回填
+                    // 设置委托奖励提取额
+                    DelegateExitParam param = getTxParam(DelegateExitParam.class);
+                    BigDecimal reward = new BigDecimal(getDelegateReward(receipt.getLogs()));
+                    param.setReward(reward);
+                    setInfo(param.toJSONString());
+                }
                 block.setDQty(block.getDQty()+1);
                 break;
             case CLAIM_REWARDS: // 领取委托奖励
-                DelegateRewardClaimParam fromLog = (DelegateRewardClaimParam) decodedResult.getParam();
-                setInfo(fromLog.toJSONString());
+                if(status==Receipt.getSuccess()){
+                    // 成功的领取交易才解析info回填
+                    DelegateRewardClaimParam fromLog = (DelegateRewardClaimParam) decodedResult.getParam();
+                    setInfo(fromLog.toJSONString());
+                }
                 block.setDQty(block.getDQty()+1);
                 break;
             case PROPOSAL_TEXT:// 创建文本提案
