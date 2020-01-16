@@ -11,6 +11,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +63,17 @@ public class OnSettleConverter {
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
+        List<String> exitNodeIds = new ArrayList<>();
         stakingList.forEach(staking -> {
             //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
             staking.setStakingHes(BigDecimal.ZERO);
+
+            if(staking.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()&&staking.getIsSettle()==CustomStaking.YesNoEnum.YES.getCode()){
+                // 如果质押状态是退出中&&属于当前周期，则对node表的委托奖励进行挪动累加操作
+
+            }
+
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
             if(staking.getStatus() == 2 && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
@@ -99,6 +107,9 @@ public class OnSettleConverter {
         });
         settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
+
+        // 在当前周期退出的节点会在周期末变为已退出，需要在上面遍历中记下退出中的质押节点，以便对node的total_dele_reward
+        // 累加到pre_total_dele_reward
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}

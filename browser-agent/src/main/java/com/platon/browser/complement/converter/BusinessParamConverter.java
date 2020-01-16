@@ -53,6 +53,7 @@ public abstract class BusinessParamConverter<T> {
 
 
     protected void updateTxInfo(TxParam txParam,Transaction tx){
+        if(txParam==null) return;
         NodeItem nodeItem;
         try {
             switch (tx.getTypeEnum()) {
@@ -121,7 +122,7 @@ public abstract class BusinessParamConverter<T> {
                 case RESTRICTING_CREATE: // 4000
                     break;
                 case CLAIM_REWARDS: // 5000
-                    // 把交易回执里的领取奖励数量设置到TxInfo
+                    // 把交易回执里的领取奖励数量设置到TxInfo,
                     DelegateRewardClaimParam drcp = (DelegateRewardClaimParam)txParam;
                     drcp.getRewardList().forEach(reward -> {
                         String nodeName = "Unknown";

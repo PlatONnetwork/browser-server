@@ -32,7 +32,6 @@
 		`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,
 		`stat_delegate_value` = 0,
 		`stat_valid_addrs` = 0,
-		`pre_total_dele_reward`=`total_dele_reward`+`pre_total_dele_reward`,
 		`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2),
 		`is_consensus` = 2
 	where `node_id` = #{nodeId};
