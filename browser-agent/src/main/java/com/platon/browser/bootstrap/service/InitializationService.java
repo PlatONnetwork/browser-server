@@ -1,6 +1,7 @@
 package com.platon.browser.bootstrap.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -9,11 +10,10 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.ParamProposalCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.ProposalExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
@@ -64,6 +64,10 @@ public class InitializationService {
     private ProposalMapper proposalMapper;
     @Autowired
     private ParamProposalCache paramProposalCache;
+    @Autowired
+    private GasEstimateLogMapper gasEstimateLogMapper;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
 
     @Transactional
     public InitializationResult init() {
@@ -122,6 +126,17 @@ public class InitializationService {
         epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
         epochRetryService.settlementChange(BigInteger.valueOf(networkStat.getCurNumber()));
         epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
+
+
+        // 检查gas price估算数据表
+        GasEstimateLogExample condition = new GasEstimateLogExample();
+        condition.setOrderByClause("seq asc");
+        List<GasEstimateLog> gasEstimateLogs = gasEstimateLogMapper.selectByExample(condition);
+        gasEstimateLogs.forEach(e->{
+            List<GasEstimate> estimates = JSON.parseArray(e.getJson(),GasEstimate.class);
+            gasEstimateEventPublisher.publish(e.getSeq(),estimates);
+        });
+
         return initialResult;
     }
 
