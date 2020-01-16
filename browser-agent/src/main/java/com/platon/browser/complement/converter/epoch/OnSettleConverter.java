@@ -57,8 +57,8 @@ public class OnSettleConverter {
                 .build();
 
         List<Integer> statusList = new ArrayList <>();
-        statusList.add(1);
-        statusList.add(2);
+        statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        statusList.add(CustomStaking.StatusEnum.EXITING.getCode());
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
@@ -71,13 +71,13 @@ public class OnSettleConverter {
 
             if(staking.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()&&staking.getIsSettle()==CustomStaking.YesNoEnum.YES.getCode()){
                 // 如果质押状态是退出中&&属于当前周期，则对node表的委托奖励进行挪动累加操作
-
+                exitNodeIds.add(staking.getNodeId());
             }
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
-            if(staking.getStatus() == 2 && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
+            if(staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
-                staking.setStatus(3);
+                staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
             }
             //当前质押是上轮结算周期验证人,发放本结算周期的质押奖励, 奖励金额暂存至stakeReward变量
             BigDecimal curSettleStakeReward = BigDecimal.ZERO;
@@ -87,9 +87,9 @@ public class OnSettleConverter {
 
             //当前质押是下轮结算周期验证人
             if(settle.getCurVerifierSet().contains(staking.getNodeId())){
-                staking.setIsSettle(1);
+                staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
             }else {
-                staking.setIsSettle(2);
+                staking.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
             }
 
             // 设置当前质押的总委托奖励，从节点上取出来的委托总奖励就是当前质押获取的总委托奖励
@@ -108,8 +108,12 @@ public class OnSettleConverter {
         settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
 
-        // 在当前周期退出的节点会在周期末变为已退出，需要在上面遍历中记下退出中的质押节点，以便对node的total_dele_reward
-        // 累加到pre_total_dele_reward
+        if(!exitNodeIds.isEmpty()){
+            // 在当前周期退出的节点会在周期末变为已退出，需要在上面遍历中记下退出中的质押节点，以便对node的total_dele_reward
+            // 累加到pre_total_dele_reward
+            // 退出中且属于当前周期的质押做委托奖励相关操作
+            epochBusinessMapper.rotateDelegateReward(exitNodeIds);
+        }
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}
