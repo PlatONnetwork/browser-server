@@ -5,6 +5,7 @@ import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
@@ -24,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class OnSettleConverter {
     @Autowired
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
-	public void convert(CollectionEvent event, Block block) throws IOException {
+    public void convert(CollectionEvent event, Block block) throws IOException {
         long startTime = System.currentTimeMillis();
 	    if(block.getNum()==1) return;
 
@@ -75,21 +75,17 @@ public class OnSettleConverter {
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
-        List<String> exitNodeIds = new ArrayList<>();
+        List<String> exitedNodeIds = new ArrayList<>();
         stakingList.forEach(staking -> {
             //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
             staking.setStakingHes(BigDecimal.ZERO);
 
-            if(staking.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()&&staking.getIsSettle()==CustomStaking.YesNoEnum.YES.getCode()){
-                // 如果质押状态是退出中&&属于当前周期，则对node表的委托奖励进行挪动累加操作
-                exitNodeIds.add(staking.getNodeId());
-            }
-
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
             if(staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+                exitedNodeIds.add(staking.getNodeId());
             }
             //当前质押是上轮结算周期验证人,发放本结算周期的质押奖励, 奖励金额暂存至stakeReward变量
             BigDecimal curSettleStakeReward = BigDecimal.ZERO;
@@ -118,14 +114,8 @@ public class OnSettleConverter {
             calcDelegateAnnualizedRate(staking,curTotalDelegateCost,settle);
         });
         settle.setStakingList(stakingList);
+        settle.setExitNodeList(exitedNodeIds);
         epochBusinessMapper.settle(settle);
-
-        if(!exitNodeIds.isEmpty()){
-            // 在当前周期退出的节点会在周期末变为已退出，需要在上面遍历中记下退出中的质押节点，以便对node的total_dele_reward
-            // 累加到pre_total_dele_reward
-            // 退出中且属于当前周期的质押做委托奖励相关操作
-            epochBusinessMapper.rotateDelegateReward(exitNodeIds);
-        }
 
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k,v)->{
@@ -145,7 +135,6 @@ public class OnSettleConverter {
         customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs,GasEstimateLog.Column.values());
         // 2、发布到操作队列
         gasEstimateEventPublisher.publish(seq,gasEstimates);
-
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}

@@ -43,10 +43,4 @@ public interface EpochBusinessMapper {
      * @return
      */
 	List<Staking> querySlashNode(@Param("list") List<String> preValidatorList);
-
-    /**
-     * 委托奖励操作
-     * @param exitNodeIds
-     */
-    void rotateDelegateReward(@Param("list") List<String> exitNodeIds);
 }

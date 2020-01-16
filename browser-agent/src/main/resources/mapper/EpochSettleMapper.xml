@@ -44,20 +44,21 @@
             `stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`,
             `stat_delegate_hes` = 0
         where `stat_delegate_hes` > 0;
+
+        <foreach collection="exitNodeList" item="nodeId">
+            /*5、节点委托奖励累加*/
+            update `node` set
+            `pre_total_dele_reward` = `pre_total_dele_reward`+`total_dele_reward`
+            where `node_id` =  #{nodeId};
+        </foreach>
+        update `node` set
+        `total_dele_reward`=0
+        where `status` = 3;
     </update>
 
     <update id="updateGasEstimate">
         <foreach collection="list" item="item" separator=";">
             update `gas_estimate` set `epoch` = `epoch`+1 where `node_id`= #{item.nodeId} and `sbn`=#{item.sbn}
-        </foreach>
-    </update>
-
-    <update id="rotateDelegateReward">
-        <foreach collection="list" item="nodeId">
-            /*1、更新节点*/
-            update `node` set
-            `pre_total_dele_reward` = `pre_total_dele_reward`+`total_dele_reward`
-            where `node_id` =  #{nodeId};
         </foreach>
     </update>
 </mapper>
