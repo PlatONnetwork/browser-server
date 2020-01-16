@@ -3,19 +3,22 @@ package com.platon.browser.complement.converter.delegate;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateRewardClaimParam;
+import com.platon.browser.param.claim.Reward;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,25 +67,19 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
 
         delegateBusinessMapper.claim(businessParam);
 
-        DelegationReward delegationReward = new DelegationReward();
-        delegationReward.setHash(tx.getHash());
-        delegationReward.setAddr(tx.getFrom());
-        delegationReward.setTime(tx.getTime());
-        delegationReward.setCreTime(new Date());
-        delegationReward.setUpdTime(new Date());
-
-        // 奖励extra字段
+        // 累计总的委托奖励
+        BigDecimal txTotalReward = BigDecimal.ZERO;
         List<DelegationReward.Extra> extraList = new ArrayList<>();
 
         // 1. 领取委托奖励 估算gas委托未计算周期 epoch = 0: 直接入库到mysql数据库
         List<GasEstimate> estimates = new ArrayList<>();
-
-        businessParam.getRewardList().forEach(reward -> {
+        for (Reward reward : businessParam.getRewardList()) {
             DelegationReward.Extra extra = new DelegationReward.Extra();
             extra.setNodeId(reward.getNodeId());
             extra.setNodeName(reward.getNodeName());
             extra.setReward(reward.getReward().toString());
             extraList.add(extra);
+            txTotalReward = txTotalReward.add(reward.getReward());
 
             GasEstimate estimate = new GasEstimate();
             estimate.setNodeId(reward.getNodeId());
@@ -90,13 +87,25 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
             estimate.setAddr(tx.getFrom());
             estimate.setEpoch(0L);
             estimates.add(estimate);
-        });
-        delegationReward.setExtra(JSON.toJSONString(extraList));
-
-        addressCache.update(businessParam);
+        }
 
         // 直接入库到mysql数据库
         customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
+
+        if(txTotalReward.compareTo(BigDecimal.ZERO)==0){
+            // 如果总奖励为零，则不记录领取明细
+            return null;
+        }
+
+        DelegationReward delegationReward = new DelegationReward();
+        delegationReward.setHash(tx.getHash());
+        delegationReward.setAddr(tx.getFrom());
+        delegationReward.setTime(tx.getTime());
+        delegationReward.setCreTime(new Date());
+        delegationReward.setUpdTime(new Date());
+        delegationReward.setExtra(JSON.toJSONString(extraList));
+
+        addressCache.update(businessParam);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return delegationReward;
