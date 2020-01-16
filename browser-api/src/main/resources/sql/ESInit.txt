@@ -211,6 +211,12 @@ PUT /_template/transaction_template
         "doc_values": false,
         "norms": false
       },
+      "bin": {
+        "type": "text",
+        "index": false,
+        "doc_values": false,
+        "norms": false
+      },
       "seq": {
         "type": "long"
       },
