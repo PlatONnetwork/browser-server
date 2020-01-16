@@ -54,23 +54,23 @@ logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
-    org.springframework: debug
-    org.springframework.retry: debug
-    com.platon.browser: debug
-    com.platon.browser.bootstrap: debug
-    com.platon.browser.collection: debug
-    com.platon.browser.collection.queue.handler: debug
-    com.platon.browser.common: debug
-    com.platon.browser.common.utils: debug
-    com.platon.browser.complement: debug
-    com.platon.browser.complement.handler: debug
-    com.platon.browser.complement.converter: debug
-    com.platon.browser.complement.converter.epoch: debug
-    com.platon.browser.complement.dao.mapper: debug
-    com.platon.browser.persistence: debug
-    com.platon.browser.persistence.handler: debug
-    com.platon.browser.persistence.queue.handler: debug
-    com.platon.browser.task: debug
+    org.springframework: error
+    org.springframework.retry: error
+    com.platon.browser: error
+    com.platon.browser.bootstrap: error
+    com.platon.browser.collection: error
+    com.platon.browser.collection.queue.handler: error
+    com.platon.browser.common: error
+    com.platon.browser.common.utils: error
+    com.platon.browser.complement: error
+    com.platon.browser.complement.handler: error
+    com.platon.browser.complement.converter: error
+    com.platon.browser.complement.converter.epoch: error
+    com.platon.browser.complement.dao.mapper: error
+    com.platon.browser.persistence: error
+    com.platon.browser.persistence.handler: error
+    com.platon.browser.persistence.queue.handler: error
+    com.platon.browser.task: error
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数

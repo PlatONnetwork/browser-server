@@ -46,7 +46,7 @@
         where `stat_delegate_hes` > 0;
     </update>
 
-    <update id="updateGasEstimate" parameterType="map">
+    <update id="updateGasEstimate">
         <foreach collection="list" item="item" separator=";">
             update `gas_estimate` set `epoch` = `epoch`+1 where `node_id`= #{item.nodeId} and `sbn`=#{item.sbn}
         </foreach>
