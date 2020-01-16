@@ -11,8 +11,6 @@ import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.entity.GasEstimateLog;
-import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
