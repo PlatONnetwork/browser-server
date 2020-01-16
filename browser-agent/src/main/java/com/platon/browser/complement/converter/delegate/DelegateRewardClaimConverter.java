@@ -12,10 +12,12 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateRewardClaimParam;
+import com.platon.browser.param.claim.Reward;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,21 +60,29 @@ public class DelegateRewardClaimConverter extends BusinessParamConverter<Delegat
 
         delegateBusinessMapper.claim(businessParam);
 
+        // 累计总的委托奖励
+        BigDecimal txTotalReward = BigDecimal.ZERO;
+        List<DelegationReward.Extra> extraList = new ArrayList<>();
+        for (Reward reward : businessParam.getRewardList()) {
+            DelegationReward.Extra extra = new DelegationReward.Extra();
+            extra.setNodeId(reward.getNodeId());
+            extra.setNodeName(reward.getNodeName());
+            extra.setReward(reward.getReward().toString());
+            extraList.add(extra);
+            txTotalReward = txTotalReward.add(reward.getReward());
+        }
+
+        if(txTotalReward.compareTo(BigDecimal.ZERO)==0){
+            // 如果总奖励为零，则不记录领取明细
+            return null;
+        }
+
         DelegationReward delegationReward = new DelegationReward();
         delegationReward.setHash(tx.getHash());
         delegationReward.setAddr(tx.getFrom());
         delegationReward.setTime(tx.getTime());
         delegationReward.setCreTime(new Date());
         delegationReward.setUpdTime(new Date());
-
-        List<DelegationReward.Extra> extraList = new ArrayList<>();
-        businessParam.getRewardList().forEach(reward -> {
-            DelegationReward.Extra extra = new DelegationReward.Extra();
-            extra.setNodeId(reward.getNodeId());
-            extra.setNodeName(reward.getNodeName());
-            extra.setReward(reward.getReward().toString());
-            extraList.add(extra);
-        });
         delegationReward.setExtra(JSON.toJSONString(extraList));
 
         addressCache.update(businessParam);
