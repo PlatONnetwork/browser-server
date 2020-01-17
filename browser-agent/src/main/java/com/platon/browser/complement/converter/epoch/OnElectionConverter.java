@@ -5,6 +5,7 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Election;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,8 @@ public class OnElectionConverter {
     private EpochBusinessMapper epochBusinessMapper;
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private BlockChainConfig blockChainConfig;
 	
 	public Optional<List<NodeOpt>> convert(CollectionEvent event, Block block) {
 
@@ -52,17 +56,25 @@ public class OnElectionConverter {
 				.build();
 		epochBusinessMapper.slashNode(election);
 		
+		
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
 		List<NodeOpt> nodeOpts = slashNodeList.stream()
 				.map(node -> {
+					StringBuffer desc = new StringBuffer("0|");
+					/**
+					 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
+					 */
+					String amount =  new BigDecimal(block.getReward())
+							.multiply(blockChainConfig.getSlashBlockRewardCount()).toString();
+					desc.append(blockChainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
 					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 					nodeOpt.setNodeId(node.getNodeId());
 					nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
 					nodeOpt.setBNum(bNum.longValue());
 					nodeOpt.setTime(block.getTime());
-					nodeOpt.setDesc("0|0|0|1");
+					nodeOpt.setDesc(desc.toString());
 					return nodeOpt;
 				}).collect(Collectors.toList());
 

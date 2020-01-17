@@ -384,7 +384,7 @@ public class StakingServiceImpl implements StakingService {
 						break;
 					/** 出块率低 */
 					case LOW_BLOCK_RATE:
-						stakingOptRecordListResp.setPercent(desces[0]);
+						stakingOptRecordListResp.setPercent(desces[1]);
 						stakingOptRecordListResp.setAmount(new BigDecimal(desces[2]));
 						stakingOptRecordListResp.setIsFire(Integer.parseInt(desces[3]));
 						break;

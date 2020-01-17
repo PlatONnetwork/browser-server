@@ -344,7 +344,9 @@ public class TransactionServiceImpl implements TransactionService {
         		} catch (IOException e) {
         			logger.error("获取交易错误。", e);
         		}
-        		resp.setPreHash(first.getRsData().get(0).getHash());
+        		if(first.getTotal() > 0l) {
+        			resp.setPreHash(first.getRsData().get(0).getHash());
+        		}
     		}
     		
     		resp.setLast(true);
