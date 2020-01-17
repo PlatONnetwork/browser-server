@@ -66,7 +66,7 @@ public class OnElectionConverter {
 					 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
 					 */
 					String amount =  new BigDecimal(block.getReward())
-							.add(blockChainConfig.getSlashBlockRewardCount()).toString();
+							.multiply(blockChainConfig.getSlashBlockRewardCount()).toString();
 					desc.append(blockChainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
 					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
