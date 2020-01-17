@@ -96,7 +96,7 @@ public class HomeServiceImpl implements HomeService {
 				/* 转换失败则超出long的数字范围，则认为无效区块号  */
 				number = Long.valueOf(keyword);
 			} catch (Exception e) {
-				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
+				return result;
 			}
 			/* 存在区块信息则返回区块号 */
 			Block block = null;
