@@ -2,6 +2,7 @@ package com.platon.browser.bootstrap.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
@@ -43,6 +44,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private TxBakMapper txBakMapper;
     @Autowired
     private NOptBakMapper nOptBakMapper;
+    @Autowired
+    private PlatOnClient platOnClient;
 
     private Set<Block> blocks=new HashSet<>();
     private Set<Transaction> transactions=new HashSet<>();
@@ -57,7 +60,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient.getWeb3jWrapper().getWeb3j());
 
             clear();
             blocks.add(block);

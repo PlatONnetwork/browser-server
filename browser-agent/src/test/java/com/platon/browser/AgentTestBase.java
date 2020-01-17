@@ -1,6 +1,7 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
@@ -39,6 +40,8 @@ import java.util.*;
 public class AgentTestBase extends AgentTestData {
     @Autowired
     protected StakingMapper stakingMapper;
+    @Autowired
+    protected PlatOnClient platOnClient;
 
     public static Map<Integer, BigDecimal> subsidies = new HashMap<>();
 

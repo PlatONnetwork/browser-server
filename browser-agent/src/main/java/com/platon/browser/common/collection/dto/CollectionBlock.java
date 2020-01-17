@@ -8,6 +8,7 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.extern.slf4j.Slf4j;
+import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
@@ -38,7 +39,7 @@ public class CollectionBlock extends Block {
         return block;
     }
 
-    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block,ReceiptResult receiptResult) throws BeanCreateOrUpdateException {
+    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, Web3j web3j) throws BeanCreateOrUpdateException {
         String nodeId;
         if(block.getNumber().longValue()==0){
             nodeId="000000000000000000000000000000000";
@@ -71,7 +72,7 @@ public class CollectionBlock extends Block {
                 CollectionTransaction transaction = CollectionTransaction.newInstance()
                         .updateWithBlock(this)
                         .updateWithRawTransaction(rawTransaction)
-                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()));
+                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),web3j);
                 transactions.add(transaction);
             }
         }

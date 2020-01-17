@@ -2,6 +2,7 @@ package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.DelegateExitParam;
@@ -10,7 +11,11 @@ import com.platon.browser.util.decode.DecodedResult;
 import com.platon.browser.util.decode.TxInputUtil;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.Log;
+import org.web3j.protocol.core.methods.response.PlatonGetCode;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -60,7 +65,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block,Receipt receipt) throws BeanCreateOrUpdateException {
+    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, Web3j web3j) throws BeanCreateOrUpdateException {
 
         // 默认取状态字段作为交易成功与否的状态
         int status = receipt.getStatus();
@@ -75,17 +80,43 @@ public class CollectionTransaction extends Transaction {
             decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
 
             // =========TODO:交易类型&to地址类型判断 START==========
-            // 交易类型
+            // 交易类型默认取解码出来的结果
             int type = decodedResult.getTypeEnum().getCode();
+            // to地址类型默认设置为合约
             int toType = ToTypeEnum.CONTRACT.getCode();
+            // 合约代码
+            String binCode = null;
+            // 合约方法
+            String method = null;
+            // 合约类型
+            int contractType = ContractTypeEnum.EVM.getCode();
 
-
-            if (getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(getTo())) {
-                // 如果交易value不为空，且to不是内置合约地址，则交易类型设置为转账，to地址设置为账户类型
-                type = TypeEnum.TRANSFER.getCode();
-                toType = ToTypeEnum.ACCOUNT.getCode();
+            if(decodedResult.getTypeEnum()==TypeEnum.OTHERS){
+                // 交易input无法解析的交易
+                if (getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(getTo())) {
+                    // 普通转账
+                    // 如果交易value不为空，且to不是内置合约地址，则交易类型设置为转账，to地址设置为账户类型
+                    type = TypeEnum.TRANSFER.getCode(); // 由于转账交易没有input信息，在调用TxInputUtil.decode()后，取回来的是OTHERS类型，所以需要明确设置
+                    toType = ToTypeEnum.ACCOUNT.getCode();
+                }
+            }else {
+                // 交易input可解析的交易
+                if(StringUtils.isNotBlank(receipt.getContractAddress())){
+                    // contractAddress不为null，证明是合约创建
+                    // 1、普通交易(转账&内置合约调用)：to!=null, 回执contractAddress==null
+                    // 2、合约交易：
+                    //      创建：to==null, 回执contractAddress!=null
+                    //      执行：to!=null, 回执contractAddress==null
+                    // 查询合约代码
+                    String contractAddr = receipt.getContractAddress();
+                    PlatonGetCode platonGetCode = web3j.platonGetCode(contractAddr, DefaultBlockParameterName.LATEST).send();
+                    binCode = platonGetCode.getCode();
+                }
+                if(decodedResult.getTypeEnum()==TypeEnum.CONTRACT_EXEC){
+                    // 合约执行，需要解析出被调用的合约方法
+                    method = "aaa";
+                }
             }
-
             // =========交易类型&to地址类型判断 END==========
 
             // 交易信息
@@ -97,7 +128,10 @@ public class CollectionTransaction extends Transaction {
                     .setSeq(getNum()*10000+getIndex())
                     .setInfo(info)
                     .setType(type)
-                    .setToType(toType);
+                    .setToType(toType)
+                    .setContractType(contractType)
+                    .setBin(binCode)
+                    .setMethod(method);
         } catch (Exception e) {
             throw new BeanCreateOrUpdateException("交易[hash:" + this.getHash() + "]的参数解析出错:" + e.getMessage());
         }

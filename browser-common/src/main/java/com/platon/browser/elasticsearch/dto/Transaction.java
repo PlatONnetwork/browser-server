@@ -37,6 +37,9 @@ public class Transaction {
     private String input;
     private String info;
     private String failReason;
+    private Integer contractType;
+    private String method;
+    private String bin;
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalGasLimit(){return new BigDecimal(this.getGasLimit());}

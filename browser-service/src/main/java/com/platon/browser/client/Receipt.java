@@ -126,5 +126,12 @@ public class Receipt {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-    
+
+	public String getContractAddress() {
+		return contractAddress;
+	}
+
+	public void setContractAddress(String contractAddress) {
+		this.contractAddress = contractAddress;
+	}
 }

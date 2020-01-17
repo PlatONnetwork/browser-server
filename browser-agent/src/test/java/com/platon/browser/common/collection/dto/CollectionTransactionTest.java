@@ -40,7 +40,7 @@ public class CollectionTransactionTest extends AgentTestBase {
 
         ReceiptResult receipt = receiptResultList.get(0);
         Receipt receipt1 = receipt.getResult().get(0);
-        transaction.updateWithBlockAndReceipt(collectionBlock,receipt1);
+        transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,platOnClient.getWeb3jWrapper().getWeb3j());
 
         assertTrue(true);
     }

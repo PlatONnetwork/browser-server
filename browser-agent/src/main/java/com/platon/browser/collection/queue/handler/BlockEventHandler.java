@@ -1,6 +1,7 @@
 package com.platon.browser.collection.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.queue.event.BlockEvent;
 import com.platon.browser.common.collection.dto.CollectionBlock;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
+import org.web3j.protocol.core.methods.response.PlatonCall;
 
 import java.util.concurrent.ExecutionException;
 
@@ -23,6 +25,8 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
 
     @Autowired
     private CollectionEventPublisher collectionEventPublisher;
+    @Autowired
+    private PlatOnClient platOnClient;
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BlockEventHandler")
@@ -34,7 +38,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient.getWeb3jWrapper().getWeb3j());
             block.setReward(event.getEpochMessage().getBlockReward().toString());
 
             collectionEventPublisher.publish(block,block.getTransactions(),event.getEpochMessage());
