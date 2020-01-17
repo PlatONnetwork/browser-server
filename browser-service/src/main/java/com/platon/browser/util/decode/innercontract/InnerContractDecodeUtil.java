@@ -1,4 +1,4 @@
-package com.platon.browser.util.decode;
+package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.OthersTxParam;
@@ -15,16 +15,18 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * 交易参数解析器
+ * 内置合约交易解析工具：
+ * 1、根据tx input解得内置合约交易类型及参数
+ * 2、根据logs解得内置合约执行结果相关信息
  * User: dongqile
  * Date: 2019/1/9
  * Time: 11:46
  */
 @Slf4j
-public class TxInputUtil {
-    private TxInputUtil(){}
-    public static DecodedResult decode(String txInput,List<Log> logs) {
-        DecodedResult result = new DecodedResult();
+public class InnerContractDecodeUtil {
+    private InnerContractDecodeUtil(){}
+    public static InnerContractDecodedResult decode(String txInput, List<Log> logs) {
+        InnerContractDecodedResult result = new InnerContractDecodedResult();
         try {
             if (StringUtils.isNotEmpty(txInput) && !txInput.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
@@ -43,8 +45,6 @@ public class TxInputUtil {
                 RlpList rlpList2 = RlpDecoder.decode(rlpString.getBytes());
                 RlpString rl = (RlpString) rlpList2.getValues().get(0);
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
-
-
 
                 Transaction.TypeEnum typeEnum = Transaction.TypeEnum.getEnum(txCode.intValue());
                 result.setTypeEnum(typeEnum);
@@ -81,16 +81,12 @@ public class TxInputUtil {
                         // 如果日志为空则不解析
                         if(logs.isEmpty()) return result;
                         return result.setParam(DelegateRewardClaimDecoder.decode(rootList,logs));
-                    case CONTRACT_CREATE: // 合约创建
-                        return result.setParam(ContractCreateDecoder.decode(rootList,logs));
-                    case CONTRACT_EXEC: // 合约执行
-                        return result.setParam(ContractExecDecoder.decode(rootList,logs));
 				default:
 					break;
                 }
             }
         } catch (Exception e) {
-            log.error("解析交易输入出错:",e);
+            log.error("解析内置合约交易输入出错:",e);
         }
         return result;
     }

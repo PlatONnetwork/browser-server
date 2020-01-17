@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -42,7 +43,7 @@ public class BlockEventHandlerTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException {
+    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException {
         CompletableFuture<PlatonBlock> blockCF=getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF=getReceiptAsync(7000L);
         BlockEvent blockEvent = new BlockEvent();

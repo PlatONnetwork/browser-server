@@ -40,6 +40,8 @@ public class Transaction {
     private Integer contractType;
     private String method;
     private String bin;
+    private String contractAddress;
+
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalGasLimit(){return new BigDecimal(this.getGasLimit());}

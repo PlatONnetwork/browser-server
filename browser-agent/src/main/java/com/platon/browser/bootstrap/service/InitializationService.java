@@ -10,6 +10,7 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.ParamProposalCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
+import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
@@ -119,6 +120,13 @@ public class InitializationService {
         // 初始化节点缓存
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
         nodeCache.init(nodeList);
+
+        // 初始化普通合约地址
+        AddressExample addressExample = new AddressExample();
+        addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.CONTRACT.getCode());
+        List<Address> addressList = addressMapper.selectByExample(addressExample);
+        addressCache.initGeneralContractAddressCache(addressList);
+
         // 初始化网络缓存
         networkStatCache.init(networkStat);
 

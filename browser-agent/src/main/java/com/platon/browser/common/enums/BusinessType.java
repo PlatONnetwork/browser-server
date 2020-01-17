@@ -27,5 +27,5 @@ public enum BusinessType {
     // 合约创建
     CONTRACT_CREATE,
     // 合约执行
-    CONTRACT_EXECUTE
+    CONTRACT_EXEC
 }

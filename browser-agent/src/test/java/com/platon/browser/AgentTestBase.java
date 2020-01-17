@@ -2,6 +2,7 @@ package com.platon.browser;//package com.platon.browser;
 
 
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
@@ -42,6 +43,8 @@ public class AgentTestBase extends AgentTestData {
     protected StakingMapper stakingMapper;
     @Autowired
     protected PlatOnClient platOnClient;
+    @Autowired
+    protected AddressCache addressCache;
 
     public static Map<Integer, BigDecimal> subsidies = new HashMap<>();
 

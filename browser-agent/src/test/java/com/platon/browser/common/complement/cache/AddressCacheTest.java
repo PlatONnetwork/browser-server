@@ -18,7 +18,7 @@ public class AddressCacheTest extends AgentTestBase {
     private AddressCache addressCache;
     @Test
     public void test(){
-        addressCache.init(new ArrayList<>(addressList));
+        addressCache.initGeneralContractAddressCache(new ArrayList<>(addressList));
         addressCache.initOnFirstStart();
         addressCache.update(transactionList.get(0));
         addressCache.getAll();

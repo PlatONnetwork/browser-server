@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertTrue;
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 public class CollectionTransactionTest extends AgentTestBase {
 
     @Test
-    public void test() throws InvocationTargetException, IllegalAccessException, BeanCreateOrUpdateException {
+    public void test() throws InvocationTargetException, IllegalAccessException, BeanCreateOrUpdateException, IOException {
         CollectionTransaction transaction = CollectionTransaction.newInstance();
 
         Block block = blockList.get(0);
@@ -40,7 +41,7 @@ public class CollectionTransactionTest extends AgentTestBase {
 
         ReceiptResult receipt = receiptResultList.get(0);
         Receipt receipt1 = receipt.getResult().get(0);
-        transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,platOnClient.getWeb3jWrapper().getWeb3j());
+        transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,platOnClient.getWeb3jWrapper().getWeb3j(),addressCache.getGeneralContractAddressCache());
 
         assertTrue(true);
     }

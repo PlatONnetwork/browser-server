@@ -7,15 +7,11 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.claim.Reward;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 地址统计缓存
@@ -23,12 +19,22 @@ import java.util.Map;
 @Component
 public class AddressCache {
     private Map<String,Address> addressMap = new HashMap<>();
+	/**
+	 * 普通合约地址缓存
+	 */
+	private Set<String> generalContractAddressCache = new HashSet<>();
+	public Set<String> getGeneralContractAddressCache(){return generalContractAddressCache;}
+	public boolean isGeneralContractAddress(String address){
+		return generalContractAddressCache.contains(address);
+	}
     
     public void update(Transaction tx) {
     	String from = tx.getFrom();
     	String to = tx.getTo();
+    	String contractAddress = tx.getContractAddress();
     	updateAddress(tx,from);
-    	updateAddress(tx,to);
+		updateAddress(tx,to);
+		updateAddress(tx,contractAddress);
     }
     
     public Collection<Address> getAll(){
@@ -40,6 +46,7 @@ public class AddressCache {
     }
     
     private void updateAddress(Transaction tx, String addr) {
+    	if(addr==null) return;
     	Address address = addressMap.get(addr);
     	if(address == null) {
     		address = createDefaultAddress(addr);
@@ -70,9 +77,16 @@ public class AddressCache {
 		case PROPOSAL_CANCEL:// 取消提案
 		case VERSION_DECLARE:// 版本声明
 		   	 address.setProposalQty(address.getProposalQty()+1); 
-		        break;
+			break;
+		case CONTRACT_CREATE:
+			address.setContractCreatehash(tx.getHash());
+			address.setContractCreate(tx.getFrom());
+			// 覆盖createDefaultAddress()中设置的值
+			address.setType(AddressTypeEnum.CONTRACT.getCode());
+			generalContractAddressCache.add(addr);
+			break;
 		    default:
-		}    	
+		}
     }
     
     private Address createDefaultAddress(String addr) {
@@ -83,7 +97,7 @@ public class AddressCache {
             // 内置合约地址
         	address.setType(AddressTypeEnum.INNER_CONTRACT.getCode());
         }else{
-            // 主动发起交易的都认为是账户地址因为当前川陀版本无wasm
+            // 先默认置为账户地址，具体是什么类型，由调用此方法的后续逻辑决定并设置
         	address.setType(AddressTypeEnum.ACCOUNT.getCode());
         }
         
@@ -111,10 +125,14 @@ public class AddressCache {
 	 * 初始化
 	 * @param addressList 地址实体列表
 	 */
-	public void init(List<Address> addressList) {
+	public void initGeneralContractAddressCache(List<Address> addressList) {
 		if(addressList.isEmpty()) return;
-		addressMap.clear();
-		addressList.forEach(address -> addressMap.put(address.getAddress(),address));
+		generalContractAddressCache.clear();
+		addressList.forEach(address -> {
+			if(address.getType()==AddressTypeEnum.CONTRACT.getCode()){
+				generalContractAddressCache.add(address.getAddress());
+			}
+		});
 	}
 	
 	/**

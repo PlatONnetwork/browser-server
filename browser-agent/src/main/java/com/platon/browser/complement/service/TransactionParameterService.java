@@ -167,7 +167,6 @@ public class TransactionParameterService {
             }catch (BusinessException | NoSuchBeanException e){
                 log.debug("",e);
             }
-           
         }
 
         Block block = event.getBlock();

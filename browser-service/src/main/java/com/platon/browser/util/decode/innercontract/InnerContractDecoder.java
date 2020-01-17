@@ -1,4 +1,4 @@
-package com.platon.browser.util.decode;
+package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.RestrictingCreateParam;
 import org.web3j.rlp.RlpDecoder;
@@ -17,7 +17,7 @@ import java.util.List;
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:14:38
  **/
-public interface Decoder {
+public interface InnerContractDecoder {
 
     static BigInteger bigIntegerResolver(RlpString rlpString) {
         RlpList integersList = RlpDecoder.decode(rlpString.getBytes());

@@ -1,4 +1,4 @@
-package com.platon.browser.util.decode;
+package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.ContractCreateParam;
 import com.platon.browser.param.TxParam;

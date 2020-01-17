@@ -5,6 +5,7 @@ import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
@@ -26,6 +27,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -46,13 +48,15 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private NOptBakMapper nOptBakMapper;
     @Autowired
     private PlatOnClient platOnClient;
+    @Autowired
+    private AddressCache addressCache;
 
     private Set<Block> blocks=new HashSet<>();
     private Set<Transaction> transactions=new HashSet<>();
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BootstrapEventHandler")
-    public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
+    public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException {
         long startTime = System.currentTimeMillis();
 
         log.debug("BootstrapEvent处理:{}(event(blockCF({}),transactions({})),sequence({}),endOfBatch({}))",
@@ -60,7 +64,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient.getWeb3jWrapper().getWeb3j());
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient.getWeb3jWrapper().getWeb3j(),addressCache.getGeneralContractAddressCache());
 
             clear();
             blocks.add(block);

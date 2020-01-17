@@ -1,4 +1,4 @@
-package com.platon.browser.util.decode;
+package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.OthersTxParam;
@@ -9,7 +9,7 @@ import com.platon.browser.param.TxParam;
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 20:38:57
  **/
-public class DecodedResult {
+public class InnerContractDecodedResult {
     private TxParam param= new OthersTxParam();
     private Transaction.TypeEnum typeEnum= Transaction.TypeEnum.OTHERS;
 
@@ -17,7 +17,7 @@ public class DecodedResult {
         return param;
     }
 
-    public DecodedResult setParam(TxParam param) {
+    public InnerContractDecodedResult setParam(TxParam param) {
         this.param = param;
         return this;
     }
@@ -26,7 +26,7 @@ public class DecodedResult {
         return typeEnum;
     }
 
-    public DecodedResult setTypeEnum(Transaction.TypeEnum typeEnum) {
+    public InnerContractDecodedResult setTypeEnum(Transaction.TypeEnum typeEnum) {
         this.typeEnum = typeEnum;
         return this;
     }

@@ -6,8 +6,9 @@ package com.platon.browser.enums;
  * @Description:
  */
 public enum ContractTypeEnum {
-    EVM(0, "EVM"),
-    WASM(1, "WASM");
+    INNER(0, "INNER"),
+    EVM(1, "EVM"),
+    WASM(2, "WASM");
 
     private int code;
     private String desc;

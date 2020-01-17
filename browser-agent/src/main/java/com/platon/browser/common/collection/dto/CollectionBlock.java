@@ -12,10 +12,12 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class CollectionBlock extends Block {
@@ -39,7 +41,7 @@ public class CollectionBlock extends Block {
         return block;
     }
 
-    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, Web3j web3j) throws BeanCreateOrUpdateException {
+    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, Web3j web3j, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
         String nodeId;
         if(block.getNumber().longValue()==0){
             nodeId="000000000000000000000000000000000";
@@ -72,7 +74,7 @@ public class CollectionBlock extends Block {
                 CollectionTransaction transaction = CollectionTransaction.newInstance()
                         .updateWithBlock(this)
                         .updateWithRawTransaction(rawTransaction)
-                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),web3j);
+                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),web3j,generalContractAddressCache);
                 transactions.add(transaction);
             }
         }

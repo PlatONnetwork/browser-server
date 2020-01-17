@@ -1,7 +1,6 @@
 package com.platon.browser.complement.dao.param.delegate;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.util.decode.DecodedResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

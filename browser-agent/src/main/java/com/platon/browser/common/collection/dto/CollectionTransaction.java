@@ -7,8 +7,8 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
-import com.platon.browser.util.decode.DecodedResult;
-import com.platon.browser.util.decode.TxInputUtil;
+import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
+import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,11 +22,13 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class CollectionTransaction extends Transaction {
@@ -66,7 +68,21 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, Web3j web3j) throws BeanCreateOrUpdateException {
+    static class ComplementInfo{
+        // 交易类型
+        Integer type=TypeEnum.OTHERS.getCode();
+        // to地址类型默认设置为合约
+        Integer toType=null;
+        // 合约代码
+        String binCode = null;
+        // 合约方法
+        String method = null;
+        // 合约类型
+        Integer contractType = ContractTypeEnum.EVM.getCode();
+        // tx info信息
+        String info = "{}";
+    }
+    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, Web3j web3j, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
 
         // 默认取状态字段作为交易成功与否的状态
         int status = receipt.getStatus();
@@ -75,67 +91,42 @@ public class CollectionTransaction extends Transaction {
             status=receipt.getLogStatus();
         }
 
-        DecodedResult decodedResult;
-        try {
-            // 解析交易的输入及交易回执log信息
-            decodedResult = TxInputUtil.decode(getInput(),receipt.getLogs());
-
-            // =========TODO:交易类型&to地址类型判断 START==========
-            // 交易类型默认取解码出来的结果
-            int type = decodedResult.getTypeEnum().getCode();
-            // to地址类型默认设置为合约
-            int toType = ToTypeEnum.CONTRACT.getCode();
-            // 合约代码
-            String binCode = null;
-            // 合约方法
-            String method = null;
-            // 合约类型
-            int contractType = ContractTypeEnum.EVM.getCode();
-
-            if(decodedResult.getTypeEnum()==TypeEnum.OTHERS){
-                // 交易input无法解析的交易
-                if (getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(getTo())) {
-                    // 普通转账
-                    // 如果交易value不为空，且to不是内置合约地址，则交易类型设置为转账，to地址设置为账户类型
-                    type = TypeEnum.TRANSFER.getCode(); // 由于转账交易没有input信息，在调用TxInputUtil.decode()后，取回来的是OTHERS类型，所以需要明确设置
-                    toType = ToTypeEnum.ACCOUNT.getCode();
-                }
-            }else {
-                // 交易input可解析的交易
-                if(StringUtils.isNotBlank(receipt.getContractAddress())){
-                    // contractAddress不为null，证明是合约创建
-                    // 1、普通交易(转账&内置合约调用)：to!=null, 回执contractAddress==null
-                    // 2、合约交易：
-                    //      创建：to==null, 回执contractAddress!=null
-                    //      执行：to!=null, 回执contractAddress==null
-                    // 查询合约代码
-                    String contractAddr = receipt.getContractAddress();
-                    PlatonGetCode platonGetCode = web3j.platonGetCode(contractAddr, DefaultBlockParameterName.LATEST).send();
-                    binCode = platonGetCode.getCode();
-                }
-                if(decodedResult.getTypeEnum()==TypeEnum.CONTRACT_EXEC){
-                    // 合约执行，需要解析出被调用的合约方法
-                    method = "aaa";
+        //============需要通过解码补充的交易信息============
+        ComplementInfo ci = new ComplementInfo();
+        String inputWithoutPrefix = StringUtils.isNotBlank(getInput())?getInput().replace("0x",""):"";
+        if(InnerContractAddrEnum.getAddresses().contains(getTo())&&StringUtils.isNotBlank(inputWithoutPrefix)){
+            // 如果to地址是内置合约地址，则解码交易输入
+            resolveInnerContractInvokeTxComplementInfo(receipt.getLogs(),ci);
+        }else{
+            if(StringUtils.isBlank(getTo())) {
+                // 如果to地址为空则是普通合约创建
+                resolveGeneralContractCreateTxComplementInfo(getTo(),web3j,ci);
+            }else{
+                if(generalContractAddressCache.contains(getTo())&&inputWithoutPrefix.length()>=8){
+                    // evm or wasm 合约调用
+                    resolveGeneralContractInvokeTxComplementInfo(ci);
+                }else {
+                    BigInteger value = StringUtils.isNotBlank(getValue())?new BigInteger(getValue()):BigInteger.ZERO;
+                    if(value.compareTo(BigInteger.ZERO)>0){
+                        // 如果输入为空且value大于0，则是普通转账
+                        resolveGeneralTransferTxComplementInfo(ci,generalContractAddressCache);
+                    }
                 }
             }
-            // =========交易类型&to地址类型判断 END==========
-
-            // 交易信息
-            String info = decodedResult.getParam().toJSONString();
-            this.setGasUsed(receipt.getGasUsed().toString())
-                    .setCost(decimalGasUsed().multiply(decimalGasPrice()).toString())
-                    .setFailReason(receipt.getFailReason())
-                    .setStatus(status)
-                    .setSeq(getNum()*10000+getIndex())
-                    .setInfo(info)
-                    .setType(type)
-                    .setToType(toType)
-                    .setContractType(contractType)
-                    .setBin(binCode)
-                    .setMethod(method);
-        } catch (Exception e) {
-            throw new BeanCreateOrUpdateException("交易[hash:" + this.getHash() + "]的参数解析出错:" + e.getMessage());
         }
+
+        // 交易信息
+        this.setGasUsed(receipt.getGasUsed().toString())
+                .setCost(decimalGasUsed().multiply(decimalGasPrice()).toString())
+                .setFailReason(receipt.getFailReason())
+                .setStatus(status)
+                .setSeq(getNum()*10000+getIndex())
+                .setInfo(ci.info)
+                .setType(ci.type)
+                .setToType(ci.toType)
+                .setContractType(ci.contractType)
+                .setBin(ci.binCode)
+                .setMethod(ci.method);
 
         // 累加总交易数
         block.setTxQty(block.getTxQty()+1);
@@ -171,7 +162,7 @@ public class CollectionTransaction extends Transaction {
                         .build();
                 if(status==Receipt.getSuccess()){
                     // 成功的领取交易才解析info回填
-                    param = (DelegateRewardClaimParam) decodedResult.getParam();
+                    param = getTxParam(DelegateRewardClaimParam.class);
                 }
                 setInfo(param.toJSONString());
                 block.setDQty(block.getDQty()+1);
@@ -183,12 +174,6 @@ public class CollectionTransaction extends Transaction {
             case PROPOSAL_CANCEL:// 取消提案
             case VERSION_DECLARE:// 版本声明
                 block.setPQty(block.getPQty()+1);
-                break;
-            case CONTRACT_CREATE:// 创建合约
-                //TODO: 创建合约
-                break;
-            case CONTRACT_EXEC:// 合约执行
-                //TODO: 合约执行
                 break;
             default:
         }
@@ -202,7 +187,7 @@ public class CollectionTransaction extends Transaction {
     /**
      *  获得解除委托时所提取的委托收益
      */
-    public BigInteger getDelegateReward(List<Log> logs) {
+    private BigInteger getDelegateReward(List<Log> logs) {
         if(logs==null||logs.isEmpty()) return BigInteger.ZERO;
 
         String logData = logs.get(0).getData();
@@ -216,5 +201,76 @@ public class CollectionTransaction extends Transaction {
         if(statusCode != ErrorCode.SUCCESS) return BigInteger.ZERO;
 
         return ((RlpString)(RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())).getValues().get(0)).asPositiveBigInteger();
+    }
+
+    /**
+     * 解析内置合约调用交易的补充信息
+     */
+    private void resolveInnerContractInvokeTxComplementInfo(List<Log> logs,ComplementInfo ci) throws BeanCreateOrUpdateException {
+        InnerContractDecodedResult decodedResult;
+        try {
+            // 解析交易的输入及交易回执log信息
+            decodedResult = InnerContractDecodeUtil.decode(getInput(),logs);
+            ci.type = decodedResult.getTypeEnum().getCode();
+            ci.info = decodedResult.getParam().toJSONString();
+            ci.toType = ToTypeEnum.CONTRACT.getCode();
+            ci.contractType = ContractTypeEnum.INNER.getCode();
+            ci.method = null;
+            ci.binCode = null;
+        } catch (Exception e) {
+            throw new BeanCreateOrUpdateException("交易[hash:" + this.getHash() + "]的参数解析出错:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 解析创建普通合约交易的补充信息
+     * @param contractAddress
+     * @param web3j
+     * @param ci
+     * @throws IOException
+     */
+    private void resolveGeneralContractCreateTxComplementInfo(String contractAddress, Web3j web3j,ComplementInfo ci) throws IOException {
+        ci.info="";
+        PlatonGetCode platonGetCode = web3j.platonGetCode(contractAddress, DefaultBlockParameterName.LATEST).send();
+        ci.binCode = platonGetCode.getCode();
+
+        // TODO: 解析出调用合约方法名
+        String txInput = getInput();
+        //ci.method = getGeneralContractMethod();
+        ci.toType = ToTypeEnum.CONTRACT.getCode();
+        ci.type = TypeEnum.CONTRACT_CREATE.getCode();
+        // 现阶段默认只有EVM类型的合约
+        ci.contractType = ContractTypeEnum.EVM.getCode();
+    }
+
+    /**
+     * 解析调用普通合约交易的补充信息
+     * @param ci
+     * @throws IOException
+     */
+    private void resolveGeneralContractInvokeTxComplementInfo(ComplementInfo ci) {
+        ci.info="";
+        ci.binCode=null;
+        // TODO: 解析出调用合约方法名
+        String txInput = getInput();
+//        ci.method = getGeneralContractMethod();
+        ci.toType = ToTypeEnum.CONTRACT.getCode();
+        ci.type = TypeEnum.CONTRACT_EXEC.getCode();
+        // 现阶段默认只有EVM类型的合约
+        ci.contractType = ContractTypeEnum.EVM.getCode();
+    }
+
+    /**
+     * 解析普通交易的补充信息
+     * @param ci
+     */
+    private void resolveGeneralTransferTxComplementInfo(ComplementInfo ci,Set<String> generalContractAddressCache){
+        ci.type = TypeEnum.TRANSFER.getCode();
+        ci.contractType = null;
+        ci.method = null;
+        ci.info = "{}";
+        ci.binCode = null;
+        // 需要根据交易的to地址是否是什么类型的地址
+        ci.toType = generalContractAddressCache.contains(getTo())? ToTypeEnum.CONTRACT.getCode():ToTypeEnum.ACCOUNT.getCode();
     }
 }

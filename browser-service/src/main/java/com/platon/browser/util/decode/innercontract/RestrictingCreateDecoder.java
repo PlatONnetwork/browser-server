@@ -1,4 +1,4 @@
-package com.platon.browser.util.decode;
+package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.RestrictingCreateParam;
 import com.platon.browser.param.TxParam;
@@ -7,8 +7,8 @@ import org.web3j.rlp.RlpString;
 
 import java.util.List;
 
-import static com.platon.browser.util.decode.Decoder.resolvePlan;
-import static com.platon.browser.util.decode.Decoder.stringResolver;
+import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.resolvePlan;
+import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.stringResolver;
 
 /**
  * @description: 创建验证人交易输入参数解码器
