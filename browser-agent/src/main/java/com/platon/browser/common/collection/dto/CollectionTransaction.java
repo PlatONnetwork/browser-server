@@ -24,6 +24,7 @@ import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -165,11 +166,14 @@ public class CollectionTransaction extends Transaction {
                 block.setDQty(block.getDQty()+1);
                 break;
             case CLAIM_REWARDS: // 领取委托奖励
+                DelegateRewardClaimParam param = DelegateRewardClaimParam.builder()
+                        .rewardList(new ArrayList<>())
+                        .build();
                 if(status==Receipt.getSuccess()){
                     // 成功的领取交易才解析info回填
-                    DelegateRewardClaimParam fromLog = (DelegateRewardClaimParam) decodedResult.getParam();
-                    setInfo(fromLog.toJSONString());
+                    param = (DelegateRewardClaimParam) decodedResult.getParam();
                 }
+                setInfo(param.toJSONString());
                 block.setDQty(block.getDQty()+1);
                 break;
             case PROPOSAL_TEXT:// 创建文本提案
