@@ -1,0 +1,20 @@
+package com.platon.browser.elasticsearch;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
+
+/**
+ * @Auther: Chendongming
+ * @Date: 2019/10/25 15:12
+ * @Description: gas price估算数据ES服务
+ */
+@Repository
+public class GasEstimateEpochESRepository extends ESRepository {
+    @Value("${spring.elasticsearch.high-level-client.gasEstimateEpochIndexName}")
+    private String indexName;
+
+    @Override
+    public String getIndexName() {
+        return indexName;
+    }
+}

@@ -15,6 +15,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class OnSettleConverterTest extends AgentTestBase {
     }
 
     @Test
-    public void convert(){
+    public void convert() throws IOException {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setCurValidatorList(validatorList);

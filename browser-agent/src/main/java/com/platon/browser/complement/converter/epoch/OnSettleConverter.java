@@ -4,14 +4,19 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.elasticsearch.GasEstimateEpochESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +41,14 @@ public class OnSettleConverter {
     private EpochBusinessMapper epochBusinessMapper;
     @Autowired
     private StakingMapper stakingMapper;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private GasEstimateEpochESRepository gasEstimateEpochESRepository;
+    @Autowired
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
-	public void convert(CollectionEvent event, Block block) {
+    public void convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
 	    if(block.getNum()==1) return;
 
@@ -104,6 +115,25 @@ public class OnSettleConverter {
         settle.setStakingList(stakingList);
         settle.setExitNodeList(exitedNodeIds);
         epochBusinessMapper.settle(settle);
+
+        List<GasEstimate> gasEstimates = new ArrayList<>();
+        preVerifierMap.forEach((k,v)->{
+            GasEstimate ge = new GasEstimate();
+            ge.setNodeId(v.getNodeId());
+            ge.setSbn(v.getStakingBlockNum().longValue());
+            gasEstimates.add(ge);
+        });
+
+        // 1、把周期数需要自增1的节点质押先入mysql数据库
+        Long seq = block.getNum()*10000;
+        List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
+        GasEstimateLog gasEstimateLog = new GasEstimateLog();
+        gasEstimateLog.setSeq(seq);
+        gasEstimateLog.setJson(JSON.toJSONString(gasEstimates));
+        gasEstimateLogs.add(gasEstimateLog);
+        customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs,GasEstimateLog.Column.values());
+        // 2、发布到操作队列
+        gasEstimateEventPublisher.publish(seq,gasEstimates);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 	}

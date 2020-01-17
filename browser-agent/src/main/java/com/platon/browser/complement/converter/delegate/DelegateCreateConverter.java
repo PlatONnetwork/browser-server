@@ -1,9 +1,13 @@
 package com.platon.browser.complement.converter.delegate;
 
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateCreateParam;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: 委托业务参数转换器
@@ -23,6 +29,12 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
 	
     @Autowired
     private DelegateBusinessMapper delegateBusinessMapper;
+    @Autowired
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private CustomGasEstimateMapper customGasEstimateMapper;
+    @Autowired
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
     @Override
     public DelegateCreate convert(CollectionEvent event, Transaction tx) {
@@ -45,6 +57,16 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
                 .build();
 
         delegateBusinessMapper.create(businessParam);
+
+        // 1. 新增 估算gas委托未计算周期 epoch = 0: 直接入库到mysql数据库
+        List<GasEstimate> estimates = new ArrayList<>();
+        GasEstimate estimate = new GasEstimate();
+        estimate.setNodeId(txParam.getNodeId());
+        estimate.setSbn(txParam.getStakingBlockNum().longValue());
+        estimate.setAddr(tx.getFrom());
+        estimate.setEpoch(0L);
+        estimates.add(estimate);
+        customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return businessParam;
