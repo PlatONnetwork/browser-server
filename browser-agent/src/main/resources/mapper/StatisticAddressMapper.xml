@@ -15,7 +15,8 @@
         `contract_create`,
         `contract_createHash`,
         `have_reward`,
-        `contract_destroy_hash`
+        `contract_destroy_hash`,
+        `contract_bin`
     ) values
     <foreach collection="addressStatItemList" item="item" separator=",">
     (
@@ -30,7 +31,8 @@
         #{item.contractCreate},
         #{item.contractCreatehash},
         #{item.haveReward},
-        #{item.contractDestroyHash}
+        #{item.contractDestroyHash},
+        #{item.contractBin}
     )
     </foreach>
 </update>

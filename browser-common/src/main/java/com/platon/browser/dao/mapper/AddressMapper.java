@@ -16,15 +16,21 @@ public interface AddressMapper {
 
     int insertSelective(Address record);
 
+    List<Address> selectByExampleWithBLOBs(AddressExample example);
+
     List<Address> selectByExample(AddressExample example);
 
     Address selectByPrimaryKey(String address);
 
     int updateByExampleSelective(@Param("record") Address record, @Param("example") AddressExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") Address record, @Param("example") AddressExample example);
+
     int updateByExample(@Param("record") Address record, @Param("example") AddressExample example);
 
     int updateByPrimaryKeySelective(Address record);
+
+    int updateByPrimaryKeyWithBLOBs(Address record);
 
     int updateByPrimaryKey(Address record);
 

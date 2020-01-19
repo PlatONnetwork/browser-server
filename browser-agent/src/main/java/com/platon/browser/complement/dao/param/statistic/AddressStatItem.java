@@ -63,6 +63,10 @@ public class AddressStatItem {
 	 * 合约的销毁hash
 	 */
 	private String contractDestroyHash;
+	/**
+	 * 合约代码数据
+	 */
+	private String contractBin;
 
 	/**
 	 * 已领取委托奖励

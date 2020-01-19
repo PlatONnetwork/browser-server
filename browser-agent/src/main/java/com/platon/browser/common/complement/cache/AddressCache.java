@@ -86,6 +86,7 @@ public class AddressCache {
 				address.setContractCreate(tx.getFrom());
 				// 覆盖createDefaultAddress()中设置的值
 				address.setType(AddressTypeEnum.CONTRACT.getCode());
+				address.setContractBin(tx.getBin());
 				generalContractAddressCache.add(addr);
 			}
 			break;

@@ -26,6 +26,9 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="have_reward" jdbcType="DECIMAL" property="haveReward" />
   </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Address">
+    <result column="contract_bin" jdbcType="LONGVARCHAR" property="contractBin" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -90,6 +93,25 @@
     delegate_locked, delegate_released, contract_name, contract_create, contract_createHash, 
     contract_destroy_hash, create_time, update_time, have_reward
   </sql>
+  <sql id="Blob_Column_List">
+    contract_bin
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.AddressExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from address
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.AddressExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -104,9 +126,11 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from address
     where address = #{address,jdbcType=VARCHAR}
   </select>
@@ -128,8 +152,8 @@
       candidate_count, delegate_hes, delegate_locked, 
       delegate_released, contract_name, contract_create, 
       contract_createHash, contract_destroy_hash, 
-      create_time, update_time, have_reward
-      )
+      create_time, update_time, have_reward, 
+      contract_bin)
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
       #{restrictingBalance,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{delegateValue,jdbcType=DECIMAL}, 
       #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
@@ -137,8 +161,8 @@
       #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, 
       #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, #{contractCreate,jdbcType=VARCHAR}, 
       #{contractCreatehash,jdbcType=VARCHAR}, #{contractDestroyHash,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{haveReward,jdbcType=DECIMAL}
-      )
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{haveReward,jdbcType=DECIMAL}, 
+      #{contractBin,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Address">
     insert into address
@@ -212,6 +236,9 @@
       <if test="haveReward != null">
         have_reward,
       </if>
+      <if test="contractBin != null">
+        contract_bin,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="address != null">
@@ -282,6 +309,9 @@
       </if>
       <if test="haveReward != null">
         #{haveReward,jdbcType=DECIMAL},
+      </if>
+      <if test="contractBin != null">
+        #{contractBin,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -363,7 +393,40 @@
       <if test="record.haveReward != null">
         have_reward = #{record.haveReward,jdbcType=DECIMAL},
       </if>
+      <if test="record.contractBin != null">
+        contract_bin = #{record.contractBin,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update address
+    set address = #{record.address,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=INTEGER},
+      balance = #{record.balance,jdbcType=DECIMAL},
+      restricting_balance = #{record.restrictingBalance,jdbcType=DECIMAL},
+      staking_value = #{record.stakingValue,jdbcType=DECIMAL},
+      delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
+      redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
+      tx_qty = #{record.txQty,jdbcType=INTEGER},
+      transfer_qty = #{record.transferQty,jdbcType=INTEGER},
+      delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
+      staking_qty = #{record.stakingQty,jdbcType=INTEGER},
+      proposal_qty = #{record.proposalQty,jdbcType=INTEGER},
+      candidate_count = #{record.candidateCount,jdbcType=INTEGER},
+      delegate_hes = #{record.delegateHes,jdbcType=DECIMAL},
+      delegate_locked = #{record.delegateLocked,jdbcType=DECIMAL},
+      delegate_released = #{record.delegateReleased,jdbcType=DECIMAL},
+      contract_name = #{record.contractName,jdbcType=VARCHAR},
+      contract_create = #{record.contractCreate,jdbcType=VARCHAR},
+      contract_createHash = #{record.contractCreatehash,jdbcType=VARCHAR},
+      contract_destroy_hash = #{record.contractDestroyHash,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      have_reward = #{record.haveReward,jdbcType=DECIMAL},
+      contract_bin = #{record.contractBin,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -466,7 +529,37 @@
       <if test="haveReward != null">
         have_reward = #{haveReward,jdbcType=DECIMAL},
       </if>
+      <if test="contractBin != null">
+        contract_bin = #{contractBin,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    where address = #{address,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.Address">
+    update address
+    set `type` = #{type,jdbcType=INTEGER},
+      balance = #{balance,jdbcType=DECIMAL},
+      restricting_balance = #{restrictingBalance,jdbcType=DECIMAL},
+      staking_value = #{stakingValue,jdbcType=DECIMAL},
+      delegate_value = #{delegateValue,jdbcType=DECIMAL},
+      redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
+      tx_qty = #{txQty,jdbcType=INTEGER},
+      transfer_qty = #{transferQty,jdbcType=INTEGER},
+      delegate_qty = #{delegateQty,jdbcType=INTEGER},
+      staking_qty = #{stakingQty,jdbcType=INTEGER},
+      proposal_qty = #{proposalQty,jdbcType=INTEGER},
+      candidate_count = #{candidateCount,jdbcType=INTEGER},
+      delegate_hes = #{delegateHes,jdbcType=DECIMAL},
+      delegate_locked = #{delegateLocked,jdbcType=DECIMAL},
+      delegate_released = #{delegateReleased,jdbcType=DECIMAL},
+      contract_name = #{contractName,jdbcType=VARCHAR},
+      contract_create = #{contractCreate,jdbcType=VARCHAR},
+      contract_createHash = #{contractCreatehash,jdbcType=VARCHAR},
+      contract_destroy_hash = #{contractDestroyHash,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      have_reward = #{haveReward,jdbcType=DECIMAL},
+      contract_bin = #{contractBin,jdbcType=LONGVARCHAR}
     where address = #{address,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Address">
@@ -505,8 +598,8 @@
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
       tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
       delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
-      contract_createHash, contract_destroy_hash, create_time, update_time, have_reward
-      )
+      contract_createHash, contract_destroy_hash, create_time, update_time, have_reward, 
+      contract_bin)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
@@ -518,7 +611,8 @@
         #{item.delegateReleased,jdbcType=DECIMAL}, #{item.contractName,jdbcType=VARCHAR}, 
         #{item.contractCreate,jdbcType=VARCHAR}, #{item.contractCreatehash,jdbcType=VARCHAR}, 
         #{item.contractDestroyHash,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL})
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}, #{item.contractBin,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -604,6 +698,9 @@
         </if>
         <if test="'have_reward'.toString() == column.value">
           #{item.haveReward,jdbcType=DECIMAL}
+        </if>
+        <if test="'contract_bin'.toString() == column.value">
+          #{item.contractBin,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )

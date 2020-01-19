@@ -50,6 +50,7 @@ public class StatisticsAddressConverter {
 					.contractCreate(cache.getContractCreate())
 					.contractCreatehash(cache.getContractCreatehash())
 					.contractDestroyHash(cache.getContractDestroyHash())
+					.contractBin(cache.getContractBin())
 					.haveReward(cache.getHaveReward())
 					.build();
 			itemFromCache.add(item);
@@ -60,7 +61,7 @@ public class StatisticsAddressConverter {
 		// 从数据库中查询出与缓存中对应的地址信息
 		AddressExample condition = new AddressExample();
 		condition.createCriteria().andAddressIn(addresses);
-		List<Address> itemFromDb = addressMapper.selectByExample(condition);
+		List<Address> itemFromDb = addressMapper.selectByExampleWithBLOBs(condition);
 		// 地址与详情进行映射
 		Map <String,Address> dbMap = new HashMap <>();
 		itemFromDb.forEach(item -> dbMap.put(item.getAddress(),item));
@@ -88,7 +89,10 @@ public class StatisticsAddressConverter {
 				String contractDestroyHash = fromDb.getContractDestroyHash();
 				if(StringUtils.isBlank(contractDestroyHash)) contractDestroyHash = fromCache.getContractDestroyHash();
 				fromCache.setContractDestroyHash(contractDestroyHash);
-
+				// 合约bin代码数据
+				String contractBin = fromDb.getContractBin();
+				if(StringUtils.isBlank(contractBin)) contractBin = fromCache.getContractBin();
+				fromCache.setContractBin(contractBin);
 				// 合约名称
 				String contractName = fromCache.getContractName();
 				if(StringUtils.isBlank(contractName)) contractName = fromDb.getContractName();
