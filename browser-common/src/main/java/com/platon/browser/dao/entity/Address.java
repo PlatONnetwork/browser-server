@@ -44,6 +44,8 @@ public class Address {
 
     private String contractCreatehash;
 
+    private String contractDestroyHash;
+
     private Date createTime;
 
     private Date updateTime;
@@ -202,6 +204,14 @@ public class Address {
         this.contractCreatehash = contractCreatehash == null ? null : contractCreatehash.trim();
     }
 
+    public String getContractDestroyHash() {
+        return contractDestroyHash;
+    }
+
+    public void setContractDestroyHash(String contractDestroyHash) {
+        this.contractDestroyHash = contractDestroyHash == null ? null : contractDestroyHash.trim();
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -253,6 +263,7 @@ public class Address {
         contractName("contract_name", "contractName", "VARCHAR", false),
         contractCreate("contract_create", "contractCreate", "VARCHAR", false),
         contractCreatehash("contract_createHash", "contractCreatehash", "VARCHAR", false),
+        contractDestroyHash("contract_destroy_hash", "contractDestroyHash", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         haveReward("have_reward", "haveReward", "DECIMAL", false);

@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,7 @@ public class StatisticsAddressConverter {
 					.contractName(cache.getContractName())
 					.contractCreate(cache.getContractCreate())
 					.contractCreatehash(cache.getContractCreatehash())
+					.contractDestroyHash(cache.getContractDestroyHash())
 					.haveReward(cache.getHaveReward())
 					.build();
 			itemFromCache.add(item);
@@ -63,7 +65,9 @@ public class StatisticsAddressConverter {
 		Map <String,Address> dbMap = new HashMap <>();
 		itemFromDb.forEach(item -> dbMap.put(item.getAddress(),item));
 		// 合并数据库与缓存中的值
+		Map<String,AddressStatItem> cacheMap = new HashMap<>();
 		itemFromCache.forEach(fromCache -> {
+			cacheMap.put(fromCache.getAddress(),fromCache);
 			Address fromDb =  dbMap.get(fromCache.getAddress());
 			if(null != fromDb){
 				fromCache.setTxQty(fromDb.getTxQty() + fromCache.getTxQty()); // 交易数量
@@ -72,8 +76,41 @@ public class StatisticsAddressConverter {
 				fromCache.setStakingQty(fromDb.getStakingQty() + fromCache.getStakingQty()); // 质押数量
 				fromCache.setProposalQty(fromDb.getProposalQty() + fromCache.getProposalQty()); // 提案数量
 				fromCache.setHaveReward(fromDb.getHaveReward().add(fromCache.getHaveReward())); // 已领取委托奖励总额
+				// 合约创建人，数据库的值优先
+				String contractCreate = fromDb.getContractCreate();
+				if(StringUtils.isBlank(contractCreate)) contractCreate = fromCache.getContractCreate();
+				fromCache.setContractCreate(contractCreate);
+				// 合约创建交易hash，数据库的值优先
+				String contractCreateHash = fromDb.getContractCreatehash();
+				if(StringUtils.isBlank(contractCreateHash)) contractCreateHash = fromCache.getContractCreatehash();
+				fromCache.setContractCreatehash(contractCreateHash);
+				// 合约销毁交易hash，数据库的值优先
+				String contractDestroyHash = fromDb.getContractDestroyHash();
+				if(StringUtils.isBlank(contractDestroyHash)) contractDestroyHash = fromCache.getContractDestroyHash();
+				fromCache.setContractDestroyHash(contractDestroyHash);
+
+				// 合约名称
+				String contractName = fromCache.getContractName();
+				if(StringUtils.isBlank(contractName)) contractName = fromDb.getContractName();
+				fromCache.setContractName(contractName);
+
+				fromCache.setType(fromDb.getType()); // 不能让缓存覆盖数据库中的地址类型
 			}
 		});
+
+		// 查看交易列表中是否有bin属性为0x的交易,有则对to对应的合约地址进行设置
+		event.getTransactions().forEach(tx->{
+			// 如果tx的bin为0x，表明这笔交易是销毁合约交易或调用已销毁合约交易, to地址必定是合约地址
+			if("0x".equals(tx.getBin())){
+				AddressStatItem item = cacheMap.get(tx.getTo());
+				if(item!=null&&StringUtils.isBlank(item.getContractDestroyHash())){
+					// 如果当前地址缓存的销毁交易地址为空，则设置
+					item.setContractDestroyHash(tx.getHash());
+				}
+			}
+
+		});
+
 		// 使用合并后的信息构造地址入库参数
         AddressStatChange addressStatChange = AddressStatChange.builder()
         		.addressStatItemList(itemFromCache)

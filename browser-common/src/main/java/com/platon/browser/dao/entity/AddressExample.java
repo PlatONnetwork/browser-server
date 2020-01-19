@@ -1286,6 +1286,76 @@ public class AddressExample {
             return (Criteria) this;
         }
 
+        public Criteria andContractDestroyHashIsNull() {
+            addCriterion("contract_destroy_hash is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashIsNotNull() {
+            addCriterion("contract_destroy_hash is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashEqualTo(String value) {
+            addCriterion("contract_destroy_hash =", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashNotEqualTo(String value) {
+            addCriterion("contract_destroy_hash <>", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashGreaterThan(String value) {
+            addCriterion("contract_destroy_hash >", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashGreaterThanOrEqualTo(String value) {
+            addCriterion("contract_destroy_hash >=", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashLessThan(String value) {
+            addCriterion("contract_destroy_hash <", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashLessThanOrEqualTo(String value) {
+            addCriterion("contract_destroy_hash <=", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashLike(String value) {
+            addCriterion("contract_destroy_hash like", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashNotLike(String value) {
+            addCriterion("contract_destroy_hash not like", value, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashIn(List<String> values) {
+            addCriterion("contract_destroy_hash in", values, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashNotIn(List<String> values) {
+            addCriterion("contract_destroy_hash not in", values, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashBetween(String value1, String value2) {
+            addCriterion("contract_destroy_hash between", value1, value2, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyHashNotBetween(String value1, String value2) {
+            addCriterion("contract_destroy_hash not between", value1, value2, "contractDestroyHash");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

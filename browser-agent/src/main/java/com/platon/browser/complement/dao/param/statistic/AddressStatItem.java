@@ -59,6 +59,10 @@ public class AddressStatItem {
 	 * 创建合约的交易Hash
 	 */
     private String contractCreatehash;
+	/**
+	 * 合约的销毁hash
+	 */
+	private String contractDestroyHash;
 
 	/**
 	 * 已领取委托奖励

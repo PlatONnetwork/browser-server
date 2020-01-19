@@ -1,5 +1,6 @@
 package com.platon.browser.common.collection.dto;
 
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -8,7 +9,6 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.extern.slf4j.Slf4j;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
@@ -41,7 +41,7 @@ public class CollectionBlock extends Block {
         return block;
     }
 
-    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, Web3j web3j, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
+    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, PlatOnClient platOnClient, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
         String nodeId;
         if(block.getNumber().longValue()==0){
             nodeId="000000000000000000000000000000000";
@@ -74,7 +74,7 @@ public class CollectionBlock extends Block {
                 CollectionTransaction transaction = CollectionTransaction.newInstance()
                         .updateWithBlock(this)
                         .updateWithRawTransaction(rawTransaction)
-                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),web3j,generalContractAddressCache);
+                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),platOnClient,generalContractAddressCache);
                 transactions.add(transaction);
             }
         }

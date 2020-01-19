@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.websocket.WebSocketService;
 
 import java.math.BigInteger;
@@ -30,7 +31,7 @@ public class SpecialContractApiInvoker {
     //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797")); // atonDev
 //    private static Web3jService service = new HttpService("http://192.168.120.151:6789");
 //    private static Web3j web3j = Web3j.build(service); // atonTest
-    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.172:8788",false);
+    private static WebSocketService socketService = new WebSocketService("ws://192.168.112.171:6666",false);
     private static Web3j web3j; // test
     static {
         try {
@@ -50,6 +51,15 @@ public class SpecialContractApiInvoker {
     private static SpecialApi sca = new SpecialApi();
 
     public static void main(String args[]) throws Exception {
+
+//        BigInteger balance = web3j
+//                .platonGetBalance("0x1000000000000000000000000000000000000003", DefaultBlockParameter.valueOf(BigInteger.ONE))
+//                .send().getBalance();
+
+        String code = web3j
+                .platonGetCode("0x1000000000000000000000000000000000000003", DefaultBlockParameterName.LATEST)
+                .send().getCode();
+
         List<Node> ver = nodeContract.getVerifierList().send().getData();
         List<Node> hver = sca.getHistoryVerifierList(web3j,BigInteger.valueOf(43520));
 
@@ -62,9 +72,9 @@ public class SpecialContractApiInvoker {
         String json = JSON.toJSONString(governParamList,true);
         logger.error("{}",json);
         //BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
-        BigInteger balance = web3j
+        /*BigInteger balance = web3j
                 .platonGetBalance("0x1000000000000000000000000000000000000001", DefaultBlockParameter.valueOf(BigInteger.valueOf(1)))
-                .send().getBalance();
+                .send().getBalance();*/
 
         List<Node> preVal = sca.getHistoryValidatorList(web3j,BigInteger.valueOf(40));
         System.out.println();

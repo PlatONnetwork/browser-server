@@ -1,5 +1,6 @@
 package com.platon.browser.common.collection.dto;
 
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -12,7 +13,7 @@ import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonGetCode;
@@ -82,7 +83,7 @@ public class CollectionTransaction extends Transaction {
         // tx info信息
         String info = "{}";
     }
-    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, Web3j web3j, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
+    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
 
         // 默认取状态字段作为交易成功与否的状态
         int status = receipt.getStatus();
@@ -100,11 +101,11 @@ public class CollectionTransaction extends Transaction {
         }else{
             if(StringUtils.isBlank(getTo())) {
                 // 如果to地址为空则是普通合约创建
-                resolveGeneralContractCreateTxComplementInfo(getTo(),web3j,ci);
+                resolveGeneralContractCreateTxComplementInfo(receipt.getContractAddress(),platOnClient,ci);
             }else{
                 if(generalContractAddressCache.contains(getTo())&&inputWithoutPrefix.length()>=8){
                     // evm or wasm 合约调用
-                    resolveGeneralContractInvokeTxComplementInfo(ci);
+                    resolveGeneralContractInvokeTxComplementInfo(platOnClient,ci);
                 }else {
                     BigInteger value = StringUtils.isNotBlank(getValue())?new BigInteger(getValue()):BigInteger.ZERO;
                     if(value.compareTo(BigInteger.ZERO)>0){
@@ -124,6 +125,7 @@ public class CollectionTransaction extends Transaction {
                 .setInfo(ci.info)
                 .setType(ci.type)
                 .setToType(ci.toType)
+                .setContractAddress(receipt.getContractAddress())
                 .setContractType(ci.contractType)
                 .setBin(ci.binCode)
                 .setMethod(ci.method);
@@ -222,18 +224,29 @@ public class CollectionTransaction extends Transaction {
         }
     }
 
+
+    private String getContractBinCode(PlatOnClient platOnClient,String contractAddress) throws BeanCreateOrUpdateException {
+        try {
+            PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j().platonGetCode(contractAddress,
+                    DefaultBlockParameter.valueOf(BigInteger.valueOf(getNum()))).send();
+            return platonGetCode.getCode();
+        }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
+            String error = "获取合约代码出错["+contractAddress+"]:"+e.getMessage();
+            log.error("{}",error);
+            throw new BeanCreateOrUpdateException(error);
+        }
+    }
+
     /**
      * 创建普通合约交易,解析补充信息
      * @param contractAddress
-     * @param web3j
      * @param ci
      * @throws IOException
      */
-    private void resolveGeneralContractCreateTxComplementInfo(String contractAddress, Web3j web3j,ComplementInfo ci) throws IOException {
+    private void resolveGeneralContractCreateTxComplementInfo(String contractAddress, PlatOnClient platOnClient, ComplementInfo ci) throws BeanCreateOrUpdateException {
         ci.info="";
-        PlatonGetCode platonGetCode = web3j.platonGetCode(contractAddress, DefaultBlockParameterName.LATEST).send();
-        ci.binCode = platonGetCode.getCode();
-
+        ci.binCode = getContractBinCode(platOnClient,contractAddress);
         // TODO: 解析出调用合约方法名
         String txInput = getInput();
         //ci.method = getGeneralContractMethod();
@@ -248,9 +261,9 @@ public class CollectionTransaction extends Transaction {
      * @param ci
      * @throws IOException
      */
-    private void resolveGeneralContractInvokeTxComplementInfo(ComplementInfo ci) {
+    private void resolveGeneralContractInvokeTxComplementInfo(PlatOnClient platOnClient,ComplementInfo ci) throws BeanCreateOrUpdateException {
         ci.info="";
-        ci.binCode=null;
+        ci.binCode = getContractBinCode(platOnClient,getTo());
         // TODO: 解析出调用合约方法名
         String txInput = getInput();
 //        ci.method = getGeneralContractMethod();

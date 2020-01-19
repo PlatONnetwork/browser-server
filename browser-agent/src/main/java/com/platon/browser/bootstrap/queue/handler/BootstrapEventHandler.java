@@ -64,7 +64,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient.getWeb3jWrapper().getWeb3j(),addressCache.getGeneralContractAddressCache());
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient,addressCache.getGeneralContractAddressCache());
 
             clear();
             blocks.add(block);

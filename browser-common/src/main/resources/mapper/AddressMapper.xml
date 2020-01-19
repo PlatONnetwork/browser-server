@@ -21,6 +21,7 @@
     <result column="contract_name" jdbcType="VARCHAR" property="contractName" />
     <result column="contract_create" jdbcType="VARCHAR" property="contractCreate" />
     <result column="contract_createHash" jdbcType="VARCHAR" property="contractCreatehash" />
+    <result column="contract_destroy_hash" jdbcType="VARCHAR" property="contractDestroyHash" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="have_reward" jdbcType="DECIMAL" property="haveReward" />
@@ -87,7 +88,7 @@
     address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
     tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes, 
     delegate_locked, delegate_released, contract_name, contract_create, contract_createHash, 
-    create_time, update_time, have_reward
+    contract_destroy_hash, create_time, update_time, have_reward
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.AddressExample" resultMap="BaseResultMap">
     select
@@ -126,16 +127,18 @@
       delegate_qty, staking_qty, proposal_qty, 
       candidate_count, delegate_hes, delegate_locked, 
       delegate_released, contract_name, contract_create, 
-      contract_createHash, create_time, update_time, 
-      have_reward)
+      contract_createHash, contract_destroy_hash, 
+      create_time, update_time, have_reward
+      )
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
       #{restrictingBalance,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{delegateValue,jdbcType=DECIMAL}, 
       #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
       #{delegateQty,jdbcType=INTEGER}, #{stakingQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
       #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, 
       #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, #{contractCreate,jdbcType=VARCHAR}, 
-      #{contractCreatehash,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{haveReward,jdbcType=DECIMAL})
+      #{contractCreatehash,jdbcType=VARCHAR}, #{contractDestroyHash,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{haveReward,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Address">
     insert into address
@@ -196,6 +199,9 @@
       </if>
       <if test="contractCreatehash != null">
         contract_createHash,
+      </if>
+      <if test="contractDestroyHash != null">
+        contract_destroy_hash,
       </if>
       <if test="createTime != null">
         create_time,
@@ -264,6 +270,9 @@
       </if>
       <if test="contractCreatehash != null">
         #{contractCreatehash,jdbcType=VARCHAR},
+      </if>
+      <if test="contractDestroyHash != null">
+        #{contractDestroyHash,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -342,6 +351,9 @@
       <if test="record.contractCreatehash != null">
         contract_createHash = #{record.contractCreatehash,jdbcType=VARCHAR},
       </if>
+      <if test="record.contractDestroyHash != null">
+        contract_destroy_hash = #{record.contractDestroyHash,jdbcType=VARCHAR},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -377,6 +389,7 @@
       contract_name = #{record.contractName,jdbcType=VARCHAR},
       contract_create = #{record.contractCreate,jdbcType=VARCHAR},
       contract_createHash = #{record.contractCreatehash,jdbcType=VARCHAR},
+      contract_destroy_hash = #{record.contractDestroyHash,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       have_reward = #{record.haveReward,jdbcType=DECIMAL}
@@ -441,6 +454,9 @@
       <if test="contractCreatehash != null">
         contract_createHash = #{contractCreatehash,jdbcType=VARCHAR},
       </if>
+      <if test="contractDestroyHash != null">
+        contract_destroy_hash = #{contractDestroyHash,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -473,6 +489,7 @@
       contract_name = #{contractName,jdbcType=VARCHAR},
       contract_create = #{contractCreate,jdbcType=VARCHAR},
       contract_createHash = #{contractCreatehash,jdbcType=VARCHAR},
+      contract_destroy_hash = #{contractDestroyHash,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       have_reward = #{haveReward,jdbcType=DECIMAL}
@@ -488,7 +505,8 @@
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
       tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
       delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
-      contract_createHash, create_time, update_time, have_reward)
+      contract_createHash, contract_destroy_hash, create_time, update_time, have_reward
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
@@ -499,8 +517,8 @@
         #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
         #{item.delegateReleased,jdbcType=DECIMAL}, #{item.contractName,jdbcType=VARCHAR}, 
         #{item.contractCreate,jdbcType=VARCHAR}, #{item.contractCreatehash,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}
-        )
+        #{item.contractDestroyHash,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -574,6 +592,9 @@
         </if>
         <if test="'contract_createHash'.toString() == column.value">
           #{item.contractCreatehash,jdbcType=VARCHAR}
+        </if>
+        <if test="'contract_destroy_hash'.toString() == column.value">
+          #{item.contractDestroyHash,jdbcType=VARCHAR}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
