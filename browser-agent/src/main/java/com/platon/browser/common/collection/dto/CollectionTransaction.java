@@ -204,7 +204,7 @@ public class CollectionTransaction extends Transaction {
     }
 
     /**
-     * 解析内置合约调用交易的补充信息
+     * 内置合约调用交易,解析补充信息
      */
     private void resolveInnerContractInvokeTxComplementInfo(List<Log> logs,ComplementInfo ci) throws BeanCreateOrUpdateException {
         InnerContractDecodedResult decodedResult;
@@ -223,7 +223,7 @@ public class CollectionTransaction extends Transaction {
     }
 
     /**
-     * 解析创建普通合约交易的补充信息
+     * 创建普通合约交易,解析补充信息
      * @param contractAddress
      * @param web3j
      * @param ci
@@ -244,7 +244,7 @@ public class CollectionTransaction extends Transaction {
     }
 
     /**
-     * 解析调用普通合约交易的补充信息
+     * 调用普通合约交易,解析补充信息
      * @param ci
      * @throws IOException
      */
@@ -261,7 +261,7 @@ public class CollectionTransaction extends Transaction {
     }
 
     /**
-     * 解析普通交易的补充信息
+     * 发起普通交易,解析补充信息
      * @param ci
      */
     private void resolveGeneralTransferTxComplementInfo(ComplementInfo ci,Set<String> generalContractAddressCache){
