@@ -16,7 +16,6 @@ import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.elasticsearch.GasEstimateEpochESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +42,6 @@ public class OnSettleConverter {
     private StakingMapper stakingMapper;
     @Autowired
     private GasEstimateEventPublisher gasEstimateEventPublisher;
-    @Autowired
-    private GasEstimateEpochESRepository gasEstimateEpochESRepository;
     @Autowired
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 

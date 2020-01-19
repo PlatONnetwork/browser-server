@@ -31,7 +31,6 @@ spring:
       delegationIndexName: browser_delegation_local
       nodeOptIndexName: browser_nodeopt_local
       delegationRewardIndexName: browser_delegation_reward_local
-      gasEstimateEpochIndexName: browser_gas_estimate_epoch_local
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

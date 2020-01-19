@@ -31,7 +31,6 @@ spring:
       delegationIndexName: browser_delegation_testdelete
       nodeOptIndexName: browser_nodeopt_testdelete
       delegationRewardIndexName: browser_delegation_reward_testdelete
-      gasEstimateEpochIndexName: browser_gas_estimate_epoch_testdelete
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

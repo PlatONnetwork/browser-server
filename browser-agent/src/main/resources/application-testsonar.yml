@@ -31,7 +31,6 @@ spring:
       delegationIndexName: browser_delegation_testsonar
       nodeOptIndexName: browser_nodeopt_testsonar
       delegationRewardIndexName: browser_delegation_reward_testsonar
-      gasEstimateEpochIndexName: browser_gas_estimate_epoch_testsonar
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
