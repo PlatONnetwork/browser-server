@@ -71,15 +71,14 @@ public class CollectionTransaction extends Transaction {
 
     static class ComplementInfo{
         // 交易类型
-        Integer type=TypeEnum.OTHERS.getCode();
-        // to地址类型默认设置为合约
+        Integer type=null;
         Integer toType=null;
         // 合约代码
         String binCode = null;
         // 合约方法
         String method = null;
         // 合约类型
-        Integer contractType = ContractTypeEnum.EVM.getCode();
+        Integer contractType = null;
         // tx info信息
         String info = "{}";
     }
@@ -114,6 +113,13 @@ public class CollectionTransaction extends Transaction {
                     }
                 }
             }
+        }
+
+        if(ci.type==null){
+            throw new BeanCreateOrUpdateException("交易类型为空,遇到未知交易:[blockNumber="+getNum()+",txHash="+getHash()+"]");
+        }
+        if(ci.toType==null){
+            throw new BeanCreateOrUpdateException("To地址为空:[blockNumber="+getNum()+",txHash="+getHash()+"]");
         }
 
         // 交易信息
