@@ -368,3 +368,23 @@ CREATE TABLE `vote` (
   PRIMARY KEY (`hash`),
   KEY `verifier` (`node_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for contract
+-- ----------------------------
+DROP TABLE IF EXISTS `contract`;
+CREATE TABLE `contract` (
+  `addr` varchar(42) NOT NULL COMMENT '合约地址',
+  `balance` decimal(65,0) NOT NULL COMMENT '余额',
+  `name` varchar(128) NOT NULL COMMENT '合约名称',
+  `tx_qty` bigint(20) NOT NULL DEFAULT '0' COMMENT '交易数',
+  `cre_addr` varchar(42) NOT NULL COMMENT '创建合约的钱包地址',
+  `hash` varchar(66) NOT NULL COMMENT '合约交易Hash',
+  `type` int(2) NOT NULL COMMENT '合约类型:1 -系统合约 2-evm,3- wasm',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '合约创建时间',
+  `bin` longtext NOT NULL COMMENT '合约二进制bin',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`addr`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

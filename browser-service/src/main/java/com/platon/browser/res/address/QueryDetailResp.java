@@ -36,6 +36,8 @@ public class QueryDetailResp {
     private String contractCreateHash; //合约创建哈希
     private String contractBin; //合约bin
     private Integer isRestricting; //是否锁仓
+    private Integer isDestroy; //是否销毁 
+    private String destroyHash; //合约销毁哈希
 	public Integer getType() {
 		return type;
 	}
@@ -184,6 +186,18 @@ public class QueryDetailResp {
 	}
 	public void setContractBin(String contractBin) {
 		this.contractBin = contractBin;
+	}
+	public Integer getIsDestroy() {
+		return isDestroy;
+	}
+	public void setIsDestroy(Integer isDestroy) {
+		this.isDestroy = isDestroy;
+	}
+	public String getDestroyHash() {
+		return destroyHash;
+	}
+	public void setDestroyHash(String destroyHash) {
+		this.destroyHash = destroyHash;
 	}
     
 }

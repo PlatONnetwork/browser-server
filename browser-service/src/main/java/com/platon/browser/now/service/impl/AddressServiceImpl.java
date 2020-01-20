@@ -30,6 +30,7 @@ import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
 import com.platon.sdk.contracts.ppos.dto.resp.Reward;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -93,6 +94,9 @@ public class AddressServiceImpl implements AddressService {
         	/** 预先设置是否展示锁仓 */
         	resp.setIsRestricting(0);
         	resp.setStakingValue(item.getStakingValue().add(item.getDelegateValue()));
+        	resp.setIsDestroy(StringUtils.isBlank(item.getContractDestroyHash())?0:1);
+        	resp.setContractCreateHash(item.getContractCreatehash());
+        	resp.setDestroyHash(item.getContractDestroyHash());
         }
         /** 特殊账户余额直接查询链  */
 	  	try {
@@ -214,6 +218,12 @@ public class AddressServiceImpl implements AddressService {
 		 */
 		List<String> nodes = new ArrayList<>();
 		List<Reward> rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
+		/**
+		 * 当奖励为空时直接return
+		 */
+		if (rewards == null) {
+			return resp;
+		}
 		BigDecimal allRewards = BigDecimal.ZERO;
 		for(Reward reward : rewards) {
 			allRewards = allRewards.add(new BigDecimal(reward.getReward()));

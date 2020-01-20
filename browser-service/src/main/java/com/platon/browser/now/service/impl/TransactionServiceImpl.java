@@ -291,7 +291,6 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setBlockNumber(transaction.getNum());
     		resp.setGasLimit(transaction.getGasLimit());
     		resp.setGasUsed(transaction.getGasUsed());
-    		resp.setReceiveType(String.valueOf(transaction.getToType()));
     		resp.setTxType(String.valueOf(transaction.getType()));
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
@@ -299,6 +298,9 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTxInfo(transaction.getInfo());
     		resp.setGasPrice(new BigDecimal(transaction.getGasPrice()));
     		resp.setValue(new BigDecimal(transaction.getValue()));
+    		if(transaction.getToType() != null) {
+    			resp.setReceiveType(transaction.getToType().intValue() == 1?"contract":"account");
+    		}
     		/**
     		 * 失败信息国际化
     		 */
@@ -319,8 +321,6 @@ public class TransactionServiceImpl implements TransactionService {
     			resp.setConfirmNum("0");
 			}
 
-    		/** 暂时只有账户合约 */
-    		resp.setReceiveType("account");
     		/** 如果数据值为null 则置为空 */
     		if("null".equals(transaction.getInfo())) {
     			resp.setTxInfo("0x");
@@ -625,8 +625,10 @@ public class TransactionServiceImpl implements TransactionService {
 						 * 合约创建
 						 */
 					case CONTRACT_CREATE:
-						
-						
+						/**
+						 * to地址设置为合约地址
+						 */
+						resp.setTo(transaction.getContractAddress());
 						break;
 						/**
 						 * 合约执行
