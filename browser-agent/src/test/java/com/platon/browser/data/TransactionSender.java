@@ -27,6 +27,7 @@ import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
+import org.web3j.tx.gas.GasProvider;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
@@ -228,7 +229,18 @@ public class TransactionSender {
  // 发送解委托奖励提取交易
     @Test
     public void withdrawReward() throws Exception {
-        TransactionResponse res = rewardContract.withdrawDelegateReward().send();
+        TransactionResponse res = rewardContract.withdrawDelegateReward(new GasProvider() {
+			
+			@Override
+			public BigInteger getGasPrice() {
+				return BigInteger.valueOf(10000000000l);
+			}
+			
+			@Override
+			public BigInteger getGasLimit() {
+				return BigInteger.valueOf(30000l);
+			}
+		}).send();
         logger.debug("res:{}",res);
     }
     

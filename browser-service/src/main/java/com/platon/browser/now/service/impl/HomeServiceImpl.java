@@ -74,6 +74,7 @@ public class HomeServiceImpl implements HomeService {
 	private static final String STAKING_TYPE="staking";
 	private static final String BLOCK_TYPE="block";
 	private static final String ADDRESS_TYPE="address";
+	private static final String CONTACT_TYPE="contract";
 	private static final String TRANSACTION_TYPE="transaction";
 
 	@Override
@@ -132,7 +133,7 @@ public class HomeServiceImpl implements HomeService {
 					/* 判断为合约或账户地址 */
 					Address address = addressMapper.selectByPrimaryKey(keyword);
 					if(address != null && address.getType().intValue() != 1) {
-						result.setType(ADDRESS_TYPE);
+						result.setType(CONTACT_TYPE);
 					} else {
 						result.setType(ADDRESS_TYPE);
 					}

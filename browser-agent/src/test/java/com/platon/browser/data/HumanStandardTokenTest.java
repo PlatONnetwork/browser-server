@@ -31,9 +31,9 @@ public class HumanStandardTokenTest extends BaseContractTest {
 	private Logger logger = LoggerFactory.getLogger(HumanStandardTokenTest.class);
 
 	// The solidity smart contract 'HumanStandardToken' address
-	String contractAddress = "0xa63e48b04d8cfc98896765676eb10fdc9c28b2c9";
+	String contractAddress = "0x3b1546bd4274d170baef32f0fe92bb59783550f3";
 	String toAddress = "0x31ac3dad7fa96b62d58b2be229575db40aa28b2c";
-	String transactionHash = "0x8dfacc2410b42bd113a99fa17cb77d1661548a635aa9959b3be1634f836e148d";
+	String transactionHash = "0x14b2c0fa9c7efa6952a323ceebff6d73e721c32960c03e9c589bb28fa0333120";
 	BigInteger blockNum = BigInteger.valueOf(4379l);
 
 	@Test
@@ -50,8 +50,8 @@ public class HumanStandardTokenTest extends BaseContractTest {
 			contractAddress = humanStandardToken.getContractAddress();
 			transactionHash = humanStandardToken.getTransactionReceipt().get().getTransactionHash();
 			blockNum = humanStandardToken.getTransactionReceipt().get().getBlockNumber();
-			logger.info("Deploy smart contract [HumanStandardToken] success.contract address >>> " + contractAddress + "transactionHash >>>>" + transactionHash
-					+ "block >>>>" + blockNum);
+			logger.info("Deploy smart contract [HumanStandardToken] success.contract address >>> " + contractAddress + " transactionHash >>>>" + transactionHash
+					+ " block >>>>" + blockNum);
 		} catch (Exception e) {
 			logger.error("Deploy smart contract [HumanStandardToken] error: " + e.getMessage(), e);
 		}

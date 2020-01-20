@@ -66,7 +66,9 @@ public interface AppDocAddress {
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希
      *       "contractBin":"",  //合约bin
-     *       "isRestricting":""  //是否有锁仓交易 0-无  1-有
+     *       "isRestricting":"",  //是否有锁仓交易 0-无  1-有
+     *       "isDestroy":"",  //是否被销毁 1是自毁，0是正常
+     *       "destroyHash":""  //销毁hash
      *    }
      * }
      */
