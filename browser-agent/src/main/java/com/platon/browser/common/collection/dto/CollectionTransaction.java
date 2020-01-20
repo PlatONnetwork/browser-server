@@ -101,6 +101,8 @@ public class CollectionTransaction extends Transaction {
             if(StringUtils.isBlank(getTo())) {
                 // 如果to地址为空则是普通合约创建
                 resolveGeneralContractCreateTxComplementInfo(receipt.getContractAddress(),platOnClient,ci);
+                // 把回执里的合约地址回填到交易的to字段
+                setTo(receipt.getContractAddress());
             }else{
                 if(generalContractAddressCache.contains(getTo())&&inputWithoutPrefix.length()>=8){
                     // evm or wasm 合约调用
