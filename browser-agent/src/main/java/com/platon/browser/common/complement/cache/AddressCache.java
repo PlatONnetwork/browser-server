@@ -32,10 +32,8 @@ public class AddressCache {
     	String from = tx.getFrom();
     	String to = tx.getTo();
     	String contractAddress = tx.getContractAddress();
-    	updateAddress(tx,from,false);
-		updateAddress(tx,to,false);
-		updateAddress(tx,contractAddress,true);
-
+    	updateAddress(tx,from);
+		updateAddress(tx,to);
     }
     
     public Collection<Address> getAll(){
@@ -46,7 +44,7 @@ public class AddressCache {
     	addressMap.clear();
     }
     
-    private void updateAddress(Transaction tx, String addr,boolean isContractCreateAddress) {
+    private void updateAddress(Transaction tx, String addr) {
     	if(addr==null) return;
     	Address address = addressMap.get(addr);
     	if(address == null) {
@@ -80,15 +78,13 @@ public class AddressCache {
 		   	 address.setProposalQty(address.getProposalQty()+1);
 		   	 break;
 		case CONTRACT_CREATE:
-			if(isContractCreateAddress){
-				// 如果地址是创建合约的回执里返回的合约地址
-				address.setContractCreatehash(tx.getHash());
-				address.setContractCreate(tx.getFrom());
-				// 覆盖createDefaultAddress()中设置的值
-				address.setType(AddressTypeEnum.CONTRACT.getCode());
-				address.setContractBin(tx.getBin());
-				generalContractAddressCache.add(addr);
-			}
+			// 如果地址是创建合约的回执里返回的合约地址
+			address.setContractCreatehash(tx.getHash());
+			address.setContractCreate(tx.getFrom());
+			// 覆盖createDefaultAddress()中设置的值
+			address.setType(AddressTypeEnum.CONTRACT.getCode());
+			address.setContractBin(tx.getBin());
+			generalContractAddressCache.add(addr);
 			break;
 		    default:
 		}
