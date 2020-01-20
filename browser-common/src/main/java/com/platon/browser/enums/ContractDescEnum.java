@@ -11,11 +11,12 @@ import java.util.*;
  * @Description: 内置合约地址描述枚举
  */
 public enum  ContractDescEnum {
-    RESTRICTING_PLAN_CONTRACT(ContractAddress.RESTRICTING_PLAN_CONTRACT_ADDRESS,"restricting","system",""),
-    STAKING_CONTRACT(ContractAddress.STAKING_CONTRACT_ADDRESS,"staking","system",""),
-    SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"slash","system",""),
-    PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"proposal","system",""),
-    INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"incentive","system","");
+    RESTRICTING_PLAN_CONTRACT(ContractAddress.RESTRICTING_PLAN_CONTRACT_ADDRESS,"Restricting","system",""),
+    STAKING_CONTRACT(ContractAddress.STAKING_CONTRACT_ADDRESS,"Staking","system",""),
+    SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"Slash","system",""),
+    PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"Proposal","system",""),
+    INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"Incentive","system",""),
+	REWARD_CONTRACT(ContractAddress.REWARD_CONTRACT_ADDRESS,"Reward","system","");
 
     private String address;
     private String contractName;

@@ -627,12 +627,13 @@ public class TransactionServiceImpl implements TransactionService {
 						 * to地址设置为合约地址
 						 */
 						resp.setTo(transaction.getContractAddress());
+						resp.setTxInfo(transaction.getInput());
 						break;
 						/**
 						 * 合约执行
 						 */
 					case CONTRACT_EXEC:
-						
+						resp.setTxInfo(transaction.getInput());
 						break;
 				default:
 					break;
