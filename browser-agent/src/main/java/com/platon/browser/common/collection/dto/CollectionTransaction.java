@@ -71,15 +71,14 @@ public class CollectionTransaction extends Transaction {
 
     static class ComplementInfo{
         // 交易类型
-        Integer type=TypeEnum.OTHERS.getCode();
-        // to地址类型默认设置为合约
+        Integer type=null;
         Integer toType=null;
         // 合约代码
         String binCode = null;
         // 合约方法
         String method = null;
         // 合约类型
-        Integer contractType = ContractTypeEnum.EVM.getCode();
+        Integer contractType = null;
         // tx info信息
         String info = "{}";
     }
@@ -102,6 +101,8 @@ public class CollectionTransaction extends Transaction {
             if(StringUtils.isBlank(getTo())) {
                 // 如果to地址为空则是普通合约创建
                 resolveGeneralContractCreateTxComplementInfo(receipt.getContractAddress(),platOnClient,ci);
+                // 把回执里的合约地址回填到交易的to字段
+                setTo(receipt.getContractAddress());
             }else{
                 if(generalContractAddressCache.contains(getTo())&&inputWithoutPrefix.length()>=8){
                     // evm or wasm 合约调用
@@ -114,6 +115,13 @@ public class CollectionTransaction extends Transaction {
                     }
                 }
             }
+        }
+
+        if(ci.type==null){
+            throw new BeanCreateOrUpdateException("交易类型为空,遇到未知交易:[blockNumber="+getNum()+",txHash="+getHash()+"]");
+        }
+        if(ci.toType==null){
+            throw new BeanCreateOrUpdateException("To地址为空:[blockNumber="+getNum()+",txHash="+getHash()+"]");
         }
 
         // 交易信息
