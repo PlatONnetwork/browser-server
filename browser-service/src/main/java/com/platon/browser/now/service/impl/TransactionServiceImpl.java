@@ -298,9 +298,7 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTxInfo(transaction.getInfo());
     		resp.setGasPrice(new BigDecimal(transaction.getGasPrice()));
     		resp.setValue(new BigDecimal(transaction.getValue()));
-    		if(transaction.getToType() != null) {
-    			resp.setReceiveType(transaction.getToType().intValue() == 1?"contract":"account");
-    		}
+			resp.setReceiveType(String.valueOf(transaction.getToType()));
     		/**
     		 * 失败信息国际化
     		 */

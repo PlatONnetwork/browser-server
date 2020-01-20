@@ -223,9 +223,9 @@ public interface AppDocTransaction {
      *       "preHash":"",
      *       "last":true,
      *       "nextHash":"",              //是否最后一条记录
-     *       "receiveType":"account",  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
+     *       "receiveType":"1",  //此字段表示的是to字段存储的账户类型：1-合约地址，2-钱包地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
-     *       "contractType":"1",  //合约类型  1-系统合约，2-evm合约 3-wasm合约
+     *       "contractType":"1",  //合约类型  0-系统合约，1-evm合约 2-wasm合约
      *       "method":"Set",  //合约调用函数
      *        --交易基本信息结束
      *        --可选信息开始
