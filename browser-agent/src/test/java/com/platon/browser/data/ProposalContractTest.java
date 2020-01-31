@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ProposalContractTest {
 
-	private Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
+	private Web3j web3j = Web3j.build(new HttpService("http://192.168.9.221:19777"));
 
 	String nodeId = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
 	String blsPubKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
@@ -144,7 +144,7 @@ public class ProposalContractTest {
 //		
 		vote(proposalID,
 				"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
-				"http://192.168.112.172:8789", VoteOption.YEAS, voteCredentials);
+				"http://192.168.9.221:19777", VoteOption.YEAS, voteCredentials);
 		
 	    vote(proposalID,
 			"459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",

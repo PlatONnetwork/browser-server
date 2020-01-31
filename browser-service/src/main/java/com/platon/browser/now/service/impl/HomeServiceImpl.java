@@ -87,6 +87,10 @@ public class HomeServiceImpl implements HomeService {
 		*/
 		req.setParameter(req.getParameter().trim());
 		String keyword = req.getParameter();
+		if (keyword.length() == 40) {
+			/* 长度为40则拼接0x*/
+			keyword = HexTool.prefix(keyword);
+		}
 		/* 判断是否为纯数字 */
 		boolean isNumber = keyword.matches("[0-9]+");
 		QueryNavigationResp result = new QueryNavigationResp();
@@ -115,10 +119,6 @@ public class HomeServiceImpl implements HomeService {
 			if (keyword.length() <= 2) {
 				/* 小于两位的则认为不是正确hash */
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
-			}
-			if (keyword.length() == 40) {
-				/* 长度为40则拼接0x*/
-				keyword = HexTool.prefix(keyword);
 			}
 			if (keyword.length() == 128) {
 				/* 判断为节点Id */
