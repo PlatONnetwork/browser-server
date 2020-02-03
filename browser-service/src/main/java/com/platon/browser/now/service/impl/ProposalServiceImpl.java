@@ -33,10 +33,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -149,6 +151,17 @@ public class ProposalServiceImpl implements ProposalService {
          	*/
 			case PARAMETER:
 				proposalDetailsResp.setParamName(ConvertUtil.captureName(proposal.getName()));
+				String currentValue = proposal.getStaleValue();
+				String newValue = proposal.getNewValue();
+				/**
+				 * 如果参数是需要转换lat的，则进一步转换
+				 */
+				if(BrowserConst.EXTRA_LAT_PARAM.contains(proposal.getName())) {
+					currentValue = Convert.fromVon(currentValue, Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString() + "LAT";
+					newValue = Convert.fromVon(newValue, Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString() + "LAT";
+				} 
+				proposalDetailsResp.setCurrentValue(currentValue);
+				proposalDetailsResp.setNewValue(newValue);
 				proposalDetailsResp.setCurrentValue(proposal.getStaleValue());
 				proposalDetailsResp.setNewValue(proposal.getNewValue());
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getParamProposalSupportRate().toString());

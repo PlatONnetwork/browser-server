@@ -25,6 +25,7 @@ import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 import com.platon.browser.res.address.DetailsRPPlanResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
+import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.I18nUtil;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
@@ -97,6 +98,7 @@ public class AddressServiceImpl implements AddressService {
         	resp.setIsDestroy(StringUtils.isBlank(item.getContractDestroyHash())?0:1);
         	resp.setContractCreateHash(item.getContractCreatehash());
         	resp.setDestroyHash(item.getContractDestroyHash());
+        	resp.setContractName(ConvertUtil.captureName(item.getContractName()));
         }
         /** 特殊账户余额直接查询链  */
 	  	try {

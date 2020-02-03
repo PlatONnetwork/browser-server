@@ -85,7 +85,7 @@ public class CalculateUtils {
 		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
 		//年份增发量 = (1+增发比例)的增发年份次方
 		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
-		//计算流通量 = 初始发行量 * 年份增发量 - 锁仓余额  - 质押余额 - 实时激励池余额
+		//计算流通量 = 初始发行量 * 年份增发量 - 锁仓余额  - 质押余额 - 实时激励池余额 - 委托账户合约余额
     	return initIssueAmount.multiply(circulationByYear).subtract(restrictBalance)
 				.subtract(stakingBalance)
 				.subtract(inciteBalance)
