@@ -75,7 +75,7 @@ public class CalculateUtils {
 				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.LAT):BigDecimal.ZERO);
 	}
 
-	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, BigInteger issueEpoch,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance){
+	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, BigInteger issueEpoch,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance,BigDecimal rewardBalance){
 		//当前块高所属结算周期
     	int curIssueEpoch=issueEpoch.intValue();
     	//获取初始发行金额
@@ -88,7 +88,8 @@ public class CalculateUtils {
 		//计算流通量 = 初始发行量 * 年份增发量 - 锁仓余额  - 质押余额 - 实时激励池余额
     	return initIssueAmount.multiply(circulationByYear).subtract(restrictBalance)
 				.subtract(stakingBalance)
-				.subtract(inciteBalance);
+				.subtract(inciteBalance)
+				.subtract(rewardBalance);
 	}
 
 	/**

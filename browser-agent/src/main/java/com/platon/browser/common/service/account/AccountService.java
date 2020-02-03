@@ -22,7 +22,8 @@ public class AccountService {
     private static final String INCITE_ACCOUNT_ADDR = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
     private static final String RESTRICTING_ADDR = InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress();
     private static final String STAKING_ADDR = InnerContractAddrEnum.STAKING_CONTRACT.getAddress();
-
+    private static final String REWARD_ADDR = InnerContractAddrEnum.REWARD_CONTRACT.getAddress();
+    
     private static final String BLOCK_TIP="]在区块号[";
     private static final String BALANCE_TIP="]的余额失败:";
 
@@ -82,6 +83,25 @@ public class AccountService {
         }catch (Exception e){
             platOnClient.updateCurrentWeb3jWrapper();
             String error = "获取质押合约["+STAKING_ADDR+BLOCK_TIP+blockNumber+BALANCE_TIP+e.getMessage();
+            log.error("{}",error);
+            throw new BusinessException(error);
+        }
+    }
+    
+    /**
+     * 带有重试功能的根据区块号获取收益余额
+     * @param blockNumber
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public BigDecimal getRewardBalance(BigInteger blockNumber){
+        if(blockNumber.compareTo(BigInteger.ZERO)<0) blockNumber=BigInteger.ZERO;
+        try {
+            BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(REWARD_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+                    .send().getBalance();
+            return new BigDecimal(balance);
+        }catch (Exception e){
+            platOnClient.updateCurrentWeb3jWrapper();
+            String error = "获取质押合约["+REWARD_ADDR+BLOCK_TIP+blockNumber+BALANCE_TIP+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }

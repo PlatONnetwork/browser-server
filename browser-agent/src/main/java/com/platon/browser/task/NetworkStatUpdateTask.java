@@ -56,10 +56,12 @@ public class NetworkStatUpdateTask {
 			BigDecimal stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(curNumber));
 			//获取锁仓余额
 			BigDecimal restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(curNumber));
+			//获取锁仓余额
+			BigDecimal rewardBalance = accountService.getRewardBalance(BigInteger.valueOf(curNumber));
 			//计算发行量
 			BigDecimal issueValue = CalculateUtils.calculationIssueValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance);
 			//计算流通量
-			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,new BigInteger(issueEpochRound.toString()),inciteBalance,stakingBalance,restrictBalance);
+			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,new BigInteger(issueEpochRound.toString()),inciteBalance,stakingBalance,restrictBalance,rewardBalance);
 			//获得节点相关的网络统计
 			NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
 			BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();
