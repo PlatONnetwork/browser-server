@@ -11,7 +11,7 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/browser_${version}_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/browser_${version}_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(hkzKdE6lTNkwP0xXNAgjuA==)
     password: ENC(hkzKdE6lTNkwP0xXNAgjuA==)
   #Redis配置
