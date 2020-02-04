@@ -2,6 +2,8 @@ package com.platon.browser.util;
 
 import java.math.BigInteger;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 数据转换工具类
  * 
@@ -20,8 +22,13 @@ public class ConvertUtil {
 	}
 
 	public static String captureName(String name) {
+		if(StringUtils.isBlank(name)) {
+			return "";
+		}
 		char[] cs = name.toCharArray();
-		cs[0] -= 32;
+		if (cs[0] >= 'a' && cs[0] <= 'z') {
+			cs[0] = (char) (cs[0] - 32);
+	    }
 		return String.valueOf(cs);
 
 	}
