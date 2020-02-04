@@ -3,6 +3,7 @@ package com.platon.browser.common.collection.dto;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -84,12 +85,6 @@ public class CollectionTransaction extends Transaction {
     }
     CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
 
-        // 默认取状态字段作为交易成功与否的状态
-        int status = receipt.getStatus();
-        if (InnerContractAddrEnum.getAddresses().contains(getTo())) {
-            // 如果接收者为内置合约, 取日志中的状态作为交易成功与否的状态
-            status=receipt.getLogStatus();
-        }
 
         //============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
@@ -116,12 +111,18 @@ public class CollectionTransaction extends Transaction {
                 }
             }
         }
-
+        
         if(ci.type==null){
             throw new BeanCreateOrUpdateException("交易类型为空,遇到未知交易:[blockNumber="+getNum()+",txHash="+getHash()+"]");
         }
         if(ci.toType==null){
             throw new BeanCreateOrUpdateException("To地址为空:[blockNumber="+getNum()+",txHash="+getHash()+"]");
+        }
+        // 默认取状态字段作为交易成功与否的状态
+        int status = receipt.getStatus();
+        if (InnerContractAddrEnum.getAddresses().contains(getTo()) && ci.type.intValue() != TypeEnum.TRANSFER.getCode()) {
+            // 如果接收者为内置合约且不为转账, 取日志中的状态作为交易成功与否的状态
+            status=receipt.getLogStatus();
         }
 
         // 交易信息
@@ -292,6 +293,15 @@ public class CollectionTransaction extends Transaction {
         ci.info = "{}";
         ci.binCode = null;
         // 需要根据交易的to地址是否是什么类型的地址
-        ci.toType = generalContractAddressCache.contains(getTo())? ToTypeEnum.CONTRACT.getCode():ToTypeEnum.ACCOUNT.getCode();
+        if(InnerContractAddrEnum.getAddresses().contains(getTo())) {
+        	ci.toType = ToTypeEnum.CONTRACT.getCode();
+        	ci.contractType = ContractTypeEnum.INNER.getCode();
+        	ci.method = ContractDescEnum.getMap().get(getTo()).getContractName();
+        } else if (generalContractAddressCache.contains(getTo())) {
+        	ci.toType = ToTypeEnum.CONTRACT.getCode();
+        	ci.contractType = ContractTypeEnum.EVM.getCode();
+        } else {
+        	ci.toType = ToTypeEnum.ACCOUNT.getCode();
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.platon.browser.req.staking;
 
+import javax.validation.constraints.NotBlank;
+
 import com.platon.browser.req.PageReq;
 
 /**
@@ -10,6 +12,7 @@ import com.platon.browser.req.PageReq;
  *  @data 2019年8月31日
  */
 public class DelegationListByAddressReq extends PageReq{
+	@NotBlank(message = "{address not null}")
     private String address;
 
 	public String getAddress() {

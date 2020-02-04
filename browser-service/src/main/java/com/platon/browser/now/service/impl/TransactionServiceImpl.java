@@ -299,6 +299,7 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setGasPrice(new BigDecimal(transaction.getGasPrice()));
     		resp.setValue(new BigDecimal(transaction.getValue()));
 			resp.setReceiveType(String.valueOf(transaction.getToType()));
+			resp.setContractName(transaction.getMethod());
     		/**
     		 * 失败信息国际化
     		 */
