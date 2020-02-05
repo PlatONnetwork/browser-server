@@ -16,10 +16,10 @@
 	/*把节点设置为异常*/
 	/*2、更新质押*/
 	update `staking` set `exception_status` = 2
-	and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+	where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
 	/*3、更新节点*/
 	update `node` set `exception_status` = 2
-	where `node_id` in  <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+	where `node_id` in  <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
 </update>
 
 <select id="getException" resultType="com.platon.browser.dao.entity.Staking">
@@ -27,7 +27,7 @@
 	select  `node_id` as nodeId,
 	`staking_block_num` as stakingBlockNum
 	from staking
-	where `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
+	where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
 	and `exception_status` = 2;
 </select>
 
