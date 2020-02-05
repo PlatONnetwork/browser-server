@@ -15,6 +15,8 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,9 +69,16 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
 
-        String desc = NodeOpt.TypeEnum.MODIFY.getTpl()
-                .replace("BEFORERATE",preDelegateRewardRate)
-                .replace("AFTERRATE",String.valueOf(businessParam.getDelegateRewardPer()));
+        
+        String desc = "";
+        /**
+         * 参数有值的情况下设置desc
+         */
+        if(txParam.getDelegateRewardPer() != null) {
+        	desc = NodeOpt.TypeEnum.MODIFY.getTpl()
+                    .replace("BEFORERATE",preDelegateRewardRate)
+                    .replace("AFTERRATE",String.valueOf(businessParam.getDelegateRewardPer()));
+        }
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());

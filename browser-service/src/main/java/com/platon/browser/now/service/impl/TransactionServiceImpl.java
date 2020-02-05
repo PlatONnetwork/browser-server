@@ -128,6 +128,8 @@ public class TransactionServiceImpl implements TransactionService {
 			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
 		}
 		constructor.setDesc("seq");
+		constructor.setResult(new String[] { "hash", "time", "status", "from",
+			      "to", "value", "num", "type", "toType", "cost", "failReason" });
 		/** 根据区块号和类型分页查询交易信息 */
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
@@ -155,6 +157,8 @@ public class TransactionServiceImpl implements TransactionService {
 		constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
 				.should(QueryBuilders.termQuery("to", req.getAddress())));
 		constructor.setDesc("seq");
+		constructor.setResult(new String[] { "hash", "time", "status", "from",
+			      "to", "value", "num", "type", "toType", "cost", "failReason" });
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
@@ -211,6 +215,8 @@ public class TransactionServiceImpl implements TransactionService {
 				.should(QueryBuilders.termQuery("to", address)));
 		ESResult<Transaction> items = new ESResult<>();
 		constructor.setDesc("seq");
+		constructor.setResult(new String[] { "hash", "time", "status", "from",
+			      "to", "value", "num", "type", "toType", "cost"});
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, 1, 3000);
 		} catch (IOException e) {
@@ -337,6 +343,7 @@ public class TransactionServiceImpl implements TransactionService {
     			*/
     			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         		constructor.must(new ESQueryBuilders().term("id", transaction.getId()-1));
+        		constructor.setResult(new String[] { "hash"});
         		ESResult<Transaction> first = new ESResult<>();
         		try {
         			first = transactionESRepository.search(constructor, Transaction.class, 1, 1);
@@ -354,6 +361,7 @@ public class TransactionServiceImpl implements TransactionService {
     		 * */
     		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
     		constructor.must(new ESQueryBuilders().term("id", transaction.getId()+1));
+    		constructor.setResult(new String[] { "hash"});
     		ESResult<Transaction> last = new ESResult<>();
     		try {
     			last = transactionESRepository.search(constructor, Transaction.class, 1, 1);
@@ -801,7 +809,12 @@ public class TransactionServiceImpl implements TransactionService {
 			 * 累积交易的所有领取奖励
 			 */
 			for(Extra extra : extras) {
-				allRewards = allRewards.add(new BigDecimal(extra.getReward()));
+				/**
+				 * 只有地址相同的才需要累积
+				 */
+				if(req.getNodeId().equals(extra.getNodeId())) {
+					allRewards = allRewards.add(new BigDecimal(extra.getReward()));
+				}
 			}
 			/**
 			 * 根据交易累加所有的奖励

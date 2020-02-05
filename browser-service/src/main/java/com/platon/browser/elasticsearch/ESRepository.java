@@ -258,6 +258,7 @@ public abstract class ESRepository {
         }
      // 设置SearchSourceBuilder查询属性
 		searchRequest.source(searchSourceBuilder);
+		log.debug("get rs" + searchSourceBuilder.toString());
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 		ESResult<T> esResult = new ESResult<>();
 		SearchHits hits = response.getHits();
