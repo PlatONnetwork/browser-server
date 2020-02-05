@@ -25,6 +25,8 @@ public class Election implements BusinessParam {
     private int settingEpoch;
     //时间
     private Date time;
+    // 是否惩罚上上轮
+    private int isPrePreRound;
 
     @Override
     public BusinessType getBusinessType () {

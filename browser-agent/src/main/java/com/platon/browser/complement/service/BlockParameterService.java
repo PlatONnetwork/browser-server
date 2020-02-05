@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class BlockParameterService {
      * 解析区块, 构造业务入库参数信息
      * @return
      */
-    public List<NodeOpt> getParameters(CollectionEvent event) throws NoSuchBeanException, IOException {
+    public List<NodeOpt> getParameters(CollectionEvent event) throws NoSuchBeanException, IOException, BlockNumberException {
         long startTime = System.currentTimeMillis();
 
         List<NodeOpt> nodeOptList = new ArrayList<>();

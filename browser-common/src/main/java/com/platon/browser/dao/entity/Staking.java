@@ -82,6 +82,8 @@ public class Staking extends StakingKey {
 
     private BigDecimal totalDeleReward;
 
+    private Integer exceptionStatus;
+
     private String annualizedRateInfo;
 
     public Integer getStakingTxIndex() {
@@ -388,6 +390,14 @@ public class Staking extends StakingKey {
         this.totalDeleReward = totalDeleReward;
     }
 
+    public Integer getExceptionStatus() {
+        return exceptionStatus;
+    }
+
+    public void setExceptionStatus(Integer exceptionStatus) {
+        this.exceptionStatus = exceptionStatus;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -444,6 +454,7 @@ public class Staking extends StakingKey {
         preDeleAnnualizedRate("pre_dele_annualized_rate", "preDeleAnnualizedRate", "DOUBLE", false),
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
+        exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

@@ -100,6 +100,8 @@ public class Node {
 
     private BigDecimal preTotalDeleReward;
 
+    private Integer exceptionStatus;
+
     private String annualizedRateInfo;
 
     public String getNodeId() {
@@ -478,6 +480,14 @@ public class Node {
         this.preTotalDeleReward = preTotalDeleReward;
     }
 
+    public Integer getExceptionStatus() {
+        return exceptionStatus;
+    }
+
+    public void setExceptionStatus(Integer exceptionStatus) {
+        this.exceptionStatus = exceptionStatus;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -541,6 +551,7 @@ public class Node {
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         preTotalDeleReward("pre_total_dele_reward", "preTotalDeleReward", "DECIMAL", false),
+        exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

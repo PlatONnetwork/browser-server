@@ -2615,6 +2615,66 @@ public class StakingExample {
             addCriterion("total_dele_reward not between", value1, value2, "totalDeleReward");
             return (Criteria) this;
         }
+
+        public Criteria andExceptionStatusIsNull() {
+            addCriterion("exception_status is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusIsNotNull() {
+            addCriterion("exception_status is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusEqualTo(Integer value) {
+            addCriterion("exception_status =", value, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusNotEqualTo(Integer value) {
+            addCriterion("exception_status <>", value, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusGreaterThan(Integer value) {
+            addCriterion("exception_status >", value, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("exception_status >=", value, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusLessThan(Integer value) {
+            addCriterion("exception_status <", value, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("exception_status <=", value, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusIn(List<Integer> values) {
+            addCriterion("exception_status in", values, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusNotIn(List<Integer> values) {
+            addCriterion("exception_status not in", values, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusBetween(Integer value1, Integer value2) {
+            addCriterion("exception_status between", value1, value2, "exceptionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andExceptionStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("exception_status not between", value1, value2, "exceptionStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

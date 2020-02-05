@@ -43,4 +43,16 @@ public interface EpochBusinessMapper {
      * @return
      */
 	List<Staking> querySlashNode(@Param("list") List<String> preValidatorList);
+
+    /**
+     * 把节点标记为异常
+     * @return
+     */
+    void setException(@Param("list") List<String> nodeIdList);
+
+    /**
+     * 查询标记为异常的节点
+     * @return
+     */
+    List<Staking> getException(@Param("list") List<String> nodeIdList);
 }

@@ -210,6 +210,7 @@ public class InitializationService {
             staking.setPreDeleAnnualizedRate(0.0);
             staking.setHaveDeleReward(BigDecimal.ZERO);
             staking.setTotalDeleReward(BigDecimal.ZERO);
+            staking.setExceptionStatus(1);
 
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();

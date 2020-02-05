@@ -72,6 +72,7 @@ public class StakingKey {
         preDeleAnnualizedRate("pre_dele_annualized_rate", "preDeleAnnualizedRate", "DOUBLE", false),
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
+        exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**
