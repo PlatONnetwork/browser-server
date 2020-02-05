@@ -64,5 +64,5 @@ public class StakeModifyParam extends TxParam{
     /**
      * 委托奖励比例
      */
-    private int delegateRewardPer;
+    private Integer delegateRewardPer;
 }
