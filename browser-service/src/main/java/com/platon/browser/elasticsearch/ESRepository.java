@@ -257,6 +257,7 @@ public abstract class ESRepository {
         	searchSourceBuilder.fetchSource(constructor.getResult(), null);
         }
 		searchRequest.source(searchSourceBuilder);
+		log.debug("get rs" + searchSourceBuilder.toString());
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 		ESResult<T> esResult = new ESResult<>();
 		SearchHits hits = response.getHits();
