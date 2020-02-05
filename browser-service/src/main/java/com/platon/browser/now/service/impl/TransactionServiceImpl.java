@@ -801,7 +801,12 @@ public class TransactionServiceImpl implements TransactionService {
 			 * 累积交易的所有领取奖励
 			 */
 			for(Extra extra : extras) {
-				allRewards = allRewards.add(new BigDecimal(extra.getReward()));
+				/**
+				 * 只有地址相同的才需要累积
+				 */
+				if(req.getNodeId().equals(extra.getNodeId())) {
+					allRewards = allRewards.add(new BigDecimal(extra.getReward()));
+				}
 			}
 			/**
 			 * 根据交易累加所有的奖励

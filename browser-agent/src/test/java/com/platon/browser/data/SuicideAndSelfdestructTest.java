@@ -5,7 +5,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.tx.Transfer;
+import org.web3j.utils.Convert.Unit;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 
@@ -30,6 +33,9 @@ public class SuicideAndSelfdestructTest extends BaseContractTest {
             TransactionReceipt tx = suicideAndSelfdestruct.getTransactionReceipt().get();
 
 
+            Transfer transfer = new Transfer(web3j, transactionManager);
+            transfer.sendFunds(contractAddress, BigDecimal.TEN, Unit.LAT,GAS_PRICE,GAS_LIMIT).send();
+            
             TransactionReceipt transactionReceipt = suicideAndSelfdestruct.increment().send();
 
             logger.debug("SuicideAndSelfdestructTest increment successful.transactionHash:" + transactionReceipt.getTransactionHash());
