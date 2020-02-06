@@ -55,7 +55,7 @@
 		`stat_delegate_locked` = 0,
 		`is_consensus` = 2,
 		<if test="isPrePreRound == 1">
-			`exception_status` = 3,
+			`exception_status` = 4,
 		</if>
 		`is_settle` = 2
 	where `status` = 1
@@ -76,7 +76,7 @@
 		n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
 		n.`is_consensus` = 2,
 		<if test="isPrePreRound == 1">
-			`exception_status` = 3,
+			`exception_status` = 4,
 		</if>
 		n.`is_settle` = 2
 	where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;

@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.SlashBusinessMapper">
-<update id="report" parameterType="com.platon.browser.complement.dao.param.slash.Report">
+	<update id="setException">
+		/*把节点设置为双签异常*/
+		/*2、更新质押*/
+		update `staking` set `exception_status` = 3
+		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
+		/*3、更新节点*/
+		update `node` set `exception_status` = 3
+		where `node_id` in  <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
+	</update>
+
+	<select id="getException" resultType="com.platon.browser.dao.entity.Staking">
+		/*查询双签异常节点*/
+		select  `node_id` as nodeId,
+		`staking_block_num` as stakingBlockNum
+		from staking
+		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
+		and `exception_status` = 3;
+	</select>
+	<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.slash.Report">
 	/*1、更新委托*/
 	update `delegation` set
 		`delegate_released` = `delegate_hes` + `delegate_locked`,

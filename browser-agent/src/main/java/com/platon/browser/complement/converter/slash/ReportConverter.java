@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.slash;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.complement.cache.ReportMultiSignParamCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,9 +38,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
     private SlashBusinessMapper slashBusinessMapper;
 
     @Autowired
-    private StakingMapper stakingMapper;
-    @Autowired
-    private NetworkStatCache networkStatCache;
+    private ReportMultiSignParamCache reportMultiSignParamCache;
 
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -50,6 +51,11 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
 
         long startTime = System.currentTimeMillis();
 
+        // 举报成功，先把节点设置为异常，后续处罚操作在共识周期切换时执行
+        List<String> nodeIdList = new ArrayList<>();
+        nodeIdList.add(txParam.getVerify());
+        slashBusinessMapper.setException(nodeIdList);
+
         Report businessParam= Report.builder()
         		.slashData(txParam.getData())
                 .nodeId(txParam.getVerify())
@@ -61,49 +67,14 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
                 .slash2ReportRate(chainConfig.getDuplicateSignRewardRate())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
+
+        // 把举报参数暂时缓存，待共识周期切换时处理
+        reportMultiSignParamCache.addReport(businessParam);
         
-        StakingKey stakingKey = new StakingKey();
-        stakingKey.setNodeId(businessParam.getNodeId());
-        stakingKey.setStakingBlockNum(businessParam.getStakingBlockNum().longValue());
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        //惩罚的金额
-        BigDecimal codeSlashValue = staking.getStakingLocked().multiply(businessParam.getSlashRate());
-        //奖励的金额
-        BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
-        //当前锁定的
-        BigDecimal codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
-        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO)>0){
-            businessParam.setCodeStatus(2);
-            businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
-        }else {
-            businessParam.setCodeStatus(3);
-            businessParam.setCodeStakingReductionEpoch(0);
-        }
-        businessParam.setCodeRewardValue(codeRewardValue);
-        businessParam.setCodeCurStakingLocked(codeCurStakingLocked);
-        businessParam.setCodeSlashValue(codeSlashValue);
 
-        slashBusinessMapper.report(businessParam);
-
-
-        //操作描述:6【PERCENT|AMOUNT】 
-        String desc = NodeOpt.TypeEnum.MULTI_SIGN.getTpl()
-                .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
-                .replace("AMOUNT",codeSlashValue.toString());
-
-
-
-        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-        nodeOpt.setNodeId(txParam.getVerify());
-        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MULTI_SIGN.getCode()));
-        nodeOpt.setDesc(desc);
-        nodeOpt.setTxHash(tx.getHash());
-        nodeOpt.setBNum(event.getBlock().getNum());
-        nodeOpt.setTime(event.getBlock().getTime());
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
-        return nodeOpt;
+        return null;
     }
 }
