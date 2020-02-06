@@ -16,10 +16,6 @@
     <update id="updateProposalInfoList">
         <foreach collection="proposalList" item="item" separator=";">
             update `proposal` set
-            /*`yeas` = #{item.yeas},
-            `nays` = #{item.nays},
-            `abstentions` = #{item.abstentions},
-            `accu_verifiers` = #{item.accuVerifiers},*/
             `status` = #{item.status}
             where
             `hash` = #{item.hash}

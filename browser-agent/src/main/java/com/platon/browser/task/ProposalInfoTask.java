@@ -61,7 +61,6 @@ public class ProposalInfoTask {
         if (proposals.isEmpty()) return;
 
         for (Proposal proposal : proposals) {
-
             try {
 //                //发送rpc请求查询提案结果
 //                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
@@ -97,7 +96,7 @@ public class ProposalInfoTask {
             }catch (Exception e){
                 log.error("提案投票信息更新出错:",e);
             }
-            customProposalMapper.updateProposalInfoList(proposals);
         }
+        customProposalMapper.updateProposalInfoList(proposals);
     }
 }
