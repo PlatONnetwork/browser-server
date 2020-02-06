@@ -63,12 +63,12 @@ public class ProposalInfoTask {
         for (Proposal proposal : proposals) {
             try {
 //                //发送rpc请求查询提案结果
-//                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
-//                //设置参与人数
-//                if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
-//                    // 有变更
-//                    proposal.setAccuVerifiers(pps.getVoterCount());
-//                }
+                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
+                //设置参与人数
+                if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
+                    // 有变更
+                    proposal.setAccuVerifiers(pps.getVoterCount());
+                }
 //                //设置赞成票
 //                if (pps.getSupportCount() != null && !pps.getSupportCount().equals(proposal.getYeas())) {
 //                    // 有变更

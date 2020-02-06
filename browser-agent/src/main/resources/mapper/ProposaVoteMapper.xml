@@ -22,7 +22,6 @@
     /*投票选项:1支持,2反对,3弃权*/
     update `proposal`
     <set>
-        `accu_verifiers`=`accu_verifiers`+1,
         <if test="voteOption == 1">
             `yeas` = `yeas`+1,
         </if>
