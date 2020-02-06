@@ -77,6 +77,8 @@ public class OnConsensusConverter {
                         NodeOpt nodeOpt = slash(report,block);
                         nodeOpts.add(nodeOpt);
                     });
+                    // 双签处罚后需要删除缓存中的双签参数，防止下一次进来重复处罚
+                    reportMultiSignParamCache.remove(slashNode.getNodeId());
                 });
             }
         }

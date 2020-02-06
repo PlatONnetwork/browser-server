@@ -45,4 +45,8 @@ public class ReportMultiSignParamCache {
     public List<String> getNodeIdList(){
         return new ArrayList<>(cache.keySet());
     }
+
+    public void remove(String nodeId) {
+        cache.remove(nodeId);
+    }
 }

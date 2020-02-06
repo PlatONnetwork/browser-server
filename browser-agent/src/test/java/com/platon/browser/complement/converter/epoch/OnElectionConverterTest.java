@@ -7,6 +7,7 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.BlockNumberException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +50,7 @@ public class OnElectionConverterTest extends AgentTestBase {
     }
 
     @Test
-    public void convert(){
+    public void convert() throws BlockNumberException {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setPreValidatorList(validatorList);
