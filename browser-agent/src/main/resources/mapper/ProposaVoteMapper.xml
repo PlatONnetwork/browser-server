@@ -18,5 +18,19 @@
         #{proposalHash},
         #{timestamp}
     );
+    /*更新对应提案的字段*/
+    /*投票选项:1支持,2反对,3弃权*/
+    update `proposal` set
+    `accu_verifiers`=`accu_verifiers`+1,
+    <if test="voteOption == 1">
+        `yeas` = `yeas`+1,
+    </if>
+    <if test="voteOption == 2">
+        `nays` = `nays`+1,
+    </if>
+    <if test="voteOption == 3">
+        `abstentions` = `abstentions`+1,
+    </if>
+    where `hash`=#{proposalHash};
 </update>
 </mapper>
