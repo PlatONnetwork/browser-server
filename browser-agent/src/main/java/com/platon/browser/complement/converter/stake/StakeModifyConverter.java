@@ -72,9 +72,9 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         
         String desc = "";
         /**
-         * 参数有值的情况下设置desc
+         * 参数有值且与初始不相等的情况下设置desc
          */
-        if(txParam.getDelegateRewardPer() != null) {
+        if(txParam.getDelegateRewardPer() != null && !String.valueOf(businessParam.getDelegateRewardPer()).equals(preDelegateRewardRate)) {
         	desc = NodeOpt.TypeEnum.MODIFY.getTpl()
                     .replace("BEFORERATE",preDelegateRewardRate)
                     .replace("AFTERRATE",String.valueOf(businessParam.getDelegateRewardPer()));
