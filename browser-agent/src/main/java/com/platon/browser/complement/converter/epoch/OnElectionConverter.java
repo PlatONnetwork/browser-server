@@ -61,7 +61,7 @@ public class OnElectionConverter {
 			BigInteger curConsEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(BigInteger.valueOf(block.getNum()),blockChainConfig.getConsensusPeriodBlockCount());
 			BigInteger prePreConsEpochLastBlockNumber = curConsEpochLastBlockNumber.subtract(blockChainConfig.getConsensusPeriodBlockCount().multiply(BigInteger.valueOf(2)));
 			BigInteger prePreSettleEpoch = EpochUtil.getEpoch(prePreConsEpochLastBlockNumber,blockChainConfig.getConsensusPeriodBlockCount());
-			List<NodeOpt> exceptionNodeOpts = slash(block,prePreSettleEpoch.intValue(),preExceptionNodeList, BusinessParam.YesNoEnum.YES);
+			List<NodeOpt> exceptionNodeOpts = slash(block,prePreSettleEpoch.intValue(),preExceptionNodeList, BusinessParam.YesNoEnum.YES,event.getEpochMessage().getBlockReward());
 			nodeOpts.addAll(exceptionNodeOpts);
 		}
 
@@ -90,7 +90,7 @@ public class OnElectionConverter {
 
 		if(!preSlashNodeList.isEmpty()){
 			//b、不参与当前共识周期，则直接处罚；
-			List<NodeOpt> preLowRateNodeOpts = slash(block,event.getEpochMessage().getSettleEpochRound().intValue(),preSlashNodeList, BusinessParam.YesNoEnum.NO);
+			List<NodeOpt> preLowRateNodeOpts = slash(block,event.getEpochMessage().getSettleEpochRound().intValue(),preSlashNodeList, BusinessParam.YesNoEnum.NO,event.getEpochMessage().getBlockReward());
 			nodeOpts.addAll(preLowRateNodeOpts);
 		}
 
@@ -107,7 +107,7 @@ public class OnElectionConverter {
 	 * @param isPrePreRound slashNodeList是否是上上个共识周期的低出块节点
 	 * @return
 	 */
-	private List<NodeOpt> slash(Block block, int settleEpoch, List<Staking> slashNodeList, BusinessParam.YesNoEnum isPrePreRound){
+	private List<NodeOpt> slash(Block block, int settleEpoch, List<Staking> slashNodeList, BusinessParam.YesNoEnum isPrePreRound,BigDecimal blockReward){
 		//惩罚节点
 		Election election = Election.builder()
 				.time(block.getTime())
@@ -125,7 +125,7 @@ public class OnElectionConverter {
 					/**
 					 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
 					 */
-					String amount =  new BigDecimal(block.getReward())
+					String amount =  blockReward
 							.multiply(blockChainConfig.getSlashBlockRewardCount()).toString();
 					desc.append(blockChainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
 					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
