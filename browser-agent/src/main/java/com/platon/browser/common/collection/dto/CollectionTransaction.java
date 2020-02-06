@@ -104,7 +104,7 @@ public class CollectionTransaction extends Transaction {
                     resolveGeneralContractInvokeTxComplementInfo(platOnClient,ci);
                 }else {
                     BigInteger value = StringUtils.isNotBlank(getValue())?new BigInteger(getValue()):BigInteger.ZERO;
-                    if(value.compareTo(BigInteger.ZERO)>0){
+                    if(value.compareTo(BigInteger.ZERO)>=0){
                         // 如果输入为空且value大于0，则是普通转账
                         resolveGeneralTransferTxComplementInfo(ci,generalContractAddressCache);
                     }
