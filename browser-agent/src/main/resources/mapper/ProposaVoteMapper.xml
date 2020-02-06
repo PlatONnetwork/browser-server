@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.ProposalBusinessMapper">
-<update id="vote" parameterType="com.platon.browser.complement.dao.param.proposal.ProposalText">
+<update id="vote" parameterType="com.platon.browser.complement.dao.param.proposal.ProposalVote">
     /*1、创建投票提案*/
     insert into `vote` (
         `hash`,
@@ -20,17 +20,19 @@
     );
     /*更新对应提案的字段*/
     /*投票选项:1支持,2反对,3弃权*/
-    update `proposal` set
-    `accu_verifiers`=`accu_verifiers`+1,
-    <if test="voteOption == 1">
-        `yeas` = `yeas`+1,
-    </if>
-    <if test="voteOption == 2">
-        `nays` = `nays`+1,
-    </if>
-    <if test="voteOption == 3">
-        `abstentions` = `abstentions`+1,
-    </if>
+    update `proposal`
+    <set>
+        `accu_verifiers`=`accu_verifiers`+1,
+        <if test="voteOption == 1">
+            `yeas` = `yeas`+1,
+        </if>
+        <if test="voteOption == 2">
+            `nays` = `nays`+1,
+        </if>
+        <if test="voteOption == 3">
+            `abstentions` = `abstentions`+1,
+        </if>
+    </set>
     where `hash`=#{proposalHash};
 </update>
 </mapper>
