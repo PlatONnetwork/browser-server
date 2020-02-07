@@ -60,7 +60,7 @@ public class OnElectionConverter {
 			//处罚上一共识周期被设置为异常的节点：即上上轮低出块的节点;
 			BigInteger curConsEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(BigInteger.valueOf(block.getNum()),blockChainConfig.getConsensusPeriodBlockCount());
 			BigInteger prePreConsEpochLastBlockNumber = curConsEpochLastBlockNumber.subtract(blockChainConfig.getConsensusPeriodBlockCount().multiply(BigInteger.valueOf(2)));
-			BigInteger prePreSettleEpoch = EpochUtil.getEpoch(prePreConsEpochLastBlockNumber,blockChainConfig.getConsensusPeriodBlockCount());
+			BigInteger prePreSettleEpoch = EpochUtil.getEpoch(prePreConsEpochLastBlockNumber,blockChainConfig.getSettlePeriodBlockCount());
 			List<NodeOpt> exceptionNodeOpts = slash(block,prePreSettleEpoch.intValue(),preExceptionNodeList, BusinessParam.YesNoEnum.YES,event.getEpochMessage().getBlockReward());
 			nodeOpts.addAll(exceptionNodeOpts);
 		}
