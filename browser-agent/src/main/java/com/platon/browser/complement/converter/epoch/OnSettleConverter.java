@@ -78,6 +78,8 @@ public class OnSettleConverter {
             staking.setStakingHes(BigDecimal.ZERO);
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
+            log.debug("www,nodeId:{},status:{},stakingredution:{},stakingLockEpoch{},settleepoch:{}"
+            		,staking.getNodeId(),staking.getStatus().intValue(),staking.getStakingReductionEpoch(),settle.getStakingLockEpoch() , settle.getSettingEpoch());
             if(staking.getStatus().intValue() == CustomStaking.StatusEnum.EXITING.getCode() && staking.getStakingReductionEpoch() + settle.getStakingLockEpoch() < settle.getSettingEpoch()){
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
