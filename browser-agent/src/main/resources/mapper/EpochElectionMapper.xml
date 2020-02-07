@@ -28,7 +28,8 @@
 	`staking_block_num` as stakingBlockNum
 	from staking
 	where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
-	and `exception_status` = 2;
+	and `exception_status` = 2
+	and `status` = 1;
 </select>
 
 <update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
