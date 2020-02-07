@@ -84,15 +84,17 @@ public class OnElectionConverter {
 		});
 
 		if (!curExceptionNodeList.isEmpty()){
-			//a、参与当前共识周期，则标识为异常；
+			//a、参与当前共识周期，则标识为异常；且登记节点行为
 			epochBusinessMapper.setException(curExceptionNodeList);
+			List<NodeOpt> preLowRateNodeOpts = slashOnlyOpt(block,event.getEpochMessage().getSettleEpochRound().intValue(),preSlashNodeList, BusinessParam.YesNoEnum.NO,event.getEpochMessage().getBlockReward());
+			nodeOpts.addAll(preLowRateNodeOpts);
 		}
 
 		if(!preSlashNodeList.isEmpty()){
 			//b、不参与当前共识周期，则直接处罚；
 			List<NodeOpt> preLowRateNodeOpts = slash(block,event.getEpochMessage().getSettleEpochRound().intValue(),preSlashNodeList, BusinessParam.YesNoEnum.NO,event.getEpochMessage().getBlockReward());
 			nodeOpts.addAll(preLowRateNodeOpts);
-		}
+		} 
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
@@ -116,6 +118,39 @@ public class OnElectionConverter {
 				.isPrePreRound(isPrePreRound.getCode())
 				.build();
 		epochBusinessMapper.slashNode(election);
+
+		//节点操作日志
+		BigInteger bNum = BigInteger.valueOf(block.getNum());
+		List<NodeOpt> nodeOpts = slashNodeList.stream()
+				.map(node -> {
+					StringBuffer desc = new StringBuffer("0|");
+					/**
+					 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
+					 */
+					String amount =  blockReward
+							.multiply(blockChainConfig.getSlashBlockRewardCount()).toString();
+					desc.append(blockChainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
+					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+					nodeOpt.setNodeId(node.getNodeId());
+					nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
+					nodeOpt.setBNum(bNum.longValue());
+					nodeOpt.setTime(block.getTime());
+					nodeOpt.setDesc(desc.toString());
+					return nodeOpt;
+				}).collect(Collectors.toList());
+		return nodeOpts;
+	}
+	
+	/**
+	 * 不处罚节点只登记操作日志
+	 * @param block 区块
+	 * @param settleEpoch 所在结算周期
+	 * @param slashNodeList 被处罚的节点列表
+	 * @param isPrePreRound slashNodeList是否是上上个共识周期的低出块节点
+	 * @return
+	 */
+	private List<NodeOpt> slashOnlyOpt(Block block, int settleEpoch, List<Staking> slashNodeList, BusinessParam.YesNoEnum isPrePreRound,BigDecimal blockReward){
 
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
