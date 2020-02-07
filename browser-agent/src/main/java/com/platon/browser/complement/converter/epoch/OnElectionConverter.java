@@ -73,11 +73,13 @@ public class OnElectionConverter {
 		List<Staking> preLowRateNodeList = epochBusinessMapper.querySlashNode(preValidatorList);
 		// 前一周期出块率低且在当前周期当选的异常节点列表, 这些列表的节点需要被设置为异常状态
 		List<String> curExceptionNodeList = new ArrayList<>();
+		List<Staking> curSlashNodeList = new ArrayList<>();
 		// 前一周期出块率低且在当前周期未当选的低出块节点列表, 这些列表的节点需要被处罚
 		List<Staking> preSlashNodeList = new ArrayList<>();
 		preLowRateNodeList.forEach(n->{
 			if(curValidatorList.contains(n.getNodeId())){
 				curExceptionNodeList.add(n.getNodeId());
+				curSlashNodeList.add(n);
 			}else{
 				preSlashNodeList.add(n);
 			}
@@ -86,7 +88,7 @@ public class OnElectionConverter {
 		if (!curExceptionNodeList.isEmpty()){
 			//a、参与当前共识周期，则标识为异常；且登记节点行为
 			epochBusinessMapper.setException(curExceptionNodeList);
-			List<NodeOpt> preLowRateNodeOpts = slashOnlyOpt(block,event.getEpochMessage().getSettleEpochRound().intValue(),preSlashNodeList, BusinessParam.YesNoEnum.NO,event.getEpochMessage().getBlockReward());
+			List<NodeOpt> preLowRateNodeOpts = slashOnlyOpt(block, curSlashNodeList, event.getEpochMessage().getBlockReward());
 			nodeOpts.addAll(preLowRateNodeOpts);
 		}
 
@@ -150,7 +152,7 @@ public class OnElectionConverter {
 	 * @param isPrePreRound slashNodeList是否是上上个共识周期的低出块节点
 	 * @return
 	 */
-	private List<NodeOpt> slashOnlyOpt(Block block, int settleEpoch, List<Staking> slashNodeList, BusinessParam.YesNoEnum isPrePreRound,BigDecimal blockReward){
+	private List<NodeOpt> slashOnlyOpt(Block block, List<Staking> slashNodeList,BigDecimal blockReward){
 
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
