@@ -14,7 +14,7 @@ public enum  ContractDescEnum {
     RESTRICTING_PLAN_CONTRACT(ContractAddress.RESTRICTING_PLAN_CONTRACT_ADDRESS,"RestrictingContract","system",""),
     STAKING_CONTRACT(ContractAddress.STAKING_CONTRACT_ADDRESS,"StakingContract","system",""),
     INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"RewardManagerPool","system",""),
-    SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"SlashContract","system",""),
+    SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"SlashingContract","system",""),
     PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"GovContract","system",""),
 	REWARD_CONTRACT(ContractAddress.REWARD_CONTRACT_ADDRESS,"DelegateRewardPool","system","");
 
