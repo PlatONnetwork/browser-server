@@ -162,8 +162,6 @@ public class ProposalServiceImpl implements ProposalService {
 				} 
 				proposalDetailsResp.setCurrentValue(currentValue);
 				proposalDetailsResp.setNewValue(newValue);
-				proposalDetailsResp.setCurrentValue(proposal.getStaleValue());
-				proposalDetailsResp.setNewValue(proposal.getNewValue());
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getParamProposalSupportRate().toString());
 				proposalDetailsResp.setParticipationRate(blockChainConfig.getParamProposalVoteRate().toString());
 				break;

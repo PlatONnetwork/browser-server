@@ -220,8 +220,19 @@ public class TransactionSender {
     	BigDecimal delegate = Convert.toVon("10000", Unit.LAT);
         TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
-                BigInteger.valueOf(221),
-                delegate.toBigInteger()
+                BigInteger.valueOf(164),
+                delegate.toBigInteger(),new GasProvider() {
+        			
+        			@Override
+        			public BigInteger getGasPrice() {
+        				return BigInteger.valueOf(10000000000l);
+        			}
+        			
+        			@Override
+        			public BigInteger getGasLimit() {
+        				return BigInteger.valueOf(30000l);
+        			}
+        		}
         ).send();
         logger.debug("res:{}",res);
     }
