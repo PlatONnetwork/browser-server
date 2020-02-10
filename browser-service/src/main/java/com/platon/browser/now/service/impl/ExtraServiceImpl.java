@@ -95,8 +95,8 @@ public class ExtraServiceImpl implements ExtraService {
 			 * 百分比转换
 			 */
 			if(BrowserConst.EXTRA_PECENT_PARAM.contains(config.getName())) {
-				configDetail.setValue(new BigDecimal(config.getValue()).setScale(18).stripTrailingZeros().toPlainString());
-				configDetail.setInitValue(new BigDecimal(config.getInitValue()).setScale(18).stripTrailingZeros().toPlainString());
+				configDetail.setValue(new BigDecimal(config.getValue()).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				configDetail.setInitValue(new BigDecimal(config.getInitValue()).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 			}
 			switch (config.getModule()) {
 			case "staking":
