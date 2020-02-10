@@ -76,16 +76,16 @@ public class ExtraServiceImpl implements ExtraService {
 			 */
 			if(BrowserConst.EXTRA_LAT_PARAM.contains(config.getName())) {
 				if(StringUtils.isNotBlank(res2)) {
-					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(res3)) {
-					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(config.getValue())) {
-					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(config.getInitValue())) {
-					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.LAT).setScale(0,RoundingMode.HALF_UP).toString());
+					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 			} else {
 				configDetail.setStartValue(res2.trim());
@@ -95,8 +95,8 @@ public class ExtraServiceImpl implements ExtraService {
 			 * 百分比转换
 			 */
 			if(BrowserConst.EXTRA_PECENT_PARAM.contains(config.getName())) {
-				configDetail.setValue(new BigDecimal(config.getValue()).setScale(18).stripTrailingZeros().toPlainString());
-				configDetail.setInitValue(new BigDecimal(config.getInitValue()).setScale(18).stripTrailingZeros().toPlainString());
+				configDetail.setValue(new BigDecimal(config.getValue()).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+				configDetail.setInitValue(new BigDecimal(config.getInitValue()).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 			}
 			switch (config.getModule()) {
 			case "staking":
