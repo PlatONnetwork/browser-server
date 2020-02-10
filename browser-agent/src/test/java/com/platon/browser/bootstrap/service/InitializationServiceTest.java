@@ -8,8 +8,10 @@ import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
@@ -21,11 +23,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,9 +67,12 @@ public class InitializationServiceTest extends AgentTestBase {
     private ParamProposalCache paramProposalCache;
     @Mock
     private ParameterService parameterService;
+    @Mock
+    private GasEstimateLogMapper gasEstimateLogMapper;
+    @Mock
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Spy
     private InitializationService target;
-
     @Before
     public void setup() throws Exception {
         // 修改测试数据
@@ -91,6 +98,8 @@ public class InitializationServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
         ReflectionTestUtils.setField(target, "paramProposalCache", paramProposalCache);
         ReflectionTestUtils.setField(target, "parameterService", parameterService);
+        ReflectionTestUtils.setField(target, "gasEstimateLogMapper", gasEstimateLogMapper);
+        ReflectionTestUtils.setField(target, "gasEstimateEventPublisher", gasEstimateEventPublisher);
 
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);
@@ -99,6 +108,12 @@ public class InitializationServiceTest extends AgentTestBase {
         when(chainConfig.getDefaultStakingList()).thenReturn(stakingList);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(100000000));
         when(proposalMapper.selectByExample(any())).thenReturn(new ArrayList<>(proposalList));
+        List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
+        GasEstimateLog gel = new GasEstimateLog();
+        gel.setSeq(1l);
+        gel.setJson("[]");
+        gasEstimateLogs.add(gel);
+        when(gasEstimateLogMapper.selectByExample(any())).thenReturn(gasEstimateLogs);
     }
 
     @Test

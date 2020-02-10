@@ -147,9 +147,7 @@ public class OnElectionConverter {
 	/**
 	 * 不处罚节点只登记操作日志
 	 * @param block 区块
-	 * @param settleEpoch 所在结算周期
 	 * @param slashNodeList 被处罚的节点列表
-	 * @param isPrePreRound slashNodeList是否是上上个共识周期的低出块节点
 	 * @return
 	 */
 	private List<NodeOpt> slashOnlyOpt(Block block, List<Staking> slashNodeList,BigDecimal blockReward){

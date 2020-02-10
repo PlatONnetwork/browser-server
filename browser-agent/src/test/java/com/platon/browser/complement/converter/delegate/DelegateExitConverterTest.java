@@ -8,7 +8,9 @@ import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
@@ -49,10 +51,12 @@ public class DelegateExitConverterTest extends AgentTestBase {
     private BlockChainConfig chainConfig;
     @Mock
     private AddressCache addressCache;
+    @Mock
+    private GasEstimateMapper gasEstimateMapper;
+    @Mock
+    private CustomGasEstimateMapper customGasEstimateMapper;
     @Spy
     private DelegateExitConverter target;
-
-
 
     @Before
     public void setup() throws Exception{
@@ -61,6 +65,8 @@ public class DelegateExitConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"delegationMapper",delegationMapper);
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"addressCache",addressCache);
+        ReflectionTestUtils.setField(target,"gasEstimateMapper",gasEstimateMapper);
+        ReflectionTestUtils.setField(target,"customGasEstimateMapper",customGasEstimateMapper);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")

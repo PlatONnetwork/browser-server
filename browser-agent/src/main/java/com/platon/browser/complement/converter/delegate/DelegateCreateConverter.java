@@ -1,12 +1,10 @@
 package com.platon.browser.complement.converter.delegate;
 
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateCreateParam;
@@ -30,11 +28,7 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
     @Autowired
     private DelegateBusinessMapper delegateBusinessMapper;
     @Autowired
-    private GasEstimateEventPublisher gasEstimateEventPublisher;
-    @Autowired
     private CustomGasEstimateMapper customGasEstimateMapper;
-    @Autowired
-    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
     @Override
     public DelegateCreate convert(CollectionEvent event, Transaction tx) {

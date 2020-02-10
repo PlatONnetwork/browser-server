@@ -3,8 +3,10 @@ package com.platon.browser.complement.converter.epoch;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -32,6 +35,10 @@ public class OnSettleConverterTest extends AgentTestBase {
     private EpochBusinessMapper epochBusinessMapper;
     @Mock
     private StakingMapper stakingMapper;
+    @Mock
+    private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Mock
+    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
     @Spy
     private OnSettleConverter target;
@@ -41,6 +48,8 @@ public class OnSettleConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"epochBusinessMapper",epochBusinessMapper);
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
+        ReflectionTestUtils.setField(target,"gasEstimateEventPublisher",gasEstimateEventPublisher);
+        ReflectionTestUtils.setField(target,"customGasEstimateLogMapper",customGasEstimateLogMapper);
         when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(blockChainConfig.getUnStakeRefundSettlePeriodCount());
         when(chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat()).thenReturn(blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat());
         when(chainConfig.getSettlePeriodCountPerIssue()).thenReturn(blockChainConfig.getSettlePeriodCountPerIssue());

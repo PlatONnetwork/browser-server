@@ -5,6 +5,7 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
@@ -16,6 +17,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,8 @@ public class OnElectionConverterTest extends AgentTestBase {
     private EpochBusinessMapper epochBusinessMapper;
     @Mock
     private NetworkStatCache networkStatCache;
+    @Mock
+    private BlockChainConfig blockChainConfig;
 
     @Spy
     private OnElectionConverter target;
@@ -38,6 +42,7 @@ public class OnElectionConverterTest extends AgentTestBase {
     public void setup()throws Exception{
         ReflectionTestUtils.setField(target,"epochBusinessMapper",epochBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
+        ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
         List<Staking> list = new ArrayList <>();
         stakingList.forEach(item ->{
         	Staking staking = new Staking();
@@ -46,7 +51,11 @@ public class OnElectionConverterTest extends AgentTestBase {
             list.add(staking);
         });
         when(epochBusinessMapper.querySlashNode(any())).thenReturn(list);
+        when(epochBusinessMapper.getException(any())).thenReturn(list);
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);
+        when(blockChainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.TEN);
+        when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
+        when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
     }
 
     @Test
