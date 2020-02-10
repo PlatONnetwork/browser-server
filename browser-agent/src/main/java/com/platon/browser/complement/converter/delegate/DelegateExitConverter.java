@@ -3,15 +3,16 @@ package com.platon.browser.complement.converter.delegate;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.complement.bean.DelegateExitResult;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.DelegationKey;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.entity.GasEstimateKey;
 import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.GasEstimateMapper;
@@ -48,10 +49,6 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private DelegationMapper delegationMapper;
     @Autowired
     private AddressCache addressCache;
-    @Autowired
-    private GasEstimateEventPublisher gasEstimateEventPublisher;
-    @Autowired
-    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
     @Autowired
     private CustomGasEstimateMapper customGasEstimateMapper;
     @Autowired
@@ -99,6 +96,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .subtract(txParam.getAmount()).compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
         if(delegation.getDelegateReleased().compareTo(BigDecimal.ONE)>0){
             // 如果待提取金额大于0,则把节点置为已退出
+            // 如果delegateReleased>0, 证明对应的质押已经退出，同时对应的delegateHes和delegateLocked字段的金额都会被挪到delegateReleased字段
+            // 对应金额移动的逻辑请参考质押退出部分代码
             businessParam.setCodeNodeIsLeave(true);
         }
 
@@ -117,16 +116,16 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             // 如果不是全部退回
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.NO.getCode()) // 委托状态置为非历史
                     .setCodeRealAmount(txParam.getAmount()); // 真实退回金额=参数申请的金额
-            if(delegation.getDelegateReleased().compareTo(BigDecimal.ZERO)>0){
-                // 如果delegateReleased>0, 证明对应的质押已经退出，对应的delegateHes和delegateLocked字段的金额都会被挪到delegateReleased字段，
-                // 所以从此字段扣除申请金额
-                // 对应金额移动的逻辑请参考质押退出部分代码
-                businessParam.setCodeDelegateReleased(delegation.getDelegateReleased().subtract(txParam.getAmount()));
+            if(businessParam.isCodeNodeIsLeave()){
+                // 如果节点已经退出，则从此字段扣除真实扣除金额
+                // 设置扣除当前申请金额后，剩余的委托待赎回金额
+                businessParam.setCodeDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeRealAmount()));
             }else if(delegation.getDelegateHes().compareTo(txParam.getAmount())>=0) {
-                // 如果犹豫期金额大于申请的退出金额，则
+                // 如果犹豫期金额大于申请的退出金额，则从犹豫期金额扣除申请金额，且锁定委托金额不变
                 businessParam.setCodeDelegateHes(delegation.getDelegateHes().subtract(txParam.getAmount())) // 从犹豫期金额扣除申请金额
                     .setCodeDelegateLocked(delegation.getDelegateLocked()); // 锁定委托金额保持不变
             }else {
+                // 如果犹豫期金额比申请金额小，则需要扣干净犹豫期金额，再从锁定金额中扣除
                 businessParam.setCodeDelegateHes(BigDecimal.ZERO) // 犹豫期金额置0
                     .setCodeDelegateLocked(delegation.getDelegateLocked().add(delegation.getDelegateHes()).subtract(txParam.getAmount())); // 锁定金额+犹豫金额-申请金额
             }
@@ -135,7 +134,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         // 计算数据库中需要减除的金额 = 数据库空的金额-程序计算后应该剩余的金额
         businessParam.setCodeRmDelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
                 .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()))
-                .setCodeRmDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeDelegateReleased()));
+                // 节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
+                .setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
 
         // 补充真实退款金额
         txParam.setRealAmount(businessParam.getCodeRealAmount());

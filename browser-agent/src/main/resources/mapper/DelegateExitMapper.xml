@@ -19,7 +19,7 @@
     update `delegation` set
         `delegate_hes` = #{codeDelegateHes},
         `delegate_locked` = #{codeDelegateLocked},
-        `delegate_released` = #{codeRmDelegateReleased},
+        `delegate_released` = #{codeDelegateReleased},
         `is_history` = #{codeIsHistory}
     where `delegate_addr` = #{txFrom}
     and `node_id` = #{nodeId}
