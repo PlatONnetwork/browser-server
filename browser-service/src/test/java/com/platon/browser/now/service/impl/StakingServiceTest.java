@@ -2,9 +2,11 @@ package com.platon.browser.now.service.impl;
 
 
 import com.github.pagehelper.Page;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
@@ -22,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -47,11 +50,15 @@ public class StakingServiceTest {
     @Mock
     private NodeMapper nodeMapper;
     @Mock
+    private CustomNodeMapper customNodeMapper;
+    @Mock
     private NodeOptESRepository nodeOptESRepository;
     @Mock
     private I18nUtil i18n;
     @Mock
     private BlockChainConfig blockChainConfig;
+    @Mock
+    private PlatOnClient platonClient;
     @Spy
     private StakingServiceImpl target;
 
@@ -64,6 +71,8 @@ public class StakingServiceTest {
         ReflectionTestUtils.setField(target,"nodeOptESRepository",nodeOptESRepository);
         ReflectionTestUtils.setField(target,"i18n",i18n);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
+        ReflectionTestUtils.setField(target,"platonClient",platonClient);
+        ReflectionTestUtils.setField(target,"customNodeMapper",customNodeMapper);
 
         when(blockChainConfig.getMinProposalTextSupportRate()).thenReturn(BigDecimal.ONE);
         when(blockChainConfig.getMinProposalTextParticipationRate()).thenReturn(BigDecimal.ONE);
@@ -73,7 +82,7 @@ public class StakingServiceTest {
         when(blockChainConfig.getMinProposalCancelSupportRate()).thenReturn(BigDecimal.ONE);
         when(blockChainConfig.getMinProposalCancelParticipationRate()).thenReturn(BigDecimal.ONE);
     }
-    
+
     @Test
     public void test() throws IOException {
         HistoryStakingListReq req = new HistoryStakingListReq();
@@ -91,11 +100,14 @@ public class StakingServiceTest {
         staking.setIsSettle(2);
         staking.setDeleAnnualizedRate(9.3);
         staking.setTotalDeleReward(BigDecimal.ONE);
+        staking.setPreTotalDeleReward(BigDecimal.ONE);
         staking.setHaveDeleReward(BigDecimal.TEN);
         staking.setRewardPer(333);
         stakings.add(staking);
-        when(nodeMapper.selectByExample(any())).thenReturn(stakings);
 
+        Page<Node> nodeList = new Page<>();
+        nodeList.addAll(stakings);
+        when(customNodeMapper.selectListByExample(any())).thenReturn(nodeList);
         target.historyStakingList(req);
 
 

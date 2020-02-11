@@ -64,10 +64,10 @@ public class TransactionServiceTest {
 	private CommonService commonService;
 	@Mock
 	private RedisFactory redisFactory;
-	
+
 	@Spy
     private TransactionServiceImpl target;
-	
+
 	@Before
 	public void setup() {
 		ReflectionTestUtils.setField(target,"transactionESRepository",transactionESRepository);
@@ -83,6 +83,7 @@ public class TransactionServiceTest {
 		RedisCommands redisCommands = mock(RedisCommands.class);
 		when(redisFactory.createRedisCommands()).thenReturn(redisCommands);
 		when(redisCommands.get(anyString())).thenReturn("test");
+		when(commonService.getNodeName(any(),any())).thenReturn("test-name");
 	}
 
 	@Test
@@ -114,7 +115,7 @@ public class TransactionServiceTest {
 		when(transactionESRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(first);
 
 		transaction.setType(Transaction.TypeEnum.STAKE_MODIFY.getCode());
-		transaction.setInfo("{\"benefitAddress\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"details\":\"Node of CDM\",\"externalId\":\"5FD68B690010632B\",\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"cdm-004\",\"website\":\"WWW.CCC.COM\"}");
+		transaction.setInfo("{\"benefitAddress\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"details\":\"Node of CDM\",\"externalId\":\"5FD68B690010632B\",\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"cdm-004\",\"website\":\"WWW.CCC.COM\",\"DelegateRewardPer\":3}");
 		target.transactionDetails(req);
 
 		transaction.setType(Transaction.TypeEnum.STAKE_INCREASE.getCode());
@@ -171,7 +172,7 @@ public class TransactionServiceTest {
 
 		assertTrue(true);
 	}
-	
+
 	@Test
 	public void testQueryClaimByAddress() throws IOException {
 		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
@@ -197,7 +198,7 @@ public class TransactionServiceTest {
 		queryClaimByStakingReq.setPageNo(1);
 		queryClaimByStakingReq.setPageSize(10);
 		target.queryClaimByStaking(queryClaimByStakingReq);
-		
+
 		assertTrue(true);
 	}
 }
