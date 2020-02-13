@@ -33,13 +33,3 @@ mybatis:
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
 
-# mq设置：
-activemq:
-  brokenHost: ${brokenHost}
-  brokenPort: ${brokenPort}
-  system:
-    username: ${system.username}
-    password: ${system.password}
-  client:
-    username: ${client.username}
-    password: ${client.password}

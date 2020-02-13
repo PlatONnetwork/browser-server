@@ -12,7 +12,7 @@ CREATE TABLE `address` (
   `restricting_balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
   `staking_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '质押的金额(von)',
   `delegate_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '委托的金额(von)',
-  `redeemed_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '赎回中的金额(von):委托+质押',
+  `redeemed_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '赎回中的质押金额(von)',
   `tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT '交易总数',
   `transfer_qty` int(11) NOT NULL DEFAULT '0' COMMENT '转账交易总数',
   `delegate_qty` int(11) NOT NULL DEFAULT '0' COMMENT '委托交易总数',
@@ -21,12 +21,15 @@ CREATE TABLE `address` (
   `candidate_count` int(11) NOT NULL DEFAULT '0' COMMENT '已委托的验证人数',
   `delegate_hes` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '未锁定委托(von)',
   `delegate_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已锁定委托(von)',
-  `delegate_released` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已解锁委托(von)',
+  `delegate_released` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '待赎回委托金额(von,需要用户主动发起赎回交易)',
   `contract_name` varchar(125) NOT NULL DEFAULT '' COMMENT '合约名称',
   `contract_create` varchar(125) NOT NULL DEFAULT '' COMMENT '合约创建者地址',
   `contract_createHash` varchar(66) NOT NULL DEFAULT '0' COMMENT '创建合约的交易Hash',
+  `contract_destroy_hash` varchar(66) DEFAULT '' COMMENT '销毁合约的交易Hash',
+  `contract_bin` longtext COMMENT '合约bincode数据(通过web3j查询出来的合约代码)',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `have_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已领取委托奖励',
   PRIMARY KEY (`address`),
   KEY `type` (`type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -36,7 +39,7 @@ CREATE TABLE `address` (
 -- ----------------------------
 DROP TABLE IF EXISTS `config`;
 CREATE TABLE `config` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL ,
   `module` varchar(64) NOT NULL COMMENT '参数模块名',
   `name` varchar(128) NOT NULL COMMENT '参数名',
   `init_value` varchar(255) NOT NULL COMMENT '系统初始值',
@@ -68,6 +71,28 @@ CREATE TABLE `delegation` (
   PRIMARY KEY (`delegate_addr`,`staking_block_num`,`node_id`),
   KEY `node_id` (`node_id`) USING BTREE,
   KEY `staking_block_num` (`staking_block_num`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for gas_estimate
+-- ----------------------------
+DROP TABLE IF EXISTS `gas_estimate`;
+CREATE TABLE `gas_estimate` (
+  `addr` varchar(42) NOT NULL COMMENT '委托交易地址',
+  `node_id` varchar(130) NOT NULL COMMENT '节点id',
+  `sbn` bigint(20) NOT NULL COMMENT '最新的质押交易块高',
+  `epoch` bigint(20) NOT NULL DEFAULT '0' COMMENT '委托未计算周期',
+  PRIMARY KEY (`addr`,`node_id`,`sbn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for gas_estimate_log
+-- ----------------------------
+DROP TABLE IF EXISTS `gas_estimate_log`;
+CREATE TABLE `gas_estimate_log` (
+  `seq` bigint(20) NOT NULL COMMENT '序号',
+  `json` longtext NOT NULL,
+  PRIMARY KEY (`seq`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -170,11 +195,20 @@ CREATE TABLE `node` (
   `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `reward_per` int(10) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
+  `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '所有质押已领取委托奖励',
+  `pre_dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
+  `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
+  `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前质押总的委托奖励',
+  `pre_total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '所有历史质押记录总的委托奖励累计字段(在质押退出时会把total_dele_reward累加到此字段)',
+  `exception_status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因异常被惩罚。(例如在连续两个周期当选验证人，但在第一个周期出块率低)',
   PRIMARY KEY (`node_id`),
   KEY `node_id` (`node_id`) USING BTREE,
   KEY `status` (`status`),
   KEY `staking_addr` (`staking_addr`),
-  KEY `benefit_addr` (`benefit_addr`)
+  KEY `benefit_addr` (`benefit_addr`),
+  KEY `list` (`status`,`is_settle`,`big_version`,`total_value`,`staking_block_num`,`staking_tx_index`),
+  KEY `list2` (`big_version`,`total_value`,`staking_block_num`,`staking_tx_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -227,7 +261,7 @@ CREATE TABLE `rp_plan` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for slash
@@ -289,6 +323,12 @@ CREATE TABLE `staking` (
   `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `reward_per` int(10) NOT NULL COMMENT '委托奖励比例',
+  `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点当前质押已领取委托奖励',
+  `pre_dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
+  `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
+  `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点当前质押总的委托奖励',
+  `exception_status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因异常被惩罚。(例如在连续两个周期当选验证人，但在第一个周期出块率低)',
   PRIMARY KEY (`node_id`,`staking_block_num`),
   KEY `staking_addr` (`staking_addr`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -334,6 +374,11 @@ CREATE TABLE `staking_history` (
   `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `reward_per` int(10) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
+  `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已领取委托奖励(初始值等于前一条历史质押记录的【已领取委托奖励】)',
+  `pre_dele_annualized_rate` double(16,2) DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
+  `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
+  `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点总的委托奖励(前一条历史质押记录的【节点总的委托奖励】+ 当前质押实时查询出来的奖励)',
   PRIMARY KEY (`node_id`,`staking_block_num`),
   KEY `staking_addr` (`staking_addr`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -347,7 +392,7 @@ CREATE TABLE `tx_bak` (
   `hash` varchar(66) NOT NULL COMMENT '交易Hash',
   `num` bigint(20) NOT NULL COMMENT '区块号',
   `info` text COMMENT '交易信息',
-  PRIMARY KEY (`hash`),
+  PRIMARY KEY (`id`),
   KEY `block_number` (`num`) USING BTREE,
   KEY `id` (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -368,3 +413,10 @@ CREATE TABLE `vote` (
   PRIMARY KEY (`hash`),
   KEY `verifier` (`node_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE INDEX address ON rp_plan (address);
+CREATE INDEX proposal ON vote (proposal_hash,`timestamp`);
+CREATE INDEX proposalOp ON vote (proposal_hash,`option`,`timestamp`);
+CREATE INDEX staking ON delegation (is_history,`node_id`,`delegate_addr`,`sequence`,delegate_hes,delegate_locked,delegate_released);
+CREATE INDEX home ON node (status,`is_consensus`,`big_version`,`total_value`,`staking_block_num`,`staking_tx_index`);
