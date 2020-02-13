@@ -1,9 +1,11 @@
 package com.platon.browser.collection.queue.handler;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.queue.event.BlockEvent;
 import com.platon.browser.common.collection.dto.EpochMessage;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.publisher.CollectionEventPublisher;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Before;
@@ -12,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
@@ -31,6 +34,10 @@ import static org.mockito.Mockito.*;
 public class BlockEventHandlerTest extends AgentTestBase {
     @Mock
     private CollectionEventPublisher collectionEventPublisher;
+    @Mock
+    private PlatOnClient platOnClient;
+    @Mock
+    private AddressCache addressCache;
     @Spy
     private BlockEventHandler target;
 
@@ -39,6 +46,8 @@ public class BlockEventHandlerTest extends AgentTestBase {
     @Before
     public void setup() {
         ReflectionTestUtils.setField(target, "collectionEventPublisher", collectionEventPublisher);
+        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
+        ReflectionTestUtils.setField(target, "addressCache", addressCache);
         receiptResult = receiptResultList.get(0);
     }
 

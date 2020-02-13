@@ -3,7 +3,9 @@ package com.platon.browser.bootstrap.queue.handler;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
 import com.platon.browser.dao.entity.TxBak;
@@ -44,6 +46,10 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     private TxBakMapper txBakMapper;
     @Mock
     private NOptBakMapper nOptBakMapper;
+    @Mock
+    private PlatOnClient platOnClient;
+    @Mock
+    private AddressCache addressCache;
     @Spy
     private BootstrapEventHandler target;
     private ReceiptResult receiptResult;
@@ -54,6 +60,8 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "redisImportService", redisImportService);
         ReflectionTestUtils.setField(target, "txBakMapper", txBakMapper);
         ReflectionTestUtils.setField(target, "nOptBakMapper", nOptBakMapper);
+        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
+        ReflectionTestUtils.setField(target, "addressCache", addressCache);
         receiptResult = receiptResultList.get(0);
     }
 
