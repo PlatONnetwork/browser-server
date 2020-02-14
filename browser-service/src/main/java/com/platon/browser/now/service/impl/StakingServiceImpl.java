@@ -462,6 +462,7 @@ public class StakingServiceImpl implements StakingService {
 			rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
 		} catch (Exception e) {
 			logger.error("{}",e.getMessage());
+			rewards = new ArrayList<>();
 		}
 		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
