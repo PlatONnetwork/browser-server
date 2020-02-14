@@ -461,7 +461,8 @@ public class StakingServiceImpl implements StakingService {
 		try {
 			rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
 		} catch (Exception e) {
-			logger.error("{}",e.getMessage());
+			logger.error("获取奖励数据错误：{}",e.getMessage());
+			rewards = new ArrayList<>();
 		}
 		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
@@ -475,12 +476,14 @@ public class StakingServiceImpl implements StakingService {
 			/**
 			 * 循环获取奖励
 			 */
-			for(Reward reward: rewards) {
-				/**
-				 * 匹配成功之后设置金额
-				 */
-				if(delegationAddress.getNodeId().equals(HexTool.prefix(reward.getNodeId()))) {
-					byAddressResp.setDelegateClaim(new BigDecimal(reward.getReward()));
+			if(rewards != null) {
+				for(Reward reward: rewards) {
+					/**
+					 * 匹配成功之后设置金额
+					 */
+					if(delegationAddress.getNodeId().equals(HexTool.prefix(reward.getNodeId()))) {
+						byAddressResp.setDelegateClaim(new BigDecimal(reward.getReward()));
+					}
 				}
 			}
 			lists.add(byAddressResp);
