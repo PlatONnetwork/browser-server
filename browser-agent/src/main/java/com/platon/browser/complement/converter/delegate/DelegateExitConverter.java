@@ -93,7 +93,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         boolean isRefundAll = delegation.getDelegateHes() // 犹豫期金额
                 .add(delegation.getDelegateLocked()) // +锁定期金额
                 .add(delegation.getDelegateReleased()) // +待提取金额
-                .subtract(txParam.getAmount()).compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
+                .subtract(txParam.getAmount()).compareTo(BigDecimal.ZERO)==0; // 小于委托门槛
         if(delegation.getDelegateReleased().compareTo(BigDecimal.ONE)>0){
             // 如果待提取金额大于0,则把节点置为已退出
             // 如果delegateReleased>0, 证明对应的质押已经退出，同时对应的delegateHes和delegateLocked字段的金额都会被挪到delegateReleased字段
