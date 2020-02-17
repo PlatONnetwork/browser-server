@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
@@ -57,6 +58,7 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         		.stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
                 .delegateRewardPer(txParam.getDelegateRewardPer())
                 .build();
+        
 
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(txParam.getNodeId());
@@ -64,6 +66,12 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
         String preDelegateRewardRate = "0";
         if(staking!=null) preDelegateRewardRate = staking.getRewardPer().toString();
+        /**
+         * 如果为激励池合约则不修改收益地址
+         */
+        if(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress().equals(staking.getBenefitAddr())) {
+        	businessParam.setBenefitAddr(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress());
+        }
 
         stakeBusinessMapper.modify(businessParam);
         // 更新节点缓存

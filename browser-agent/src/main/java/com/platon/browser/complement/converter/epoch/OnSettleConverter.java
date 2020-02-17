@@ -101,7 +101,19 @@ public class OnSettleConverter {
             BigDecimal curTotalDelegateCost = BigDecimal.ZERO;
             if(node!=null) {
                 staking.setTotalDeleReward(new BigDecimal(node.getDelegateRewardTotal()));
-                curTotalDelegateCost = new BigDecimal(node.getDelegateTotal());
+                /**
+                 * 当底层查询出来的委托数为0时，则成本使用staking中的委托数
+                 */
+                if(BigInteger.ZERO.compareTo(node.getDelegateTotal()) == 0) {
+                	curTotalDelegateCost = staking.getStatDelegateHes().add(staking.getStatDelegateLocked());
+                } else {
+                	curTotalDelegateCost = new BigDecimal(node.getDelegateTotal());
+                }
+            } else {
+            	/**
+                 * 当底层查询出来的委托数为0时，则成本使用staking中的委托数
+                 */
+            	curTotalDelegateCost = staking.getStatDelegateHes().add(staking.getStatDelegateLocked());
             }
 
             // 计算节点质押年化率
