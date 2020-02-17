@@ -44,7 +44,7 @@
 		`stat_slash_multi_qty` = `stat_slash_multi_qty` +1,
 		`is_consensus` = 2,
 		`is_settle` = 2,
-		`exception_status`=4
+		`exception_status`=5
 	where `node_id` = #{nodeId};
 	/*3、更新质押*/
 	update `staking` set
@@ -59,7 +59,7 @@
 		`stat_delegate_locked` = 0,
 		`is_consensus` = 2,
 		`is_settle` = 2,
-		`exception_status`=4
+		`exception_status`=5
 	where `node_id` = #{nodeId}
 	and `staking_block_num` = #{stakingBlockNum};
 	/*4、添加处罚记录*/
