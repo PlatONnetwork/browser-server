@@ -133,9 +133,11 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         // 计算数据库中需要减除的金额 = 数据库空的金额-程序计算后应该剩余的金额
         businessParam.setCodeRmDelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
-                .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()))
-                // 节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
-                .setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
+                .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()));
+        if (txParam.getStakingBlockNum().compareTo(txParam.getStakingBlockNumNew()) != 0) {
+        	// 只有不是同一个节点的委托下，节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
+        	businessParam.setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
+		}
 
         // 补充真实退款金额
         txParam.setRealAmount(businessParam.getCodeRealAmount());
