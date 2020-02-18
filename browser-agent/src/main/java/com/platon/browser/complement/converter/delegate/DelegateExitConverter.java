@@ -13,9 +13,12 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationKey;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.entity.GasEstimateKey;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.GasEstimateMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -53,6 +56,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private CustomGasEstimateMapper customGasEstimateMapper;
     @Autowired
     private GasEstimateMapper gasEstimateMapper;
+    @Autowired
+    private NodeMapper nodeMapper;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -134,8 +139,10 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         // 计算数据库中需要减除的金额 = 数据库空的金额-程序计算后应该剩余的金额
         businessParam.setCodeRmDelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
                 .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()));
-        if (txParam.getStakingBlockNum().compareTo(txParam.getStakingBlockNumNew()) != 0) {
-        	// 只有不是同一个节点的委托下，节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
+        Node node = nodeMapper.selectByPrimaryKey(txParam.getNodeId());
+        if (txParam.getStakingBlockNum().compareTo(BigInteger.valueOf(node.getStakingBlockNum())) != 0
+        		|| StatusEnum.CANDIDATE.getCode() != node.getStatus().intValue()) {
+        	// 只有不是同一个质押区块的节点的委托下或者状态不为候选中的时候，节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
         	businessParam.setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
 		}
 

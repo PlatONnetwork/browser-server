@@ -4,7 +4,6 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.param.BusinessParam;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -82,7 +81,6 @@ public abstract class BusinessParamConverter<T> {
                     DelegateExitParam dep = (DelegateExitParam)txParam;
                     nodeItem = nodeCache.getNode(dep.getNodeId());
                     dep.setNodeName(nodeItem.getNodeName());
-                    dep.setStakingBlockNumNew(nodeItem.getStakingBlockNum());
                     break;
                 case PROPOSAL_TEXT: // 2000
                     ProposalTextParam ptp = (ProposalTextParam)txParam;
