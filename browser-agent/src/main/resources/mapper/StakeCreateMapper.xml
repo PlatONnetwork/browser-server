@@ -58,7 +58,8 @@
         `total_value`,
         `reward_per`,
         `have_dele_reward`,
-        `total_dele_reward`
+        `total_dele_reward`,
+        `exception_status`
     ) values (
         #{nodeId},
         #{stakingBlockNum},
@@ -77,7 +78,8 @@
         #{stakingHes},
         #{delegateRewardPer},
         0,
-        0
+        0,
+        1
     ) on duplicate key update
         `staking_block_num` =  #{stakingBlockNum},
         `staking_tx_index` = #{stakingTxIndex},
@@ -100,6 +102,7 @@
         `total_value` = `total_value` + #{stakingHes},
         `reward_per` = #{delegateRewardPer},
         `have_dele_reward` = `have_dele_reward`,
-        `total_dele_reward` = `total_dele_reward`;
+        `total_dele_reward` = `total_dele_reward`,
+        `exception_status` = 1;
   </update>
 </mapper>

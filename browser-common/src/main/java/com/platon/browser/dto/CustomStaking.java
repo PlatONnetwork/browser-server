@@ -189,6 +189,30 @@ public class CustomStaking extends Staking {
         public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
     }
 
+    public enum ExceptionStatusEnum {
+        NORMAL(1, "正常"),
+        LOW_RATE(2, "低出块异常"),
+        MULTI_SIGN(3, "双签异常"),
+        LOW_RATE_SLASHED(4, "因低出块率被惩罚"),
+        MULTI_SIGN_SLASHED(5, "因双签被处罚");
+
+        private int code;
+        private String desc;
+
+        ExceptionStatusEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
+
     @Override
     public boolean equals ( Object o ) {
         if (this == o) return true;
