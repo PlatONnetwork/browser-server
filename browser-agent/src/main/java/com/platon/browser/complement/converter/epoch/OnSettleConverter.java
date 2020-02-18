@@ -171,11 +171,11 @@ public class OnSettleConverter {
 
         // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
         if(settle.getCurVerifierSet().contains(staking.getNodeId())){
-            // 计算当前质押成本
+            // 计算当前质押成本 成本暂时不需要委托
             BigDecimal curSettleCost = staking.getStakingLocked() // 锁定的质押金
-                    .add(staking.getStakingHes()) // 犹豫期的质押金
-                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
-                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
+                    .add(staking.getStakingHes()); // 犹豫期的质押金
+//                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
+//                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
             CalculateUtils.rotateCost(ari.getStakeCost(),curSettleCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
         }
         // 如果当前节点在前一轮结算周期，则更新利润并计算年化率

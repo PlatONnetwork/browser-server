@@ -116,6 +116,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .setCodeDelegateHes(BigDecimal.ZERO) // 犹豫期金额置零
                 .setCodeDelegateLocked(BigDecimal.ZERO) // 锁定期金额置零
                 .setCodeDelegateReleased(BigDecimal.ZERO); // 已解锁金额置零
+            //交易实际值
+            txParam.setRealAmount(delegation.getDelegateHes().add(delegation.getDelegateLocked()).add(delegation.getDelegateReleased()));
         }
         if(!isRefundAll){
             // 如果不是全部退回
