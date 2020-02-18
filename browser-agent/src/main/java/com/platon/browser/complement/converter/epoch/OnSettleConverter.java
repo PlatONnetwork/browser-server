@@ -191,8 +191,11 @@ public class OnSettleConverter {
                 ari.setStakeProfit(profits);
             }
             if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
+            // 对委托收益进行扣减
+            BigDecimal curSettleDelegateProfit = staking.getTotalDeleReward();
             // 对超出数量的收益轮换
-            BigDecimal curSettleStakeProfit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue());
+            BigDecimal curSettleStakeProfit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue())
+            		.subtract(curSettleDelegateProfit);
             CalculateUtils.rotateProfit(ari.getStakeProfit(),curSettleStakeProfit,BigInteger.valueOf(settle.getSettingEpoch()-1L),chainConfig);
             BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari.getStakeProfit(),ari.getStakeCost(),chainConfig);
             // 设置年化率
