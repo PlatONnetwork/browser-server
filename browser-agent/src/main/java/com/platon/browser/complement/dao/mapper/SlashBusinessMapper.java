@@ -24,7 +24,7 @@ public interface SlashBusinessMapper {
      * 把节点标记为双签异常
      * @return
      */
-    void setException(@Param("list") List<String> nodeIdList);
+    void setException(@Param("nodeId") String nodeId,@Param("stakingBlockNum") long blockNum);
 
     /**
      * 查询标记为双签异常的节点

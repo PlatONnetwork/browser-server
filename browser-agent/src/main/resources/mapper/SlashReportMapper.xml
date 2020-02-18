@@ -5,10 +5,10 @@
 		/*把节点设置为双签异常*/
 		/*2、更新质押*/
 		update `staking` set `exception_status` = 3
-		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
+		where `node_id`=#{nodeId} and `staking_block_num`=#{stakingBlockNum};
 		/*3、更新节点*/
 		update `node` set `exception_status` = 3
-		where `node_id` in  <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
+		where `node_id`=#{nodeId} and `staking_block_num`=#{stakingBlockNum};
 	</update>
 
 	<select id="getException" resultType="com.platon.browser.dao.entity.Staking">

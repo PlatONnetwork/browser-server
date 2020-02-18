@@ -47,7 +47,8 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         // 举报成功，先把节点设置为异常，后续处罚操作在共识周期切换时执行
         List<String> nodeIdList = new ArrayList<>();
         nodeIdList.add(txParam.getVerify());
-        slashBusinessMapper.setException(nodeIdList);
+
+        slashBusinessMapper.setException(txParam.getVerify(),txParam.getStakingBlockNum().longValue());
 
         Report businessParam= Report.builder()
         		.slashData(txParam.getData())
