@@ -143,7 +143,12 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         if (txParam.getStakingBlockNum().compareTo(BigInteger.valueOf(node.getStakingBlockNum())) != 0
         		|| StatusEnum.CANDIDATE.getCode() != node.getStatus().intValue()) {
         	// 只有不是同一个质押区块的节点的委托下或者状态不为候选中的时候，节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
-        	businessParam.setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
+
+            // 待赎回委托字段可减实际申请金额的情况：
+            // 1、如果当前解委托的目标质押所对应的质押块号，不等于同一节点的最新质押区块号；
+            // 2、节点对应的状态不是候选中的时候；
+
+            businessParam.setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
 		}
 
         // 补充真实退款金额
