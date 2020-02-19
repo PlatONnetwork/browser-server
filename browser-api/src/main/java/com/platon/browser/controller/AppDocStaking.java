@@ -44,6 +44,7 @@ public interface AppDocStaking {
      *    "data":{
      *       "stakingDelegationValue":"", //质押委托总数
      *       "stakingValue":"",        //质押总数
+     *       "delegationValue"":"",        //委托总数
      *       "issueValue":"",          //发行量
      *       "blockReward":"",         //当前的出块奖励
      *       "stakingReward":"",       //当前的质押奖励
