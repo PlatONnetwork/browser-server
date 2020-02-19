@@ -16,6 +16,7 @@ public class StakingStatisticNewResp {
 
 	private BigDecimal stakingDelegationValue; // 质押委托总数
 	private BigDecimal stakingValue; // 质押总数
+	private BigDecimal delegationValue; // 质押委托总数
 	private BigDecimal issueValue; // 发行量
 	private BigDecimal blockReward; // 当前的出块奖励
 	private BigDecimal stakingReward; // 当前的质押奖励
@@ -81,6 +82,13 @@ public class StakingStatisticNewResp {
 	}
 	public void setNextSetting(Long nextSetting) {
 		this.nextSetting = nextSetting;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public BigDecimal getDelegationValue() {
+		return delegationValue;
+	}
+	public void setDelegationValue(BigDecimal delegationValue) {
+		this.delegationValue = delegationValue;
 	}
 	
 }

@@ -91,6 +91,8 @@ public class StakingServiceImpl implements StakingService {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
+			stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue()
+					.subtract(networkStatRedis.getStakingReward()));
 			//实时除以现有的结算周期人数
 			Integer count= customStakingMapper.selectCountByActive();
 			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
