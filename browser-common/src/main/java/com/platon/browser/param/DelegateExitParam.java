@@ -51,8 +51,4 @@ public class DelegateExitParam extends TxParam{
      * 被质押节点的名称(有长度限制，表示该节点的名称)
      */
     private String nodeName;
-    /**
-     * node的最新区块号
-     */
-    private BigInteger stakingBlockNumNew;
 }
