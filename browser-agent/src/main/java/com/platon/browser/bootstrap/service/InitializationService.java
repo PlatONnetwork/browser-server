@@ -121,11 +121,17 @@ public class InitializationService {
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
         nodeCache.init(nodeList);
 
-        // 初始化普通合约地址
+        // 初始化EVM合约地址缓存，用于后续交易的类型判断（调用EVM合约）
         AddressExample addressExample = new AddressExample();
-        addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.CONTRACT.getCode());
+        addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.EVM_CONTRACT.getCode());
         List<Address> addressList = addressMapper.selectByExample(addressExample);
-        addressCache.initGeneralContractAddressCache(addressList);
+        addressCache.initEvmContractAddressCache(addressList);
+
+        // 初始化WASM合约地址缓存，用于后续交易的类型判断（调用WASM合约）
+        addressExample = new AddressExample();
+        addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.WASM_CONTRACT.getCode());
+        addressList = addressMapper.selectByExample(addressExample);
+        addressCache.iniWasmContractAddressCache(addressList);
 
         // 初始化网络缓存
         networkStatCache.init(networkStat);

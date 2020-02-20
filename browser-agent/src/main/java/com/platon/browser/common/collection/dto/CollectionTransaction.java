@@ -2,6 +2,7 @@ package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -83,7 +84,7 @@ public class CollectionTransaction extends Transaction {
         // tx info信息
         String info = "{}";
     }
-    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient, Set<String> generalContractAddressCache) throws BeanCreateOrUpdateException, IOException {
+    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient, AddressCache addressCache) throws BeanCreateOrUpdateException {
 
 
         //============需要通过解码补充的交易信息============
@@ -99,14 +100,14 @@ public class CollectionTransaction extends Transaction {
                 // 把回执里的合约地址回填到交易的to字段
                 setTo(receipt.getContractAddress());
             }else{
-                if(generalContractAddressCache.contains(getTo())&&inputWithoutPrefix.length()>=8){
-                    // evm or wasm 合约调用
-                    resolveGeneralContractInvokeTxComplementInfo(platOnClient,ci);
+                if(addressCache.isGeneralContractAddress(getTo())&&inputWithoutPrefix.length()>=8){
+                    // 如果是普通合约调用（EVM||WASM）
+                    resolveGeneralContractInvokeTxComplementInfo(platOnClient,ci,addressCache);
                 }else {
                     BigInteger value = StringUtils.isNotBlank(getValue())?new BigInteger(getValue()):BigInteger.ZERO;
                     if(value.compareTo(BigInteger.ZERO)>=0){
                         // 如果输入为空且value大于0，则是普通转账
-                        resolveGeneralTransferTxComplementInfo(ci,generalContractAddressCache);
+                        resolveGeneralTransferTxComplementInfo(ci,addressCache);
                     }
                 }
             }
@@ -224,7 +225,7 @@ public class CollectionTransaction extends Transaction {
             decodedResult = InnerContractDecodeUtil.decode(getInput(),logs);
             ci.type = decodedResult.getTypeEnum().getCode();
             ci.info = decodedResult.getParam().toJSONString();
-            ci.toType = ToTypeEnum.CONTRACT.getCode();
+            ci.toType = ToTypeEnum.INNER_CONTRACT.getCode();
             ci.contractType = ContractTypeEnum.INNER.getCode();
             ci.method = null;
             ci.binCode = null;
@@ -259,10 +260,19 @@ public class CollectionTransaction extends Transaction {
         // TODO: 解析出调用合约方法名
         String txInput = getInput();
         //ci.method = getGeneralContractMethod();
-        ci.toType = ToTypeEnum.CONTRACT.getCode();
+
         ci.type = TypeEnum.CONTRACT_CREATE.getCode();
-        // 现阶段默认只有EVM类型的合约
-        ci.contractType = ContractTypeEnum.EVM.getCode();
+
+        // TODO:解码合约创建交易前缀，用于区分EVM||WASM
+
+        /*if(){
+            ci.toType = ToTypeEnum.EVM_CONTRACT.getCode();
+            ci.contractType = ContractTypeEnum.EVM.getCode();
+        }
+        if(){
+            ci.toType = ToTypeEnum.WASM_CONTRACT.getCode();
+            ci.contractType = ContractTypeEnum.WASM.getCode();
+        }*/
     }
 
     /**
@@ -270,23 +280,28 @@ public class CollectionTransaction extends Transaction {
      * @param ci
      * @throws IOException
      */
-    private void resolveGeneralContractInvokeTxComplementInfo(PlatOnClient platOnClient,ComplementInfo ci) throws BeanCreateOrUpdateException {
+    private void resolveGeneralContractInvokeTxComplementInfo(PlatOnClient platOnClient,ComplementInfo ci,AddressCache addressCache) throws BeanCreateOrUpdateException {
         ci.info="";
         ci.binCode = getContractBinCode(platOnClient,getTo());
         // TODO: 解析出调用合约方法名
         String txInput = getInput();
 //        ci.method = getGeneralContractMethod();
-        ci.toType = ToTypeEnum.CONTRACT.getCode();
+        if(addressCache.isEvmContractAddress(getTo())){
+            ci.toType = ToTypeEnum.EVM_CONTRACT.getCode();
+            ci.contractType = ContractTypeEnum.EVM.getCode();
+        }
+        if(addressCache.isWasmContractAddress(getTo())){
+            ci.toType = ToTypeEnum.WASM_CONTRACT.getCode();
+            ci.contractType = ContractTypeEnum.WASM.getCode();
+        }
         ci.type = TypeEnum.CONTRACT_EXEC.getCode();
-        // 现阶段默认只有EVM类型的合约
-        ci.contractType = ContractTypeEnum.EVM.getCode();
     }
 
     /**
      * 发起普通交易,解析补充信息
      * @param ci
      */
-    private void resolveGeneralTransferTxComplementInfo(ComplementInfo ci,Set<String> generalContractAddressCache){
+    private void resolveGeneralTransferTxComplementInfo(ComplementInfo ci,AddressCache addressCache){
         ci.type = TypeEnum.TRANSFER.getCode();
         ci.contractType = null;
         ci.method = null;
@@ -294,12 +309,15 @@ public class CollectionTransaction extends Transaction {
         ci.binCode = null;
         // 需要根据交易的to地址是否是什么类型的地址
         if(InnerContractAddrEnum.getAddresses().contains(getTo())) {
-        	ci.toType = ToTypeEnum.CONTRACT.getCode();
+        	ci.toType = ToTypeEnum.INNER_CONTRACT.getCode();
         	ci.contractType = ContractTypeEnum.INNER.getCode();
         	ci.method = ContractDescEnum.getMap().get(getTo()).getContractName();
-        } else if (generalContractAddressCache.contains(getTo())) {
-        	ci.toType = ToTypeEnum.CONTRACT.getCode();
+        } else if (addressCache.isEvmContractAddress(getTo())) {
+        	ci.toType = ToTypeEnum.EVM_CONTRACT.getCode();
         	ci.contractType = ContractTypeEnum.EVM.getCode();
+        } else if (addressCache.isWasmContractAddress(getTo())) {
+            ci.toType = ToTypeEnum.WASM_CONTRACT.getCode();
+            ci.contractType = ContractTypeEnum.WASM.getCode();
         } else {
         	ci.toType = ToTypeEnum.ACCOUNT.getCode();
         }

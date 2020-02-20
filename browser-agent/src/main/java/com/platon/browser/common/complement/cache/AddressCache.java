@@ -6,6 +6,7 @@ import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
+import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
 import org.springframework.stereotype.Component;
@@ -18,14 +19,28 @@ import java.util.*;
  */
 @Component
 public class AddressCache {
+	//当前地址缓存，此缓存会在StatisticsAddressConverter执行完业务逻辑后被清除，
+	//所以这是上一次执行StatisticsAddressConverter业务时到当前的累计地址缓存，并不是全部的
     private Map<String,Address> addressMap = new HashMap<>();
-	/**
-	 * 普通合约地址缓存
-	 */
-	private Set<String> generalContractAddressCache = new HashSet<>();
-	public Set<String> getGeneralContractAddressCache(){return generalContractAddressCache;}
+	//全量EVM合约地址缓存
+	private Set<String> evmContractAddressCache = new HashSet<>();
+	public Set<String> getEvmContractAddressCache(){return evmContractAddressCache;}
+	public boolean isEvmContractAddress(String address){
+		return evmContractAddressCache.contains(address);
+	}
+	//全量WASM合约地址缓存
+	private Set<String> wasmContractAddressCache = new HashSet<>();
+	public Set<String> getWasmContractAddressCache(){return wasmContractAddressCache;}
+	public boolean isWasmContractAddress(String address){
+		return wasmContractAddressCache.contains(address);
+	}
+	//判断是不是普通合约（EVM||WASM）地址
 	public boolean isGeneralContractAddress(String address){
-		return generalContractAddressCache.contains(address);
+		boolean bool = evmContractAddressCache.contains(address);
+		if(!bool){
+			bool = wasmContractAddressCache.contains(address);
+		}
+		return bool;
 	}
     
     public void update(Transaction tx) {
@@ -82,9 +97,15 @@ public class AddressCache {
 			address.setContractCreatehash(tx.getHash());
 			address.setContractCreate(tx.getFrom());
 			// 覆盖createDefaultAddress()中设置的值
-			address.setType(AddressTypeEnum.CONTRACT.getCode());
+			if(ContractTypeEnum.EVM.getCode()==tx.getContractType()){
+				address.setType(AddressTypeEnum.EVM_CONTRACT.getCode());
+				evmContractAddressCache.add(addr);
+			}
+			if(ContractTypeEnum.WASM.getCode()==tx.getContractType()){
+				address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
+				wasmContractAddressCache.add(addr);
+			}
 			address.setContractBin(tx.getBin());
-			generalContractAddressCache.add(addr);
 			break;
 		    default:
 		}
@@ -123,15 +144,29 @@ public class AddressCache {
     }
 
 	/**
-	 * 初始化
+	 * 初始化EVM地址缓存
 	 * @param addressList 地址实体列表
 	 */
-	public void initGeneralContractAddressCache(List<Address> addressList) {
+	public void initEvmContractAddressCache(List<Address> addressList) {
 		if(addressList.isEmpty()) return;
-		generalContractAddressCache.clear();
+		evmContractAddressCache.clear();
 		addressList.forEach(address -> {
-			if(address.getType()==AddressTypeEnum.CONTRACT.getCode()){
-				generalContractAddressCache.add(address.getAddress());
+			if(address.getType()==AddressTypeEnum.EVM_CONTRACT.getCode()){
+				evmContractAddressCache.add(address.getAddress());
+			}
+		});
+	}
+
+	/**
+	 * 初始化WASM地址缓存
+	 * @param addressList 地址实体列表
+	 */
+	public void iniWasmContractAddressCache(List<Address> addressList) {
+		if(addressList.isEmpty()) return;
+		wasmContractAddressCache.clear();
+		addressList.forEach(address -> {
+			if(address.getType()==AddressTypeEnum.WASM_CONTRACT.getCode()){
+				wasmContractAddressCache.add(address.getAddress());
 			}
 		});
 	}

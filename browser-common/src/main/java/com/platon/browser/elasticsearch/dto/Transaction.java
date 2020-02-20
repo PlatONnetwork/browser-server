@@ -121,12 +121,13 @@ public class Transaction {
     }
 
     /**
-     * 交易接收者类型(to是合约还是账户):1合约,2账户
+     * 交易接收者类型(to是合约还是账户):地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约
      */
     public enum ToTypeEnum{
-        CONTRACT(1, "合约"),
-        ACCOUNT(2, "账户")
-        ;
+        ACCOUNT(1, "账户"),
+        INNER_CONTRACT(2, "内置合约"),
+        EVM_CONTRACT(3, "EVM合约"),
+        WASM_CONTRACT(4, "WASM合约");
         private int code;
         private String desc;
         ToTypeEnum(int code, String desc) {

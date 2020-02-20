@@ -41,7 +41,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient,addressCache.getGeneralContractAddressCache());
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient,addressCache);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
 
             collectionEventPublisher.publish(block,block.getTransactions(),event.getEpochMessage());

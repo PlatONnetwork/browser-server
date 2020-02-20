@@ -6,8 +6,10 @@ import java.util.Map;
 
 public enum AddressTypeEnum {
     ACCOUNT(1, "账户"),
-    CONTRACT(2, "合约"),
-    INNER_CONTRACT(3, "内置合约");
+    INNER_CONTRACT(2, "内置合约"),
+    EVM_CONTRACT(3, "EVM合约"),
+    WASM_CONTRACT(4, "WASM合约");
+
 	private int code;
     private String desc;
     AddressTypeEnum ( int code, String desc) {

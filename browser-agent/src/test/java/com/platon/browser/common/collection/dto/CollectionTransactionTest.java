@@ -4,6 +4,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -31,6 +32,8 @@ public class CollectionTransactionTest extends AgentTestBase {
 
     @Mock
     protected PlatOnClient client;
+    @Mock
+    protected AddressCache addressCache;
 
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException, BeanCreateOrUpdateException, IOException {
@@ -53,7 +56,7 @@ public class CollectionTransactionTest extends AgentTestBase {
         Receipt receipt1 = receipt.getResult().get(0);
 
         Set<String> generalContractAddressCache = InnerContractAddrEnum.getAddresses();
-        transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,client,generalContractAddressCache);
+        transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,client,addressCache);
 
         assertTrue(true);
     }
