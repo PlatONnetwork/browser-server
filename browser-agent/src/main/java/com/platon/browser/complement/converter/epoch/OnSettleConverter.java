@@ -111,7 +111,7 @@ public class OnSettleConverter {
                  * 当底层查询出来的委托数为0时，则成本使用staking中的委托数
                  */
                 if(BigInteger.ZERO.compareTo(node.getDelegateTotal()) == 0) {
-                	curTotalDelegateCost = staking.getStatDelegateHes().add(staking.getStatDelegateLocked());
+                	curTotalDelegateCost = staking.getStatDelegateLocked();
                 } else {
                 	curTotalDelegateCost = new BigDecimal(node.getDelegateTotal());
                 }
@@ -119,7 +119,7 @@ public class OnSettleConverter {
             	/**
                  * 当底层查询出来的委托数为0时，则成本使用staking中的委托数
                  */
-            	curTotalDelegateCost = staking.getStatDelegateHes().add(staking.getStatDelegateLocked());
+            	curTotalDelegateCost = staking.getStatDelegateLocked();
             }
 
             // 计算节点质押年化率
