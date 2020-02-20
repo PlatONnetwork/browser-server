@@ -161,7 +161,7 @@ public class AddressCache {
 	 * 初始化WASM地址缓存
 	 * @param addressList 地址实体列表
 	 */
-	public void iniWasmContractAddressCache(List<Address> addressList) {
+	public void initWasmContractAddressCache(List<Address> addressList) {
 		if(addressList.isEmpty()) return;
 		wasmContractAddressCache.clear();
 		addressList.forEach(address -> {

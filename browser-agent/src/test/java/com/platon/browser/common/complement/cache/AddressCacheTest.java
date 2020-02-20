@@ -19,7 +19,7 @@ public class AddressCacheTest extends AgentTestBase {
     @Test
     public void test(){
         addressCache.initEvmContractAddressCache(new ArrayList<>(addressList));
-        addressCache.iniWasmContractAddressCache(new ArrayList<>(addressList));
+        addressCache.initWasmContractAddressCache(new ArrayList<>(addressList));
         addressCache.initOnFirstStart();
         addressCache.update(transactionList.get(0));
         addressCache.getAll();

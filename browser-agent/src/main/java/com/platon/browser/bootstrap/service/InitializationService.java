@@ -131,7 +131,7 @@ public class InitializationService {
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.WASM_CONTRACT.getCode());
         addressList = addressMapper.selectByExample(addressExample);
-        addressCache.iniWasmContractAddressCache(addressList);
+        addressCache.initWasmContractAddressCache(addressList);
 
         // 初始化网络缓存
         networkStatCache.init(networkStat);
