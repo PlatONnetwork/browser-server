@@ -1,18 +1,14 @@
 package com.platon.browser.util.decode.generalcontract;
 
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.param.OthersTxParam;
-import com.platon.browser.util.decode.innercontract.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
-import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
