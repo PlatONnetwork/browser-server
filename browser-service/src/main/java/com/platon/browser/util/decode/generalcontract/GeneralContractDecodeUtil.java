@@ -31,7 +31,7 @@ public class GeneralContractDecodeUtil {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
                 List <RlpType> rlpTypes = rlpList.getValues();
                 if(rlpTypes.size() >= 4) {
-                    // WASM合约创建交易的input数据前四个节点是MAGIC_NUM
+                    // WASM合约创建交易的input数据前四个字节是MAGIC_NUM
                     RlpString mn0 = (RlpString)rlpTypes.get(0);
                     RlpString mn1 = (RlpString)rlpTypes.get(1);
                     RlpString mn2 = (RlpString)rlpTypes.get(2);
