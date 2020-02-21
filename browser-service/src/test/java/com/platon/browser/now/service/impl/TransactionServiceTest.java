@@ -99,7 +99,7 @@ public class TransactionServiceTest {
 		transaction.setGasUsed("3333");
 		transaction.setId(333L);
 		transaction.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());
-		transaction.setType(Transaction.TypeEnum.CONTRACT_CREATE.getCode());
+		transaction.setType(Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode());
 		transaction.setHash("0xddd");
 		transaction.setTime(new Date());
 		transaction.setInfo("{\"endVotingRound\":10,\"newVersion\":2064,\"nodeName\":\"sansan3.3.3.3\",\"pIDID\":\"S8\",\"verifier\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\"}");

@@ -10,6 +10,8 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
+import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
+import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
@@ -257,22 +259,17 @@ public class CollectionTransaction extends Transaction {
     private void resolveGeneralContractCreateTxComplementInfo(String contractAddress, PlatOnClient platOnClient, ComplementInfo ci) throws BeanCreateOrUpdateException {
         ci.info="";
         ci.binCode = getContractBinCode(platOnClient,contractAddress);
-        // TODO: 解析出调用合约方法名
-        String txInput = getInput();
-        //ci.method = getGeneralContractMethod();
-
-        ci.type = TypeEnum.CONTRACT_CREATE.getCode();
-
-        // TODO:解码合约创建交易前缀，用于区分EVM||WASM
-
-        /*if(){
+        //解码合约创建交易前缀，用于区分EVM||WASM
+        GeneralContractDecodedResult decodedResult = GeneralContractDecodeUtil.decode(getInput());
+        ci.type = decodedResult.getTypeEnum().getCode();
+        if(decodedResult.getTypeEnum()==TypeEnum.EVM_CONTRACT_CREATE){
             ci.toType = ToTypeEnum.EVM_CONTRACT.getCode();
             ci.contractType = ContractTypeEnum.EVM.getCode();
         }
-        if(){
+        if(decodedResult.getTypeEnum()==TypeEnum.WASM_CONTRACT_CREATE){
             ci.toType = ToTypeEnum.WASM_CONTRACT.getCode();
             ci.contractType = ContractTypeEnum.WASM.getCode();
-        }*/
+        }
     }
 
     /**

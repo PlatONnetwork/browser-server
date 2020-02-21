@@ -631,7 +631,8 @@ public class TransactionServiceImpl implements TransactionService {
 						/**
 						 * 合约创建
 						 */
-					case CONTRACT_CREATE:
+					case EVM_CONTRACT_CREATE:
+					case WASM_CONTRACT_CREATE:
 						/**
 						 * to地址设置为合约地址
 						 */

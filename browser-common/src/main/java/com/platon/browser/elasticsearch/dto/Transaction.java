@@ -52,8 +52,9 @@ public class Transaction {
 
     public enum TypeEnum {
         TRANSFER(0, "转账"),
-        CONTRACT_CREATE(1,"合约发布(合约创建)"),
+        EVM_CONTRACT_CREATE(1,"EVM合约发布(合约创建)"),
         CONTRACT_EXEC(2,"合约调用(合约执行)"),
+        WASM_CONTRACT_CREATE(3,"WASM合约发布(合约创建)"),
         OTHERS(4,"其他"),
         MPC(5,"MPC交易"),
         STAKE_CREATE(1000,"发起质押(创建验证人)"),

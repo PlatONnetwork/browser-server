@@ -92,19 +92,22 @@ public class AddressCache {
 		case VERSION_DECLARE:// 版本声明
 		   	 address.setProposalQty(address.getProposalQty()+1);
 		   	 break;
-		case CONTRACT_CREATE:
-			// 如果地址是创建合约的回执里返回的合约地址
+		case EVM_CONTRACT_CREATE:
+			// 如果地址是EVM合约创建的回执里返回的合约地址
 			address.setContractCreatehash(tx.getHash());
 			address.setContractCreate(tx.getFrom());
 			// 覆盖createDefaultAddress()中设置的值
-			if(ContractTypeEnum.EVM.getCode()==tx.getContractType()){
-				address.setType(AddressTypeEnum.EVM_CONTRACT.getCode());
-				evmContractAddressCache.add(addr);
-			}
-			if(ContractTypeEnum.WASM.getCode()==tx.getContractType()){
-				address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
-				wasmContractAddressCache.add(addr);
-			}
+			address.setType(AddressTypeEnum.EVM_CONTRACT.getCode());
+			evmContractAddressCache.add(addr);
+			address.setContractBin(tx.getBin());
+			break;
+		case WASM_CONTRACT_CREATE:
+			// 如果地址是WASM合约创建的回执里返回的合约地址
+			address.setContractCreatehash(tx.getHash());
+			address.setContractCreate(tx.getFrom());
+			// 覆盖createDefaultAddress()中设置的值
+			address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
+			wasmContractAddressCache.add(addr);
 			address.setContractBin(tx.getBin());
 			break;
 		    default:
