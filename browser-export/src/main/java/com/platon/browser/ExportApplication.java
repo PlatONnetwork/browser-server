@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 @MapperScan(basePackages = "com.platon.browser.dao.mapper")
 public class ExportApplication implements ApplicationRunner {
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(7);
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 	@Autowired
 	private ExportService exportService;
 
@@ -30,21 +30,29 @@ public class ExportApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		EXECUTOR_SERVICE.submit(() -> exportService.exportTxHash());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportAddress());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportNodeId());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportRpPlanAddress());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationInfo());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportProposal());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportVote());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportTxHash());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportAddress());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportNodeId());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportRpPlanAddress());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationInfo());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportProposal());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportVote());
+//		while (
+//			!ExportService.isTxHashExportDone() ||
+//			!ExportService.isAddressExportDone() ||
+//			!ExportService.isRpplanExportDone() ||
+//			!ExportService.isDelegationExportDone()||
+//			!ExportService.isNodeExportDone()||
+//			!ExportService.isProposalExportDone()||
+//			!ExportService.isVoteExportDone()
+//		) {
+//			SleepUtil.sleep(1L);
+//		}
+		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationReward());
+		EXECUTOR_SERVICE.submit(() -> exportService.exportAllTx());
 		while (
-			!ExportService.isTxHashExportDone() ||
-			!ExportService.isAddressExportDone() ||
-			!ExportService.isRpplanExportDone() ||
-			!ExportService.isDelegationExportDone()||
-			!ExportService.isNodeExportDone()||
-			!ExportService.isProposalExportDone()||
-			!ExportService.isVoteExportDone()
+			!ExportService.isDelegationRewardExportDone() ||
+			!ExportService.isTxInfoExportDone()
 		) {
 			SleepUtil.sleep(1L);
 		}
