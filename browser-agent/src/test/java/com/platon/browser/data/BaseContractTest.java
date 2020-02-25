@@ -13,8 +13,8 @@ import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.GasProvider;
 
 public abstract class BaseContractTest {
-	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4700000);
-	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(1000000000L);
+	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(47000000);
+	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(1000000000000L);
 
 	protected static final long chainId = 100L;
 	protected static final String nodeUrl = "http://192.168.112.171:6789";

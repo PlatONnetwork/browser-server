@@ -22,6 +22,8 @@ import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.DelegationReward.Extra;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
+import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
+import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
@@ -180,7 +182,14 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setActualTxCost(new BigDecimal(transaction.getCost()));
             transactionListResp.setBlockNumber(transaction.getNum());
             transactionListResp.setReceiveType(String.valueOf(transaction.getToType()));
-            transactionListResp.setTxType(String.valueOf(transaction.getType()));
+            /**
+             * wasm也是合约创建
+             */
+            if(transaction.getType() == TypeEnum.WASM_CONTRACT_CREATE.getCode()) {
+            	transactionListResp.setTxType(String.valueOf(TypeEnum.EVM_CONTRACT_CREATE.getCode()));
+            } else {
+            	transactionListResp.setTxType(String.valueOf(transaction.getType()));
+            }            
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
             transactionListResp.setValue(new BigDecimal(transaction.getValue()));
@@ -297,14 +306,29 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setBlockNumber(transaction.getNum());
     		resp.setGasLimit(transaction.getGasLimit());
     		resp.setGasUsed(transaction.getGasUsed());
-    		resp.setTxType(String.valueOf(transaction.getType()));
+    		/**
+             * wasm也是合约创建
+             */
+            if(transaction.getType() == TypeEnum.WASM_CONTRACT_CREATE.getCode()) {
+            	resp.setTxType(String.valueOf(TypeEnum.EVM_CONTRACT_CREATE.getCode()));
+            } else {
+            	resp.setTxType(String.valueOf(transaction.getType()));
+            }
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
     		resp.setServerTime(new Date().getTime());
     		resp.setTxInfo(transaction.getInfo());
     		resp.setGasPrice(new BigDecimal(transaction.getGasPrice()));
     		resp.setValue(new BigDecimal(transaction.getValue()));
-			resp.setReceiveType(String.valueOf(transaction.getToType()));
+    		/**
+    		 * 设置合约类型
+    		 */
+    		if(transaction.getToType() == ToTypeEnum.WASM_CONTRACT.getCode()
+    				|| transaction.getToType() == ToTypeEnum.EVM_CONTRACT.getCode()) {
+            	resp.setTxType("1");
+            } else {
+            	resp.setReceiveType(String.valueOf(transaction.getToType()));
+            }
 			resp.setContractName(transaction.getMethod());
     		/**
     		 * 失败信息国际化
