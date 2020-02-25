@@ -1,6 +1,6 @@
 # ***************************通用配置**************************** #
 # 应用版本
-version: 0.9.0.0
+version: 0.9.1.0
 #Spring应用配置
 spring:
   application.name: browser-press
