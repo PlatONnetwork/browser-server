@@ -262,6 +262,8 @@ public class CollectionTransaction extends Transaction {
         //解码合约创建交易前缀，用于区分EVM||WASM
         GeneralContractDecodedResult decodedResult = GeneralContractDecodeUtil.decode(getInput());
         ci.type = decodedResult.getTypeEnum().getCode();
+        ci.toType=ToTypeEnum.ACCOUNT.getCode();
+        ci.contractType = ContractTypeEnum.UNKNOWN.getCode();
         if(decodedResult.getTypeEnum()==TypeEnum.EVM_CONTRACT_CREATE){
             ci.toType = ToTypeEnum.EVM_CONTRACT.getCode();
             ci.contractType = ContractTypeEnum.EVM.getCode();
