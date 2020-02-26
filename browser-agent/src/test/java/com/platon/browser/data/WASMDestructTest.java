@@ -1,86 +1,66 @@
 package com.platon.browser.data;
 
-import org.junit.Before;
+import java.math.BigDecimal;
+
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert.Unit;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-
 /**
- * @title  suicide()已弃用, 请使用 selfdestruct()
- * @description: 
+ * @title 合约销毁
+ * @description:
  * @author: hudenian
- * @create: 2019/12/27
+ * @create: 2020/02/07
  */
 public class WASMDestructTest extends BaseContractTest {
-
-	private Logger logger = LoggerFactory.getLogger(WASMDestructTest.class);
-	
-
     @Test
-    public void selfKill() {
+    public void testDistoryContract() {
+
+        String name = "hudenian";
         try {
+        	/**
+        	 * 会因gas失败的交易场景
+        	 */
+        	Destory_contract failContract = Destory_contract.deploy(web3j, transactionManager, gasProvider,"").send();
 
-            Destory_contract destory_contract = Destory_contract.deploy(web3j, transactionManager, gasProvider,"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219").send();
+            System.out.println("contractAddress " + failContract.getContractAddress());
+        	
+            /**
+             * 交易成功的合约场景
+             */
+            ContractDistory contractDistory = ContractDistory.deploy(web3j, transactionManager, gasProvider).send();
+            String contractAddress = contractDistory.getContractAddress();
+            String transactionHash = contractDistory.getTransactionReceipt().get().getTransactionHash();
 
-            String contractAddress = destory_contract.getContractAddress();
-            TransactionReceipt tx = destory_contract.getTransactionReceipt().get();
-
-
+            System.out.println("contractAddress " + contractAddress);
+            System.out.println("tx hash " + transactionHash);
+            /**
+             * 合约转账的场景
+             */
             Transfer transfer = new Transfer(web3j, transactionManager);
             transfer.sendFunds(contractAddress, BigDecimal.TEN, Unit.LAT,GAS_PRICE,GAS_LIMIT).send();
             
+            //合约设置值
+            TransactionReceipt transactionReceipt = contractDistory.set_string(name).send();
+            
+            System.out.println("tx status " + transactionReceipt.getStatus());
+            
 
-            //调用自杀函数
-            TransactionReceipt transactionReceipt1 = destory_contract.destroy().send();
+            //合约销毁前查询合约上的数据
+            String chainName = contractDistory.get_string().send();
+            System.out.println("chainName " + chainName);
 
-            logger.debug("destory_contract kill successful.transactionHash:" + transactionReceipt1.getTransactionHash());
-            logger.debug( "currentBlockNumber:" + transactionReceipt1.getBlockNumber());
+            //合约销毁
+            transactionReceipt = contractDistory.distory_contract().send();
 
+//            //合约销毁后查询合约上的数据
+//            String chainName1 = contractDistory.get_string().send();
+//            
+//            System.out.println("chainName1 " + chainName1);
 
         } catch (Exception e) {
-            if(e.getMessage().startsWith("Empty")){
-            	logger.debug("自杀后查询链上的count值为 Empty");
-            }
-            logger.debug(e.toString(), "ContractCallException");
+            e.printStackTrace();
         }
     }
-
-
-    /**
-     * @title do...while结果值
-     * @description: 
-     * @author: hudenian
-     * @create: 2019/12/27
-     */
-    public static String dowhile(int x){
-        int y = x+10;
-        int z = x+9;
-        do{
-            x+=1;
-            if(x>z) continue;
-        }while (x<y);
-        return  String.valueOf(x);
-    }
-
-    /**
-     * @title for 循环后的结果值
-     * @description: 
-     * @author: hudenian
-     * @create: 2019/12/27
-     */
-    public static String forsum(int x){
-        int forSum = 0;
-        for(int i=0;i<x;i++){
-            forSum = forSum +i;
-        }
-        return  String.valueOf(forSum);
-    }
-
 }

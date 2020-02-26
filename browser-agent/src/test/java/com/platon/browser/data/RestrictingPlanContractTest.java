@@ -11,6 +11,7 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.gas.GasProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ public class RestrictingPlanContractTest {
     private RestrictingPlanContract restrictingPlanContract;
 
     private Credentials credentials;
+    
+    protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(470000);
+	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(10000000000L);
 
     @Before
     public void init() {
@@ -52,7 +56,18 @@ public class RestrictingPlanContractTest {
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(1000), new BigInteger("5000000000000000000")));
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("600000000000000000")));
         try {
-            PlatonSendTransaction platonSendTransaction = restrictingPlanContract.createRestrictingPlanReturnTransaction(benifitAddress, restrictingPlans).send();
+            PlatonSendTransaction platonSendTransaction = restrictingPlanContract.createRestrictingPlanReturnTransaction(benifitAddress, restrictingPlans,new GasProvider() {
+				
+				@Override
+				public BigInteger getGasPrice() {
+					return GAS_PRICE;
+				}
+				
+				@Override
+				public BigInteger getGasLimit() {
+					return GAS_LIMIT;
+				}
+			}).send();
             TransactionResponse baseResponse = restrictingPlanContract.getTransactionResponse(platonSendTransaction).send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
