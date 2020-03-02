@@ -323,11 +323,10 @@ public class TransactionServiceImpl implements TransactionService {
     		/**
     		 * 设置合约类型
     		 */
-    		if(transaction.getToType() == ToTypeEnum.WASM_CONTRACT.getCode()
-    				|| transaction.getToType() == ToTypeEnum.EVM_CONTRACT.getCode()) {
-            	resp.setTxType("1");
+    		if(transaction.getToType() == ToTypeEnum.ACCOUNT.getCode()) {
+    			resp.setReceiveType("2");
             } else {
-            	resp.setReceiveType(String.valueOf(transaction.getToType()));
+            	resp.setReceiveType("1");
             }
 			resp.setContractName(transaction.getMethod());
     		/**
@@ -625,9 +624,20 @@ public class TransactionServiceImpl implements TransactionService {
 							amountSum = amountSum.add(p.getAmount());
 							transactionDetailsRPPlanResp.setAmount(p.getAmount());
 							transactionDetailsRPPlanResp.setEpoch(p.getEpoch());
-							//锁仓周期对应快高  结算周期 * epoch
-							transactionDetailsRPPlanResp.setBlockNumber(blockChainConfig.getSettlePeriodBlockCount()
-									.multiply(new BigInteger(String.valueOf(p.getEpoch()))).longValue());
+							/**
+							 * 锁仓周期对应快高  结算周期数 * epoch  + number,如果不是整数倍则为：结算周期 * （epoch-1）  + 多余的数目
+							 */
+							Long number;
+							long remainder = transaction.getNum() % blockChainConfig.getSettlePeriodBlockCount().longValue();
+							if(remainder == 0l) {
+								number = blockChainConfig.getSettlePeriodBlockCount()
+										.multiply(BigInteger.valueOf(p.getEpoch())).add(BigInteger.valueOf(transaction.getNum())).longValue();
+							} else {
+								number = blockChainConfig.getSettlePeriodBlockCount()
+										.multiply(BigInteger.valueOf(p.getEpoch() - 1)).add(BigInteger.valueOf(transaction.getNum()))
+										.add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder))).longValue();
+							}
+							transactionDetailsRPPlanResp.setBlockNumber(number);
 							rpPlanResps.add(transactionDetailsRPPlanResp);
 						}
 						//累加

@@ -205,6 +205,12 @@ PUT /_template/transaction_template
       "seq": {
         "type": "long"
       },
+      "remark": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
       "cre_time": {
         "type": "date",
 		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
