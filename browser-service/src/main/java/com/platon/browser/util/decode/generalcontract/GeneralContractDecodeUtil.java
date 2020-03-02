@@ -22,8 +22,10 @@ public class GeneralContractDecodeUtil {
     private GeneralContractDecodeUtil(){}
     public static GeneralContractDecodedResult decode(String txInput) {
         GeneralContractDecodedResult result = new GeneralContractDecodedResult();
+        result.setTypeEnum(Transaction.TypeEnum.EVM_CONTRACT_CREATE);
         try {
             if (StringUtils.isNotEmpty(txInput) && !txInput.equals("0x")) {
+                // 非WASM合约的创建交易的txInput解码时可能会出异常，现阶段暂时把解txInput出异常的合约创建交易认为是EVM合约创建交易
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
                 List <RlpType> rlpTypes = rlpList.getValues();
                 if(rlpTypes.size() >= 4) {
@@ -41,8 +43,6 @@ public class GeneralContractDecodeUtil {
                         result.setTypeEnum(Transaction.TypeEnum.WASM_CONTRACT_CREATE);
                     }
                 }
-            }else{
-                result.setTypeEnum(Transaction.TypeEnum.EVM_CONTRACT_CREATE);
             }
         } catch (Exception e) {
             log.error("解析普通合约交易输入出错:",e);
