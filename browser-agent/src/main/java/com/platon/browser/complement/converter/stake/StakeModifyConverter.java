@@ -69,7 +69,7 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         /**
          * 如果为激励池合约则不修改收益地址
          */
-        if(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress().equals(staking.getBenefitAddr())) {
+        if(staking!=null&&InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress().equals(staking.getBenefitAddr())) {
         	businessParam.setBenefitAddr(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress());
         }
 
