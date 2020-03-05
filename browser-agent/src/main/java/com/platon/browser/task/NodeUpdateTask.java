@@ -9,7 +9,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.keybase.KeyBaseUser;
+import com.platon.browser.dto.keybase.KeyBaseUserInfo;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
 import com.platon.browser.util.KeyBaseAnalysis;
@@ -53,7 +53,7 @@ public class NodeUpdateTask {
 			nodeExample.createCriteria().andExternalIdNotEqualTo("");
 			List<Node> nodeList = nodeMapper.selectByExample(null);
 			
-			Map<String, Optional<KeyBaseUser>> cache = new HashMap<>();
+			Map<String, Optional<KeyBaseUserInfo>> cache = new HashMap<>();
 			List<Node> updateNodeList = new ArrayList<>();
 
 			// 查询节点版本号列表
@@ -67,10 +67,10 @@ public class NodeUpdateTask {
 
 				// 更新keybase相关信息
 				if( node.getExternalId().trim().length() == 16){
-					Optional<KeyBaseUser> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
+					Optional<KeyBaseUserInfo> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
 						String url = prefix.concat(key);
 						try {
-							KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
+							KeyBaseUserInfo keyBaseUser = HttpUtil.get(url,KeyBaseUserInfo.class);
 							return Optional.of(keyBaseUser);
 						} catch (HttpRequestException e) {
 							log.error("get keybase error:key={}",key,e);
