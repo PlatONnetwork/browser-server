@@ -124,7 +124,7 @@ platon:
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
-  keyBaseApi: _/api/1.0/user/autocomplete.json?q=
+  keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
 brokenHost: 192.168.16.173
 brokenPort: 61613
 system.username: admin

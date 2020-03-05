@@ -1,9 +1,8 @@
 package com.platon.browser.util;
 
-import com.platon.browser.dto.keybase.Completion;
-import com.platon.browser.dto.keybase.Components;
-import com.platon.browser.dto.keybase.KeyBaseUser;
-import com.platon.browser.dto.keybase.ValueScore;
+import com.platon.browser.dto.keybase.Basics;
+import com.platon.browser.dto.keybase.KeyBaseUserInfo;
+import com.platon.browser.dto.keybase.Them;
 
 import java.util.List;
 
@@ -16,24 +15,22 @@ public class KeyBaseAnalysis {
 
     private KeyBaseAnalysis(){}
 
-    public static String getKeyBaseUseName(KeyBaseUser keyBaseUser){
-        List <Completion> completions = keyBaseUser.getCompletions();
-        if (completions == null || completions.isEmpty()) return null;
+    public static String getKeyBaseUseName(KeyBaseUserInfo keyBaseUser){
+        List<Them> thems = keyBaseUser.getThem();
+        if (thems == null || thems.isEmpty()) return null;
         // 取最新一条
-        Completion completion = completions.get(0);
-        Components components = completion.getComponents();
-        ValueScore vs = components.getUsername();
-        if(vs==null) return null;
-        return vs.getVal();
+        Them them = thems.get(0);
+        Basics basics = them.getBasics();
+        return basics.getUsername();
     }
 
 
-    public static String getKeyBaseIcon( KeyBaseUser keyBaseUser){
-        List <Completion> completions = keyBaseUser.getCompletions();
-        if (completions == null || completions.isEmpty()) return null;
+    public static String getKeyBaseIcon( KeyBaseUserInfo keyBaseUser){
+    	List<Them> thems = keyBaseUser.getThem();
+        if (thems == null || thems.isEmpty()) return null;
         // 取最新一条
-        Completion completion = completions.get(0);
+        Them them = thems.get(0);
         //获取头像
-        return completion.getThumbnail();
+        return them.getPictures().getPrimary().getUrl();
     }
 }

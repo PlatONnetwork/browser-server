@@ -13,7 +13,7 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
-import com.platon.browser.dto.keybase.KeyBaseUser;
+import com.platon.browser.dto.keybase.KeyBaseUserInfo;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
@@ -706,7 +706,7 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 			String url = keyBaseUrl.concat(keyBaseApi.concat(externalId));
 			try {
-				KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
+				KeyBaseUserInfo keyBaseUser = HttpUtil.get(url,KeyBaseUserInfo.class);
 				userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
 			} catch (Exception e) {
 				logger.error("getStakingUrl error.externalId:{},txReceiptStatus:{},error:{}",externalId, txReceiptStatus, e.getMessage());
