@@ -6,7 +6,7 @@
             UPDATE
             `config`
             SET
-            `stale_value` = #{item.staleValue},
+            `stale_value` = <if test="item.staleValue==''">`value`</if><if test="item.staleValue!=''">#{item.staleValue}</if>,
             `value` = #{item.value}
             WHERE `module` = #{item.module}
             AND `name` = #{item.name};

@@ -76,8 +76,8 @@ public class OnNewBlockConverter {
             for (String hash : proposalTxHashSet) {
                 try {
                     TallyResult tr = proposalService.getTallyResult(hash);
-                    if(tr.getStatus()== CustomProposal.StatusEnum.PASS.getCode()){
-                        // 提案生效：
+                    if(tr.getStatus()== CustomProposal.StatusEnum.PASS.getCode()||tr.getStatus()==CustomProposal.StatusEnum.FINISH.getCode()){
+                        // 提案通过（参数提案，status=2）||提案生效（升级提案,status=5）：
                         Proposal proposal = proposalMap.get(hash);
                         if(proposal.getType()==CustomProposal.TypeEnum.PARAMETER.getCode()){
                             // 如果是参数提案
@@ -92,7 +92,7 @@ public class OnNewBlockConverter {
                         if(proposal.getType()==CustomProposal.TypeEnum.UPGRADE.getCode()){
                             // 如果是升级提案
                             // 则查询治理参数详情，并把新参数值覆盖到Config表中对应的参数
-                            List<GovernParam> governParamList = platOnClient.getGovernParamValue(null);
+                            List<GovernParam> governParamList = platOnClient.getGovernParamValue("");
                             governParamList.forEach(gp->{
                                 Config config = new Config();
                                 config.setModule(gp.getParamItem().getModule());
