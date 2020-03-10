@@ -4,11 +4,9 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.govern.ModifiableParam;
 import com.platon.browser.dao.entity.Config;
-import com.platon.browser.dao.entity.ConfigExample;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
-import com.platon.browser.exception.BusinessException;
 import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -147,24 +145,5 @@ public class ParameterService {
                 break;
         }
         return staleValue;
-    }
-
-    /**
-     * 取当前最新的配置
-     * @param paramEnum
-     * @return
-     */
-    public Config getCurrentConfig(ModifiableGovernParamEnum paramEnum){
-        // 查询此时解质押需要经过的结算周期数
-        ConfigExample configExample = new ConfigExample();
-        configExample.createCriteria()
-                .andModuleEqualTo(paramEnum.getModule())
-                .andNameEqualTo(paramEnum.getName());
-        List<Config> configs = configMapper.selectByExample(configExample);
-        if(configs.isEmpty()){
-            throw new BusinessException("配置表参数缺失！");
-        }
-        Config config = configs.get(0);
-        return config;
     }
 }

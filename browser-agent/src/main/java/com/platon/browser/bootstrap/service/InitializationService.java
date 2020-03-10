@@ -213,8 +213,8 @@ public class InitializationService {
             staking.setTotalDeleReward(BigDecimal.ZERO);
             staking.setExceptionStatus(1);
 
-            Config config = parameterService.getCurrentConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION);
-            Integer  unStakeFreezeDuration = Integer.parseInt(config.getValue());
+            String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+            Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration);
 
             // 使用当前质押信息生成节点信息
