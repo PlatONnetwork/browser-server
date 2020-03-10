@@ -1,10 +1,9 @@
 package com.platon.browser.dto;
 
-import java.math.BigDecimal;
-
 import com.platon.browser.dao.entity.Staking;
-
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class StakingNode extends Staking{
@@ -38,4 +37,5 @@ public class StakingNode extends Staking{
     private BigDecimal statStakingRewardValue;
     
     private Integer nodeStatVerifierTime;
+    private Integer unStakeFreezeDuration;
 }

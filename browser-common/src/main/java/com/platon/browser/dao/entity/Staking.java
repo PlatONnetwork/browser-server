@@ -84,6 +84,8 @@ public class Staking extends StakingKey {
 
     private Integer exceptionStatus;
 
+    private Integer unStakeFreezeDuration;
+
     private String annualizedRateInfo;
 
     public Integer getStakingTxIndex() {
@@ -398,6 +400,14 @@ public class Staking extends StakingKey {
         this.exceptionStatus = exceptionStatus;
     }
 
+    public Integer getUnStakeFreezeDuration() {
+        return unStakeFreezeDuration;
+    }
+
+    public void setUnStakeFreezeDuration(Integer unStakeFreezeDuration) {
+        this.unStakeFreezeDuration = unStakeFreezeDuration;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -455,6 +465,7 @@ public class Staking extends StakingKey {
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
+        unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**
