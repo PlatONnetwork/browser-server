@@ -19,7 +19,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.enums.GovernParamEnum;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
@@ -213,7 +213,7 @@ public class InitializationService {
             staking.setTotalDeleReward(BigDecimal.ZERO);
             staking.setExceptionStatus(1);
 
-            Config config = parameterService.getCurrentConfig(GovernParamEnum.STAKING_UN_STAKE_FREEZE_DURATION);
+            Config config = parameterService.getCurrentConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION);
             Integer  unStakeFreezeDuration = Integer.parseInt(config.getValue());
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration);
 

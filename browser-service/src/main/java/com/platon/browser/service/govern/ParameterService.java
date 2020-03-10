@@ -7,7 +7,6 @@ import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.ConfigExample;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
-import com.platon.browser.enums.GovernParamEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
@@ -155,7 +154,7 @@ public class ParameterService {
      * @param paramEnum
      * @return
      */
-    public Config getCurrentConfig(GovernParamEnum paramEnum){
+    public Config getCurrentConfig(ModifiableGovernParamEnum paramEnum){
         // 查询此时解质押需要经过的结算周期数
         ConfigExample configExample = new ConfigExample();
         configExample.createCriteria()

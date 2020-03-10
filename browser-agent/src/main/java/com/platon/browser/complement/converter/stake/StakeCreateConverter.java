@@ -9,7 +9,7 @@ import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.enums.GovernParamEnum;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.utils.HexTool;
@@ -48,7 +48,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
         BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
 
-        Config config = parameterService.getCurrentConfig(GovernParamEnum.STAKING_UN_STAKE_FREEZE_DURATION);
+        Config config = parameterService.getCurrentConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION);
         Integer  unStakeFreezeDuration = Integer.parseInt(config.getValue());
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
