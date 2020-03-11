@@ -26,7 +26,7 @@ public class NodeVersion {
 		return bigVersion;
 	}
 	public void setBigVersion(Integer bigVersion) {
-		this.bigVersion = bigVersion;
+		this.bigVersion = VerUtil.transferBigVersion(new BigInteger(String.valueOf(bigVersion))).intValue();
 	}
 	public String getNodeId() {
 		return nodeId;

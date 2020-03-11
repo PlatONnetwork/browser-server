@@ -57,7 +57,7 @@ public class TransactionSender {
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
     RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);
     ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
-    private String stakingPubKey = "0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208";
+    private String stakingPubKey = "0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
     private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 
 //    private String stakingPubKey = "bfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf";
@@ -249,7 +249,7 @@ public class TransactionSender {
 			
 			@Override
 			public BigInteger getGasLimit() {
-				return BigInteger.valueOf(30000l);
+				return BigInteger.valueOf(3000000l);
 			}
 		}).send();
         logger.debug("res:{}",res);
