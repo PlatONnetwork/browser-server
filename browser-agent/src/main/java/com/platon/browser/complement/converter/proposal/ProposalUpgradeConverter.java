@@ -1,7 +1,6 @@
 package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -35,8 +34,6 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<NodeOpt> {
     private ProposalBusinessMapper proposalBusinessMapper;
     @Autowired
     private NetworkStatCache networkStatCache;
-	@Autowired
-	private ParamProposalCache paramProposalCache;
 	
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -63,18 +60,17 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<NodeOpt> {
     			.stakingName(txParam.getNodeName())
     			.newVersion(String.valueOf(txParam.getNewVersion()))
                 .build();
+    	
 
     	proposalBusinessMapper.upgrade(businessParam);
 
-		// 添加到参数提案缓存Map<未来生效块号,List<提案ID>>
-		BigInteger activeBlockNum = businessParam.getActiveBlock();
-		paramProposalCache.add(activeBlockNum.longValue(),tx.getHash());
 
 		String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
 				.replace("TYPE",String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()))
 				.replace("VERSION",businessParam.getNewVersion());
+
 
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());

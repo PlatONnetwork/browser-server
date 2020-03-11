@@ -1,6 +1,5 @@
 package com.platon.browser.complement.converter.epoch;
 
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.ParamProposalCache;
@@ -17,7 +16,6 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +33,6 @@ public class OnNewBlockConverter {
     
     @Autowired
     private NewBlockMapper newBlockMapper;
-    @Autowired
-    private PlatOnClient platOnClient;
 
     @Autowired
     private NetworkStatCache networkStatCache;
@@ -64,7 +60,7 @@ public class OnNewBlockConverter {
         
 		newBlockMapper.newBlock(newBlock);
 
-		// 检查当前区块是否有参数提案|升级提案生效
+		// 检查当前区块是否有参数提案生效
         Set<String> proposalTxHashSet = paramProposalCache.get(block.getNum());
         if(proposalTxHashSet!=null){
             ProposalExample proposalExample = new ProposalExample();
@@ -78,30 +74,14 @@ public class OnNewBlockConverter {
                     TallyResult tr = proposalService.getTallyResult(hash);
                     if(tr.getStatus()== CustomProposal.StatusEnum.PASS.getCode()){
                         // 提案生效：
+                        // 把提案表中的参数覆盖到Config表中对应的参数
                         Proposal proposal = proposalMap.get(hash);
-                        if(proposal.getType()==CustomProposal.TypeEnum.PARAMETER.getCode()){
-                            // 如果是参数提案
-                            // 把提案表中的参数覆盖到Config表中对应的参数
-                            Config config = new Config();
-                            config.setModule(proposal.getModule());
-                            config.setName(proposal.getName());
-                            config.setStaleValue(proposal.getStaleValue());
-                            config.setValue(proposal.getNewValue());
-                            configList.add(config);
-                        }
-                        if(proposal.getType()==CustomProposal.TypeEnum.UPGRADE.getCode()){
-                            // 如果是升级提案
-                            // 则查询治理参数详情，并把新参数值覆盖到Config表中对应的参数
-                            List<GovernParam> governParamList = platOnClient.getGovernParamValue(null);
-                            governParamList.forEach(gp->{
-                                Config config = new Config();
-                                config.setModule(gp.getParamItem().getModule());
-                                config.setName(gp.getParamItem().getName());
-                                config.setStaleValue(gp.getParamValue().getStaleValue());
-                                config.setValue(gp.getParamValue().getValue());
-                                configList.add(config);
-                            });
-                        }
+                        Config config = new Config();
+                        config.setModule(proposal.getModule());
+                        config.setName(proposal.getName());
+                        config.setStaleValue(proposal.getStaleValue());
+                        config.setValue(proposal.getNewValue());
+                        configList.add(config);
                     }
                 } catch (Exception e) {
                     throw new BusinessException(e.getMessage());
