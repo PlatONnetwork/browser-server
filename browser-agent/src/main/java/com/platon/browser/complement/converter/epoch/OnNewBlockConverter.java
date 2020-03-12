@@ -35,8 +35,6 @@ public class OnNewBlockConverter {
     
     @Autowired
     private NewBlockMapper newBlockMapper;
-    @Autowired
-    private PlatOnClient platOnClient;
 
     @Autowired
     private NetworkStatCache networkStatCache;
@@ -48,6 +46,8 @@ public class OnNewBlockConverter {
     private ProposalMapper proposalMapper;
     @Autowired
     private ParameterService parameterService;
+    @Autowired
+    private PlatOnClient platOnClient;
 
 	public void convert(CollectionEvent event, Block block) throws NoSuchBeanException {
 
@@ -64,7 +64,7 @@ public class OnNewBlockConverter {
         
 		newBlockMapper.newBlock(newBlock);
 
-		// 检查当前区块是否有参数提案|升级提案生效
+		// 检查当前区块是否有参数提案生效
         Set<String> proposalTxHashSet = paramProposalCache.get(block.getNum());
         if(proposalTxHashSet!=null){
             ProposalExample proposalExample = new ProposalExample();
@@ -78,6 +78,7 @@ public class OnNewBlockConverter {
                     TallyResult tr = proposalService.getTallyResult(hash);
                     if(tr.getStatus()== CustomProposal.StatusEnum.PASS.getCode()||tr.getStatus()==CustomProposal.StatusEnum.FINISH.getCode()){
                         // 提案通过（参数提案，status=2）||提案生效（升级提案,status=5）：
+                        // 把提案表中的参数覆盖到Config表中对应的参数
                         Proposal proposal = proposalMap.get(hash);
                         if(proposal.getType()==CustomProposal.TypeEnum.PARAMETER.getCode()){
                             // 如果是参数提案
