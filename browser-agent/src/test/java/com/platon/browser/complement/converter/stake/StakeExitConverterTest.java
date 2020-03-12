@@ -16,7 +16,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -51,8 +50,6 @@ public class StakeExitConverterTest extends AgentTestBase {
                 .build();
 
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
-        when(stakeBusinessMapper.queryStakingValue(any())).thenReturn(new BigDecimal("1000000000"));
-
     }
 
 
