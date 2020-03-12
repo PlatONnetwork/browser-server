@@ -7,7 +7,7 @@ import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.enums.AddressTypeEnum;
@@ -65,7 +65,7 @@ public class InitializationService {
     @Autowired
     private ProposalMapper proposalMapper;
     @Autowired
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Autowired
     private GasEstimateLogMapper gasEstimateLogMapper;
     @Autowired
@@ -73,11 +73,11 @@ public class InitializationService {
 
     @Transactional
     public InitializationResult init() {
-        // 初始化参数提案缓存：把所有状态为投票中的参数提案缓存到内存中
+        // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
         List<Proposal> proposalList = proposalMapper.selectByExample(proposalExample);
-        paramProposalCache.init(proposalList);
+        proposalCache.init(proposalList);
 
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);

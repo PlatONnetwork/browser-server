@@ -9,18 +9,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ParamProposalCacheTest extends AgentTestBase {
+public class ProposalCacheTest extends AgentTestBase {
 
     @Spy
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Test
     public void test() throws NoSuchBeanException {
-        paramProposalCache.init(new ArrayList<>(proposalList));
-        paramProposalCache.add(4444L,"0xsfsfdsf");
-        paramProposalCache.get(4444L);
+        proposalCache.init(new ArrayList<>(proposalList));
+        proposalCache.add(4444L,"0xsfsfdsf");
+        proposalCache.get(4444L);
         //assertEquals(paramProposalCache.get(444L),"0xsfsfdsf");
     }
 }

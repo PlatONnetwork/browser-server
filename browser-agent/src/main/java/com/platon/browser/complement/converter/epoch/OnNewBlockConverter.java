@@ -3,7 +3,7 @@ package com.platon.browser.complement.converter.epoch;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.service.proposal.ProposalService;
 import com.platon.browser.complement.dao.mapper.NewBlockMapper;
@@ -39,7 +39,7 @@ public class OnNewBlockConverter {
     @Autowired
     private NetworkStatCache networkStatCache;
     @Autowired
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Autowired
     private ProposalService proposalService;
     @Autowired
@@ -65,7 +65,7 @@ public class OnNewBlockConverter {
 		newBlockMapper.newBlock(newBlock);
 
 		// 检查当前区块是否有参数提案生效
-        Set<String> proposalTxHashSet = paramProposalCache.get(block.getNum());
+        Set<String> proposalTxHashSet = proposalCache.get(block.getNum());
         if(proposalTxHashSet!=null){
             ProposalExample proposalExample = new ProposalExample();
             proposalExample.createCriteria().andHashIn(new ArrayList<>(proposalTxHashSet));

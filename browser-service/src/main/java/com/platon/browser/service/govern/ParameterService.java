@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,6 +44,7 @@ public class ParameterService {
         List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().getData();
         List<Config> configList = new ArrayList<>();
         int id = 1;
+        Date date = new Date();
         for (GovernParam gp : governParamList) {
             Config config = new Config();
             config.setId(id);
@@ -51,6 +53,8 @@ public class ParameterService {
             config.setRangeDesc(gp.getParamItem().getDesc());
             config.setActiveBlock(0L);
             configList.add(config);
+            config.setCreateTime(date);
+            config.setUpdateTime(date);
 
             // 更新内存中的blockChainConfig中在init_value,stale_value,value字段值
             String initValue = getValueInBlockChainConfig(config.getName());

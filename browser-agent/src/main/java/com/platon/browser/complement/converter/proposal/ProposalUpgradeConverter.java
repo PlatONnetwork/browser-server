@@ -1,7 +1,7 @@
 package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -36,7 +36,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<NodeOpt> {
     @Autowired
     private NetworkStatCache networkStatCache;
 	@Autowired
-	private ParamProposalCache paramProposalCache;
+	private ProposalCache proposalCache;
 	
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -68,7 +68,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<NodeOpt> {
 
 		// 添加到参数提案缓存Map<未来生效块号,List<提案ID>>
 		BigInteger activeBlockNum = businessParam.getActiveBlock();
-		paramProposalCache.add(activeBlockNum.longValue(),tx.getHash());
+		proposalCache.add(activeBlockNum.longValue(),tx.getHash());
 
 		String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())

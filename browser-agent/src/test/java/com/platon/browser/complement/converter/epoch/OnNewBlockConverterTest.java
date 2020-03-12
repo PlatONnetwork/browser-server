@@ -4,7 +4,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.service.proposal.ProposalService;
@@ -42,7 +42,7 @@ public class OnNewBlockConverterTest  extends AgentTestBase {
     @Mock
     private NetworkStatCache networkStatCache;
     @Mock
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Mock
     private ProposalService proposalService;
     @Mock
@@ -58,7 +58,7 @@ public class OnNewBlockConverterTest  extends AgentTestBase {
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         ReflectionTestUtils.setField(target,"newBlockMapper",newBlockMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"paramProposalCache",paramProposalCache);
+        ReflectionTestUtils.setField(target,"proposalCache",proposalCache);
         ReflectionTestUtils.setField(target,"proposalService",proposalService);
         ReflectionTestUtils.setField(target,"proposalMapper",proposalMapper);
         ReflectionTestUtils.setField(target,"parameterService",parameterService);
@@ -71,7 +71,7 @@ public class OnNewBlockConverterTest  extends AgentTestBase {
         Set<String> proposalSet = new HashSet<>();
         Proposal proposal = proposalList.get(0);
         proposalSet.add(proposal.getHash());
-        when(paramProposalCache.get(any())).thenReturn(proposalSet);
+        when(proposalCache.get(any())).thenReturn(proposalSet);
         TallyResult tr = new TallyResult();
         tr.setStatus(2);
         tr.setProposalID(proposal.getPipId());
