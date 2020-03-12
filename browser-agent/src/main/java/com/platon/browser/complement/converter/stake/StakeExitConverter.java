@@ -12,8 +12,10 @@ import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeExitParam;
+import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,10 +58,17 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
             throw new BusinessException("节点ID为["+txParam.getNodeId()+"],质押区块号为["+txParam.getStakingBlockNum()+"]的质押记录不存在！");
         }
 
-        // 计算质押金退回的区块号 = 每个结算周期的区块数x(退出质押所在结算周期轮数+需要经过的结算周期轮数)
-        BigInteger withdrawBlockNum = chainConfig.getSettlePeriodBlockCount()
-                .multiply(BigInteger.valueOf(staking.getStakingReductionEpoch()+staking.getUnStakeFreezeDuration()));
-        txParam.setWithdrawBlockNum(withdrawBlockNum);
+        try {
+            // 计算当前周期
+            BigInteger curEpoch = EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),chainConfig.getSettlePeriodBlockCount());
+            // 计算质押金退回的区块号 = 每个结算周期的区块数x(退出质押所在结算周期轮数+需要经过的结算周期轮数)
+            BigInteger withdrawBlockNum = chainConfig.getSettlePeriodBlockCount()
+                    .multiply(curEpoch.add(BigInteger.valueOf(staking.getUnStakeFreezeDuration())));
+            txParam.setWithdrawBlockNum(withdrawBlockNum);
+        } catch (BlockNumberException e) {
+            log.error("",e);
+            throw new BusinessException("周期计算错误!");
+        }
 
         long startTime = System.currentTimeMillis();
 
