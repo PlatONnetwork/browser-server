@@ -5,10 +5,9 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.service.govern.ParameterService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -39,6 +37,8 @@ public class StakeCreateConverterTest extends AgentTestBase {
     private NodeCache nodeCache;
     @Mock
     private CollectionEvent collectionEvent;
+    @Mock
+    private ParameterService parameterService;
     @Spy
     private StakeCreateConverter target;
 
@@ -47,6 +47,7 @@ public class StakeCreateConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
+        ReflectionTestUtils.setField(target,"parameterService",parameterService);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")
@@ -54,6 +55,7 @@ public class StakeCreateConverterTest extends AgentTestBase {
                 .build();
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
+        when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
     }
 
 

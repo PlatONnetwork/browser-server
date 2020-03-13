@@ -4,6 +4,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
@@ -39,6 +40,8 @@ public class ProposalUpgradeConverterTest extends AgentTestBase {
     private NetworkStatCache networkStatCache;
     @Mock
     private NodeCache nodeCache;
+    @Mock
+    private ProposalCache proposalCache;
 
     @Spy
     private ProposalUpgradeConverter target;
@@ -49,6 +52,7 @@ public class ProposalUpgradeConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"proposalBusinessMapper",proposalBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
+        ReflectionTestUtils.setField(target,"proposalCache",proposalCache);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")

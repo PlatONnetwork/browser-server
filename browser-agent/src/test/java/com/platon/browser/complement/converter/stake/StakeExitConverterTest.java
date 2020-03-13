@@ -7,6 +7,8 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +37,10 @@ public class StakeExitConverterTest extends AgentTestBase {
     private NodeCache nodeCache;
     @Mock
     private NetworkStatCache networkStatCache;
+    @Mock
+    private StakingMapper stakingMapper;
+    @Mock
+    private BlockChainConfig chainConfig;
     @Spy
     private StakeExitConverter target;
 
@@ -43,13 +49,17 @@ public class StakeExitConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
+        ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
+        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")
                 .stakingBlockNum(new BigInteger("20483"))
                 .build();
 
+        when(stakingMapper.selectByPrimaryKey(any())).thenReturn(stakingList.get(0));
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
+        when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(400));
     }
 
 
