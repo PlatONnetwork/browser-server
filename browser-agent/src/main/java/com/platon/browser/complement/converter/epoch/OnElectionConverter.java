@@ -10,10 +10,14 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +38,8 @@ public class OnElectionConverter {
     private NetworkStatCache networkStatCache;
     @Autowired
     private BlockChainConfig blockChainConfig;
+	@Autowired
+	private ParameterService parameterService;
 	
 	public Optional<List<NodeOpt>> convert(CollectionEvent event, Block block) throws BlockNumberException {
 
@@ -151,6 +157,18 @@ public class OnElectionConverter {
 	 * @return
 	 */
 	private List<NodeOpt> slashOnlyOpt(Block block, List<Staking> slashNodeList,BigDecimal blockReward){
+
+		// 更新解质押到账需要经过的结算周期数
+		String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+		if(StringUtils.isBlank(configVal)){
+			throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+		}
+		Integer unStakeFreezeDuration = Integer.parseInt(configVal);
+		Election election = Election.builder()
+				.slashNodeList(slashNodeList)
+				.unStakeFreezeDuration(unStakeFreezeDuration)
+				.build();
+		epochBusinessMapper.updateUnStakeFreezeDuration(election);
 
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());

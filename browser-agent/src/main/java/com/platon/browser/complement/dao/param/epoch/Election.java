@@ -27,6 +27,8 @@ public class Election implements BusinessParam {
     private Date time;
     // 是否惩罚上上轮
     private int isPrePreRound;
+    //解质押需要经过的结算周期数
+    private int unStakeFreezeDuration;
 
     @Override
     public BusinessType getBusinessType () {

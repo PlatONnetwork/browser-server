@@ -82,4 +82,16 @@
 		n.`is_settle` = 2
 	where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
 </update>
+
+	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
+		/*2、更新质押*/
+		update `staking` set
+		`un_stake_freeze_duration` = #{unStakeFreezeDuration}
+		where `status` = 1
+		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+		/*3、更新节点*/
+		update `node` n set
+		`un_stake_freeze_duration` = #{unStakeFreezeDuration}
+		where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+	</update>
 </mapper>

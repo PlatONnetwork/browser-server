@@ -42,6 +42,8 @@ public class Report implements BusinessParam {
     private int codeStakingReductionEpoch;
     //惩罚的金额
     private BigDecimal codeSlashValue;
+    //解质押需要经过的结算周期数
+    private int unStakeFreezeDuration;
 
     @Override
     public BusinessType getBusinessType() {
