@@ -16,8 +16,6 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +67,7 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         /**
          * 如果为激励池合约则不修改收益地址
          */
-        if(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress().equals(staking.getBenefitAddr())) {
+        if(staking!=null&&InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress().equals(staking.getBenefitAddr())) {
         	businessParam.setBenefitAddr(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress());
         }
 
