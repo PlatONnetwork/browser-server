@@ -9,11 +9,13 @@ import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +50,9 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
 
         String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+        if(StringUtils.isBlank(configVal)){
+        	throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+		}
         Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
