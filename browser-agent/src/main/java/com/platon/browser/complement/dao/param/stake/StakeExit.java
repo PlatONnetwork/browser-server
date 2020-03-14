@@ -28,6 +28,8 @@ public class StakeExit implements BusinessParam {
     private Date time;
     //结算周期标识(撤销质押交易所在的结算周期轮数)
     private int stakingReductionEpoch;
+    //解质押需要经过的结算周期数
+    private int unStakeFreezeDuration;
 
     @Override
     public BusinessType getBusinessType() {

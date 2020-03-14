@@ -214,6 +214,9 @@ public class InitializationService {
             staking.setExceptionStatus(1);
 
             String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+            if(StringUtils.isBlank(configVal)){
+                throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+            }
             Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration);
 

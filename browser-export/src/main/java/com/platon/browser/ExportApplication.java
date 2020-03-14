@@ -48,7 +48,7 @@ public class ExportApplication implements ApplicationRunner {
 //		) {
 //			SleepUtil.sleep(1L);
 //		}
-		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationReward());
+//		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationReward());
 		EXECUTOR_SERVICE.submit(() -> exportService.exportAllTx());
 		while (
 			!ExportService.isDelegationRewardExportDone() ||

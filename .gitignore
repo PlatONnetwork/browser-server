@@ -34,3 +34,4 @@ HELP.md
 /out/*
 /build/*
 /out/ 
+/bin/

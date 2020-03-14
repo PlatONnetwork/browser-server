@@ -8,8 +8,12 @@ import com.platon.browser.complement.dao.param.slash.Report;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.ReportParam;
+import com.platon.browser.service.govern.ParameterService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +36,8 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
 
     @Autowired
     private ReportMultiSignParamCache reportMultiSignParamCache;
+    @Autowired
+    private ParameterService parameterService;
 
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -50,6 +56,12 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
 
         slashBusinessMapper.setException(txParam.getVerify(),txParam.getStakingBlockNum().longValue());
 
+        // 更新解质押到账需要经过的结算周期数
+        String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+        if(StringUtils.isBlank(configVal)){
+            throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+        }
+        Integer unStakeFreezeDuration = Integer.parseInt(configVal);
         Report businessParam= Report.builder()
         		.slashData(txParam.getData())
                 .nodeId(txParam.getVerify())
@@ -60,7 +72,11 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
                 .benefitAddr(tx.getFrom())
                 .slash2ReportRate(chainConfig.getDuplicateSignRewardRate())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                .unStakeFreezeDuration(unStakeFreezeDuration)
                 .build();
+
+        //更新节点提取质押需要经过的周期数
+        slashBusinessMapper.updateUnStakeFreezeDuration(businessParam);
 
         // 把举报参数暂时缓存，待共识周期切换时处理
         reportMultiSignParamCache.addReport(businessParam);
