@@ -63,7 +63,7 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
             BigInteger curEpoch = EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),chainConfig.getSettlePeriodBlockCount());
             // 计算质押金退回的区块号 = 每个结算周期的区块数x(退出质押所在结算周期轮数+需要经过的结算周期轮数)
             BigInteger withdrawBlockNum = chainConfig.getSettlePeriodBlockCount()
-                    .multiply(curEpoch.add(BigInteger.valueOf(staking.getUnStakeFreezeDuration())));
+                    .multiply(curEpoch.add(chainConfig.getUnStakeRefundSettlePeriodCount()));
             txParam.setWithdrawBlockNum(withdrawBlockNum);
         } catch (BlockNumberException e) {
             log.error("",e);
