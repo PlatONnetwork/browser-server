@@ -7,7 +7,7 @@ import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.enums.AddressTypeEnum;
@@ -19,6 +19,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
@@ -64,7 +65,7 @@ public class InitializationService {
     @Autowired
     private ProposalMapper proposalMapper;
     @Autowired
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Autowired
     private GasEstimateLogMapper gasEstimateLogMapper;
     @Autowired
@@ -72,11 +73,11 @@ public class InitializationService {
 
     @Transactional
     public InitializationResult init() {
-        // 初始化参数提案缓存：把所有状态为投票中的参数提案缓存到内存中
+        // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
         List<Proposal> proposalList = proposalMapper.selectByExample(proposalExample);
-        paramProposalCache.init(proposalList);
+        proposalCache.init(proposalList);
 
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
@@ -217,6 +218,13 @@ public class InitializationService {
             staking.setHaveDeleReward(BigDecimal.ZERO);
             staking.setTotalDeleReward(BigDecimal.ZERO);
             staking.setExceptionStatus(1);
+
+            String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+            if(StringUtils.isBlank(configVal)){
+                throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+            }
+            Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
+            staking.setUnStakeFreezeDuration(unStakeFreezeDuration);
 
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();

@@ -6,15 +6,25 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeExit;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeExitParam;
+import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.math.BigInteger;
 
 /**
  * @description: 退出质押业务参数转换器
@@ -29,6 +39,12 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
     private StakeBusinessMapper stakeBusinessMapper;
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private StakingMapper stakingMapper;
+    @Autowired
+    private BlockChainConfig chainConfig;
+    @Autowired
+    private ParameterService parameterService;
 	
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -39,18 +55,45 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
 
+        StakingKey stakingKey = new StakingKey();
+        stakingKey.setNodeId(txParam.getNodeId());
+        stakingKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
+        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+        if(staking==null){
+            throw new BusinessException("节点ID为["+txParam.getNodeId()+"],质押区块号为["+txParam.getStakingBlockNum()+"]的质押记录不存在！");
+        }
+
+        try {
+            // 计算当前周期
+            BigInteger curEpoch = EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),chainConfig.getSettlePeriodBlockCount());
+            // 计算质押金退回的区块号 = 每个结算周期的区块数x(退出质押所在结算周期轮数+需要经过的结算周期轮数)
+            BigInteger withdrawBlockNum = chainConfig.getSettlePeriodBlockCount()
+                    .multiply(curEpoch.add(chainConfig.getUnStakeRefundSettlePeriodCount()));
+            txParam.setWithdrawBlockNum(withdrawBlockNum);
+        } catch (BlockNumberException e) {
+            log.error("",e);
+            throw new BusinessException("周期计算错误!");
+        }
+
         long startTime = System.currentTimeMillis();
 
+        // 更新解质押到账需要经过的结算周期数
+        String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+        if(StringUtils.isBlank(configVal)){
+            throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+        }
+        Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
         // 撤销质押
         StakeExit businessParam= StakeExit.builder()
         		.nodeId(txParam.getNodeId())
         		.stakingBlockNum(txParam.getStakingBlockNum())
         		.time(tx.getTime())
                 .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                .unStakeFreezeDuration(unStakeFreezeDuration)
                 .build();
         
         // 查询质押金额
-        BigDecimal stakingValue = stakeBusinessMapper.queryStakingValue(businessParam);
+        BigDecimal stakingValue = staking.getStakingHes().add(staking.getStakingLocked());
         
         // 质押撤销
         stakeBusinessMapper.exit(businessParam);
@@ -68,8 +111,6 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
         nodeOpt.setTxHash(tx.getHash());
         nodeOpt.setBNum(tx.getNum());
         nodeOpt.setTime(tx.getTime());
-
-
         return nodeOpt;
     }
 }

@@ -10,7 +10,8 @@ import java.util.*;
  * 缓存结构: Map<提案生效块号,List<参数提案交易Hash>>
  */
 @Component
-public class ParamProposalCache {
+public class ProposalCache {
+    //<生效块号->提案实体列表>
     private static final Map<Long, Set<String>> cache = new HashMap<>();
 
     public void add(Long activeBlockNumber,String proposalId)

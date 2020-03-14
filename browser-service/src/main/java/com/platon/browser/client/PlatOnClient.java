@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.sdk.contracts.ppos.*;
+import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
 import lombok.Setter;
@@ -100,6 +101,14 @@ public class PlatOnClient {
     public List<Node> getLatestVerifiers() {
         try {
             return getNodeContract().getVerifierList().send().getData();
+        } catch (Exception e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+    
+    public List<GovernParam> getGovernParamValue(String module) {
+    	try {
+            return getProposalContract().getParamList(module).send().getData();
         } catch (Exception e) {
             throw new BusinessException(e.getMessage());
         }

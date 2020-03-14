@@ -1,6 +1,6 @@
 package com.platon.browser;
 
-import com.platon.browser.service.ExportGalleryService;
+//import com.platon.browser.service.ExportGalleryService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ public class ExportApplication implements ApplicationRunner {
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(3);
 	@Autowired
 	private ExportService exportService;
-	@Autowired
-	private ExportGalleryService exportGalleryService;
+//	@Autowired
+//	private ExportGalleryService exportGalleryService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ExportApplication.class, args);
@@ -129,7 +129,7 @@ public class ExportApplication implements ApplicationRunner {
 //	}
 	
 	
-		EXECUTOR_SERVICE.submit(() -> exportGalleryService.exportAllTx());
+//		EXECUTOR_SERVICE.submit(() -> exportGalleryService.exportAllTx());
 	
 //		while (
 //				!ExportGalleryService.isTxInfoExportDone()

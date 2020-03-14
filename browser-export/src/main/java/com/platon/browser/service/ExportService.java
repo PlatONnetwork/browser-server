@@ -2,7 +2,9 @@ package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.client.NodeVersion;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Delegation;
@@ -23,6 +25,8 @@ import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.param.DelegateCreateParam;
@@ -116,6 +120,8 @@ public class ExportService {
 	private VoteMapper voteMapper;
 	@Autowired
 	private NetworkStatMapper networkStatMapper;
+    @Autowired
+	private SpecialApi specialApi;
 
 	@Value("${paging.pageSize}")
 	private int transactionPageSize;
@@ -407,10 +413,10 @@ public class ExportService {
 		} catch (Exception e) {
 			log.error("导出委托奖励失败", e);
 		}
-		this.buildFile("delegationReward.csv", rows, null);
-		log.info("delegations导出成功,总行数：{}", rows.size());
-		delegationRewardExportDone = true;
-	}
+    	this.buildFile("delegationReward.csv", rows, null);
+        log.info("delegations导出成功,总行数：{}", rows.size());
+        delegationRewardExportDone = true;
+    }
 
 	/**
 	 * 导出交易表交易hash

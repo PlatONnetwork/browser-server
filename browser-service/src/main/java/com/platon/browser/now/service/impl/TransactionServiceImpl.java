@@ -461,18 +461,18 @@ public class TransactionServiceImpl implements TransactionService {
 							} else {
 								resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
 							}
-							/*
-							 * 提案交易所在块高%共识周期块数,交易所在第几个共识轮
-							 */
-				            BigDecimal[] belongToConList = new BigDecimal(resp.getBlockNumber())
-				            		.divideAndRemainder(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
-				            BigDecimal belongToCon = belongToConList[0];
-				            /**
-				             * 预计退出区块数=（math.ceil（现有区块/结算周期区块数） + 锁定周期数） +* 结算周期区块数
-				             */
-							BigDecimal blockNum = (belongToCon.add(new BigDecimal(1)).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
-									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
-							resp.setRedeemUnLockedBlock(blockNum.toString());
+//							/*
+//							 * 提案交易所在块高%共识周期块数,交易所在第几个共识轮
+//							 */
+//				            BigDecimal[] belongToConList = new BigDecimal(resp.getBlockNumber())
+//				            		.divideAndRemainder(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
+//				            BigDecimal belongToCon = belongToConList[0];
+//				            /**
+//				             * 预计退出区块数=（math.ceil（现有区块/结算周期区块数） + 锁定周期数） +* 结算周期区块数
+//				             */
+//							BigDecimal blockNum = (belongToCon.add(new BigDecimal(1)).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
+//									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
+							resp.setRedeemUnLockedBlock(exitValidatorParam.getWithdrawBlockNum().toString());
 						}
 						break;
 						/**

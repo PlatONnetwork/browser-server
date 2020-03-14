@@ -4,7 +4,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
@@ -40,7 +40,7 @@ public class ProposalParamConverterTest extends AgentTestBase {
     @Mock
     private NetworkStatCache networkStatCache;
     @Mock
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Mock
     private ParameterService parameterService;
     @Mock
@@ -54,7 +54,7 @@ public class ProposalParamConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"proposalBusinessMapper",proposalBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"paramProposalCache",paramProposalCache);
+        ReflectionTestUtils.setField(target,"proposalCache",proposalCache);
         ReflectionTestUtils.setField(target,"parameterService",parameterService);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
 

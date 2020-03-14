@@ -50,6 +50,7 @@
     <result column="total_dele_reward" jdbcType="DECIMAL" property="totalDeleReward" />
     <result column="pre_total_dele_reward" jdbcType="DECIMAL" property="preTotalDeleReward" />
     <result column="exception_status" jdbcType="INTEGER" property="exceptionStatus" />
+    <result column="un_stake_freeze_duration" jdbcType="INTEGER" property="unStakeFreezeDuration" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Node">
     <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
@@ -121,7 +122,8 @@
     is_consensus, is_settle, is_init, stat_delegate_value, stat_delegate_released, stat_valid_addrs, 
     stat_invalid_addrs, stat_block_reward_value, stat_staking_reward_value, stat_fee_reward_value, 
     predict_staking_reward, create_time, update_time, reward_per, have_dele_reward, pre_dele_annualized_rate, 
-    dele_annualized_rate, total_dele_reward, pre_total_dele_reward, exception_status
+    dele_annualized_rate, total_dele_reward, pre_total_dele_reward, exception_status, 
+    un_stake_freeze_duration
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -192,7 +194,8 @@
       create_time, update_time, reward_per, 
       have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, 
       total_dele_reward, pre_total_dele_reward, exception_status, 
-      annualized_rate_info)
+      un_stake_freeze_duration, annualized_rate_info
+      )
     values (#{nodeId,jdbcType=VARCHAR}, #{statSlashMultiQty,jdbcType=INTEGER}, #{statSlashLowQty,jdbcType=INTEGER}, 
       #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=BIGINT}, #{statVerifierTime,jdbcType=INTEGER}, 
       #{isRecommend,jdbcType=INTEGER}, #{totalValue,jdbcType=DECIMAL}, #{stakingBlockNum,jdbcType=BIGINT}, 
@@ -210,7 +213,8 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rewardPer,jdbcType=INTEGER}, 
       #{haveDeleReward,jdbcType=DECIMAL}, #{preDeleAnnualizedRate,jdbcType=DOUBLE}, #{deleAnnualizedRate,jdbcType=DOUBLE}, 
       #{totalDeleReward,jdbcType=DECIMAL}, #{preTotalDeleReward,jdbcType=DECIMAL}, #{exceptionStatus,jdbcType=INTEGER}, 
-      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
+      #{unStakeFreezeDuration,jdbcType=INTEGER}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
     insert into node
@@ -358,6 +362,9 @@
       </if>
       <if test="exceptionStatus != null">
         exception_status,
+      </if>
+      <if test="unStakeFreezeDuration != null">
+        un_stake_freeze_duration,
       </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info,
@@ -507,6 +514,9 @@
       </if>
       <if test="exceptionStatus != null">
         #{exceptionStatus,jdbcType=INTEGER},
+      </if>
+      <if test="unStakeFreezeDuration != null">
+        #{unStakeFreezeDuration,jdbcType=INTEGER},
       </if>
       <if test="annualizedRateInfo != null">
         #{annualizedRateInfo,jdbcType=LONGVARCHAR},
@@ -666,6 +676,9 @@
       <if test="record.exceptionStatus != null">
         exception_status = #{record.exceptionStatus,jdbcType=INTEGER},
       </if>
+      <if test="record.unStakeFreezeDuration != null">
+        un_stake_freeze_duration = #{record.unStakeFreezeDuration,jdbcType=INTEGER},
+      </if>
       <if test="record.annualizedRateInfo != null">
         annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -724,6 +737,7 @@
       total_dele_reward = #{record.totalDeleReward,jdbcType=DECIMAL},
       pre_total_dele_reward = #{record.preTotalDeleReward,jdbcType=DECIMAL},
       exception_status = #{record.exceptionStatus,jdbcType=INTEGER},
+      un_stake_freeze_duration = #{record.unStakeFreezeDuration,jdbcType=INTEGER},
       annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -778,7 +792,8 @@
       dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{record.totalDeleReward,jdbcType=DECIMAL},
       pre_total_dele_reward = #{record.preTotalDeleReward,jdbcType=DECIMAL},
-      exception_status = #{record.exceptionStatus,jdbcType=INTEGER}
+      exception_status = #{record.exceptionStatus,jdbcType=INTEGER},
+      un_stake_freeze_duration = #{record.unStakeFreezeDuration,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -927,6 +942,9 @@
       <if test="exceptionStatus != null">
         exception_status = #{exceptionStatus,jdbcType=INTEGER},
       </if>
+      <if test="unStakeFreezeDuration != null">
+        un_stake_freeze_duration = #{unStakeFreezeDuration,jdbcType=INTEGER},
+      </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -982,6 +1000,7 @@
       total_dele_reward = #{totalDeleReward,jdbcType=DECIMAL},
       pre_total_dele_reward = #{preTotalDeleReward,jdbcType=DECIMAL},
       exception_status = #{exceptionStatus,jdbcType=INTEGER},
+      un_stake_freeze_duration = #{unStakeFreezeDuration,jdbcType=INTEGER},
       annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
@@ -1033,7 +1052,8 @@
       dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{totalDeleReward,jdbcType=DECIMAL},
       pre_total_dele_reward = #{preTotalDeleReward,jdbcType=DECIMAL},
-      exception_status = #{exceptionStatus,jdbcType=INTEGER}
+      exception_status = #{exceptionStatus,jdbcType=INTEGER},
+      un_stake_freeze_duration = #{unStakeFreezeDuration,jdbcType=INTEGER}
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -1052,7 +1072,8 @@
       stat_valid_addrs, stat_invalid_addrs, stat_block_reward_value, stat_staking_reward_value, 
       stat_fee_reward_value, predict_staking_reward, create_time, update_time, reward_per, 
       have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward, 
-      pre_total_dele_reward, exception_status, annualized_rate_info)
+      pre_total_dele_reward, exception_status, un_stake_freeze_duration, annualized_rate_info
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.statSlashMultiQty,jdbcType=INTEGER}, #{item.statSlashLowQty,jdbcType=INTEGER}, 
@@ -1074,7 +1095,8 @@
         #{item.haveDeleReward,jdbcType=DECIMAL}, #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}, 
         #{item.deleAnnualizedRate,jdbcType=DOUBLE}, #{item.totalDeleReward,jdbcType=DECIMAL}, 
         #{item.preTotalDeleReward,jdbcType=DECIMAL}, #{item.exceptionStatus,jdbcType=INTEGER}, 
-        #{item.annualizedRateInfo,jdbcType=LONGVARCHAR})
+        #{item.unStakeFreezeDuration,jdbcType=INTEGER}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -1235,6 +1257,9 @@
         </if>
         <if test="'exception_status'.toString() == column.value">
           #{item.exceptionStatus,jdbcType=INTEGER}
+        </if>
+        <if test="'un_stake_freeze_duration'.toString() == column.value">
+          #{item.unStakeFreezeDuration,jdbcType=INTEGER}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}

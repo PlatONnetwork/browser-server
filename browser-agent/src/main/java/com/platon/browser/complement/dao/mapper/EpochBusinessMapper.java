@@ -28,7 +28,14 @@ public interface EpochBusinessMapper {
     /**
      * 新选举周期数据变更（结算&共识周期往前推20个块）
      */
+    @Transactional
     void slashNode (BusinessParam param);
+    /**
+     * 新选举周期更新节点提取质押需要经过的周期数
+     */
+    @Transactional
+    void updateUnStakeFreezeDuration (BusinessParam param);
+
 
 
     /**

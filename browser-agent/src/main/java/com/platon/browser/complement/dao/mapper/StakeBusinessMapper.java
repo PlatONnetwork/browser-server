@@ -2,12 +2,10 @@ package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.dao.entity.Node;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /*
  * @Auther: dongqile
@@ -37,12 +35,6 @@ public interface StakeBusinessMapper {
      */
     @Transactional
     void exit(BusinessParam param);
-    
-    /**
-     * 查询质押总金额
-     */
-    @Transactional
-    BigDecimal queryStakingValue(BusinessParam param);
 
     /**
      * 更新节点信息：keybase信息，程序版本号信息

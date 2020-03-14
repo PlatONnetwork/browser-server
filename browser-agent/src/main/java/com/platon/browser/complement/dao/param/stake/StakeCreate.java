@@ -53,6 +53,8 @@ public class StakeCreate implements BusinessParam {
     private String txHash;
     //委托奖励比例
     private int delegateRewardPer;
+    //解质押需要经过的结算周期数
+    private int unStakeFreezeDuration;
 
     @Override
     public BusinessType getBusinessType() {

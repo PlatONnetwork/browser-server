@@ -7,7 +7,7 @@ import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
@@ -23,7 +23,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -64,7 +63,7 @@ public class InitializationServiceTest extends AgentTestBase {
     @Mock
     private ProposalMapper proposalMapper;
     @Mock
-    private ParamProposalCache paramProposalCache;
+    private ProposalCache proposalCache;
     @Mock
     private ParameterService parameterService;
     @Mock
@@ -96,7 +95,7 @@ public class InitializationServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "addressCache", addressCache);
         ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
-        ReflectionTestUtils.setField(target, "paramProposalCache", paramProposalCache);
+        ReflectionTestUtils.setField(target, "proposalCache", proposalCache);
         ReflectionTestUtils.setField(target, "parameterService", parameterService);
         ReflectionTestUtils.setField(target, "gasEstimateLogMapper", gasEstimateLogMapper);
         ReflectionTestUtils.setField(target, "gasEstimateEventPublisher", gasEstimateEventPublisher);
@@ -108,6 +107,7 @@ public class InitializationServiceTest extends AgentTestBase {
         when(chainConfig.getDefaultStakingList()).thenReturn(stakingList);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(100000000));
         when(proposalMapper.selectByExample(any())).thenReturn(new ArrayList<>(proposalList));
+        when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
         List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
         GasEstimateLog gel = new GasEstimateLog();
         gel.setSeq(1l);

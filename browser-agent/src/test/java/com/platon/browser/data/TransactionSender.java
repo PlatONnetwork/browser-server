@@ -57,7 +57,7 @@ public class TransactionSender {
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
     RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);
     ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
-    private String stakingPubKey = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
+    private String stakingPubKey = "0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
     private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 
 //    private String stakingPubKey = "bfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf";
@@ -217,10 +217,10 @@ public class TransactionSender {
     // 发送解委托交易
     @Test
     public void unDelegate() throws Exception {
-    	BigDecimal delegate = Convert.toVon("10000", Unit.LAT);
+    	BigDecimal delegate = Convert.toVon("65000", Unit.LAT);
         TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
-                BigInteger.valueOf(164),
+                BigInteger.valueOf(1514),
                 delegate.toBigInteger(),new GasProvider() {
         			
         			@Override
@@ -230,7 +230,7 @@ public class TransactionSender {
         			
         			@Override
         			public BigInteger getGasLimit() {
-        				return BigInteger.valueOf(30000l);
+        				return BigInteger.valueOf(300000l);
         			}
         		}
         ).send();
@@ -249,7 +249,7 @@ public class TransactionSender {
 			
 			@Override
 			public BigInteger getGasLimit() {
-				return BigInteger.valueOf(30000l);
+				return BigInteger.valueOf(3000000l);
 			}
 		}).send();
         logger.debug("res:{}",res);

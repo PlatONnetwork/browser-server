@@ -42,4 +42,8 @@ public class StakeExitParam extends TxParam{
      *  撤销金额
      */
     private BigDecimal amount;
+    /**
+     * 节点实际的退出区块号（质押金退还的到账区块号）
+     */
+    private BigInteger withdrawBlockNum;
 }

@@ -1,7 +1,7 @@
 package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.cache.ParamProposalCache;
+import com.platon.browser.common.complement.cache.ProposalCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
@@ -37,7 +37,7 @@ public class ProposalParameterConverter extends BusinessParamConverter<NodeOpt> 
     @Autowired
     private NetworkStatCache networkStatCache;
     @Autowired
-	private ParamProposalCache paramProposalCache;
+	private ProposalCache proposalCache;
     @Autowired
 	private ParameterService parameterService;
 	
@@ -77,7 +77,7 @@ public class ProposalParameterConverter extends BusinessParamConverter<NodeOpt> 
     	proposalBusinessMapper.parameter(businessParam);
 
     	// 添加到参数提案缓存Map<未来生效块号,List<提案ID>>
-		paramProposalCache.add(activeBlockNum.longValue(),tx.getHash());
+		proposalCache.add(activeBlockNum.longValue(),tx.getHash());
 
 		String desc = NodeOpt.TypeEnum.PARAMETER.getTpl()
 				.replace("ID",txParam.getPIDID())

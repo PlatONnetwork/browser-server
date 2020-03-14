@@ -9,6 +9,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.service.govern.ParameterService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +35,8 @@ public class OnElectionConverterTest extends AgentTestBase {
     private NetworkStatCache networkStatCache;
     @Mock
     private BlockChainConfig blockChainConfig;
+    @Mock
+    private ParameterService parameterService;
 
     @Spy
     private OnElectionConverter target;
@@ -43,6 +46,7 @@ public class OnElectionConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"epochBusinessMapper",epochBusinessMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
+        ReflectionTestUtils.setField(target,"parameterService",parameterService);
         List<Staking> list = new ArrayList <>();
         stakingList.forEach(item ->{
         	Staking staking = new Staking();
@@ -56,6 +60,8 @@ public class OnElectionConverterTest extends AgentTestBase {
         when(blockChainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
+        when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
+        when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
     }
 
     @Test

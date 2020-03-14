@@ -2675,6 +2675,66 @@ public class StakingExample {
             addCriterion("exception_status not between", value1, value2, "exceptionStatus");
             return (Criteria) this;
         }
+
+        public Criteria andUnStakeFreezeDurationIsNull() {
+            addCriterion("un_stake_freeze_duration is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationIsNotNull() {
+            addCriterion("un_stake_freeze_duration is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationEqualTo(Integer value) {
+            addCriterion("un_stake_freeze_duration =", value, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationNotEqualTo(Integer value) {
+            addCriterion("un_stake_freeze_duration <>", value, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationGreaterThan(Integer value) {
+            addCriterion("un_stake_freeze_duration >", value, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationGreaterThanOrEqualTo(Integer value) {
+            addCriterion("un_stake_freeze_duration >=", value, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationLessThan(Integer value) {
+            addCriterion("un_stake_freeze_duration <", value, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationLessThanOrEqualTo(Integer value) {
+            addCriterion("un_stake_freeze_duration <=", value, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationIn(List<Integer> values) {
+            addCriterion("un_stake_freeze_duration in", values, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationNotIn(List<Integer> values) {
+            addCriterion("un_stake_freeze_duration not in", values, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationBetween(Integer value1, Integer value2) {
+            addCriterion("un_stake_freeze_duration between", value1, value2, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeFreezeDurationNotBetween(Integer value1, Integer value2) {
+            addCriterion("un_stake_freeze_duration not between", value1, value2, "unStakeFreezeDuration");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
