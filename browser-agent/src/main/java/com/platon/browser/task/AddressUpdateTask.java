@@ -1,12 +1,13 @@
 package com.platon.browser.task;
 
-import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.enums.AddressTypeEnum;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

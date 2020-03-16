@@ -1,10 +1,10 @@
 package com.platon.browser.common.complement.cache;
 
-import com.platon.browser.common.enums.AddressTypeEnum;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;

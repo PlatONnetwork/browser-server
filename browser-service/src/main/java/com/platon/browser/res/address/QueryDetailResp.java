@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  *  @data 2019年8月31日
  */
 public class QueryDetailResp {
-	private Integer type;                //地址详情  1：账号   2：合约   3：内置合约
+	private Integer type;                //地址详情  1：账号   2：内置合约   3：EVM合约 4:WASM
     private BigDecimal balance;             //余额(单位:LAT)
     private BigDecimal restrictingBalance;  //锁仓余额(单位:LAT)
     private BigDecimal stakingValue;        //质押的金额

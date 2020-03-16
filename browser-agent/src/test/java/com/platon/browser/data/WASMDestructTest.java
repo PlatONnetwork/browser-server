@@ -19,12 +19,12 @@ public class WASMDestructTest extends BaseContractTest {
 
         String name = "hudenian";
         try {
-        	/**
-        	 * 会因gas失败的交易场景
-        	 */
-        	Destory_contract failContract = Destory_contract.deploy(web3j, transactionManager, gasProvider,"").send();
-
-            System.out.println("contractAddress " + failContract.getContractAddress());
+//        	/**
+//        	 * 会因gas失败的交易场景
+//        	 */
+//        	Destory_contract failContract = Destory_contract.deploy(web3j, transactionManager, gasProvider,"").send();
+//
+//            System.out.println("contractAddress " + failContract.getContractAddress());
         	
             /**
              * 交易成功的合约场景

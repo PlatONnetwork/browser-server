@@ -44,7 +44,7 @@ public interface AppDocAddress {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "type":"",                //地址类型  1：账号    2：evm合约  3：内置合约  4:wasm合约
+     *       "type":"",                //地址类型   1：账号   2：内置合约   3：EVM合约 4:WASM
      *       "balance":"",             //余额(单位:LAT)
      *       "restrictingBalance":"",  //锁仓余额(单位:LAT)
      *       "stakingValue":"",        //质押的金额
