@@ -45,7 +45,7 @@ public class GeneralContractDecodeUtil {
                 }
             }
         } catch (Exception e) {
-            log.error("解析普通合约交易输入出错:",e);
+            log.error("解析普通合约交易输入出错,系统将默认把当前交易识别为EVM合约创建:",e);
         }
         return result;
     }
