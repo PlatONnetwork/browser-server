@@ -87,7 +87,7 @@
 
 	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.slash.Report">
 		/*2、更新节点*/
-		update `node` set` un_stake_freeze_duration` = #{unStakeFreezeDuration}
+		update `node` set `un_stake_freeze_duration` = #{unStakeFreezeDuration}
 		where `node_id` = #{nodeId};
 		/*3、更新质押*/
 		update `staking` set `un_stake_freeze_duration` = #{unStakeFreezeDuration}

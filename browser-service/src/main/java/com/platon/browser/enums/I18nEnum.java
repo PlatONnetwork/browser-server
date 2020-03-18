@@ -123,6 +123,8 @@ public enum I18nEnum {
     RESTRICTING_CREATE,
     MULTI_SIGN,
     CLAIM_REWARDS,
+    EVM_CONTRACT_CREATE,
+    WASM_CONTRACT_CREATE,
     
     CODE0,
     CODE1,
@@ -219,7 +221,9 @@ public enum I18nEnum {
     CODE304010,
     CODE304011,
     CODE304012,
-    CODE304013
+    CODE304013,
+    
+    CODE305001
     ;
 	
 	private static final Map <String, I18nEnum> ENUMS = new HashMap <>();
