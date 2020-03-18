@@ -15,7 +15,8 @@ public class DelegationReward {
     private Date creTime;
     private Date updTime;
     private String extra;
-    
+    private String extraClean;
+
     @Data
     public static class Extra {
 	    private String nodeName;
