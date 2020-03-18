@@ -4,8 +4,11 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
-import lombok.Data;
+import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
+import com.platon.sdk.contracts.ppos.dto.resp.ParamItem;
+import com.platon.sdk.contracts.ppos.dto.resp.ParamValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -173,6 +176,11 @@ public class BlockChainConfig {
     private String keyBaseApi;
     // 初始内置节点默认质押金额(VON)
     private BigDecimal defaultStakingLockedAmount;
+    // 零出块次数阈值，在指定时间范围内达到该次数则处罚
+    private Integer zeroProduceNumberThreshold;
+    // 说明：用N代表下面字段所设置的值，阐述如下：
+    // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
+    private Integer zeroProduceCumulativeTime;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakingList=new ArrayList<>();
 
@@ -180,6 +188,26 @@ public class BlockChainConfig {
     public void init() throws ConfigLoadingException {
         defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.LAT);
         updateWithEconomicConfig(client.getEconomicConfig());
+        updateWithGovernParams(client.getGovernParamValue(""));
+    }
+
+    private void updateWithGovernParams(List<GovernParam> governParam) {
+        governParam.forEach(param->{
+            ParamItem pi = param.getParamItem();
+            ParamValue pv = param.getParamValue();
+            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(pi.getName());
+            switch (paramEnum){
+                case ZERO_PRODUCE_NUMBER_THRESHOLD:
+                    this.setZeroProduceNumberThreshold(Integer.valueOf(pv.getValue()));
+                    break;
+                // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
+                case ZERO_PRODUCE_CUMULATIVE_TIME:
+                    this.setZeroProduceCumulativeTime(Integer.valueOf(pv.getValue()));
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     private void updateWithEconomicConfig(EconomicConfig dec) {
@@ -667,6 +695,22 @@ public class BlockChainConfig {
 
     public void setDefaultStakingLockedAmount ( BigDecimal defaultStakingLockedAmount ) {
         this.defaultStakingLockedAmount = defaultStakingLockedAmount;
+    }
+
+    public Integer getZeroProduceNumberThreshold() {
+        return zeroProduceNumberThreshold;
+    }
+
+    public void setZeroProduceNumberThreshold(Integer zeroProduceNumberThreshold) {
+        this.zeroProduceNumberThreshold = zeroProduceNumberThreshold;
+    }
+
+    public Integer getZeroProduceCumulativeTime() {
+        return zeroProduceCumulativeTime;
+    }
+
+    public void setZeroProduceCumulativeTime(Integer zeroProduceCumulativeTime) {
+        this.zeroProduceCumulativeTime = zeroProduceCumulativeTime;
     }
 
     public List <CustomStaking> getDefaultStakingList () {

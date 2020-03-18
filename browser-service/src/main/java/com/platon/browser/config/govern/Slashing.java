@@ -15,6 +15,11 @@ public class Slashing {
     private BigDecimal duplicateSignReportReward;
     private BigDecimal maxEvidenceAge;
     private BigDecimal slashBlocksReward;
+	// 零出块次数阈值，在指定时间范围内达到该次数则处罚
+	private Integer zeroProduceNumberThreshold;
+	// 说明：用N代表下面字段所设置的值，阐述如下：
+	// 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
+	private Integer zeroProduceCumulativeTime;
 	public BigDecimal getSlashFractionDuplicateSign() {
 		return slashFractionDuplicateSign;
 	}
@@ -38,5 +43,21 @@ public class Slashing {
 	}
 	public void setSlashBlocksReward(BigDecimal slashBlocksReward) {
 		this.slashBlocksReward = slashBlocksReward;
+	}
+
+	public Integer getZeroProduceNumberThreshold() {
+		return zeroProduceNumberThreshold;
+	}
+
+	public void setZeroProduceNumberThreshold(Integer zeroProduceNumberThreshold) {
+		this.zeroProduceNumberThreshold = zeroProduceNumberThreshold;
+	}
+
+	public Integer getZeroProduceCumulativeTime() {
+		return zeroProduceCumulativeTime;
+	}
+
+	public void setZeroProduceCumulativeTime(Integer zeroProduceCumulativeTime) {
+		this.zeroProduceCumulativeTime = zeroProduceCumulativeTime;
 	}
 }

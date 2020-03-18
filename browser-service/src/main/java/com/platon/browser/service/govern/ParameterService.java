@@ -92,6 +92,10 @@ public class ParameterService {
         chainConfig.setSlashBlockRewardCount(modifiableParam.getSlashing().getSlashBlocksReward());
         //默认每个区块的最大Gas
         chainConfig.setMaxBlockGasLimit(modifiableParam.getBlock().getMaxBlockGasLimit());
+        // 零出块次数阈值，在指定时间范围内达到该次数则处罚
+        chainConfig.setZeroProduceNumberThreshold(modifiableParam.getSlashing().getZeroProduceNumberThreshold());
+        // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
+        chainConfig.setZeroProduceCumulativeTime(modifiableParam.getSlashing().getZeroProduceCumulativeTime());
     }
 
     /**
@@ -144,6 +148,14 @@ public class ParameterService {
             // 区块相关
             case MAX_BLOCK_GAS_LIMIT:
                 staleValue = chainConfig.getMaxBlockGasLimit().toString();
+                break;
+            // 零出块次数阈值，在指定时间范围内达到该次数则处罚
+            case ZERO_PRODUCE_NUMBER_THRESHOLD:
+                staleValue = chainConfig.getZeroProduceNumberThreshold().toString();
+                break;
+            // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
+            case ZERO_PRODUCE_CUMULATIVE_TIME:
+                staleValue = chainConfig.getZeroProduceCumulativeTime().toString();
                 break;
             default:
                 break;
