@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 public class StakingDetailsResp {
 	private String nodeName;            //验证人名称
     private String stakingIcon;         //验证人图标
-    private Integer status;              //状态   1:候选中  2:活跃中  3:出块中
+    private Integer status;              //状态   1:候选中  2:活跃中  3:出块中  4:退出中 5:已退出
     private BigDecimal totalValue;          //质押总数=有效的质押+委托
     private BigDecimal delegateValue;       //委托总数
     private BigDecimal stakingValue;        //质押总数
