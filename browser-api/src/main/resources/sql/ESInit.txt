@@ -411,6 +411,9 @@ PUT /_template/delegation_reward_template
       "extra": {
         "type": "text"
       },
+      "extra_clean": {
+        "type": "text"
+      },
       "time": {
         "type": "date",
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
