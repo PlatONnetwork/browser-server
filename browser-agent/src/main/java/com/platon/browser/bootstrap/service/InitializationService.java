@@ -149,7 +149,9 @@ public class InitializationService {
         List<GasEstimateLog> gasEstimateLogs = gasEstimateLogMapper.selectByExample(condition);
         gasEstimateLogs.forEach(e->{
             List<GasEstimate> estimates = JSON.parseArray(e.getJson(),GasEstimate.class);
-            gasEstimateEventPublisher.publish(e.getSeq(),estimates);
+            if(estimates!=null&&!estimates.isEmpty()){
+                gasEstimateEventPublisher.publish(e.getSeq(),estimates);
+            }
         });
 
         return initialResult;
