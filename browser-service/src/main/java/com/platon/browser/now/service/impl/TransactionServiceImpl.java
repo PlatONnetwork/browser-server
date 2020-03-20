@@ -227,7 +227,7 @@ public class TransactionServiceImpl implements TransactionService {
 		constructor.setResult(new String[] { "hash", "time", "status", "from",
 			      "to", "value", "num", "type", "toType", "cost"});
 		try {
-			items = transactionESRepository.search(constructor, Transaction.class, 1, 3000);
+			items = transactionESRepository.search(constructor, Transaction.class, 1, 30000);
 		} catch (IOException e) {
 			logger.error(ERROR_TIPS, e);
 		}
