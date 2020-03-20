@@ -24,7 +24,7 @@ public class NetworkStatCacheTest extends AgentTestBase {
         networkStatCache.setNetworkStat(networkStatList.get(0));
         assertEquals(networkStatCache.getNetworkStat(),networkStatList.get(0));
         networkStatCache.updateByBlock(blockList.get(0),333);
-        networkStatCache.updateByTask(BigDecimal.TEN,BigDecimal.ONE,BigDecimal.TEN,BigDecimal.ONE,33,33,BigDecimal.TEN);
+        networkStatCache.updateByTask(BigDecimal.TEN,BigDecimal.ONE,BigDecimal.ONE,BigDecimal.TEN,BigDecimal.ONE,33,33,BigDecimal.TEN);
         networkStatCache.getNetworkStat();
         networkStatCache.getAndIncrementNodeOptSeq();
         networkStatCache.getTpsCalcCache();

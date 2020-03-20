@@ -62,6 +62,8 @@ public class NetworkStatUpdateTask {
 			BigDecimal issueValue = CalculateUtils.calculationIssueValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance);
 			//计算流通量
 			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,new BigInteger(issueEpochRound.toString()),inciteBalance,stakingBalance,restrictBalance,rewardBalance);
+			//计算可使用质押量
+			BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance);
 			//获得节点相关的网络统计
 			NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
 			BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();
@@ -79,7 +81,7 @@ public class NetworkStatUpdateTask {
 
 			//获得进行中的提案
 			int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-			networkStatCache.updateByTask(issueValue,turnValue,totalValue,stakingValue,addressQty,doingProposalQty,stakingReward);
+			networkStatCache.updateByTask(issueValue,turnValue,availableStaking,totalValue,stakingValue,addressQty,doingProposalQty,stakingReward);
 		} catch (Exception e) {
 			log.error("网络统计任务出错:",e);
 		}

@@ -1,0 +1,1 @@
+ALTER TABLE `network_stat` ADD COLUMN `available_staking` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '可用总质押量(von)' after `turn_value` ;

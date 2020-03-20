@@ -74,6 +74,23 @@ public class CalculateUtils {
 				.subtract(incentivePoolAccountBalance)
 				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.LAT):BigDecimal.ZERO);
 	}
+	
+	public static BigDecimal calculationAvailableValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
+		int curIssueEpoch=issueEpoch.intValue();
+		//获取初始发行金额
+		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
+		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
+		//获取增发比例
+		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
+
+		//年份增发量 = (1+增发比例)的增发年份次方
+		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
+		// 发行量
+		return initIssueAmount
+				.multiply(circulationByYear)
+				.subtract(incentivePoolAccountBalance);
+	}
 
 	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, BigInteger issueEpoch,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance,BigDecimal rewardBalance){
 		//当前块高所属结算周期
