@@ -26,6 +26,8 @@ public class NetworkStat {
 
     private BigDecimal turnValue;
 
+    private BigDecimal availableStaking;
+
     private BigDecimal stakingDelegationValue;
 
     private BigDecimal stakingValue;
@@ -134,6 +136,14 @@ public class NetworkStat {
 
     public void setTurnValue(BigDecimal turnValue) {
         this.turnValue = turnValue;
+    }
+
+    public BigDecimal getAvailableStaking() {
+        return availableStaking;
+    }
+
+    public void setAvailableStaking(BigDecimal availableStaking) {
+        this.availableStaking = availableStaking;
     }
 
     public BigDecimal getStakingDelegationValue() {
@@ -274,6 +284,7 @@ public class NetworkStat {
         maxTps("max_tps", "maxTps", "INTEGER", false),
         issueValue("issue_value", "issueValue", "DECIMAL", false),
         turnValue("turn_value", "turnValue", "DECIMAL", false),
+        availableStaking("available_staking", "availableStaking", "DECIMAL", false),
         stakingDelegationValue("staking_delegation_value", "stakingDelegationValue", "DECIMAL", false),
         stakingValue("staking_value", "stakingValue", "DECIMAL", false),
         doingProposalQty("doing_proposal_qty", "doingProposalQty", "INTEGER", false),

@@ -736,6 +736,66 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
+        public Criteria andAvailableStakingIsNull() {
+            addCriterion("available_staking is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingIsNotNull() {
+            addCriterion("available_staking is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingEqualTo(BigDecimal value) {
+            addCriterion("available_staking =", value, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingNotEqualTo(BigDecimal value) {
+            addCriterion("available_staking <>", value, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingGreaterThan(BigDecimal value) {
+            addCriterion("available_staking >", value, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("available_staking >=", value, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingLessThan(BigDecimal value) {
+            addCriterion("available_staking <", value, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("available_staking <=", value, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingIn(List<BigDecimal> values) {
+            addCriterion("available_staking in", values, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingNotIn(List<BigDecimal> values) {
+            addCriterion("available_staking not in", values, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("available_staking between", value1, value2, "availableStaking");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvailableStakingNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("available_staking not between", value1, value2, "availableStaking");
+            return (Criteria) this;
+        }
+
         public Criteria andStakingDelegationValueIsNull() {
             addCriterion("staking_delegation_value is null");
             return (Criteria) this;
