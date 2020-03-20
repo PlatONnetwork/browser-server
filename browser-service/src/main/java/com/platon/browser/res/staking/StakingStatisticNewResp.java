@@ -24,12 +24,20 @@ public class StakingStatisticNewResp {
 	private Long addIssueBegin; // 当前增发周期的开始快高
 	private Long addIssueEnd; // 当前增发周期的结束块高
 	private Long nextSetting; // 离下个结算周期倒计时
+	private BigDecimal availableStaking;// 总可用质押
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getStakingDelegationValue() {
 		return stakingDelegationValue;
 	}
 	public void setStakingDelegationValue(BigDecimal stakingDelegationValue) {
 		this.stakingDelegationValue = stakingDelegationValue;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public BigDecimal getAvailableStaking() {
+		return availableStaking;
+	}
+	public void setAvailableStaking(BigDecimal availableStaking) {
+		this.availableStaking = availableStaking;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getStakingValue() {

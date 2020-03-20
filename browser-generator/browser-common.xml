@@ -22,11 +22,10 @@
             <property name="suppressDate" value="false"/>
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
-
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/browser_0.8.0.0_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.10.2.0_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="root"
-                        password="root"/>
+                        password="Juzhen123!"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="../browser-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
@@ -127,12 +126,6 @@
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>-->
 
-        <table tableName="node" domainObjectName="Node">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>
-
-        <table tableName="staking" domainObjectName="Staking">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>
+        <table tableName="network_stat" domainObjectName="NetworkStat"><columnRenamingRule searchString="^D_" replaceString=""/></table>
     </context>
 </generatorConfiguration>

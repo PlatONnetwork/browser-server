@@ -121,6 +121,7 @@ public interface AppDocHome {
      *       "addressQty":"",          //地址数
      *       "proposalQty":"",         //总提案数
      *       "doingProposalQty":""     //进行中提案数
+     *       "availableStaking":""   //可质押量
      *       "blockList":[
      *       {
      *       	"isRefresh":true // 是否更新,false不更新区块，true更新区块

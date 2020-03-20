@@ -26,7 +26,7 @@ public class ChainStatisticNewResp {
 	private Integer addressQty; // 地址数
 	private Integer proposalQty; // 总提案数
 	private Integer doingProposalQty; // 进行中提案数
-	
+	private BigDecimal availableStaking;// 总可用质押
 	private List<BlockListNewResp> blockList;
 	public Long getCurrentNumber() {
 		return currentNumber;
@@ -108,6 +108,13 @@ public class ChainStatisticNewResp {
 	}
 	public void setBlockList(List<BlockListNewResp> blockList) {
 		this.blockList = blockList;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public BigDecimal getAvailableStaking() {
+		return availableStaking;
+	}
+	public void setAvailableStaking(BigDecimal availableStaking) {
+		this.availableStaking = availableStaking;
 	}
 	
 }

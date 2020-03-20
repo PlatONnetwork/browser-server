@@ -51,7 +51,8 @@ public interface AppDocStaking {
      *       "currentNumber":111,      //当前区块高度
      *       "addIssueBegin":111,      //当前增发周期的开始快高
      *       "addIssueEnd":111,        //当前增发周期的结束块高
-     *       "nextSetting":111         //离下个结算周期倒计时
+     *       "nextSetting":111 ,        //离下个结算周期倒计时
+     *       "availableStaking":""   //可质押量
      *    }
      * }
      */	
