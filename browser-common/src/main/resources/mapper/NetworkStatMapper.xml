@@ -12,6 +12,7 @@
     <result column="max_tps" jdbcType="INTEGER" property="maxTps" />
     <result column="issue_value" jdbcType="DECIMAL" property="issueValue" />
     <result column="turn_value" jdbcType="DECIMAL" property="turnValue" />
+    <result column="available_staking" jdbcType="DECIMAL" property="availableStaking" />
     <result column="staking_delegation_value" jdbcType="DECIMAL" property="stakingDelegationValue" />
     <result column="staking_value" jdbcType="DECIMAL" property="stakingValue" />
     <result column="doing_proposal_qty" jdbcType="INTEGER" property="doingProposalQty" />
@@ -88,8 +89,8 @@
   </sql>
   <sql id="Base_Column_List">
     id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
-    turn_value, staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, 
-    address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
+    turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
+    proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
     add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NetworkStatExample" resultMap="BaseResultMap">
@@ -126,21 +127,21 @@
     insert into network_stat (id, cur_number, cur_block_hash, 
       node_id, node_name, tx_qty, 
       cur_tps, max_tps, issue_value, 
-      turn_value, staking_delegation_value, staking_value, 
-      doing_proposal_qty, proposal_qty, address_qty, 
-      block_reward, staking_reward, settle_staking_reward, 
-      add_issue_begin, add_issue_end, next_settle, 
-      node_opt_seq, create_time, update_time, 
-      avg_pack_time)
+      turn_value, available_staking, staking_delegation_value, 
+      staking_value, doing_proposal_qty, proposal_qty, 
+      address_qty, block_reward, staking_reward, 
+      settle_staking_reward, add_issue_begin, add_issue_end, 
+      next_settle, node_opt_seq, create_time, 
+      update_time, avg_pack_time)
     values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
       #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, 
       #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, 
-      #{turnValue,jdbcType=DECIMAL}, #{stakingDelegationValue,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, 
-      #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, #{addressQty,jdbcType=INTEGER}, 
-      #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, #{settleStakingReward,jdbcType=DECIMAL}, 
-      #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, #{nextSettle,jdbcType=BIGINT}, 
-      #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{avgPackTime,jdbcType=BIGINT})
+      #{turnValue,jdbcType=DECIMAL}, #{availableStaking,jdbcType=DECIMAL}, #{stakingDelegationValue,jdbcType=DECIMAL}, 
+      #{stakingValue,jdbcType=DECIMAL}, #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
+      #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, 
+      #{settleStakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
+      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into network_stat
@@ -174,6 +175,9 @@
       </if>
       <if test="turnValue != null">
         turn_value,
+      </if>
+      <if test="availableStaking != null">
+        available_staking,
       </if>
       <if test="stakingDelegationValue != null">
         staking_delegation_value,
@@ -251,6 +255,9 @@
       </if>
       <if test="turnValue != null">
         #{turnValue,jdbcType=DECIMAL},
+      </if>
+      <if test="availableStaking != null">
+        #{availableStaking,jdbcType=DECIMAL},
       </if>
       <if test="stakingDelegationValue != null">
         #{stakingDelegationValue,jdbcType=DECIMAL},
@@ -338,6 +345,9 @@
       <if test="record.turnValue != null">
         turn_value = #{record.turnValue,jdbcType=DECIMAL},
       </if>
+      <if test="record.availableStaking != null">
+        available_staking = #{record.availableStaking,jdbcType=DECIMAL},
+      </if>
       <if test="record.stakingDelegationValue != null">
         staking_delegation_value = #{record.stakingDelegationValue,jdbcType=DECIMAL},
       </if>
@@ -400,6 +410,7 @@
       max_tps = #{record.maxTps,jdbcType=INTEGER},
       issue_value = #{record.issueValue,jdbcType=DECIMAL},
       turn_value = #{record.turnValue,jdbcType=DECIMAL},
+      available_staking = #{record.availableStaking,jdbcType=DECIMAL},
       staking_delegation_value = #{record.stakingDelegationValue,jdbcType=DECIMAL},
       staking_value = #{record.stakingValue,jdbcType=DECIMAL},
       doing_proposal_qty = #{record.doingProposalQty,jdbcType=INTEGER},
@@ -448,6 +459,9 @@
       </if>
       <if test="turnValue != null">
         turn_value = #{turnValue,jdbcType=DECIMAL},
+      </if>
+      <if test="availableStaking != null">
+        available_staking = #{availableStaking,jdbcType=DECIMAL},
       </if>
       <if test="stakingDelegationValue != null">
         staking_delegation_value = #{stakingDelegationValue,jdbcType=DECIMAL},
@@ -508,6 +522,7 @@
       max_tps = #{maxTps,jdbcType=INTEGER},
       issue_value = #{issueValue,jdbcType=DECIMAL},
       turn_value = #{turnValue,jdbcType=DECIMAL},
+      available_staking = #{availableStaking,jdbcType=DECIMAL},
       staking_delegation_value = #{stakingDelegationValue,jdbcType=DECIMAL},
       staking_value = #{stakingValue,jdbcType=DECIMAL},
       doing_proposal_qty = #{doingProposalQty,jdbcType=INTEGER},
@@ -533,22 +548,23 @@
     -->
     insert into network_stat
     (id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
-      turn_value, staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, 
-      address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
-      add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time
-      )
+      turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
+      proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, 
+      add_issue_begin, add_issue_end, next_settle, node_opt_seq, create_time, update_time, 
+      avg_pack_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
         #{item.nodeId,jdbcType=VARCHAR}, #{item.nodeName,jdbcType=VARCHAR}, #{item.txQty,jdbcType=INTEGER}, 
         #{item.curTps,jdbcType=INTEGER}, #{item.maxTps,jdbcType=INTEGER}, #{item.issueValue,jdbcType=DECIMAL}, 
-        #{item.turnValue,jdbcType=DECIMAL}, #{item.stakingDelegationValue,jdbcType=DECIMAL}, 
-        #{item.stakingValue,jdbcType=DECIMAL}, #{item.doingProposalQty,jdbcType=INTEGER}, 
-        #{item.proposalQty,jdbcType=INTEGER}, #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, 
-        #{item.stakingReward,jdbcType=DECIMAL}, #{item.settleStakingReward,jdbcType=DECIMAL}, 
-        #{item.addIssueBegin,jdbcType=BIGINT}, #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, 
-        #{item.nodeOptSeq,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.avgPackTime,jdbcType=BIGINT})
+        #{item.turnValue,jdbcType=DECIMAL}, #{item.availableStaking,jdbcType=DECIMAL}, 
+        #{item.stakingDelegationValue,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL}, 
+        #{item.doingProposalQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, 
+        #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL}, 
+        #{item.settleStakingReward,jdbcType=DECIMAL}, #{item.addIssueBegin,jdbcType=BIGINT}, 
+        #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.avgPackTime,jdbcType=BIGINT}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -595,6 +611,9 @@
         </if>
         <if test="'turn_value'.toString() == column.value">
           #{item.turnValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'available_staking'.toString() == column.value">
+          #{item.availableStaking,jdbcType=DECIMAL}
         </if>
         <if test="'staking_delegation_value'.toString() == column.value">
           #{item.stakingDelegationValue,jdbcType=DECIMAL}
@@ -645,5 +664,4 @@
       )
     </foreach>
   </insert>
-
 </mapper>

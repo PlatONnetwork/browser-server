@@ -174,7 +174,7 @@ public interface AppDocStaking {
      *    "data": {
      *       "nodeName":"",            //验证人名称
      *       "stakingIcon":"",         //验证人图标
-     *       "status":"",              //状态   1:候选中  2:活跃中  3:出块中
+     *       "status":"",              //状态   1:候选中  2:活跃中  3:出块中   4:退出中 5:已退出
      *       "totalValue":"",          //质押总数=有效的质押+委托
      *       "delegateValue":"",       //委托总数
      *       "stakingValue":"",        //自有质押（有效的质押数）
