@@ -18,7 +18,6 @@ import com.platon.browser.now.service.ExtraService;
 import com.platon.browser.res.extra.ConfigDetail;
 import com.platon.browser.res.extra.ModuleConfig;
 import com.platon.browser.res.extra.QueryConfigResp;
-import com.platon.browser.util.ConvertUtil;
 
 /**
  * 实现
@@ -42,17 +41,17 @@ public class ExtraServiceImpl implements ExtraService {
 		 * 设置质押模块的配置
 		 */
 		ModuleConfig stakingModuleConfig = new ModuleConfig();
-		stakingModuleConfig.setModule("Staking");
+		stakingModuleConfig.setModule("staking");
 		/**
 		 * 设置惩罚模块的配置
 		 */
 		ModuleConfig slashingModuleConfig = new ModuleConfig();
-		slashingModuleConfig.setModule("Slashing");
+		slashingModuleConfig.setModule("slashing");
 		/**
 		 * 设置区块模块的配置
 		 */
 		ModuleConfig blockModuleConfig = new ModuleConfig();
-		blockModuleConfig.setModule("Block");
+		blockModuleConfig.setModule("block");
 		List<ConfigDetail> stakingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> slashingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> blockConfigDetails = new ArrayList<>();
@@ -112,7 +111,7 @@ public class ExtraServiceImpl implements ExtraService {
 				break;
 			}
 			
-			configDetail.setName(ConvertUtil.captureName(config.getName()));
+			configDetail.setName(config.getName());
 			/**
 			 * 设置质押和证据的上下区块
 			 */
@@ -132,7 +131,7 @@ public class ExtraServiceImpl implements ExtraService {
 		 * 设置质押的开始区间值
 		 */
 		for(ConfigDetail stakingConfig:stakingConfigDetails) {
-			if("UnStakeFreezeDuration".equals(stakingConfig.getName())) {
+			if("unStakeFreezeDuration".equals(stakingConfig.getName())) {
 				stakingConfig.setStartValue(maxEvidenceAge);
 				break;
 			}
@@ -141,7 +140,7 @@ public class ExtraServiceImpl implements ExtraService {
 		 * 设置惩罚证据的区间值
 		 */
 		for(ConfigDetail slashingConfig:slashingConfigDetails) {
-			if("MaxEvidenceAge".equals(slashingConfig.getName())) {
+			if("maxEvidenceAge".equals(slashingConfig.getName())) {
 				slashingConfig.setEndValue(unStakeFreezeDuration);
 				break;
 			}
