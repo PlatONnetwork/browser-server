@@ -150,6 +150,9 @@ public class OnSettleConverter {
         gasEstimateLog.setJson(JSON.toJSONString(gasEstimates));
         gasEstimateLogs.add(gasEstimateLog);
         customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs,GasEstimateLog.Column.values());
+        if(gasEstimates.isEmpty()){
+            log.error("结算周期["+event.getEpochMessage().getSettleEpochRound().intValue()+"]的前一周期验证人为空,无法对节点估算epoch进行累加操作！");
+        }
         // 2、发布到操作队列
         gasEstimateEventPublisher.publish(seq,gasEstimates);
 
