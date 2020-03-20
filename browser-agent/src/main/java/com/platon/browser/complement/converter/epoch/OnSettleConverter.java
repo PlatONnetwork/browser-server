@@ -17,6 +17,7 @@ import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.BusinessException;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,10 @@ public class OnSettleConverter {
         event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierMap.put(v.getNodeId(),v));
         Map<String,Node> preVerifierMap = new HashMap<>();
         event.getEpochMessage().getPreVerifierList().forEach(v->preVerifierMap.put(v.getNodeId(),v));
+
+        if(event.getEpochMessage().getPreVerifierList().isEmpty()){
+            throw new BusinessException("当前周期["+event.getEpochMessage().getSettleEpochRound().intValue()+"]的前一结算周期验证人列表为空！");
+        }
 
         Settle settle = Settle.builder()
                 .preVerifierSet(preVerifierMap.keySet())
@@ -150,6 +155,7 @@ public class OnSettleConverter {
         gasEstimateLog.setJson(JSON.toJSONString(gasEstimates));
         gasEstimateLogs.add(gasEstimateLog);
         customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs,GasEstimateLog.Column.values());
+
         // 2、发布到操作队列
         gasEstimateEventPublisher.publish(seq,gasEstimates);
 

@@ -137,7 +137,7 @@ public class InitializationService {
         // 初始化网络缓存
         networkStatCache.init(networkStat);
 
-        // 确保epochRetryService中的preStakeReward不为0
+        // 确保epochRetryService中的各种属性处于当前块状态：当前共识和结算周期验证人、前一共识和结算周期验证人等
         epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
         epochRetryService.settlementChange(BigInteger.valueOf(networkStat.getCurNumber()));
         epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
