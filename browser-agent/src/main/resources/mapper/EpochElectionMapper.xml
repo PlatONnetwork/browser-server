@@ -1,88 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
-
-<select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
-	/*查询低出块率质押节点*/
-	select  `node_id` as nodeId,
+	<select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
+		/*查询低出块率质押节点*/
+		select  `node_id` as nodeId,
+			`staking_block_num` as stakingBlockNum
+		from staking
+		where `status` = 1
+		and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
+		and `pre_cons_block_qty` = 0;
+	</select>
+	<update id="setException">
+		/*把节点设置为异常*/
+		/*2、更新质押*/
+		update `staking` set `exception_status` = 2
+		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
+		/*3、更新节点*/
+		update `node` set `exception_status` = 2
+		where `node_id` in  <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
+	</update>
+	<select id="getException" resultType="com.platon.browser.dao.entity.Staking">
+		/*查询异常节点*/
+		select  `node_id` as nodeId,
 		`staking_block_num` as stakingBlockNum
-	from staking
-	where `status` = 1
-	and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
-	and `pre_cons_block_qty` = 0;
-</select>
-
-<update id="setException">
-	/*把节点设置为异常*/
-	/*2、更新质押*/
-	update `staking` set `exception_status` = 2
-	where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
-	/*3、更新节点*/
-	update `node` set `exception_status` = 2
-	where `node_id` in  <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
-</update>
-
-<select id="getException" resultType="com.platon.browser.dao.entity.Staking">
-	/*查询异常节点*/
-	select  `node_id` as nodeId,
-	`staking_block_num` as stakingBlockNum
-	from staking
-	where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
-	and `exception_status` = 2
-	and `status` = 1;
-</select>
-
-<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
-	/*1、更新委托*/
-	<foreach collection="slashNodeList" item="item">
-		update `delegation` set
-			`delegate_released` = `delegate_hes` + `delegate_locked`,
-			`delegate_hes` = 0,
-			`delegate_locked` = 0
-		where `node_id` = #{item.nodeId}
-		and `staking_block_num` = #{item.stakingBlockNum}
-		and `is_history` = 2;
-    </foreach>
-	/*2、更新质押*/
-	update `staking` set
-		`leave_time` = #{time},
-		`status` = if(`staking_locked` > 0, 2, 3),
-		`staking_reduction_epoch` = #{settingEpoch},
-		`staking_reduction` = `staking_locked`,
-		`staking_locked` = 0,
-		`staking_hes` = 0,
-		`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
-		`stat_delegate_hes` = 0,
-		`stat_delegate_locked` = 0,
-		`is_consensus` = 2,
-		<if test="isPrePreRound == 1">
-			`exception_status` = 4,
-		</if>
-		`is_settle` = 2
-	where `status` = 1
-	and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
-	/*3、更新节点*/
-	update `node` n set
-		n.`leave_time` = #{time},
-		n.`status` = if(n.`staking_locked` > 0, 2, 3),
-		n.`staking_reduction_epoch` = #{settingEpoch},
-		n.`staking_reduction` = n.`staking_locked`,
-		n.`total_value` = 0,
-		n.`staking_locked` = 0,
-		n.`staking_hes` = 0,
-		n.`stat_delegate_released` = n.`stat_delegate_released` + n.`stat_delegate_value`,
-		n.`stat_delegate_value` = 0,
-		n.`stat_valid_addrs` = 0,
-		n.`stat_invalid_addrs` = (select count(distinct d.delegate_addr) from delegation d where d.node_id = n.`node_id` and d.is_history = 2),
-		n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
-		n.`is_consensus` = 2,
-		<if test="isPrePreRound == 1">
-			`exception_status` = 4,
-		</if>
-		n.`is_settle` = 2
-	where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
-</update>
-
+		from staking
+		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
+		and `exception_status` = 2
+		and `status` = 1;
+	</select>
+	<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
+		/*1、更新委托*/
+		<foreach collection="slashNodeList" item="item">
+			update `delegation` set
+				`delegate_released` = `delegate_hes` + `delegate_locked`,
+				`delegate_hes` = 0,
+				`delegate_locked` = 0
+			where `node_id` = #{item.nodeId}
+			and `staking_block_num` = #{item.stakingBlockNum}
+			and `is_history` = 2;
+		</foreach>
+		/*2、更新质押*/
+		update `staking` set
+			`leave_time` = #{time},
+			`status` = if(`staking_locked` > 0, 2, 3),
+			`staking_reduction_epoch` = #{settingEpoch},
+			`staking_reduction` = `staking_locked`,
+			`staking_locked` = 0,
+			`staking_hes` = 0,
+			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
+			`stat_delegate_hes` = 0,
+			`stat_delegate_locked` = 0,
+			`is_consensus` = 2,
+			`is_settle` = 2
+		where `status` = 1
+		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+		/*3、更新节点*/
+		update `node` n set
+			n.`leave_time` = #{time},
+			n.`status` = if(n.`staking_locked` > 0, 2, 3),
+			n.`staking_reduction_epoch` = #{settingEpoch},
+			n.`staking_reduction` = n.`staking_locked`,
+			n.`total_value` = 0,
+			n.`staking_locked` = 0,
+			n.`staking_hes` = 0,
+			n.`stat_delegate_released` = n.`stat_delegate_released` + n.`stat_delegate_value`,
+			n.`stat_delegate_value` = 0,
+			n.`stat_valid_addrs` = 0,
+			n.`stat_invalid_addrs` = (select count(distinct d.delegate_addr) from delegation d where d.node_id = n.`node_id` and d.is_history = 2),
+			n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
+			n.`is_consensus` = 2,
+			n.`is_settle` = 2
+		where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
+	</update>
 	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
 		/*2、更新质押*/
 		update `staking` set
