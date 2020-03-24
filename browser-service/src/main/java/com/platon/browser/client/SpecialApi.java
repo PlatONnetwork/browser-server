@@ -157,7 +157,7 @@ public class SpecialApi {
         if(br==null){
             throw new BlankResponseException(String.format("【查询历史低出块处罚信息出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
-        if(br.getCode()==ErrorCode.OBJECT_NOT_FOUND){
+        if(br.getData()==null){
             // 找不到数据，返回空列表
             return Collections.emptyList();
         }
