@@ -816,7 +816,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public RespPage<QueryClaimByStakingResp> queryClaimByStaking(QueryClaimByStakingReq req) {
 		/** 根据地址查询具体的领取奖励数据 */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.must(new ESQueryBuilders().fuzzy("extra_clean", req.getNodeId()));
+		constructor.must(new ESQueryBuilders().fuzzy("extraClean", req.getNodeId()));
 		constructor.setDesc("time");
 		ESResult<DelegationReward> delegationRewards = null;
 		try {

@@ -31,6 +31,12 @@ public class ExtraServiceImpl implements ExtraService {
 
 	@Autowired
 	private ConfigMapper configMapper;
+	
+	private static String stakingValue = "staking";
+	
+	private static String slashingValue = "slashing";
+	
+	private static String blockValue = "block";
 
 	@Override
 	public QueryConfigResp queryConfig() {
@@ -41,22 +47,24 @@ public class ExtraServiceImpl implements ExtraService {
 		 * 设置质押模块的配置
 		 */
 		ModuleConfig stakingModuleConfig = new ModuleConfig();
-		stakingModuleConfig.setModule("staking");
+		stakingModuleConfig.setModule(stakingValue);
 		/**
 		 * 设置惩罚模块的配置
 		 */
 		ModuleConfig slashingModuleConfig = new ModuleConfig();
-		slashingModuleConfig.setModule("slashing");
+		slashingModuleConfig.setModule(slashingValue);
 		/**
 		 * 设置区块模块的配置
 		 */
 		ModuleConfig blockModuleConfig = new ModuleConfig();
-		blockModuleConfig.setModule("block");
+		blockModuleConfig.setModule(blockValue);
 		List<ConfigDetail> stakingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> slashingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> blockConfigDetails = new ArrayList<>();
 		String maxEvidenceAge = "";
 		String unStakeFreezeDuration = "";
+		String zeroProduceCumulativeTime = "";
+		String zeroProduceNumberThreshold = "";
 		for(Config config:configs) {
 			ConfigDetail configDetail = new ConfigDetail();
 			/**
@@ -122,6 +130,12 @@ public class ExtraServiceImpl implements ExtraService {
 			case "maxEvidenceAge":
 				maxEvidenceAge = config.getValue();
 				break;
+			case "zeroProduceCumulativeTime":
+				zeroProduceCumulativeTime = config.getValue();
+				break;
+			case "zeroProduceNumberThreshold":
+				zeroProduceNumberThreshold = config.getValue();
+				break;
 
 			default:
 				break;
@@ -142,7 +156,12 @@ public class ExtraServiceImpl implements ExtraService {
 		for(ConfigDetail slashingConfig:slashingConfigDetails) {
 			if("maxEvidenceAge".equals(slashingConfig.getName())) {
 				slashingConfig.setEndValue(unStakeFreezeDuration);
-				break;
+			}
+			if("zeroProduceCumulativeTime".equals(slashingConfig.getName())) {
+				slashingConfig.setStartValue(zeroProduceNumberThreshold);
+			}
+			if("zeroProduceNumberThreshold".equals(slashingConfig.getName())) {
+				slashingConfig.setEndValue(zeroProduceCumulativeTime);
 			}
 		}
 		/**
