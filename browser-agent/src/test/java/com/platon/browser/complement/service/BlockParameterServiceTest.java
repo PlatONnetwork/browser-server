@@ -19,10 +19,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
@@ -54,7 +53,7 @@ public class BlockParameterServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "onSettleConverter", onSettleConverter);
         when(chainConfig.getElectionBackwardBlockCount()).thenReturn(BigInteger.ONE);
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(40));
-        when(onElectionConverter.convert(any(),any())).thenReturn(Optional.of(nodeOptList));
+        when(onElectionConverter.convert(any(),any())).thenReturn(nodeOptList);
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(80));
     }
 

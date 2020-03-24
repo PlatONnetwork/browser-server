@@ -1,25 +1,23 @@
 package com.platon.browser.complement.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.exception.NoSuchBeanException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.epoch.OnConsensusConverter;
 import com.platon.browser.complement.converter.epoch.OnElectionConverter;
 import com.platon.browser.complement.converter.epoch.OnNewBlockConverter;
 import com.platon.browser.complement.converter.epoch.OnSettleConverter;
 import com.platon.browser.config.BlockChainConfig;
-
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @description: 业务入库参数服务
@@ -58,8 +56,8 @@ public class BlockParameterService {
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
-            Optional<List<NodeOpt>> nodeOpt = onElectionConverter.convert(event, block);
-            nodeOpt.ifPresent(nodeOptList::addAll);
+            List<NodeOpt> nodeOpt = onElectionConverter.convert(event, block);
+            nodeOptList.addAll(nodeOpt);
         }
 
         // 新共识周期事件

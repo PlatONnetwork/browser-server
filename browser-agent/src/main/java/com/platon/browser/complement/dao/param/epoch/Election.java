@@ -25,8 +25,6 @@ public class Election implements BusinessParam {
     private int settingEpoch;
     //时间
     private Date time;
-    // 是否惩罚上上轮
-    private int isPrePreRound;
     //解质押需要经过的结算周期数
     private int unStakeFreezeDuration;
 

@@ -30,7 +30,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * @Auther: Chendongming
@@ -49,6 +48,10 @@ public class SpecialApi {
      * 查询历史共识周期的验证人列
      */
     public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1107;
+    /**
+     * 历史低出块处罚信息
+     */
+    public static final int GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE = 1110;
     /**
      * 查询版本列表
      */
@@ -140,6 +143,34 @@ public class SpecialApi {
      */
     public List<Node> getHistoryValidatorList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         return nodeCall(web3j,blockNumber,GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE);
+    }
+
+    /**
+     * 根据区块号获取历史低出块处罚信息列表
+     * @param blockNumber
+     * @return
+     * @throws Exception
+     */
+    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
+        final Function function = new Function(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
+        CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null){
+            throw new BlankResponseException(String.format("【查询历史低出块处罚信息出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
+        }
+        if(br.getData()==null){
+            // 找不到数据，返回空列表
+            return Collections.emptyList();
+        }
+        if(br.isStatusOk()){
+            String data = br.getData();
+            if(data==null){
+                throw new BlankResponseException(BLANK_RES);
+            }
+            return JSON.parseArray(data,HistoryLowRateSlash.class);
+        }else{
+            String msg = JSON.toJSONString(br,true);
+            throw new ContractInvokeException(String.format("【查询历史低出块处罚信息出错】函数类型:%s,区块号:%s,返回数据:%s",GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE,blockNumber.toString(),msg));
+        }
     }
 
     /**
