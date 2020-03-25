@@ -31,7 +31,6 @@
     ) on duplicate key update
     `delegate_hes` = `delegate_hes` + #{amount},
     `is_history` = 2,
-    `sequence` = #{sequence},
     `cur_delegation_block_num` = #{blockNumber};
 </update>
 </mapper>
