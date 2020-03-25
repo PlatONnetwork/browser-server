@@ -56,7 +56,7 @@
 			AND node_id=#{nodeId,jdbcType=VARCHAR}
 		</if>
 	</where>
-	 group by `delegate_addr` order by `sequence` desc
+	 group by `delegate_addr` order by `cur_delegation_block_num` desc
   </select>
   
   <select id="selectAddressByAddr" resultMap="AddressListResultMap">
@@ -68,7 +68,7 @@
 			AND d.`delegate_addr`=#{delegateAddr,jdbcType=VARCHAR}
 		</if>
 	</where>
-	group by d.`node_id` order by d.`sequence` desc
+	group by d.`node_id` order by d.`cur_delegation_block_num` desc
   </select>
   
 </mapper>
