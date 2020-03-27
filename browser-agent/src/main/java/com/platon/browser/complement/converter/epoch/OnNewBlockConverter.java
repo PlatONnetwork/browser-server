@@ -105,6 +105,7 @@ public class OnNewBlockConverter {
                         }
                     }
                 } catch (Exception e) {
+                	log.error("get error",e);
                     throw new BusinessException(e.getMessage());
                 }
             }

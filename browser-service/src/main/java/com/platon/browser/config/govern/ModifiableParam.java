@@ -31,6 +31,8 @@ public class ModifiableParam {
                 .maxEvidenceAge(BigDecimal.ZERO)
                 .slashBlocksReward(BigDecimal.ZERO)
                 .slashFractionDuplicateSign(BigDecimal.ZERO)
+                .zeroProduceCumulativeTime(0)
+                .zeroProduceNumberThreshold(0)
                 .build();
         this.block=Block.builder()
                 .maxBlockGasLimit(BigDecimal.ZERO)
@@ -67,6 +69,12 @@ public class ModifiableParam {
                 // 区块相关
                 case MAX_BLOCK_GAS_LIMIT:
                     block.setMaxBlockGasLimit(new BigDecimal(config.getValue()));
+                    break;
+                case ZERO_PRODUCE_CUMULATIVE_TIME:
+                	slashing.setZeroProduceCumulativeTime(Integer.valueOf(config.getValue()));
+                    break;
+                case ZERO_PRODUCE_NUMBER_THRESHOLD:
+                	slashing.setZeroProduceNumberThreshold(Integer.valueOf(config.getValue()));
                     break;
                 default:
                     break;
