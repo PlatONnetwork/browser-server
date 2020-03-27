@@ -45,9 +45,9 @@ public class ProposalService {
      */
     public TallyResult getTallyResult (String proposalHash ) throws Exception {
         CallResponse<TallyResult> result = client.getProposalContract().getTallyResult(proposalHash).send();
-        if (result.isStatusOk()) {
-            return result.getData();
+        if(result.getData()==null){
+            log.warn("提案["+proposalHash+"]的投票结果为空!");
         }
-        throw new ContractInvokeException("查询不到提案[proposalHash=" + proposalHash + "]对应的投票结果!");
+        return result.getData();
     }
 }

@@ -76,6 +76,7 @@ public class OnNewBlockConverter {
             for (String hash : proposalTxHashSet) {
                 try {
                     TallyResult tr = proposalService.getTallyResult(hash);
+                    if(tr==null) continue;
                     if(tr.getStatus()== CustomProposal.StatusEnum.PASS.getCode()||tr.getStatus()==CustomProposal.StatusEnum.FINISH.getCode()){
                         // 提案通过（参数提案，status=2）||提案生效（升级提案,status=5）：
                         // 把提案表中的参数覆盖到Config表中对应的参数
