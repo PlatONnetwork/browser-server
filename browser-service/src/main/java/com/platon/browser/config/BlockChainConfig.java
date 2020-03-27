@@ -188,7 +188,7 @@ public class BlockChainConfig {
     public void init() throws ConfigLoadingException {
         defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.LAT);
         updateWithEconomicConfig(client.getEconomicConfig());
-        updateWithGovernParams(client.getGovernParamValue(""));
+//        updateWithGovernParams(client.getGovernParamValue(""));
     }
 
     private void updateWithGovernParams(List<GovernParam> governParam) {
@@ -287,6 +287,10 @@ public class BlockChainConfig {
         this.setStakeRewardRate(BigDecimal.ONE.subtract(this.blockRewardRate));
         //【奖励】Platon基金会年限
         this.setPlatOnFoundationYear(dec.getReward().getPlatonFoundationYear());
+        //【惩罚】零出块次数
+        this.setZeroProduceCumulativeTime(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
+        //【惩罚】零出块阈值
+        this.setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
     }
 
     public ConfigMapper getConfigMapper () {
