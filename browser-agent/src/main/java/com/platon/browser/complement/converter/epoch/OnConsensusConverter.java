@@ -96,8 +96,12 @@ public class OnConsensusConverter {
         stakingKey.setNodeId(businessParam.getNodeId());
         stakingKey.setStakingBlockNum(businessParam.getStakingBlockNum().longValue());
         Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        //惩罚的金额
-        BigDecimal codeSlashValue = staking.getStakingLocked().multiply(businessParam.getSlashRate());
+        //惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
+        BigDecimal stakingAmount = staking.getStakingLocked();
+        if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
+        	stakingAmount = staking.getStakingReduction();
+        }
+        BigDecimal codeSlashValue = stakingAmount.multiply(businessParam.getSlashRate());
         //奖励的金额
         BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
         //当前锁定的
