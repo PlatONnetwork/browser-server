@@ -104,9 +104,18 @@ public class OnConsensusConverter {
         BigDecimal codeSlashValue = stakingAmount.multiply(businessParam.getSlashRate());
         //奖励的金额
         BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
-        //当前锁定的
-        BigDecimal codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
-        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO)>0){
+        //当前锁定的大于零则扣除金额，不大于则保留
+        BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
+        if(staking.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
+        	codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
+        }
+        /**
+         * 如果扣减的结果小于0则设置为0
+         */
+        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
+        	codeCurStakingLocked = BigDecimal.ZERO;
+        }
+        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO)>=0){
             businessParam.setCodeStatus(2);
             businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
         }else {
