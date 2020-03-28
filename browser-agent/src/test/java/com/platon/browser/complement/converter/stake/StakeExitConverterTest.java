@@ -64,6 +64,7 @@ public class StakeExitConverterTest extends AgentTestBase {
         when(stakingMapper.selectByPrimaryKey(any())).thenReturn(stakingList.get(0));
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(400));
+        when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(BigInteger.valueOf(400));
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
     }
 

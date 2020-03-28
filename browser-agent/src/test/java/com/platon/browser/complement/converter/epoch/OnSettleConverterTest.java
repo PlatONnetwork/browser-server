@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -61,7 +60,9 @@ public class OnSettleConverterTest extends AgentTestBase {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setCurValidatorList(validatorList);
+        epochMessage.setPreValidatorList(validatorList);
         epochMessage.setCurVerifierList(verifierList);
+        epochMessage.setPreVerifierList(verifierList);
         epochMessage.setStakeReward(new BigDecimal("10000"));
         epochMessage.setSettleEpochRound(BigInteger.TEN);
         CollectionEvent collectionEvent = new CollectionEvent();

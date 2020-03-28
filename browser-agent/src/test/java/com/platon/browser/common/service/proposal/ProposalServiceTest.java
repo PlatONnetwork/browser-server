@@ -4,7 +4,6 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.sdk.contracts.ppos.ProposalContract;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
@@ -56,7 +55,7 @@ public class ProposalServiceTest extends AgentTestBase {
     /**
      * 测试更新
      */
-    @Test(expected = ContractInvokeException.class)
+    @Test
     public void test() throws Exception {
         target.getProposalParticipantStat("0x3522","0xfsfsf");
         target.getTallyResult("0xerere");

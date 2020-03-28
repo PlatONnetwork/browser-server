@@ -60,7 +60,9 @@ public class BlockChainConfigTest {
             "\t\t\"duplicateSignReportReward\":50,\n" +
             "\t\t\"maxEvidenceAge\":1,\n" +
             "\t\t\"slashBlocksReward\":20,\n" +
-            "\t\t\"slashFractionDuplicateSign\":100\n" +
+            "\t\t\"slashFractionDuplicateSign\":100,\n" +
+            "\t\t\"zeroProduceNumberThreshold\":20,\n" +
+            "\t\t\"zeroProduceCumulativeTime\":100\n" +
             "\t},\n" +
             "\t\"staking\":{\n" +
             "\t\t\"hesitateRatio\":1,\n" +
