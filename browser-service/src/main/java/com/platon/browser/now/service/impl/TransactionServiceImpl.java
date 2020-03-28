@@ -634,7 +634,7 @@ public class TransactionServiceImpl implements TransactionService {
 										.multiply(BigInteger.valueOf(p.getEpoch())).add(BigInteger.valueOf(transaction.getNum())).longValue();
 							} else {
 								number = blockChainConfig.getSettlePeriodBlockCount()
-										.multiply(BigInteger.valueOf(p.getEpoch() - 1)).add(BigInteger.valueOf(transaction.getNum()))
+										.multiply(BigInteger.valueOf(p.getEpoch().longValue() - 1)).add(BigInteger.valueOf(transaction.getNum()))
 										.add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder))).longValue();
 							}
 							transactionDetailsRPPlanResp.setBlockNumber(number);
