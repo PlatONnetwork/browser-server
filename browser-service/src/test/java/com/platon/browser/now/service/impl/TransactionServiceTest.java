@@ -123,7 +123,7 @@ public class TransactionServiceTest {
 		target.transactionDetails(req);
 
 		transaction.setType(Transaction.TypeEnum.STAKE_EXIT.getCode());
-		transaction.setInfo("{\"amount\":5000000000000000000000000,\"nodeId\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"nodeName\":\"sansan33\",\"stakingBlockNum\":50767}");
+		transaction.setInfo("{\"amount\":5000000000000000000000000,\"nodeId\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"nodeName\":\"sansan33\",\"stakingBlockNum\":50767,\"withdrawBlockNum\":50767}");
 		Staking staking = new Staking();
 		staking.setStakingReduction(BigDecimal.ONE);
 		staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
