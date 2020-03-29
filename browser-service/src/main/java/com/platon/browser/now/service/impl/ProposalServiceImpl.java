@@ -160,6 +160,13 @@ public class ProposalServiceImpl implements ProposalService {
 					currentValue = Convert.fromVon(currentValue, Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "LAT";
 					newValue = Convert.fromVon(newValue, Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "LAT";
 				} 
+				/**
+				 * 去除无用的0
+				 */
+				if("slashFractionDuplicateSign".contains(proposal.getName())) {
+					currentValue = new BigDecimal(currentValue).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+					newValue = new BigDecimal(newValue).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+				}
 				proposalDetailsResp.setCurrentValue(currentValue);
 				proposalDetailsResp.setNewValue(newValue);
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getParamProposalSupportRate().toString());
