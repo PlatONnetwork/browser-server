@@ -13,6 +13,8 @@ import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.entity.TxBakExample;
+import com.platon.browser.dao.mapper.CustomNOptBakMapper;
+import com.platon.browser.dao.mapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -20,7 +22,6 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -46,7 +47,11 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     @Autowired
     private NOptBakMapper nOptBakMapper;
     @Autowired
+    private CustomNOptBakMapper customNOptBakMapper;
+    @Autowired
     private TxBakMapper txBakMapper;
+    @Autowired
+    private CustomTxBakMapper customTxBakMapper;
 
     // 交易序号id
     private long transactionId = 0;
@@ -99,7 +104,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     BeanUtils.copyProperties(tx,bak);
                     baks.add(bak);
                 });
-                txBakMapper.batchInsert(baks);
+                customTxBakMapper.batchInsertOrUpdateSelective(baks,TxBak.Column.values());
             }
 
             if(optDeleteBatchCount>=10){
@@ -118,7 +123,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                     BeanUtils.copyProperties(no,bak);
                     baks.add(bak);
                 });
-                nOptBakMapper.batchInsert(baks);
+                customNOptBakMapper.batchInsertOrUpdateSelective(baks,NOptBak.Column.values());
             }
 
         }catch (Exception e){

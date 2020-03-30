@@ -26,7 +26,9 @@ public class GasEstimateEventHandler implements IGasEstimateEventHandler {
         long startTime = System.currentTimeMillis();
         try {
             List<GasEstimate> estimateList = event.getEstimateList();
-            epochBusinessMapper.updateGasEstimate(estimateList);
+            if(estimateList!=null&&!estimateList.isEmpty()){
+                epochBusinessMapper.updateGasEstimate(estimateList);
+            }
             // es入库完成后删除mysql中的日志记录
             gasEstimateLogMapper.deleteByPrimaryKey(event.getSeq());
         }catch (Exception e){
