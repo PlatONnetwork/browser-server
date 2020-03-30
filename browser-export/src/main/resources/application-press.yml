@@ -39,14 +39,14 @@ spring:
   #ES配置
   elasticsearch:
     high-level-client:
-      hosts: 149.129.183.207,149.129.180.213,149.129.179.137
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_test
-      transactionIndexName: browser_transaction_test
-      delegationIndexName: browser_delegation_test
-      nodeOptIndexName: browser_nodeopt_test
-      delegationRewardIndexName: browser_delegation_reward_test
+      blockIndexName: browser_block_1
+      transactionIndexName: browser_transaction_1
+      delegationIndexName: browser_delegation_1
+      nodeOptIndexName: browser_nodeopt_1
+      delegationRewardIndexName: browser_delegation_reward_1
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -66,8 +66,8 @@ platon:
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.112.171:6789
+    protocol: WS
+    addresses: 192.168.112.172:8788
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)
@@ -103,5 +103,3 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
 fileUrl: D://111//222//
-exportBlock: 634240
-exportDBBlock: 634240

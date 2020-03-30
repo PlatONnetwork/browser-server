@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
     <update id="create" parameterType="com.platon.browser.complement.dao.param.stake.StakeCreate">
     /*1、staking新增*/
-    insert into `staking` (
+    replace into `staking` (
         `node_id`,
         `staking_block_num`,
         `staking_tx_index`,

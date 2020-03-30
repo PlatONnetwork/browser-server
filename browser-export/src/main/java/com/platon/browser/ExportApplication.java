@@ -1,6 +1,5 @@
 package com.platon.browser;
 
-//import com.platon.browser.service.ExportGalleryService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +12,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,11 +20,9 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 @MapperScan(basePackages = "com.platon.browser.dao.mapper")
 public class ExportApplication implements ApplicationRunner {
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(3);
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 	@Autowired
 	private ExportService exportService;
-//	@Autowired
-//	private ExportGalleryService exportGalleryService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ExportApplication.class, args);
@@ -54,88 +49,14 @@ public class ExportApplication implements ApplicationRunner {
 //			SleepUtil.sleep(1L);
 //		}
 //		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationReward());
-		
-//		EXECUTOR_SERVICE.submit(() -> {
-//			try {
-//				exportService.exportBalance();
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		});
-//		EXECUTOR_SERVICE.submit(() -> {
-//			try {
-//				exportService.exportBenBalance();
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		});
-		
-//		EXECUTOR_SERVICE.submit(() -> {
-//			try {
-//				exportService.exportNodeInfo();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		});
-		
-		
-//		while (
-////			!ExportService.isDelegationRewardExportDone() ||
-//			!ExportService.isTxInfoExportDone()||
-//			!ExportService.isStakingExportDone()
-//		) {
-////			while(exportService.checkDatabaseNumer()){
-////				try {
-////					Thread.sleep(300);
-////				} catch (InterruptedException e) {
-////					e.printStackTrace();
-////				}
-////			}
-////			EXECUTOR_SERVICE.submit(() -> {
-////				try {
-////					exportService.exportNodeInfo();
-////				} catch (Exception e) {
-////					e.printStackTrace();
-////				}
-////			});
-////			SleepUtil.sleep(300L);
-//			
-//			while (exportService.checkNumer().compareTo(BigInteger.ZERO) == 0) {
-//				log.debug("wait block");
-//			}
-////			EXECUTOR_SERVICE.submit(() -> {
-////				try {
-////					exportService.exportStaking();
-////				} catch (Exception e) {
-////					e.printStackTrace();
-////				}
-////			});
-//			EXECUTOR_SERVICE.submit(() -> {
-//				try {
-//					exportService.exportAllStaking();
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			});
-//			EXECUTOR_SERVICE.submit(() -> exportService.exportAllTx());
-//			SleepUtil.sleep(300L);
-//			exportService.addCount();
-//			
-//		}
-//		log.info("数据导出完成!");
-//		System.exit(0);
-//	}
-	
-	
-//		EXECUTOR_SERVICE.submit(() -> exportGalleryService.exportAllTx());
-	
-//		while (
-//				!ExportGalleryService.isTxInfoExportDone()
-//			) {
-//			log.info("数据导出完成!");
-//			System.exit(0);
-//		}
+		EXECUTOR_SERVICE.submit(() -> exportService.exportAllTx());
+		while (
+			!ExportService.isDelegationRewardExportDone() ||
+			!ExportService.isTxInfoExportDone()
+		) {
+			SleepUtil.sleep(1L);
+		}
+		log.info("数据导出完成!");
+		System.exit(0);
 	}
 }
