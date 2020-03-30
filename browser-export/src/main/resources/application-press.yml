@@ -103,3 +103,5 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
 fileUrl: D://111//222//
+exportBlock: 698750
+exportDBBlock: 698750
