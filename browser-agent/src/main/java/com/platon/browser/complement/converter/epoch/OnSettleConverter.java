@@ -94,7 +94,9 @@ public class OnSettleConverter {
 
             // 如果当前节点是因举报而被处罚[exception_status = 5], 则状态直接置为已退出【因为底层实际上已经没有这个节点了】
             if(staking.getExceptionStatus()== CustomStaking.ExceptionStatusEnum.MULTI_SIGN_SLASHED.getCode()){
-                staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+            	staking.setStakingReduction(BigDecimal.ZERO);
+            	staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+            	exitedNodeIds.add(staking.getNodeId());
             }
 
             //当前质押是上轮结算周期验证人,发放本结算周期的质押奖励, 奖励金额暂存至stakeReward变量

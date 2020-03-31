@@ -599,13 +599,13 @@ public class TransactionServiceImpl implements TransactionService {
 						transactionDetailsEvidencesResp.setNodeName(commonService.getNodeName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
 						resp.setEvidence(reportValidatorParam.getData());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
+						/**
+						 * 查看举报之后是否退出来判断是否交易正确
+						 */
+						resp.setReportStatus(transaction.getStatus() == 1?2:1);
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 						if(slash != null) {
 							resp.setReportRewards(slash.getReward());
-							/**
-							 * 查看举报之后是否退出来判断是否交易正确
-							 */
-							resp.setReportStatus(slash.getIsQuit() == 1?2:1);
 						}
 						resp.setReportType(reportValidatorParam.getType().intValue());
 						resp.setEvidences(transactionDetailsEvidencesResps);
