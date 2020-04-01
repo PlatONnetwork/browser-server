@@ -651,7 +651,20 @@ public class TransactionServiceImpl implements TransactionService {
 						DelegateRewardClaimParam delegateRewardClaimParam  = JSON.parseObject(txInfo, DelegateRewardClaimParam.class);
 						List<TransactionDetailsRewardsResp> rewards = new ArrayList<>();
 						BigDecimal rewardSum = BigDecimal.ZERO;
+						Map<String, Reward> rewrdsMap = new HashMap<String, Reward>();
+						/**
+						 * 对相同的nodeId的奖励需要进行累加，不同的可以直接设置返回
+						 */
 						for(Reward reward:delegateRewardClaimParam.getRewardList()) {
+							if(rewrdsMap.containsKey(reward.getNodeId())) {
+								Reward reward2 = rewrdsMap.get(reward.getNodeId());
+								reward2.setReward(reward2.getReward().add(reward.getReward()));
+							} else {
+								rewrdsMap.put(reward.getNodeId(), reward);
+							}
+						}
+						for(String nodeId : rewrdsMap.keySet()) {
+							Reward reward = rewrdsMap.get(nodeId);
 							TransactionDetailsRewardsResp transactionDetailsRewardsResp = new TransactionDetailsRewardsResp();
 							transactionDetailsRewardsResp.setVerify(reward.getNodeId());
 							transactionDetailsRewardsResp.setNodeName(reward.getNodeName());
@@ -791,7 +804,20 @@ public class TransactionServiceImpl implements TransactionService {
 			/**
 			 * 设置每一个领取奖励从哪个节点上获取
 			 */
+			Map<String, Extra> rewrdsMap = new HashMap<String, Extra>();
 			for(Extra extra : extras) {
+				/**
+				 * 对相同的nodeId的奖励需要进行累加，不同的可以直接设置返回
+				 */
+				if(rewrdsMap.containsKey(extra.getNodeId())) {
+					Extra reward2 = rewrdsMap.get(extra.getNodeId());
+					reward2.setReward(new BigDecimal(reward2.getReward()).add(new BigDecimal(reward2.getReward())).toString());
+				} else {
+					rewrdsMap.put(extra.getNodeId(), extra);
+				}
+			}
+			for(String nodeId : rewrdsMap.keySet()) {
+				Extra extra = rewrdsMap.get(nodeId);
 				TransactionDetailsRewardsResp transactionDetailsRewardsResp = new TransactionDetailsRewardsResp();
 				transactionDetailsRewardsResp.setVerify(extra.getNodeId());
 				transactionDetailsRewardsResp.setNodeName(extra.getNodeName());
