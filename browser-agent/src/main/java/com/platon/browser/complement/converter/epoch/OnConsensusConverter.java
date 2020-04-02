@@ -12,6 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import lombok.extern.slf4j.Slf4j;
@@ -108,6 +109,12 @@ public class OnConsensusConverter {
         BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
         if(staking.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
         	codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
+        }
+        /**
+         * 如果节点状态为退出中则需要reduction进行扣减
+         */
+        if(staking.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
+        	codeCurStakingLocked = staking.getStakingReduction().subtract(codeSlashValue);
         }
         /**
          * 如果扣减的结果小于0则设置为0
