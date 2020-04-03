@@ -41,6 +41,7 @@
 			/*2、更新质押*/
 			update `staking` set
 			`leave_time` = #{time},
+			`status` = #{item.status},
 			`staking_reduction_epoch` = #{settingEpoch},
 			`staking_reduction` = #{item.stakingLocked},
 			`staking_locked` = 0,
@@ -56,6 +57,7 @@
 			/*3、更新节点*/
 			update `node` n set
 			n.`leave_time` = #{time},
+			n.`status` = #{item.status},
 			n.`staking_reduction_epoch` = #{settingEpoch},
 			n.`staking_reduction` = #{item.stakingLocked},
 			n.`total_value` = 0,

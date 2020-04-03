@@ -149,7 +149,13 @@ public class OnElectionConverter {
 						codeCurStakingLocked = BigDecimal.ZERO;
 					}
 					node.setStakingLocked(codeCurStakingLocked);
-
+					/**
+					 * 候选中则改成退出中
+					 */
+					if(node.getStatus().intValue() ==  StatusEnum.CANDIDATE.getCode()) {
+						node.setStatus(StatusEnum.EXITING.getCode());
+					}
+					
 					return nodeOpt;
 				}).collect(Collectors.toList());
 		epochBusinessMapper.slashNode(election);
