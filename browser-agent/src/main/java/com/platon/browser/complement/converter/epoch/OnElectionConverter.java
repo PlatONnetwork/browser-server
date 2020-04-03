@@ -75,6 +75,7 @@ public class OnElectionConverter {
 				}
 			}
 		} catch (Exception e) {
+			log.error("OnElectionConverter error", e);
 			throw new BusinessException(e.getMessage());
 		}
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
