@@ -71,7 +71,7 @@
 			n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
 			n.`is_consensus` = 2,
 			n.`is_settle` = 2,
-			`un_stake_freeze_duration` = #{unStakeFreezeDuration}
+			n.`un_stake_freeze_duration` = #{unStakeFreezeDuration}
 		where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
 	</update>
 	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
