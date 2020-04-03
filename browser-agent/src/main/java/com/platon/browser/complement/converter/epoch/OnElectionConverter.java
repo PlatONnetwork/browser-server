@@ -65,8 +65,11 @@ public class OnElectionConverter {
 				log.info("低出块节点：{}",slashNodeIdList);
 				// 查询节点
 				StakingExample stakingExample = new StakingExample();
+				List<Integer> status = new ArrayList<>();
+				status.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
+				status.add(CustomStaking.StatusEnum.EXITING.getCode());
 				stakingExample.createCriteria()
-						.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode())
+						.andStatusIn(status)
 						.andNodeIdIn(slashNodeIdList);
 				List<Staking> slashStakingList = stakingMapper.selectByExample(stakingExample);
 				if(slashStakingList.isEmpty()){
