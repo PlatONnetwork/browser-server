@@ -135,27 +135,20 @@ public class OnElectionConverter {
 					BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
 					if(node.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
 						codeCurStakingLocked = node.getStakingLocked().subtract(new BigDecimal(amount));
-						/**
-						 * 如果扣减的结果小于0则设置为0
-						 */
-						if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-							codeCurStakingLocked = BigDecimal.ZERO;
-						}
-						node.setStakingLocked(codeCurStakingLocked);
 					}
 					/**
 					 * 如果节点状态为退出中则需要reduction进行扣减
 					 */
 					if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
 						codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
-						/**
-						 * 如果扣减的结果小于0则设置为0
-						 */
-						if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-							codeCurStakingLocked = BigDecimal.ZERO;
-						}
-						node.setStakingReduction(codeCurStakingLocked);
 					}
+					/**
+					 * 如果扣减的结果小于0则设置为0
+					 */
+					if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
+						codeCurStakingLocked = BigDecimal.ZERO;
+					}
+					node.setStakingLocked(codeCurStakingLocked);
 
 					return nodeOpt;
 				}).collect(Collectors.toList());
