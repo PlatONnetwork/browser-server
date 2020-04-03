@@ -16,10 +16,13 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
@@ -45,6 +48,8 @@ public class OnElectionConverter {
 	private PlatOnClient platOnClient;
 	@Autowired
 	private StakingMapper stakingMapper;
+	@Autowired
+	private ParameterService parameterService;
 	
 	public List<NodeOpt> convert(CollectionEvent event, Block block) {
 		long startTime = System.currentTimeMillis();
@@ -90,11 +95,18 @@ public class OnElectionConverter {
 	 * @return
 	 */
 	private List<NodeOpt> slash(Block block, int settleEpoch, List<Staking> slashNodeList,BigDecimal blockReward){
+		// 更新解质押到账需要经过的结算周期数
+		String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+		if(StringUtils.isBlank(configVal)){
+			throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+		}
+		Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
 		//惩罚节点
 		Election election = Election.builder()
 				.time(block.getTime())
 				.settingEpoch(settleEpoch)
 				.slashNodeList(slashNodeList)
+				.unStakeFreezeDuration(unStakeFreezeDuration)
 				.build();
 
 		//节点操作日志
