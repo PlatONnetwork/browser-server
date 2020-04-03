@@ -13,6 +13,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
@@ -94,7 +95,6 @@ public class OnElectionConverter {
 				.settingEpoch(settleEpoch)
 				.slashNodeList(slashNodeList)
 				.build();
-		epochBusinessMapper.slashNode(election);
 
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
@@ -114,8 +114,36 @@ public class OnElectionConverter {
 					nodeOpt.setBNum(bNum.longValue());
 					nodeOpt.setTime(block.getTime());
 					nodeOpt.setDesc(desc.toString());
+					
+					 //当前锁定的大于零则扣除金额，不大于则保留
+			        BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
+			        if(node.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
+			        	codeCurStakingLocked = node.getStakingLocked().subtract(new BigDecimal(amount));
+			        	/**
+				         * 如果扣减的结果小于0则设置为0
+				         */
+				        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
+				        	codeCurStakingLocked = BigDecimal.ZERO;
+				        }
+			        	node.setStakingLocked(codeCurStakingLocked);
+			        }
+			        /**
+			         * 如果节点状态为退出中则需要reduction进行扣减
+			         */
+			        if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
+			        	codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
+			        	/**
+				         * 如果扣减的结果小于0则设置为0
+				         */
+				        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
+				        	codeCurStakingLocked = BigDecimal.ZERO;
+				        }
+			        	node.setStakingReduction(codeCurStakingLocked);
+			        }
+			        
 					return nodeOpt;
 				}).collect(Collectors.toList());
+		epochBusinessMapper.slashNode(election);
 		return nodeOpts;
 	}
 }
