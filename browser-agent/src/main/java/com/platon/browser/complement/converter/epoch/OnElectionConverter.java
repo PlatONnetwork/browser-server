@@ -13,6 +13,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
@@ -29,20 +30,18 @@ import org.web3j.protocol.Web3j;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class OnElectionConverter {
-    @Autowired
-    private EpochBusinessMapper epochBusinessMapper;
-    @Autowired
-    private NetworkStatCache networkStatCache;
-    @Autowired
-    private BlockChainConfig blockChainConfig;
+	@Autowired
+	private EpochBusinessMapper epochBusinessMapper;
+	@Autowired
+	private NetworkStatCache networkStatCache;
+	@Autowired
+	private BlockChainConfig blockChainConfig;
 	@Autowired
 	private SpecialApi specialApi;
 	@Autowired
@@ -51,7 +50,7 @@ public class OnElectionConverter {
 	private StakingMapper stakingMapper;
 	@Autowired
 	private ParameterService parameterService;
-	
+
 	public List<NodeOpt> convert(CollectionEvent event, Block block) {
 		long startTime = System.currentTimeMillis();
 		// 操作日志列表
@@ -78,20 +77,17 @@ public class OnElectionConverter {
 				}else {
 					//处罚低出块率的节点;
 					BigInteger curSettleEpoch = EpochUtil.getEpoch(BigInteger.valueOf(block.getNum()),blockChainConfig.getSettlePeriodBlockCount());
-					slash(block,curSettleEpoch.intValue(),slashStakingList);
+					List<NodeOpt> exceptionNodeOpts = slash(block,curSettleEpoch.intValue(),slashStakingList, event.getEpochMessage().getBlockReward());
+					nodeOpts.addAll(exceptionNodeOpts);
 					log.debug("被处罚节点列表["+slashStakingList+"]");
 				}
-
-				// 统一记录操作日志
-				nodeOpts = recordLog(block,slashNodeIdList,event.getEpochMessage().getBlockReward());
 			}
 		} catch (Exception e) {
 			log.error("OnElectionConverter error", e);
 			throw new BusinessException(e.getMessage());
 		}
-
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
-       return nodeOpts;
+		return nodeOpts;
 	}
 
 	/**
@@ -101,7 +97,7 @@ public class OnElectionConverter {
 	 * @param slashNodeList 被处罚的节点列表
 	 * @return
 	 */
-	private void slash(Block block, int settleEpoch, List<Staking> slashNodeList){
+	private List<NodeOpt> slash(Block block, int settleEpoch, List<Staking> slashNodeList,BigDecimal blockReward){
 		// 更新解质押到账需要经过的结算周期数
 		String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
 		if(StringUtils.isBlank(configVal)){
@@ -115,22 +111,10 @@ public class OnElectionConverter {
 				.slashNodeList(slashNodeList)
 				.unStakeFreezeDuration(unStakeFreezeDuration)
 				.build();
-		epochBusinessMapper.slashNode(election);
-	}
-
-	// 统一记录日志
-	private List<NodeOpt> recordLog(Block block, List<String> slashNodeIdList,BigDecimal blockReward){
-
-		StakingExample stakingExample = new StakingExample();
-		stakingExample.createCriteria().andNodeIdIn(slashNodeIdList);
-		List<Staking> slashStakingList = stakingMapper.selectByExample(stakingExample);
-		// 去重
-		Map<String,Staking> stakingMap = new HashMap<>();
-		slashStakingList.forEach(staking->stakingMap.put(staking.getNodeId(),staking));
 
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
-		List<NodeOpt> nodeOpts = stakingMap.values().stream()
+		List<NodeOpt> nodeOpts = slashNodeList.stream()
 				.map(node -> {
 					StringBuffer desc = new StringBuffer("0|");
 					/**
@@ -162,19 +146,20 @@ public class OnElectionConverter {
 					/**
 					 * 如果节点状态为退出中则需要reduction进行扣减
 					 */
-//					if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
-//						codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
-//						/**
-//						 * 如果扣减的结果小于0则设置为0
-//						 */
-//						if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-//							codeCurStakingLocked = BigDecimal.ZERO;
-//						}
-//						node.setStakingReduction(codeCurStakingLocked);
-//					}
+					if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
+						codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
+						/**
+						 * 如果扣减的结果小于0则设置为0
+						 */
+						if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
+							codeCurStakingLocked = BigDecimal.ZERO;
+						}
+						node.setStakingReduction(codeCurStakingLocked);
+					}
 
 					return nodeOpt;
 				}).collect(Collectors.toList());
+		epochBusinessMapper.slashNode(election);
 		return nodeOpts;
 	}
 }
