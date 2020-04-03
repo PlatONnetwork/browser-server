@@ -51,7 +51,8 @@
 			`stat_delegate_hes` = 0,
 			`stat_delegate_locked` = 0,
 			`is_consensus` = 2,
-			`is_settle` = 2
+			`is_settle` = 2,
+			`un_stake_freeze_duration` = #{unStakeFreezeDuration}
 		where `status` = 1
 		and `node_id` in <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
 		/*3、更新节点*/
@@ -69,7 +70,8 @@
 			n.`stat_invalid_addrs` = (select count(distinct d.delegate_addr) from delegation d where d.node_id = n.`node_id` and d.is_history = 2),
 			n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
 			n.`is_consensus` = 2,
-			n.`is_settle` = 2
+			n.`is_settle` = 2,
+			`un_stake_freeze_duration` = #{unStakeFreezeDuration}
 		where n.`node_id` in  <foreach open="(" collection="slashNodeList" item="item"  separator="," close=")"> #{item.nodeId} </foreach>;
 	</update>
 	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
