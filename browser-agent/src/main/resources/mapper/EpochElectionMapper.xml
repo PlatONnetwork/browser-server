@@ -38,10 +38,8 @@
 			where `node_id` = #{item.nodeId}
 			and `staking_block_num` = #{item.stakingBlockNum}
 			and `is_history` = 2;
-		</foreach>
-		/*2、更新质押*/
-		<foreach open="(" collection="slashNodeList" item="item"  separator="," close=")">
-		update `staking` set
+			/*2、更新质押*/
+			update `staking` set
 			`leave_time` = #{time},
 			`status` = if(`staking_locked` > 0, 2, 3),
 			`staking_reduction_epoch` = #{settingEpoch},
@@ -54,10 +52,10 @@
 			`is_consensus` = 2,
 			`is_settle` = 2,
 			`un_stake_freeze_duration` = #{unStakeFreezeDuration}
-		where `status` = 1
-		and `node_id` =  #{item.nodeId} ;
-		/*3、更新节点*/
-		update `node` n set
+			where `status` = 1
+			and `node_id` =  #{item.nodeId} ;
+			/*3、更新节点*/
+			update `node` n set
 			n.`leave_time` = #{time},
 			n.`status` = if(n.`staking_locked` > 0, 2, 3),
 			n.`staking_reduction_epoch` = #{settingEpoch},
@@ -73,7 +71,8 @@
 			n.`is_consensus` = 2,
 			n.`is_settle` = 2,
 			n.`un_stake_freeze_duration` = #{unStakeFreezeDuration}
-		where n.`node_id` = #{item.nodeId} ;</foreach>
+			where n.`node_id` = #{item.nodeId} ;
+		</foreach>
 	</update>
 	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
 		/*2、更新质押*/
