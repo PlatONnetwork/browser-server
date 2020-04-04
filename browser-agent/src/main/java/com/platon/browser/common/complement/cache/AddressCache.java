@@ -47,8 +47,20 @@ public class AddressCache {
     	String from = tx.getFrom();
     	String to = tx.getTo();
     	String contractAddress = tx.getContractAddress();
-    	updateAddress(tx,from);
-		updateAddress(tx,to);
+    	/**
+    	 * 合约创建的from信息不能被覆盖成合约账户类型
+    	 */
+		switch (tx.getTypeEnum()){
+			case EVM_CONTRACT_CREATE:
+			case WASM_CONTRACT_CREATE:
+				this.updateContractFromAddress(tx,from);
+				this.updateAddress(tx,contractAddress);
+				break;
+			default:
+				this.updateAddress(tx,from);
+				this.updateAddress(tx,to);
+				break;
+		}
     }
     
     public Collection<Address> getAll(){
@@ -112,6 +124,17 @@ public class AddressCache {
 			break;
 		    default:
 		}
+    }
+    
+    private void updateContractFromAddress(Transaction tx, String addr) {
+    	if(addr==null) return;
+    	Address address = addressMap.get(addr);
+    	if(address == null) {
+    		address = createDefaultAddress(addr);
+    		addressMap.put(addr, address);
+    	}
+
+		address.setTxQty(address.getTxQty() + 1);
     }
     
     private Address createDefaultAddress(String addr) {
