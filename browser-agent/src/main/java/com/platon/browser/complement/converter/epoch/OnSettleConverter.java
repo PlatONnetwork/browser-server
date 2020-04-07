@@ -181,39 +181,45 @@ public class OnSettleConverter {
         if(ari.getStakeCost()==null) ari.setStakeCost(new ArrayList<>());
         if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
 
-        // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
+        // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的质押成本为0
+        BigDecimal curSettleCost = BigDecimal.ZERO;
         if(settle.getCurVerifierSet().contains(staking.getNodeId())){
+            // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
             // 计算当前质押成本 成本暂时不需要委托
-            BigDecimal curSettleCost = staking.getStakingLocked() // 锁定的质押金
+            curSettleCost = staking.getStakingLocked() // 锁定的质押金
                     .add(staking.getStakingHes()); // 犹豫期的质押金
 //                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
 //                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
-            CalculateUtils.rotateCost(ari.getStakeCost(),curSettleCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
+
         }
-        // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
+        // 轮换下一结算周期的成本信息
+        CalculateUtils.rotateCost(ari.getStakeCost(),curSettleCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
+
+        // 计算当前质押的年化率 START ******************************
+        // 打地基 START -- 这样收益总和才有减数基础
+        layFoundation(ari.getStakeProfit(),settle.getSettingEpoch());
+
+        if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
+        // 打地基 END
+
+        // 默认节点在上一周期的收益为零
+        BigDecimal curSettleStakeProfit = BigDecimal.ZERO;
         if(settle.getPreVerifierSet().contains(staking.getNodeId())){
-            if(ari.getStakeProfit().isEmpty()) {
-                // 设置0收益作为计算周期间收益的减数
-                PeriodValueElement pv = new PeriodValueElement();
-                // 例如当前是第6个周期，要得出5和6两个周期的利润和，则需要记录第4个周期末的利润，这样才可以用【第6个周期末的利润】-【第4个周期末的利润】计算出5和6两个周期的利润和
-                pv.setPeriod(settle.getSettingEpoch()-2L);
-                pv.setValue(BigDecimal.ZERO);
-                List<PeriodValueElement> profits = new ArrayList<>();
-                profits.add(pv);
-                ari.setStakeProfit(profits);
-            }
-            if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
-            // 对委托收益进行扣减
-            BigDecimal curSettleDelegateProfit = staking.getTotalDeleReward();
-            // 对超出数量的收益轮换
-            BigDecimal curSettleStakeProfit = staking.getStakingRewardValue().add(staking.getBlockRewardValue()).add(staking.getFeeRewardValue())
-            		.subtract(curSettleDelegateProfit);
-            CalculateUtils.rotateProfit(ari.getStakeProfit(),curSettleStakeProfit,BigInteger.valueOf(settle.getSettingEpoch()-1L),chainConfig);
-            BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari.getStakeProfit(),ari.getStakeCost(),chainConfig);
-            // 设置年化率
-            staking.setAnnualizedRate(annualizedRate.doubleValue());
+            // 如果当前节点在前一轮结算周期，则计算真实收益
+            curSettleStakeProfit = staking.getStakingRewardValue() // 质押奖励
+                    .add(staking.getBlockRewardValue()) // + 出块奖励
+                    .add(staking.getFeeRewardValue()) // + 手续费奖励
+                    .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
         }
-        // 设置年化率计算原始数据
+        // 轮换质押收益信息，把当前节点在上一周期的收益放入轮换信息里
+        CalculateUtils.rotateProfit(ari.getStakeProfit(),curSettleStakeProfit,BigInteger.valueOf(settle.getSettingEpoch()-1L),chainConfig);
+        // 计算年化率
+        BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari.getStakeProfit(),ari.getStakeCost(),chainConfig);
+        // 设置年化率
+        staking.setAnnualizedRate(annualizedRate.doubleValue());
+        // 计算当前质押的年化率 END ******************************
+
+        // 更新年化率计算原始信息
         staking.setAnnualizedRateInfo(ari.toJSONString());
 
         // 把当前staking的stakingRewardValue的值置为当前结算周期的质押奖励值，累加操作由mapper xmm中的SQL语句完成
@@ -236,32 +242,49 @@ public class OnSettleConverter {
         if(ari.getDelegateProfit()==null) ari.setDelegateProfit(new ArrayList<>());
         if(ari.getDelegateCost()==null) ari.setDelegateCost(new ArrayList<>());
 
-        // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的委托成本
+        // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的委托成本为0
+        BigDecimal curDelegateCost = BigDecimal.ZERO;
         if(settle.getCurVerifierSet().contains(staking.getNodeId())){
-            CalculateUtils.rotateCost(ari.getDelegateCost(),curTotalDelegateCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
+            // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的委托成本, 委托成本以参数传进来的curTotalDelegateCost为准
+            curDelegateCost = curTotalDelegateCost;
         }
+        // 轮换下一结算周期的成本信息
+        CalculateUtils.rotateCost(ari.getDelegateCost(),curDelegateCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
+
+        // 计算当前委托的年化率 START ******************************
+        layFoundation(ari.getDelegateProfit(),settle.getSettingEpoch());
+
         // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
+        // 默认节点在上一周期的委托收益为零
+        BigDecimal curSettleDelegateProfit = BigDecimal.ZERO;
         if(settle.getPreVerifierSet().contains(staking.getNodeId())){
-            if(ari.getDelegateProfit().isEmpty()) {
-                // 设置0收益作为计算周期间收益的减数
-                PeriodValueElement pv = new PeriodValueElement();
-                // 例如当前是第6个周期，要得出5和6两个周期的利润和，则需要记录第4个周期末的利润，这样才可以用【第6个周期末的利润】-【第4个周期末的利润】计算出5和6两个周期的利润和
-                pv.setPeriod(settle.getSettingEpoch()-2L);
-                pv.setValue(BigDecimal.ZERO);
-                List<PeriodValueElement> profits = new ArrayList<>();
-                profits.add(pv);
-                ari.setDelegateProfit(profits);
-            }
-            // 对超出数量的收益轮换
-            BigDecimal curSettleDelegateProfit = staking.getTotalDeleReward();
-            CalculateUtils.rotateProfit(ari.getDelegateProfit(),curSettleDelegateProfit,BigInteger.valueOf(settle.getSettingEpoch()-1L),chainConfig);
-            BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari.getDelegateProfit(),ari.getDelegateCost(),chainConfig);
-            // 把前一周期的委托奖励年化率设置至preDeleAnnualizedRate字段
-            staking.setPreDeleAnnualizedRate(staking.getDeleAnnualizedRate());
-            // 设置当前质押记录的委托奖励年化率
-            staking.setDeleAnnualizedRate(annualizedRate.doubleValue());
+            curSettleDelegateProfit = staking.getTotalDeleReward();
         }
-        // 设置年化率计算原始数据
+        // 轮换委托收益信息，把当前节点在上一周期的委托收益放入轮换信息里
+        CalculateUtils.rotateProfit(ari.getDelegateProfit(),curSettleDelegateProfit,BigInteger.valueOf(settle.getSettingEpoch()-1L),chainConfig);
+        // 计算年化率
+        BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari.getDelegateProfit(),ari.getDelegateCost(),chainConfig);
+        // 把前一周期的委托奖励年化率设置至preDeleAnnualizedRate字段
+        staking.setPreDeleAnnualizedRate(staking.getDeleAnnualizedRate());
+        // 设置当前质押记录的委托奖励年化率
+        staking.setDeleAnnualizedRate(annualizedRate.doubleValue());
+        // 计算当前质押的年化率 END ******************************
+
+        // 更新年化率计算原始信息
         staking.setAnnualizedRateInfo(ari.toJSONString());
+    }
+
+    // 打地基
+    private void layFoundation(List<PeriodValueElement> pves, int settleEpoch){
+        // 打地基 START -- 这样收益总和才有减数基础
+        if(pves.isEmpty()) {
+            // 设置0收益作为计算周期间收益的减数
+            PeriodValueElement pv = new PeriodValueElement();
+            // 例如当前是第6个周期，要得出5和6两个周期的利润和，则需要记录第4个周期末的利润，这样才可以用【第6个周期末的利润】-【第4个周期末的利润】计算出5和6两个周期的利润和
+            pv.setPeriod(settleEpoch-2L);
+            pv.setValue(BigDecimal.ZERO);
+            pves.add(pv);
+        }
+        // 打地基 END
     }
 }
