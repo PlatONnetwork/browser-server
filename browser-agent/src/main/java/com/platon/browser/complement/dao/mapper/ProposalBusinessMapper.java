@@ -2,6 +2,11 @@ package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.proposal.ProposalParameter;
+import com.platon.browser.complement.dao.param.proposal.ProposalSlash;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
@@ -39,4 +44,10 @@ public interface ProposalBusinessMapper {
      */
     @Transactional
     void parameter(ProposalParameter businessParam);
+    
+    /**
+     * 提案数据更新
+     */
+    @Transactional
+    void proposalSlashUpdate(@Param("proposalSlashs") List<ProposalSlash> proposalSlashs);
 }

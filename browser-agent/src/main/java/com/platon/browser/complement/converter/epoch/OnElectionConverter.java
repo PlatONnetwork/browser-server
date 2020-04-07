@@ -8,6 +8,7 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Election;
+import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
@@ -50,6 +51,8 @@ public class OnElectionConverter {
 	private StakingMapper stakingMapper;
 	@Autowired
 	private ParameterService parameterService;
+	@Autowired
+    private ProposalParameterService proposalParameterService;
 
 	public List<NodeOpt> convert(CollectionEvent event, Block block) {
 		long startTime = System.currentTimeMillis();
@@ -155,7 +158,8 @@ public class OnElectionConverter {
 					if(node.getStatus().intValue() ==  StatusEnum.CANDIDATE.getCode()) {
 						node.setStatus(StatusEnum.EXITING.getCode());
 					}
-					
+					//对提案数据进行处罚
+                    proposalParameterService.setSlashParameters(node.getNodeId());
 					return nodeOpt;
 				}).collect(Collectors.toList());
 		epochBusinessMapper.slashNode(election);

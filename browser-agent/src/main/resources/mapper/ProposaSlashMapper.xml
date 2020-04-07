@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.complement.dao.mapper.ProposalBusinessMapper">
+    <update id="proposalSlashUpdate" >
+        <foreach collection="proposalSlashs" item="item" separator=";">
+        	/*1、更新提案*/
+			update proposal set 
+			<if test="item.voteOption == 1">
+          	`yeas` = `yeas`- 1
+        	</if>
+        	<if test="item.voteOption == 2">
+          	`nays` = `nays`- 1
+        	</if>
+        	<if test="item.voteOption == 3">
+          	`abstentions` = `abstentions`- 1
+        	</if> where `hash` = #{item.hash};
+            /*2、更新投票*/
+		    update vote set `option` = 4 where `hash` = #{item.voteHash} ;
+        </foreach>
+</update>
+</mapper>
