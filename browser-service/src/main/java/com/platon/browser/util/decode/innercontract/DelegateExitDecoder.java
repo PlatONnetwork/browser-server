@@ -2,6 +2,8 @@ package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.TxParam;
+
+import org.apache.commons.lang3.StringUtils;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 
@@ -28,8 +30,12 @@ class DelegateExitDecoder {
         //减持委托的金额(按照最小单位算，1LAT = 10**18 von)
         BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
+        BigInteger bl = BigInteger.ZERO;
+        if(StringUtils.isNotBlank(blockNumber)) {
+        	bl = new BigInteger(blockNumber,16);
+        }
         return DelegateExitParam.builder()
-                .stakingBlockNum(new BigInteger(blockNumber,16))
+                .stakingBlockNum(bl)
                 .nodeId(nodeId)
                 .amount(new BigDecimal(amount))
                 .build();

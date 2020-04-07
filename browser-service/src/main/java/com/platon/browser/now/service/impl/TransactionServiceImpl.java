@@ -398,7 +398,7 @@ public class TransactionServiceImpl implements TransactionService {
     		
     		String txInfo = transaction.getInfo();
     		/** 根据不同交易类型判断逻辑 */
-    		if(StringUtils.isNotBlank(txInfo) || (!"null".equals(txInfo))) {
+    		if(StringUtils.isNotBlank(txInfo) && (!"null".equals(txInfo) && (!"{}".equals(txInfo)))) {
 	    		switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
 		    		/** 创建验证人 */
 					case STAKE_CREATE:

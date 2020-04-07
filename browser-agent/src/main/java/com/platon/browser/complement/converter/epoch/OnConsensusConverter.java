@@ -8,6 +8,7 @@ import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Consensus;
 import com.platon.browser.complement.dao.param.slash.Report;
+import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
@@ -39,6 +40,8 @@ public class OnConsensusConverter {
     private ReportMultiSignParamCache reportMultiSignParamCache;
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
+    @Autowired
+    private ProposalParameterService proposalParameterService;
 	
 	public Optional<List<NodeOpt>> convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
@@ -80,6 +83,8 @@ public class OnConsensusConverter {
                     });
                     // 双签处罚后需要删除缓存中的双签参数，防止下一次进来重复处罚
                     reportMultiSignParamCache.remove(slashNode.getNodeId());
+                    //对提案数据进行处罚
+                    proposalParameterService.setSlashParameters(slashNode.getNodeId());
                 });
             }
         }

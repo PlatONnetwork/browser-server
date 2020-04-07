@@ -8,6 +8,7 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Election;
+import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
@@ -36,12 +37,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class OnElectionConverter {
-    @Autowired
-    private EpochBusinessMapper epochBusinessMapper;
-    @Autowired
-    private NetworkStatCache networkStatCache;
-    @Autowired
-    private BlockChainConfig blockChainConfig;
+	@Autowired
+	private EpochBusinessMapper epochBusinessMapper;
+	@Autowired
+	private NetworkStatCache networkStatCache;
+	@Autowired
+	private BlockChainConfig blockChainConfig;
 	@Autowired
 	private SpecialApi specialApi;
 	@Autowired
@@ -50,7 +51,9 @@ public class OnElectionConverter {
 	private StakingMapper stakingMapper;
 	@Autowired
 	private ParameterService parameterService;
-	
+	@Autowired
+    private ProposalParameterService proposalParameterService;
+
 	public List<NodeOpt> convert(CollectionEvent event, Block block) {
 		long startTime = System.currentTimeMillis();
 		// 操作日志列表
@@ -87,7 +90,7 @@ public class OnElectionConverter {
 			throw new BusinessException(e.getMessage());
 		}
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
-       return nodeOpts;
+		return nodeOpts;
 	}
 
 	/**
@@ -130,33 +133,33 @@ public class OnElectionConverter {
 					nodeOpt.setBNum(bNum.longValue());
 					nodeOpt.setTime(block.getTime());
 					nodeOpt.setDesc(desc.toString());
-					
-					 //当前锁定的大于零则扣除金额，不大于则保留
-			        BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
-			        if(node.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
-			        	codeCurStakingLocked = node.getStakingLocked().subtract(new BigDecimal(amount));
-			        	/**
-				         * 如果扣减的结果小于0则设置为0
-				         */
-				        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-				        	codeCurStakingLocked = BigDecimal.ZERO;
-				        }
-			        	node.setStakingLocked(codeCurStakingLocked);
-			        }
-			        /**
-			         * 如果节点状态为退出中则需要reduction进行扣减
-			         */
-			        if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
-			        	codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
-			        	/**
-				         * 如果扣减的结果小于0则设置为0
-				         */
-				        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-				        	codeCurStakingLocked = BigDecimal.ZERO;
-				        }
-			        	node.setStakingReduction(codeCurStakingLocked);
-			        }
-			        
+
+					//当前锁定的大于零则扣除金额，不大于则保留
+					BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
+					if(node.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
+						codeCurStakingLocked = node.getStakingLocked().subtract(new BigDecimal(amount));
+					}
+					/**
+					 * 如果节点状态为退出中则需要reduction进行扣减
+					 */
+					if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
+						codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
+					}
+					/**
+					 * 如果扣减的结果小于0则设置为0
+					 */
+					if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
+						codeCurStakingLocked = BigDecimal.ZERO;
+					}
+					node.setStakingLocked(codeCurStakingLocked);
+					/**
+					 * 候选中则改成退出中
+					 */
+					if(node.getStatus().intValue() ==  StatusEnum.CANDIDATE.getCode()) {
+						node.setStatus(StatusEnum.EXITING.getCode());
+					}
+					//对提案数据进行处罚
+                    proposalParameterService.setSlashParameters(node.getNodeId());
 					return nodeOpt;
 				}).collect(Collectors.toList());
 		epochBusinessMapper.slashNode(election);
