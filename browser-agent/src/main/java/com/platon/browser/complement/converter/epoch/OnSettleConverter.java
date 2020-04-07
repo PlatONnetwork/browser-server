@@ -254,7 +254,6 @@ public class OnSettleConverter {
         // 计算当前委托的年化率 START ******************************
         layFoundation(ari.getDelegateProfit(),settle.getSettingEpoch());
 
-        // 如果当前节点在前一轮结算周期，则更新利润并计算年化率
         // 默认节点在上一周期的委托收益为零
         BigDecimal curSettleDelegateProfit = BigDecimal.ZERO;
         if(settle.getPreVerifierSet().contains(staking.getNodeId())){
