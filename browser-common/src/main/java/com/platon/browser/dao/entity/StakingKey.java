@@ -74,6 +74,7 @@ public class StakingKey {
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
+        unStakeEndBlock("un_stake_end_block", "unStakeEndBlock", "BIGINT", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

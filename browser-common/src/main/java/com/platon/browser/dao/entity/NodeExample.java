@@ -3135,6 +3135,66 @@ public class NodeExample {
             addCriterion("un_stake_freeze_duration not between", value1, value2, "unStakeFreezeDuration");
             return (Criteria) this;
         }
+
+        public Criteria andUnStakeEndBlockIsNull() {
+            addCriterion("un_stake_end_block is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockIsNotNull() {
+            addCriterion("un_stake_end_block is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockEqualTo(Long value) {
+            addCriterion("un_stake_end_block =", value, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockNotEqualTo(Long value) {
+            addCriterion("un_stake_end_block <>", value, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockGreaterThan(Long value) {
+            addCriterion("un_stake_end_block >", value, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockGreaterThanOrEqualTo(Long value) {
+            addCriterion("un_stake_end_block >=", value, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockLessThan(Long value) {
+            addCriterion("un_stake_end_block <", value, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockLessThanOrEqualTo(Long value) {
+            addCriterion("un_stake_end_block <=", value, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockIn(List<Long> values) {
+            addCriterion("un_stake_end_block in", values, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockNotIn(List<Long> values) {
+            addCriterion("un_stake_end_block not in", values, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockBetween(Long value1, Long value2) {
+            addCriterion("un_stake_end_block between", value1, value2, "unStakeEndBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnStakeEndBlockNotBetween(Long value1, Long value2) {
+            addCriterion("un_stake_end_block not between", value1, value2, "unStakeEndBlock");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

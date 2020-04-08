@@ -53,6 +53,7 @@
     <result column="stat_fee_reward_value" jdbcType="DECIMAL" property="statFeeRewardValue" />
     <result column="stat_staking_reward_value" jdbcType="DECIMAL" property="statStakingRewardValue" />
     <result column="un_stake_freeze_duration" jdbcType="INTEGER" property="unStakeFreezeDuration" />
+    <result column="un_stake_end_block" jdbcType="INTEGER" property="unStakeEndBlock" />
   </resultMap>
   <select id="selectByNodeId" resultMap="BaseResultMap">
     select

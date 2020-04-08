@@ -86,6 +86,8 @@ public class Staking extends StakingKey {
 
     private Integer unStakeFreezeDuration;
 
+    private Long unStakeEndBlock;
+
     private String annualizedRateInfo;
 
     public Integer getStakingTxIndex() {
@@ -408,6 +410,14 @@ public class Staking extends StakingKey {
         this.unStakeFreezeDuration = unStakeFreezeDuration;
     }
 
+    public Long getUnStakeEndBlock() {
+        return unStakeEndBlock;
+    }
+
+    public void setUnStakeEndBlock(Long unStakeEndBlock) {
+        this.unStakeEndBlock = unStakeEndBlock;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -466,6 +476,7 @@ public class Staking extends StakingKey {
         totalDeleReward("total_dele_reward", "totalDeleReward", "DECIMAL", false),
         exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
+        unStakeEndBlock("un_stake_end_block", "unStakeEndBlock", "BIGINT", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

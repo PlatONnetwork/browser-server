@@ -104,6 +104,8 @@ public class Node {
 
     private Integer unStakeFreezeDuration;
 
+    private Long unStakeEndBlock;
+
     private String annualizedRateInfo;
 
     public String getNodeId() {
@@ -498,6 +500,14 @@ public class Node {
         this.unStakeFreezeDuration = unStakeFreezeDuration;
     }
 
+    public Long getUnStakeEndBlock() {
+        return unStakeEndBlock;
+    }
+
+    public void setUnStakeEndBlock(Long unStakeEndBlock) {
+        this.unStakeEndBlock = unStakeEndBlock;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -563,6 +573,7 @@ public class Node {
         preTotalDeleReward("pre_total_dele_reward", "preTotalDeleReward", "DECIMAL", false),
         exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
+        unStakeEndBlock("un_stake_end_block", "unStakeEndBlock", "BIGINT", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**
