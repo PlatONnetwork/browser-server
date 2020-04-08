@@ -631,7 +631,7 @@ public class TransactionServiceImpl implements TransactionService {
 							long remainder = transaction.getNum() % blockChainConfig.getSettlePeriodBlockCount().longValue();
 							if(remainder == 0l) {
 								number = blockChainConfig.getSettlePeriodBlockCount()
-										.multiply(BigInteger.valueOf(p.getEpoch())).add(BigInteger.valueOf(transaction.getNum())).longValue();
+										.multiply(p.getEpoch()).add(BigInteger.valueOf(transaction.getNum())).longValue();
 							} else {
 								number = blockChainConfig.getSettlePeriodBlockCount()
 										.multiply(BigInteger.valueOf(p.getEpoch().longValue() - 1)).add(BigInteger.valueOf(transaction.getNum()))

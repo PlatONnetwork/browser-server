@@ -40,7 +40,7 @@ public interface InnerContractDecoder {
             RlpString parama = (RlpString) beanTypeList.getValues().get(0);
             RlpString paramb = (RlpString) beanTypeList.getValues().get(1);
             RestrictingCreateParam.RestrictingPlan planParam = RestrictingCreateParam.RestrictingPlan.builder()
-                    .epoch(parama.asPositiveBigInteger().intValue())
+                    .epoch(parama.asPositiveBigInteger())
                     .amount(new BigDecimal(paramb.asPositiveBigInteger()))
                     .build();
             list.add(planParam);

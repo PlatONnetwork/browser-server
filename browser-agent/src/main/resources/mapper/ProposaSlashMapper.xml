@@ -15,7 +15,16 @@
           	`abstentions` = `abstentions`- 1
         	</if> where `hash` = #{item.hash};
             /*2、更新投票*/
-		    update vote set `option` = 4 where `hash` = #{item.voteHash} ;
+		    update vote set 
+		    <if test="item.voteOption == 1">
+		    	`option` = 11 
+		    </if> 
+		    <if test="item.voteOption == 2">
+		    	`option` = 12 
+		    </if> 
+		    <if test="item.voteOption == 3">
+		    	`option` = 13 
+		    </if> where `hash` = #{item.voteHash} ;
         </foreach>
 </update>
 </mapper>

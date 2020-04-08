@@ -154,7 +154,7 @@ public interface AppDocProposal {
      *      {
      *         "nodeName":"",          //投票验证人的节点名称
      *         "nodeId":"",            //投票验证人的节点id
-     *         "option":"",            //投票选型  1：支持；  2：反对；  3弃权 4:无效
+     *         "option":"",            //投票选型  1：支持；  2：反对；  3弃权 11:支持（无效票） 12:反对（无效票） 13：弃权（无效票）
      *         "txHash":"15566",       //投票的hash
      *         "timestamp":"",         //投票的时间
      *      }
