@@ -24,7 +24,8 @@
 		`stat_valid_addrs` = 0,
 		`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2),
 		`is_consensus` = 2,
-		`un_stake_freeze_duration` = #{unStakeFreezeDuration}
+		`un_stake_freeze_duration` = #{unStakeFreezeDuration},
+		`un_stake_end_block` = #{unStakeEndBlock}
 	where `node_id` = #{nodeId};
 	/*3、更新质押*/
 	update `staking` set

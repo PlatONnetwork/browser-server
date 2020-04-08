@@ -6,6 +6,7 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeCreate;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
@@ -37,6 +38,8 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
     private NetworkStatCache networkStatCache;
     @Autowired
 	private ParameterService parameterService;
+    @Autowired
+	private BlockChainConfig chainConfig;
 
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -54,6 +57,10 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         	throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
 		}
         Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
+        BigInteger unStakeEndBlock = event.getEpochMessage()
+				.getSettleEpochRound() // 当前块所处的结算周期轮数
+				.add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
+				.multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
         		.stakingHes(txParam.getAmount())
@@ -72,6 +79,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         		.txHash(tx.getHash())
 				.delegateRewardPer(txParam.getDelegateRewardPer())
 				.unStakeFreezeDuration(unStakeFreezeDuration)
+				.unStakeEndBlock(unStakeEndBlock)
                 .build();
 
         stakeBusinessMapper.create(businessParam);

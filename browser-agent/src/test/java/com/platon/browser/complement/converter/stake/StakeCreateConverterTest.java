@@ -6,6 +6,7 @@ import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.govern.ParameterService;
 import org.junit.Before;
@@ -39,6 +40,8 @@ public class StakeCreateConverterTest extends AgentTestBase {
     private CollectionEvent collectionEvent;
     @Mock
     private ParameterService parameterService;
+    @Mock
+    private BlockChainConfig chainConfig;
     @Spy
     private StakeCreateConverter target;
 
@@ -48,6 +51,7 @@ public class StakeCreateConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         ReflectionTestUtils.setField(target,"parameterService",parameterService);
+        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")
@@ -56,6 +60,7 @@ public class StakeCreateConverterTest extends AgentTestBase {
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
+        when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
     }
 
 

@@ -8,7 +8,6 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -39,8 +38,6 @@ public class OnElectionConverterTest extends AgentTestBase {
     @Mock
     private NetworkStatCache networkStatCache;
     @Mock
-    private BlockChainConfig blockChainConfig;
-    @Mock
     private SpecialApi specialApi;
     @Mock
     private PlatOnClient platOnClient;
@@ -57,6 +54,7 @@ public class OnElectionConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"specialApi",specialApi);
         ReflectionTestUtils.setField(target,"platOnClient",platOnClient);
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
+        ReflectionTestUtils.setField(target,"chainConfig",blockChainConfig);
         List<Staking> list = new ArrayList <>();
         stakingList.forEach(item ->{
         	Staking staking = new Staking();

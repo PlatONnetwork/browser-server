@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +63,10 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
             throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
         }
         Integer unStakeFreezeDuration = Integer.parseInt(configVal);
+        BigInteger unStakeEndBlock = event.getEpochMessage()
+                .getSettleEpochRound() // 当前块所处的结算周期轮数
+                .add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
+                .multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
         Report businessParam= Report.builder()
         		.slashData(txParam.getData())
                 .nodeId(txParam.getVerify())
@@ -73,6 +78,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
                 .slash2ReportRate(chainConfig.getDuplicateSignRewardRate())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .unStakeFreezeDuration(unStakeFreezeDuration)
+                .unStakeEndBlock(unStakeFreezeDuration)
                 .build();
 
         //更新节点提取质押需要经过的周期数

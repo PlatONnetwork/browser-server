@@ -84,8 +84,9 @@ public class OnSettleConverter {
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
             if(
-                staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() &&
-                (staking.getStakingReductionEpoch() + staking.getUnStakeFreezeDuration()) < settle.getSettingEpoch()
+                staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
+                //(staking.getStakingReductionEpoch() + staking.getUnStakeFreezeDuration()) < settle.getSettingEpoch()
+                event.getBlock().getNum()>=staking.getUnStakeEndBlock() // 且当前区块号大于等于质押预计的实际退出区块号
             ){
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());

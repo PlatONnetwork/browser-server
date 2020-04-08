@@ -42,7 +42,7 @@ public class OnElectionConverter {
 	@Autowired
 	private NetworkStatCache networkStatCache;
 	@Autowired
-	private BlockChainConfig blockChainConfig;
+	private BlockChainConfig chainConfig;
 	@Autowired
 	private SpecialApi specialApi;
 	@Autowired
@@ -79,8 +79,8 @@ public class OnElectionConverter {
 					log.info("特殊节点查询到的低出块率节点["+slashNodeIdList+"]在staking表中查询不到对应的候选中节点数据!");
 				}else {
 					//处罚低出块率的节点;
-					BigInteger curSettleEpoch = EpochUtil.getEpoch(BigInteger.valueOf(block.getNum()),blockChainConfig.getSettlePeriodBlockCount());
-					List<NodeOpt> exceptionNodeOpts = slash(block,curSettleEpoch.intValue(),slashStakingList, event.getEpochMessage().getBlockReward());
+					BigInteger curSettleEpoch = EpochUtil.getEpoch(BigInteger.valueOf(block.getNum()),chainConfig.getSettlePeriodBlockCount());
+					List<NodeOpt> exceptionNodeOpts = slash(event,block,curSettleEpoch.intValue(),slashStakingList);
 					nodeOpts.addAll(exceptionNodeOpts);
 					log.debug("被处罚节点列表["+slashStakingList+"]");
 				}
@@ -100,19 +100,24 @@ public class OnElectionConverter {
 	 * @param slashNodeList 被处罚的节点列表
 	 * @return
 	 */
-	private List<NodeOpt> slash(Block block, int settleEpoch, List<Staking> slashNodeList,BigDecimal blockReward){
+	private List<NodeOpt> slash(CollectionEvent event,Block block, int settleEpoch, List<Staking> slashNodeList){
 		// 更新解质押到账需要经过的结算周期数
 		String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
 		if(StringUtils.isBlank(configVal)){
 			throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
 		}
 		Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
+		BigInteger unStakeEndBlock = event.getEpochMessage()
+				.getSettleEpochRound() // 当前块所处的结算周期轮数
+				.add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
+				.multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
 		//惩罚节点
 		Election election = Election.builder()
 				.time(block.getTime())
 				.settingEpoch(settleEpoch)
 				.slashNodeList(slashNodeList)
 				.unStakeFreezeDuration(unStakeFreezeDuration)
+				.unStakeEndBlock(unStakeEndBlock)
 				.build();
 
 		//节点操作日志
@@ -123,9 +128,9 @@ public class OnElectionConverter {
 					/**
 					 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
 					 */
-					String amount =  blockReward
-							.multiply(blockChainConfig.getSlashBlockRewardCount()).toString();
-					desc.append(blockChainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
+					String amount =  event.getEpochMessage().getBlockReward()
+							.multiply(chainConfig.getSlashBlockRewardCount()).toString();
+					desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
 					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 					nodeOpt.setNodeId(node.getNodeId());

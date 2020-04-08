@@ -20,8 +20,10 @@ import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.utils.EpochUtil;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +74,7 @@ public class InitializationService {
     private GasEstimateEventPublisher gasEstimateEventPublisher;
 
     @Transactional
-    public InitializationResult init() {
+    public InitializationResult init() throws BlockNumberException {
         // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
@@ -161,7 +163,7 @@ public class InitializationService {
      * 初始化入库内部质押节点
      * @throws Exception
      */
-    private List<com.platon.browser.dao.entity.Node> initInnerStake() {
+    private List<com.platon.browser.dao.entity.Node> initInnerStake() throws BlockNumberException {
         epochRetryService.issueChange(BigInteger.ZERO);
         epochRetryService.settlementChange(BigInteger.ZERO);
         epochRetryService.consensusChange(BigInteger.ZERO);
@@ -226,7 +228,14 @@ public class InitializationService {
                 throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
             }
             Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
+            // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
+            BigInteger unStakeEndBlock = EpochUtil
+                    .getEpoch(BigInteger.ONE,chainConfig.getSettlePeriodBlockCount()) // 当前块所处的结算周期轮数
+                    .add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
+                    .multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
+
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration);
+            staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
 
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();
