@@ -9,14 +9,12 @@ import com.platon.browser.complement.dao.param.stake.StakeExit;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +41,6 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
     private StakingMapper stakingMapper;
     @Autowired
     private BlockChainConfig chainConfig;
-    @Autowired
-    private ParameterService parameterService;
-    @Autowired
-    private ProposalMapper proposalMapper;
     @Autowired
     private StakeMiscService stakeMiscService;
 	

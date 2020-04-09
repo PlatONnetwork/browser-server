@@ -16,6 +16,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,6 +71,8 @@ public class InitializationServiceTest extends AgentTestBase {
     private GasEstimateLogMapper gasEstimateLogMapper;
     @Mock
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Mock
+    private StakeMiscService stakeMiscService;
     @Spy
     private InitializationService target;
     @Before
@@ -99,7 +102,7 @@ public class InitializationServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "parameterService", parameterService);
         ReflectionTestUtils.setField(target, "gasEstimateLogMapper", gasEstimateLogMapper);
         ReflectionTestUtils.setField(target, "gasEstimateEventPublisher", gasEstimateEventPublisher);
-
+        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);
         when(epochRetryService.getCandidates()).thenReturn(candidateList);
@@ -114,6 +117,8 @@ public class InitializationServiceTest extends AgentTestBase {
         gel.setJson("[]");
         gasEstimateLogs.add(gel);
         when(gasEstimateLogMapper.selectByExample(any())).thenReturn(gasEstimateLogs);
+        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
     }
 
     @Test

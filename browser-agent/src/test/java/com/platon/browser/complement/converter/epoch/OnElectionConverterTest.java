@@ -12,6 +12,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,8 @@ public class OnElectionConverterTest extends AgentTestBase {
     private PlatOnClient platOnClient;
     @Mock
     private StakingMapper stakingMapper;
+    @Mock
+    private StakeMiscService stakeMiscService;
 
     @Spy
     private OnElectionConverter target;
@@ -55,6 +58,7 @@ public class OnElectionConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"platOnClient",platOnClient);
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
         ReflectionTestUtils.setField(target,"chainConfig",blockChainConfig);
+        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         List<Staking> list = new ArrayList <>();
         stakingList.forEach(item ->{
         	Staking staking = new Staking();
@@ -69,6 +73,8 @@ public class OnElectionConverterTest extends AgentTestBase {
         when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
         when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
+        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);

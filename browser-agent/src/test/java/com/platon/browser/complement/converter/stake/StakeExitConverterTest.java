@@ -10,7 +10,7 @@ import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class StakeExitConverterTest extends AgentTestBase {
     @Mock
     private BlockChainConfig chainConfig;
     @Mock
-    private ParameterService parameterService;
+    private StakeMiscService stakeMiscService;
     @Spy
     private StakeExitConverter target;
 
@@ -54,7 +54,7 @@ public class StakeExitConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
-        ReflectionTestUtils.setField(target,"parameterService",parameterService);
+        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")
@@ -65,7 +65,8 @@ public class StakeExitConverterTest extends AgentTestBase {
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(400));
         when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(BigInteger.valueOf(400));
-        when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
+        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
     }
 
 
