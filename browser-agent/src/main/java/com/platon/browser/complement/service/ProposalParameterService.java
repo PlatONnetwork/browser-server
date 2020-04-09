@@ -72,7 +72,7 @@ public class ProposalParameterService {
         		ProposalSlash proposalSlash = new ProposalSlash();
         		proposalSlash.setVoteHash(vote.getHash());
         		proposalSlash.setHash(proposal.getHash());
-        		proposalSlash.setVoteOption(vote.getOption());
+        		proposalSlash.setVoteOption(String.valueOf(vote.getOption()));
         		proposalSlashs.add(proposalSlash);
 //        		vote.setOption(Integer.valueOf(OptionEnum.INVALID.getCode()));
 //        		if(vote.getOption() == Integer.valueOf(OptionEnum.OPPOSITION.getCode())) {
