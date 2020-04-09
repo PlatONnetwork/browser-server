@@ -9,6 +9,8 @@ import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -87,11 +89,14 @@ public class ProposalInfoTask {
 //                    proposal.setAbstentions(pps.getAbstainCount());
 //                }
 
-                //设置状态
-                int status = proposalService.getTallyResult(proposal.getHash()).getStatus();
-                if (status != proposal.getStatus()) {
-                    // 有变更
-                    proposal.setStatus(status);
+                TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());
+                if(tallyResult != null) {
+                	//设置状态
+                    int status = tallyResult.getStatus();
+                    if (status != proposal.getStatus()) {
+                        // 有变更
+                        proposal.setStatus(status);
+                    }
                 }
             }catch (Exception e){
                 log.error("提案投票信息更新出错:",e);
