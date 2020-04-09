@@ -6,13 +6,13 @@
         	/*1、更新提案*/
 			update proposal set 
 			<choose>
-            	<when test="ps.voteOption == 1">
+            	<when test="ps.voteOption == '1'">
          			`yeas` = `yeas`- 1
          		</when>
-         		<when test="ps.voteOption == 2">
+         		<when test="ps.voteOption == '2'">
          			`nays` = `nays`- 1
          		</when>
-         		<when test="ps.voteOption == 3">
+         		<when test="ps.voteOption == '3'">
          			`abstentions` = `abstentions`- 1
          		</when>
          	</choose>
@@ -20,13 +20,13 @@
             /*2、更新投票*/
 		    update vote set 
 		    <choose>
-            	<when test="ps.voteOption == 1">
+            	<when test="ps.voteOption == '1'">
 		    	`option` = 11
 		    	</when> 
-		    	<when test="ps.voteOption == 2">
+		    	<when test="ps.voteOption == '2'">
 		    	`option` = 12
 		    	</when> 
-		    	<when test="ps.voteOption == 3">
+		    	<when test="ps.voteOption == '3'">
 		    	`option` = 13
 		    	</when>
 		    </choose> where `hash` = #{ps.voteHash} ;
