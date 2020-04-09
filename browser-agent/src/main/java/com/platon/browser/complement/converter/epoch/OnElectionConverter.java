@@ -17,13 +17,11 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
@@ -50,7 +48,7 @@ public class OnElectionConverter {
 	@Autowired
 	private StakingMapper stakingMapper;
 	@Autowired
-	private ParameterService parameterService;
+	private StakeMiscService stakeMiscService;
 	@Autowired
     private ProposalParameterService proposalParameterService;
 
@@ -102,22 +100,18 @@ public class OnElectionConverter {
 	 */
 	private List<NodeOpt> slash(CollectionEvent event,Block block, int settleEpoch, List<Staking> slashNodeList){
 		// 更新解质押到账需要经过的结算周期数
-		String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
-		if(StringUtils.isBlank(configVal)){
-			throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
-		}
-		Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
-		BigInteger unStakeEndBlock = event.getEpochMessage()
-				.getSettleEpochRound() // 当前块所处的结算周期轮数
-				.add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
-				.multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
+		BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+		slashNodeList.forEach(staking -> {
+			// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
+			BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
+			staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
+		});
 		//惩罚节点
 		Election election = Election.builder()
 				.time(block.getTime())
 				.settingEpoch(settleEpoch)
 				.slashNodeList(slashNodeList)
-				.unStakeFreezeDuration(unStakeFreezeDuration)
-				.unStakeEndBlock(unStakeEndBlock)
+				.unStakeFreezeDuration(unStakeFreezeDuration.intValue())
 				.build();
 
 		//节点操作日志

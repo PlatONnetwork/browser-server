@@ -12,6 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,8 @@ public class ReportConverterTest extends AgentTestBase {
     private NodeCache nodeCache;
     @Mock
     private ParameterService parameterService;
+    @Mock
+    private StakeMiscService stakeMiscService;
 
     @Spy
     private ReportConverter target;
@@ -55,6 +58,7 @@ public class ReportConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"reportMultiSignParamCache",reportMultiSignParamCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         ReflectionTestUtils.setField(target,"parameterService",parameterService);
+        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")
@@ -64,6 +68,8 @@ public class ReportConverterTest extends AgentTestBase {
         when(chainConfig.getDuplicateSignSlashRate()).thenReturn(blockChainConfig.getDuplicateSignSlashRate());
         when(chainConfig.getDuplicateSignRewardRate()).thenReturn(blockChainConfig.getDuplicateSignRewardRate());
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
+        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
     }
 
     @Test

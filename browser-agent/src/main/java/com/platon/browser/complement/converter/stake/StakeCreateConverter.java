@@ -6,13 +6,13 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.stake.StakeCreate;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
     @Autowired
 	private ParameterService parameterService;
     @Autowired
-	private BlockChainConfig chainConfig;
+	private StakeMiscService stakeMiscService;
 
     @Override
     public NodeOpt convert(CollectionEvent event, Transaction tx) {
@@ -56,11 +56,10 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         if(StringUtils.isBlank(configVal)){
         	throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
 		}
-        Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
-        BigInteger unStakeEndBlock = event.getEpochMessage()
-				.getSettleEpochRound() // 当前块所处的结算周期轮数
-				.add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
-				.multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
+		// 更新解质押到账需要经过的结算周期数
+		BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+		// 理论上的退出区块号
+		BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(txParam.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
         		.stakingHes(txParam.getAmount())
@@ -78,7 +77,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         		.joinTime(tx.getTime())
         		.txHash(tx.getHash())
 				.delegateRewardPer(txParam.getDelegateRewardPer())
-				.unStakeFreezeDuration(unStakeFreezeDuration)
+				.unStakeFreezeDuration(unStakeFreezeDuration.intValue())
 				.unStakeEndBlock(unStakeEndBlock)
                 .build();
 
