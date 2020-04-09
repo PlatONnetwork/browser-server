@@ -5,24 +5,24 @@
         <foreach collection="proposalSlashs" item="item" separator=";">
         	/*1、更新提案*/
 			update proposal set 
-			<if test="#{item.voteOption} == 1">
+			<if test="#{item.voteOption} == '1'">
           	`yeas` = `yeas`- 1
         	</if>
-        	<if test="#{item.voteOption} == 2">
+        	<if test="#{item.voteOption} == '2'">
           	`nays` = `nays`- 1
         	</if>
-        	<if test="#{item.voteOption} == 3">
+        	<if test="#{item.voteOption} == '3'">
           	`abstentions` = `abstentions`- 1
         	</if> where `hash` = #{item.hash};
             /*2、更新投票*/
 		    update vote set 
-		    <if test="#{item.voteOption} == 1">
+		    <if test="#{item.voteOption} == '1'">
 		    	`option` = 11 
 		    </if> 
-		    <if test="#{item.voteOption} == 2">
+		    <if test="#{item.voteOption} == '2'">
 		    	`option` = 12 
 		    </if> 
-		    <if test="#{item.voteOption} == 3">
+		    <if test="#{item.voteOption} == '3'">
 		    	`option` = 13 
 		    </if> where `hash` = #{item.voteHash} ;
         </foreach>

@@ -33,7 +33,9 @@ public class CustomVote extends Vote {
         SUPPORT("1", "支持"),
         OPPOSITION("2", "反对"),
         ABSTENTION("3", "弃权"),
-        INVALID("4", "无效");
+        INVALID_SUPPORT("11", "支持（无效）"),
+        INVALID_OPPOSITION("12", "反对（无效）"),
+        INVALID_ABSTENTION("13", "弃权（无效）");
         private String code;
         private String desc;
         OptionEnum ( String code, String desc ) {
