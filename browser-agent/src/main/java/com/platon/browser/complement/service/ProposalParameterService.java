@@ -47,7 +47,11 @@ public class ProposalParameterService {
         VoteExample voteExample = new VoteExample();
         Criteria credentials = voteExample.createCriteria();
         credentials.andNodeIdEqualTo(nodeId);
-        credentials.andOptionNotEqualTo(Integer.valueOf(OptionEnum.INVALID.getCode()));
+        List<Integer> options = new ArrayList<>();
+        options.add(Integer.valueOf(OptionEnum.SUPPORT.getCode()));
+        options.add(Integer.valueOf(OptionEnum.ABSTENTION.getCode()));
+        options.add(Integer.valueOf(OptionEnum.OPPOSITION.getCode()));
+        credentials.andOptionIn(options);
         List<Vote> votes = voteMapper.selectByExample(voteExample);
         /**
          * 没有投票情况直接返回
@@ -68,7 +72,7 @@ public class ProposalParameterService {
         		ProposalSlash proposalSlash = new ProposalSlash();
         		proposalSlash.setVoteHash(vote.getHash());
         		proposalSlash.setHash(proposal.getHash());
-        		proposalSlash.setVoteOption(Integer.valueOf(OptionEnum.INVALID.getCode()));
+        		proposalSlash.setVoteOption(vote.getOption());
         		proposalSlashs.add(proposalSlash);
 //        		vote.setOption(Integer.valueOf(OptionEnum.INVALID.getCode()));
 //        		if(vote.getOption() == Integer.valueOf(OptionEnum.OPPOSITION.getCode())) {

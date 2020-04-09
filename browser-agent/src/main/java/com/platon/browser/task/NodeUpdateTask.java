@@ -49,8 +49,6 @@ public class NodeUpdateTask {
 		if(!AppStatusUtil.isRunning()) return;
 		try {
 			//查询待补充的质押信息
-			NodeExample nodeExample = new NodeExample();
-			nodeExample.createCriteria().andExternalIdNotEqualTo("");
 			List<Node> nodeList = nodeMapper.selectByExample(null);
 			
 			Map<String, Optional<KeyBaseUserInfo>> cache = new HashMap<>();
