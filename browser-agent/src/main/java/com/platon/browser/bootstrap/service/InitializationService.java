@@ -19,10 +19,10 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.AddressTypeEnum;
-import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +72,8 @@ public class InitializationService {
     private GasEstimateLogMapper gasEstimateLogMapper;
     @Autowired
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+    @Autowired
+    private StakeMiscService stakeMiscService;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
@@ -223,18 +225,12 @@ public class InitializationService {
             staking.setTotalDeleReward(BigDecimal.ZERO);
             staking.setExceptionStatus(1);
 
-            String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
-            if(StringUtils.isBlank(configVal)){
-                throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
-            }
-            Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
+            BigInteger curSettleEpochRound = EpochUtil.getEpoch(BigInteger.ONE,chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
+            // 更新解质押到账需要经过的结算周期数
+            BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
             // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-            BigInteger unStakeEndBlock = EpochUtil
-                    .getEpoch(BigInteger.ONE,chainConfig.getSettlePeriodBlockCount()) // 当前块所处的结算周期轮数
-                    .add(BigInteger.valueOf(unStakeFreezeDuration)) //+ 解质押需要经过的结算周期轮数
-                    .multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
-
-            staking.setUnStakeFreezeDuration(unStakeFreezeDuration);
+            BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(null,curSettleEpochRound,false);
+            staking.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
             staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
 
             // 使用当前质押信息生成节点信息
