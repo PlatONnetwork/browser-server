@@ -14,7 +14,7 @@ public class ProposalSlash {
     //投票hash
     private String voteHash;
     //投票选项
-    private Integer voteOption;
+    private int voteOption;
     //提案hash
     private String hash;
 
