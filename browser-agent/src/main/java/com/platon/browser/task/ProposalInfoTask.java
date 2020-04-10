@@ -103,7 +103,7 @@ public class ProposalInfoTask {
                 /**
             	 * 当区块号小于结束区块则跳过更新状态
             	 */
-            	if(bigInteger.compareTo(BigInteger.valueOf(proposal.getEndVotingBlock())) <= 0) {
+            	if(bigInteger.compareTo(BigInteger.valueOf(proposal.getEndVotingBlock())) < 0) {
             		continue;
             	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());
