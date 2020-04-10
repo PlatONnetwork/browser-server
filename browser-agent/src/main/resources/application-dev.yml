@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: dev
+profile: zrj
 # 密码加密配置
 jasypt:
   encryptor:
@@ -24,11 +24,11 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_1
-      transactionIndexName: browser_transaction_1
-      delegationIndexName: browser_delegation_1
-      nodeOptIndexName: browser_nodeopt_1
-      delegationRewardIndexName: browser_delegation_reward_1
+      blockIndexName: browser_block_zrj
+      transactionIndexName: browser_transaction_zrj
+      delegationIndexName: browser_delegation_zrj
+      nodeOptIndexName: browser_nodeopt_zrj
+      delegationRewardIndexName: browser_delegation_reward_zrj
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

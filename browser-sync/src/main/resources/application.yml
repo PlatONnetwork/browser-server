@@ -1,6 +1,6 @@
 # ***************************通用配置**************************** #
 # 应用版本
-version: 0.12.0.0
+version: 0.11.0.1
 #Spring应用配置
 spring:
   application.name: browser-sync
