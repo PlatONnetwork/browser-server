@@ -74,12 +74,6 @@ public class ProposalInfoTask {
 			log.error("get blocknumber error");
 		}
         for (Proposal proposal : proposals) {
-        	/**
-        	 * 当区块号小于结束区块则跳过
-        	 */
-        	if(bigInteger.compareTo(BigInteger.valueOf(proposal.getEndVotingBlock())) >= 0) {
-        		continue;
-        	}
             try {
 //                //发送rpc请求查询提案结果
                 ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
@@ -106,6 +100,12 @@ public class ProposalInfoTask {
 //                    proposal.setAbstentions(pps.getAbstainCount());
 //                }
 
+                /**
+            	 * 当区块号小于结束区块则跳过更新状态
+            	 */
+            	if(bigInteger.compareTo(BigInteger.valueOf(proposal.getEndVotingBlock())) <= 0) {
+            		continue;
+            	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());
                 if(tallyResult != null) {
                 	//设置状态
