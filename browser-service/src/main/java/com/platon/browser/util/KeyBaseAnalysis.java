@@ -20,6 +20,7 @@ public class KeyBaseAnalysis {
         if (thems == null || thems.isEmpty()) return null;
         // 取最新一条
         Them them = thems.get(0);
+        if(them == null || them.getBasics() == null )  return null;
         Basics basics = them.getBasics();
         return basics.getUsername();
     }
@@ -30,6 +31,7 @@ public class KeyBaseAnalysis {
         if (thems == null || thems.isEmpty()) return null;
         // 取最新一条
         Them them = thems.get(0);
+        if(them == null || them.getPictures() == null || them.getPictures().getPrimary() == null)  return null;
         //获取头像
         return them.getPictures().getPrimary().getUrl();
     }

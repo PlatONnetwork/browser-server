@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.proposal.ProposalService;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,8 @@ public class ProposalInfoTask {
     private CustomProposalMapper customProposalMapper;
     @Autowired
     private ProposalService proposalService;
+    @Autowired
+    private PlatOnClient platOnClient;
 
     /**
      *
@@ -62,7 +67,19 @@ public class ProposalInfoTask {
         //如果已经补充则无需补充
         if (proposals.isEmpty()) return;
 
+        BigInteger bigInteger = BigInteger.ZERO;
+        try {
+			bigInteger = platOnClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
+		} catch (IOException e1) {
+			log.error("get blocknumber error");
+		}
         for (Proposal proposal : proposals) {
+        	/**
+        	 * 当区块号小于结束区块则跳过
+        	 */
+        	if(bigInteger.compareTo(BigInteger.valueOf(proposal.getEndVotingBlock())) >= 0) {
+        		continue;
+        	}
             try {
 //                //发送rpc请求查询提案结果
                 ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());

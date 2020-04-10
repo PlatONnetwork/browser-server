@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.NodeVersion;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
@@ -7,7 +8,6 @@ import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.keybase.KeyBaseUserInfo;
 import com.platon.browser.exception.HttpRequestException;
@@ -77,16 +77,21 @@ public class NodeUpdateTask {
 					});
 
 					optional.ifPresent(keyBaseUser ->{
-						String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
-						String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
 						boolean hasChange = false;
-						if(StringUtils.isNotBlank(icon)&&!icon.equals(node.getNodeIcon())){
-							node.setNodeIcon(icon);
-							hasChange = true;
-						}
-						if(StringUtils.isNotBlank(userName)&&!userName.equals(node.getExternalName())){
-							node.setExternalName(userName);
-							hasChange = true;
+						try {
+							String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
+							String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
+							
+							if(StringUtils.isNotBlank(icon)&&!icon.equals(node.getNodeIcon())){
+								node.setNodeIcon(icon);
+								hasChange = true;
+							}
+							if(StringUtils.isNotBlank(userName)&&!userName.equals(node.getExternalName())){
+								node.setExternalName(userName);
+								hasChange = true;
+							}
+						} catch (Exception e) {
+							log.error("get keybase error:keyBaseUser={}",JSONObject.toJSONString(keyBaseUser),e);
 						}
 
 						if(hasChange) {
