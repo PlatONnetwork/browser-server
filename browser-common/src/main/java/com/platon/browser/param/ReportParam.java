@@ -60,12 +60,16 @@ public class ReportParam extends TxParam{
 
     private String format ( BigInteger type, String date ) {
         String info = "";
-        Evidence evidence = JSON.parseObject(date, Evidence.class);
-        if (isObjectFieldEmpty(evidence)) {
-            if (isObjectFieldEmpty(evidence.getPrepareA())) {
-                info = evidence.getPrepareA().getValidateNode().getNodeId();
+        try {
+        	Evidence evidence = JSON.parseObject(date, Evidence.class);
+        	if (isObjectFieldEmpty(evidence)) {
+                if (isObjectFieldEmpty(evidence.getPrepareA())) {
+                    info = evidence.getPrepareA().getValidateNode().getNodeId();
+                }
             }
-        }
+		} catch (Exception e) {
+			log.error("json decode error", e);
+		}
         return info;
     }
 
