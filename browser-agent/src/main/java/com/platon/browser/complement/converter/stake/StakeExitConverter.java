@@ -63,8 +63,11 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
             throw new BusinessException("周期计算错误!");
         }
         
-        // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        // 失败的交易不分析业务数据，增加info信息
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) {
+        	tx.setInfo(txParam.toJSONString());
+        	return null;
+        }
 
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(txParam.getNodeId());
