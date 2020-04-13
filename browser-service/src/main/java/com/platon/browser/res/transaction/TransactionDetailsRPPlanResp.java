@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  *  交易详情锁仓子结构体返回对象
@@ -14,13 +13,13 @@ import java.math.BigInteger;
  *  @data 2019年8月31日
  */
 public class TransactionDetailsRPPlanResp {
-	private BigInteger epoch;         //锁仓周期
+	private String epoch;         //锁仓周期
     private BigDecimal amount;      //锁定金额
-    private Long blockNumber;   //锁仓周期对应快高  结束周期 * epoch  
-	public BigInteger getEpoch() {
+    private String blockNumber;   //锁仓周期对应快高  结束周期 * epoch  
+	public String getEpoch() {
 		return epoch;
 	}
-	public void setEpoch(BigInteger epoch) {
+	public void setEpoch(String epoch) {
 		this.epoch = epoch;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
@@ -30,10 +29,10 @@ public class TransactionDetailsRPPlanResp {
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-	public Long getBlockNumber() {
+	public String getBlockNumber() {
 		return blockNumber;
 	}
-	public void setBlockNumber(Long blockNumber) {
+	public void setBlockNumber(String blockNumber) {
 		this.blockNumber = blockNumber;
 	}
     

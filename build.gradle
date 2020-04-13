@@ -106,6 +106,10 @@ subprojects {
 	    exclude '**/SlashContractTest.class'
 	    exclude '**/TransactionSender.class'
 	    exclude '**/CustomNodeMapperTest.class'
+	    exclude '**/StakingContractTest.class'
+	    exclude '**/WASMUploadTest.class'
+	    exclude '**/SuicideAndSelfdestructTest.class'
+	    exclude '**/HumanStandardTokenTest.class'
 	}
 }
 

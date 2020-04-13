@@ -50,17 +50,7 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         // 补充节点名称
         updateTxInfo(txParam,tx);
-        // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
-
-        StakingKey stakingKey = new StakingKey();
-        stakingKey.setNodeId(txParam.getNodeId());
-        stakingKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        if(staking==null){
-            throw new BusinessException("节点ID为["+txParam.getNodeId()+"],质押区块号为["+txParam.getStakingBlockNum()+"]的质押记录不存在！");
-        }
-
+        
         try {
             // 计算当前周期
             BigInteger curEpoch = EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),chainConfig.getSettlePeriodBlockCount());
@@ -71,6 +61,17 @@ public class StakeExitConverter extends BusinessParamConverter<NodeOpt> {
         } catch (BlockNumberException e) {
             log.error("",e);
             throw new BusinessException("周期计算错误!");
+        }
+        
+        // 失败的交易不分析业务数据
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+
+        StakingKey stakingKey = new StakingKey();
+        stakingKey.setNodeId(txParam.getNodeId());
+        stakingKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
+        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+        if(staking==null){
+            throw new BusinessException("节点ID为["+txParam.getNodeId()+"],质押区块号为["+txParam.getStakingBlockNum()+"]的质押记录不存在！");
         }
 
         long startTime = System.currentTimeMillis();
