@@ -21,7 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,7 +65,7 @@ public class StakeExitConverterTest extends AgentTestBase {
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(400));
         when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(BigInteger.valueOf(400));
-        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
         when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
     }
 

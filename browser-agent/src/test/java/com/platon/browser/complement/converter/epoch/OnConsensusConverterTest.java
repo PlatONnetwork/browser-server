@@ -8,6 +8,7 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.complement.dao.param.slash.Report;
+import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -19,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -45,6 +45,8 @@ public class OnConsensusConverterTest extends AgentTestBase {
     private StakingMapper stakingMapper;
     @Mock
     private NetworkStatCache networkStatCache;
+    @Mock
+    private ProposalParameterService proposalParameterService;
 	
     @Spy
     private OnConsensusConverter target;
@@ -57,6 +59,7 @@ public class OnConsensusConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"slashBusinessMapper",slashBusinessMapper);
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
         ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
+        ReflectionTestUtils.setField(target,"proposalParameterService",proposalParameterService);
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(blockChainConfig.getConsensusPeriodBlockCount());
         List<String> nodeIdList = new ArrayList<>();
         nodeList.forEach(n->nodeIdList.add(n.getNodeId()));

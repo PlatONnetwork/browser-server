@@ -8,6 +8,7 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -27,7 +28,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +47,8 @@ public class OnElectionConverterTest extends AgentTestBase {
     private StakingMapper stakingMapper;
     @Mock
     private StakeMiscService stakeMiscService;
+    @Mock
+    private BlockChainConfig chainConfig;
 
     @Spy
     private OnElectionConverter target;
@@ -57,7 +60,7 @@ public class OnElectionConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"specialApi",specialApi);
         ReflectionTestUtils.setField(target,"platOnClient",platOnClient);
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
-        ReflectionTestUtils.setField(target,"chainConfig",blockChainConfig);
+        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         List<Staking> list = new ArrayList <>();
         stakingList.forEach(item ->{
@@ -69,11 +72,11 @@ public class OnElectionConverterTest extends AgentTestBase {
         when(epochBusinessMapper.querySlashNode(any())).thenReturn(list);
         when(epochBusinessMapper.getException(any())).thenReturn(list);
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);
-        when(blockChainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.TEN);
-        when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
-        when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
-        when(blockChainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
-        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
+        when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.TEN);
+        when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
+        when(chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
+        when(chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
+        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
         when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);

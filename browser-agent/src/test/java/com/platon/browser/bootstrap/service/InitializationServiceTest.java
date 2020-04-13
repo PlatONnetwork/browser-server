@@ -32,8 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -109,6 +108,7 @@ public class InitializationServiceTest extends AgentTestBase {
         when(epochRetryService.getExpectBlockCount()).thenReturn(10L);
         when(chainConfig.getDefaultStakingList()).thenReturn(stakingList);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(100000000));
+        when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(proposalMapper.selectByExample(any())).thenReturn(new ArrayList<>(proposalList));
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
         List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
@@ -117,8 +117,8 @@ public class InitializationServiceTest extends AgentTestBase {
         gel.setJson("[]");
         gasEstimateLogs.add(gel);
         when(gasEstimateLogMapper.selectByExample(any())).thenReturn(gasEstimateLogs);
-        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
         when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
     }
 
     @Test

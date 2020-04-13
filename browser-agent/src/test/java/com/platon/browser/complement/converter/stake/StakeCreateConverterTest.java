@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.stake;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
@@ -19,7 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,8 +61,8 @@ public class StakeCreateConverterTest extends AgentTestBase {
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
-        when(stakeMiscService.getUnStakeEndBlock(any(),any(),any())).thenReturn(BigInteger.TEN);
         when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
     }
 
 
@@ -72,6 +73,10 @@ public class StakeCreateConverterTest extends AgentTestBase {
             if(transaction.getTypeEnum().equals(Transaction.TypeEnum.STAKE_CREATE))
                 tx=transaction;
         }
+        EpochMessage epochMessage = EpochMessage.newInstance();
+        epochMessage.setSettleEpochRound(new BigInteger("13"));
+        CollectionEvent collectionEvent = new CollectionEvent();
+        collectionEvent.setEpochMessage(epochMessage);
         target.convert(collectionEvent,tx);
     }
 }

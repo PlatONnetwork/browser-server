@@ -229,7 +229,7 @@ public class InitializationService {
             // 更新解质押到账需要经过的结算周期数
             BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
             // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-            BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(null,curSettleEpochRound,false);
+            BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock("",curSettleEpochRound,false);
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
             staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
 

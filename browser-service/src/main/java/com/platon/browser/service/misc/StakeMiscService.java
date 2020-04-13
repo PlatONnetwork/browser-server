@@ -35,7 +35,7 @@ public class StakeMiscService {
      * @param compareProposalVotingEndBlock 是否需要对比关联的提案
      * @return
      */
-    public BigInteger getUnStakeEndBlock(String nodeId,BigInteger curSettleEpoch,boolean compareProposalVotingEndBlock){
+    public BigInteger getUnStakeEndBlock(String nodeId,BigInteger curSettleEpoch,Boolean compareProposalVotingEndBlock){
         // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
         BigInteger unStakeEndBlock = curSettleEpoch // 当前块所处的结算周期轮数
                 .add(getUnStakeFreeDuration()) //+ 解质押需要经过的结算周期轮数

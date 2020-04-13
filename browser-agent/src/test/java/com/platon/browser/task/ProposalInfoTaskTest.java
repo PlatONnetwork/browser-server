@@ -1,6 +1,8 @@
 package com.platon.browser.task;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.enums.AppStatus;
@@ -16,7 +18,12 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 import static org.mockito.Mockito.*;
@@ -36,15 +43,27 @@ public class ProposalInfoTaskTest extends AgentTestBase {
     private CustomProposalMapper customProposalMapper;
     @Mock
     private ProposalService proposalService;
+    @Mock
+    private PlatOnClient platOnClient;
     @Spy
     private ProposalInfoTask target;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
         ReflectionTestUtils.setField(target, "customProposalMapper", customProposalMapper);
         ReflectionTestUtils.setField(target, "proposalService", proposalService);
+        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
+        Web3jWrapper ww = mock(Web3jWrapper.class);
+        when(platOnClient.getWeb3jWrapper()).thenReturn(ww);
+        Web3j web3j = mock(Web3j.class);
+        when(ww.getWeb3j()).thenReturn(web3j);
+        Request rq = mock(Request.class);
+        when(web3j.platonBlockNumber()).thenReturn(rq);
+        PlatonBlockNumber rs = mock(PlatonBlockNumber.class);
+        when(rq.send()).thenReturn(rs);
+        when(rs.getBlockNumber()).thenReturn(BigInteger.TEN);
     }
 
     @Test
