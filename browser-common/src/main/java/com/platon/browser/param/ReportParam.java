@@ -2,6 +2,8 @@ package com.platon.browser.param;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.param.evidence.Evidence;
+import com.platon.browser.param.evidence.PrepareEvidence;
+import com.platon.browser.param.evidence.VoteEvidence;
 import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,12 +63,22 @@ public class ReportParam extends TxParam{
     private String format ( BigInteger type, String date ) {
         String info = "";
         try {
-        	Evidence evidence = JSON.parseObject(date, Evidence.class);
-        	if (isObjectFieldEmpty(evidence)) {
-                if (isObjectFieldEmpty(evidence.getPrepareA())) {
-                    info = evidence.getPrepareA().getValidateNode().getNodeId();
+        	if(BigInteger.ONE.compareTo(type) == 0) {
+        		PrepareEvidence evidence = JSON.parseObject(date, PrepareEvidence.class);
+            	if (isObjectFieldEmpty(evidence)) {
+                    if (isObjectFieldEmpty(evidence.getPrepareA())) {
+                        info = evidence.getPrepareA().getValidateNode().getNodeId();
+                    }
                 }
-            }
+        	} else if(BigInteger.valueOf(2l).compareTo(type) == 0) {
+        		VoteEvidence evidence = JSON.parseObject(date, VoteEvidence.class);
+            	if (isObjectFieldEmpty(evidence)) {
+                    if (isObjectFieldEmpty(evidence.getVoteA())) {
+                        info = evidence.getVoteA().getValidateNode().getNodeId();
+                    }
+                }
+        	}
+        	
 		} catch (Exception e) {
 			log.error("json decode error", e);
 		}

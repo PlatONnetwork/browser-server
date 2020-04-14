@@ -6,7 +6,4 @@ import lombok.Data;
 @Data
 public class Evidence {
 
-    private Prepare prepareA;
-    private Prepare prepareB;
-
 }
