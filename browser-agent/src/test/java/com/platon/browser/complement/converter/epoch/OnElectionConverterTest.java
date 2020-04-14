@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.epoch;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.client.HistoryLowRateSlash;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
@@ -8,9 +9,11 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.service.misc.StakeMiscService;
@@ -26,6 +29,7 @@ import org.web3j.protocol.Web3j;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -49,6 +53,8 @@ public class OnElectionConverterTest extends AgentTestBase {
     private StakeMiscService stakeMiscService;
     @Mock
     private BlockChainConfig chainConfig;
+    @Mock
+    private ProposalParameterService proposalParameterService;
 
     @Spy
     private OnElectionConverter target;
@@ -62,15 +68,30 @@ public class OnElectionConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
+        ReflectionTestUtils.setField(target,"proposalParameterService",proposalParameterService);
         List<Staking> list = new ArrayList <>();
-        stakingList.forEach(item ->{
+        for (int i = 0; i < stakingList.size(); i++) {
         	Staking staking = new Staking();
-        	staking.setNodeId(item.getNodeId());
-        	staking.setStakingBlockNum(item.getStakingBlockNum());
+        	staking.setNodeId(stakingList.get(i).getNodeId());
+        	staking.setStakingBlockNum(stakingList.get(i).getStakingBlockNum());
+        	staking.setStakingLocked(BigDecimal.ONE);
+        	staking.setStakingReduction(BigDecimal.ONE);
+        	staking.setStatus(StatusEnum.EXITING.getCode());
+        	if(i == 1) {
+        		staking.setStatus(StatusEnum.CANDIDATE.getCode());
+        	} else {
+        		staking.setStakingReduction(new BigDecimal("-1"));
+        	}
             list.add(staking);
-        });
-        when(epochBusinessMapper.querySlashNode(any())).thenReturn(list);
-        when(epochBusinessMapper.getException(any())).thenReturn(list);
+		}
+        
+        List<HistoryLowRateSlash> list1 = new ArrayList <>();
+        HistoryLowRateSlash historyLowRateSlash = new HistoryLowRateSlash();
+        historyLowRateSlash.setNodeId("0x");
+        historyLowRateSlash.setAmount(BigInteger.ZERO);
+        list1.add(historyLowRateSlash);
+        when(specialApi.getHistoryLowRateSlashList(any(),any())).thenReturn(list1);
+        when(stakingMapper.selectByExample(any())).thenReturn(list);
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
@@ -95,6 +116,14 @@ public class OnElectionConverterTest extends AgentTestBase {
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
         target.convert(collectionEvent,block);
+        when(stakingMapper.selectByExample(any())).thenReturn(Collections.EMPTY_LIST);
+        target.convert(collectionEvent,block);
+        try {
+        	when(stakingMapper.selectByExample(any())).thenReturn(null);
+            target.convert(collectionEvent,block);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
     }
 	
 

@@ -2,34 +2,214 @@ package com.platon.browser.now.service.impl;
 
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.RemoteCall;
+import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.PlatonCall;
+import org.web3j.protocol.core.methods.response.PlatonGetBalance;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.exceptions.ContractCallException;
+import org.web3j.utils.JSONUtil;
+import org.web3j.utils.Numeric;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.TestBase;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.client.SpecialApi;
+import com.platon.browser.client.Web3jWrapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.RpPlan;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.CustomRpPlanMapper;
+import com.platon.browser.dao.mapper.RpPlanMapper;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.now.service.AddressService;
+import com.platon.browser.now.service.cache.StatisticCacheService;
+import com.platon.browser.redis.RedisCommands;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
+import com.platon.browser.util.I18nUtil;
+import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
+import com.platon.sdk.contracts.ppos.RewardContract;
+import com.platon.sdk.contracts.ppos.BaseContract.CallRet;
+import com.platon.sdk.contracts.ppos.abi.Function;
+import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
+import com.platon.sdk.contracts.ppos.dto.resp.Reward;
+import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
 
 
-public class AddressServiceImplTest extends TestBase{
+@RunWith(MockitoJUnitRunner.Silent.class)
+public class AddressServiceImplTest extends TestBase {
 
+	@Mock
+    private AddressMapper addressMapper;
+
+	@Mock
+    private RpPlanMapper rpPlanMapper;
+
+	@Mock
+    private CustomRpPlanMapper customRpPlanMapper;
+
+	@Mock
+    private PlatOnClient platonClient;
+
+	@Mock
+    private I18nUtil i18n;
+
+	@Mock
+    private BlockChainConfig blockChainConfig;
+    
+	@Mock
+	private BlockESRepository blockESRepository;
+    
+	@Mock
+    private SpecialApi specialApi;
+    
+	@Mock
+    private StatisticCacheService statisticCacheService;
+	
+	@Spy
+    private AddressServiceImpl targe;
+	
 	@Autowired
-    private AddressService addressService;
+	private AddressService addressService;
+	
+	@Before
+    public void setup() throws Exception {
+        ReflectionTestUtils.setField(targe, "addressMapper", addressMapper);
+        ReflectionTestUtils.setField(targe, "rpPlanMapper", rpPlanMapper);
+        ReflectionTestUtils.setField(targe, "customRpPlanMapper", customRpPlanMapper);
+        ReflectionTestUtils.setField(targe, "platonClient", platonClient);
+        ReflectionTestUtils.setField(targe, "i18n", i18n);
+        ReflectionTestUtils.setField(targe, "blockChainConfig", blockChainConfig);
+        ReflectionTestUtils.setField(targe, "blockESRepository", blockESRepository);
+        ReflectionTestUtils.setField(targe, "specialApi", specialApi);
+        ReflectionTestUtils.setField(targe, "statisticCacheService", statisticCacheService);
+        RestrictingPlanContract restrictingPlanContract = mock(RestrictingPlanContract.class);
+        when(platonClient.getRestrictingPlanContract()).thenReturn(restrictingPlanContract);
+        RestrictingItem restrictingItem = new RestrictingItem();
+		restrictingItem.setBalance("0x0");
+		restrictingItem.setDebt("0x0");
+		restrictingItem.setPledge("0x0");
+		CallResponse<RestrictingItem> baseResponse = new CallResponse<RestrictingItem>();
+		baseResponse.setCode(0);
+		baseResponse.setData(restrictingItem);
+		
+//		RemoteCall<CallResponse<RestrictingItem>> remoteCall = new RemoteCall<>(() -> executeCallObjectValueReturn());
+		RemoteCall<CallResponse<RestrictingItem>> remoteCall =mock(RemoteCall.class);
+		when(restrictingPlanContract.getRestrictingInfo(anyString())).thenReturn(remoteCall);
+		when(remoteCall.send()).thenReturn(baseResponse);
+    }
 	
 	@Test
-	public void getDetails() {
+	public void getDetails() throws Exception {
 		QueryDetailRequest req = new QueryDetailRequest();
 		req.setAddress("0x1000000000000000000000000000000000000001");
-		assertNotNull(addressService.getDetails(req));
+//		assertNotNull(addressService.getDetails(req));
+		
+		Address address = new Address();
+		address.setAddress("0x1000000000000000000000000000000000000001");
+		address.setBalance(BigDecimal.ZERO);
+		address.setDelegateHes(BigDecimal.ZERO);
+		address.setStakingValue(BigDecimal.ZERO);
+		address.setDelegateValue(BigDecimal.ZERO);
+		address.setContractDestroyHash("0x");
+		
+		when(addressMapper.selectByPrimaryKey(req.getAddress())).thenReturn(address);
+		List<RestrictingBalance> restrictingBalances = new ArrayList<RestrictingBalance>();
+		RestrictingBalance restrictingBalance = new RestrictingBalance();
+		restrictingBalance.setAccount("0x1000000000000000000000000000000000000001");
+		restrictingBalance.setFreeBalance("0x10");
+		restrictingBalance.setLockBalance("0x10");
+		restrictingBalance.setPledgeBalance("0x10");
+		restrictingBalances.add(restrictingBalance);
+		when(specialApi.getRestrictingBalance(any(),any())).thenReturn(restrictingBalances);
+		Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
+		when(platonClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
+		Web3j web3j = mock(Web3j.class);
+		when(web3jWrapper.getWeb3j()).thenReturn(web3j);
+		Request<?, PlatonGetBalance> rq = mock(Request.class);
+		doReturn(rq).when(web3j).platonGetBalance(any(),any());
+		PlatonGetBalance platonGetBalance = mock(PlatonGetBalance.class);
+		when(rq.send()).thenReturn(platonGetBalance);
+		
+		when(platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(any(),any()).send().getBalance()).thenReturn(BigInteger.ONE);
+		
+		RewardContract rewardContract = mock(RewardContract.class);
+		when(platonClient.getRewardContract()).thenReturn(rewardContract);
+		
+		RemoteCall<CallResponse<List<Reward>>> remoteCall = mock(RemoteCall.class);
+		when(rewardContract.getDelegateReward(any(),any())).thenReturn(remoteCall);
+		
+		CallResponse<List<Reward>> callResponse = mock(CallResponse.class);
+		when(remoteCall.send()).thenReturn(callResponse);
+		when(platonClient.getRewardContract().getDelegateReward(any(),any()).send().getData()).thenReturn(null);
+		targe.getDetails(req);
+		List<Reward> rewards = new ArrayList<Reward>();
+		Reward reward = new Reward();
+		reward.setReward("0x0");
+		when(platonClient.getRewardContract().getDelegateReward(any(),any()).send().getData()).thenReturn(rewards);
+		
+		Page<RpPlan> rpPlans = new Page();
+		RpPlan rpPlan = new RpPlan();
+		rpPlans.add(rpPlan);
+		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlans);
+		targe.getDetails(req);
 	}
 	@Test
-	public void rpplanDetail() {
+	public void rpplanDetail() throws Exception {
 		QueryRPPlanDetailRequest req = new QueryRPPlanDetailRequest();
 		req.setPageNo(0);
 		req.setPageSize(10);
 		req.setAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
-		assertNotNull(addressService.rpplanDetail(req));
+		Page<RpPlan> rpPlansPage = new Page<RpPlan>();
+		RpPlan rpPlan = new RpPlan();
+		rpPlan.setAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+		rpPlan.setAmount(BigDecimal.TEN);
+		rpPlan.setEpoch(10l);
+		rpPlan.setNumber(10l);
+		rpPlansPage.add(rpPlan);
+		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlansPage);
+		when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
+		Block block = new Block();
+		block.setTime(new Date());
+		when(blockESRepository.get(any(),any())).thenReturn(block);
+		
+		NetworkStat networkStat = new NetworkStat();
+		networkStat.setAvgPackTime(1l);
+		when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStat);
+		assertNotNull(targe.rpplanDetail(req));
 	}
 	
 }

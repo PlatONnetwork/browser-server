@@ -27,6 +27,7 @@ import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.I18nUtil;
+import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
 import com.platon.sdk.contracts.ppos.dto.resp.Reward;
@@ -130,7 +131,8 @@ public class AddressServiceImpl implements AddressService {
 			/**
 			 * 链上实时查询对应的锁仓信息
 			 */
-			CallResponse<RestrictingItem> baseResponse = platonClient.getRestrictingPlanContract().getRestrictingInfo(req.getAddress()).send();
+			RestrictingPlanContract restrictingPlanContract = platonClient.getRestrictingPlanContract();
+			CallResponse<RestrictingItem> baseResponse = restrictingPlanContract.getRestrictingInfo(req.getAddress()).send();
 			if(baseResponse.isStatusOk()) {
 				/**
 				 * 可用余额为balance减去质押金额
