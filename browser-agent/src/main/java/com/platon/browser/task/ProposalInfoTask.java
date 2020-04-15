@@ -4,12 +4,13 @@ import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.proposal.ProposalService;
 import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class ProposalInfoTask {
     @Autowired
     private ProposalService proposalService;
     @Autowired
-	private StatisticCacheService statisticCacheService;
+	private NetworkStatMapper networkStatMapper;
 
     /**
      *
@@ -95,7 +96,8 @@ public class ProposalInfoTask {
                 /**
             	 * 当同步区块号小于结束区块则跳过更新状态
             	 */
-            	if(statisticCacheService.getNetworkStatCache().getCurNumber() < proposal.getEndVotingBlock()) {
+                List<NetworkStat> networkStat = networkStatMapper.selectByExample(null);
+            	if(networkStat.get(0).getCurNumber() < proposal.getEndVotingBlock()) {
             		continue;
             	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());
