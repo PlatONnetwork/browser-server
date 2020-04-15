@@ -1,6 +1,5 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.proposal.ProposalService;
@@ -10,6 +9,7 @@ import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +37,7 @@ public class ProposalInfoTask {
     @Autowired
     private ProposalService proposalService;
     @Autowired
-    private PlatOnClient platOnClient;
+	private StatisticCacheService statisticCacheService;
 
     /**
      *
@@ -67,12 +65,6 @@ public class ProposalInfoTask {
         //如果已经补充则无需补充
         if (proposals.isEmpty()) return;
 
-        BigInteger bigInteger = BigInteger.ZERO;
-        try {
-			bigInteger = platOnClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
-		} catch (IOException e1) {
-			log.error("get blocknumber error");
-		}
         for (Proposal proposal : proposals) {
             try {
 //                //发送rpc请求查询提案结果
@@ -101,9 +93,9 @@ public class ProposalInfoTask {
 //                }
 
                 /**
-            	 * 当区块号小于结束区块则跳过更新状态
+            	 * 当同步区块号小于结束区块则跳过更新状态
             	 */
-            	if(bigInteger.compareTo(BigInteger.valueOf(proposal.getEndVotingBlock())) < 0) {
+            	if(statisticCacheService.getNetworkStatCache().getCurNumber() < proposal.getEndVotingBlock()) {
             		continue;
             	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());

@@ -2,9 +2,7 @@ package com.platon.browser.service.misc;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.ProposalExample;
-import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
@@ -26,7 +24,7 @@ public class StakeMiscService {
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
-    private ProposalMapper proposalMapper;
+    private CustomProposalMapper customProposalMapper;
 
     /**
      * 获取解质押的实际退出块号
@@ -42,11 +40,7 @@ public class StakeMiscService {
                 .multiply(chainConfig.getSettlePeriodBlockCount()); // x 每个结算周期的区块数
         if(compareProposalVotingEndBlock){
             // 如果需要跟当前节点的投票中的提案进行对比，则执行如下逻辑
-            ProposalExample condition = new ProposalExample();
-            condition.createCriteria()
-                    .andNodeIdEqualTo(nodeId) // 提案节点ID等于当前退出节点
-                    .andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode()); // 提案状态为投票中
-            List<Proposal> proposalList = proposalMapper.selectByExample(condition);
+        	List<Proposal> proposalList = customProposalMapper.selectVotingProposal(nodeId);
             for (Proposal proposal : proposalList) {
                 BigInteger endVotingBlock = BigInteger.valueOf(proposal.getEndVotingBlock());
                 if(endVotingBlock.compareTo(unStakeEndBlock)>0){
