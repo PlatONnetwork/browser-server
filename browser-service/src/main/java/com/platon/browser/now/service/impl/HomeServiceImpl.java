@@ -3,6 +3,7 @@ package com.platon.browser.now.service.impl;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.elasticsearch.ESResult;
@@ -62,6 +63,8 @@ public class HomeServiceImpl implements HomeService {
 	private BlockChainConfig blockChainConfig;
 	@Autowired
 	private CommonService commonService;
+	@Autowired
+	private CustomNodeMapper customNodeMapper;
 
 	private final static String BLOCK_ERR_TIPS="获取区块错误。";
 
@@ -257,6 +260,8 @@ public class HomeServiceImpl implements HomeService {
 			}
 		}
 
+		int nodeNum = customNodeMapper.selectCountByActive();
+		chainStatisticNewResp.setNodeNum(nodeNum);
 		List<BlockListNewResp> lists = new LinkedList<>();
 		for (int i=0; i < items.size(); i++) {
 			BlockListNewResp blockListNewResp = new BlockListNewResp();

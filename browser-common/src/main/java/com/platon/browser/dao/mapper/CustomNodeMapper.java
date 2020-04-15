@@ -20,4 +20,7 @@ public interface CustomNodeMapper {
      * @return
      */
     Page<Node> selectListByExample(NodeExample example);
+    
+    
+    int selectCountByActive();
 }

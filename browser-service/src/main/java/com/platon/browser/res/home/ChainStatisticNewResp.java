@@ -26,6 +26,7 @@ public class ChainStatisticNewResp {
 	private Integer addressQty; // 地址数
 	private Integer proposalQty; // 总提案数
 	private Integer doingProposalQty; // 进行中提案数
+	private Integer nodeNum; // 节点数
 	private BigDecimal availableStaking;// 总可用质押
 	private List<BlockListNewResp> blockList;
 	public Long getCurrentNumber() {
@@ -115,6 +116,12 @@ public class ChainStatisticNewResp {
 	}
 	public void setAvailableStaking(BigDecimal availableStaking) {
 		this.availableStaking = availableStaking;
+	}
+	public Integer getNodeNum() {
+		return nodeNum;
+	}
+	public void setNodeNum(Integer nodeNum) {
+		this.nodeNum = nodeNum;
 	}
 	
 }

@@ -120,8 +120,9 @@ public interface AppDocHome {
      *       "stakingDelegationValue":"",  //当前质押总数=有效的质押+委托
      *       "addressQty":"",          //地址数
      *       "proposalQty":"",         //总提案数
-     *       "doingProposalQty":""     //进行中提案数
-     *       "availableStaking":""   //可质押量
+     *       "doingProposalQty":"",     //进行中提案数
+     *       "availableStaking":"",   //可质押量
+     *       "nodeNum":"", // 节点数
      *       "blockList":[
      *       {
      *       	"isRefresh":true // 是否更新,false不更新区块，true更新区块

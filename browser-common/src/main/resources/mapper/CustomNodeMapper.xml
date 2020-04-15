@@ -54,4 +54,9 @@
       order by ${orderByClause}
     </if>
   </select>
+  
+  <select id="selectCountByActive" resultType="java.lang.Integer">
+  	SELECT count(*)
+	FROM node WHERE (`status` = 1) or (`status` = 2 and `is_settle` = 1)
+  </select>
 </mapper>
