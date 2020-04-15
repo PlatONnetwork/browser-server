@@ -1,9 +1,7 @@
 package com.platon.browser.common.utils;
 
-import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Staking;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.utils.Convert;
 
@@ -167,15 +165,21 @@ public class CalculateUtils {
 			List<PeriodValueElement> profits,
 			List<PeriodValueElement> costs,
 			BlockChainConfig chainConfig){
+		// 利润累计按周期从大到小排列
 		profits.sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+		// 成本按周期从大到小排列
 		costs.sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-		// 最新利润累计
-		PeriodValueElement last=profits.get(0);
 		// 最旧利润累计
 		PeriodValueElement first=profits.get(profits.size()-1);
-		// 利润=最新的收益累计-最旧的收益收益累计
-		BigDecimal profitSum=last.getValue().subtract(first.getValue()).abs();
+		// 利润=最大收益累计-最小的收益累计
+		PeriodValueElement max = first;
+		for (PeriodValueElement p : profits) {
+			if (p.getValue().compareTo(max.getValue()) > 0) max = p;
+		}
+		BigDecimal profitSum=max.getValue().subtract(first.getValue()).abs();
 
+		// 最新利润累计
+		PeriodValueElement last=profits.get(0);
 		BigDecimal costSum=BigDecimal.ZERO;
 		for (PeriodValueElement cost : costs) {
 			// 跳过大于利润所在最大结算周期的成本周期
