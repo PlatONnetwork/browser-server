@@ -6,9 +6,8 @@ import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.complement.dao.param.slash.Report;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -37,7 +36,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
     @Autowired
-    private StakingMapper stakingMapper;
+    private NodeMapper nodeMapper;
     @Autowired
     private ReportMultiSignParamCache reportMultiSignParamCache;
     @Autowired
@@ -48,10 +47,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
         if(null==txParam) return null;
-        StakingKey stakingKey = new StakingKey();
-        stakingKey.setNodeId(txParam.getVerify());
-        stakingKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
-        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+        Node staking = nodeMapper.selectByPrimaryKey(txParam.getVerify());
         //惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
         BigDecimal stakingAmount = staking.getStakingLocked();
         if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
