@@ -603,10 +603,11 @@ public class TransactionServiceImpl implements TransactionService {
 						 * 查看举报之后是否退出来判断是否交易正确
 						 */
 						resp.setReportStatus(transaction.getStatus() == 1?2:1);
-						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
-						if(slash != null) {
-							resp.setReportRewards(slash.getReward());
-						}
+//						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
+//						if(slash != null) {
+//							resp.setReportRewards(slash.getReward());
+//						}
+						resp.setReportRewards(reportValidatorParam.getReward());
 						resp.setReportType(reportValidatorParam.getType().intValue());
 						resp.setEvidences(transactionDetailsEvidencesResps);
 						break;

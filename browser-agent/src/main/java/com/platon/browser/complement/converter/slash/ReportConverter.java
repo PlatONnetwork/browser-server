@@ -6,6 +6,10 @@ import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.complement.dao.param.slash.Report;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ReportParam;
@@ -14,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +36,8 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
     private BlockChainConfig chainConfig;
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
-
+    @Autowired
+    private StakingMapper stakingMapper;
     @Autowired
     private ReportMultiSignParamCache reportMultiSignParamCache;
     @Autowired
@@ -42,6 +48,19 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
         if(null==txParam) return null;
+        StakingKey stakingKey = new StakingKey();
+        stakingKey.setNodeId(txParam.getVerify());
+        stakingKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
+        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+        //惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
+        BigDecimal stakingAmount = staking.getStakingLocked();
+        if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
+        	stakingAmount = staking.getStakingReduction();
+        }
+        //奖励的金额
+        BigDecimal codeRewardValue = stakingAmount.multiply(chainConfig.getDuplicateSignSlashRate())
+        		.multiply(chainConfig.getDuplicateSignRewardRate());
+        txParam.setReward(codeRewardValue);
         updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
@@ -72,8 +91,13 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
                 .unStakeEndBlock(unStakeEndBlock)
                 .build();
 
-        //更新节点提取质押需要经过的周期数
-        slashBusinessMapper.updateUnStakeFreezeDuration(businessParam);
+        /**
+         * 只有第一次候选中惩罚的时候才需要更新质押锁定周期数
+         */
+        if(staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
+        	//更新节点提取质押需要经过的周期数
+            slashBusinessMapper.updateUnStakeFreezeDuration(businessParam);
+        }
 
         // 把举报参数暂时缓存，待共识周期切换时处理
         reportMultiSignParamCache.addReport(businessParam);

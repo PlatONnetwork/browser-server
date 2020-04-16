@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -54,6 +55,11 @@ public class ReportParam extends TxParam{
      * 质押交易快高
      */
     private BigInteger stakingBlockNum;
+    
+    /**
+     * 举报金额
+     */
+    private BigDecimal reward;
 
     public ReportParam init() {
         this.verify = format(type, data);
