@@ -184,7 +184,7 @@ public class OnSettleConverter {
 
         // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的质押成本为0
         BigDecimal curSettleCost = BigDecimal.ZERO;
-        if(settle.getCurVerifierSet().contains(staking.getNodeId())){
+//        if(settle.getCurVerifierSet().contains(staking.getNodeId())){
             // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
             // 计算当前质押成本 成本暂时不需要委托
             curSettleCost = staking.getStakingLocked() // 锁定的质押金
@@ -192,7 +192,7 @@ public class OnSettleConverter {
 //                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
 //                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
 
-        }
+//        }
         // 轮换下一结算周期的成本信息
         CalculateUtils.rotateCost(ari.getStakeCost(),curSettleCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
 
@@ -245,10 +245,10 @@ public class OnSettleConverter {
 
         // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的委托成本为0
         BigDecimal curDelegateCost = BigDecimal.ZERO;
-        if(settle.getCurVerifierSet().contains(staking.getNodeId())){
+//        if(settle.getCurVerifierSet().contains(staking.getNodeId())){
             // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的委托成本, 委托成本以参数传进来的curTotalDelegateCost为准
             curDelegateCost = curTotalDelegateCost;
-        }
+//        }
         // 轮换下一结算周期的成本信息
         CalculateUtils.rotateCost(ari.getDelegateCost(),curDelegateCost,BigInteger.valueOf(settle.getSettingEpoch()),chainConfig);
 
