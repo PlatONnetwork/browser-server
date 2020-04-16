@@ -48,15 +48,18 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         ReportParam txParam = tx.getTxParam(ReportParam.class);
         if(null==txParam) return null;
         Node staking = nodeMapper.selectByPrimaryKey(txParam.getVerify());
-        //惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
-        BigDecimal stakingAmount = staking.getStakingLocked();
-        if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
-        	stakingAmount = staking.getStakingReduction();
+        if(staking != null) {
+        	//惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
+            BigDecimal stakingAmount = staking.getStakingLocked();
+            if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
+            	stakingAmount = staking.getStakingReduction();
+            }
+            //奖励的金额
+            BigDecimal codeRewardValue = stakingAmount.multiply(chainConfig.getDuplicateSignSlashRate())
+            		.multiply(chainConfig.getDuplicateSignRewardRate());
+            txParam.setReward(codeRewardValue);
         }
-        //奖励的金额
-        BigDecimal codeRewardValue = stakingAmount.multiply(chainConfig.getDuplicateSignSlashRate())
-        		.multiply(chainConfig.getDuplicateSignRewardRate());
-        txParam.setReward(codeRewardValue);
+        
         updateTxInfo(txParam,tx);
         // 失败的交易不分析业务数据
         if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
