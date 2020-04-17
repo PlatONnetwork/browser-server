@@ -255,15 +255,15 @@ public class BlockChainConfig {
         this.setSlashBlockRewardCount(new BigDecimal(dec.getSlashing().getSlashBlocksReward()));
 
         //【治理】文本提案参与率: >
-        this.setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate());
+        this.setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】文本提案支持率：>=
-        this.setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate());
+        this.setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】取消提案参与率: >
-        this.setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate());
+        this.setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】取消提案支持率：>=
-        this.setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate());
+        this.setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】升级提案通过率
-        this.setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate());
+        this.setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】文本提案投票周期
         this.setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
                 .divide(
@@ -277,9 +277,9 @@ public class BlockChainConfig {
         //【治理】参数提案的投票持续最长的时间（单位：s）
         this.setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
         //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
-        this.setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate());
+        this.setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
-        this.setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate());
+        this.setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
 
         //【奖励】激励池分配给出块激励的比例
         this.setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
