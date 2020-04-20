@@ -326,20 +326,7 @@ public class ExportGallyService extends ServiceBase {
 	
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportMatchNode() {
-		 List<String> list = new ArrayList<String>();
-		
-		try {
-			File file = new File(filepath);
-	        InputStream in = new FileInputStream(file);
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-	        while (reader.ready()) {
-	            String line = reader.readLine();
-	            list.add(line.trim().toLowerCase());
-	        }
-	        reader.close();
-	    } catch (Exception e) {
-	        log.error("read error", e);
-	    }
+		List<String> list = readLines(filepath);
 		
 		List<Object[]> csvRows = new ArrayList<>();
 		Object[] rowHead = new Object[6];
@@ -356,69 +343,54 @@ public class ExportGallyService extends ServiceBase {
 		typeList.add(String.valueOf(TypeEnum.STAKE_MODIFY.getCode()));
 		constructor.must(new ESQueryBuilders().terms("type", typeList));
 		constructor.must(new ESQueryBuilders().range("time", 1587348000l, 1587646800l));
-		// 分页查询区块数据
-		ESResult<Transaction> esResult = null;
-		try {
-			esResult = transactionESRepository.search(constructor, Transaction.class, 0, 100);
-		} catch (Exception e) {
-			log.error("【syncBlock()】查询ES出错:", e);
-		}
 		
-		if (esResult == null || esResult.getRsData() == null || esResult.getTotal() == 0
-				|| esResult.getRsData().isEmpty()) {
-			// 如果查询结果为空则结束
-			log.error("【esResult()】data null:{}:", esResult);
-		} else {
-			log.error("【esResult()】data size:{}:", esResult.getTotal());
-			List<Transaction> txList = esResult.getRsData();
-			txList.forEach(tx -> {
-				Object[] rowData = new Object[6];
-				InnerContractDecodedResult innerContractDecodedResult = InnerContractDecodeUtil.decode(tx.getInput(), null);
-				switch (Transaction.TypeEnum.getEnum(tx.getType())) {
-				/** 创建验证人 */
-				case STAKE_CREATE:
-					StakeCreateParam stakeCreateParam= (StakeCreateParam)innerContractDecodedResult.getParam();
-					rowData[0] = stakeCreateParam.getNodeId();
-					rowData[1] = tx.getHash();
-					rowData[2] = tx.getInfo();
-					rowData[3] = stakeCreateParam.getBenefitAddress();
-					rowData[4] = 1;
+		
+		traverseTx(constructor, tx->{
+			Object[] rowData = new Object[6];
+			InnerContractDecodedResult innerContractDecodedResult = InnerContractDecodeUtil.decode(tx.getInput(), null);
+			switch (Transaction.TypeEnum.getEnum(tx.getType())) {
+			/** 创建验证人 */
+			case STAKE_CREATE:
+				StakeCreateParam stakeCreateParam= (StakeCreateParam)innerContractDecodedResult.getParam();
+				rowData[0] = stakeCreateParam.getNodeId();
+				rowData[1] = tx.getHash();
+				rowData[2] = tx.getInfo();
+				rowData[3] = stakeCreateParam.getBenefitAddress();
+				rowData[4] = 1;
+				for(String address: list) {
+					if(address.equals(stakeCreateParam.getBenefitAddress().toLowerCase())) {
+						rowData[4] =0;
+						break;
+					}
+				}
+				rowData[5] = Transaction.TypeEnum.STAKE_CREATE.getDesc();
+				break;
+			/**
+			 * 增加质押
+			 */
+			case STAKE_MODIFY:
+				StakeModifyParam stakeModifyParam= (StakeModifyParam)innerContractDecodedResult.getParam();
+				rowData[0] = stakeModifyParam.getNodeId();
+				rowData[1] = tx.getHash();
+				rowData[2] = tx.getInfo();
+				rowData[3] = stakeModifyParam.getBenefitAddress();
+				rowData[4] = 1;
+				if(StringUtils.isNotBlank(stakeModifyParam.getBenefitAddress())) {
 					for(String address: list) {
-						if(address.equals(stakeCreateParam.getBenefitAddress().toLowerCase())) {
+						if(address.equals(stakeModifyParam.getBenefitAddress().toLowerCase())) {
 							rowData[4] =0;
 							break;
 						}
 					}
-					rowData[5] = Transaction.TypeEnum.STAKE_MODIFY.getDesc();
-					break;
-				/**
-				 * 增加质押
-				 */
-				case STAKE_MODIFY:
-					StakeModifyParam stakeModifyParam= (StakeModifyParam)innerContractDecodedResult.getParam();
-					rowData[0] = stakeModifyParam.getNodeId();
-					rowData[1] = tx.getHash();
-					rowData[2] = tx.getInfo();
-					rowData[3] = stakeModifyParam.getBenefitAddress();
-					rowData[4] = 1;
-					if(StringUtils.isNotBlank(stakeModifyParam.getBenefitAddress())) {
-						for(String address: list) {
-							if(address.equals(stakeModifyParam.getBenefitAddress().toLowerCase())) {
-								rowData[4] =0;
-								break;
-							}
-						}
-					}
-					rowData[5] = Transaction.TypeEnum.STAKE_MODIFY.getDesc();
-					break;
-				default:
-					break;
 				}
-				log.info("exportMatchNode数据导出,hash：{}", tx.getHash());
-				csvRows.add(rowData);
-			});
-			
-		}
+				rowData[5] = Transaction.TypeEnum.STAKE_MODIFY.getDesc();
+				break;
+			default:
+				break;
+			}
+			log.info("exportMatchNode数据导出,hash：{}", tx.getHash());
+			csvRows.add(rowData);
+		});
 		
 		buildFile("exportMatchNode.csv", csvRows, null);
 		log.info("exportMatchNode数据导出成功,总行数：{}", csvRows.size());
