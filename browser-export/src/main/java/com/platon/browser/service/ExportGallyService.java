@@ -369,5 +369,77 @@ public class ExportGallyService extends ServiceBase {
 		log.info("exportMatchNode数据导出成功,总行数：{}", csvRows.size());
 		txInfoExportDone = true;
 	}
-	
+
+
+	/**
+	 * 导出合法的交易类型：委托，委托赎回，获取委托收益，转账<特定from>
+	 */
+	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+	public void exportLegalTx() {
+		List<Object[]> csvRows = new ArrayList<>();
+		// 定义表头
+		csvRows.add(new String[]{
+				"address",
+				"balance",
+				"illegal tx info"
+		});
+		// 读取文件内容
+		List<String> lines = readLines(filepath);
+		class Counter{
+			int illegalTxCount = 0;
+			StringBuilder sb = new StringBuilder();
+			void reset(){
+				illegalTxCount=0;
+				sb.setLength(0);
+				sb.append("[");
+			}
+			String getRs(){
+				String str = sb.toString();
+				str = str.substring(0,str.lastIndexOf(":"));
+				str = str+"]";
+				str = illegalTxCount+str;
+				return str;
+			}
+		}
+		Counter counter = new Counter();
+		int i = 0;
+		for(String address: lines) {
+			counter.reset();// 重置计数器
+			Object[] rowData = new Object[3];
+			rowData[0] = address; // 地址
+			rowData[1] = getBalance(address).toString(); // 余额
+			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+			constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
+					.should(QueryBuilders.termQuery("to", address)));
+			// 遍历交易数据
+			traverseTx(constructor,tx -> {
+				boolean illegal = true;
+				switch (Transaction.TypeEnum.getEnum(tx.getType())) {
+					case DELEGATE_CREATE:
+					case DELEGATE_EXIT:
+					case CLAIM_REWARDS:
+						// 合法交易
+						illegal = false;
+						break;
+					case TRANSFER:
+						if("0xceca295e1471b3008d20b017c7df7d4f338a7fba".equals(tx.getFrom())){
+							// 合法交易
+							illegal = false;
+						}
+				}
+				if(illegal){
+					// 非法交易
+					counter.illegalTxCount++;
+					counter.sb.append(tx.getHash()).append(":");
+				}
+			});
+			rowData[2] = counter.getRs();
+			csvRows.add(rowData);
+			log.info("exportLegalTx数据,address：{},i:{}",address,i);
+			i++;
+		}
+		buildFile("addressLegalTx.csv", csvRows, null);
+		log.info("交易数据导出成功,总行数：{}", csvRows.size());
+		txInfoExportDone = true;
+	}
 }
