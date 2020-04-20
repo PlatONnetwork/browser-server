@@ -41,13 +41,13 @@ public class ExportApplication implements ApplicationRunner {
 //		EXECUTOR_SERVICE.submit(() -> exportService.exportProposal());
 //		EXECUTOR_SERVICE.submit(() -> exportService.exportVote());
 //		while (
-//			!ExportService.isTxHashExportDone() ||
-//			!ExportService.isAddressExportDone() ||
-//			!ExportService.isRpplanExportDone() ||
-//			!ExportService.isDelegationExportDone()||
-//			!ExportService.isNodeExportDone()||
-//			!ExportService.isProposalExportDone()||
-//			!ExportService.isVoteExportDone()
+//			!exportService.isTxHashExportDone() ||
+//			!exportService.isAddressExportDone() ||
+//			!exportService.isRpplanExportDone() ||
+//			!exportService.isDelegationExportDone()||
+//			!exportService.isNodeExportDone()||
+//			!exportService.isProposalExportDone()||
+//			!exportService.isVoteExportDone()
 //		) {
 //			SleepUtil.sleep(1L);
 //		}
@@ -57,8 +57,8 @@ public class ExportApplication implements ApplicationRunner {
 		
 		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportLegalTx());
 		while (
-			!ExportGallyService.isDelegationRewardExportDone() ||
-			!ExportGallyService.isTxInfoExportDone()
+			!exportGallyService.isDelegationRewardExportDone() ||
+			!exportGallyService.isTxInfoExportDone()
 		) {
 			SleepUtil.sleep(1L);
 		}

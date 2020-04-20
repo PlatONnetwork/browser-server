@@ -15,8 +15,7 @@ import com.platon.browser.util.SleepUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
 import com.platon.browser.utils.HexTool;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -38,38 +37,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Data
 @Service
 public class ExportGallyService extends ServiceBase {
-	@Getter
-	@Setter
-	private static volatile boolean txHashExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean addressExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean rpplanExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean nodeExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean delegationExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean proposalExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean voteExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean delegationRewardExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean txInfoExportDone = false;
-	@Getter
-	@Setter
-	private static volatile boolean stakingExportDone = false;
+	private volatile boolean txHashExportDone = false;
+	private volatile boolean addressExportDone = false;
+	private volatile boolean rpplanExportDone = false;
+	private volatile boolean nodeExportDone = false;
+	private volatile boolean delegationExportDone = false;
+	private volatile boolean proposalExportDone = false;
+	private volatile boolean voteExportDone = false;
+	private volatile boolean delegationRewardExportDone = false;
+	private volatile boolean txInfoExportDone = false;
+	private volatile boolean stakingExportDone = false;
+	private volatile boolean exportLegalTxDone = false;
 	@Autowired
     private NodeMapper nodeMapper;
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(470000);
@@ -127,7 +108,7 @@ public class ExportGallyService extends ServiceBase {
 		traverseTx(constructor, tx -> {
 			BigDecimal txAmount = BigDecimal.ZERO;
 			BigDecimal reward = BigDecimal.ZERO;
-			switch (Transaction.TypeEnum.getEnum(tx.getType())) {
+			switch (tx.getTypeEnum()) {
 				/** 创建验证人 */
 				case STAKE_CREATE:
 					StakeCreateParam createValidatorParam = JSON.parseObject(tx.getInfo(), StakeCreateParam.class);
@@ -321,7 +302,7 @@ public class ExportGallyService extends ServiceBase {
 		traverseTx(constructor, tx->{
 			Object[] rowData = new Object[6];
 			InnerContractDecodedResult innerContractDecodedResult = InnerContractDecodeUtil.decode(tx.getInput(), null);
-			switch (Transaction.TypeEnum.getEnum(tx.getType())) {
+			switch (tx.getTypeEnum()) {
 			/** 创建验证人 */
 			case STAKE_CREATE:
 				StakeCreateParam stakeCreateParam= (StakeCreateParam)innerContractDecodedResult.getParam();
@@ -414,7 +395,7 @@ public class ExportGallyService extends ServiceBase {
 			// 遍历交易数据
 			traverseTx(constructor,tx -> {
 				boolean illegal = true;
-				switch (Transaction.TypeEnum.getEnum(tx.getType())) {
+				switch (tx.getTypeEnum()) {
 					case DELEGATE_CREATE:
 					case DELEGATE_EXIT:
 					case CLAIM_REWARDS:
@@ -440,6 +421,6 @@ public class ExportGallyService extends ServiceBase {
 		}
 		buildFile("addressLegalTx.csv", csvRows, null);
 		log.info("交易数据导出成功,总行数：{}", csvRows.size());
-		txInfoExportDone = true;
+		exportLegalTxDone = true;
 	}
 }
