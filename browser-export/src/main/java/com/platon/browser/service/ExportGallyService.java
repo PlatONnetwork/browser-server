@@ -1,18 +1,14 @@
 package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.param.*;
-import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.SleepUtil;
@@ -31,20 +27,15 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.PlatonGetBalance;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @Service
@@ -80,8 +71,6 @@ public class ExportGallyService extends ServiceBase {
 	@Setter
 	private static volatile boolean stakingExportDone = false;
 	@Autowired
-	private PlatOnClient platonClient;
-	@Autowired
     private NodeMapper nodeMapper;
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(470000);
 	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(10000000000L);
@@ -92,15 +81,6 @@ public class ExportGallyService extends ServiceBase {
 	private String filepath;
 	@Value("${addresspath}")
 	private String addresspath;
-	
-	@PostConstruct
-	private void init() {
-		File destDir = new File(fileUrl);
-		if (destDir.exists())
-			destDir.delete();
-		if (!destDir.exists())
-			destDir.mkdirs();
-	}
 
 	@Value("${fileUrl}")
 	private String fileUrl;
@@ -242,14 +222,7 @@ public class ExportGallyService extends ServiceBase {
 		for(String address: lines) {
 			Object[] rowData = new Object[4];
 			rowData[0] = address;
-			
-			try {
-				PlatonGetBalance platonGetBalance = platonClient.getWeb3jWrapper().getWeb3j()
-					.platonGetBalance(address, DefaultBlockParameterName.LATEST).send();
-				rowData[1] = platonGetBalance.getBalance();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			rowData[1] = getBalance(address);
 			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 			constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
 					.should(QueryBuilders.termQuery("to", address)));
@@ -297,11 +270,11 @@ public class ExportGallyService extends ServiceBase {
 //				}
 //			}
 			Credentials credentials = WalletUtils.loadCredentials("88888888", addresspath);
-			PlatonGetBalance platonGetBalance =platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance("0xceca295e1471b3008d20b017c7df7d4f338a7fba", DefaultBlockParameterName.LATEST).send();
-			log.error("platonGetBalance:{}",platonGetBalance.getBalance());
+			BigInteger balance = getBalance("0xceca295e1471b3008d20b017c7df7d4f338a7fba");
+			log.error("platonGetBalance:{}",balance);
 			for(String address: lines) {
 					Transfer.sendFunds(
-							platonClient.getWeb3jWrapper().getWeb3j(),
+							getClient(),
 					        credentials,
 					        "101",
 					        address,

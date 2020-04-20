@@ -16,4 +16,8 @@ public class DelegateActivityEStageService extends ServiceBase{
 	public String getFileUrl() {
 		return fileUrl;
 	}
+
+	public void doService(){
+
+	}
 }

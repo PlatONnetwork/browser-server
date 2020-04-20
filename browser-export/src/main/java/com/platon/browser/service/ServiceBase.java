@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.callback.TransactionHandler;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -10,9 +11,13 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.PlatonGetBalance;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +26,8 @@ import java.util.List;
 public abstract class ServiceBase {
     @Autowired
     protected TransactionESRepository transactionESRepository;
+    @Autowired
+    private PlatOnClient platonClient;
     @Value("${paging.pageSize}")
     protected int transactionPageSize;
 
@@ -108,5 +115,26 @@ public abstract class ServiceBase {
             log.error("read error", e);
         }
         return lines;
+    }
+
+    /**
+     * 取地址余额
+     * @param address
+     * @return
+     */
+    protected BigInteger getBalance(String address){
+        BigInteger balance = BigInteger.ZERO;
+        try {
+            PlatonGetBalance platonGetBalance = platonClient.getWeb3jWrapper().getWeb3j()
+                    .platonGetBalance(address, DefaultBlockParameterName.LATEST).send();
+            balance = platonGetBalance.getBalance();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return balance;
+    }
+
+    protected Web3j getClient(){
+        return platonClient.getWeb3jWrapper().getWeb3j();
     }
 }
