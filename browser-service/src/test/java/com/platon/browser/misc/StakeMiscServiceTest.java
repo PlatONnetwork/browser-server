@@ -17,6 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
@@ -28,14 +29,14 @@ public class StakeMiscServiceTest {
     @Mock
     private BlockChainConfig chainConfig;
     @Mock
-    private ProposalMapper proposalMapper;
+    private CustomProposalMapper customProposalMapper;
 
     @Spy
     private StakeMiscService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
+        ReflectionTestUtils.setField(target, "customProposalMapper", customProposalMapper);
         ReflectionTestUtils.setField(target, "parameterService", parameterService);
         ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
     }
@@ -52,7 +53,7 @@ public class StakeMiscServiceTest {
     	List<Proposal> proposals = new ArrayList<Proposal>();
     	Proposal proposal = new Proposal();
     	proposal.setEndVotingBlock(1000000000l);
-    	when(proposalMapper.selectByExample(any())).thenReturn(proposals);
+    	when(customProposalMapper.selectVotingProposal(any())).thenReturn(proposals);
     	
     	target.getUnStakeEndBlock("0x1", BigInteger.TEN, true);
     	

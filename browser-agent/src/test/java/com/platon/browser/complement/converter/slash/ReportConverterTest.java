@@ -9,6 +9,9 @@ import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.misc.StakeMiscService;
@@ -20,6 +23,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -43,6 +47,8 @@ public class ReportConverterTest extends AgentTestBase {
     private NodeCache nodeCache;
     @Mock
     private StakeMiscService stakeMiscService;
+    @Mock
+    private NodeMapper nodeMapper;
 
     @Spy
     private ReportConverter target;
@@ -54,6 +60,7 @@ public class ReportConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"reportMultiSignParamCache",reportMultiSignParamCache);
         ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
         ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
+        ReflectionTestUtils.setField(target,"nodeMapper",nodeMapper);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")
@@ -80,6 +87,13 @@ public class ReportConverterTest extends AgentTestBase {
                 tx = collectionTransaction;
             }
         }
+        Node node = new Node();
+        node.setStakingLocked(BigDecimal.TEN);
+        node.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        when(nodeMapper.selectByPrimaryKey(any())).thenReturn(node);
+        target.convert(collectionEvent,tx);
+        node.setStakingLocked(BigDecimal.ZERO);
+        node.setStakingReduction(BigDecimal.TEN);
         target.convert(collectionEvent,tx);
     }
 }

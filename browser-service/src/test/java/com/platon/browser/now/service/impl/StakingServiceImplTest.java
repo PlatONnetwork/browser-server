@@ -28,11 +28,11 @@ public class StakingServiceImplTest extends TestBase{
 	@Autowired
     private StakingService stakingService;
 	
-	@Test
-	public void stakingStatisticNew() {
-		StakingStatisticNewResp resp = this.stakingService.stakingStatisticNew();
-		assertNotNull(resp);
-	}
+//	@Test
+//	public void stakingStatisticNew() {
+//		StakingStatisticNewResp resp = this.stakingService.stakingStatisticNew();
+//		assertNotNull(resp);
+//	}
 	
 	@Test
 	public void aliveStakingList() {

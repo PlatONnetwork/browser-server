@@ -29,12 +29,12 @@ public class TransactionServiceImplTest extends TestBase{
 //		assertNotNull(detail);
 //	}
 	
-	@Test
-	public void getTransactionList() {
-		PageReq req = new PageReq();
-		RespPage<TransactionListResp> resp = this.transactionService.getTransactionList(req);
-		assertNotNull(resp);
-	}
+//	@Test
+//	public void getTransactionList() {
+//		PageReq req = new PageReq();
+//		RespPage<TransactionListResp> resp = this.transactionService.getTransactionList(req);
+//		assertNotNull(resp);
+//	}
 	
 	@Test
 	public void getTransactionListByBlock() {

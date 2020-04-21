@@ -64,10 +64,10 @@ public class HomeServiceImplTest extends TestBase {
 		assertNotNull(resp);
 	}
 
-	@Test
-	public void stakingListNew() {
-		StakingListNewResp list = homeService.stakingListNew();
-		assertNotNull(list);
-	}
+//	@Test
+//	public void stakingListNew() {
+//		StakingListNewResp list = homeService.stakingListNew();
+//		assertNotNull(list);
+//	}
 	
 }

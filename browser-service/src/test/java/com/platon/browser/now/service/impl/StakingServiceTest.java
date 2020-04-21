@@ -4,6 +4,7 @@ package com.platon.browser.now.service.impl;
 import com.github.pagehelper.Page;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
@@ -17,6 +18,7 @@ import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.staking.HistoryStakingListReq;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.res.staking.StakingStatisticNewResp;
 import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +26,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -33,10 +34,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -159,4 +160,17 @@ public class StakingServiceTest {
 
         assertTrue(true);
     }
+    
+    @Test
+	public void stakingStatisticNew() {
+    	NetworkStat net = new NetworkStat();
+		net.setTxQty(10);
+		net.setStakingDelegationValue(BigDecimal.TEN);
+		net.setStakingValue(BigDecimal.ONE);
+		net.setSettleStakingReward(BigDecimal.TEN);
+		when(statisticCacheService.getNetworkStatCache()).thenReturn(net);
+		when(customStakingMapper.selectCountByActive()).thenReturn(10);
+		StakingStatisticNewResp resp = target.stakingStatisticNew();
+		assertNotNull(resp);
+	}
 }

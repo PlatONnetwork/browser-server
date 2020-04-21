@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.Staking;
@@ -10,6 +11,7 @@ import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
@@ -17,9 +19,12 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.RedisCommands;
+import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
+import com.platon.browser.res.RespPage;
+import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -200,5 +206,21 @@ public class TransactionServiceTest {
 		target.queryClaimByStaking(queryClaimByStakingReq);
 
 		assertTrue(true);
+	}
+	
+	@Test
+	public void getTransactionList() {
+		PageReq req = new PageReq();
+		TransactionCacheDto transactionCacheDto = new TransactionCacheDto();
+		RespPage<?> page = new RespPage<>();
+		page.setTotalCount(10l);
+		page.setTotalPages(10);
+		transactionCacheDto.setPage(page);
+		when(statisticCacheService.getTransactionCache(any(),any())).thenReturn(transactionCacheDto);
+		NetworkStat net = new NetworkStat();
+		net.setTxQty(10);
+		when(statisticCacheService.getNetworkStatCache()).thenReturn(net);
+		RespPage<TransactionListResp> resp = target.getTransactionList(req);
+		assertNotNull(resp);
 	}
 }

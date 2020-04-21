@@ -24,12 +24,12 @@ public class BlockServiceImplTest extends TestBase{
 	@Autowired
     private BlockService blockService;
 	
-	@Test
-	public void blockList() {
-		PageReq pageReq = new PageReq();
-        RespPage<BlockListResp> pages = blockService.blockList(pageReq);
-        assertTrue(pages.getData().size()>=0);
-	}
+//	@Test
+//	public void blockList() {
+//		PageReq pageReq = new PageReq();
+//        RespPage<BlockListResp> pages = blockService.blockList(pageReq);
+//        assertTrue(pages.getData().size()>=0);
+//	}
 	
 	@Test
 	public void blockListByNodeId() {
@@ -39,22 +39,22 @@ public class BlockServiceImplTest extends TestBase{
 		assertTrue(pages.getData().size()>=0);
 	}
 	
-	@Test
-	public void blockDetails() {
-		BlockDetailsReq req = new BlockDetailsReq();
-		req.setNumber(0);
-		BlockDetailResp blockDetailResp = blockService.blockDetails(req);
-		assertNotNull(blockDetailResp);
-	}
+//	@Test
+//	public void blockDetails() {
+//		BlockDetailsReq req = new BlockDetailsReq();
+//		req.setNumber(0);
+//		BlockDetailResp blockDetailResp = blockService.blockDetails(req);
+//		assertNotNull(blockDetailResp);
+//	}
 	
-	@Test
-	public void blockDetailNavigate() {
-		BlockDetailNavigateReq req = new BlockDetailNavigateReq();
-		req.setNumber(0l);
-		req.setDirection("next");
-		BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
-		assertNotNull(blockDetailResp);
-	}
+//	@Test
+//	public void blockDetailNavigate() {
+//		BlockDetailNavigateReq req = new BlockDetailNavigateReq();
+//		req.setNumber(0l);
+//		req.setDirection("next");
+//		BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
+//		assertNotNull(blockDetailResp);
+//	}
 	
 	@Test
 	public void blockListByNodeIdDownload() {
