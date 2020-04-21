@@ -106,6 +106,9 @@ public class StakingServiceImpl implements StakingService {
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Integer status = null;
 		Integer isSettle = null;
+
+		// 是否需要把退出中状态的节点当做活跃中处理，默认不需要，只有在查询全部或活跃中时需要把退出中状态当作活跃中
+		boolean exitingAsActive = false;
 		/**
 		 *  对前端传的参数进行转换查询条件
 		 */
@@ -113,11 +116,13 @@ public class StakingServiceImpl implements StakingService {
 			case ALL:
 				/** 查询候选人 */
 				status = StakingStatusEnum.CANDIDATE.getCode();
+				exitingAsActive = true;
 				break;
 			case ACTIVE:
 				/** 活跃中代表即使后续同时也是结算周期验证人 */
 				status = StakingStatusEnum.CANDIDATE.getCode();
 				isSettle = CustomStaking.YesNoEnum.YES.getCode();
+				exitingAsActive = true;
 				break;
 			case CANDIDATE:
 				/** 查询候选人 */
@@ -142,20 +147,23 @@ public class StakingServiceImpl implements StakingService {
 			criteria1.andIsSettleEqualTo(isSettle);
 		}
 		nodeExample.or(criteria1);
-		/**
-		 * 如果节点状态为退出中且为结算周期则认为在活跃中
-		 */
-		NodeExample.Criteria criteria2 = nodeExample.createCriteria();
-		criteria2.andStatusEqualTo(CustomStaking.StatusEnum.EXITING.getCode());
-		if(StringUtils.isNotBlank(req.getKey())){
-			criteria2.andNodeNameLike("%" + req.getKey() + "%");
+
+		if(exitingAsActive){
+			/**
+			 * 如果节点状态为退出中且为结算周期则认为在活跃中
+			 */
+			NodeExample.Criteria criteria2 = nodeExample.createCriteria();
+			criteria2.andStatusEqualTo(CustomStaking.StatusEnum.EXITING.getCode());
+			if(StringUtils.isNotBlank(req.getKey())){
+				criteria2.andNodeNameLike("%" + req.getKey() + "%");
+			}
+			criteria2.andIsSettleEqualTo(CustomStaking.YesNoEnum.YES.getCode());
+			if(isSettle != null) {
+				criteria1.andIsSettleEqualTo(isSettle);
+			}
+			nodeExample.or(criteria2);
 		}
-		criteria2.andIsSettleEqualTo(CustomStaking.YesNoEnum.YES.getCode());
-		if(isSettle != null) {
-			criteria1.andIsSettleEqualTo(isSettle);
-		}
-		nodeExample.or(criteria2);
-		
+
 		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
 		List<Node> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
