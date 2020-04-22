@@ -94,10 +94,14 @@ public class ProposalInfoTask {
 //                }
 
                 /**
-            	 * 当同步区块号小于结束区块则跳过更新状态
+            	 * 当同步区块号小于结束区块且相应的取消提案未成功时候则跳过更新状态，防止追块时候提案提前结束造成数据错误
             	 */
                 List<NetworkStat> networkStat = networkStatMapper.selectByExample(null);
-            	if(networkStat.get(0).getCurNumber() < proposal.getEndVotingBlock()) {
+                ProposalExample pe = new ProposalExample();
+                proposalExample.createCriteria().andCanceledPipIdEqualTo(proposal.getHash());
+                proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.PASS.getCode());
+                List <Proposal> ppsList = proposalMapper.selectByExample(pe);
+            	if(networkStat.get(0).getCurNumber() < proposal.getEndVotingBlock() && ppsList.size() == 0) {
             		continue;
             	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());

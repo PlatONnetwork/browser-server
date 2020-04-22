@@ -93,7 +93,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         /**
          * 只有第一次候选中惩罚的时候才需要更新质押锁定周期数
          */
-        if(staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
+        if(staking != null && staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
         	//更新节点提取质押需要经过的周期数
             slashBusinessMapper.updateUnStakeFreezeDuration(businessParam);
         }
