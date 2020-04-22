@@ -184,6 +184,12 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             extraList.add(extra);
             delegationReward.setExtra(JSON.toJSONString(extraList));
 
+            List<DelegationReward.Extra> extraCleanList = new ArrayList<>();
+            if(extra.decimalReward().compareTo(BigDecimal.ZERO)>0){
+                extraCleanList.add(extra);
+            }
+            delegationReward.setExtraClean(JSON.toJSONString(extraCleanList));
+
             der.setDelegationReward(delegationReward);
         }
 
