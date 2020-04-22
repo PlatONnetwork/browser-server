@@ -4,6 +4,7 @@ import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.proposal.ProposalService;
 import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
@@ -14,10 +15,13 @@ import com.platon.browser.dto.CustomProposal;
 import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +43,8 @@ public class ProposalInfoTask {
     private ProposalService proposalService;
     @Autowired
 	private NetworkStatMapper networkStatMapper;
+    @Autowired
+	private BlockChainConfig blockChainConfig;
 
     /**
      *
@@ -101,8 +107,32 @@ public class ProposalInfoTask {
                 proposalExample.createCriteria().andCanceledPipIdEqualTo(proposal.getHash());
                 proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.PASS.getCode());
                 List <Proposal> ppsList = proposalMapper.selectByExample(pe);
+                
+                BigDecimal total = new BigDecimal(proposal.getYeas())
+                		.add(new BigDecimal(proposal.getAbstentions())).add(new BigDecimal(proposal.getNays()));
+                BigDecimal yes = new BigDecimal(proposal.getYeas()).divide(total, 2, RoundingMode.CEILING);
+                BigDecimal acc = total.divide(new BigDecimal(proposal.getAccuVerifiers()), 2, RoundingMode.CEILING);
             	if(networkStat.get(0).getCurNumber() < proposal.getEndVotingBlock() && ppsList.size() == 0) {
-            		continue;
+            		if(proposal.getType().intValue() == CustomProposal.TypeEnum.TEXT.getCode()) {
+            			if(yes.compareTo(blockChainConfig.getMinProposalTextSupportRate()) < 0 
+            					||acc.compareTo(blockChainConfig.getMinProposalTextParticipationRate()) < 0) {
+            				continue;
+            			}
+            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.UPGRADE.getCode()) {
+            			if(acc.compareTo(blockChainConfig.getMinProposalUpgradePassRate()) < 0) {
+            				continue;
+            			}
+            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.CANCEL.getCode()) {
+            			if(yes.compareTo(blockChainConfig.getMinProposalCancelSupportRate()) < 0 
+            					||acc.compareTo(blockChainConfig.getMinProposalCancelParticipationRate()) < 0) {
+            				continue;
+            			}
+            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.PARAMETER.getCode()) {
+            			if(yes.compareTo(blockChainConfig.getParamProposalSupportRate()) < 0 
+            					||acc.compareTo(blockChainConfig.getParamProposalVoteRate()) < 0) {
+            				continue;
+            			}
+            		} 
             	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());
                 if(tallyResult != null) {
