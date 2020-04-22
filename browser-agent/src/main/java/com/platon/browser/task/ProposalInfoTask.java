@@ -108,31 +108,32 @@ public class ProposalInfoTask {
                 proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.PASS.getCode());
                 List <Proposal> ppsList = proposalMapper.selectByExample(pe);
                 
-                BigDecimal total = new BigDecimal(proposal.getYeas())
-                		.add(new BigDecimal(proposal.getAbstentions())).add(new BigDecimal(proposal.getNays()));
-                BigDecimal yes = new BigDecimal(proposal.getYeas()).divide(total, 2, RoundingMode.CEILING);
-                BigDecimal acc = total.divide(new BigDecimal(proposal.getAccuVerifiers()), 2, RoundingMode.CEILING);
+//                BigDecimal total = new BigDecimal(proposal.getYeas())
+//                		.add(new BigDecimal(proposal.getAbstentions())).add(new BigDecimal(proposal.getNays()));
+//                BigDecimal yes = new BigDecimal(proposal.getYeas()).divide(total, 2, RoundingMode.CEILING);
+//                BigDecimal acc = total.divide(new BigDecimal(proposal.getAccuVerifiers()), 2, RoundingMode.CEILING);
             	if(networkStat.get(0).getCurNumber() < proposal.getEndVotingBlock() && ppsList.size() == 0) {
-            		if(proposal.getType().intValue() == CustomProposal.TypeEnum.TEXT.getCode()) {
-            			if(yes.compareTo(blockChainConfig.getMinProposalTextSupportRate()) < 0 
-            					||acc.compareTo(blockChainConfig.getMinProposalTextParticipationRate()) < 0) {
-            				continue;
-            			}
-            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.UPGRADE.getCode()) {
-            			if(acc.compareTo(blockChainConfig.getMinProposalUpgradePassRate()) < 0) {
-            				continue;
-            			}
-            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.CANCEL.getCode()) {
-            			if(yes.compareTo(blockChainConfig.getMinProposalCancelSupportRate()) < 0 
-            					||acc.compareTo(blockChainConfig.getMinProposalCancelParticipationRate()) < 0) {
-            				continue;
-            			}
-            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.PARAMETER.getCode()) {
-            			if(yes.compareTo(blockChainConfig.getParamProposalSupportRate()) < 0 
-            					||acc.compareTo(blockChainConfig.getParamProposalVoteRate()) < 0) {
-            				continue;
-            			}
-            		} 
+//            		if(proposal.getType().intValue() == CustomProposal.TypeEnum.TEXT.getCode()) {
+//            			if(yes.compareTo(blockChainConfig.getMinProposalTextSupportRate()) < 0 
+//            					||acc.compareTo(blockChainConfig.getMinProposalTextParticipationRate()) < 0) {
+//            				continue;
+//            			}
+//            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.UPGRADE.getCode()) {
+//            			if(acc.compareTo(blockChainConfig.getMinProposalUpgradePassRate()) < 0) {
+//            				continue;
+//            			}
+//            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.CANCEL.getCode()) {
+//            			if(yes.compareTo(blockChainConfig.getMinProposalCancelSupportRate()) < 0 
+//            					||acc.compareTo(blockChainConfig.getMinProposalCancelParticipationRate()) < 0) {
+//            				continue;
+//            			}
+//            		} else if(proposal.getType().intValue() == CustomProposal.TypeEnum.PARAMETER.getCode()) {
+//            			if(yes.compareTo(blockChainConfig.getParamProposalSupportRate()) < 0 
+//            					||acc.compareTo(blockChainConfig.getParamProposalVoteRate()) < 0) {
+//            				continue;
+//            			}
+//            		} 
+            		continue;
             	}
                 TallyResult tallyResult = proposalService.getTallyResult(proposal.getHash());
                 if(tallyResult != null) {
