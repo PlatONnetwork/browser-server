@@ -22,7 +22,7 @@
 	<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.slash.Report">
 	/*1、更新委托*/
 	update `delegation` set
-		`delegate_released` = `delegate_hes` + `delegate_locked`,
+		`delegate_released` = `delegate_hes` + `delegate_locked` + `delegate_released`,
 		`delegate_hes` = 0,
 		`delegate_locked` = 0
 	where `node_id` = #{nodeId}

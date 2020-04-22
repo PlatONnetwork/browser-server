@@ -32,7 +32,7 @@
 		/*1、更新委托*/
 		<foreach collection="slashNodeList" item="item">
 			update `delegation` set
-				`delegate_released` = `delegate_hes` + `delegate_locked`,
+				`delegate_released` = `delegate_hes` + `delegate_locked` + `delegate_released`,
 				`delegate_hes` = 0,
 				`delegate_locked` = 0
 			where `node_id` = #{item.nodeId}
