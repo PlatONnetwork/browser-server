@@ -12,6 +12,7 @@ import com.platon.browser.dto.DelegationAddress;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.DelegationStaking;
+import com.platon.browser.dto.CustomDelegation.YesNoEnum;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -195,14 +196,6 @@ public class StakingServiceImpl implements StakingService {
 			/** 质押总数=有效的质押+委托 */
 			aliveStakingListResp.setTotalValue(stakings.get(i).getTotalValue().toString());
 			aliveStakingListResp.setDeleAnnualizedRate(stakings.get(i).getDeleAnnualizedRate().toString());
-			/**
-			 * 如果在节点自主退出是要进行数据转换
-			 */
-			if(stakings.get(i).getStatus().intValue() == StatusEnum.EXITING.getCode()) {
-				BigDecimal totalValue = stakings.get(i).getStakingReduction().add(stakings.get(i).getStatDelegateValue());
-				aliveStakingListResp.setTotalValue(totalValue.toString());
-				aliveStakingListResp.setDelegateValue(stakings.get(i).getStatDelegateValue().add(stakings.get(i).getStatDelegateReleased()).toString());
-			}
 			lists.add(aliveStakingListResp);
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
@@ -333,9 +326,18 @@ public class StakingServiceImpl implements StakingService {
 			} else {
 				resp.setDelegateQty(stakingNode.getStatInvalidAddrs());
 				resp.setDelegateValue(stakingNode.getStatDelegateValue());
-				resp.setStakingValue(stakingNode.getStakingReduction());
-				BigDecimal totalValue = resp.getStakingValue().add(resp.getDelegateValue());
-				resp.setTotalValue(totalValue);
+				/**
+				 * 如果在结算中则直接设置为0
+				 */
+				if(stakingNode.getIsSettle().intValue() == YesNoEnum.YES.getCode()) {
+					resp.setTotalValue(BigDecimal.ZERO);
+					resp.setStakingValue(BigDecimal.ZERO);
+				} else {
+					resp.setStakingValue(stakingNode.getStakingReduction());
+					BigDecimal totalValue = resp.getStakingValue().add(resp.getDelegateValue());
+					resp.setTotalValue(totalValue);
+				}
+				
 				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
 			}
 		}
