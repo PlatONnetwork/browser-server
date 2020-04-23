@@ -195,6 +195,14 @@ public class StakingServiceImpl implements StakingService {
 			/** 质押总数=有效的质押+委托 */
 			aliveStakingListResp.setTotalValue(stakings.get(i).getTotalValue().toString());
 			aliveStakingListResp.setDeleAnnualizedRate(stakings.get(i).getDeleAnnualizedRate().toString());
+			/**
+			 * 如果在节点自主退出是要进行数据转换
+			 */
+			if(stakings.get(i).getStatus().intValue() == StatusEnum.EXITING.getCode()) {
+				BigDecimal totalValue = stakings.get(i).getStakingReduction().add(stakings.get(i).getStatDelegateValue());
+				aliveStakingListResp.setTotalValue(totalValue.toString());
+				aliveStakingListResp.setDelegateValue(stakings.get(i).getStatDelegateValue().add(stakings.get(i).getStatDelegateReleased()).toString());
+			}
 			lists.add(aliveStakingListResp);
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
