@@ -1,5 +1,6 @@
 package com.platon.browser;
 
+import com.platon.browser.service.ExportGallyService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,8 @@ public class ExportApplication implements ApplicationRunner {
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 	@Autowired
 	private ExportService exportService;
+	@Autowired
+	private ExportGallyService exportGallyService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ExportApplication.class, args);
@@ -38,21 +41,25 @@ public class ExportApplication implements ApplicationRunner {
 //		EXECUTOR_SERVICE.submit(() -> exportService.exportProposal());
 //		EXECUTOR_SERVICE.submit(() -> exportService.exportVote());
 //		while (
-//			!ExportService.isTxHashExportDone() ||
-//			!ExportService.isAddressExportDone() ||
-//			!ExportService.isRpplanExportDone() ||
-//			!ExportService.isDelegationExportDone()||
-//			!ExportService.isNodeExportDone()||
-//			!ExportService.isProposalExportDone()||
-//			!ExportService.isVoteExportDone()
+//			!exportService.isTxHashExportDone() ||
+//			!exportService.isAddressExportDone() ||
+//			!exportService.isRpplanExportDone() ||
+//			!exportService.isDelegationExportDone()||
+//			!exportService.isNodeExportDone()||
+//			!exportService.isProposalExportDone()||
+//			!exportService.isVoteExportDone()
 //		) {
 //			SleepUtil.sleep(1L);
 //		}
 //		EXECUTOR_SERVICE.submit(() -> exportService.exportDelegationReward());
-		EXECUTOR_SERVICE.submit(() -> exportService.exportAllTx());
+//		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportMatch());
+//		EXECUTOR_SERVICE.submit(() -> exportGallyService.transfer());
+		
+		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportLegalTx());
+//		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportMatchNode());
 		while (
-			!ExportService.isDelegationRewardExportDone() ||
-			!ExportService.isTxInfoExportDone()
+//			!exportGallyService.isTxInfoExportDone() ||
+			!exportGallyService.isExportLegalTxDone()
 		) {
 			SleepUtil.sleep(1L);
 		}

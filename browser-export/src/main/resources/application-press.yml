@@ -1,6 +1,6 @@
 # ***************************Aton测试配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: press
+profile: test
 # 密码加密配置
 jasypt:
   encryptor:
@@ -103,3 +103,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
 fileUrl: D://111//222//
+filepath: C://Users//51632//Desktop//transfer.csv
+exportBlock: 100
+exportDBBlock: 100
+addresspath: G:\\Download\\ceca295e1471b3008d20b017c7df7d4f338a7fba.json
