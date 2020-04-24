@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.PlatonGetBalance;
 
 import javax.annotation.PostConstruct;
@@ -87,6 +89,7 @@ public abstract class ServiceBase {
             if (esResult == null || esResult.getRsData() == null || esResult.getTotal() == 0
                     || esResult.getRsData().isEmpty()) {
                 // 如果查询结果为空则结束
+            	log.error("【esResult()】查询数据为空:{}", esResult.getTotal());
                 break;
             }
             List<Transaction> txList = esResult.getRsData();
@@ -122,11 +125,11 @@ public abstract class ServiceBase {
      * @param address
      * @return
      */
-    protected BigInteger getBalance(String address){
+    protected BigInteger getBalance(String address,DefaultBlockParameter defaultBlockParameter){
         BigInteger balance = BigInteger.ZERO;
         try {
             PlatonGetBalance platonGetBalance = platonClient.getWeb3jWrapper().getWeb3j()
-                    .platonGetBalance(address, DefaultBlockParameterName.LATEST).send();
+                    .platonGetBalance(address, defaultBlockParameter).send();
             balance = platonGetBalance.getBalance();
         } catch (IOException e1) {
             e1.printStackTrace();

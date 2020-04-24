@@ -12,6 +12,7 @@ import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.util.DateUtil;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Date;
 
 
 /**
@@ -53,6 +55,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         if(StringUtils.isBlank(configVal)){
         	throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
 		}
+        Date txTime = DateUtil.covertTime(tx.getTime());
         Integer  unStakeFreezeDuration = Integer.parseInt(configVal);
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
@@ -68,7 +71,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
         		.stakingBlockNum(stakingBlockNum)
         		.stakingTxIndex(tx.getIndex())
         		.stakingAddr(tx.getFrom())
-        		.joinTime(tx.getTime())
+        		.joinTime(txTime)
         		.txHash(tx.getHash())
 				.delegateRewardPer(txParam.getDelegateRewardPer())
 				.unStakeFreezeDuration(unStakeFreezeDuration)
@@ -84,7 +87,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
 		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.CREATE.getCode()));
 		nodeOpt.setTxHash(tx.getHash());
 		nodeOpt.setBNum(tx.getNum());
-		nodeOpt.setTime(tx.getTime());
+		nodeOpt.setTime(txTime);
 
 		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 

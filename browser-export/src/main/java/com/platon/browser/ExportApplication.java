@@ -56,9 +56,10 @@ public class ExportApplication implements ApplicationRunner {
 //		EXECUTOR_SERVICE.submit(() -> exportGallyService.transfer());
 		
 		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportLegalTx());
+//		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportMatchNode());
 		while (
-			!exportGallyService.isDelegationRewardExportDone() ||
-			!exportGallyService.isTxInfoExportDone()
+//			!exportGallyService.isTxInfoExportDone() ||
+			!exportGallyService.isExportLegalTxDone()
 		) {
 			SleepUtil.sleep(1L);
 		}

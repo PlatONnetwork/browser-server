@@ -26,6 +26,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
@@ -203,7 +205,7 @@ public class ExportGallyService extends ServiceBase {
 		for(String address: lines) {
 			Object[] rowData = new Object[4];
 			rowData[0] = address;
-			rowData[1] = getBalance(address);
+			rowData[1] = getBalance(address,DefaultBlockParameterName.LATEST);
 			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 			constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
 					.should(QueryBuilders.termQuery("to", address)));
@@ -251,7 +253,7 @@ public class ExportGallyService extends ServiceBase {
 //				}
 //			}
 			Credentials credentials = WalletUtils.loadCredentials("88888888", addresspath);
-			BigInteger balance = getBalance("0xceca295e1471b3008d20b017c7df7d4f338a7fba");
+			BigInteger balance = getBalance("0xceca295e1471b3008d20b017c7df7d4f338a7fba",DefaultBlockParameterName.LATEST);
 			log.error("platonGetBalance:{}",balance);
 			for(String address: lines) {
 					Transfer.sendFunds(
@@ -281,70 +283,73 @@ public class ExportGallyService extends ServiceBase {
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportMatchNode() {
 		List<String> list = readLines(filepath);
-		
 		List<Object[]> csvRows = new ArrayList<>();
-		Object[] rowHead = new Object[6];
-		rowHead[0] = "node";
-		rowHead[1] = "hash";
-		rowHead[2] = "txInfo";
-		rowHead[3] = "benefitAddress";
-		rowHead[4] = "isBenefit(1:false 0:true)";
-		rowHead[5] = "type";
-		csvRows.add(rowHead);
-		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		List<Object> typeList = new ArrayList<Object>();
-		typeList.add(String.valueOf(TypeEnum.STAKE_CREATE.getCode()));
-		typeList.add(String.valueOf(TypeEnum.STAKE_MODIFY.getCode()));
-		constructor.must(new ESQueryBuilders().terms("type", typeList));
-		constructor.must(new ESQueryBuilders().range("time", 1587348000l, 1587646800l));
-		
-		
-		traverseTx(constructor, tx->{
-			Object[] rowData = new Object[6];
-			InnerContractDecodedResult innerContractDecodedResult = InnerContractDecodeUtil.decode(tx.getInput(), null);
-			switch (tx.getTypeEnum()) {
-			/** 创建验证人 */
-			case STAKE_CREATE:
-				StakeCreateParam stakeCreateParam= (StakeCreateParam)innerContractDecodedResult.getParam();
-				rowData[0] = stakeCreateParam.getNodeId();
-				rowData[1] = tx.getHash();
-				rowData[2] = tx.getInfo();
-				rowData[3] = stakeCreateParam.getBenefitAddress();
-				rowData[4] = 1;
-				for(String address: list) {
-					if(address.equals(stakeCreateParam.getBenefitAddress().toLowerCase())) {
-						rowData[4] =0;
-						break;
-					}
-				}
-				rowData[5] = Transaction.TypeEnum.STAKE_CREATE.getDesc();
-				break;
-			/**
-			 * 增加质押
-			 */
-			case STAKE_MODIFY:
-				StakeModifyParam stakeModifyParam= (StakeModifyParam)innerContractDecodedResult.getParam();
-				rowData[0] = stakeModifyParam.getNodeId();
-				rowData[1] = tx.getHash();
-				rowData[2] = tx.getInfo();
-				rowData[3] = stakeModifyParam.getBenefitAddress();
-				rowData[4] = 1;
-				if(StringUtils.isNotBlank(stakeModifyParam.getBenefitAddress())) {
+		try {
+			Object[] rowHead = new Object[6];
+			rowHead[0] = "node";
+			rowHead[1] = "hash";
+			rowHead[2] = "txInfo";
+			rowHead[3] = "benefitAddress";
+			rowHead[4] = "isBenefit(1:false 0:true)";
+			rowHead[5] = "type";
+			csvRows.add(rowHead);
+			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+			List<Object> typeList = new ArrayList<Object>();
+			typeList.add(TypeEnum.STAKE_CREATE.getCode());
+			typeList.add(TypeEnum.STAKE_MODIFY.getCode());
+			constructor.must(new ESQueryBuilders().terms("type", typeList));
+			constructor.must(new ESQueryBuilders().range("time", 1587348000000l, 1587646800000l));
+			
+			
+			traverseTx(constructor, tx->{
+				Object[] rowData = new Object[6];
+				InnerContractDecodedResult innerContractDecodedResult = InnerContractDecodeUtil.decode(tx.getInput(), null);
+				switch (tx.getTypeEnum()) {
+				/** 创建验证人 */
+				case STAKE_CREATE:
+					StakeCreateParam stakeCreateParam= (StakeCreateParam)innerContractDecodedResult.getParam();
+					rowData[0] = stakeCreateParam.getNodeId();
+					rowData[1] = tx.getHash();
+					rowData[2] = tx.getInfo();
+					rowData[3] = stakeCreateParam.getBenefitAddress();
+					rowData[4] = 1;
 					for(String address: list) {
-						if(address.equals(stakeModifyParam.getBenefitAddress().toLowerCase())) {
+						if(address.equals(stakeCreateParam.getBenefitAddress().toLowerCase())) {
 							rowData[4] =0;
 							break;
 						}
 					}
+					rowData[5] = Transaction.TypeEnum.STAKE_CREATE.getDesc();
+					break;
+				/**
+				 * 增加质押
+				 */
+				case STAKE_MODIFY:
+					StakeModifyParam stakeModifyParam= (StakeModifyParam)innerContractDecodedResult.getParam();
+					rowData[0] = stakeModifyParam.getNodeId();
+					rowData[1] = tx.getHash();
+					rowData[2] = tx.getInfo();
+					rowData[3] = stakeModifyParam.getBenefitAddress();
+					rowData[4] = 1;
+					if(StringUtils.isNotBlank(stakeModifyParam.getBenefitAddress())) {
+						for(String address: list) {
+							if(address.equals(stakeModifyParam.getBenefitAddress().toLowerCase())) {
+								rowData[4] =0;
+								break;
+							}
+						}
+					}
+					rowData[5] = Transaction.TypeEnum.STAKE_MODIFY.getDesc();
+					break;
+				default:
+					break;
 				}
-				rowData[5] = Transaction.TypeEnum.STAKE_MODIFY.getDesc();
-				break;
-			default:
-				break;
-			}
-			log.info("exportMatchNode数据导出,hash：{}", tx.getHash());
-			csvRows.add(rowData);
-		});
+				log.info("exportMatchNode数据导出,hash：{}", tx.getHash());
+				csvRows.add(rowData);
+			});	
+		} catch (Exception e) {
+			log.error("exportMatchNode error", e);
+		}
 		
 		buildFile("exportMatchNode.csv", csvRows, null);
 		log.info("exportMatchNode数据导出成功,总行数：{}", csvRows.size());
@@ -358,66 +363,74 @@ public class ExportGallyService extends ServiceBase {
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportLegalTx() {
 		List<Object[]> csvRows = new ArrayList<>();
-		// 定义表头
-		csvRows.add(new String[]{
-				"address",
-				"balance",
-				"illegal tx info"
-		});
-		// 读取文件内容
-		List<String> lines = readLines(filepath);
-		class Counter{
-			int illegalTxCount = 0;
-			StringBuilder sb = new StringBuilder();
-			void reset(){
-				illegalTxCount=0;
-				sb.setLength(0);
-				sb.append("[");
+		try {
+			// 定义表头
+			csvRows.add(new String[]{
+					"address",
+					"balance",
+					"illegal tx info"
+			});
+			// 读取文件内容
+			List<String> lines = readLines(filepath);
+			class Counter{
+				int illegalTxCount = 0;
+				StringBuilder sb = new StringBuilder();
+				void reset(){
+					illegalTxCount=0;
+					sb.setLength(0);
+					sb.append("[");
+				}
+				String getRs(){
+					String str = sb.toString();
+//					str = str.substring(0,str.lastIndexOf(":"));
+					str = str+"]";
+					str = illegalTxCount+str;
+					return str;
+				}
 			}
-			String getRs(){
-				String str = sb.toString();
-				str = str.substring(0,str.lastIndexOf(":"));
-				str = str+"]";
-				str = illegalTxCount+str;
-				return str;
-			}
-		}
-		Counter counter = new Counter();
-		int i = 0;
-		for(String address: lines) {
-			counter.reset();// 重置计数器
-			Object[] rowData = new Object[3];
-			rowData[0] = address; // 地址
-			rowData[1] = getBalance(address).toString(); // 余额
-			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-			constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
-					.should(QueryBuilders.termQuery("to", address)));
-			// 遍历交易数据
-			traverseTx(constructor,tx -> {
-				boolean illegal = true;
-				switch (tx.getTypeEnum()) {
-					case DELEGATE_CREATE:
-					case DELEGATE_EXIT:
-					case CLAIM_REWARDS:
-						// 合法交易
-						illegal = false;
-						break;
-					case TRANSFER:
-						if("0xceca295e1471b3008d20b017c7df7d4f338a7fba".equals(tx.getFrom())){
+			Counter counter = new Counter();
+			int i = 0;
+			for(String address: lines) {
+				log.info("exportLegalTx数据1,address：{},i:{}",address,i);
+				counter.reset();// 重置计数器
+				Object[] rowData = new Object[3];
+				rowData[0] = address; // 地址
+				rowData[1] = HexTool.append(EnergonUtil
+						.format(Convert.fromVon(getBalance(address,DefaultBlockParameter.valueOf(BigInteger.valueOf(4812771l))).toString(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)); // 余额
+				ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+				constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address))
+						.should(QueryBuilders.termQuery("to", address)));
+				constructor.must(new ESQueryBuilders().range("time", 1587348000000l, 1587646800000l));
+				// 遍历交易数据
+				traverseTx(constructor,tx -> {
+					boolean illegal = true;
+					switch (tx.getTypeEnum()) {
+						case DELEGATE_CREATE:
+						case DELEGATE_EXIT:
+						case CLAIM_REWARDS:
 							// 合法交易
 							illegal = false;
-						}
-				}
-				if(illegal){
-					// 非法交易
-					counter.illegalTxCount++;
-					counter.sb.append(tx.getHash()).append(":");
-				}
-			});
-			rowData[2] = counter.getRs();
-			csvRows.add(rowData);
-			log.info("exportLegalTx数据,address：{},i:{}",address,i);
-			i++;
+							break;
+						case TRANSFER:
+							if("0xceca295e1471b3008d20b017c7df7d4f338a7fba".equals(tx.getFrom())){
+								// 合法交易
+								illegal = false;
+							}
+					}
+					log.info("exportLegalTx数据2,address：{},illegal:{}",address,illegal);
+					if(illegal){
+						// 非法交易
+						counter.illegalTxCount++;
+						counter.sb.append(tx.getHash()).append(":");
+					}
+				});
+				rowData[2] = counter.getRs();
+				csvRows.add(rowData);
+				log.info("exportLegalTx数据3,address：{},i:{}",address,i);
+				i++;
+			}
+		} catch (Exception e) {
+			log.error("addressLegalTx error", e);
 		}
 		buildFile("addressLegalTx.csv", csvRows, null);
 		log.info("交易数据导出成功,总行数：{}", csvRows.size());

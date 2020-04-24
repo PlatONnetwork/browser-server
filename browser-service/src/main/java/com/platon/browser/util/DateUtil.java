@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.platon.browser.exception.BusinessException;
+
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,6 +31,8 @@ public class DateUtil {
 	
 	private static final String DATE_PATTERN = "EEE MMM dd yyyy HH:mm:ss";
 
+	private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
 	private static String localLANG;
 	
 	/**
@@ -127,4 +132,17 @@ public class DateUtil {
     	String timeStr = simpleDateFormat.format(time);
     	return DateUtil.timeZoneTransfer(timeStr, pattern, "0", "+8");
     }
+    
+
+	public static Date covertTime(Date date) {
+		Timestamp now = new Timestamp(date.getTime());
+		String str = df.format(now);
+		Date newDate = null;
+		try {
+			newDate = df.parse(str);
+		} catch (ParseException e) {
+			throw new BusinessException("转换日期去掉毫秒异常");
+		}
+		return newDate;
+	}
 }
