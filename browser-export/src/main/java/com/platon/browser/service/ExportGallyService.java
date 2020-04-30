@@ -530,9 +530,16 @@ public class ExportGallyService extends ServiceBase {
 				rowData[3] = evmTotal;
 				rowData[4] = wasmTotal;
 				rowData[5] = total;
-				rowData[6] = new BigDecimal(txTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
-				rowData[7] = new BigDecimal(evmTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
-				rowData[8] = new BigDecimal(wasmTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+				if(total.compareTo(BigInteger.ZERO) > 0) {
+					rowData[6] = new BigDecimal(txTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+					rowData[7] = new BigDecimal(evmTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+					rowData[8] = new BigDecimal(wasmTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+				} else {
+					rowData[6] = BigDecimal.ZERO;
+					rowData[7] = BigDecimal.ZERO;
+					rowData[8] = BigDecimal.ZERO;
+				}
+				
 				csvRows.add(rowData);
 				log.info("export nodeId:{}", nodeId);
 			}
