@@ -130,11 +130,11 @@ public abstract class ServiceBase {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             int i = 0;
             while (reader.ready()) {
-            	if(i == 0) {
-            		i++;
-            		continue;
-            	}
                 String line = reader.readLine();
+                if(i == 0) {
+                    i++;
+                    continue;
+                }
                 lines.add(line.split(",")[0].trim().toLowerCase());
             }
             reader.close();
