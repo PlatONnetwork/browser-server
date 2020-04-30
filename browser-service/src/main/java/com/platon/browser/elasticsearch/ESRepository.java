@@ -22,6 +22,8 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -266,6 +268,37 @@ public abstract class ESRepository {
 		List<T> list = new ArrayList<>();
 		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
 		esResult.setRsData(list);
+
+		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+
+		return esResult;
+	}
+	
+	/**
+	 * 查询总数
+	 * 
+	 * @throws IOException
+	 */
+	public ESResult<?> Count(ESQueryBuilderConstructor constructor) throws IOException {
+		long startTime = System.currentTimeMillis();
+
+		CountRequest searchRequest = new CountRequest(getIndexName());
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		//排序
+        if (StringUtils.isNotEmpty(constructor.getAsc())) {
+        	searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
+        }
+        if (StringUtils.isNotEmpty(constructor.getDesc())) {
+        	searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
+        }
+        //设置查询体
+        searchSourceBuilder.query(constructor.listBuilders());
+     // 设置SearchSourceBuilder查询属性
+		searchRequest.source(searchSourceBuilder);
+		log.debug("get rs" + searchSourceBuilder.toString());
+		CountResponse response = client.count(searchRequest, RequestOptions.DEFAULT);
+		ESResult<?> esResult = new ESResult<>();
+		esResult.setTotal(response.getCount());
 
 		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 

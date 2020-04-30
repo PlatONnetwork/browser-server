@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -28,15 +30,24 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.DefaultBlockParameterNumber;
+import org.web3j.protocol.core.methods.response.PlatonGetTransactionCount;
 import org.web3j.tx.Transfer;
+import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Data
@@ -57,6 +68,9 @@ public class ExportGallyService extends ServiceBase {
     private NodeMapper nodeMapper;
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(470000);
 	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(10000000000L);
+	protected Credentials adminCredentials = Credentials.create("009614c2b32f2d5d3421591ab3ffc03ac66c831fb6807b532f6e3a8e7aac31f1d9");
+	
+    protected ContractGasProvider provider = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);;
 
 	@Value("${paging.maxCount}")
 	private int maxCount;
@@ -200,7 +214,7 @@ public class ExportGallyService extends ServiceBase {
 			"nodeId"
 		});
 		// 读取文件内容
-		List<String> lines = readLines(filepath);
+		Set<String> lines = readLines(filepath);
 		int i = 0;
 		for(String address: lines) {
 			Object[] rowData = new Object[4];
@@ -242,7 +256,7 @@ public class ExportGallyService extends ServiceBase {
 	
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void transfer() {
-		 List<String> lines = readLines(filepath);
+		Set<String> lines = readLines(filepath);
 		
 		int i = 0;
 		try {
@@ -282,7 +296,7 @@ public class ExportGallyService extends ServiceBase {
 	
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportMatchNode() {
-		List<String> list = readLines(filepath);
+		Set<String> list = readLines(filepath);
 		List<Object[]> csvRows = new ArrayList<>();
 		try {
 			Object[] rowHead = new Object[6];
@@ -371,7 +385,7 @@ public class ExportGallyService extends ServiceBase {
 					"illegal tx info"
 			});
 			// 读取文件内容
-			List<String> lines = readLines(filepath);
+			Set<String> lines = readLines(filepath);
 			class Counter{
 				int illegalTxCount = 0;
 				StringBuilder sb = new StringBuilder();
@@ -436,4 +450,102 @@ public class ExportGallyService extends ServiceBase {
 		log.info("交易数据导出成功,总行数：{}", csvRows.size());
 		exportLegalTxDone = true;
 	}
+	
+	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+	public void exportContractData() {
+		Map<String, Set<String>> nodesMap = new HashMap<>();
+		try {
+			File file = new File(filepath);
+			if(file.isDirectory()) {
+	            File next[]=file.listFiles();
+	            for (File f:next) {
+	            	Set<String> addresslist = new HashSet<>();
+//	                if(next[i].isDirectory()) {
+//	                	File addressFile[]=file.listFiles();
+//	                	for(File addF:addressFile) {
+//	                		if(addF.getPath().endsWith(".csv"))
+//	                		addresslist = readLines(addF.getPath());
+//	                	}
+//	                }
+	            	if(f.getPath().endsWith(".csv")) {
+	            		addresslist = readLines(f.getPath());
+	            	}
+	            	String[] name = f.getName().split("\\.");
+	                log.info("file:{}", f.getName());
+	                nodesMap.put(name[0], addresslist);
+	            }
+	        }
+			List<Object[]> csvRows = new ArrayList<>();
+			Object[] rowHead = new Object[9];
+			rowHead[0] = "nodeName";
+			rowHead[1] = "nodeId";
+			rowHead[2] = "txNum";
+			rowHead[3] = "EvmNum";
+			rowHead[4] = "WasmNum";
+			rowHead[5] = "TotalNum";
+			rowHead[6] = "txPer";
+			rowHead[7] = "EvmPer";
+			rowHead[8] = "WasmPer";
+			csvRows.add(rowHead);
+			for(String nodeId:nodesMap.keySet()) {
+				nodeId = HexTool.prefix(nodeId);
+				BigInteger total = BigInteger.ZERO;
+				Object[] rowData = new Object[9];
+				Node node = nodeMapper.selectByPrimaryKey(nodeId);
+				rowData[0] = node.getNodeName();
+				rowData[1] = nodeId;
+				for(String address : nodesMap.get(nodeId)) {
+//					ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+//					constructor.must(new ESQueryBuilders().term("type", TypeEnum.TRANSFER.getCode()));
+//					constructor.must(new ESQueryBuilders().term("from", address));
+//					constructor.must(new ESQueryBuilders().term("status", StatusEnum.SUCCESS.getCode()));
+//					ESResult<?> es;
+//					try {
+//						es = transactionESRepository.Count(constructor);
+//						txTotal = txTotal + es.getTotal();
+//					} catch (IOException e) {
+//						log.error("query es error",e);
+//					}
+					
+					BigInteger beginTx = this.getNonce(address, DefaultBlockParameter.valueOf(BigInteger.valueOf(1l)));
+					BigInteger endTx = this.getNonce(address, DefaultBlockParameter.valueOf(BigInteger.valueOf(1l)));
+					total = total.add(endTx.subtract(beginTx));
+				}
+				com.platon.browser.evm.bean.PressureContract evmPressureContract = com.platon.browser.evm.bean.PressureContract
+						.load("", getClient(), adminCredentials, provider);
+				BigInteger evmTotal =  evmPressureContract.getValue(nodeId).send();
+				com.platon.browser.wasm.bean.PressureContract wasmPressureContract = com.platon.browser.wasm.bean.PressureContract
+						.load("", getClient(), adminCredentials, provider);
+				BigInteger wasmTotal =  wasmPressureContract.getValue(nodeId).send();
+				BigInteger txTotal = total.subtract(wasmTotal).subtract(evmTotal);
+				rowData[2] = txTotal;
+				rowData[3] = evmTotal;
+				rowData[4] = wasmTotal;
+				rowData[5] = total;
+				rowData[6] = new BigDecimal(txTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+				rowData[7] = new BigDecimal(evmTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+				rowData[8] = new BigDecimal(wasmTotal).divide(new BigDecimal(total), 2, RoundingMode.HALF_UP);
+				csvRows.add(rowData);
+				log.info("export nodeId:{}", nodeId);
+			}
+			buildFile("exportContractData.csv", csvRows, null);
+			log.info("exportContractData数据导出成功,总行数：{}", csvRows.size());
+		} catch (Exception e) {
+			log.error("exportContractData error", e);
+		}
+		
+		txInfoExportDone = true;
+	}
+	
+	private BigInteger getNonce(String address, DefaultBlockParameter defaultBlockParameter) throws IOException {
+        PlatonGetTransactionCount ethGetTransactionCount = getClient().platonGetTransactionCount(
+        		address, defaultBlockParameter).send();
+
+//        if (ethGetTransactionCount.getTransactionCount().intValue() == 0) {
+//            ethGetTransactionCount = getClient().platonGetTransactionCount(
+//            		address, DefaultBlockParameterName.LATEST).send();
+//        }
+
+        return ethGetTransactionCount.getTransactionCount();
+    }
 }

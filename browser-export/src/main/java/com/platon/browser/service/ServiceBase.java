@@ -22,7 +22,9 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public abstract class ServiceBase {
@@ -103,8 +105,8 @@ public abstract class ServiceBase {
         }
     }
 
-    protected List<String> readLines(String filepath){
-        List<String> lines = new ArrayList<>();
+    protected Set<String> readLines(String filepath){
+        Set<String> lines = new HashSet<>();
         try {
             File file = new File(filepath);
             InputStream in = new FileInputStream(file);
@@ -112,6 +114,28 @@ public abstract class ServiceBase {
             while (reader.ready()) {
                 String line = reader.readLine();
                 lines.add(line.trim().toLowerCase());
+            }
+            reader.close();
+        } catch (Exception e) {
+            log.error("read error", e);
+        }
+        return lines;
+    }
+    
+    protected Set<String> readLinesOne(String filepath){
+        Set<String> lines = new HashSet<>();
+        try {
+            File file = new File(filepath);
+            InputStream in = new FileInputStream(file);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            int i = 0;
+            while (reader.ready()) {
+            	if(i == 0) {
+            		i++;
+            		continue;
+            	}
+                String line = reader.readLine();
+                lines.add(line.split(",")[0].trim().toLowerCase());
             }
             reader.close();
         } catch (Exception e) {

@@ -213,6 +213,8 @@ public class TransactionServiceImpl implements TransactionService {
     public AccountDownload transactionListByAddressDownload(String address, Long date,String local, String timeZone) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
+        SimpleDateFormat  format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		logger.error("now time:{}",format.format(currentServerTime));
         String msg = dateFormat.format(currentServerTime);
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
 

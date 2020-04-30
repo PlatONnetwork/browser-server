@@ -205,6 +205,8 @@ public class BlockServiceImpl implements BlockService {
 	public BlockDownload blockListByNodeIdDownload(String nodeId, Long date, String local, String timeZone) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
+		SimpleDateFormat  format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		logger.error("now time:{}",format.format(now));
 		String msg = dateFormat.format(now);
 		String msg2 = dateFormat.format(new Date(date));
         logger.info("导出数据起始日期：{},结束时间：{}",msg2,msg);
