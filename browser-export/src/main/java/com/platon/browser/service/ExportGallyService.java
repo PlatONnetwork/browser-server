@@ -476,7 +476,7 @@ public class ExportGallyService extends ServiceBase {
 //	                	}
 //	                }
 	            	if(f.getPath().endsWith(".csv")) {
-	            		addresslist = readLines(f.getPath());
+	            		addresslist = readLinesOne(f.getPath());
 	            	}
 	            	String[] name = f.getName().split("\\.");
 	                log.info("file:{}", f.getName());
