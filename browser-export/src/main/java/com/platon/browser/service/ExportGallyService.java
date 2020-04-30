@@ -81,6 +81,14 @@ public class ExportGallyService extends ServiceBase {
 
 	@Value("${fileUrl}")
 	private String fileUrl;
+	@Value("${evmContract}")
+	private String evmContract;
+	@Value("${wasmContract}")
+	private String wasmContract;
+	@Value("${beginBlock}")
+	private int beginBlock;
+	@Value("${endBlock}")
+	private int endBlock;
 	@Override
 	public String getFileUrl() {
 		return fileUrl;
@@ -507,15 +515,15 @@ public class ExportGallyService extends ServiceBase {
 //						log.error("query es error",e);
 //					}
 					
-					BigInteger beginTx = this.getNonce(address, DefaultBlockParameter.valueOf(BigInteger.valueOf(1l)));
-					BigInteger endTx = this.getNonce(address, DefaultBlockParameter.valueOf(BigInteger.valueOf(1l)));
+					BigInteger beginTx = this.getNonce(address, DefaultBlockParameter.valueOf(BigInteger.valueOf(beginBlock)));
+					BigInteger endTx = this.getNonce(address, DefaultBlockParameter.valueOf(BigInteger.valueOf(endBlock)));
 					total = total.add(endTx.subtract(beginTx));
 				}
 				com.platon.browser.evm.bean.PressureContract evmPressureContract = com.platon.browser.evm.bean.PressureContract
-						.load("", getClient(), adminCredentials, provider);
+						.load(evmContract, getClient(), adminCredentials, provider);
 				BigInteger evmTotal =  evmPressureContract.getValue(nodeId).send();
 				com.platon.browser.wasm.bean.PressureContract wasmPressureContract = com.platon.browser.wasm.bean.PressureContract
-						.load("", getClient(), adminCredentials, provider);
+						.load(wasmContract, getClient(), adminCredentials, provider);
 				BigInteger wasmTotal =  wasmPressureContract.getValue(nodeId).send();
 				BigInteger txTotal = total.subtract(wasmTotal).subtract(evmTotal);
 				rowData[2] = txTotal;
