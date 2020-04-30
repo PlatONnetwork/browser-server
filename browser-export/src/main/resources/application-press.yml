@@ -104,6 +104,6 @@ platon:
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
 fileUrl: D://111//222//
 filepath: E://文件//矩真文件//区块链//PlatON周边工具//官网//活动//wallets
-exportBlock: 100
-exportDBBlock: 100
-addresspath: G:\\Download\\ceca295e1471b3008d20b017c7df7d4f338a7fba.json
+#exportBlock: 100
+#exportDBBlock: 100
+#addresspath: G:\\Download\\ceca295e1471b3008d20b017c7df7d4f338a7fba.json

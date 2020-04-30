@@ -22,8 +22,8 @@ import java.util.concurrent.Executors;
 @MapperScan(basePackages = "com.platon.browser.dao.mapper")
 public class ExportApplication implements ApplicationRunner {
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
-	@Autowired
-	private ExportService exportService;
+//	@Autowired
+//	private ExportService exportService;
 	@Autowired
 	private ExportGallyService exportGallyService;
 

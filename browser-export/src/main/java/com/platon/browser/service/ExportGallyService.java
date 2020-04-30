@@ -72,12 +72,12 @@ public class ExportGallyService extends ServiceBase {
 	
     protected ContractGasProvider provider = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);;
 
-	@Value("${paging.maxCount}")
-	private int maxCount;
+//	@Value("${paging.maxCount}")
+//	private int maxCount;
 	@Value("${filepath}")
 	private String filepath;
-	@Value("${addresspath}")
-	private String addresspath;
+//	@Value("${addresspath}")
+//	private String addresspath;
 
 	@Value("${fileUrl}")
 	private String fileUrl;
@@ -254,45 +254,45 @@ public class ExportGallyService extends ServiceBase {
 	}
 	
 	
-	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-	public void transfer() {
-		Set<String> lines = readLines(filepath);
-		
-		int i = 0;
-		try {
-//			for(String address: list) {
-//				PlatonGetBalance platonGetBalance =platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameterName.LATEST).send();
-//				if(platonGetBalance.getBalance().compareTo(BigInteger.valueOf(0)) != 0) {
-//					log.error("add:{}",address);
-//				}
-//			}
-			Credentials credentials = WalletUtils.loadCredentials("88888888", addresspath);
-			BigInteger balance = getBalance("0xceca295e1471b3008d20b017c7df7d4f338a7fba",DefaultBlockParameterName.LATEST);
-			log.error("platonGetBalance:{}",balance);
-			for(String address: lines) {
-					Transfer.sendFunds(
-							getClient(),
-					        credentials,
-					        "101",
-					        address,
-					        BigDecimal.valueOf(1),
-					        Unit.LAT
-					).send();
-					
-				
-//					TransactionManager transactionManager = new RawTransactionManager(platonClient.getWeb3jWrapper().getWeb3j()
-//							, credentials,101l);
-//					PlatonSendTransaction ethSendTransaction = transactionManager.sendTransaction(GAS_PRICE, GAS_LIMIT, address, "", new BigInteger("1000000000000000000000"));
-					SleepUtil.sleep(5);
-//					log.error("transfer数据,address：{},i:{},status:{}",address,i,ethSendTransaction.getResult());
-					i++;
-			} 
-		} catch ( Exception e1) {
-			log.error("transerr", e1);
-		}
-		log.info("转账成功,总行数：{}",i);
-		txInfoExportDone = true;
-	}
+//	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+//	public void transfer() {
+//		Set<String> lines = readLines(filepath);
+//		
+//		int i = 0;
+//		try {
+////			for(String address: list) {
+////				PlatonGetBalance platonGetBalance =platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameterName.LATEST).send();
+////				if(platonGetBalance.getBalance().compareTo(BigInteger.valueOf(0)) != 0) {
+////					log.error("add:{}",address);
+////				}
+////			}
+//			Credentials credentials = WalletUtils.loadCredentials("88888888", addresspath);
+//			BigInteger balance = getBalance("0xceca295e1471b3008d20b017c7df7d4f338a7fba",DefaultBlockParameterName.LATEST);
+//			log.error("platonGetBalance:{}",balance);
+//			for(String address: lines) {
+//					Transfer.sendFunds(
+//							getClient(),
+//					        credentials,
+//					        "101",
+//					        address,
+//					        BigDecimal.valueOf(1),
+//					        Unit.LAT
+//					).send();
+//					
+//				
+////					TransactionManager transactionManager = new RawTransactionManager(platonClient.getWeb3jWrapper().getWeb3j()
+////							, credentials,101l);
+////					PlatonSendTransaction ethSendTransaction = transactionManager.sendTransaction(GAS_PRICE, GAS_LIMIT, address, "", new BigInteger("1000000000000000000000"));
+//					SleepUtil.sleep(5);
+////					log.error("transfer数据,address：{},i:{},status:{}",address,i,ethSendTransaction.getResult());
+//					i++;
+//			} 
+//		} catch ( Exception e1) {
+//			log.error("transerr", e1);
+//		}
+//		log.info("转账成功,总行数：{}",i);
+//		txInfoExportDone = true;
+//	}
 	
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportMatchNode() {
