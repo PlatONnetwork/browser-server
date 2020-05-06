@@ -52,7 +52,7 @@ public class PressureContract extends Contract {
 
     public static final String FUNC_RECORD = "record";
 
-    public static final Event SETSUCCESS_EVENT = new Event("SetSuccess", 
+    public static final Event SETSUCCESS_EVENT = new Event("SetSuccess",
             Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Bool>() {}));
     ;
 
@@ -75,7 +75,7 @@ public class PressureContract extends Contract {
     }
 
     public RemoteCall<String> nodeids(BigInteger param0) {
-        final Function function = new Function(FUNC_NODEIDS, 
+        final Function function = new Function(FUNC_NODEIDS,
                 Arrays.<Type>asList(new Uint256(param0)),
                 Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}));
         return executeRemoteCallSingleValueReturn(function, String.class);

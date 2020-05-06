@@ -475,6 +475,11 @@ public class ExportGallyService extends ServiceBase {
 //	                		addresslist = readLines(addF.getPath());
 //	                	}
 //	                }
+
+					if(!f.getPath().endsWith(".csv")|| !f.getName().startsWith("0x")){
+						continue;
+					}
+
 	            	if(f.getPath().endsWith(".csv")) {
 	            		addresslist = readLinesOne(f.getPath());
 	            	}
