@@ -90,10 +90,10 @@ public class HomeServiceImpl implements HomeService {
 		*/
 		req.setParameter(req.getParameter().trim());
 		String keyword = req.getParameter();
-		if (keyword.length() == 40) {
-			/* 长度为40则拼接0x*/
-			keyword = HexTool.prefix(keyword);
-		}
+//		if (keyword.length() == 40) {
+//			/* 长度为40则拼接0x*/
+//			keyword = HexTool.prefix(keyword);
+//		}
 		/* 判断是否为纯数字 */
 		boolean isNumber = keyword.matches("[0-9]+");
 		QueryNavigationResp result = new QueryNavigationResp();
@@ -131,7 +131,7 @@ public class HomeServiceImpl implements HomeService {
 					queryNavigationStructResp.setNodeId(HexTool.prefix(node.getNodeId()));
 				}
 			}
-			if (keyword.startsWith("0x")) {
+			if (keyword.startsWith("lat")||keyword.startsWith("lax")) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */
 					Address address = addressMapper.selectByPrimaryKey(keyword);

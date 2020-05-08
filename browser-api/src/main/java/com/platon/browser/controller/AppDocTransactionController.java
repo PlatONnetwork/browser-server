@@ -94,7 +94,7 @@ public class AppDocTransactionController implements AppDocTransaction {
 		/**
 		 * 对地址进行补充前缀
 		 */
-		address = HexTool.prefix(address.toLowerCase());
+		address = address.toLowerCase();
 		AccountDownload accountDownload = transactionService.transactionListByAddressDownload(address, date, local, timeZone);
 		try {
 			downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(), accountDownload.getData());

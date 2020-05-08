@@ -181,6 +181,10 @@ public class BlockChainConfig {
     // 说明：用N代表下面字段所设置的值，阐述如下：
     // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
     private Integer zeroProduceCumulativeTime;
+    // 节点的委托比例调整幅度，需要除以100%
+    private Integer rewardPerMaxChangeRange;
+    // 调整委托比例的间隔周期
+    private Integer rewardPerChangeInterval;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakingList=new ArrayList<>();
 
@@ -291,6 +295,10 @@ public class BlockChainConfig {
         this.setZeroProduceCumulativeTime(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
         //【惩罚】零出块阈值
         this.setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
+      //【质押】委托比例调整幅度限制
+        this.setRewardPerMaxChangeRange(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
+      //【质押】委托比例调整间隔
+        this.setRewardPerChangeInterval(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
     }
 
     public ConfigMapper getConfigMapper () {
@@ -717,7 +725,23 @@ public class BlockChainConfig {
         this.zeroProduceCumulativeTime = zeroProduceCumulativeTime;
     }
 
-    public List <CustomStaking> getDefaultStakingList () {
+    public Integer getRewardPerMaxChangeRange() {
+		return rewardPerMaxChangeRange;
+	}
+
+	public void setRewardPerMaxChangeRange(Integer rewardPerMaxChangeRange) {
+		this.rewardPerMaxChangeRange = rewardPerMaxChangeRange;
+	}
+
+	public Integer getRewardPerChangeInterval() {
+		return rewardPerChangeInterval;
+	}
+
+	public void setRewardPerChangeInterval(Integer rewardPerChangeInterval) {
+		this.rewardPerChangeInterval = rewardPerChangeInterval;
+	}
+
+	public List <CustomStaking> getDefaultStakingList () {
         return defaultStakingList;
     }
 

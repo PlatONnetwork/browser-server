@@ -37,7 +37,7 @@ public class BrowserConst {
 	public static final String PIP_NAME = "PIP-";
 	
 	/**账户*/
-	public static final String ACCOUNT = "0x1000000000000000000000000000000000000001";
+	public static final String ACCOUNT = "lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep,lax1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep";
 	
 	/**默认提案标题*/
 	public static final String INQUIRY = "inquiry";
