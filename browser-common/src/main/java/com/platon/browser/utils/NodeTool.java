@@ -11,6 +11,8 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
+import com.platon.sdk.utlis.Bech32;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,7 +71,7 @@ public class NodeTool {
         //ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getParentHash())));
         //Coinbase    common.Address `json:"miner"            gencodec:"required"`
-        result.add(RlpString.create(decodeHash(block.getMiner())));
+        result.add(RlpString.create(decodeAddress(block.getMiner())));
         //Root        common.Hash    `json:"stateRoot"        gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getStateRoot())));
         //TxHash      common.Hash    `json:"transactionsRoot" gencodec:"required"`
@@ -95,6 +97,10 @@ public class NodeTool {
 
     static byte[] decodeHash(String hex) {
         return Hex.decode(Numeric.cleanHexPrefix(hex));
+    }
+    
+    static byte[] decodeAddress(String address) {
+        return Bech32.addressDecode(address);
     }
 
 }
