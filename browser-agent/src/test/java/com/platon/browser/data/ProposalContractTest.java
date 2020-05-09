@@ -31,7 +31,7 @@ public class ProposalContractTest {
 	String nodeId = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
 	String blsPubKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 //	private String blsPubKey = "b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f";
-	String chainId = "100";
+	Long chainId = 100l;
 
 	private Credentials superCredentials;
 	private Credentials stakingCredentials;
@@ -45,16 +45,16 @@ public class ProposalContractTest {
 
 		superCredentials = Credentials.create("1a4c5a5b88433a9aaff294cdd7193eca632aec0a41e46e46aa47d82ca16fd19f");
 		System.out.println("superCredentials balance=" + web3j
-				.platonGetBalance(superCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
+				.platonGetBalance(superCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
 
 		stakingCredentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 		System.out.println("stakingCredentials balance="
-				+ web3j.platonGetBalance(stakingCredentials.getAddress(), DefaultBlockParameterName.LATEST).send()
+				+ web3j.platonGetBalance(stakingCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send()
 						.getBalance());
 
 		voteCredentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 		System.out.println("voteCredentials balance=" + web3j
-				.platonGetBalance(voteCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
+				.platonGetBalance(voteCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
 
 		proposalContract = ProposalContract.load(web3j, stakingCredentials, chainId);
 

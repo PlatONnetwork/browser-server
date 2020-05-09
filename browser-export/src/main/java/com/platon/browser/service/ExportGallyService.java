@@ -259,7 +259,7 @@ public class ExportGallyService extends ServiceBase {
 					Transfer.sendFunds(
 							getClient(),
 					        credentials,
-					        "101",
+					        101l,
 					        address,
 					        BigDecimal.valueOf(1),
 					        Unit.LAT

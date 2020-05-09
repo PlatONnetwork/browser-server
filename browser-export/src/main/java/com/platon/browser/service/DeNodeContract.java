@@ -8,9 +8,9 @@ import org.web3j.protocol.core.RemoteCall;
 
 import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
-import com.platon.sdk.contracts.ppos.dto.common.ContractAddress;
 import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.platon.sdk.utlis.NetworkParameters;
 
 public class DeNodeContract extends DeContract{
 
@@ -45,6 +45,6 @@ public class DeNodeContract extends DeContract{
 	 * @return
 	 */
     public static DeNodeContract load(Web3j web3j) {
-        return new DeNodeContract(ContractAddress.NODE_CONTRACT_ADDRESS, web3j);
+        return new DeNodeContract(NetworkParameters.getPposContractAddressOfStaking(101l), web3j);
     }
 }

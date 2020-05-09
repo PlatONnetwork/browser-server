@@ -41,7 +41,7 @@ public class RestrictingPlanContractTest {
 
         credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 
-        restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials, "100");
+        restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials, 100l);
     }
 
     /**

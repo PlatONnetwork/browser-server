@@ -2,6 +2,7 @@ package com.platon.browser.client;
 
 import com.platon.browser.enums.Web3jProtocolEnum;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.browser.utils.NetworkParms;
 import com.platon.sdk.contracts.ppos.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -112,13 +113,13 @@ public class RetryableClient {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     private void updateContract(){
-    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j());
-        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j());
-        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j());
-        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j());
-        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j());
-        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j());
-        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j());
+    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
+        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
+        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
+        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
+        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
+        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
+        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j(),NetworkParms.getChainId());
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)

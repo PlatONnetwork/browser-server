@@ -44,7 +44,7 @@ import java.util.List;
  * @Description:
  */
 public class TransactionSender {
-	private static String chainId = "100";
+	private static Long chainId = 100l;
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:5789"));
@@ -52,7 +52,7 @@ public class TransactionSender {
     private Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
 //    private Credentials credentials1 = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     private Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
-    NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
+    NodeContract nodeContract = NodeContract.load(currentValidWeb3j,chainId);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
     RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);

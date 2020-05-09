@@ -32,6 +32,7 @@ public class SpecialContractApiInvoker {
 //    private static Web3jService service = new HttpService("http://192.168.120.151:6789");
 //    private static Web3j web3j = Web3j.build(service); // atonTest
     private static WebSocketService socketService = new WebSocketService("ws://192.168.112.171:6666",false);
+    static Long chainId = 100l;
     private static Web3j web3j; // test
     static {
         try {
@@ -44,10 +45,10 @@ public class SpecialContractApiInvoker {
 
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
-    private static NodeContract nodeContract = NodeContract.load(web3j);
-    private static DelegateContract delegateContract = DelegateContract.load(web3j);
-    private static RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(web3j);
-    private static ProposalContract proposalContract = ProposalContract.load(web3j);
+    private static NodeContract nodeContract = NodeContract.load(web3j,chainId);
+    private static DelegateContract delegateContract = DelegateContract.load(web3j,chainId);
+    private static RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(web3j,chainId);
+    private static ProposalContract proposalContract = ProposalContract.load(web3j,chainId);
     private static SpecialApi sca = new SpecialApi();
 
     public static void main(String args[]) throws Exception {
