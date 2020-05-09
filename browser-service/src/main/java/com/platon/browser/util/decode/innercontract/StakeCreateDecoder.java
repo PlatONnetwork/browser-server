@@ -11,6 +11,7 @@ import java.math.BigInteger;
 
 import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.bigIntegerResolver;
 import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.stringResolver;
+import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.addressResolver;
 
 /**
  * @description: 创建验证人交易输入参数解码器
@@ -38,7 +39,7 @@ class StakeCreateDecoder {
         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
         BigInteger type =  bigIntegerResolver((RlpString) rootList.getValues().get(1));
         //用于接受出块奖励和质押奖励的收益账户benefitAddress
-        String address = stringResolver((RlpString) rootList.getValues().get(2));
+        String address = addressResolver((RlpString) rootList.getValues().get(2));
         //被质押的节点的NodeId
         String nodeId = stringResolver((RlpString) rootList.getValues().get(3));
         //外部Id externalId

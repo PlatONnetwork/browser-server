@@ -10,6 +10,7 @@ import java.math.BigInteger;
 
 import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.bigIntegerResolver;
 import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.stringResolver;
+import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.addressResolver;
 
 /**
  * @description: 创建验证人交易输入参数解码器
@@ -21,7 +22,7 @@ public class StakeModifyDecoder {
     static TxParam decode(RlpList rootList) {
         // 修改质押信息
         //用于接受出块奖励和质押奖励的收益账户
-        String address = stringResolver((RlpString) rootList.getValues().get(1));
+        String address = addressResolver((RlpString) rootList.getValues().get(1));
         //被质押的节点的NodeId
         String nodeId = stringResolver((RlpString) rootList.getValues().get(2));
         //外部Id

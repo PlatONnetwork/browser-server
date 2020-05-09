@@ -1,6 +1,10 @@
 package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.RestrictingCreateParam;
+import com.platon.browser.utils.NetworkParms;
+import com.platon.sdk.utlis.Bech32;
+import com.platon.sdk.utlis.NetworkParameters;
+
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -29,6 +33,19 @@ public interface InnerContractDecoder {
         RlpList stringsList = RlpDecoder.decode(rlpString.getBytes());
         RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
         return Numeric.toHexString(stringsListString.getBytes());
+    }
+    
+    static String addressResolver(RlpString rlpString) {
+        RlpList stringsList = RlpDecoder.decode(rlpString.getBytes());
+        RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
+        /**
+         * 判断是否为主网
+         */
+        String hrp = NetworkParameters.TestNetParams.getHrp();
+        if(NetworkParms.getChainId() == 100l) {
+        	hrp = NetworkParameters.MainNetParams.getHrp();
+        }
+        return Bech32.addressEncode(hrp,Numeric.toHexString(stringsListString.getBytes()));
     }
 
     static List<RestrictingCreateParam.RestrictingPlan> resolvePlan(RlpString rlpString) {
