@@ -1,9 +1,9 @@
 package com.platon.browser.utils;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class NetworkParms {
 
 	private static Long chainId;
@@ -17,8 +17,8 @@ public class NetworkParms {
 	 * @param chainId
 	 */
 	@Value("${platon.chainId:100}")
-	public void setChainId(Long chainId) {
-		NetworkParms.chainId = chainId;
+	public void setChainId(String chainId) {
+		NetworkParms.chainId = Long.valueOf(chainId);
 	}
 	
 	

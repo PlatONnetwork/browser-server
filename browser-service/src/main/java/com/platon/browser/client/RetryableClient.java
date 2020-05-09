@@ -7,6 +7,7 @@ import com.platon.sdk.contracts.ppos.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
@@ -28,6 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
+@DependsOn("networkParms")
 public class RetryableClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
     @Value("${platon.web3j.protocol}")

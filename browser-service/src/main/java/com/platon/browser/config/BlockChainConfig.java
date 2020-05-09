@@ -6,6 +6,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.browser.utils.NetworkParms;
 import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import com.platon.sdk.contracts.ppos.dto.resp.ParamItem;
 import com.platon.sdk.contracts.ppos.dto.resp.ParamValue;
@@ -14,8 +15,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.Environment;
 import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
@@ -37,13 +41,14 @@ import java.util.*;
  */
 
 @Slf4j
+@DependsOn("networkParms")
 @Configuration
 @ConfigurationProperties(prefix="platon")
 public class BlockChainConfig {
 
     @Autowired
     private ConfigMapper configMapper;
-
+    
     static {
         File saltFile = FileUtils.getFile(System.getProperty("user.dir"), "jasypt.properties");
         Properties properties = new Properties();
@@ -63,7 +68,7 @@ public class BlockChainConfig {
     @Autowired
     private PlatOnClient client;
 
-    private static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
+    private static Set<String> INNER_CONTRACT_ADDR ;
 
     public Set<String> getInnerContractAddr(){
         return Collections.unmodifiableSet(INNER_CONTRACT_ADDR);
@@ -190,6 +195,7 @@ public class BlockChainConfig {
 
     @PostConstruct
     public void init() throws ConfigLoadingException {
+    	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
         defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.LAT);
         updateWithEconomicConfig(client.getEconomicConfig());
 //        updateWithGovernParams(client.getGovernParamValue(""));
@@ -748,4 +754,6 @@ public class BlockChainConfig {
     public void setDefaultStakingList ( List <CustomStaking> defaultStakingList ) {
         this.defaultStakingList = defaultStakingList;
     }
+
+	
 }
