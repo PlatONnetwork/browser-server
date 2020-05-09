@@ -1,7 +1,6 @@
 package com.platon.browser.req.address;
 
 import com.platon.browser.req.PageReq;
-import com.platon.browser.utils.HexTool;
 
 import javax.validation.constraints.NotBlank;
 
@@ -21,7 +20,7 @@ public class QueryRPPlanDetailRequest extends PageReq{
 	}
 
 	public void setAddress(String address) {
-		this.address = HexTool.prefix(address.toLowerCase());
+		this.address = address.toLowerCase();
 	}
     
 }

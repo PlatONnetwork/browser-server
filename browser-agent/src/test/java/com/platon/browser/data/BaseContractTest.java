@@ -16,7 +16,7 @@ public abstract class BaseContractTest {
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4700000);
 	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(10000000000L);
 
-	protected static final long chainId = 100L;
+	protected static final long chainId = 108L;
 	protected static final String nodeUrl = "http://192.168.112.171:6789";
 	protected static final String privateKey = "a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b";
 

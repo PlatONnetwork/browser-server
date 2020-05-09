@@ -27,7 +27,7 @@ public class RestrictingPlanContractTest {
 
     private Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
-    private String benifitAddress = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
+    private String benifitAddress = "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e";
 
     private RestrictingPlanContract restrictingPlanContract;
 
@@ -41,7 +41,7 @@ public class RestrictingPlanContractTest {
 
         credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 
-        restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials, 100l);
+        restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials, 108l);
     }
 
     /**

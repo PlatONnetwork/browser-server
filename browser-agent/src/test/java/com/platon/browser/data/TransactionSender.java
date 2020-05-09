@@ -44,7 +44,7 @@ import java.util.List;
  * @Description:
  */
 public class TransactionSender {
-	private static Long chainId = 100l;
+	private static Long chainId = 108l;
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:5789"));
@@ -80,7 +80,7 @@ public class TransactionSender {
 			        currentValidWeb3j,
 			        credentials,
 			        chainId,
-			        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+			        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 			        BigDecimal.valueOf(1000000000),
 			        Unit.LAT
 			).send();
@@ -96,11 +96,11 @@ public class TransactionSender {
 //			        currentValidWeb3j,
 //			        credentials1,
 //			        chainId,
-//			        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+//			        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 //			        BigDecimal.valueOf(10),
 //			        Convert.Unit.LAT
 //			).sendAsync();
-			BigInteger balance = currentValidWeb3j.platonGetBalance("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219", DefaultBlockParameterName.LATEST).send().getBalance();
+			BigInteger balance = currentValidWeb3j.platonGetBalance("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e", DefaultBlockParameterName.LATEST).send().getBalance();
 	        logger.debug("balance:{}",balance);
 //    	}
     }
@@ -117,7 +117,7 @@ public class TransactionSender {
                .setNodeId(stakingPubKey)
                .setAmount(stakingAmount.toBigInteger())
                .setStakingAmountType(StakingAmountType.FREE_AMOUNT_TYPE)
-               .setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219")
+               .setBenifitAddress("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e")
                .setExternalId(externalId)
                .setNodeName(nodeName)
                .setWebSite(webSite)
@@ -136,13 +136,13 @@ public class TransactionSender {
     @Test
     public void updateStakingInfo() throws Exception {
     	UpdateStakingParam.Builder uBuilder = new UpdateStakingParam.Builder();
-    	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+    	uBuilder.setBenifitAddress("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e");
     	uBuilder.setDetails("Node of CDM");
     	uBuilder.setExternalId("5FD68B690010632B");
     	uBuilder.setNodeId(stakingPubKey);
     	uBuilder.setNodeName("cdm-004");
     	uBuilder.setWebSite("WWW.CCC.COM");
-    	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+    	uBuilder.setBenifitAddress("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e");
     	uBuilder.setRewardPer(new BigInteger("500"));
     	UpdateStakingParam updateStakingParam = new UpdateStakingParam(uBuilder);
         TransactionResponse res = stakingContract.updateStakingInfo(updateStakingParam).send();
@@ -320,7 +320,7 @@ public class TransactionSender {
 							web3j,
 					        c,
 					        chainId,
-					        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+					        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 					        BigDecimal.valueOf(1),
 					        Convert.Unit.LAT
 					).sendAsync();

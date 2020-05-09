@@ -32,7 +32,7 @@ public class SpecialContractApiInvoker {
 //    private static Web3jService service = new HttpService("http://192.168.120.151:6789");
 //    private static Web3j web3j = Web3j.build(service); // atonTest
     private static WebSocketService socketService = new WebSocketService("ws://192.168.112.171:6666",false);
-    static Long chainId = 100l;
+    static Long chainId = 108l;
     private static Web3j web3j; // test
     static {
         try {
