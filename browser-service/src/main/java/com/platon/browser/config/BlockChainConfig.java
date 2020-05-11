@@ -302,9 +302,9 @@ public class BlockChainConfig {
         //【惩罚】零出块阈值
         this.setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
       //【质押】委托比例调整幅度限制
-        this.setRewardPerMaxChangeRange(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
+        this.setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
       //【质押】委托比例调整间隔
-        this.setRewardPerChangeInterval(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
+        this.setRewardPerChangeInterval(dec.getStaking().getRewardPerChangeInterval().intValue());
     }
 
     public ConfigMapper getConfigMapper () {
