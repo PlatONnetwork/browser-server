@@ -87,7 +87,7 @@ public class DelegateExitConverterTest extends AgentTestBase {
     public void convert() throws Exception {
         CustomDelegation delegation = new CustomDelegation();
         for(CustomDelegation  delegations: delegationList){
-            if(delegations.getDelegateAddr().equals("0xaef5c047712d9f4e2c8696b23c73ca34c431b060"))
+            if(delegations.getDelegateAddr().equals("lax14m6uq3m39k05utyxj6ercu72xnzrrvrq4ttlxz"))
                 delegation=delegations;
         }
         delegation.setDelegateReleased(BigDecimal.ONE);

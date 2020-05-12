@@ -2,6 +2,7 @@ package com.platon.browser.config;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ConfigLoadingException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,8 @@ import org.web3j.platon.bean.EconomicConfig;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -69,7 +72,9 @@ public class BlockChainConfigTest {
             "\t\t\"maxValidators\":30,\n" +
             "\t\t\"operatingThreshold\":10000000000000000000,\n" +
             "\t\t\"stakeThreshold\":1000000000000000000000000,\n" +
-            "\t\t\"unStakeFreezeDuration\":5\n" +
+            "\t\t\"unStakeFreezeDuration\":5,\n" +
+            "\t\t\"rewardPerMaxChangeRange\":10,\n" +
+            "\t\t\"rewardPerChangeInterval\":4\n" +
             "\t}\n" +
             "}\n";
 
@@ -77,6 +82,8 @@ public class BlockChainConfigTest {
     public void test() throws InvocationTargetException, IllegalAccessException, ConfigLoadingException {
         ReflectionTestUtils.setField(target,"client",client);
 
+        Set<String> set = new HashSet<>(InnerContractAddrEnum.getAddresses());
+        target.setINNER_CONTRACT_ADDR(set);
         target.getInnerContractAddr();
         for(Method method:BlockChainConfig.class.getDeclaredMethods()){
             if(method.getName().contains("get")){

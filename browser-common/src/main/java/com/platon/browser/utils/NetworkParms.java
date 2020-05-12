@@ -9,6 +9,9 @@ public class NetworkParms {
 	private static Long chainId;
 
 	public static Long getChainId() {
+		if(chainId == null) {
+			return 100l;
+		}
 		return chainId;
 	}
 

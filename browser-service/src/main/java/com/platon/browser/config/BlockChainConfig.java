@@ -755,5 +755,13 @@ public class BlockChainConfig {
         this.defaultStakingList = defaultStakingList;
     }
 
+	public static Set<String> getINNER_CONTRACT_ADDR() {
+		return INNER_CONTRACT_ADDR;
+	}
+
+	public static void setINNER_CONTRACT_ADDR(Set<String> iNNER_CONTRACT_ADDR) {
+		INNER_CONTRACT_ADDR = iNNER_CONTRACT_ADDR;
+	}
+
 	
 }

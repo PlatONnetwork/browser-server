@@ -18,7 +18,7 @@ public class NodeToolTest {
 		PlatonBlock.Block block = new PlatonBlock.Block();
 		block.setNumber("0x123");
 		block.setParentHash("0x40dcaa2aabfd7de17a9dd21094db7190c3d16af3ac164bc5462dfff73c764cf2");
-		block.setMiner("0x7cc27a18b7e33871acf4cd82e879c3ab2462caa9");
+		block.setMiner("lax10np85x9huvu8rt85ekpws7wr4vjx9j4fty2f2l");
 		block.setExtraData("000000000000000000000000000000000000000000000000000000000000000000");
 		block.setStateRoot("0x40dcaa2aabfd7de17a9dd21094db7190c3d16af3ac164bc5462dfff73c764cf2");
 		block.setTransactionsRoot("0x40dcaa2aabfd7de17a9dd21094db7190c3d16af3ac164bc5462dfff73c764cf2");

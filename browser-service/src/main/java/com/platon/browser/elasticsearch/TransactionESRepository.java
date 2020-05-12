@@ -17,4 +17,8 @@ public class TransactionESRepository extends ESRepository {
     public String getIndexName() {
         return indexName;
     }
+    
+    public void setIndexName(String indexName) {
+		this.indexName = indexName;
+	}
 }

@@ -34,7 +34,7 @@ public class AppDocAddressControllerTest {
     
     @Test
     public void details() throws Exception{
-    	String requestBody = "{\"address\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\"}";
+    	String requestBody = "{\"address\":\"lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/address/details")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
@@ -45,7 +45,7 @@ public class AppDocAddressControllerTest {
 		QueryRPPlanDetailRequest req = new QueryRPPlanDetailRequest();
 		req.setPageNo(0);
 		req.setPageSize(10);
-		req.setAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+		req.setAddress("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e");
 		String requestBody = JSONObject.toJSONString(req);
     	mockMvc.perform(MockMvcRequestBuilders.post("/address/rpplanDetail")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
