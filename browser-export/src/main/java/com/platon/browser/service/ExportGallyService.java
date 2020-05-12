@@ -501,11 +501,16 @@ public class ExportGallyService extends ServiceBase {
 			rowHead[8] = "WasmPer";
 			csvRows.add(rowHead);
 			for(String nodeId:nodesMap.keySet()) {
+				log.info("export nodeId start:{}", nodeId);
 				nodeId = HexTool.prefix(nodeId);
 				BigInteger total = BigInteger.ZERO;
 				Object[] rowData = new Object[9];
 				Node node = nodeMapper.selectByPrimaryKey(nodeId);
-				rowData[0] = node.getNodeName();
+				if(node != null) {
+					rowData[0] = node.getNodeName();
+				} else {
+					rowData[0] = "";
+				}
 				rowData[1] = nodeId;
 				for(String address : nodesMap.get(nodeId)) {
 //					ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
@@ -546,7 +551,7 @@ public class ExportGallyService extends ServiceBase {
 				}
 				
 				csvRows.add(rowData);
-				log.info("export nodeId:{}", nodeId);
+				log.info("export nodeId end:{}", nodeId);
 			}
 			buildFile("exportContractData.csv", csvRows, null);
 			log.info("exportContractData数据导出成功,总行数：{}", csvRows.size());
