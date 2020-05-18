@@ -120,7 +120,7 @@ public class ParameterService {
         String staleValue = "";
         switch (paramEnum){
             // 质押相关
-            case STAKE_THRESHOLD:
+            case STAKE_THRESHOLD: 
                 staleValue = chainConfig.getStakeThreshold().toString();
                 break;
             case OPERATING_THRESHOLD:
@@ -156,6 +156,12 @@ public class ParameterService {
             // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
             case ZERO_PRODUCE_CUMULATIVE_TIME:
                 staleValue = chainConfig.getZeroProduceCumulativeTime().toString();
+                break;
+            case REWARD_PER_MAX_CHANGE_RANGE:
+                staleValue = chainConfig.getRewardPerMaxChangeRange().toString();
+                break;
+            case REWARD_PER_CHANGE_INTERVAL:
+                staleValue = chainConfig.getRewardPerChangeInterval().toString();
                 break;
             default:
                 break;
