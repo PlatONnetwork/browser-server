@@ -40,4 +40,14 @@ public class BlockEvent {
     public void setEpochMessage(EpochMessage epochMessage) {
         this.epochMessage = epochMessage;
     }
+
+
+    /**
+     * 释放对象引用
+     */
+    public void releaseRef(){
+        blockCF=null;
+        receiptCF=null;
+        epochMessage=null;
+    }
 }

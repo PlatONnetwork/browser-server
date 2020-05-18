@@ -48,4 +48,14 @@ public class ComplementEvent {
     public void setDelegationRewards(List<DelegationReward> delegationRewards) {
         this.delegationRewards = delegationRewards;
     }
+
+    /**
+     * 释放对象引用
+     */
+    public void releaseRef(){
+        block=null;
+        transactions=null;
+        nodeOpts=null;
+        delegationRewards=null;
+    }
 }

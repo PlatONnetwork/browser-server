@@ -108,6 +108,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             maxBlockNumber=event.getBlock().getNum();
+            // 释放对象引用
+            event.releaseRef();
         }catch (Exception e){
             log.error("",e);
             throw e;
