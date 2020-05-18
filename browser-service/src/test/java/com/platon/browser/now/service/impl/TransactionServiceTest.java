@@ -1,5 +1,6 @@
 package com.platon.browser.now.service.impl;
 
+import com.platon.browser.TestMockBase;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.NetworkStat;
@@ -10,22 +11,21 @@ import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.now.service.CommonService;
-import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.RedisCommands;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
+import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.transaction.TransactionListResp;
-import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,22 +48,16 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionServiceTest {
+public class TransactionServiceTest extends TestMockBase{
 
 	@Mock
-	private TransactionESRepository transactionESRepository;
-	@Mock
 	private DelegationRewardESRepository delegationRewardESRepository;
-	@Mock
-	private I18nUtil i18n;
 	@Mock
 	private StakingMapper stakingMapper;
 	@Mock
 	private SlashMapper slashMapper;
 	@Mock
 	private ProposalMapper proposalMapper;
-	@Mock
-	private StatisticCacheService statisticCacheService;
 	@Mock
 	private BlockChainConfig blockChainConfig;
 	@Mock
@@ -209,7 +203,7 @@ public class TransactionServiceTest {
 	}
 	
 	@Test
-	public void getTransactionList() {
+	public void testGetTransactionList() {
 		PageReq req = new PageReq();
 		TransactionCacheDto transactionCacheDto = new TransactionCacheDto();
 		RespPage<?> page = new RespPage<>();
@@ -221,6 +215,33 @@ public class TransactionServiceTest {
 		net.setTxQty(10);
 		when(statisticCacheService.getNetworkStatCache()).thenReturn(net);
 		RespPage<TransactionListResp> resp = target.getTransactionList(req);
+		assertNotNull(resp);
+	}
+	
+	@Test
+	public void testGetTransactionListByBlock() {
+		TransactionListByBlockRequest req = new TransactionListByBlockRequest();
+		req.setBlockNumber(10);
+		req.setTxType("transfer");
+		RespPage<TransactionListResp> resp = target.getTransactionListByBlock(req);
+		assertNotNull(resp);
+	}
+	
+	@Test
+	public void testGetTransactionListByAddress() {
+		TransactionListByAddressRequest req = new TransactionListByAddressRequest();
+		req.setAddress("lax");
+		req.setTxType("transfer");
+		RespPage<TransactionListResp> resp = target.getTransactionListByAddress(req);
+		assertNotNull(resp);
+	}
+	
+	@Test
+	public void testGetTransactionListByAddressDownload() {
+		TransactionListByAddressRequest req = new TransactionListByAddressRequest();
+		req.setAddress("lax");
+		req.setTxType("transfer");
+		AccountDownload resp = target.transactionListByAddressDownload("0x", new Date().getTime(), "en_US", "+8");
 		assertNotNull(resp);
 	}
 }

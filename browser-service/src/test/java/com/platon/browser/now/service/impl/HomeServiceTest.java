@@ -1,16 +1,13 @@
 package com.platon.browser.now.service.impl;
 
 
+import com.platon.browser.TestMockBase;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.CustomNodeMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.now.service.CommonService;
-import com.platon.browser.now.service.cache.StatisticCacheService;
+import com.platon.browser.req.home.QueryNavigationRequest;
+import com.platon.browser.res.home.BlockStatisticNewResp;
+import com.platon.browser.res.home.ChainStatisticNewResp;
+import com.platon.browser.res.home.QueryNavigationResp;
 import com.platon.browser.res.home.StakingListNewResp;
 import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
@@ -21,35 +18,22 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class HomeServiceTest {
-	@Mock
-	private BlockESRepository blockESRepository;
-	@Mock
-	private TransactionESRepository transactionESRepository;
-	@Mock
-	private StatisticCacheService statisticCacheService;
+public class HomeServiceTest extends TestMockBase {
 	@Mock
 	private I18nUtil i18n;
-	@Mock
-	private NodeMapper nodeMapper;
-	@Mock
-	private AddressMapper addressMapper;
 	@Mock
 	private BlockChainConfig blockChainConfig;
 	@Mock
 	private CommonService commonService;
-	@Mock
-	private CustomNodeMapper customNodeMapper;
     @Spy
     private HomeServiceImpl target;
 
@@ -77,26 +61,49 @@ public class HomeServiceTest {
 
 	@Test
 	public void stakingListNew() {
-		NetworkStat net = new NetworkStat();
-		net.setTxQty(10);
-		net.setStakingDelegationValue(BigDecimal.TEN);
-		net.setStakingValue(BigDecimal.ONE);
-		net.setSettleStakingReward(BigDecimal.TEN);
-		net.setCurNumber(1000000l);
-		when(statisticCacheService.getNetworkStatCache()).thenReturn(net);
-		List<Node> nodes = new ArrayList<Node>();
-		Node node = new Node();
-		node.setIsInit(1);
-		node.setStakingHes(BigDecimal.TEN);
-		node.setStakingLocked(BigDecimal.TEN);
-		node.setStakingReduction(BigDecimal.TEN);
-		node.setStatDelegateValue(BigDecimal.TEN);
-		nodes.add(node);
-		node.setAnnualizedRate(10.0);
-		node.setIsInit(0);
-		nodes.add(node);
-		when(nodeMapper.selectByExample(any())).thenReturn(nodes);
 		StakingListNewResp list = target.stakingListNew();
 		assertNotNull(list);
+	}
+	
+	@Test
+	public void testQueryNavigation() throws IOException {
+		QueryNavigationRequest req = new QueryNavigationRequest();
+		req.setParameter("3");
+		QueryNavigationResp list = target.queryNavigation(req);
+		try {
+			req.setParameter("a");
+			list = target.queryNavigation(req);
+		} catch (Exception e) {
+			
+		}
+		
+		req.setParameter("0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3");
+		list = target.queryNavigation(req);
+		
+		req.setParameter("53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3");
+		list = target.queryNavigation(req);
+		
+		req.setParameter("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e");
+		list = target.queryNavigation(req);
+		
+		req.setParameter("0x9bf480e19c921c93cfc30e2e1d5d67b02b65b89f1f68a675e782ec46478fe228");
+		list = target.queryNavigation(req);
+		
+		when(transactionESRepository.get(any(),any())).thenReturn(null);
+		req.setParameter("0x9bf480e19c921c93cfc30e2e1d5d67b02b65b89f1f68a675e782ec46478fe228");
+		list = target.queryNavigation(req);
+		assertNotNull(list);
+	}
+	
+	@Test
+	public void testChainStatisticNew() throws IOException {
+		ChainStatisticNewResp chainStatisticNewResp = target.chainStatisticNew();
+		assertNotNull(chainStatisticNewResp);
+	}
+	
+	@Test
+	public void testBlockStatisticNew() throws IOException {
+		BlockStatisticNewResp blockStatisticNewResp = target.blockStatisticNew();
+		assertNotNull(blockStatisticNewResp);
 	}
 }

@@ -8,14 +8,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doReturn;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,16 +23,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.Request;
-import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.PlatonCall;
 import org.web3j.protocol.core.methods.response.PlatonGetBalance;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.exceptions.ContractCallException;
-import org.web3j.utils.JSONUtil;
-import org.web3j.utils.Numeric;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.TestBase;
@@ -51,22 +42,16 @@ import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.now.service.AddressService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
-import com.platon.browser.redis.RedisCommands;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 import com.platon.browser.util.I18nUtil;
 import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
 import com.platon.sdk.contracts.ppos.RewardContract;
-import com.platon.sdk.contracts.ppos.BaseContract.CallRet;
-import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
 import com.platon.sdk.contracts.ppos.dto.resp.Reward;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)

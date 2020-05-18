@@ -142,6 +142,8 @@ public class HomeServiceImpl implements HomeService {
 					}
 					queryNavigationStructResp.setAddress(keyword);
 				}
+			}
+			if(keyword.startsWith("0x")) {
 				if (keyword.length() == 130) {
 					/* 判断为节点Id */
 					Node node = nodeMapper.selectByPrimaryKey(keyword);

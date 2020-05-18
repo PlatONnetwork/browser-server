@@ -9,6 +9,8 @@ import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
 import com.platon.browser.req.newblock.BlockDetailsReq;
+import com.platon.browser.req.newblock.BlockDownload;
+import com.platon.browser.req.newblock.BlockListByNodeIdReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
@@ -125,5 +127,63 @@ public class BlockServiceTest {
 		req.setDirection("prev");
 		target.blockDetailNavigate(req);
 		assertNotNull(blockDetailResp);
+	}
+	
+	@Test
+	public void blockListByNodeId() throws IOException {
+		BlockListByNodeIdReq req = new BlockListByNodeIdReq();
+		req.setNodeId("0x");
+		ESResult<Object> blockEs = new ESResult<>();
+		List<Block> blocks = new ArrayList<>();
+		Block block = new Block();
+		block.setNum(10l);
+		block.setReward("10");
+		block.setTime(new Date());
+		blocks.add(block);
+		
+		Block block1 = new Block();
+		block1.setNum(110l);
+		block1.setReward("10");
+		block1.setTime(new Date());
+		blocks.add(block1);
+        List<Object> blockList = new ArrayList<>();
+        blockList.add(block);
+        blockList.add(block1);
+        blockEs.setRsData(blockList);
+        blockEs.setTotal(2l);
+        when(blockESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
+		RespPage<BlockListResp> pages = target.blockListByNodeId(req);
+		
+		assertNotNull(pages);
+	}
+	
+	@Test
+	public void blockListByNodeIdDownload() throws IOException {
+		ESResult<Object> blockEs = new ESResult<>();
+		List<Block> blocks = new ArrayList<>();
+		Block block = new Block();
+		block.setNum(10l);
+		block.setReward("10");
+		block.setTime(new Date());
+		block.setTxFee("10");
+		blocks.add(block);
+		
+		Block block1 = new Block();
+		block1.setNum(110l);
+		block1.setReward("10");
+		block1.setTime(new Date());
+		block1.setTxFee("10");
+		blocks.add(block1);
+        List<Object> blockList = new ArrayList<>();
+        blockList.add(block);
+        blockList.add(block1);
+        blockEs.setRsData(blockList);
+        blockEs.setTotal(2l);
+        when(blockESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
+        
+        when(i18n.i(any(), any(), any())).thenReturn("test");
+        BlockDownload blpBlockDownload = target.blockListByNodeIdDownload("0x", new Date().getTime(), "en_US", "+8");
+		
+		assertNotNull(blpBlockDownload);
 	}
 }

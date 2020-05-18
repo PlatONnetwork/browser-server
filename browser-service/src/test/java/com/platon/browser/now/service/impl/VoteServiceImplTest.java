@@ -2,7 +2,6 @@ package com.platon.browser.now.service.impl;
 
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.now.service.VoteService;
 import com.platon.browser.req.proposal.VoteListRequest;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.VoteListResp;

@@ -2,24 +2,28 @@ package com.platon.browser.now.service.impl;
 
 
 import com.github.pagehelper.Page;
+import com.platon.browser.TestMockBase;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.DelegationAddress;
+import com.platon.browser.dto.DelegationStaking;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.now.service.cache.StatisticCacheService;
+import com.platon.browser.req.staking.AliveStakingListReq;
+import com.platon.browser.req.staking.DelegationListByAddressReq;
+import com.platon.browser.req.staking.DelegationListByStakingReq;
 import com.platon.browser.req.staking.HistoryStakingListReq;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.res.RespPage;
+import com.platon.browser.res.staking.DelegationListByAddressResp;
+import com.platon.browser.res.staking.DelegationListByStakingResp;
 import com.platon.browser.res.staking.StakingStatisticNewResp;
-import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,23 +45,15 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakingServiceTest {
-    @Mock
-    private StatisticCacheService statisticCacheService;
+public class StakingServiceTest extends TestMockBase{
     @Mock
     private CustomStakingMapper customStakingMapper;
     @Mock
     private CustomDelegationMapper customDelegationMapper;
     @Mock
-    private NodeMapper nodeMapper;
-    @Mock
     private CustomNodeMapper customNodeMapper;
     @Mock
     private NodeOptESRepository nodeOptESRepository;
-    @Mock
-    private I18nUtil i18n;
-    @Mock
-    private BlockChainConfig blockChainConfig;
     @Mock
     private PlatOnClient platonClient;
     @Spy
@@ -75,20 +71,25 @@ public class StakingServiceTest {
         ReflectionTestUtils.setField(target,"platonClient",platonClient);
         ReflectionTestUtils.setField(target,"customNodeMapper",customNodeMapper);
 
-        when(blockChainConfig.getMinProposalTextSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalTextParticipationRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalUpgradePassRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getParamProposalSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getParamProposalVoteRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalCancelSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalCancelParticipationRate()).thenReturn(BigDecimal.ONE);
     }
 
     @Test
-    public void test() throws IOException {
+    public void testDetails() throws IOException {
         HistoryStakingListReq req = new HistoryStakingListReq();
         req.setKey("test");
-        Page<Node> stakings = new Page();
+
+        Page<Node> nodeListPage = new Page<>();
+        nodeListPage.addAll(nodeList);
+        when(customNodeMapper.selectListByExample(any())).thenReturn(nodeListPage);
+        target.historyStakingList(req);
+        AliveStakingListReq aliveStakingListReq = new AliveStakingListReq(); 
+        aliveStakingListReq.setQueryStatus("all");
+        target.aliveStakingList(aliveStakingListReq);
+
+
+        StakingDetailsReq stakingDetailsReq = new StakingDetailsReq();
+        stakingDetailsReq.setNodeId("0xdssfsf");
+        
         Node staking = new Node();
         staking.setNodeName("test");
         staking.setNodeIcon("icon");
@@ -104,16 +105,6 @@ public class StakingServiceTest {
         staking.setPreTotalDeleReward(BigDecimal.ONE);
         staking.setHaveDeleReward(BigDecimal.TEN);
         staking.setRewardPer(333);
-        stakings.add(staking);
-
-        Page<Node> nodeList = new Page<>();
-        nodeList.addAll(stakings);
-        when(customNodeMapper.selectListByExample(any())).thenReturn(nodeList);
-        target.historyStakingList(req);
-
-
-        StakingDetailsReq stakingDetailsReq = new StakingDetailsReq();
-        stakingDetailsReq.setNodeId("0xdssfsf");
         staking.setIsInit(1);
         staking.setStakingLocked(BigDecimal.ONE);
         staking.setStatDelegateValue(BigDecimal.ONE);
@@ -162,15 +153,39 @@ public class StakingServiceTest {
     }
     
     @Test
-	public void stakingStatisticNew() {
-    	NetworkStat net = new NetworkStat();
-		net.setTxQty(10);
-		net.setStakingDelegationValue(BigDecimal.TEN);
-		net.setStakingValue(BigDecimal.ONE);
-		net.setSettleStakingReward(BigDecimal.TEN);
-		when(statisticCacheService.getNetworkStatCache()).thenReturn(net);
+	public void testStakingStatisticNew() {
 		when(customStakingMapper.selectCountByActive()).thenReturn(10);
 		StakingStatisticNewResp resp = target.stakingStatisticNew();
 		assertNotNull(resp);
 	}
+    
+    @Test
+	public void testDelegationListByStaking() {
+    	DelegationListByStakingReq req = new DelegationListByStakingReq();
+    	Page<DelegationStaking> delegationStakingPage = new Page<DelegationStaking>();
+    	List<DelegationStaking> delegationStakings = new ArrayList<DelegationStaking>();
+    	DelegationStaking delegationStaking = new DelegationStaking();
+    	delegationStaking.setDelegateHes(BigDecimal.TEN);
+    	delegationStaking.setDelegateLocked(BigDecimal.TEN);
+    	delegationStakings.add(delegationStaking);
+    	delegationStakingPage.add(delegationStaking);
+    	when(customDelegationMapper.selectStakingByNodeId(any())).thenReturn(delegationStakingPage);
+    	RespPage<DelegationListByStakingResp> resp = target.delegationListByStaking(req);
+    	assertNotNull(resp);
+    }
+    
+    @Test
+	public void testDelegationListByAddress() {
+    	DelegationListByAddressReq req = new DelegationListByAddressReq();
+    	Page<DelegationAddress> delegationAddressPage = new Page<DelegationAddress>();
+    	List<DelegationAddress> delegationAddresses = new ArrayList<DelegationAddress>();
+    	DelegationAddress delegationAddress = new DelegationAddress();
+    	delegationAddress.setDelegateHes(BigDecimal.TEN);
+    	delegationAddress.setDelegateLocked(BigDecimal.TEN);
+    	delegationAddresses.add(delegationAddress);
+    	delegationAddressPage.add(delegationAddress);
+    	when(customDelegationMapper.selectAddressByAddr(any())).thenReturn(delegationAddressPage);
+    	RespPage<DelegationListByAddressResp> resp = target.delegationListByAddress(req);
+    	assertNotNull(resp);
+    }
 }
