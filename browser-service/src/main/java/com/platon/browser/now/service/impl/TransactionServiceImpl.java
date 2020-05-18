@@ -8,7 +8,6 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.account.AccountDownload;
@@ -91,8 +90,6 @@ public class TransactionServiceImpl implements TransactionService {
     private I18nUtil i18n;
     @Autowired
     private StakingMapper stakingMapper;
-    @Autowired
-    private SlashMapper slashMapper;
     @Autowired
     private ProposalMapper proposalMapper;
     @Autowired
@@ -461,17 +458,6 @@ public class TransactionServiceImpl implements TransactionService {
 							} else {
 								resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
 							}
-//							/*
-//							 * 提案交易所在块高%共识周期块数,交易所在第几个共识轮
-//							 */
-//				            BigDecimal[] belongToConList = new BigDecimal(resp.getBlockNumber())
-//				            		.divideAndRemainder(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
-//				            BigDecimal belongToCon = belongToConList[0];
-//				            /**
-//				             * 预计退出区块数=（math.ceil（现有区块/结算周期区块数） + 锁定周期数） +* 结算周期区块数
-//				             */
-//							BigDecimal blockNum = (belongToCon.add(new BigDecimal(1)).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
-//									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
 							resp.setRedeemUnLockedBlock(exitValidatorParam.getWithdrawBlockNum().toString());
 						}
 						break;

@@ -1,17 +1,13 @@
 package com.platon.browser.now.service.impl;
 
 
-import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.TestMockBase;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
-import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +17,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,17 +26,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalServiceTest {
-    @Mock
-    private I18nUtil i18n;
+public class ProposalServiceTest extends TestMockBase{
     @Mock
     private ProposalMapper proposalMapper;
-    @Mock
-    private StatisticCacheService statisticCacheService;
-    @Mock
-    private BlockChainConfig blockChainConfig;
-    @Mock
-    private BlockESRepository blockESRepository;
     @Spy
     private ProposalServiceImpl target;
     
@@ -52,13 +39,6 @@ public class ProposalServiceTest {
         ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
         ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
-        when(blockChainConfig.getMinProposalTextSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalTextParticipationRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalUpgradePassRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getParamProposalSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getParamProposalVoteRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalCancelSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalCancelParticipationRate()).thenReturn(BigDecimal.ONE);
     }
     
     @Test
@@ -82,14 +62,7 @@ public class ProposalServiceTest {
         proposal.setNewValue("1000000000000000000");
         proposal.setType(CustomProposal.TypeEnum.UPGRADE.getCode());
         when(proposalMapper.selectByPrimaryKey(any())).thenReturn(proposal);
-        NetworkStat networkStat = new NetworkStat();
-        networkStat.setCurNumber(33L);
-        networkStat.setAvgPackTime(33L);
-        when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStat);
 
-        Block block = new Block();
-        block.setTime(new Date());
-        when(blockESRepository.get(any(),any())).thenReturn(block);
         proposal.setType(CustomProposal.TypeEnum.TEXT.getCode());
         target.get(req);
 

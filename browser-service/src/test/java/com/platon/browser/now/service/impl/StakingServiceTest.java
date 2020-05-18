@@ -124,8 +124,8 @@ public class StakingServiceTest extends TestMockBase{
         stakingOptRecordListReq.setPageNo(2);
         stakingOptRecordListReq.setPageSize(3);
         stakingOptRecordListReq.setPager(new Page<>());
-        ESResult items = new ESResult<>();
-        List<NodeOpt> opts = new ArrayList<>();
+        ESResult<Object> items = new ESResult<>();
+        List<Object> opts = new ArrayList<>();
         NodeOpt nodeOpt = new NodeOpt();
         opts.add(nodeOpt);
         items.setRsData(opts);

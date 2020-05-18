@@ -33,7 +33,7 @@ public class DateUtil {
 
 	private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private static String localLANG;
+	private static String LOCAL_LANG;
 	
 	/**
 	 * 获取年的第一天
@@ -75,19 +75,15 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String getGMT(Date dateCST) {
-		Locale locale = Locale.forLanguageTag(localLANG);
+		Locale locale = Locale.forLanguageTag(LOCAL_LANG);
 		DateFormat df = new SimpleDateFormat(DATE_PATTERN, locale);
 		df.setTimeZone(TimeZone.getTimeZone("GMT")); // modify Time Zone.
 		return (df.format(dateCST));
 	}
 
-	public String getLocalLANG() {
-		return localLANG;
-	}
-
 	@Value("${localLANG:en}")
 	public void setLocalLANG(String localLANG) {
-		DateUtil.localLANG = localLANG;
+		LOCAL_LANG = localLANG;
 	}
 	
 	/**

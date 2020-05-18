@@ -2,25 +2,19 @@ package com.platon.browser.now.service.impl;
 
 
 import com.platon.browser.TestMockBase;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.now.service.CommonService;
 import com.platon.browser.req.home.QueryNavigationRequest;
 import com.platon.browser.res.home.BlockStatisticNewResp;
 import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.QueryNavigationResp;
 import com.platon.browser.res.home.StakingListNewResp;
-import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -28,14 +22,10 @@ import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class HomeServiceTest extends TestMockBase {
-	@Mock
-	private I18nUtil i18n;
-	@Mock
-	private BlockChainConfig blockChainConfig;
-	@Mock
-	private CommonService commonService;
     @Spy
     private HomeServiceImpl target;
+    @Spy
+    private CommonServiceImpl service;
 
     @Before
 	public void setup() {
@@ -48,15 +38,9 @@ public class HomeServiceTest extends TestMockBase {
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
         ReflectionTestUtils.setField(target,"commonService",commonService);
         ReflectionTestUtils.setField(target,"customNodeMapper",customNodeMapper);
+        
+        ReflectionTestUtils.setField(service,"customNodeMapper",customNodeMapper);
 
-        when(blockChainConfig.getMinProposalTextSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalTextParticipationRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalUpgradePassRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getParamProposalSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getParamProposalVoteRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalCancelSupportRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getMinProposalCancelParticipationRate()).thenReturn(BigDecimal.ONE);
-        when(blockChainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.ONE);
     }
 
 	@Test
@@ -105,5 +89,12 @@ public class HomeServiceTest extends TestMockBase {
 	public void testBlockStatisticNew() throws IOException {
 		BlockStatisticNewResp blockStatisticNewResp = target.blockStatisticNew();
 		assertNotNull(blockStatisticNewResp);
+	}
+	
+	@Test
+	public void testCommonService() throws IOException {
+		service.getNodeName("0x", "test");
+		when(customNodeMapper.findNameById("0x")).thenReturn("test");
+		service.getNodeName("0x", "");
 	}
 }

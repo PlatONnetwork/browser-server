@@ -1,7 +1,6 @@
 package com.platon.browser.now.service.impl;
 
 import com.platon.browser.TestMockBase;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
@@ -17,7 +16,6 @@ import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.now.service.CommonService;
 import com.platon.browser.redis.RedisCommands;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
@@ -36,7 +34,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,10 +56,6 @@ public class TransactionServiceTest extends TestMockBase{
 	@Mock
 	private ProposalMapper proposalMapper;
 	@Mock
-	private BlockChainConfig blockChainConfig;
-	@Mock
-	private CommonService commonService;
-	@Mock
 	private RedisFactory redisFactory;
 
 	@Spy
@@ -74,7 +67,6 @@ public class TransactionServiceTest extends TestMockBase{
 		ReflectionTestUtils.setField(target,"delegationRewardESRepository",delegationRewardESRepository);
 		ReflectionTestUtils.setField(target,"i18n",i18n);
 		ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
-		ReflectionTestUtils.setField(target,"slashMapper",slashMapper);
 		ReflectionTestUtils.setField(target,"proposalMapper",proposalMapper);
 		ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
 		ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
@@ -90,8 +82,6 @@ public class TransactionServiceTest extends TestMockBase{
 	public void test() throws IOException {
 		TransactionDetailsReq req = new TransactionDetailsReq();
 		req.setTxHash("0xddd");
-		//doThrow(new IOException()).when(transactionESRepository).get(any(),any());
-		//target.transactionDetails(req);
 		Transaction transaction = new Transaction();
 		transaction.setCost("999");
 		transaction.setNum(33L);
@@ -114,6 +104,10 @@ public class TransactionServiceTest extends TestMockBase{
 		first.setTotal(33L);
 		when(transactionESRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(first);
 
+		transaction.setType(Transaction.TypeEnum.STAKE_CREATE.getCode());
+		transaction.setInfo("{\"benefitAddress\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"details\":\"Node of CDM\",\"externalId\":\"5FD68B690010632B\",\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"cdm-004\",\"programVersion\":2048,\"website\":\"WWW.CCC.COM\",\"DelegateRewardPer\":3}");
+		target.transactionDetails(req);
+		
 		transaction.setType(Transaction.TypeEnum.STAKE_MODIFY.getCode());
 		transaction.setInfo("{\"benefitAddress\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"details\":\"Node of CDM\",\"externalId\":\"5FD68B690010632B\",\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"cdm-004\",\"website\":\"WWW.CCC.COM\",\"DelegateRewardPer\":3}");
 		target.transactionDetails(req);
@@ -128,8 +122,6 @@ public class TransactionServiceTest extends TestMockBase{
 		staking.setStakingReduction(BigDecimal.ONE);
 		staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
 		when(stakingMapper.selectByPrimaryKey(any())).thenReturn(staking);
-		when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.ONE);
-		when(blockChainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(BigInteger.ONE);
 		target.transactionDetails(req);
 		staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
 		target.transactionDetails(req);
@@ -169,7 +161,29 @@ public class TransactionServiceTest extends TestMockBase{
 		transaction.setType(Transaction.TypeEnum.RESTRICTING_CREATE.getCode());
 		transaction.setInfo("{\"account\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"plans\":[{\"amount\":5000000000000000000,\"epoch\":1},{\"amount\":600000000000000000,\"epoch\":2}]}");
 		target.transactionDetails(req);
+		
+		transaction.setType(Transaction.TypeEnum.DELEGATE_CREATE.getCode());
+		transaction.setInfo("{\"nodeId\":\"0x\",\"amount\":5000,\"nodeName\":\"test\"}");
+		target.transactionDetails(req);
 
+		transaction.setType(Transaction.TypeEnum.DELEGATE_EXIT.getCode());
+		transaction.setInfo("{\"nodeId\":\"0x\",\"amount\":5000,\"nodeName\":\"test\",\"reward\":200}");
+		target.transactionDetails(req);
+		
+		transaction.setType(Transaction.TypeEnum.PROPOSAL_PARAMETER.getCode());
+		transaction.setInfo("{\"verifier\":\"0x\",\"txHash\":\"0x1\",\"nodeName\":\"test\"}");
+		target.transactionDetails(req);
+		
+		transaction.setType(Transaction.TypeEnum.CLAIM_REWARDS.getCode());
+		transaction.setInfo("{\"rewardList\":[{\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"zrj-node1\",\"reward\":234884281013318097782607,\"stakingNum\":21319}]}");
+		target.transactionDetails(req);
+		
+		transaction.setType(Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
+		target.transactionDetails(req);
+		
+		transaction.setType(Transaction.TypeEnum.CONTRACT_EXEC.getCode());
+		target.transactionDetails(req);
+		
 		assertTrue(true);
 	}
 

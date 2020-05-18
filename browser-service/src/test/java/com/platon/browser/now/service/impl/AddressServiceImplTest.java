@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doReturn;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -20,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;
@@ -28,25 +26,17 @@ import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.PlatonGetBalance;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.TestBase;
+import com.platon.browser.TestMockBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.RpPlan;
-import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.now.service.AddressService;
-import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
-import com.platon.browser.util.I18nUtil;
 import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
 import com.platon.sdk.contracts.ppos.RewardContract;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
@@ -55,10 +45,7 @@ import com.platon.sdk.contracts.ppos.dto.resp.Reward;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AddressServiceImplTest extends TestBase {
-
-	@Mock
-    private AddressMapper addressMapper;
+public class AddressServiceImplTest extends TestMockBase {
 
 	@Mock
     private RpPlanMapper rpPlanMapper;
@@ -70,26 +57,12 @@ public class AddressServiceImplTest extends TestBase {
     private PlatOnClient platonClient;
 
 	@Mock
-    private I18nUtil i18n;
-
-	@Mock
-    private BlockChainConfig blockChainConfig;
-    
-	@Mock
-	private BlockESRepository blockESRepository;
-    
-	@Mock
     private SpecialApi specialApi;
     
-	@Mock
-    private StatisticCacheService statisticCacheService;
-	
 	@Spy
     private AddressServiceImpl targe;
 	
-	@Autowired
-	private AddressService addressService;
-	
+	@SuppressWarnings("unchecked")
 	@Before
     public void setup() throws Exception {
         ReflectionTestUtils.setField(targe, "addressMapper", addressMapper);
@@ -111,12 +84,12 @@ public class AddressServiceImplTest extends TestBase {
 		baseResponse.setCode(0);
 		baseResponse.setData(restrictingItem);
 		
-//		RemoteCall<CallResponse<RestrictingItem>> remoteCall = new RemoteCall<>(() -> executeCallObjectValueReturn());
 		RemoteCall<CallResponse<RestrictingItem>> remoteCall =mock(RemoteCall.class);
 		when(restrictingPlanContract.getRestrictingInfo(anyString())).thenReturn(remoteCall);
 		when(remoteCall.send()).thenReturn(baseResponse);
     }
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void getDetails() throws Exception {
 		QueryDetailRequest req = new QueryDetailRequest();
@@ -166,7 +139,7 @@ public class AddressServiceImplTest extends TestBase {
 		reward.setReward("0x0");
 		when(platonClient.getRewardContract().getDelegateReward(any(),any()).send().getData()).thenReturn(rewards);
 		
-		Page<RpPlan> rpPlans = new Page();
+		Page<RpPlan> rpPlans = new Page<RpPlan>();
 		RpPlan rpPlan = new RpPlan();
 		rpPlans.add(rpPlan);
 		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlans);
@@ -186,14 +159,7 @@ public class AddressServiceImplTest extends TestBase {
 		rpPlan.setNumber(10l);
 		rpPlansPage.add(rpPlan);
 		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlansPage);
-		when(blockChainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
-		Block block = new Block();
-		block.setTime(new Date());
-		when(blockESRepository.get(any(),any())).thenReturn(block);
-		
-		NetworkStat networkStat = new NetworkStat();
-		networkStat.setAvgPackTime(1l);
-		when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStat);
+		when(customRpPlanMapper.selectSumByAddress(any())).thenReturn(BigDecimal.TEN);
 		assertNotNull(targe.rpplanDetail(req));
 	}
 	

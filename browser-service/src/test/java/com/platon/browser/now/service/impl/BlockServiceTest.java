@@ -1,11 +1,8 @@
 package com.platon.browser.now.service.impl;
 
-import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.TestMockBase;
 import com.platon.browser.dto.elasticsearch.ESResult;
-import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.now.service.CommonService;
-import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
 import com.platon.browser.req.newblock.BlockDetailsReq;
@@ -14,11 +11,9 @@ import com.platon.browser.req.newblock.BlockListByNodeIdReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
-import com.platon.browser.util.I18nUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -35,19 +30,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockServiceTest {
-
-	@Mock
-	private StatisticCacheService statisticCacheService;
-
-	@Mock
-	private BlockESRepository blockESRepository;
-
-	@Mock
-	private I18nUtil i18n;
-	
-	@Mock
-	private CommonService commonService;
+public class BlockServiceTest extends TestMockBase{
 
 	@Spy
     private BlockServiceImpl target;
@@ -58,23 +41,12 @@ public class BlockServiceTest {
 		ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
 		ReflectionTestUtils.setField(target,"commonService",commonService);
 		ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
-		when(commonService.getNodeName(any(),any())).thenReturn("test-name");
-		NetworkStat net = new NetworkStat();
-		net.setCurNumber(10l);
-		when(statisticCacheService.getNetworkStatCache()).thenReturn(net);
-		Block block = new Block();
-		block.setReward("10");
-		block.setTime(new Date());
-		block.setNum(10l);
-		when(blockESRepository.get(any(),any())).thenReturn(block);
 	}
 
 	@Test
 	public void blockDetails() throws IOException {
-		
-		
 		BlockDetailsReq req = new BlockDetailsReq();
-		req.setNumber(10);
+		req.setNumber(440);
 		BlockDetailResp blockDetailResp = target.blockDetails(req);
 		
 		req.setNumber(0);

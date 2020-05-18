@@ -22,6 +22,8 @@
 "minProposalCancelParticipationRate": "0.5",
 "minProposalCancelSupportRate": "0.667",
 "minProposalUpgradePassRate": "0.667",
+"paramProposalSupportRate":"0.667",
+"paramProposalVoteRate":"0.5",
 "proposalTextConsensusRounds": "4",
 "versionProposalActiveConsensusRounds": "4",
 "blockRewardRate": "0.50",
