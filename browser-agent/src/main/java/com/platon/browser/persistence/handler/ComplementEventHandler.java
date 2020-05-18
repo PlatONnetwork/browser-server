@@ -25,6 +25,8 @@ public class ComplementEventHandler implements IComplementEventHandler {
         try {
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),event.getTransactions(),event.getNodeOpts(),event.getDelegationRewards());
+            // 释放对象引用
+            event.releaseRef();
         }catch (Exception e){
             log.error("",e);
             throw e;
