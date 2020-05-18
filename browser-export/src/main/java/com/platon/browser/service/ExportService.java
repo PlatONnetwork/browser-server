@@ -67,7 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service
+//@Service
 public class ExportService {
 	@Getter
 	@Setter

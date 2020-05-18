@@ -125,7 +125,8 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                 });
                 customNOptBakMapper.batchInsertOrUpdateSelective(baks,NOptBak.Column.values());
             }
-
+            // 释放对象引用
+            event.releaseRef();
         }catch (Exception e){
             log.error("",e);
             throw e;

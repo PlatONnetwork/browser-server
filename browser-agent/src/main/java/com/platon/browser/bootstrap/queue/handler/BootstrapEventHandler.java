@@ -115,6 +115,9 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
 
             clear();
             event.getCallback().call(block.getNum());
+
+            // 释放事件对对象的引用
+            event.releaseRef();
         }catch (Exception e){
             log.error("",e);
             throw e;

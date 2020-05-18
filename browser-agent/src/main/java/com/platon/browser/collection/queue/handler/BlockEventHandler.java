@@ -45,6 +45,9 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             block.setReward(event.getEpochMessage().getBlockReward().toString());
 
             collectionEventPublisher.publish(block,block.getTransactions(),event.getEpochMessage());
+
+            // 释放对象引用
+            event.releaseRef();
         }catch (Exception e){
             log.error("",e);
             throw e;
