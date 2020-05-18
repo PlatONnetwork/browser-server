@@ -5,7 +5,6 @@ import com.platon.browser.common.queue.complement.handler.IComplementEventHandle
 import com.platon.browser.persistence.queue.publisher.PersistenceEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * 区块事件处理器
@@ -25,6 +24,8 @@ public class ComplementEventHandler implements IComplementEventHandler {
         try {
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),event.getTransactions(),event.getNodeOpts(),event.getDelegationRewards());
+            // 释放对象引用
+            event.releaseRef();
         }catch (Exception e){
             log.error("",e);
             throw e;
