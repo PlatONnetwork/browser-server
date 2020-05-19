@@ -7,7 +7,7 @@ CREATE DATABASE IF NOT EXISTS `platon_agent`;
 DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address` (
   `address` varchar(42) NOT NULL COMMENT '地址',
-  `type` int(2) NOT NULL COMMENT '地址类型\r\n1:账号\r\n2:合约\r\n3:内置合约',
+  `type` int(2) NOT NULL COMMENT '地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约',
   `balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
   `restricting_balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
   `staking_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '质押的金额(von)',
@@ -39,7 +39,7 @@ CREATE TABLE `address` (
 -- ----------------------------
 DROP TABLE IF EXISTS `config`;
 CREATE TABLE `config` (
-  `id` int(11) NOT NULL ,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `module` varchar(64) NOT NULL COMMENT '参数模块名',
   `name` varchar(128) NOT NULL COMMENT '参数名',
   `init_value` varchar(255) NOT NULL COMMENT '系统初始值',
@@ -50,7 +50,7 @@ CREATE TABLE `config` (
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for delegation
@@ -64,7 +64,7 @@ CREATE TABLE `delegation` (
   `delegate_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已锁定委托金额(von)',
   `delegate_released` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '待提取的金额(von)',
   `is_history` int(2) NOT NULL DEFAULT '2' COMMENT '是否为历史:\r\n1是,\r\n2否',
-  `sequence` bigint(20) NOT NULL COMMENT 'blockNum*100000+tx_index',
+  `sequence` bigint(20) NOT NULL COMMENT '首次委托时的序号：blockNum*100000+tx_index',
   `cur_delegation_block_num` bigint(20) NOT NULL COMMENT '最新委托交易块号',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -113,7 +113,7 @@ CREATE TABLE `n_opt_bak` (
   KEY `node_id` (`node_id`) USING BTREE,
   KEY `tx_hash` (`tx_hash`) USING BTREE,
   KEY `block_number` (`b_num`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for network_stat
@@ -130,11 +130,12 @@ CREATE TABLE `network_stat` (
   `max_tps` int(11) NOT NULL DEFAULT '0' COMMENT '最大交易TPS',
   `issue_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前发行量(von)',
   `turn_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前流通量(von)',
+  `available_staking` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '可用总质押量(von)',
   `staking_delegation_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '实时质押委托总数(von)',
   `staking_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '实时质押总数(von)',
   `doing_proposal_qty` int(11) NOT NULL DEFAULT '0' COMMENT '进行中提案总数',
   `proposal_qty` int(11) NOT NULL DEFAULT '0' COMMENT '提案总数',
-  `address_qty` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '地址数',
+  `address_qty` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '地址数',
   `block_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前出块奖励(von)',
   `staking_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前质押奖励(von)',
   `settle_staking_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前结算周期总质押奖励',
@@ -146,7 +147,7 @@ CREATE TABLE `network_stat` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `avg_pack_time` bigint(20) NOT NULL DEFAULT '0' COMMENT '平均区块打包时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for node
@@ -195,13 +196,15 @@ CREATE TABLE `node` (
   `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `reward_per` int(10) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
+  `reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
   `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '所有质押已领取委托奖励',
   `pre_dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
   `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
   `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前质押总的委托奖励',
   `pre_total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '所有历史质押记录总的委托奖励累计字段(在质押退出时会把total_dele_reward累加到此字段)',
-  `exception_status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因异常被惩罚。(例如在连续两个周期当选验证人，但在第一个周期出块率低)',
+  `exception_status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因低出块被惩罚(例如在连续两个周期当选验证人，但在第一个周期出块率低),5因双签被惩罚',
+  `un_stake_freeze_duration` int(11) NOT NULL COMMENT '解质押理论上锁定的结算周期数',
+  `un_stake_end_block` bigint(20) DEFAULT NULL COMMENT '解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者',
   PRIMARY KEY (`node_id`),
   KEY `node_id` (`node_id`) USING BTREE,
   KEY `status` (`status`),
@@ -293,7 +296,7 @@ CREATE TABLE `staking` (
   `staking_hes` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '犹豫期的质押金(von)',
   `staking_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁定期的质押金(von)',
   `staking_reduction` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '退回中的质押金(von)',
-  `staking_reduction_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '结算周期标识',
+  `staking_reduction_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '撤销质押时的结算周期轮数',
   `node_name` varchar(64) NOT NULL DEFAULT '' COMMENT '节点名称(质押节点名称)',
   `node_icon` varchar(255) DEFAULT '' COMMENT '节点头像(关联external_id，第三方软件获取)',
   `external_id` varchar(255) NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
@@ -323,12 +326,14 @@ CREATE TABLE `staking` (
   `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `reward_per` int(10) NOT NULL COMMENT '委托奖励比例',
+  `reward_per` int(11) NOT NULL COMMENT '委托奖励比例',
   `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点当前质押已领取委托奖励',
   `pre_dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
   `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
   `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点当前质押总的委托奖励',
-  `exception_status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因异常被惩罚。(例如在连续两个周期当选验证人，但在第一个周期出块率低)',
+  `exception_status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因低出块被惩罚(例如在连续两个周期当选验证人，但在第一个周期出块率低),5因双签被惩罚',
+  `un_stake_freeze_duration` int(11) NOT NULL COMMENT '解质押理论上锁定的结算周期数',
+  `un_stake_end_block` bigint(20) DEFAULT NULL COMMENT '解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者',
   PRIMARY KEY (`node_id`,`staking_block_num`),
   KEY `staking_addr` (`staking_addr`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -374,7 +379,7 @@ CREATE TABLE `staking_history` (
   `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `reward_per` int(10) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
+  `reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
   `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已领取委托奖励(初始值等于前一条历史质押记录的【已领取委托奖励】)',
   `pre_dele_annualized_rate` double(16,2) DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
   `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
@@ -395,7 +400,7 @@ CREATE TABLE `tx_bak` (
   PRIMARY KEY (`id`),
   KEY `block_number` (`num`) USING BTREE,
   KEY `id` (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for vote

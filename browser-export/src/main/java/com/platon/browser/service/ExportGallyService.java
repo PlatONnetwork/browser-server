@@ -37,6 +37,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Data
@@ -200,7 +201,7 @@ public class ExportGallyService extends ServiceBase {
 			"nodeId"
 		});
 		// 读取文件内容
-		List<String> lines = readLines(filepath);
+		Set<String> lines = readLines(filepath);
 		int i = 0;
 		for(String address: lines) {
 			Object[] rowData = new Object[4];
@@ -242,7 +243,7 @@ public class ExportGallyService extends ServiceBase {
 	
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void transfer() {
-		 List<String> lines = readLines(filepath);
+		Set<String> lines = readLines(filepath);
 		
 		int i = 0;
 		try {
@@ -282,7 +283,7 @@ public class ExportGallyService extends ServiceBase {
 	
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportMatchNode() {
-		List<String> list = readLines(filepath);
+		Set<String> list = readLines(filepath);
 		List<Object[]> csvRows = new ArrayList<>();
 		try {
 			Object[] rowHead = new Object[6];
@@ -371,7 +372,7 @@ public class ExportGallyService extends ServiceBase {
 					"illegal tx info"
 			});
 			// 读取文件内容
-			List<String> lines = readLines(filepath);
+			Set<String> lines = readLines(filepath);
 			class Counter{
 				int illegalTxCount = 0;
 				StringBuilder sb = new StringBuilder();
