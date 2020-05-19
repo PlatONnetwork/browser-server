@@ -27,7 +27,7 @@ public class SuicideAndSelfdestructTest extends BaseContractTest {
     public void selfKill() {
         try {
 
-            SuicideAndSelfdestruct suicideAndSelfdestruct = SuicideAndSelfdestruct.deploy(web3j, transactionManager, gasProvider).send();
+            SuicideAndSelfdestruct suicideAndSelfdestruct = SuicideAndSelfdestruct.deploy(web3j, transactionManager, gasProvider,chainId).send();
 
             String contractAddress = suicideAndSelfdestruct.getContractAddress();
             TransactionReceipt tx = suicideAndSelfdestruct.getTransactionReceipt().get();

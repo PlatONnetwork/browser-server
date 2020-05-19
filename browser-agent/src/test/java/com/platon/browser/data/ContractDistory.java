@@ -32,32 +32,32 @@ public class ContractDistory extends WasmContract {
 
     public static final String FUNC_GET_STRING = "get_string";
 
-    protected ContractDistory(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
+    protected ContractDistory(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider,chainId);
     }
 
-    protected ContractDistory(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
+    protected ContractDistory(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider,chainId);
     }
 
-    public static RemoteCall<ContractDistory> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+    public static RemoteCall<ContractDistory> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList());
-        return deployRemoteCall(ContractDistory.class, web3j, credentials, contractGasProvider, encodedConstructor);
+        return deployRemoteCall(ContractDistory.class, web3j, credentials, contractGasProvider, encodedConstructor,chainId);
     }
 
-    public static RemoteCall<ContractDistory> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+    public static RemoteCall<ContractDistory> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList());
-        return deployRemoteCall(ContractDistory.class, web3j, transactionManager, contractGasProvider, encodedConstructor);
+        return deployRemoteCall(ContractDistory.class, web3j, transactionManager, contractGasProvider, encodedConstructor,chainId);
     }
 
-    public static RemoteCall<ContractDistory> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, BigInteger initialVonValue) {
+    public static RemoteCall<ContractDistory> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, BigInteger initialVonValue,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList());
-        return deployRemoteCall(ContractDistory.class, web3j, credentials, contractGasProvider, encodedConstructor, initialVonValue);
+        return deployRemoteCall(ContractDistory.class, web3j, credentials, contractGasProvider, encodedConstructor, initialVonValue,chainId);
     }
 
-    public static RemoteCall<ContractDistory> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, BigInteger initialVonValue) {
+    public static RemoteCall<ContractDistory> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, BigInteger initialVonValue,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList());
-        return deployRemoteCall(ContractDistory.class, web3j, transactionManager, contractGasProvider, encodedConstructor, initialVonValue);
+        return deployRemoteCall(ContractDistory.class, web3j, transactionManager, contractGasProvider, encodedConstructor, initialVonValue,chainId);
     }
 
     public RemoteCall<TransactionReceipt> distory_contract() {
@@ -85,11 +85,11 @@ public class ContractDistory extends WasmContract {
         return executeRemoteCall(function, String.class);
     }
 
-    public static ContractDistory load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
-        return new ContractDistory(contractAddress, web3j, credentials, contractGasProvider);
+    public static ContractDistory load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
+        return new ContractDistory(contractAddress, web3j, credentials, contractGasProvider,chainId);
     }
 
-    public static ContractDistory load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
-        return new ContractDistory(contractAddress, web3j, transactionManager, contractGasProvider);
+    public static ContractDistory load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
+        return new ContractDistory(contractAddress, web3j, transactionManager, contractGasProvider,chainId);
     }
 }

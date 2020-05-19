@@ -36,12 +36,12 @@ public class PressureContract extends WasmContract {
 
     public static final String FUNC_GETVALUE = "getValue";
 
-    protected PressureContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
+    protected PressureContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider,chainId);
     }
 
-    protected PressureContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
+    protected PressureContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider,chainId);
     }
 
     public RemoteCall<TransactionReceipt> setBeginAndEndBlock(Uint64 BeginBlock, Uint64 EndBlock) {
@@ -54,24 +54,24 @@ public class PressureContract extends WasmContract {
         return executeRemoteCallTransaction(function, vonValue);
     }
 
-    public static RemoteCall<PressureContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Uint64 BeginBlock, Uint64 EndBlock) {
+    public static RemoteCall<PressureContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Uint64 BeginBlock, Uint64 EndBlock,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList(BeginBlock,EndBlock));
-        return deployRemoteCall(PressureContract.class, web3j, credentials, contractGasProvider, encodedConstructor);
+        return deployRemoteCall(PressureContract.class, web3j, credentials, contractGasProvider, encodedConstructor,chainId);
     }
 
-    public static RemoteCall<PressureContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Uint64 BeginBlock, Uint64 EndBlock) {
+    public static RemoteCall<PressureContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Uint64 BeginBlock, Uint64 EndBlock,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList(BeginBlock,EndBlock));
-        return deployRemoteCall(PressureContract.class, web3j, transactionManager, contractGasProvider, encodedConstructor);
+        return deployRemoteCall(PressureContract.class, web3j, transactionManager, contractGasProvider, encodedConstructor,chainId);
     }
 
-    public static RemoteCall<PressureContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, BigInteger initialVonValue, Uint64 BeginBlock, Uint64 EndBlock) {
+    public static RemoteCall<PressureContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, BigInteger initialVonValue, Uint64 BeginBlock, Uint64 EndBlock,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList(BeginBlock,EndBlock));
-        return deployRemoteCall(PressureContract.class, web3j, credentials, contractGasProvider, encodedConstructor, initialVonValue);
+        return deployRemoteCall(PressureContract.class, web3j, credentials, contractGasProvider, encodedConstructor, initialVonValue,chainId);
     }
 
-    public static RemoteCall<PressureContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, BigInteger initialVonValue, Uint64 BeginBlock, Uint64 EndBlock) {
+    public static RemoteCall<PressureContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, BigInteger initialVonValue, Uint64 BeginBlock, Uint64 EndBlock,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList(BeginBlock,EndBlock));
-        return deployRemoteCall(PressureContract.class, web3j, transactionManager, contractGasProvider, encodedConstructor, initialVonValue);
+        return deployRemoteCall(PressureContract.class, web3j, transactionManager, contractGasProvider, encodedConstructor, initialVonValue,chainId);
     }
 
     public RemoteCall<TransactionReceipt> record(String nodeID) {
@@ -99,11 +99,11 @@ public class PressureContract extends WasmContract {
         return executeRemoteCall(function, BigInteger.class);
     }
 
-    public static PressureContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
-        return new PressureContract(contractAddress, web3j, credentials, contractGasProvider);
+    public static PressureContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
+        return new PressureContract(contractAddress, web3j, credentials, contractGasProvider,chainId);
     }
 
-    public static PressureContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
-        return new PressureContract(contractAddress, web3j, transactionManager, contractGasProvider);
+    public static PressureContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
+        return new PressureContract(contractAddress, web3j, transactionManager, contractGasProvider,chainId);
     }
 }
