@@ -167,7 +167,7 @@ public class ParameterService {
                 staleValue = chainConfig.getRewardPerChangeInterval().toString();
                 break;
             case INCREASE_ISSUANCE_RATIO:
-                staleValue = chainConfig.getAddIssueRate().multiply(new BigDecimal(10000)).toPlainString();
+                staleValue = chainConfig.getAddIssueRate().multiply(new BigDecimal(10000)).setScale(0).toPlainString();
                 break;
             default:
                 break;
