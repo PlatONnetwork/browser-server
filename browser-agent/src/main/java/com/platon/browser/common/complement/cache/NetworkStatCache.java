@@ -77,7 +77,6 @@ public class NetworkStatCache {
 		if(configChange.getYearStartNum()!=null) networkStat.setAddIssueBegin(configChange.getYearStartNum().longValue());
 		if(configChange.getYearEndNum()!=null) networkStat.setAddIssueEnd(configChange.getYearEndNum().longValue());
 		if(configChange.getSettleStakeReward()!=null) networkStat.setSettleStakingReward(configChange.getSettleStakeReward());
-		if(configChange.getBlockReward()!=null) networkStat.setBlockReward(configChange.getBlockReward());
 		if(configChange.getStakeReward()!=null) networkStat.setStakingReward(configChange.getStakeReward());
 		if(configChange.getAvgPackTime()!=null) networkStat.setAvgPackTime(configChange.getAvgPackTime().longValue());
 		if(StringUtils.isNotBlank(configChange.getIssueRates())) networkStat.setIssueRates(configChange.getIssueRates());

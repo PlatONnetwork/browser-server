@@ -109,6 +109,7 @@ public class InitializationServiceTest extends AgentTestBase {
         when(chainConfig.getDefaultStakingList()).thenReturn(stakingList);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(100000000));
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
+        when(chainConfig.getAddIssueRate()).thenReturn(BigDecimal.TEN);
         when(proposalMapper.selectByExample(any())).thenReturn(new ArrayList<>(proposalList));
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
         List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();

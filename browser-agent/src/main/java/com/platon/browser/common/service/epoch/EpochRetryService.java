@@ -246,7 +246,7 @@ public class EpochRetryService {
             	/**
                  * 当年份不一样时候需要更新network比例
                  */
-                if(chainConfig.getIssueEpochRound().compareTo(configChange.getIssueEpoch()) != 0) {
+                if(chainConfig.getIssueEpochRound() != null && chainConfig.getIssueEpochRound().compareTo(configChange.getIssueEpoch()) != 0) {
                 	NetworkStat networkStat = networkStatCache.getNetworkStat();
                 	summary.setIssueRates(networkStat.getIssueRates()+ BrowserConst.HTTP_SPILT + chainConfig.getAddIssueRate().toPlainString());
                 }
