@@ -137,10 +137,10 @@ public class ParameterService {
                 break;
             // 惩罚相关
             case SLASH_FRACTION_DUPLICATE_SIGN:
-                staleValue = chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).toString();
+                staleValue = chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).setScale(0).toString();
                 break;
             case DUPLICATE_SIGN_REPORT_REWARD:
-                staleValue = chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).toString();
+                staleValue = chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).setScale(0).toString();
                 break;
             case MAX_EVIDENCE_AGE:
                 staleValue = chainConfig.getEvidenceValidEpoch().toString();

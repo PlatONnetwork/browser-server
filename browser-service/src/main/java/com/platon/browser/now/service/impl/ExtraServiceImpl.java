@@ -37,6 +37,8 @@ public class ExtraServiceImpl implements ExtraService {
 	private static String slashingValue = "slashing";
 	
 	private static String blockValue = "block";
+	
+	private static String rewardValue = "reward";
 
 	@Override
 	public QueryConfigResp queryConfig() {
@@ -58,9 +60,15 @@ public class ExtraServiceImpl implements ExtraService {
 		 */
 		ModuleConfig blockModuleConfig = new ModuleConfig();
 		blockModuleConfig.setModule(blockValue);
+		/**
+		 * 设置收益比例模块的配置
+		 */
+		ModuleConfig rewardModuleConfig = new ModuleConfig();
+		rewardModuleConfig.setModule(rewardValue);
 		List<ConfigDetail> stakingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> slashingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> blockConfigDetails = new ArrayList<>();
+		List<ConfigDetail> rewardConfigDetails = new ArrayList<>();
 		String maxEvidenceAge = "";
 		String unStakeFreezeDuration = "";
 		String zeroProduceCumulativeTime = "";
@@ -114,6 +122,9 @@ public class ExtraServiceImpl implements ExtraService {
 				break;
 			case "block":
 				blockConfigDetails.add(configDetail);
+				break;
+			case "reward":
+				rewardConfigDetails.add(configDetail);
 				break;
 			default:
 				break;
@@ -170,9 +181,11 @@ public class ExtraServiceImpl implements ExtraService {
 		stakingModuleConfig.setDetail(stakingConfigDetails);
 		slashingModuleConfig.setDetail(slashingConfigDetails);
 		blockModuleConfig.setDetail(blockConfigDetails);
+		rewardModuleConfig.setDetail(rewardConfigDetails);
 		moduleConfigs.add(stakingModuleConfig);
 		moduleConfigs.add(slashingModuleConfig);
 		moduleConfigs.add(blockModuleConfig);
+		moduleConfigs.add(rewardModuleConfig);
 		queryConfigResp.setConfig(moduleConfigs);
 		return queryConfigResp;
 	}
