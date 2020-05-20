@@ -18,7 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
-import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
 
@@ -43,18 +42,18 @@ public class StakeMiscServiceTest {
 
     @Test
     public void test() throws Exception {
-    	
-    	
-//    	assertEquals(target.getUnStakeFreeDuration(), new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName()));
+    	try {
+    		target.getUnStakeFreeDuration();
+		} catch (Exception e) {
+		}
     	when(parameterService.getValueInBlockChainConfig(any())).thenReturn("1");
     	target.getUnStakeFreeDuration();
-    	
     	when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.ONE);
     	List<Proposal> proposals = new ArrayList<Proposal>();
     	Proposal proposal = new Proposal();
     	proposal.setEndVotingBlock(1000000000l);
+    	proposals.add(proposal);
     	when(customProposalMapper.selectVotingProposal(any())).thenReturn(proposals);
-    	
     	target.getUnStakeEndBlock("0x1", BigInteger.TEN, true);
     	
     }

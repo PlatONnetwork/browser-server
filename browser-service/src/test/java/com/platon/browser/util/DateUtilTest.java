@@ -26,7 +26,7 @@ public class DateUtilTest {
 	@Test
 	public void testGetYearFirstDate() {
 		Date date = new Date();
-		Date firstDate = DateUtil.getYearFirstDate(date);
+		DateUtil.getYearFirstDate(date);
 		assertTrue(true);
 	}
 
@@ -49,7 +49,7 @@ public class DateUtilTest {
 	}
 
 	@Test
-	public void testTimeZoneTransfer(){
+	public void testTimeZoneTransfer() throws ParseException{
 		Date date = new Date(1568083846564L);
 		String dataStr = DateUtil.timeZoneTransfer(date, "0", "+8");
 		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
@@ -57,6 +57,11 @@ public class DateUtilTest {
 		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
 		dataStr = DateUtil.timeZoneTransferUTC(date, "EEE MMM dd yyyy HH:mm:ss");
 		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
+	}
+	
+	@Test
+	public void testConverTime(){
+		DateUtil.covertTime(new Date());
 	}
 	
 }

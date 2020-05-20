@@ -5,8 +5,10 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.bean.DelegateExitResult;
 import com.platon.browser.complement.converter.delegate.DelegateCreateConverter;
 import com.platon.browser.complement.converter.delegate.DelegateExitConverter;
+import com.platon.browser.complement.converter.delegate.DelegateRewardClaimConverter;
 import com.platon.browser.complement.converter.proposal.*;
 import com.platon.browser.complement.converter.restricting.RestrictingCreateConverter;
 import com.platon.browser.complement.converter.slash.ReportConverter;
@@ -14,7 +16,8 @@ import com.platon.browser.complement.converter.stake.StakeCreateConverter;
 import com.platon.browser.complement.converter.stake.StakeExitConverter;
 import com.platon.browser.complement.converter.stake.StakeIncreaseConverter;
 import com.platon.browser.complement.converter.stake.StakeModifyConverter;
-import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +64,11 @@ public class TransactionParameterServiceTest extends AgentTestBase {
     @Mock
     private VersionDeclareConverter proposalVersionConverter;
     @Mock
+    private ProposalParameterConverter proposalParameterConverter;
+    @Mock
     private RestrictingCreateConverter restrictingCreateConverter;
+    @Mock
+    private DelegateRewardClaimConverter delegateRewardClaimConverter;
     @Mock
     private NetworkStatCache networkStatCache;
     @Mock
@@ -84,15 +91,15 @@ public class TransactionParameterServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "proposalCancelConverter", proposalCancelConverter);
         ReflectionTestUtils.setField(target, "proposalVoteConverter", proposalVoteConverter);
         ReflectionTestUtils.setField(target, "proposalVersionConverter", proposalVersionConverter);
+        ReflectionTestUtils.setField(target, "proposalParameterConverter", proposalParameterConverter);
+        ReflectionTestUtils.setField(target, "delegateRewardClaimConverter", delegateRewardClaimConverter);
         ReflectionTestUtils.setField(target, "restrictingCreateConverter", restrictingCreateConverter);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "addressCache", addressCache);
     }
 
     @Test(expected = Exception.class)
-    public void test() throws Exception {
-        Block block = blockList.get(0);
-        EpochMessage epochMessage=EpochMessage.newInstance();
+    public void test() {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
@@ -101,6 +108,12 @@ public class TransactionParameterServiceTest extends AgentTestBase {
 
         tx.setStatus(Transaction.StatusEnum.SUCCESS.getCode());
         tx.setType(Transaction.TypeEnum.TRANSFER.getCode());
+        DelegateExitResult der = DelegateExitResult.builder().build();
+        when(delegateExitConverter.convert(any(),any())).thenReturn(der);
+        NodeOpt nodeOpt = new NodeOpt();
+        when(proposalParameterConverter.convert(any(),any())).thenReturn(nodeOpt);
+        DelegationReward delegationReward = new DelegationReward();
+        when(delegateRewardClaimConverter.convert(any(),any())).thenReturn(delegationReward);
         target.getParameters(event);
         tx.setType(Transaction.TypeEnum.STAKE_CREATE.getCode());
         target.getParameters(event);

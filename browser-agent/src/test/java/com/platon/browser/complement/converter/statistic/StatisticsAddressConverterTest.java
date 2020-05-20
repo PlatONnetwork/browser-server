@@ -43,7 +43,7 @@ public class StatisticsAddressConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"statisticBusinessMapper",statisticBusinessMapper);
         ReflectionTestUtils.setField(target,"addressMapper",addressMapper);
         when(addressCache.getAll()).thenReturn(new ArrayList <>(addressList));
-        when(addressMapper.selectByExample(any())).thenReturn(new ArrayList <>(addressList));
+        when(addressMapper.selectByExampleWithBLOBs(any())).thenReturn(new ArrayList <>(addressList));
 
     }
 

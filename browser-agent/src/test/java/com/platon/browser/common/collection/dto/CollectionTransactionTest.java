@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.rlp.RlpEncoder;
@@ -26,7 +25,6 @@ import org.web3j.rlp.RlpString;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -82,7 +80,7 @@ public class CollectionTransactionTest extends AgentTestBase {
 			// TODO: handle exception
 		}
         
-        transaction.setTo("0x1000000000000000000000000000000000000002");
+        transaction.setTo("lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxlcypcy");
         transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,client,addressCache);
         
         transaction.setType(TypeEnum.REPORT.getCode());
@@ -118,7 +116,7 @@ public class CollectionTransactionTest extends AgentTestBase {
 		}
         
         
-        transaction.setTo("0x1000000000000000000000000000000000000002");
+        transaction.setTo("lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxlcypcy");
         transaction.setType(TypeEnum.PROPOSAL_TEXT.getCode());
         transaction.setInput("0xf84c838207d0b842b840ff40ac420279ddbe58e1bf1cfe19f4b5978f86e7c483223be26e80ac9790e855cb5d7bd743d94b9bd72be79f01ee068bc1fefe79c06ba9cd49fa96f52c7bdce083827334");
         transaction.updateWithBlockAndReceipt(collectionBlock,receipt1,client,addressCache);

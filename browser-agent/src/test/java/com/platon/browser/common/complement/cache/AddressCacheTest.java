@@ -35,8 +35,18 @@ public class AddressCacheTest extends AgentTestBase {
         tx.setType(Transaction.TypeEnum.VERSION_DECLARE.getCode());
         addressCache.update(tx);
 
-        tx.setFrom("0xddd");
-        tx.setTo("0xddd");
+        tx.setFrom("0x1");
+        tx.setTo("0x1");
+        addressCache.update(tx);
+        
+        tx.setFrom("lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7");
+        tx.setTo("lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7");
+        addressCache.update(tx);
+        
+        tx.setType(Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode());
+        addressCache.update(tx);
+        
+        tx.setType(Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
         addressCache.update(tx);
 
         assertTrue(true);

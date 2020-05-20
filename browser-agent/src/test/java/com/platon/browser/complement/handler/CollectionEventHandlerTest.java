@@ -10,6 +10,8 @@ import com.platon.browser.complement.service.BlockParameterService;
 import com.platon.browser.complement.service.StatisticParameterService;
 import com.platon.browser.complement.service.TransactionParameterService;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.CustomNOptBakMapper;
+import com.platon.browser.dao.mapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import org.junit.Before;
@@ -46,6 +48,10 @@ public class CollectionEventHandlerTest extends AgentTestBase {
     private NOptBakMapper nOptBakMapper;
     @Mock
     private TxBakMapper txBakMapper;
+    @Mock
+    private CustomTxBakMapper customTxBakMapper;
+    @Mock
+    private CustomNOptBakMapper customNOptBakMapper;
 
     @Spy
     private CollectionEventHandler target;
@@ -59,9 +65,10 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "statisticParameterService", statisticParameterService);
         ReflectionTestUtils.setField(target, "complementEventPublisher", complementEventPublisher);
         ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         ReflectionTestUtils.setField(target, "nOptBakMapper", nOptBakMapper);
         ReflectionTestUtils.setField(target, "txBakMapper", txBakMapper);
+        ReflectionTestUtils.setField(target, "customTxBakMapper", customTxBakMapper);
+        ReflectionTestUtils.setField(target, "customNOptBakMapper", customNOptBakMapper);
         NetworkStat networkStat = mock(NetworkStat.class);
         when(networkStatCache.getNetworkStat()).thenReturn(networkStat);
         when(networkStat.getTxQty()).thenReturn(1000);
@@ -75,16 +82,20 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         when(nOptBakMapper.deleteByExample(any())).thenReturn(100);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void test() throws Exception {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
         event.setTransactions(new ArrayList <>(transactionList));
+        when(customTxBakMapper.batchInsertOrUpdateSelective(any(),any())).thenReturn(100);
         target.onEvent(event,33,false);
         verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
 
         doThrow(new RuntimeException("")).when(blockParameterService).getParameters(any());
-        target.onEvent(event,33,false);
+        try {
+        	target.onEvent(event,33,false);
+		} catch (Exception e) {
+		}
     }
 }

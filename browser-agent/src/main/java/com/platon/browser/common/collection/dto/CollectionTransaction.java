@@ -18,7 +18,6 @@ import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonGetCode;
 import org.web3j.rlp.RlpDecoder;
@@ -33,7 +32,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 public class CollectionTransaction extends Transaction {

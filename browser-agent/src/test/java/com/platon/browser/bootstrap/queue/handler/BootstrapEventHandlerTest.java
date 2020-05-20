@@ -76,9 +76,6 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
         sc.setEndBlockNum(7000L);
         bootstrapEvent.setCallback(sc);
 
-        when(txBakMapper.selectByExample(any())).thenReturn(Collections.emptyList());
-        target.onEvent(bootstrapEvent,1,false);
-
         List<TxBak> txBaks = new ArrayList<>();
         TxBak bak = new TxBak();
         bak.setHash(receiptCF.get().getResult().get(0).getTransactionHash());
@@ -88,7 +85,7 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
         txBaks.add(bak);
         when(txBakMapper.selectByExample(any())).thenReturn(txBaks);
         target.onEvent(bootstrapEvent,1,false);
-        verify(target, times(2)).onEvent(any(),anyLong(),anyBoolean());
+
     }
 
     /**

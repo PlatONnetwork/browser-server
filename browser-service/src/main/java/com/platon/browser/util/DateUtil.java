@@ -31,8 +31,6 @@ public class DateUtil {
 	
 	private static final String DATE_PATTERN = "EEE MMM dd yyyy HH:mm:ss";
 
-	private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
 	private static String LOCAL_LANG;
 	
 	/**
@@ -54,18 +52,6 @@ public class DateUtil {
 			logger.error("日期错误:",e);
 		}
 		return firstDate;
-	}
-
-	/**
-	 * 转换成CST
-	 * @method getCST
-	 * @param strGMT
-	 * @return
-	 * @throws ParseException
-	 */
-	public static Date getCST(String strGMT) throws ParseException { 
-		DateFormat df = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
-		return df.parse(strGMT); 
 	}
 
 	/**
@@ -131,6 +117,7 @@ public class DateUtil {
     
 
 	public static Date covertTime(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp now = new Timestamp(date.getTime());
 		String str = df.format(now);
 		Date newDate = null;
