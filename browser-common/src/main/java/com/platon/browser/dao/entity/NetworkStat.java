@@ -52,6 +52,8 @@ public class NetworkStat {
 
     private Long nodeOptSeq;
 
+    private String issueRates;
+
     private Date createTime;
 
     private Date updateTime;
@@ -242,6 +244,14 @@ public class NetworkStat {
         this.nodeOptSeq = nodeOptSeq;
     }
 
+    public String getIssueRates() {
+        return issueRates;
+    }
+
+    public void setIssueRates(String issueRates) {
+        this.issueRates = issueRates == null ? null : issueRates.trim();
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -297,6 +307,7 @@ public class NetworkStat {
         addIssueEnd("add_issue_end", "addIssueEnd", "BIGINT", false),
         nextSettle("next_settle", "nextSettle", "BIGINT", false),
         nodeOptSeq("node_opt_seq", "nodeOptSeq", "BIGINT", false),
+        issueRates("issue_rates", "issueRates", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false);

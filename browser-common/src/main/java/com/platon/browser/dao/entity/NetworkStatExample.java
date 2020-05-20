@@ -1516,6 +1516,76 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
+        public Criteria andIssueRatesIsNull() {
+            addCriterion("issue_rates is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesIsNotNull() {
+            addCriterion("issue_rates is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesEqualTo(String value) {
+            addCriterion("issue_rates =", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesNotEqualTo(String value) {
+            addCriterion("issue_rates <>", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesGreaterThan(String value) {
+            addCriterion("issue_rates >", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesGreaterThanOrEqualTo(String value) {
+            addCriterion("issue_rates >=", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesLessThan(String value) {
+            addCriterion("issue_rates <", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesLessThanOrEqualTo(String value) {
+            addCriterion("issue_rates <=", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesLike(String value) {
+            addCriterion("issue_rates like", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesNotLike(String value) {
+            addCriterion("issue_rates not like", value, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesIn(List<String> values) {
+            addCriterion("issue_rates in", values, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesNotIn(List<String> values) {
+            addCriterion("issue_rates not in", values, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesBetween(String value1, String value2) {
+            addCriterion("issue_rates between", value1, value2, "issueRates");
+            return (Criteria) this;
+        }
+
+        public Criteria andIssueRatesNotBetween(String value1, String value2) {
+            addCriterion("issue_rates not between", value1, value2, "issueRates");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
