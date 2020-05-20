@@ -1,5 +1,6 @@
 package com.platon.browser.common.utils;
 
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class CalculateUtils {
 		return settlePeriodBlockCount.multiply(curSettingEpoch).subtract(curBlockNumber).longValue();
 	}
 
-	public static BigDecimal calculationIssueValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
+	public static BigDecimal calculationIssueValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance,String issueRates){
 		Map <Integer, BigDecimal> subsidiesMap = chainConfig.getFoundationSubsidies();
 		int curIssueEpoch=issueEpoch.intValue();
 		int subsidiesSize=subsidiesMap.size();
@@ -61,10 +62,11 @@ public class CalculateUtils {
 		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
 		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
 		//获取增发比例
-		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
-
 		//年份增发量 = (1+增发比例)的增发年份次方
-		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+		BigDecimal circulationByYear = BigDecimal.ONE;
+		for(String rate: issueRates.split(BrowserConst.HTTP_SPILT)) {
+			circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
+		}
 		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
 		// 发行量
 		return initIssueAmount
@@ -73,16 +75,17 @@ public class CalculateUtils {
 				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.LAT):BigDecimal.ZERO);
 	}
 	
-	public static BigDecimal calculationAvailableValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
-		int curIssueEpoch=issueEpoch.intValue();
+	public static BigDecimal calculationAvailableValue(String issueRates, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
 		//获取初始发行金额
 		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
 		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
-		//获取增发比例
-		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
 
+		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
-		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+		BigDecimal circulationByYear = BigDecimal.ONE;
+		for(String rate: issueRates.split(BrowserConst.HTTP_SPILT)) {
+			circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
+		}
 		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
 		// 发行量
 		return initIssueAmount
@@ -90,16 +93,16 @@ public class CalculateUtils {
 				.subtract(incentivePoolAccountBalance);
 	}
 
-	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, BigInteger issueEpoch,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance,BigDecimal rewardBalance){
-		//当前块高所属结算周期
-    	int curIssueEpoch=issueEpoch.intValue();
+	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, String issueRates,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance,BigDecimal rewardBalance){
     	//获取初始发行金额
 		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
 		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
 		//获取增发比例
-		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
 		//年份增发量 = (1+增发比例)的增发年份次方
-		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+		BigDecimal circulationByYear = BigDecimal.ONE;
+		for(String rate: issueRates.split(BrowserConst.HTTP_SPILT)) {
+			circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
+		}
 		//计算流通量 = 初始发行量 * 年份增发量 - 锁仓余额  - 质押余额 - 实时激励池余额 - 委托账户合约余额
     	return initIssueAmount.multiply(circulationByYear).subtract(restrictBalance)
 				.subtract(stakingBalance)

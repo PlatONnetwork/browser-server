@@ -11,6 +11,7 @@ public class ConfigChange {
     private BigDecimal remainEpoch; // 当前增发周期剩下的结算周期数
     private BigDecimal avgPackTime; // 平均出块时间
     private BigDecimal stakeReward; // 当前结算周期内每个验证人的质押奖励
+    private String issueRates; // 当前增发比例
 
     public BigDecimal getBlockReward() {
         return blockReward;
@@ -75,4 +76,12 @@ public class ConfigChange {
     public void setStakeReward(BigDecimal stakeReward) {
         this.stakeReward = stakeReward;
     }
+
+	public String getIssueRates() {
+		return issueRates;
+	}
+
+	public void setIssueRates(String issueRates) {
+		this.issueRates = issueRates;
+	}
 }

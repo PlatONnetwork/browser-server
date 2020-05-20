@@ -20,7 +20,8 @@ public enum ModifiableGovernParamEnum {
 	ZERO_PRODUCE_NUMBER_THRESHOLD("slashing", "zeroProduceNumberThreshold"),//零出块次数阈值，在指定时间范围内达到该次数则处罚
 	ZERO_PRODUCE_CUMULATIVE_TIME("slashing", "zeroProduceCumulativeTime"),//上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
 	REWARD_PER_MAX_CHANGE_RANGE("staking", "rewardPerMaxChangeRange"),
-	REWARD_PER_CHANGE_INTERVAL("staking", "rewardPerChangeInterval")
+	REWARD_PER_CHANGE_INTERVAL("staking", "rewardPerChangeInterval"),
+	INCREASE_ISSUANCE_RATIO("reward", "increaseIssuanceRatio")
 	;
 
 	private String module;

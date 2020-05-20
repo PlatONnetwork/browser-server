@@ -3,9 +3,11 @@ package com.platon.browser.common.service.epoch;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
@@ -241,6 +243,13 @@ public class EpochRetryService {
             ConfigChange configChange = epochChanges.poll();
 
             if(configChange.getIssueEpoch()!=null){
+            	/**
+                 * 当年份不一样时候需要更新network比例
+                 */
+                if(chainConfig.getIssueEpochRound().compareTo(configChange.getIssueEpoch()) != 0) {
+                	NetworkStat networkStat = networkStatCache.getNetworkStat();
+                	summary.setIssueRates(networkStat.getIssueRates()+ BrowserConst.HTTP_SPILT + chainConfig.getAddIssueRate().toPlainString());
+                }
                 // 更新增发周期轮数
                 chainConfig.setIssueEpochRound(configChange.getIssueEpoch());
                 summary.setIssueEpoch(configChange.getIssueEpoch());

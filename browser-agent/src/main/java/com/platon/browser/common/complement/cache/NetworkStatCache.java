@@ -4,6 +4,8 @@ import com.platon.browser.common.service.epoch.ConfigChange;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.Data;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,6 +80,7 @@ public class NetworkStatCache {
 		if(configChange.getBlockReward()!=null) networkStat.setBlockReward(configChange.getBlockReward());
 		if(configChange.getStakeReward()!=null) networkStat.setStakingReward(configChange.getStakeReward());
 		if(configChange.getAvgPackTime()!=null) networkStat.setAvgPackTime(configChange.getAvgPackTime().longValue());
+		if(StringUtils.isNotBlank(configChange.getIssueRates())) networkStat.setIssueRates(configChange.getIssueRates());
 	}
 
     public void init(NetworkStat networkStat) {

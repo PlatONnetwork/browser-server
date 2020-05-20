@@ -6,6 +6,7 @@ import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomNode;
@@ -47,7 +48,8 @@ public class NetworkStatUpdateTask {
     }
 	protected void start (){
 		try {
-			Long curNumber = networkStatCache.getNetworkStat().getCurNumber();
+			NetworkStat networkStat = networkStatCache.getNetworkStat();
+			Long curNumber = networkStat.getCurNumber();
 			//config中获取增发年份
 			BigDecimal issueEpochRound = chainConfig.getIssueEpochRound();
 			//获取激励池余额
@@ -59,11 +61,11 @@ public class NetworkStatUpdateTask {
 			//获取锁仓余额
 			BigDecimal rewardBalance = accountService.getRewardBalance(BigInteger.valueOf(curNumber));
 			//计算发行量
-			BigDecimal issueValue = CalculateUtils.calculationIssueValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance);
+			BigDecimal issueValue = CalculateUtils.calculationIssueValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance,networkStat.getIssueRates());
 			//计算流通量
-			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,new BigInteger(issueEpochRound.toString()),inciteBalance,stakingBalance,restrictBalance,rewardBalance);
+			BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig,networkStat.getIssueRates(),inciteBalance,stakingBalance,restrictBalance,rewardBalance);
 			//计算可使用质押量
-			BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(new BigInteger(issueEpochRound.toString()),chainConfig,inciteBalance);
+			BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat.getIssueRates(),chainConfig,inciteBalance);
 			//获得节点相关的网络统计
 			NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
 			BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();

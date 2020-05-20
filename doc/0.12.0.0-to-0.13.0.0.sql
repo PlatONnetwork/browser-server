@@ -1,0 +1,1 @@
+ALTER TABLE `network_stat` ADD COLUMN `issue_rates` varchar(1024)   NULL COMMENT '增发比例' after `node_opt_seq`;

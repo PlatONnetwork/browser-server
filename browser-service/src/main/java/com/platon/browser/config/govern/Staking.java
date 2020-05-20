@@ -15,6 +15,8 @@ public class Staking {
     private BigDecimal operatingThreshold;
     private BigDecimal maxValidators;
     private BigDecimal unStakeFreezeDuration;
+    private Integer rewardPerMaxChangeRange;
+    private Integer rewardPerChangeInterval;
 	public BigDecimal getStakeThreshold() {
 		return stakeThreshold;
 	}
@@ -38,6 +40,18 @@ public class Staking {
 	}
 	public void setUnStakeFreezeDuration(BigDecimal unStakeFreezeDuration) {
 		this.unStakeFreezeDuration = unStakeFreezeDuration;
+	}
+	public Integer getRewardPerMaxChangeRange() {
+		return rewardPerMaxChangeRange;
+	}
+	public void setRewardPerMaxChangeRange(Integer rewardPerMaxChangeRange) {
+		this.rewardPerMaxChangeRange = rewardPerMaxChangeRange;
+	}
+	public Integer getRewardPerChangeInterval() {
+		return rewardPerChangeInterval;
+	}
+	public void setRewardPerChangeInterval(Integer rewardPerChangeInterval) {
+		this.rewardPerChangeInterval = rewardPerChangeInterval;
 	}
     
 }

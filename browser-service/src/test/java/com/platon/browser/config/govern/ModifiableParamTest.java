@@ -25,6 +25,7 @@ public class ModifiableParamTest{
         private Block block;
         private Slashing slashing;
         private Staking staking;
+        private Reward reward;
     }
 
     private TestData testDataInit(){
@@ -55,18 +56,22 @@ public class ModifiableParamTest{
                 .stakeThreshold(BigDecimal.ZERO)
                 .unStakeFreezeDuration(BigDecimal.ZERO)
                 .build();
+        Reward re = Reward.builder()
+                .increaseIssuanceRatio(BigDecimal.ZERO)
+                .build();
         TestData testData = new TestData();
         testData.setConfigs(configList);
         testData.setBlock(b);
         testData.setSlashing(s);
         testData.setStaking(st);
+        testData.setReward(re);
         return testData;
     }
 
     @Test
     public void initStakeThreshold(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("stakeThreshold");
         target.init(testData.getConfigs());
     }
@@ -74,7 +79,7 @@ public class ModifiableParamTest{
     @Test
     public void initOperatingThreshold(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("operatingThreshold");
         target.init(testData.getConfigs());
     }
@@ -82,7 +87,7 @@ public class ModifiableParamTest{
     @Test
     public void initMaxValidators(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("maxValidators");
         target.init(testData.getConfigs());
     }
@@ -90,7 +95,7 @@ public class ModifiableParamTest{
     @Test
     public void initUnStakeFreezeDuration(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("unStakeFreezeDuration");
         target.init(testData.getConfigs());
     }
@@ -98,7 +103,7 @@ public class ModifiableParamTest{
     @Test
     public void initSlashFractionDuplicateSign(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("slashFractionDuplicateSign");
         target.init(testData.getConfigs());
     }
@@ -106,7 +111,7 @@ public class ModifiableParamTest{
     @Test
     public void initDplicateSignReportReward(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("duplicateSignReportReward");
         target.init(testData.getConfigs());
     }
@@ -114,7 +119,7 @@ public class ModifiableParamTest{
     @Test
     public void initMaxEvidenceAge(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("maxEvidenceAge");
         target.init(testData.getConfigs());
     }
@@ -122,7 +127,7 @@ public class ModifiableParamTest{
     @Test
     public void initSlashBlocksReward(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("slashBlocksReward");
         target.init(testData.getConfigs());
     }
@@ -130,7 +135,7 @@ public class ModifiableParamTest{
     @Test
     public void initMaxBlockGasLimit(){
         TestData testData = testDataInit();
-        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block);
+        ModifiableParam target = new ModifiableParam(testData.staking,testData.slashing,testData.block,testData.reward);
         testData.getConfigs().get(0).setName("maxBlockGasLimit");
         target.init(testData.getConfigs());
     }
