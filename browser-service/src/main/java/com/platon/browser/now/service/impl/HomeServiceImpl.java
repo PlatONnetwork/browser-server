@@ -119,10 +119,10 @@ public class HomeServiceImpl implements HomeService {
 			}
 		} else {
 			/* 为false则可能为区块交易hash或者为账户  */
-			if (keyword.length() <= 2) {
-				/* 小于两位的则认为不是正确hash */
-				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
-			}
+//			if (keyword.length() <= 2) {
+//				/* 小于两位的则认为不是正确hash */
+//				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
+//			}
 			if (keyword.length() == 128) {
 				/* 判断为节点Id */
 				Node node = nodeMapper.selectByPrimaryKey(HexTool.prefix(keyword.toLowerCase()));
