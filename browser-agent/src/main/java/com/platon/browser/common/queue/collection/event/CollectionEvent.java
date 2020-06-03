@@ -11,8 +11,6 @@ public class CollectionEvent {
     private Block block;
     // 交易列表
     private List<Transaction> transactions;
-    // 虚拟交易列表(通过普通合约调用PPOS操作，需要调用特殊节点数据查询接口获取信息，并构造虚拟交易)
-    private List<Transaction> virtualTransactions;
     private EpochMessage epochMessage;
 
     public Block getBlock() {
