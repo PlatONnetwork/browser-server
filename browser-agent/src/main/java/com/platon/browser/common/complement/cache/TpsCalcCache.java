@@ -20,8 +20,6 @@ public class TpsCalcCache {
     private Map<Long,Long> cacheMap = new HashMap<>();
 
     private int tps=0;
-    
-    private int blockCount=0;
 
     public void update(Block block){
         BigDecimal seconds = BigDecimal.valueOf(block.getTime().getTime()).divide(BigDecimal.valueOf(1000),0, RoundingMode.CEILING);
@@ -52,21 +50,10 @@ public class TpsCalcCache {
             return;
         }
 
-        if (maxSecond==minSecond) {
-            tps = totalTxCount;
-            return;
-        }
-        tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond + 1),0,RoundingMode.CEILING).intValue();
-        blockCount++;
+        tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond+1),0,RoundingMode.CEILING).intValue();
     }
 
     public int getTps(){
-    	/**
-    	 * 启动程序跟踪区块超过十个时候，才开始计算tps
-    	 */
-    	if(blockCount < 10) {
-    		return 0;
-    	}
         return tps;
     }
 }
