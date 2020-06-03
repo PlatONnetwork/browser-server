@@ -1,13 +1,16 @@
 package com.platon.browser.common.collection.dto;
 
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.Receipt;
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.*;
 import com.platon.browser.common.complement.cache.AddressCache;
+import com.platon.browser.common.utils.TransactionUtil;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
@@ -29,9 +32,7 @@ import org.web3j.utils.Numeric;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class CollectionTransaction extends Transaction {
@@ -84,11 +85,24 @@ public class CollectionTransaction extends Transaction {
         // tx info信息
         String info = "{}";
     }
-    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient, AddressCache addressCache) throws BeanCreateOrUpdateException {
 
+    // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存
+    // <普通合约地址,合约类型枚举>
+    private final static Map<String,ContractTypeEnum> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP = new HashMap<>();
+    private void initGeneralContractCache(AddressCache addressCache) {
+        if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.isEmpty()){
+            addressCache.getEvmContractAddressCache().forEach(address-> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address,ContractTypeEnum.EVM));
+            addressCache.getWasmContractAddressCache().forEach(address-> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address,ContractTypeEnum.WASM));
+        }
+    }
+
+    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
+        // 使用地址缓存初始化普通合约缓存信息
+        initGeneralContractCache(addressCache);
 
         //============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
+
         String inputWithoutPrefix = StringUtils.isNotBlank(getInput())?getInput().replace("0x",""):"";
         if(InnerContractAddrEnum.getAddresses().contains(getTo())&&StringUtils.isNotBlank(inputWithoutPrefix)){
             // 如果to地址是内置合约地址，则解码交易输入
@@ -99,10 +113,31 @@ public class CollectionTransaction extends Transaction {
                 resolveGeneralContractCreateTxComplementInfo(receipt.getContractAddress(),platOnClient,ci);
                 // 把回执里的合约地址回填到交易的to字段
                 setTo(receipt.getContractAddress());
+                // 把合约地址添加至缓存
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(getTo(),ContractTypeEnum.getEnum(ci.contractType));
             }else{
-                if(addressCache.isGeneralContractAddress(getTo())&&inputWithoutPrefix.length()>=8){
+                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.containsKey(getTo())&&inputWithoutPrefix.length()>=8){
                     // 如果是普通合约调用（EVM||WASM）
-                    resolveGeneralContractInvokeTxComplementInfo(platOnClient,ci,addressCache);
+                    ContractTypeEnum contractTypeEnum = GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(getTo());
+                    resolveGeneralContractInvokeTxComplementInfo(platOnClient,ci,contractTypeEnum);
+                    setStatus(receipt.getStatus()); // 普通合约调用的交易是否成功只看回执的status,不用看log中的状态
+                    if(getStatus()== StatusEnum.SUCCESS.getCode()){
+                        // 普通合约调用成功
+                        // TODO: 查看此普通合约在特殊节点上是否存在PPOS调用数据，如果有，则需要构造虚拟交易，并放到CollectionBlock的virtualTransactions中
+                        if(!PPosInvokeContractInputCache.hasCache(block.getNum())){
+                            // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
+                            List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(),BigInteger.valueOf(block.getNum()));
+                            log.debug("更新缓存-PPos调用合约输入参数：{}",JSON.toJSONString(inputs,true));
+                            if(inputs.size()>0) PPosInvokeContractInputCache.update(block.getNum(),inputs);
+                        }
+
+                        // 取出当前普通合约调用交易内部调用PPOS操作的输入参数
+                        PPosInvokeContractInput input = PPosInvokeContractInputCache.getPPosInvokeContractInput(getHash());
+                        // 使用普通合约内部调用的输入数据构造虚拟PPOS交易列表
+                        List<Transaction> virtualTxList = TransactionUtil.getVirtualTxList(block,this,input);
+                        // 把虚拟交易挂到当前普通合约交易上
+                        setVirtualTransactions(virtualTxList);
+                    }
                 }else {
                     BigInteger value = StringUtils.isNotBlank(getValue())?new BigInteger(getValue()):BigInteger.ZERO;
                     if(value.compareTo(BigInteger.ZERO)>=0){
@@ -119,9 +154,10 @@ public class CollectionTransaction extends Transaction {
         if(ci.toType==null){
             throw new BeanCreateOrUpdateException("To地址为空:[blockNumber="+getNum()+",txHash="+getHash()+"]");
         }
+
         // 默认取状态字段作为交易成功与否的状态
         int status = receipt.getStatus();
-        if (InnerContractAddrEnum.getAddresses().contains(getTo()) && ci.type.intValue() != TypeEnum.TRANSFER.getCode()) {
+        if (InnerContractAddrEnum.getAddresses().contains(getTo()) && ci.type != TypeEnum.TRANSFER.getCode()) {
             // 如果接收者为内置合约且不为转账, 取日志中的状态作为交易成功与否的状态
             status=receipt.getLogStatus();
         }
@@ -277,19 +313,19 @@ public class CollectionTransaction extends Transaction {
      * @param ci
      * @throws IOException
      */
-    private void resolveGeneralContractInvokeTxComplementInfo(PlatOnClient platOnClient,ComplementInfo ci,AddressCache addressCache) throws BeanCreateOrUpdateException {
+    private void resolveGeneralContractInvokeTxComplementInfo(PlatOnClient platOnClient,ComplementInfo ci,ContractTypeEnum contractTypeEnum) throws BeanCreateOrUpdateException {
         ci.info="";
         ci.binCode = getContractBinCode(platOnClient,getTo());
         // TODO: 解析出调用合约方法名
         String txInput = getInput();
 //        ci.method = getGeneralContractMethod();
-        if(addressCache.isEvmContractAddress(getTo())){
+
+        ci.contractType = contractTypeEnum.getCode();
+        if(contractTypeEnum==ContractTypeEnum.EVM){
             ci.toType = ToTypeEnum.EVM_CONTRACT.getCode();
-            ci.contractType = ContractTypeEnum.EVM.getCode();
         }
-        if(addressCache.isWasmContractAddress(getTo())){
+        if(contractTypeEnum==ContractTypeEnum.WASM){
             ci.toType = ToTypeEnum.WASM_CONTRACT.getCode();
-            ci.contractType = ContractTypeEnum.WASM.getCode();
         }
         ci.type = TypeEnum.CONTRACT_EXEC.getCode();
     }

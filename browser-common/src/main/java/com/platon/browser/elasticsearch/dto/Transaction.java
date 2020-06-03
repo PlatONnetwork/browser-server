@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @Accessors(chain = true)
@@ -41,6 +38,10 @@ public class Transaction {
     private String method;
     private String bin;
     private String contractAddress;
+
+    // 虚拟交易，
+    @JsonIgnore
+    protected List<Transaction> virtualTransactions=new ArrayList<>();
 
 
     /********把字符串类数值转换为大浮点数的便捷方法********/

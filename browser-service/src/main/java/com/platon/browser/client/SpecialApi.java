@@ -68,6 +68,10 @@ public class SpecialApi {
      * 获取提案结果
      */
     public static final int GET_PROPOSAL_RES_FUNC_TYPE = 2105;
+    /**
+     * 查询合约调用PPOS信息
+     */
+    public static final int GET_PPOS_INFO_FUNC_TYPE = 1111;
 
     private static final String BLANK_RES = "结果为空!";
 
@@ -322,4 +326,27 @@ public class SpecialApi {
     }
 
 
+    /**
+     * 根据区块号获取合约调用PPOS信息
+     * @param blockNumber
+     * @return
+     * @throws Exception
+     */
+    public List<PPosInvokeContractInput> getPPosInvokeInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
+        final Function function = new Function(GET_PPOS_INFO_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
+        CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
+            throw new BlankResponseException(String.format("【查询PPOS调用信息出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(GET_PPOS_INFO_FUNC_TYPE),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
+        }
+        if(br.isStatusOk()){
+            String data = br.getData();
+            if(data==null){
+                throw new BlankResponseException(BLANK_RES);
+            }
+            return JSON.parseArray(data, PPosInvokeContractInput.class);
+        }else{
+            String msg = JSON.toJSONString(br,true);
+            throw new ContractInvokeException(String.format("【查询PPOS调用信息出错】函数类型:%s,区块号:%s,返回数据:%s",GET_PPOS_INFO_FUNC_TYPE,blockNumber.toString(),msg));
+        }
+    }
 }

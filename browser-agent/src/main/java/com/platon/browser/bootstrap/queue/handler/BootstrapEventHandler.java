@@ -4,6 +4,7 @@ import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
@@ -20,6 +21,8 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +53,15 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private PlatOnClient platOnClient;
     @Autowired
     private AddressCache addressCache;
+    @Autowired
+    private SpecialApi specialApi;
 
     private Set<Block> blocks=new HashSet<>();
     private Set<Transaction> transactions=new HashSet<>();
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BootstrapEventHandler")
-    public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException {
+    public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
         long startTime = System.currentTimeMillis();
 
         log.debug("BootstrapEvent处理:{}(event(blockCF({}),transactions({})),sequence({}),endOfBatch({}))",
@@ -64,7 +69,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient,addressCache);
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult,platOnClient,addressCache,specialApi);
 
             clear();
             blocks.add(block);
