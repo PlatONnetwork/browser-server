@@ -155,7 +155,7 @@ public class AddressServiceImplTest extends TestMockBase {
 		RpPlan rpPlan = new RpPlan();
 		rpPlan.setAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
 		rpPlan.setAmount(BigDecimal.TEN);
-		rpPlan.setEpoch(10l);
+		rpPlan.setEpoch(BigInteger.TEN);
 		rpPlan.setNumber(10l);
 		rpPlansPage.add(rpPlan);
 		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlansPage);

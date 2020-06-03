@@ -19,7 +19,7 @@ public class RestrictingItemTest extends AgentTestBase {
         RestrictingItem target = RestrictingItem.builder()
                 .address("null")
                 .amount(BigDecimal.ONE)
-                .epoch(3L)
+                .epoch(BigInteger.ONE)
                 .number(BigInteger.ONE)
                 .build();
         target.setAddress(null);

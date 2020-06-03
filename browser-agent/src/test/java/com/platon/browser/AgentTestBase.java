@@ -317,7 +317,7 @@ public class AgentTestBase extends AgentTestData {
             RestrictingItem restrictingItem = RestrictingItem.builder()
                     .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
                     .amount(new BigDecimal("100000000000000"))
-                    .epoch(Long.valueOf(i))
+                    .epoch(BigInteger.valueOf(i))
                     .number(new BigInteger("100"))
                     .build();
             restrictingItems.add(restrictingItem);

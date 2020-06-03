@@ -277,7 +277,7 @@ public class DataGenService {
     public RpPlan getRpPlan(Transaction tx) throws BlockNumberException {
         RpPlan copy = JSON.parseObject(rpPlanStr, RpPlan.class);
         copy.setId(null);
-        copy.setEpoch(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN).longValue());
+        copy.setEpoch(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN));
         copy.setAddress(randomAddress());
         return copy;
     }

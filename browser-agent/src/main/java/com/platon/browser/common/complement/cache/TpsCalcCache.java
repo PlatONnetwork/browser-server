@@ -56,7 +56,7 @@ public class TpsCalcCache {
             tps = totalTxCount;
             return;
         }
-        tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond),0,RoundingMode.CEILING).intValue();
+        tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond + 1),0,RoundingMode.CEILING).intValue();
         blockCount++;
     }
 

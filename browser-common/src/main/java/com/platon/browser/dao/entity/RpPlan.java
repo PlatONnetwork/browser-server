@@ -1,6 +1,7 @@
 package com.platon.browser.dao.entity;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,7 +11,7 @@ public class RpPlan {
 
     private String address;
 
-    private Long epoch;
+    private BigInteger epoch;
 
     private BigDecimal amount;
 
@@ -36,11 +37,11 @@ public class RpPlan {
         this.address = address == null ? null : address.trim();
     }
 
-    public Long getEpoch() {
+    public BigInteger getEpoch() {
         return epoch;
     }
 
-    public void setEpoch(Long epoch) {
+    public void setEpoch(BigInteger epoch) {
         this.epoch = epoch;
     }
 

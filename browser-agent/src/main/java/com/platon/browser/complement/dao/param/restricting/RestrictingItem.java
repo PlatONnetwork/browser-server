@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class RestrictingItem {
     private String address;
-    private Long epoch;
+    private BigInteger epoch;
     private BigDecimal amount;
     private BigInteger number;
 }

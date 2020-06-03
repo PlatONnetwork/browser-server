@@ -160,15 +160,15 @@ public class AddressServiceImpl implements AddressService {
 			/**
 			 * 锁仓周期对应快高  结算周期数 * epoch  + number,如果不是整数倍则为：结算周期 * （epoch-1）  + 多余的数目
 			 */
-			Long number;
+			BigInteger number;
 			long remainder = rPlan.getNumber() % blockChainConfig.getSettlePeriodBlockCount().longValue();
 			if(remainder == 0l) {
 				number = blockChainConfig.getSettlePeriodBlockCount()
-						.multiply(BigInteger.valueOf(rPlan.getEpoch())).add(BigInteger.valueOf(rPlan.getNumber())).longValue();
+						.multiply(rPlan.getEpoch()).add(BigInteger.valueOf(rPlan.getNumber()));
 			} else {
 				number = blockChainConfig.getSettlePeriodBlockCount()
-						.multiply(BigInteger.valueOf(rPlan.getEpoch() - 1)).add(BigInteger.valueOf(rPlan.getNumber()))
-						.add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder))).longValue();
+						.multiply(rPlan.getEpoch().subtract(BigInteger.ONE)).add(BigInteger.valueOf(rPlan.getNumber()))
+						.add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
 			}
 
 			detailsRPPlanResp.setBlockNumber(number);
@@ -179,7 +179,7 @@ public class AddressServiceImpl implements AddressService {
 			} catch (IOException e) {
 				logger.error("获取区块错误。", e);
 			}
-			BigDecimal diff = BigDecimal.valueOf(number - rPlan.getNumber());
+			BigDecimal diff = new BigDecimal(number.subtract(BigInteger.valueOf(rPlan.getNumber())));
 			if(block!=null) {
 				if(diff.compareTo(BigDecimal.ZERO) > 0) {
 					NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
@@ -213,7 +213,7 @@ public class AddressServiceImpl implements AddressService {
 			resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
 		}
 		/** 特殊账户余额直接查询链  */
-		if(BrowserConst.ACCOUNT.contains(req.getAddress())) {
+		if(resp.getBalance().compareTo(BigDecimal.valueOf(10000000000l)) > 0) {
 			BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
 			resp.setBalance(new BigDecimal(balance));
 		}
