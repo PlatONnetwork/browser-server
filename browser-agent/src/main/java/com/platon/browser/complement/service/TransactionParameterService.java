@@ -120,6 +120,24 @@ public class TransactionParameterService {
             // 调用交易分析引擎分析交易，以补充相关数据
             NodeOpt nodeOpt = null;
             DelegationReward delegationReward = null;
+
+            // 如果是提案交易，且交易是由普通合约内部调用触发的，则
+            // 所构造的虚拟交易HASH的格式是：<普通合约调用hash>-<合约内部ppos交易索引>
+            // 由于底层在合约内部执行多个提案时，只有一个可以成功，是唯一的
+            // 所以在把提案数据存储到platscan数据库中时，可以把虚拟提案交易的"-<合约内部ppos交易索引>" 去掉
+            // 防止外部在查询提案时找不到相应的交易信息（也就是说通过普通合约代理执行的提案，在浏览器中查看提案所在交易时，是跳到普通合约交易的）
+            switch (tx.getTypeEnum()) {
+                case PROPOSAL_TEXT: // 2000
+                case PROPOSAL_UPGRADE: // 2001
+                case PROPOSAL_PARAMETER: // 2002
+                case PROPOSAL_CANCEL: // 2005
+                case PROPOSAL_VOTE: // 2003
+                case VERSION_DECLARE: // 2004
+                    tx.setHash(tx.getHash().split("-")[0]);
+                default:
+                    break;
+            }
+
             switch (tx.getTypeEnum()) {
                 case STAKE_CREATE: // 1000 创建验证人
                     nodeOpt = stakeCreateConverter.convert(event,tx);
