@@ -123,7 +123,6 @@ public class CollectionTransaction extends Transaction {
                     setStatus(receipt.getStatus()); // 普通合约调用的交易是否成功只看回执的status,不用看log中的状态
                     if(getStatus()== StatusEnum.SUCCESS.getCode()){
                         // 普通合约调用成功
-                        // TODO: 查看此普通合约在特殊节点上是否存在PPOS调用数据，如果有，则需要构造虚拟交易，并放到CollectionBlock的virtualTransactions中
                         if(!PPosInvokeContractInputCache.hasCache(block.getNum())){
                             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
                             List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(),BigInteger.valueOf(block.getNum()));
