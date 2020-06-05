@@ -29,12 +29,15 @@ class DelegateRewardClaimDecoder {
         String logData = logs.get(0).getData();
         RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
         List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
-        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
-        int statusCode = Integer.parseInt(decodedStatus);
+//        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+//        int statusCode = Integer.parseInt(decodedStatus);
 
         DelegateRewardClaimParam param = DelegateRewardClaimParam.builder()
                  .rewardList(new ArrayList<>())
                 .build();
+        if(rlpList.size() < 2) {
+        	return param;
+        }
         ((RlpList)RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())
                 .getValues()
                 .get(0))

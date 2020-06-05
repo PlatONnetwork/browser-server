@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class DetailsRPPlanResp {
 	private BigInteger epoch;         //锁仓周期
     private BigDecimal amount;      //锁定金额
-    private BigInteger blockNumber;   //锁仓周期对应快高  结束周期 * epoch  
+    private String blockNumber;   //锁仓周期对应快高  结束周期 * epoch  
     private Long estimateTime;   //预计时间
 	public BigInteger getEpoch() {
 		return epoch;
@@ -31,10 +31,10 @@ public class DetailsRPPlanResp {
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-	public BigInteger getBlockNumber() {
+	public String getBlockNumber() {
 		return blockNumber;
 	}
-	public void setBlockNumber(BigInteger blockNumber) {
+	public void setBlockNumber(String blockNumber) {
 		this.blockNumber = blockNumber;
 	}
 	public Long getEstimateTime() {

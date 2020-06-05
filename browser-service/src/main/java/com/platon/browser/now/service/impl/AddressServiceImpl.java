@@ -171,7 +171,7 @@ public class AddressServiceImpl implements AddressService {
 						.add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
 			}
 
-			detailsRPPlanResp.setBlockNumber(number);
+			detailsRPPlanResp.setBlockNumber(number.toString());
 			/** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
 			Block block = null;
 			try {
