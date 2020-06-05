@@ -16,4 +16,12 @@ public class ProposalBase extends TestBase {
         byte [] d = Hex.decode(EncoderUtils.functionEncoder(f));
         return d;
     }
+
+    protected void sendRequest(byte[] d1, byte[] d2) throws Exception {
+        invokeProxyContract(
+                defaultProxyContract,
+                d1,TARGET_CONTRACT_ADDRESS,
+                d2,TARGET_CONTRACT_ADDRESS
+        );
+    }
 }

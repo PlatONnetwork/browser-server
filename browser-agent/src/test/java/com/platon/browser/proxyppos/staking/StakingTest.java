@@ -26,7 +26,10 @@ public class StakingTest extends StakingBase {
     public void staking() throws Exception {
         byte[] d1 = node1();
         byte[] d2 = node2();
-        invokeProxyContract(d1,TARGET_CONTRACT_ADDRESS,d2,TARGET_CONTRACT_ADDRESS);
+        sendRequest(
+                d1,
+                d2
+        );
     }
 
     private byte[] node1() throws Exception {

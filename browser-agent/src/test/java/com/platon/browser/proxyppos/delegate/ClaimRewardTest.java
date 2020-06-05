@@ -15,6 +15,6 @@ public class ClaimRewardTest extends DelegateBase {
 
     @Test
     public void claimReward() throws Exception {
-        invokeProxyContract(encode(),TARGET_CONTRACT_ADDRESS,encode(),TARGET_CONTRACT_ADDRESS);
+        sendRequest(encode(),encode());
     }
 }

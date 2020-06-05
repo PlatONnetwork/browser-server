@@ -8,6 +8,9 @@ public class ParameterTest extends ProposalBase {
     public void parameter() throws Exception {
         Proposal p1 = Proposal.createSubmitParamProposalParam(nodeId, "5", "staking","unStakeFreezeDuration","5");
         Proposal p2 = Proposal.createSubmitParamProposalParam(nodeId, "6", "slashing","maxEvidenceAge","5");
-        invokeProxyContract(encode(p1),TARGET_CONTRACT_ADDRESS,encode(p2),TARGET_CONTRACT_ADDRESS);
+        sendRequest(
+                encode(p1),
+                encode(p2)
+        );
     }
 }

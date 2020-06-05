@@ -10,6 +10,9 @@ public class VersionTest extends ProposalBase {
     public void version() throws Exception {
         Proposal p1 = Proposal.createSubmitVersionProposalParam(nodeId, "7", BigInteger.valueOf(1200),BigInteger.valueOf(20));
         Proposal p2 = Proposal.createSubmitVersionProposalParam(nodeId, "8", BigInteger.valueOf(1200),BigInteger.valueOf(20));
-        invokeProxyContract(encode(p1),TARGET_CONTRACT_ADDRESS,encode(p2),TARGET_CONTRACT_ADDRESS);
+        sendRequest(
+                encode(p1),
+                encode(p2)
+        );
     }
 }

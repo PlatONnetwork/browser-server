@@ -30,9 +30,9 @@ public class UnDelegateTest extends DelegateBase {
 
     @Test
     public void unDelegate() throws Exception {
-        invokeProxyContract(
-            encode(BigInteger.valueOf(4000),"65000"),TARGET_CONTRACT_ADDRESS,
-            encode(BigInteger.valueOf(5000),"35000"),TARGET_CONTRACT_ADDRESS
+        sendRequest(
+            encode(BigInteger.valueOf(4000),"65000"),
+            encode(BigInteger.valueOf(5000),"35000")
         );
     }
 }

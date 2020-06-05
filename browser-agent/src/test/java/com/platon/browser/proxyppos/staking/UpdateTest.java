@@ -18,10 +18,9 @@ public class UpdateTest extends StakingBase {
 
     @Test
     public void update() throws Exception {
-
-        invokeProxyContract(
-                param1(),TARGET_CONTRACT_ADDRESS,
-                param2(),TARGET_CONTRACT_ADDRESS
+        sendRequest(
+                param1(),
+                param2()
         );
     }
 
@@ -32,7 +31,7 @@ public class UpdateTest extends StakingBase {
         String nodeName = "chendai-node6-u";
         String webSite = "www.baidu.com-u";
         String details = "chendai-node3-details-u";
-        BigInteger rewardPer = BigInteger.valueOf(2000L);
+        BigInteger rewardPer = BigInteger.valueOf(2L);
 
         UpdateStakingParam param = new UpdateStakingParam.Builder()
                 .setBenifitAddress(benifitAddress)
@@ -53,7 +52,7 @@ public class UpdateTest extends StakingBase {
         String nodeName = "chendai-node9-u";
         String webSite = "www.baidu.com-u3";
         String details = "chendai-node6-details-u";
-        BigInteger rewardPer = BigInteger.valueOf(2000L);
+        BigInteger rewardPer = BigInteger.valueOf(2L);
 
         UpdateStakingParam param = new UpdateStakingParam.Builder()
                 .setBenifitAddress(benifitAddress)

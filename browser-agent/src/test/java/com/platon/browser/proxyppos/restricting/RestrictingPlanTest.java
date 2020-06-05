@@ -35,6 +35,12 @@ public class RestrictingPlanTest extends TestBase {
         List<RestrictingPlan> restrictingPlans = new ArrayList<>();
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(1000), new BigInteger("2000000000000000000")));
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("2000000000000000000")));
-        invokeProxyContract(encode(restrictingPlans),TARGET_CONTRACT_ADDRESS,encode(restrictingPlans),TARGET_CONTRACT_ADDRESS);
+        invokeProxyContract(
+                defaultProxyContract,
+                encode(restrictingPlans),
+                TARGET_CONTRACT_ADDRESS,
+                encode(restrictingPlans),
+                TARGET_CONTRACT_ADDRESS
+        );
     }
 }

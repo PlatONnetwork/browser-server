@@ -8,6 +8,9 @@ public class TextTest extends ProposalBase {
     public void text() throws Exception {
         Proposal p1 = Proposal.createSubmitTextProposalParam(nodeId, "1");
         Proposal p2 = Proposal.createSubmitTextProposalParam(nodeId, "2");
-        invokeProxyContract(encode(p1),TARGET_CONTRACT_ADDRESS,encode(p2),TARGET_CONTRACT_ADDRESS);
+        sendRequest(
+                encode(p1),
+                encode(p2)
+        );
     }
 }

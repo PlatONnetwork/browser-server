@@ -39,11 +39,10 @@ public class VoteTest extends ProposalBase {
         pv.setVersion(BigInteger.valueOf(1792));
         pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
 
-        invokeProxyContract(
+        sendRequest(
                 encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9"),
-                TARGET_CONTRACT_ADDRESS,
-                encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9"),
-                TARGET_CONTRACT_ADDRESS);
+                encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9")
+        );
     }
 
 }

@@ -17,7 +17,6 @@ import java.util.Arrays;
 
 public class DelegateTest extends DelegateBase {
     private String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
-
     private byte[] encode(String delegateAmount){
         BigDecimal amount = Convert.toVon(delegateAmount, Convert.Unit.LAT);
         Function f = new Function(FunctionType.DELEGATE_FUNC_TYPE,
@@ -30,6 +29,6 @@ public class DelegateTest extends DelegateBase {
 
     @Test
     public void delegate() throws Exception {
-        invokeProxyContract(encode("20"),TARGET_CONTRACT_ADDRESS,encode("20"),TARGET_CONTRACT_ADDRESS);
+        sendRequest(encode("200"),encode("200"));
     }
 }
