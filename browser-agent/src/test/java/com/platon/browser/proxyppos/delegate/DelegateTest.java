@@ -16,19 +16,22 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class DelegateTest extends DelegateBase {
-    private String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
+    private String nodeId = "411a6c3640b6cd13799e7d4ed286c95104e3a31fbb05d7ae0004463db648f26e93f7f5848ee9795fb4bbb5f83985afd63f750dc4cf48f53b0e84d26d6834c20c";
     private byte[] encode(String delegateAmount){
         BigDecimal amount = Convert.toVon(delegateAmount, Convert.Unit.LAT);
-        Function f = new Function(FunctionType.DELEGATE_FUNC_TYPE,
-                Arrays.asList(new Uint16(StakingAmountType.FREE_AMOUNT_TYPE.getValue())
-                        , new BytesType(Numeric.hexStringToByteArray(nodeId))
-                        , new Uint256(amount.toBigInteger())));
-        byte [] d = Hex.decode(EncoderUtils.functionEncoder(f));
-        return d;
+        Function function = new Function(
+                FunctionType.DELEGATE_FUNC_TYPE,
+                Arrays.asList(
+                    new Uint16(StakingAmountType.FREE_AMOUNT_TYPE.getValue()),
+                    new BytesType(Numeric.hexStringToByteArray(nodeId)),
+                    new Uint256(amount.toBigInteger())
+        ));
+        byte [] data = Hex.decode(EncoderUtils.functionEncoder(function));
+        return data;
     }
 
     @Test
     public void delegate() throws Exception {
-        sendRequest(encode("200"),encode("200"));
+        sendRequest(encode("20000"),encode("20000"));
     }
 }
