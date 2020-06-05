@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class DelegateTest extends TestBase {
-    private String nodeId = "15245d4dceeb7552b52d70e56c53fc86aa030eab6b7b325e430179902884fca3d684b0e896ea421864a160e9c18418e4561e9a72f911e2511c29204a857de71a";
+    private String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
     private String targetContractAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
 
     private byte[] encode(String delegateAmount){
@@ -33,6 +33,6 @@ public class DelegateTest extends TestBase {
 
     @Test
     public void delegate() throws Exception {
-        invokeProxyContract(encode("65000"),targetContractAddress,encode("35000"),targetContractAddress);
+        invokeProxyContract(encode("20"),targetContractAddress,encode("20"),targetContractAddress);
     }
 }

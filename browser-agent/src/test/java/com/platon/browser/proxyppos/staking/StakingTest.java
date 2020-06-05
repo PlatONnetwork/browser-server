@@ -34,10 +34,9 @@ public class StakingTest extends TestBase {
     }
 
     private byte[] node1() throws Exception {
-        web3j = Web3j.build(new HttpService("http://192.168.112.141:8789"));
+        web3j = Web3j.build(new HttpService("http://192.168.120.145:6789"));
         String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
         String blsPubKey = "5ccd6b8c32f2713faa6c9a46e5fb61ad7b7400e53fabcbc56bdc0c16fbfffe09ad6256982c7059e7383a9187ad93a002a7cda7a75d569f591730481a8b91b5fad52ac26ac495522a069686df1061fc184c31771008c1fedfafd50ae794778811";
-
         StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
         String benifitAddress = benefitCredentials.getAddress(chainId);
         String externalId = "";

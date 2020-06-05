@@ -1,4 +1,4 @@
-package com.platon.browser.proxyppos.test;
+package com.platon.browser.proxyppos.restricting;
 
 import com.platon.browser.proxyppos.TestBase;
 import com.platon.sdk.contracts.ppos.abi.CustomStaticArray;
@@ -33,8 +33,8 @@ public class RestrictingPlanTest extends TestBase {
     @Test
     public void plan() throws Exception {
         List<RestrictingPlan> restrictingPlans = new ArrayList<>();
-        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(1000), new BigInteger("5000000000000000000")));
-        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("600000000000000000")));
+        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(1000), new BigInteger("2000000000000000000")));
+        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("2000000000000000000")));
         invokeProxyContract(encode(restrictingPlans),targetContractAddress,encode(restrictingPlans),targetContractAddress);
     }
 }

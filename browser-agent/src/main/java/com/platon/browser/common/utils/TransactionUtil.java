@@ -40,6 +40,7 @@ public class TransactionUtil {
             tx.setIndex(i);
             tx.setInput(input);
             tx.setInfo(result.getParam().toJSONString());
+            tx.setSeq((long) i);
             transactionList.add(tx);
         }
         return transactionList;

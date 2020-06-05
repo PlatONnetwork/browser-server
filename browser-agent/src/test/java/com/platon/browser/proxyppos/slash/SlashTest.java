@@ -1,4 +1,4 @@
-package com.platon.browser.proxyppos.test;
+package com.platon.browser.proxyppos.slash;
 
 import com.platon.browser.proxyppos.TestBase;
 import com.platon.sdk.contracts.ppos.abi.Function;

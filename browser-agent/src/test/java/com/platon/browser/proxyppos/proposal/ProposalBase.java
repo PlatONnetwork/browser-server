@@ -10,11 +10,11 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
-public class ProposalTest extends TestBase {
-    private String nodeId = "15245d4dceeb7552b52d70e56c53fc86aa030eab6b7b325e430179902884fca3d684b0e896ea421864a160e9c18418e4561e9a72f911e2511c29204a857de71a";
-    private String targetContractAddress = NetworkParameters.getPposContractAddressOfProposal(chainId);
+public class ProposalBase extends TestBase {
+    protected String nodeId = "15245d4dceeb7552b52d70e56c53fc86aa030eab6b7b325e430179902884fca3d684b0e896ea421864a160e9c18418e4561e9a72f911e2511c29204a857de71a";
+    protected String targetContractAddress = NetworkParameters.getPposContractAddressOfProposal(chainId);
 
-    private byte[] encode(Proposal p){
+    protected byte[] encode(Proposal p){
         Function f = new Function(p.getSubmitFunctionType(),p.getSubmitInputParameters());
         byte [] d = Hex.decode(EncoderUtils.functionEncoder(f));
         return d;
