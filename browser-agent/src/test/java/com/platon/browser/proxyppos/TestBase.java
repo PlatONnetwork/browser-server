@@ -33,7 +33,7 @@ public abstract class TestBase {
 	protected TransactionManager transactionManager;
 	protected GasProvider gasProvider;
 
-	protected String proxyContractAddress = DeployContractTest.proxyContractAddress;
+	protected String proxyContractAddress = CommonTest.PROXY_CONTRACT_ADDRESS;
 	protected ProxyContract proxyContract;
 
 	@Before
@@ -70,7 +70,7 @@ public abstract class TestBase {
 
 	protected void invokeProxyContract(byte[] data1,String pposContractAddress1,byte[] data2,String pposContractAddress2) throws Exception {
 		TransactionReceipt transactionReceipt = proxyContract.proxySend(data1, pposContractAddress1, data2,pposContractAddress2).send();
-		System.out.println("send hash = " + transactionReceipt.getTransactionHash());
+		System.out.println("BlockNum="+transactionReceipt.getBlockNumber()+",TxHash = " + transactionReceipt.getTransactionHash());
 		List<ProxyContract.ProxyEventEventResponse> eventEvents = proxyContract.getProxyEventEvents(transactionReceipt);
 		eventEvents.forEach(event -> System.out.println(event.log + " one"  + new String(event.oneEvent) + "  two" +  new String(event.twoEvent)));
 	}
