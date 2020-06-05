@@ -1,11 +1,9 @@
 package com.platon.browser.proxyppos.delegate;
 
-import com.platon.browser.proxyppos.TestBase;
 import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
 import com.platon.sdk.contracts.ppos.dto.enums.StakingAmountType;
 import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.NetworkParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.web3j.abi.datatypes.BytesType;
@@ -17,9 +15,8 @@ import org.web3j.utils.Numeric;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-public class DelegateTest extends TestBase {
+public class DelegateTest extends DelegateBase {
     private String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
-    private String targetContractAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
 
     private byte[] encode(String delegateAmount){
         BigDecimal amount = Convert.toVon(delegateAmount, Convert.Unit.LAT);
@@ -33,6 +30,6 @@ public class DelegateTest extends TestBase {
 
     @Test
     public void delegate() throws Exception {
-        invokeProxyContract(encode("20"),targetContractAddress,encode("20"),targetContractAddress);
+        invokeProxyContract(encode("20"),TARGET_CONTRACT_ADDRESS,encode("20"),TARGET_CONTRACT_ADDRESS);
     }
 }

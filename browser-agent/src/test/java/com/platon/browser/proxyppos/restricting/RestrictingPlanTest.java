@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RestrictingPlanTest extends TestBase {
-    private String targetContractAddress = NetworkParameters.getPposContractAddressOfRestrctingPlan(chainId);
+    private final String TARGET_CONTRACT_ADDRESS = NetworkParameters.getPposContractAddressOfRestrctingPlan(chainId);
 
     private String benefitAddress = "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e";
 
@@ -35,6 +35,6 @@ public class RestrictingPlanTest extends TestBase {
         List<RestrictingPlan> restrictingPlans = new ArrayList<>();
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(1000), new BigInteger("2000000000000000000")));
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("2000000000000000000")));
-        invokeProxyContract(encode(restrictingPlans),targetContractAddress,encode(restrictingPlans),targetContractAddress);
+        invokeProxyContract(encode(restrictingPlans),TARGET_CONTRACT_ADDRESS,encode(restrictingPlans),TARGET_CONTRACT_ADDRESS);
     }
 }

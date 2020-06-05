@@ -1,19 +1,15 @@
 package com.platon.browser.proxyppos.staking;
 
-import com.platon.browser.proxyppos.TestBase;
 import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
 import com.platon.sdk.contracts.ppos.dto.req.UpdateStakingParam;
 import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.NetworkParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
 import java.math.BigInteger;
 
-public class UpdateTest extends TestBase {
-    private String targetContractAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
-
+public class UpdateTest extends StakingBase {
     private byte[] encode(UpdateStakingParam param){
         Function function = new Function(FunctionType.UPDATE_STAKING_INFO_FUNC_TYPE,
                 param.getSubmitInputParameters());
@@ -24,8 +20,8 @@ public class UpdateTest extends TestBase {
     public void update() throws Exception {
 
         invokeProxyContract(
-                param1(),targetContractAddress,
-                param2(),targetContractAddress
+                param1(),TARGET_CONTRACT_ADDRESS,
+                param2(),TARGET_CONTRACT_ADDRESS
         );
     }
 

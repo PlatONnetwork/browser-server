@@ -1,11 +1,9 @@
 package com.platon.browser.proxyppos.proposal;
 
-import com.platon.browser.proxyppos.TestBase;
 import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
 import com.platon.sdk.contracts.ppos.dto.enums.VoteOption;
 import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.NetworkParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.web3j.abi.datatypes.BytesType;
@@ -17,10 +15,9 @@ import org.web3j.utils.Numeric;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class VoteTest extends TestBase {
+public class VoteTest extends ProposalBase {
 
     private String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
-    private String targetContractAddress = NetworkParameters.getPposContractAddressOfProposal(chainId);
 
     private byte[] encode(ProgramVersion pv,VoteOption voteOption,String verifier,String proposalID){
         Function function = new Function(FunctionType.VOTE_FUNC_TYPE,
@@ -44,9 +41,9 @@ public class VoteTest extends TestBase {
 
         invokeProxyContract(
                 encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9"),
-                targetContractAddress,
+                TARGET_CONTRACT_ADDRESS,
                 encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9"),
-                targetContractAddress);
+                TARGET_CONTRACT_ADDRESS);
     }
 
 }

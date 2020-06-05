@@ -1,12 +1,10 @@
 package com.platon.browser.proxyppos.staking;
 
-import com.platon.browser.proxyppos.TestBase;
 import com.platon.sdk.contracts.ppos.abi.Function;
 import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
 import com.platon.sdk.contracts.ppos.dto.enums.StakingAmountType;
 import com.platon.sdk.contracts.ppos.dto.req.StakingParam;
 import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.NetworkParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
@@ -16,9 +14,7 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class StakingTest extends TestBase {
-    private String targetContractAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
-
+public class StakingTest extends StakingBase {
     private byte[] encode(StakingParam stakingParam){
         Function function = new Function(
                 FunctionType.STAKING_FUNC_TYPE,
@@ -30,7 +26,7 @@ public class StakingTest extends TestBase {
     public void staking() throws Exception {
         byte[] d1 = node1();
         byte[] d2 = node2();
-        invokeProxyContract(d1,targetContractAddress,d2,targetContractAddress);
+        invokeProxyContract(d1,TARGET_CONTRACT_ADDRESS,d2,TARGET_CONTRACT_ADDRESS);
     }
 
     private byte[] node1() throws Exception {
