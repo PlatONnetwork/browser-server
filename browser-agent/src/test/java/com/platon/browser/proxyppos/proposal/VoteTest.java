@@ -17,8 +17,6 @@ import java.util.Arrays;
 
 public class VoteTest extends ProposalBase {
 
-    private String nodeId = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
-
     private byte[] encode(ProgramVersion pv,VoteOption voteOption,String verifier,String proposalID){
         Function function = new Function(FunctionType.VOTE_FUNC_TYPE,
                 Arrays.asList(new BytesType(Numeric.hexStringToByteArray(verifier)),
@@ -30,7 +28,7 @@ public class VoteTest extends ProposalBase {
     }
 
     /**
-     * TODO: FAIL
+     * TODO: Transaction has failed with status: 0x0. Gas used: 999999. (not-enough gas?)
      * @throws Exception
      */
     @Test
@@ -40,8 +38,8 @@ public class VoteTest extends ProposalBase {
         pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
 
         sendRequest(
-                encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9"),
-                encode(pv,VoteOption.YEAS,nodeId,"0x1178f6dcecd1731e2556d4a014d30ebe04cf5522c07776135e60f613e51af0c9")
+                encode(pv,VoteOption.YEAS,nodeId1,"0x19069d2ef47cbc195976ea0ec03530bdc4ba602e7035108e7ea28bc411517f1a"),
+                encode(pv,VoteOption.YEAS,nodeId2,"0x2227cc8b7d6b7e88fb59535ac93bc11e4d845d465d4938ea72b1a9e628623d50")
         );
     }
 

@@ -7,13 +7,13 @@ import java.math.BigInteger;
 
 public class CancelTest extends ProposalBase {
     /**
-     * TODO: FAIL
+     * TODO: Transaction has failed with status: 0x0. Gas used: 999999. (not-enough gas?)
      * @throws Exception
      */
     @Test
     public void cancel() throws Exception {
-        Proposal p1 = Proposal.createSubmitCancelProposalParam(nodeId, "3", BigInteger.valueOf(6000000),"1");
-        Proposal p2 = Proposal.createSubmitCancelProposalParam(nodeId, "4", BigInteger.valueOf(60000000),"2");
+        Proposal p1 = Proposal.createSubmitCancelProposalParam(nodeId1, "55", BigInteger.valueOf(6000000),"1");
+        Proposal p2 = Proposal.createSubmitCancelProposalParam(nodeId2, "66", BigInteger.valueOf(60000000),"2");
         sendRequest(
                 encode(p1),
                 encode(p2)
