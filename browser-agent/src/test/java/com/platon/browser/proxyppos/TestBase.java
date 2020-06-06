@@ -26,7 +26,10 @@ public abstract class TestBase {
 	protected static Credentials defaultCredentials =
 			Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 
-	protected String proxyContractAddress = "lax1ufjvfyxxxy6q3j5ayth97pcrn9pn475swqed9h";
+	protected Credentials delegateCredentials = Credentials.create("5d7f539ac15de26de6abbb664291e613882842d3dbe4ec79b57af8bc6bb834aa");
+
+	protected String proxyStakingContractAddress = "lax1d33nfd4djqyzmp45jq6zkwgac4e5q3jgfznp46";
+	protected String proxyDelegateContractAddress = "lax1ufjvfyxxxy6q3j5ayth97pcrn9pn475swqed9h";
 
 	protected static final Properties ERRORS = new Properties();
 	static {
@@ -44,13 +47,17 @@ public abstract class TestBase {
 	}
 
 	/**
+	 * TODO: INIT-STEP-01 当链重新部署时，生成两个代理合约，
+	 * 并用生成的合约地址替换本类中的proxyStakingContractAddress和proxyDelegateContractAddress
 	 * 部署PPOS代理合约
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String address = deployProxyContract();
-		System.out.println(address);
+		String address1 = deployProxyContract();
+		System.out.println(address1);
+		String address2 = deployProxyContract();
+		System.out.println(address2);
 	}
 
 	protected void invokeProxyContract(ProxyContract targetContract,byte[] data1,String pposContractAddress1,byte[] data2,String pposContractAddress2) throws Exception {

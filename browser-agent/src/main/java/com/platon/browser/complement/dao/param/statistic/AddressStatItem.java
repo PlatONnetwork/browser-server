@@ -16,7 +16,7 @@ public class AddressStatItem {
 	private String address;
 
 	/**
-	 * 地址类型 1:账号 2:合约 3:内置合约
+	 * 地址类型 1账号,2内置合约 ,3EVM合约,4WASM合约
 	 */
     private Integer type;
 

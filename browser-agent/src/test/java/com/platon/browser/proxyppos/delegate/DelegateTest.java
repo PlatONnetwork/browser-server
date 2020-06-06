@@ -32,6 +32,6 @@ public class DelegateTest extends DelegateBase {
 
     @Test
     public void delegate() throws Exception {
-        sendRequest(encode("20000"),encode("20000"));
+        sendRequest(encode("50000"),encode("20000"));
     }
 }

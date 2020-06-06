@@ -16,16 +16,10 @@ import java.util.List;
  * ]
  */
 public class PPosInvokeContractInput {
-    private List<String> input;
+    private List<TransData> transDatas;
     private String txHash;
     private String from;
     private String to;
-    public void setInput(List<String> input) {
-        this.input = input;
-    }
-    public List<String> getInput() {
-        return input;
-    }
 
     public void setTxHash(String txHash) {
         this.txHash = txHash;
@@ -48,5 +42,13 @@ public class PPosInvokeContractInput {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public List<TransData> getTransDatas() {
+        return transDatas;
+    }
+
+    public void setTransDatas(List<TransData> transDatas) {
+        this.transDatas = transDatas;
     }
 }

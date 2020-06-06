@@ -13,6 +13,10 @@ public class ClaimRewardTest extends DelegateBase {
         return d;
     }
 
+    /**
+     * TODO: Transaction has failed with status: 0x0. Gas used: 999999. (not-enough gas?)
+     * @throws Exception
+     */
     @Test
     public void claimReward() throws Exception {
         sendRequest(encode(),encode());

@@ -41,8 +41,7 @@ public class Transaction {
 
     // 虚拟交易，
     @JsonIgnore
-    protected List<Transaction> virtualTransactions=new ArrayList<>();
-
+    private List<Transaction> virtualTransactions=new ArrayList<>();
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalGasLimit(){return new BigDecimal(this.getGasLimit());}
