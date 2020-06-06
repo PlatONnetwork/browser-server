@@ -1,8 +1,14 @@
 package com.platon.browser.proxyppos;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.sdk.contracts.ppos.RewardContract;
+import com.platon.sdk.contracts.ppos.dto.resp.Reward;
 import org.junit.Test;
+import org.web3j.abi.WasmFunctionEncoder;
+import org.web3j.abi.datatypes.WasmFunction;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.PlatonEstimateGas;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -17,6 +23,7 @@ import org.web3j.utils.Numeric;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommonTest extends TestBase {
@@ -45,6 +52,40 @@ public class CommonTest extends TestBase {
     public void blockNumber() throws Exception {
         BigInteger blockNumber = defaultWeb3j.platonBlockNumber().send().getBlockNumber();
         System.out.println("Current Block Number:"+blockNumber);
+    }
+
+    /**
+     * 解码解委托返回的回执日志数据
+     */
+    @Test
+    public void claimRewardList() throws Exception {
+
+        //SpecialApi specialApi = new SpecialApi();
+        //List<PPosInvokeContractInput> pposInfo = specialApi.getPPosInvokeInfo(defaultWeb3j,BigInteger.valueOf(42305));
+
+
+        String nodeId1 = "411a6c3640b6cd13799e7d4ed286c95104e3a31fbb05d7ae0004463db648f26e93f7f5848ee9795fb4bbb5f83985afd63f750dc4cf48f53b0e84d26d6834c20c";
+        String nodeId2 = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
+
+        RewardContract rewardContract = RewardContract.load(defaultWeb3j,chainId);
+        List<Reward> rewards = rewardContract.getDelegateReward(
+        "lax1ufjvfyxxxy6q3j5ayth97pcrn9pn475swqed9h",
+                Arrays.asList(nodeId1,nodeId2)
+        ).send().getData();
+        //6489731995654434982104
+        System.out.println(rewards);
+
+
+
+        String data = "";
+        String pubkey = "411a6c3640b6cd13799e7d4ed286c95104e3a31fbb05d7ae0004463db648f26e93f7f5848ee9795fb4bbb5f83985afd63f750dc4cf48f53b0e84d26d6834c20c";
+        WasmFunction wasmFunction = new WasmFunction("record", Arrays.asList(pubkey), Void.class);
+        data = WasmFunctionEncoder.encode(wasmFunction);
+
+        Transaction transaction = Transaction.createEthCallTransaction(proxyDelegateContractAddress, proxyDelegateContractAddress, data);
+        PlatonEstimateGas platonEstimateGas = defaultWeb3j.platonEstimateGas(transaction).send();
+        BigInteger amount = platonEstimateGas.getAmountUsed();
+        System.out.println(amount);
     }
 
     /**

@@ -16,6 +16,7 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
+import com.platon.browser.param.TxParam;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -139,52 +141,47 @@ public class TransactionUtil {
         // 使用普通合约内部调用的输入数据构造虚拟PPOS交易列表(包括成功和失败的PPOS调用)
         List<Transaction> virtualTxList = getVirtualTxList(block,contractInvokeTx,input);
         if(!virtualTxList.isEmpty()){
-            // 如果虚拟交易列表不为空，则统一假设交易为解除委托或领取委托，对回执内的Log进行委托奖励金额解析
-            // 解除委托和领取委托奖励需要从回执中获取奖励信息，因此回执内的所有logs都需要解析委托奖励金额信息
-            List<BigInteger> rewards = new ArrayList<>();
-            // 合约代理PPOS时，回执中的logs的内部结构：
-            /**
-             * List-
-             *  - 虚拟交易1的log
-             *  - ...
-             *  - 虚拟交易n的log
-             *  - 合约调用的log
-             */
-            contractInvokeTxReceipt.getLogs().forEach(log-> {
-                BigInteger reward;
-                try {
-                    reward = getDelegateReward(log);
-                }catch (Exception e){
-                    reward = BigInteger.ZERO;
-                }
-                rewards.add(reward);
-            });
             for (int i=0;i<virtualTxList.size();i++) {
                 Transaction vt = virtualTxList.get(i);
-                if(vt.getTypeEnum()== Transaction.TypeEnum.DELEGATE_EXIT||vt.getTypeEnum()== Transaction.TypeEnum.CLAIM_REWARDS){
-                    // 默认虚拟交易数和回执内logs数量一致：按索引顺序一一对应进行奖励回填到虚拟交易的txInfo中
-                    BigInteger reward = rewards.get(i);
-                    if (reward==null) reward = BigInteger.ZERO;
-
-                    // 对vt的info字段进行解析，添加reward字段后重新序列化后回填到vt中
-                    switch (vt.getTypeEnum()){
-                        case DELEGATE_EXIT:
-                            DelegateExitParam delegateExitParam = vt.getTxParam(DelegateExitParam.class);
-                            BigDecimal rewardAmount = new BigDecimal(reward);
-                            delegateExitParam.setReward(rewardAmount);
-                            vt.setInfo(delegateExitParam.toJSONString());
-                            break;
-                        case CLAIM_REWARDS:
-                            if(vt.getStatus()== Transaction.StatusEnum.SUCCESS.getCode()){
-                                // 成功的领取交易才解析info回填
-                                DelegateRewardClaimParam delegateRewardClaimParam = vt.getTxParam(DelegateRewardClaimParam.class);
-                                vt.setInfo(delegateRewardClaimParam.toJSONString());
-                            }
-                            break;
+                // 交易失败，跳过
+                if(vt.getStatus()!=Transaction.StatusEnum.SUCCESS.getCode()) continue;
+                /**合约代理PPOS时，回执中的logs的内部结构：
+                 * List-
+                 *  - 虚拟交易1的log
+                 *  - ...
+                 *  - 虚拟交易n的log
+                 *  - 合约调用的log
+                 */
+                Log log = contractInvokeTxReceipt.getLogs().get(i);
+                if(vt.getTypeEnum()== Transaction.TypeEnum.DELEGATE_EXIT){
+                    // 解委托
+                    BigInteger reward;
+                    try {
+                        reward = getDelegateReward(log);
+                    }catch (Exception e){
+                        reward = BigInteger.ZERO;
                     }
+                    // 对vt的info字段进行解析，添加reward字段后重新序列化后回填到vt中
+                    DelegateExitParam delegateExitParam = vt.getTxParam(DelegateExitParam.class);
+                    BigDecimal rewardAmount = new BigDecimal(reward);
+                    delegateExitParam.setReward(rewardAmount);
+                    vt.setInfo(delegateExitParam.toJSONString());
+                }
+
+                if(vt.getTypeEnum()== Transaction.TypeEnum.CLAIM_REWARDS){
+                    // 领取委托奖励
+                    DelegateRewardClaimParam delegateRewardClaimParam = DelegateRewardClaimParam.builder()
+                            .rewardList(new ArrayList<>())
+                            .build();
+                    List<Log> logs = Arrays.asList(log);
+                    InnerContractDecodedResult result = InnerContractDecodeUtil.decode(vt.getInput(),logs);
+                    TxParam param = result.getParam();
+                    if(param!=null){
+                        delegateRewardClaimParam = (DelegateRewardClaimParam)param;
+                    }
+                    vt.setInfo(delegateRewardClaimParam.toJSONString());
                 }
             }
-            logger.info("virtual tx rewards: {}",rewards);
         }
         // 把成功的虚拟交易过滤出来
         List<Transaction> successVirtualTransactions = new ArrayList<>();

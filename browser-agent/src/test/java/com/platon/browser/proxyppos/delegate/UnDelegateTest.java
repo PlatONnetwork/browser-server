@@ -31,8 +31,9 @@ public class UnDelegateTest extends DelegateBase {
 
     @Test
     public void unDelegate() throws Exception {
+        //20000000000000000000000
         sendRequest(
-            encode(nodeId1,BigInteger.valueOf(2792),"15000"),
+            encode(nodeId1,BigInteger.valueOf(2792),"20000"),
             encode(nodeId2,BigInteger.valueOf(2792),"11000")
         );
     }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Properties;
 
 public abstract class TestBase {
-	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(999999L);
+	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4700000L);
 	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(1000000000000L);
 	protected static final GasProvider gasProvider = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
 	protected static final long chainId = 103;
