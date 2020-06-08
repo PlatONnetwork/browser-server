@@ -12,7 +12,6 @@ import org.web3j.abi.datatypes.generated.Uint8;
 import org.web3j.platon.bean.ProgramVersion;
 import org.web3j.utils.Numeric;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 public class VoteTest extends ProposalBase {
@@ -28,18 +27,16 @@ public class VoteTest extends ProposalBase {
     }
 
     /**
-     * TODO: Transaction has failed with status: 0x0. Gas used: 999999. (not-enough gas?)
+     *
      * @throws Exception
      */
     @Test
     public void vote() throws Exception {
-        ProgramVersion pv = new ProgramVersion();
-        pv.setVersion(BigInteger.valueOf(1792));
-        pv.setSign("25a2407f1692febff715655d53912b6284d8672a411d39b250ec40530a7e36f0b7970ed1d413f9b079e104aba80e5cef25eaf299cbd6a01e8015b505cffebc2d");
-
+        ProgramVersion pv = defaultWeb3j.getProgramVersion().send().getAdminProgramVersion();
+//        pv.setVersion(BigInteger.valueOf(7800));
         sendRequest(
-                encode(pv,VoteOption.YEAS,nodeId1,"0x19069d2ef47cbc195976ea0ec03530bdc4ba602e7035108e7ea28bc411517f1a"),
-                encode(pv,VoteOption.YEAS,nodeId2,"0x2227cc8b7d6b7e88fb59535ac93bc11e4d845d465d4938ea72b1a9e628623d50")
+                encode(pv,VoteOption.YEAS,nodeId1,"0x7403a411f7159b1e594ebface0b2fa47ccc5e1033e806218cc3a67a4f689587d"),
+                encode(pv,VoteOption.YEAS,nodeId2,"0x7403a411f7159b1e594ebface0b2fa47ccc5e1033e806218cc3a67a4f689587d")
         );
     }
 

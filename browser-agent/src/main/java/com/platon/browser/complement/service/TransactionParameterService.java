@@ -108,7 +108,7 @@ public class TransactionParameterService {
                     case PROPOSAL_UPGRADE: // 2001
                     case PROPOSAL_PARAMETER: // 2002
                     case PROPOSAL_CANCEL: // 2005
-                    case PROPOSAL_VOTE: // 2003
+                    //case PROPOSAL_VOTE: // 2003  投票提案可以同时有多笔成功(实测)
                     case VERSION_DECLARE: // 2004
                         vt.setHash(vt.getHash().split("-")[0]);
                     default:

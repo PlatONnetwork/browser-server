@@ -1,5 +1,6 @@
 package com.platon.browser.proxyppos.proposal;
 
+import com.platon.sdk.contracts.ppos.ProposalContract;
 import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
 import org.junit.Test;
 
@@ -12,8 +13,10 @@ public class CancelTest extends ProposalBase {
      */
     @Test
     public void cancel() throws Exception {
-        Proposal p1 = Proposal.createSubmitCancelProposalParam(nodeId1, "55", BigInteger.valueOf(6000000),"1");
-        Proposal p2 = Proposal.createSubmitCancelProposalParam(nodeId2, "66", BigInteger.valueOf(60000000),"2");
+        ProposalContract.load(defaultWeb3j,chainId).getProposalList();
+
+        Proposal p1 = Proposal.createSubmitCancelProposalParam(nodeId1, "110", BigInteger.valueOf(5),"0x121719200b6863d8c5201efbcceaae19938a5202f6ba6abf2c84044f48531af5");
+        Proposal p2 = Proposal.createSubmitCancelProposalParam(nodeId2, "210", BigInteger.valueOf(5),"0x121719200b6863d8c5201efbcceaae19938a5202f6ba6abf2c84044f48531af5");
         sendRequest(
                 encode(p1),
                 encode(p2)

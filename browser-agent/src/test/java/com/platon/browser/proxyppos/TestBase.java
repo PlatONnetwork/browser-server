@@ -30,6 +30,7 @@ public abstract class TestBase {
 
 	protected String proxyStakingContractAddress = "lax1d33nfd4djqyzmp45jq6zkwgac4e5q3jgfznp46";
 	protected String proxyDelegateContractAddress = "lax1ufjvfyxxxy6q3j5ayth97pcrn9pn475swqed9h";
+	protected String proxySlashContractAddress = "lax16wnrpdpn0kg4c5k0pesax5letmzwpmv7j2dlnn";
 
 	protected static final Properties ERRORS = new Properties();
 	static {
@@ -56,8 +57,8 @@ public abstract class TestBase {
 	public static void main(String[] args) throws Exception {
 		String address1 = deployProxyContract();
 		System.out.println(address1);
-		String address2 = deployProxyContract();
-		System.out.println(address2);
+		///String address2 = deployProxyContract();
+		//System.out.println(address2);
 	}
 
 	protected void invokeProxyContract(ProxyContract targetContract,byte[] data1,String pposContractAddress1,byte[] data2,String pposContractAddress2) throws Exception {

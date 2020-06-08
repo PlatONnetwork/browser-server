@@ -12,7 +12,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint32;
-import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.http.HttpService;
@@ -35,8 +34,16 @@ public class SlashTest extends TestBase {
 
     @Test
     public void slash() throws Exception {
+        /**
+         * 双签证据的生成
+         * ./duplicateSign -dtype 1 -sk <被举报节点私钥> -blskey <被举报节点BLS私钥> -blockNumber <最近出的一个块号>
+         *     ./duplicateSign -dtype 1 -sk c47153938d9bbbb2bbf3024c65b7676fceba40dd4b7e81a781102abdefb97039 -blskey 8ee60655f883f6f76702dce3624e286c3cb9345e58077223b801952ed3e8e819 -blockNumber 296941
+         */
+
+
         String evidencePath = this.getClass().getClassLoader().getResource("proxyppos/evidence.json").getPath();
         String evidence = FileUtils.readFileToString(new File(evidencePath),"UTF-8");
+
 
         BigInteger contractBalance = defaultWeb3j.platonGetBalance(proxyStakingContractAddress, DefaultBlockParameterName.LATEST).send().getBalance();
         BigInteger delegatorBalance = defaultWeb3j.platonGetBalance(defaultCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance();
@@ -47,10 +54,9 @@ public class SlashTest extends TestBase {
         System.out.println("*********************");
         System.out.println("*********************");
 
-        Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
-        Web3j web3j = Web3j.build(new HttpService("http://192.168.120.145:6790"));
-        TransactionManager manager = new RawTransactionManager(web3j, credentials, chainId);
-        ProxyContract contract = ProxyContract.load(proxyStakingContractAddress, web3j, manager, gasProvider, chainId);
+        Web3j web3j = Web3j.build(new HttpService("http://192.168.112.141:8789"));
+        TransactionManager manager = new RawTransactionManager(web3j, delegateCredentials, chainId);
+        ProxyContract contract = ProxyContract.load(proxySlashContractAddress, web3j, manager, gasProvider, chainId);
         invokeProxyContract(
                 contract,
                 encode(DuplicateSignType.PREPARE_BLOCK,evidence),
