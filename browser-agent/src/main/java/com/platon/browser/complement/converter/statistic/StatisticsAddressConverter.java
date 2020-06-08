@@ -1,5 +1,6 @@
 package com.platon.browser.complement.converter.statistic;
 
+import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -21,8 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.platon.browser.common.collection.dto.CollectionTransaction.GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP;
 
 @Slf4j
 @Service
@@ -59,7 +58,7 @@ public class StatisticsAddressConverter {
 					.haveReward(cache.getHaveReward())
 					.build();
 			// 检查当前地址是否是普通合约地址
-			ContractTypeEnum contractTypeEnum = GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(cache.getAddress());
+			ContractTypeEnum contractTypeEnum = CollectionTransaction.getGeneralContractAddressCache().get(cache.getAddress());
 			if(contractTypeEnum!=null) {
 				switch (contractTypeEnum){
 					case WASM:
