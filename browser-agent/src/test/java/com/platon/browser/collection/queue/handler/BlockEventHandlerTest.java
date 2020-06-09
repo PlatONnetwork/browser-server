@@ -8,13 +8,14 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.publisher.CollectionEventPublisher;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
@@ -23,7 +24,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
@@ -52,7 +54,7 @@ public class BlockEventHandlerTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException {
+    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
         CompletableFuture<PlatonBlock> blockCF=getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF=getReceiptAsync(7000L);
         BlockEvent blockEvent = new BlockEvent();

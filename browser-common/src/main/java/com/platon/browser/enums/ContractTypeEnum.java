@@ -1,5 +1,9 @@
 package com.platon.browser.enums;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/12 19:53
@@ -18,7 +22,12 @@ public enum ContractTypeEnum {
         this.code = code;
         this.desc = desc;
     }
-
+    private static final Map<Integer, ContractTypeEnum> ENUMS = new HashMap<>();
+    static {
+        Arrays.asList(ContractTypeEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+    public static ContractTypeEnum getEnum(Integer code){
+        return ENUMS.get(code);
+    }
     public int getCode() {
         return code;
     }

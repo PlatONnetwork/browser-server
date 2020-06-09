@@ -1,5 +1,6 @@
 package com.platon.browser.complement.converter.statistic;
 
+import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -9,7 +10,9 @@ import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.enums.ContractTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Slf4j
 @Service
 public class StatisticsAddressConverter {
@@ -53,6 +57,18 @@ public class StatisticsAddressConverter {
 					.contractBin(cache.getContractBin())
 					.haveReward(cache.getHaveReward())
 					.build();
+			// 检查当前地址是否是普通合约地址
+			ContractTypeEnum contractTypeEnum = CollectionTransaction.getGeneralContractAddressCache().get(cache.getAddress());
+			if(contractTypeEnum!=null) {
+				switch (contractTypeEnum){
+					case WASM:
+						item.setType(CustomAddress.TypeEnum.WASM.getCode());
+						break;
+					case EVM:
+						item.setType(CustomAddress.TypeEnum.EVM.getCode());
+						break;
+				}
+			}
 			itemFromCache.add(item);
 			addresses.add(cache.getAddress());
 		});

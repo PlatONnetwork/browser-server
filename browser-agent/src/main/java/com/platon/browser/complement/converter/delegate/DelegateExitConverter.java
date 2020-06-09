@@ -92,7 +92,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .codeDelegateHes(BigDecimal.ZERO)
                 .codeDelegateLocked(BigDecimal.ZERO)
                 .codeDelegateReleased(BigDecimal.ZERO)
-                .delegateReward(txParam.getReward())
+                .delegateReward(txParam.getReward()==null?BigDecimal.ZERO:txParam.getReward())
                 .build();
 
         boolean isRefundAll = delegation.getDelegateHes() // 犹豫期金额

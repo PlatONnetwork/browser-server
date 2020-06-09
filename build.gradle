@@ -112,6 +112,8 @@ subprojects {
 	    exclude '**/WASMUploadTest.class'
 	    exclude '**/SuicideAndSelfdestructTest.class'
 	    exclude '**/HumanStandardTokenTest.class'
+	    exclude '**/proxyppos/*Test.class'
+	    exclude '**/proxyppos/**/*Test.class'
 	}
 }
 
