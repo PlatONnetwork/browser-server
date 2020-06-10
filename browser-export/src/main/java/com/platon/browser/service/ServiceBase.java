@@ -2,6 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.callback.TransactionHandler;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -163,5 +164,9 @@ public abstract class ServiceBase {
 
     protected Web3j getClient(){
         return platonClient.getWeb3jWrapper().getWeb3j();
+    }
+    
+    protected Web3jWrapper getClientWrapper(){
+        return platonClient.getWeb3jWrapper();
     }
 }
