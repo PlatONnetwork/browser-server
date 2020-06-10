@@ -30,11 +30,12 @@ public class NetworkStatCache {
     public void updateByBlock(Block block,int proposalQty) {
     	tpsCalcCache.update(block);
     	int tps = tpsCalcCache.getTps();
+    	int maxTps = tpsCalcCache.getMaxTps();
     	networkStat.setTxQty(block.getTransactions().size()+networkStat.getTxQty());
     	networkStat.setProposalQty(proposalQty+networkStat.getProposalQty());
     	networkStat.setCurTps(tps);
     	networkStat.setCurBlockHash(block.getHash());
-    	if(tps > networkStat.getMaxTps()) {
+    	if(maxTps > networkStat.getMaxTps()) {
     		networkStat.setMaxTps(tps);
     	}
     }
