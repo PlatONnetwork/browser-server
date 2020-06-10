@@ -2,6 +2,7 @@ package com.platon.browser;
 
 import com.platon.browser.service.ExportGallyService;
 import com.platon.browser.service.ExportService;
+import com.platon.browser.service.ExportTpsService;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +27,9 @@ public class ExportApplication implements ApplicationRunner {
 //	private ExportService exportService;
 	@Autowired
 	private ExportGallyService exportGallyService;
+	@Autowired
+	private ExportTpsService exportTpsService;
+	
 
 	public static void main(String[] args) {
 		SpringApplication.run(ExportApplication.class, args);
@@ -58,9 +62,10 @@ public class ExportApplication implements ApplicationRunner {
 //		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportLegalTx());
 //		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportMatchNode());
 		
+		EXECUTOR_SERVICE.submit(() -> exportTpsService.exportTpsData());
 //		EXECUTOR_SERVICE.submit(() -> exportGallyService.exportContractData());
 		while (
-			!exportGallyService.isTxInfoExportDone() 
+			!exportTpsService.isTxInfoExportDone() 
 //			!exportGallyService.isExportLegalTxDone()
 		) {
 			SleepUtil.sleep(1L);
