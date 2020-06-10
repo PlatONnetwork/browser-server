@@ -152,7 +152,7 @@ public class OnConsensusConverter {
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MULTI_SIGN.getCode()));
         nodeOpt.setDesc(desc);
         nodeOpt.setTxHash(businessParam.getTxHash());
-        nodeOpt.setBNum(block.getNum());
+        nodeOpt.setBNum(businessParam.getBlockNum());
         nodeOpt.setTime(block.getTime());
         return nodeOpt;
     }

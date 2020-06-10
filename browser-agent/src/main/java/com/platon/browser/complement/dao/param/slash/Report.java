@@ -46,6 +46,8 @@ public class Report implements BusinessParam {
     private int unStakeFreezeDuration;
     //解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者
     private BigInteger unStakeEndBlock;
+    //双签的区块
+    private Long blockNum;
 
     @Override
     public BusinessType getBusinessType() {

@@ -74,6 +74,8 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
 
         // 更新解质押到账需要经过的结算周期数
         BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+        
+        Long blockNum= event.getBlock().getNum() - (event.getBlock().getNum()% chainConfig.getConsensusPeriodBlockCount().longValue())+chainConfig.getConsensusPeriodBlockCount().longValue();
         // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
         BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(txParam.getVerify(),event.getEpochMessage().getSettleEpochRound(),true);
         Report businessParam= Report.builder()
@@ -88,6 +90,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
                 .unStakeEndBlock(unStakeEndBlock)
+                .blockNum(blockNum)
                 .build();
 
         /**

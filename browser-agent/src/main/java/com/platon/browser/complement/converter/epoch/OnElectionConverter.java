@@ -102,9 +102,11 @@ public class OnElectionConverter {
 		// 更新解质押到账需要经过的结算周期数
 		BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
 		slashNodeList.forEach(staking -> {
-			// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-			BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
-			staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
+			if(staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
+				// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
+				BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
+				staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
+			}
 		});
 		//惩罚节点
 		Election election = Election.builder()
