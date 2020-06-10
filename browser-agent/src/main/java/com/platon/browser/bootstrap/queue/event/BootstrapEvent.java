@@ -40,4 +40,13 @@ public class BootstrapEvent {
     public void setCallback(Callback callback) {
         this.callback = callback;
     }
+
+    /**
+     * 释放对象引用
+     */
+    public void releaseRef(){
+        blockCF=null;
+        receiptCF=null;
+        callback=null;
+    }
 }

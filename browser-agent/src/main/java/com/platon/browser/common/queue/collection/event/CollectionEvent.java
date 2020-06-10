@@ -36,4 +36,13 @@ public class CollectionEvent {
     public void setEpochMessage(EpochMessage epochMessage) {
         this.epochMessage = epochMessage;
     }
+
+    /**
+     * 释放对象引用
+     */
+    public void releaseRef(){
+        block=null;
+        transactions=null;
+        epochMessage=null;
+    }
 }
