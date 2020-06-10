@@ -3,10 +3,13 @@ package com.platon.browser.common.collection.dto;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 public class CollectionBlock extends Block {
@@ -42,7 +44,7 @@ public class CollectionBlock extends Block {
         return block;
     }
 
-    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, PlatOnClient platOnClient, AddressCache addressCache) throws BeanCreateOrUpdateException, IOException {
+    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult, PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi) throws BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
         String nodeId;
         if(block.getNumber().longValue()==0){
             nodeId="000000000000000000000000000000000";
@@ -75,7 +77,7 @@ public class CollectionBlock extends Block {
                 CollectionTransaction transaction = CollectionTransaction.newInstance()
                         .updateWithBlock(this)
                         .updateWithRawTransaction(rawTransaction)
-                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),platOnClient,addressCache);
+                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()),platOnClient,addressCache,specialApi);
                 transactions.add(transaction);
             }
         }

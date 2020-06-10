@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,7 +78,13 @@ public class AddressUpdateTask {
     	//查询待补充的地址
     	AddressExample addressExample = new AddressExample();
     	addressExample.setOrderByClause("create_time limit "+start+","+size);
-    	addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.ACCOUNT.getCode());
+    	List<Integer> accountType = Arrays.asList(
+			AddressTypeEnum.ACCOUNT.getCode(),
+			AddressTypeEnum.EVM_CONTRACT.getCode(),
+			AddressTypeEnum.WASM_CONTRACT.getCode()
+		);
+    	addressExample.createCriteria()
+				.andTypeIn(accountType);
     	List<Address> addressList = addressMapper.selectByExample(addressExample);
     	
     	if(addressList.isEmpty()) {

@@ -14,4 +14,5 @@ import java.util.List;
 public class TxAnalyseResult {
     private List<NodeOpt> nodeOptList;
     private List<DelegationReward> delegationRewardList;
+    private int proposalQty;
 }

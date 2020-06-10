@@ -12,6 +12,8 @@ import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,13 +25,12 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
@@ -66,7 +67,7 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException {
+    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
         CompletableFuture<PlatonBlock> blockCF=getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF=getReceiptAsync(7000L);
         BootstrapEvent bootstrapEvent = new BootstrapEvent();
