@@ -97,6 +97,7 @@ public class ExportTpsService extends ServiceBase {
 
 	}
 	
+	int m = 1;
 	public void explainBlock() {
 		try {
 			Map<Long,List<Block>> cacheMap = new HashMap<>();
@@ -126,10 +127,10 @@ public class ExportTpsService extends ServiceBase {
 				if(blocks == null) {
 					blocks = new ArrayList<Block>();
 				}
-				if(now <= startTime + 10) {
+				if(now <= startTime + m) {
 					blocks.add(block);
 				} else {
-					while (now > startTime + 10) {
+					while (now > startTime + m) {
 						this.setData( blocks, cacheMap, block, csvRows);
 					}
 					blocks.add(block);
@@ -157,10 +158,10 @@ public class ExportTpsService extends ServiceBase {
 			rowData[1] = rowData[1] + "," + b.getNum() ;
 		}
 		rowData[2] = txCount;
-		int tps = BigDecimal.valueOf(txCount).divide(BigDecimal.TEN,0,RoundingMode.CEILING).intValue();
+		int tps = BigDecimal.valueOf(txCount).divide(BigDecimal.ONE,0,RoundingMode.CEILING).intValue();
 		rowData[3] = tps;
 		
-		startTime = startTime+10;
+		startTime = startTime+m;
 		blocks.clear();
 		cacheMap.clear();
 		cacheMap.put(startTime, blocks);
@@ -168,5 +169,41 @@ public class ExportTpsService extends ServiceBase {
 		csvRows.add(rowData);
 	}
 	
-	
+	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+	public void exportMaxData() {
+		try {
+			List<Object[]> csvRows = new ArrayList<>();
+			Object[] rowHead = new Object[3];
+			rowHead[0] = "时间区间";
+			rowHead[1] = "区块区间";
+			rowHead[2] = "交易笔数";
+			csvRows.add(rowHead);
+			long begin = 0l;
+			begin = beginBlock;
+			long end = 0l;
+			end = endBlock;
+			long num = 0l;
+			for(;begin < end;) {
+				PlatonBlock platonBlock = getClient().platonGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(begin)),true).send();
+				CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(platonBlock.getBlock());
+				log.info("input num:{}", block.getNum());
+				begin++;
+				if(block.getTxQty() > 1800 || num == block.getNum()) {
+					Object[] rowData = new Object[3];
+					rowData[0] = block.getTime().getTime();
+					rowData[1] = block.getNum();
+					rowData[2] = block.getTxQty();
+					csvRows.add(rowData);
+					num = block.getNum()+1;
+				}
+			}
+			buildFile("exportMaxData.csv", csvRows, null);
+			log.info("exportMaxData数据导出成功,总行数：{}", csvRows.size());
+			txInfoExportDone = true;
+		} catch (Exception e) {
+			log.error("system error", e);
+			System.exit(0);
+		}
+
+	}
 }
