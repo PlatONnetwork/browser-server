@@ -1,5 +1,7 @@
 package com.platon.browser.req.staking;
 
+import javax.validation.constraints.NotBlank;
+
 import com.platon.browser.req.PageReq;
 
 /**
@@ -10,6 +12,7 @@ import com.platon.browser.req.PageReq;
  *  @data 2019年8月31日
  */
 public class DelegationListByStakingReq extends PageReq{
+	@NotBlank(message = "{nodeId not null}")
     private String nodeId;
     private String stakingBlockNum;
 	public String getNodeId() {

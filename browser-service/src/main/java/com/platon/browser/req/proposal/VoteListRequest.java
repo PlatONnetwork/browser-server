@@ -12,7 +12,7 @@ import com.platon.browser.req.PageReq;
  *  @data 2019年8月31日
  */
 public class VoteListRequest extends PageReq{
-	@NotBlank
+	@NotBlank(message = "{proposalHash not null}")
     private String proposalHash;
     
     private String option;
