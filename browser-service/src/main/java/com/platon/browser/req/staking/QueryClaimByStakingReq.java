@@ -1,5 +1,7 @@
 package com.platon.browser.req.staking;
 
+import javax.validation.constraints.NotBlank;
+
 import com.platon.browser.req.PageReq;
 
 /**
@@ -11,6 +13,7 @@ import com.platon.browser.req.PageReq;
  */
 public class QueryClaimByStakingReq extends PageReq {
 
+	@NotBlank(message = "{nodeId not null}")
 	private String nodeId;
 
 	public String getNodeId() {

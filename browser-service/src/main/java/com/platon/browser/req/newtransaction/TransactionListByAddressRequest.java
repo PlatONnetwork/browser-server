@@ -1,5 +1,7 @@
 package com.platon.browser.req.newtransaction;
 
+import javax.validation.constraints.NotBlank;
+
 import com.platon.browser.req.PageReq;
 import com.platon.browser.utils.HexTool;
 
@@ -11,6 +13,7 @@ import com.platon.browser.utils.HexTool;
  *  @data 2019年8月31日
  */
 public class TransactionListByAddressRequest extends PageReq{
+	@NotBlank(message = "{address not null}")
     private String address;
     private String txType;
 	public String getAddress() {
