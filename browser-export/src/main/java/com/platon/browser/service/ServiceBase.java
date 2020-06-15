@@ -2,7 +2,9 @@ package com.platon.browser.service;
 
 import com.platon.browser.callback.TransactionHandler;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -33,6 +35,10 @@ public abstract class ServiceBase {
     protected TransactionESRepository transactionESRepository;
     @Autowired
     private PlatOnClient platonClient;
+    @Autowired
+    protected SpecialApi specialApi;
+    @Autowired
+    protected BlockChainConfig chainConfig;
     @Value("${paging.pageSize}")
     protected int transactionPageSize;
 

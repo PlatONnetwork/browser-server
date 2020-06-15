@@ -5,6 +5,8 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.evm.bean.CollectionBlock;
+import com.platon.browser.utils.HexTool;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -206,4 +209,145 @@ public class ExportTpsService extends ServiceBase {
 		}
 
 	}
+	
+	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+	public void exportData() {
+		try {
+			List<Object[]> csvNodeRows = new ArrayList<>();
+			Object[] nodeRowHead = new Object[2];
+			nodeRowHead[0] = "开始区块";
+			nodeRowHead[1] = "节点列表";
+			csvNodeRows.add(nodeRowHead);
+			
+			
+			List<Object[]> csvZeroRows = new ArrayList<>();
+			Object[] zeroRowHead = new Object[3];
+			zeroRowHead[0] = "零出块节点id";
+			zeroRowHead[1] = "节点名称";
+			zeroRowHead[2] = "开始区块";
+			csvZeroRows.add(zeroRowHead);
+			long begin = 0l;
+			begin = beginBlock;
+			long end = 0l;
+			end = endBlock;
+			
+			Map<String, NodeData> nodeMap = new HashMap<>();
+			Map<String, Integer> nodeZeroMap = new HashMap<>();
+			List<Node> nodes = null;
+			Map<String, String> nodeNameMap = new HashMap<>();
+			for(;begin < end;) {
+				log.info("beginNum:"+ begin);
+				PlatonBlock platonBlock = getClient().platonGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(begin)),true).send();
+				CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(platonBlock.getBlock());
+				
+				if((begin-1)%chainConfig.getConsensusPeriodBlockCount().longValue()==0) {
+					if(nodes!=null) {
+						for(Node node:nodes) {
+							if(!nodeZeroMap.containsKey(node.getNodeId())) {
+								Object[] rowData = new Object[3];
+								rowData[0] = node.getNodeId();
+								rowData[1] = nodeNameMap.get(node.getNodeId());
+								rowData[2] = begin - chainConfig.getConsensusPeriodBlockCount().longValue();
+								csvZeroRows.add(rowData);
+							}
+						}
+						nodeZeroMap.clear();
+					}
+					
+					Object[] rowData = new Object[2];
+					rowData[0] = begin-1;
+					nodes = specialApi.getHistoryValidatorList(getClient(), BigInteger.valueOf(begin));
+					StringBuilder sBuilder = new StringBuilder();
+					for(Node node:nodes) {
+						if(!nodeNameMap.containsKey(HexTool.prefix(node.getNodeId()))) {
+							com.platon.browser.dao.entity.Node node2 = nodeMapper.selectByPrimaryKey(HexTool.prefix(node.getNodeId()));
+							if (node2 != null)
+							nodeNameMap.put(HexTool.prefix(node.getNodeId()), node2.getNodeName());
+						}
+						
+						node.setNodeId(HexTool.prefix(node.getNodeId()));
+						sBuilder.append(node.getNodeId()).append("(").append(nodeNameMap.get(HexTool.prefix(node.getNodeId())))
+							.append(")").append(";");
+						if(nodeMap.containsKey(node.getNodeId())) {
+							NodeData nodeData = nodeMap.get(node.getNodeId());
+							nodeData.setExpectBlock(nodeData.getExpectBlock() + 10);
+							nodeMap.put(block.getNodeId(),nodeData);
+						} else {
+							NodeData nodeData = new NodeData();
+							nodeData.setExpectBlock(10);
+							nodeData.setNodeId(node.getNodeId());
+							nodeData.setStartNum(begin);
+							nodeData.setBlock(0);
+							nodeMap.put(node.getNodeId(), nodeData);
+						}
+					}
+					rowData[1] = sBuilder.toString();
+					csvNodeRows.add(rowData);
+					log.info("beginNum:{},data:{}", begin,rowData[1]);
+				}
+				if(nodeMap.containsKey(block.getNodeId())) {
+					NodeData nodeData = nodeMap.get(block.getNodeId());
+					nodeData.setBlock(nodeData.getBlock()+1);
+					nodeMap.put(block.getNodeId(),nodeData);
+					if(nodeZeroMap.containsKey(block.getNodeId())) {
+						Integer data = nodeZeroMap.get(block.getNodeId());
+						nodeZeroMap.put(block.getNodeId(), data+1);
+					} else {
+						nodeZeroMap.put(block.getNodeId(), 1);
+					}
+				}
+				
+				begin++;
+			}
+			
+			buildFile("exportValidatorNodeData.csv", csvNodeRows, null);
+			log.info("exportValidatorNodeData数据导出成功,总行数：{}", csvNodeRows.size());
+			
+
+			buildFile("exportZeroNodeData.csv", csvZeroRows, null);
+			log.info("exportZeroNodeData数据导出成功,总行数：{}", csvZeroRows.size());
+			
+			List<Object[]> csvBlockRateRows = new ArrayList<>();
+			Object[] blockRateRowHead = new Object[6];
+			blockRateRowHead[0] = "节点id";
+			blockRateRowHead[1] = "节点名称";
+			blockRateRowHead[2] = "已出区块";
+			blockRateRowHead[3] = "预计出块";
+			blockRateRowHead[4] = "出块率";
+			blockRateRowHead[5] = "开始出块";
+			csvBlockRateRows.add(blockRateRowHead);
+			for(Entry<String, NodeData> node: nodeMap.entrySet()) {
+				Object[] rowData = new Object[6];
+				rowData[0] = node.getKey();
+				rowData[1] = nodeNameMap.get(node.getKey());
+				rowData[2] = node.getValue().getBlock();
+				rowData[3] = node.getValue().getExpectBlock();
+				rowData[4] = BigDecimal.valueOf(node.getValue().getBlock()).divide(
+						BigDecimal.valueOf(node.getValue().getExpectBlock()), 2, RoundingMode.HALF_UP);;
+				rowData[5] = node.getValue().getStartNum();
+				csvBlockRateRows.add(rowData);
+			}
+
+			buildFile("exportBlockRateNodeData.csv", csvBlockRateRows, null);
+			log.info("exportBlockRateNodeData数据导出成功,总行数：{}", csvBlockRateRows.size());
+			txInfoExportDone = true;
+		} catch (Exception e) {
+			log.error("system error", e);
+			System.exit(0);
+		}
+
+	}
+	
+	
+}
+
+@Data
+class NodeData {
+	private String nodeId;
+	
+	private Integer expectBlock;
+	
+	private Integer block;
+	
+	private Long startNum;
 }
