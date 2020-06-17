@@ -1,6 +1,7 @@
 package com.platon.browser.req.newblock;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.platon.browser.req.PageReq;
 import com.platon.browser.utils.HexTool;
@@ -14,6 +15,7 @@ import com.platon.browser.utils.HexTool;
  */
 public class BlockListByNodeIdReq extends PageReq{
 	@NotBlank(message="{nodeId is not null}")
+	@Size(min = 130,max = 130)
     private String nodeId;
 
 	public String getNodeId() {

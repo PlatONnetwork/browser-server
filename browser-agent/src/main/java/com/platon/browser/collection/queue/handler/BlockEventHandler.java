@@ -54,7 +54,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             // 释放对象引用
             event.releaseRef();
         }catch (Exception e){
-            log.error("",e);
+            log.error("onEvent error",e);
             throw e;
         }
 

@@ -1,6 +1,7 @@
 package com.platon.browser.req.newtransaction;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import com.platon.browser.req.PageReq;
 
@@ -12,7 +13,8 @@ import com.platon.browser.req.PageReq;
  *  @data 2019年8月31日
  */
 public class TransactionListByBlockRequest extends PageReq{
-	@NotBlank(message = "{blockNumber not null}")
+	@NotNull(message = "{blockNumber not null}")
+	@Min(value = 1)
     private Integer blockNumber;
     private String txType;
 	public Integer getBlockNumber() {

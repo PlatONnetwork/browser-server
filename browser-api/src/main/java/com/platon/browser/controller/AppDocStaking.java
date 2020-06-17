@@ -165,7 +165,7 @@ public interface AppDocStaking {
      * - 查询mysql中node表并关联staking表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "nodeId":""                //节点地址
+     *    "nodeId":""                //节点地址(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -223,7 +223,7 @@ public interface AppDocStaking {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "nodeId":""                //节点地址
+     *    "nodeId":""                //节点地址(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -271,7 +271,7 @@ public interface AppDocStaking {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "nodeId":"",               //节点地址
+     *    "nodeId":"",               //节点地址(必填)
      *    "stakingBlockNum",""         //最新的质押交易块高
      * }
      * @apiSuccessExample {json} Success-Response:

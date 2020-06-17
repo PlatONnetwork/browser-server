@@ -1,6 +1,7 @@
 package com.platon.browser.req.proposal;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.platon.browser.req.PageReq;
 
@@ -13,6 +14,7 @@ import com.platon.browser.req.PageReq;
  */
 public class VoteListRequest extends PageReq{
 	@NotBlank(message = "{proposalHash not null}")
+	@Size(min = 60,max = 66)
     private String proposalHash;
     
     private String option;

@@ -44,7 +44,7 @@ public interface AppDocHome {
      * - 如果上面没有查询到，查询mysql中staking表通过节点名称查询<br/>
      * @apiParamExample {json} Request-Example:
      * {
-     *    "parameter":""               //用户输入
+     *    "parameter":""               //用户输入(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK

@@ -86,7 +86,7 @@ public interface AppDocBlock {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "nodeId":""                //节点id
+     *    "nodeId":""                //节点id(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -97,7 +97,7 @@ public interface AppDocBlock {
 	WebAsyncTask<RespPage<BlockListResp>> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
 	
     /**
-     * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date&local=:en c.导出节点的区块列表
+     * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date&local=:en&timeZone=:+8 c.导出节点的区块列表
      * @apiVersion 1.0.0
      * @apiName blockListByNodeIdDownload
      * @apiGroup block

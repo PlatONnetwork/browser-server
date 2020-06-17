@@ -1,6 +1,9 @@
 package com.platon.browser.req.staking;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.platon.browser.utils.HexTool;
 
@@ -13,6 +16,7 @@ import com.platon.browser.utils.HexTool;
  */
 public class StakingDetailsReq {
     @NotBlank(message = "{nodeId not null}")
+    @Size(min = 128,max = 130)
     private String nodeId;
 
 	public String getNodeId() {
@@ -20,6 +24,7 @@ public class StakingDetailsReq {
 	}
 
 	public void setNodeId(String nodeId) {
+		if(StringUtils.isBlank(nodeId)) return;
 		this.nodeId = HexTool.prefix(nodeId.toLowerCase());
 	}
     

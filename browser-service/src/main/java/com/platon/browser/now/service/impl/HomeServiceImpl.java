@@ -13,14 +13,11 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
-import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.CommonService;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.home.QueryNavigationRequest;
 import com.platon.browser.res.home.*;
-import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.HexTool;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,8 +50,6 @@ public class HomeServiceImpl implements HomeService {
 	private TransactionESRepository transactionESRepository;
 	@Autowired
 	private StatisticCacheService statisticCacheService;
-	@Autowired
-	private I18nUtil i18n;
 	@Autowired
 	private NodeMapper nodeMapper;
 	@Autowired
@@ -157,6 +152,7 @@ public class HomeServiceImpl implements HomeService {
 					 * 交易hash或者区块hash 逻辑分析 1、优先查询已完成交易 2、已完成交易查询无记录，则查询区块
 					 * 4、以上都无记录，则返回空结果
 					 */
+					keyword = keyword.toLowerCase();
 					Transaction items = null;
 					try {
 						items = transactionESRepository.get(keyword, Transaction.class);
