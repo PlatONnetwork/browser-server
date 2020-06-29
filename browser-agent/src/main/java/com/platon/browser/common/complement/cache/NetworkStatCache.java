@@ -36,7 +36,7 @@ public class NetworkStatCache {
     	networkStat.setCurTps(tps);
     	networkStat.setCurBlockHash(block.getHash());
     	if(maxTps > networkStat.getMaxTps()) {
-    		networkStat.setMaxTps(tps);
+    		networkStat.setMaxTps(maxTps);
     	}
     }
     

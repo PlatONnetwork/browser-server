@@ -1,6 +1,7 @@
 package com.platon.browser.req.staking;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.platon.browser.req.PageReq;
 
@@ -13,6 +14,7 @@ import com.platon.browser.req.PageReq;
  */
 public class DelegationListByStakingReq extends PageReq{
 	@NotBlank(message = "{nodeId not null}")
+	@Size(min = 130,max = 130)
     private String nodeId;
     private String stakingBlockNum;
 	public String getNodeId() {

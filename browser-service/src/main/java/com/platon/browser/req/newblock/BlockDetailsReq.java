@@ -1,5 +1,6 @@
 package com.platon.browser.req.newblock;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 public class BlockDetailsReq {
     @NotNull(message = "{number not null}")
+    @Min(value = 1)
     private Integer number;
 
 	public Integer getNumber() {

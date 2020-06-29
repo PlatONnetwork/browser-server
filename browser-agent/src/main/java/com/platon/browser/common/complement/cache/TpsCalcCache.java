@@ -47,20 +47,21 @@ public class TpsCalcCache {
 		}
         
         
-        Integer maxTxQty = maxCacheMap.get(TpsCalcCache.maxTime);
+        Integer maxTxQty = maxCacheMap.get(maxTime);
         if(maxTxQty == null) {
         	maxTxQty = 0;
         	TpsCalcCache.maxTime = now;
-        	maxCacheMap.putIfAbsent(TpsCalcCache.maxTime, 0);
+        	maxCacheMap.putIfAbsent(maxTime, 0);
         }
-        if(TpsCalcCache.maxTime.intValue() == now.intValue()) {
+        if(TpsCalcCache.maxTime.longValue() == now.longValue()) {
         	maxTxQty +=  block.getTransactions().size();
-        	maxCacheMap.put(TpsCalcCache.maxTime, maxTxQty);
+        	maxCacheMap.put(maxTime, maxTxQty);
         } else {
+        	maxTps = maxTxQty.intValue();
         	maxCacheMap.clear();
-        	maxCacheMap.put(TpsCalcCache.maxTime, maxTxQty);
+        	maxTime = now;
+        	maxCacheMap.put(maxTime, 0);
         }
-        maxTps = maxTxQty.intValue();
         
 //        cacheMap.putIfAbsent(now, 0L);
 //        cacheMap.put(now,cacheMap.get(now)+block.getTransactions().size());

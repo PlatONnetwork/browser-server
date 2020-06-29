@@ -81,7 +81,7 @@ public interface AppDocProposal {
      * - 查询mysql中proposal表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "proposalHash":""            //提案的内部id
+     *    "proposalHash":""            //提案的内部id(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -140,7 +140,7 @@ public interface AppDocProposal {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "proposalHash":"",           //提案的内部id
+     *    "proposalHash":"",           //提案的内部id(必填)
      *    "option":""                  //投票选型  1：支持；  2：反对；  3弃权
      * }
      * @apiSuccessExample {json} Success-Response:

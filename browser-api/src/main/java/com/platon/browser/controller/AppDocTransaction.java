@@ -143,7 +143,7 @@ public interface AppDocTransaction {
 	WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 	
     /**
-     * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date&local=:en d.导出地址交易列表
+     * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date&local=:en&timeZone=:+8 d.导出地址交易列表
      * @apiVersion 1.0.0
      * @apiName addressTransactionDownload
      * @apiGroup transaction
@@ -166,7 +166,7 @@ public interface AppDocTransaction {
     		@ApiParam(value = "token", required = false)@RequestParam(value = "token", required = false) String token,HttpServletResponse response);
 	
     /**
-     * @api {post} transaction/transactionDetails e.交易详情 
+     * @api {post} /transaction/transactionDetails e.交易详情 
      * @apiVersion 1.0.0
      * @apiName transactionDetails
      * @apiGroup transaction

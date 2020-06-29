@@ -75,7 +75,6 @@ public class RetryableClient {
                         service=wss;
                     } catch (ConnectException e) {
                         log.error("Websocket地址({})无法连通:",protocol.getHead()+address,e);
-                        return;
                     }
                 }else if(protocol==Web3jProtocolEnum.HTTP){
                     service = new HttpService(protocol.getHead()+address);

@@ -1,6 +1,7 @@
 package com.platon.browser.req.newtransaction;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.platon.browser.req.PageReq;
 
@@ -13,6 +14,7 @@ import com.platon.browser.req.PageReq;
  */
 public class TransactionListByAddressRequest extends PageReq{
 	@NotBlank(message = "{address not null}")
+	@Size(min = 42,max = 42)
     private String address;
     private String txType;
 	public String getAddress() {
