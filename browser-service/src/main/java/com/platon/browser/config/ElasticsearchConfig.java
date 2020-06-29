@@ -29,9 +29,11 @@ public class ElasticsearchConfig {
     @Value("${spring.elasticsearch.high-level-client.schema}")
     private String schema; // 使用的协议
     @Value("${spring.elasticsearch.high-level-client.username}")
-    private String username; // 使用的协议
+    private String username; // 用户名
     @Value("${spring.elasticsearch.high-level-client.password}")
-    private String password; // 使用的协议
+    private String password; // 密码
+   
+
 
     private int connectTimeOut = 10000; // 连接超时时间
     private int socketTimeOut = 30000; // 连接超时时间
@@ -40,12 +42,11 @@ public class ElasticsearchConfig {
     private int maxConnectNum = 200; // 最大连接数
     private int maxConnectPerRoute = 200; // 最大路由连接数
 
-    @Bean
+    @Bean(name = "restHighLevelClient")
     public RestHighLevelClient client() {
     	CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY,
                 new UsernamePasswordCredentials(username, password));
-
         List<HttpHost> hosts = new ArrayList<>();
         addresses.forEach(address->hosts.add(new HttpHost(address,port,schema)));
         RestClientBuilder builder = RestClient.builder(hosts.toArray(new HttpHost[0]));
