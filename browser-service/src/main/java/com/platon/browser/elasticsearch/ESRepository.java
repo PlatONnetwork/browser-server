@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.elasticsearch.ESSortDto;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.util.SpringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -41,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/10/25 15:12
@@ -49,8 +53,11 @@ import java.util.Map;
 @Slf4j
 public abstract class ESRepository {
 
-	@Autowired
+	@Resource(name = "restHighLevelClient")
 	private RestHighLevelClient client;
+	
+	@Autowired
+	private SpringUtils springUtils;
 
 	public abstract String getIndexName();
 	
@@ -320,11 +327,20 @@ public abstract class ESRepository {
 			ir.source(JSON.toJSONString(doc.getValue()), XContentType.JSON);
 			br.add(ir);
 		}
-		BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+		try {
+			BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+			log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
-
-		log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+			log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+		} catch (Exception e) {
+			if(e instanceof RuntimeException && e.getMessage().contains("Request cannot be executed; I/O reactor status: STOPPED")) {
+				client = (RestHighLevelClient) springUtils.resetSpring("restHighLevelClient");
+				BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+				log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+				log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+			} 
+		}
+		
 	}
 
 	/**

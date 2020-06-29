@@ -24,6 +24,8 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
+      username: elastic
+      password: changeme
       blockIndexName: browser_block_aton_${profile}
       transactionIndexName: browser_transaction_aton_${profile}
       delegationIndexName: browser_delegation_aton_${profile}
