@@ -47,6 +47,11 @@ public class InnerContractDecodeUtil {
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
 
                 Transaction.TypeEnum typeEnum = Transaction.TypeEnum.getEnum(txCode.intValue());
+                if(typeEnum == null) {
+                	OthersTxParam txParam=new OthersTxParam();
+                	result.setParam(txParam);
+                	return result;
+                }
                 result.setTypeEnum(typeEnum);
                 switch (typeEnum) {
                     case STAKE_CREATE: // 1000 发起质押

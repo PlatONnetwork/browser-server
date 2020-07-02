@@ -59,6 +59,9 @@ public class TransactionUtil {
         for (int i=0;i<trans.size();i++) {
             TransData tran = trans.get(i);
             InnerContractDecodedResult result = InnerContractDecodeUtil.decode(tran.getInput(), Collections.emptyList());
+            if(result.getTypeEnum() == null) {
+            	continue;
+            }
             Transaction tx = new Transaction();
             BeanUtils.copyProperties(parentTx, tx);
             tx.setStatus(parentTx.getStatus());
@@ -73,7 +76,7 @@ public class TransactionUtil {
             tx.setSeq((long) i);
             transactionList.add(tx);
 
-            if(tran.getCode()>0){
+            if(Integer.valueOf(tran.getCode())>0){
                 // 虚拟交易失败,交易状态码设置为失败
                 tx.setStatus(Transaction.StatusEnum.FAILURE.getCode());
             }
@@ -133,6 +136,20 @@ public class TransactionUtil {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
             List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
             logger.debug("更新缓存-PPos调用合约输入参数：{}", JSON.toJSONString(inputs,true));
+            List<PPosInvokeContractInput> ppremoveList = new ArrayList<>();
+            for (PPosInvokeContractInput input:inputs) {
+            	List<TransData> removeList = new ArrayList<>();
+            	for(TransData transData :input.getTransDatas()) {
+            		if(transData.getCode().length()>6) {
+            			removeList.add(transData);
+            		}
+            	}
+            	input.getTransDatas().removeAll(removeList);
+            	if(input.getTransDatas().isEmpty()) {
+            		ppremoveList.add(input);
+            	}
+			}
+            inputs.removeAll(ppremoveList);
             if(inputs.size()>0) PPosInvokeContractInputCache.update(block.getNum(),inputs);
         }
 
