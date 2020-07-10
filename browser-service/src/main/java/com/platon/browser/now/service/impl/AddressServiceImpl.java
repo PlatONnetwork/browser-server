@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;

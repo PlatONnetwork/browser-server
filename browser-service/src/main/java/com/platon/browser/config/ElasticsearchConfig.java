@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import java.util.List;
  * @Description: ES配置
  */
 @Configuration
+@Data
 public class ElasticsearchConfig {
     @Value("${spring.elasticsearch.high-level-client.hosts}")
     private List<String> addresses; // 集群地址，多个用,隔开

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 public class BlockDetailsReq {
     @NotNull(message = "{number not null}")
-    @Min(value = 1)
+    @Min(value = 0)
     private Integer number;
 
 	public Integer getNumber() {

@@ -61,7 +61,6 @@ import org.springframework.stereotype.Service;
 import org.web3j.utils.Convert;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -132,8 +131,9 @@ public class TransactionServiceImpl implements TransactionService {
 		/** 根据区块号和类型分页查询交易信息 */
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return result;
 		}
         List<TransactionListResp> lists = this.transferList(items.getRsData());
         /** 统计交易信息 */
@@ -160,8 +160,9 @@ public class TransactionServiceImpl implements TransactionService {
 			      "to", "value", "num", "type", "toType", "cost", "failReason" });
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return result;
 		}
         List<TransactionListResp> lists = this.transferList(items.getRsData());
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -208,6 +209,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public AccountDownload transactionListByAddressDownload(String address, Long date,String local, String timeZone) {
+    	AccountDownload accountDownload = new AccountDownload();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         SimpleDateFormat  format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -227,8 +229,9 @@ public class TransactionServiceImpl implements TransactionService {
 			      "to", "value", "num", "type", "toType", "cost"});
 		try {
 			items = transactionESRepository.search(constructor, Transaction.class, 1, 30000);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return accountDownload;
 		}
         List<Object[]> rows = new ArrayList<>();
         items.getRsData().forEach(transaction -> {
@@ -262,8 +265,9 @@ public class TransactionServiceImpl implements TransactionService {
         try {
         	/** 设置导出的csv头，防止乱码 */
         	byteArrayOutputStream.write(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF });
-        } catch (IOException e) {
+        } catch (Exception e) {
         	logger.error("输出数据错误:",e);
+        	return accountDownload;
         }
         Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
         logger.error("download Charset.defaultCharset():{}", StandardCharsets.UTF_8);
@@ -282,7 +286,6 @@ public class TransactionServiceImpl implements TransactionService {
         );
         writer.writeRowsAndClose(rows);
         /** 设置返回对象  */
-        AccountDownload accountDownload = new AccountDownload();
         accountDownload.setData(byteArrayOutputStream.toByteArray());
         accountDownload.setFilename("Transaction-" + address + "-" + date + ".CSV");
         accountDownload.setLength(byteArrayOutputStream.size());
@@ -291,14 +294,15 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetailsResp transactionDetails( TransactionDetailsReq req) {
+    	TransactionDetailsResp resp = new TransactionDetailsResp();
     	/** 根据hash查询具体的交易数据 */
 		Transaction transaction = null;
 		try {
 			transaction = transactionESRepository.get(req.getTxHash(), Transaction.class);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return resp;
 		}
-    	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(transaction != null) {
     		BeanUtils.copyProperties(transaction, resp);
     		resp.setActualTxCost(new BigDecimal(transaction.getCost()));
@@ -369,8 +373,9 @@ public class TransactionServiceImpl implements TransactionService {
         		ESResult<Transaction> first = new ESResult<>();
         		try {
         			first = transactionESRepository.search(constructor, Transaction.class, 1, 1);
-        		} catch (IOException e) {
+        		} catch (Exception e) {
         			logger.error("获取交易错误。", e);
+        			return resp;
         		}
         		if(first.getTotal() > 0l) {
         			resp.setPreHash(first.getRsData().get(0).getHash());
@@ -387,8 +392,9 @@ public class TransactionServiceImpl implements TransactionService {
     		ESResult<Transaction> last = new ESResult<>();
     		try {
     			last = transactionESRepository.search(constructor, Transaction.class, 1, 1);
-    		} catch (IOException e) {
+    		} catch (Exception e) {
     			logger.error("获取交易错误。", e);
+    			return resp;
     		}
     		if(last.getTotal() > 0) {
     			resp.setLast(false);
@@ -759,6 +765,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public RespPage<QueryClaimByAddressResp> queryClaimByAddress(TransactionListByAddressRequest req) {
+		RespPage<QueryClaimByAddressResp> result = new RespPage<>();
 		/** 根据地址查询具体的领取奖励数据 */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("addr", req.getAddress()));
@@ -768,6 +775,7 @@ public class TransactionServiceImpl implements TransactionService {
 			delegationRewards = delegationRewardESRepository.search(constructor, DelegationReward.class, req.getPageNo(), req.getPageSize());
 		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return result;
 		}
 		if(delegationRewards==null){
 			// 防止空指异常
@@ -818,7 +826,6 @@ public class TransactionServiceImpl implements TransactionService {
 			queryClaimByAddressResps.add(queryClaimByAddressResp);
 		}
 		
-		RespPage<QueryClaimByAddressResp> result = new RespPage<>();
 		result.init(queryClaimByAddressResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
 		return result;
 	}
