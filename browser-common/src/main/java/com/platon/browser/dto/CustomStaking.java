@@ -144,7 +144,8 @@ public class CustomStaking extends Staking {
     public enum StatusEnum{
         CANDIDATE(1, "候选中"),
         EXITING(2, "退出中"),
-        EXITED(3, "已退出")
+        EXITED(3, "已退出"),
+        LOCKED(4, "已锁定"),
         ;
         private int code;
         private String desc;
