@@ -336,23 +336,49 @@ public interface AppDocStaking {
 	@ApiOperation(value = "staking/delegationListByAddress", nickname = "", notes = "", response = DelegationListByAddressResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/delegationListByAddress", produces = { "application/json" })
 	WebAsyncTask<RespPage<DelegationListByAddressResp>> delegationListByAddress(@ApiParam(value = "DelegationListByAddressReq ", required = true)@Valid @RequestBody DelegationListByAddressReq req);
-	
-	
-    /**
-     * 多余的接口
-     * @apiDeprecated
-     * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date h.导出地址验证人委托列表
-     * @apiVersion 1.0.0
-     * @apiName delegationListByAddressDownload
-     * @apiGroup staking
-     * @apiDescription 逻辑同 《地址相关的委托列表接口》
-     * @apiParam {String} address 合约地址
-     * @apiParam {String} date 数据结束日期
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * >响应为 二进制文件流
-     * 没有导出
-     */
-	
-	
+
+
+
+	/**
+	 * @api {post} /staking/lockedStakingList h.已锁定验证人列表
+	 * @apiVersion 1.0.0
+	 * @apiName historyStakingList
+	 * @apiGroup staking
+	 * @apiDescription
+	 * 1. 功能：已锁定验证人列表查询<br/>
+	 * 2. 实现逻辑：<br/>
+	 * - 查询mysql中node表并关联staking表
+	 * @apiParamExample {json} Request-Example:
+	 * {
+	 *    "pageNo":1,                  //页数(必填)
+	 *    "pageSize":10,               //页大小(必填)
+	 *    "key":""                     //验证人名称
+	 * }
+	 * @apiSuccessExample {json} Success-Response:
+	 * HTTP/1.1 200 OK
+	 * {
+	 *   "errMsg":"",                  //描述信息
+	 *   "code":0,                     //成功（0），失败则由相关失败码
+	 *   "totalCount":18,              //总数
+	 *   "totalPages":1,               //总页数
+	 *   "data":[
+	 *      {
+	 *         "nodeId":"",            //出块节点地址
+	 *         "nodeName":"",          //验证人名称
+	 *         "stakingIcon":"",       //验证人图标
+	 *         "status":"",            //状态 6:已锁定
+	 *         "statDelegateReduction":"", //待提取的委托
+	 *         "slashLowQty":11,       //低出块率举报次数
+	 *         "slashMultiQty":11,     //多签举报次数
+	 *         "leaveTime":11          //退出时间
+	 *         "blockQty":11,          //产生的区块数
+	 *      }
+	 *   ]
+	 * }
+	 */
+	@ApiOperation(value = "staking/lockedStakingList", nickname = "", notes = "", response = AliveStakingListReq.class, tags = { "Staking" })
+	@PostMapping(value = "staking/lockedStakingList", produces = { "application/json" })
+	WebAsyncTask<RespPage<AliveStakingListResp>> lockedStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
+
+
 }
