@@ -37,7 +37,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -346,18 +345,18 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req) {
-		
+		RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
 		ESResult<NodeOpt> items = new ESResult<>();
 		constructor.setDesc("id");
 		try {
 			items = nodeOptESRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
-		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
+		} catch (Exception e) {
+			logger.error("获取节点操作错误。", e);
+			return respPage;
 		}
 		List<NodeOpt> nodeOpts = items.getRsData();
-		RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
 		List<StakingOptRecordListResp> lists = new LinkedList<>();
 		for (NodeOpt nodeOpt: nodeOpts) {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();

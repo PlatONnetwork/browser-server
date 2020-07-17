@@ -2,7 +2,7 @@ package com.platon.browser.client;
 
 public class TransData{
     private String input;
-    private Integer code;
+    private String code;
 
     public String getInput() {
         return input;
@@ -12,11 +12,11 @@ public class TransData{
         this.input = input;
     }
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(String code) {
         this.code = code;
     }
 }

@@ -168,6 +168,7 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
+		RespPage<BlockListResp> respPage = new RespPage<>();
 		/** 根据nodeId 查询区块列表，以区块号倒序  */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
@@ -175,11 +176,11 @@ public class BlockServiceImpl implements BlockService {
 		ESResult<Block> blocks = new ESResult<>();
 		try {
 			blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return respPage;
 		}
 		/** 初始化返回对象 */
-		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new ArrayList<>();
 		for(Block block : blocks.getRsData()) {
 			BlockListResp blockListResp = new BlockListResp();
@@ -203,6 +204,8 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public BlockDownload blockListByNodeIdDownload(String nodeId, Long date, String local, String timeZone) {
+		/** 设置下载返回对象 */
+        BlockDownload blockDownload = new BlockDownload();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
 		SimpleDateFormat  format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -220,8 +223,9 @@ public class BlockServiceImpl implements BlockService {
 		ESResult<Block> blockList = new ESResult<>();
 		try {
 			blockList = blockESRepository.search(constructor, Block.class, 1, 30000);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
+			return blockDownload;
 		}
         /** 将查询数据转成对应list */
         List<Object[]> rows = new ArrayList<>();
@@ -255,8 +259,7 @@ public class BlockServiceImpl implements BlockService {
                 i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE, local)
         );
         writer.writeRowsAndClose(rows);
-        /** 设置下载返回对象 */
-        BlockDownload blockDownload = new BlockDownload();
+        
         blockDownload.setData(baos.toByteArray());
         blockDownload.setFilename("block-"+nodeId+"-"+date+".csv");
         blockDownload.setLength(baos.size());

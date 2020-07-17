@@ -14,7 +14,7 @@ import com.platon.browser.req.PageReq;
  */
 public class TransactionListByBlockRequest extends PageReq{
 	@NotNull(message = "{blockNumber not null}")
-	@Min(value = 1)
+	@Min(value = 0)
     private Integer blockNumber;
     private String txType;
 	public Integer getBlockNumber() {
