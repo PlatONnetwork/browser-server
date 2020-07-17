@@ -20,6 +20,17 @@ sonarqube {
 }
 
 subprojects {
+    def bootApps = ['browser-agent','browser-api','browser-export','browser-press','browser-sync']
+    if(project.name in bootApps){
+        // 更新应用中的配置文件版本号
+        def appConfTpl = file(projectDir.path+"/conftpl/application.yml")
+        def appConfStr = appConfTpl.text
+                .replace('_VERSION_',"$projectVersion")
+                .replace('_DESCRIPTION_','通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录')
+        file(projectDir.path+"/src/main/resources/application.yml").write(appConfStr)
+    }
+
+
     // 设置编译器使用的编码
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
