@@ -10,7 +10,6 @@ import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.epoch.Consensus;
 import com.platon.browser.complement.dao.param.epoch.Election;
 import com.platon.browser.complement.dao.param.epoch.NewBlock;
-import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.complement.dao.param.proposal.ProposalText;
 import com.platon.browser.complement.dao.param.proposal.ProposalUpgrade;
 import com.platon.browser.complement.dao.param.proposal.ProposalVote;
@@ -132,7 +131,7 @@ public class AgentTestBase extends AgentTestData {
                 .slashRate(new BigDecimal("0.5"))
                 .slashData("json")
                 .benefitAddr("0x02fba14f5e72092c8fca6ced087cd4e7be0d8fc5")
-                .codeCurStakingLocked(new BigDecimal("50000000"))
+                .codeRemainRedeemAmount(new BigDecimal("50000000"))
                 .codeStatus(2)
                 .codeRewardValue(new BigDecimal("1000000000"))
                 .build();

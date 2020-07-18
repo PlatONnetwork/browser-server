@@ -70,7 +70,8 @@ public class BlockParameterService {
         // 新结算周期事件
         if ((block.getNum()-1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
-            onSettleConverter.convert(event, block);
+            List<NodeOpt> nodeOpt = onSettleConverter.convert(event, block);
+            nodeOptList.addAll(nodeOpt);
         }
 
         // 新区块事件

@@ -36,6 +36,7 @@ public class ModifiableParam {
                 .slashFractionDuplicateSign(BigDecimal.ZERO)
                 .zeroProduceCumulativeTime(0)
                 .zeroProduceNumberThreshold(0)
+                .zeroProduceFreezeDuration(0)
                 .build();
         this.block=Block.builder()
                 .maxBlockGasLimit(BigDecimal.ZERO)
@@ -79,6 +80,9 @@ public class ModifiableParam {
                     break;
                 case ZERO_PRODUCE_NUMBER_THRESHOLD:
                 	slashing.setZeroProduceNumberThreshold(Integer.valueOf(config.getValue()));
+                    break;
+                case ZERO_PRODUCE_FREEZE_DURATION:
+                    slashing.setZeroProduceFreezeDuration(Integer.valueOf(config.getValue()));
                     break;
                 case REWARD_PER_CHANGE_INTERVAL:
                     staking.setRewardPerChangeInterval(Integer.valueOf(config.getValue()));

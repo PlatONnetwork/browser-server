@@ -41,6 +41,7 @@ public class NodeOpt {
         LOW_BLOCK_RATE("7", "出块率低","BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT"),
         VERSION("8", "版本声明","NODE_NAME|ACTIVE_NODE|VERSION"),
         INCREASE("10", "增持质押",""),
+        UNLOCKED("11", "解除锁定","LOCKED_EPOCH|UNLOCKED_EPOCH|FREEZE_DURATION"),
         ;
         private String code;
         private String desc;

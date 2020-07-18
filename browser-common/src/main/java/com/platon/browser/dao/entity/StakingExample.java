@@ -2795,6 +2795,186 @@ public class StakingExample {
             addCriterion("un_stake_end_block not between", value1, value2, "unStakeEndBlock");
             return (Criteria) this;
         }
+
+        public Criteria andZeroProduceFreezeDurationIsNull() {
+            addCriterion("zero_produce_freeze_duration is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationIsNotNull() {
+            addCriterion("zero_produce_freeze_duration is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_duration =", value, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationNotEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_duration <>", value, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationGreaterThan(Integer value) {
+            addCriterion("zero_produce_freeze_duration >", value, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationGreaterThanOrEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_duration >=", value, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationLessThan(Integer value) {
+            addCriterion("zero_produce_freeze_duration <", value, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationLessThanOrEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_duration <=", value, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationIn(List<Integer> values) {
+            addCriterion("zero_produce_freeze_duration in", values, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationNotIn(List<Integer> values) {
+            addCriterion("zero_produce_freeze_duration not in", values, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationBetween(Integer value1, Integer value2) {
+            addCriterion("zero_produce_freeze_duration between", value1, value2, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeDurationNotBetween(Integer value1, Integer value2) {
+            addCriterion("zero_produce_freeze_duration not between", value1, value2, "zeroProduceFreezeDuration");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochIsNull() {
+            addCriterion("zero_produce_freeze_epoch is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochIsNotNull() {
+            addCriterion("zero_produce_freeze_epoch is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_epoch =", value, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochNotEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_epoch <>", value, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochGreaterThan(Integer value) {
+            addCriterion("zero_produce_freeze_epoch >", value, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochGreaterThanOrEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_epoch >=", value, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochLessThan(Integer value) {
+            addCriterion("zero_produce_freeze_epoch <", value, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochLessThanOrEqualTo(Integer value) {
+            addCriterion("zero_produce_freeze_epoch <=", value, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochIn(List<Integer> values) {
+            addCriterion("zero_produce_freeze_epoch in", values, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochNotIn(List<Integer> values) {
+            addCriterion("zero_produce_freeze_epoch not in", values, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochBetween(Integer value1, Integer value2) {
+            addCriterion("zero_produce_freeze_epoch between", value1, value2, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andZeroProduceFreezeEpochNotBetween(Integer value1, Integer value2) {
+            addCriterion("zero_produce_freeze_epoch not between", value1, value2, "zeroProduceFreezeEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountIsNull() {
+            addCriterion("low_rate_slash_count is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountIsNotNull() {
+            addCriterion("low_rate_slash_count is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountEqualTo(Integer value) {
+            addCriterion("low_rate_slash_count =", value, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountNotEqualTo(Integer value) {
+            addCriterion("low_rate_slash_count <>", value, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountGreaterThan(Integer value) {
+            addCriterion("low_rate_slash_count >", value, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("low_rate_slash_count >=", value, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountLessThan(Integer value) {
+            addCriterion("low_rate_slash_count <", value, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountLessThanOrEqualTo(Integer value) {
+            addCriterion("low_rate_slash_count <=", value, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountIn(List<Integer> values) {
+            addCriterion("low_rate_slash_count in", values, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountNotIn(List<Integer> values) {
+            addCriterion("low_rate_slash_count not in", values, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountBetween(Integer value1, Integer value2) {
+            addCriterion("low_rate_slash_count between", value1, value2, "lowRateSlashCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andLowRateSlashCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("low_rate_slash_count not between", value1, value2, "lowRateSlashCount");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

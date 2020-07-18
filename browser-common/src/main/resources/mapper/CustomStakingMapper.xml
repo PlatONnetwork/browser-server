@@ -54,6 +54,9 @@
     <result column="stat_staking_reward_value" jdbcType="DECIMAL" property="statStakingRewardValue" />
     <result column="un_stake_freeze_duration" jdbcType="INTEGER" property="unStakeFreezeDuration" />
     <result column="un_stake_end_block" jdbcType="INTEGER" property="unStakeEndBlock" />
+    <result column="zero_produce_freeze_duration" jdbcType="INTEGER" property="zeroProduceFreezeDuration" />
+    <result column="zero_produce_freeze_epoch" jdbcType="INTEGER" property="zeroProduceFreezeEpoch" />
+    <result column="low_rate_slash_count" jdbcType="INTEGER" property="lowRateSlashCount" />
   </resultMap>
   <select id="selectByNodeId" resultMap="BaseResultMap">
     select

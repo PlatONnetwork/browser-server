@@ -75,6 +75,9 @@ public class StakingKey {
         exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
         unStakeEndBlock("un_stake_end_block", "unStakeEndBlock", "BIGINT", false),
+        zeroProduceFreezeDuration("zero_produce_freeze_duration", "zeroProduceFreezeDuration", "INTEGER", false),
+        zeroProduceFreezeEpoch("zero_produce_freeze_epoch", "zeroProduceFreezeEpoch", "INTEGER", false),
+        lowRateSlashCount("low_rate_slash_count", "lowRateSlashCount", "INTEGER", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

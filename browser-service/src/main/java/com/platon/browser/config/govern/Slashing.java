@@ -20,6 +20,8 @@ public class Slashing {
 	// 说明：用N代表下面字段所设置的值，阐述如下：
 	// 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
 	private Integer zeroProduceCumulativeTime;
+	// 零出块锁定结算周期数
+	private Integer zeroProduceFreezeDuration;
 	public BigDecimal getSlashFractionDuplicateSign() {
 		return slashFractionDuplicateSign;
 	}
@@ -59,5 +61,13 @@ public class Slashing {
 
 	public void setZeroProduceCumulativeTime(Integer zeroProduceCumulativeTime) {
 		this.zeroProduceCumulativeTime = zeroProduceCumulativeTime;
+	}
+
+	public Integer getZeroProduceFreezeDuration() {
+		return zeroProduceFreezeDuration;
+	}
+
+	public void setZeroProduceFreezeDuration(Integer zeroProduceFreezeDuration) {
+		this.zeroProduceFreezeDuration = zeroProduceFreezeDuration;
 	}
 }

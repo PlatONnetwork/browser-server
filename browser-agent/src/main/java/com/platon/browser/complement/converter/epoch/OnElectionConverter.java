@@ -67,8 +67,9 @@ public class OnElectionConverter {
 				// 查询节点
 				StakingExample stakingExample = new StakingExample();
 				List<Integer> status = new ArrayList<>();
-				status.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
-				status.add(CustomStaking.StatusEnum.EXITING.getCode());
+				status.add(StatusEnum.CANDIDATE.getCode()); //候选中
+				status.add(StatusEnum.EXITING.getCode()); //退出中
+				status.add(StatusEnum.LOCKED.getCode());//已锁定
 				stakingExample.createCriteria()
 						.andStatusIn(status)
 						.andNodeIdIn(slashNodeIdList);

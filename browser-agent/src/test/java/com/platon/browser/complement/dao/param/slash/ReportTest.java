@@ -25,7 +25,7 @@ public class ReportTest extends AgentTestBase {
                 .stakingBlockNum(BigInteger.ONE)
                 .time(new Date())
                 .txHash("null")
-                .codeCurStakingLocked(BigDecimal.TEN)
+                .codeRemainRedeemAmount(BigDecimal.TEN)
                 .codeRewardValue(BigDecimal.TEN)
                 .codeStatus(3)
                 .slash2ReportRate(BigDecimal.TEN)
@@ -40,7 +40,7 @@ public class ReportTest extends AgentTestBase {
                 .setStakingBlockNum(null)
                 .setTime(null)
                 .setTxHash(null)
-                .setCodeCurStakingLocked(null)
+                .setCodeRemainRedeemAmount(null)
                 .setCodeRewardValue(null)
                 .setCodeStatus(3)
                 .setSlash2ReportRate(null)
@@ -55,7 +55,7 @@ public class ReportTest extends AgentTestBase {
         target.getStakingBlockNum();
         target.getTime();
         target.getTxHash();
-        target.getCodeCurStakingLocked();
+        target.getCodeRemainRedeemAmount();
         target.getCodeRewardValue();
         target.getCodeStatus();
         target.getSlash2ReportRate();

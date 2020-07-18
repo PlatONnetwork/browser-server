@@ -106,6 +106,12 @@ public class Node {
 
     private Long unStakeEndBlock;
 
+    private Integer zeroProduceFreezeDuration;
+
+    private Integer zeroProduceFreezeEpoch;
+
+    private Integer lowRateSlashCount;
+
     private String annualizedRateInfo;
 
     public String getNodeId() {
@@ -508,6 +514,30 @@ public class Node {
         this.unStakeEndBlock = unStakeEndBlock;
     }
 
+    public Integer getZeroProduceFreezeDuration() {
+        return zeroProduceFreezeDuration;
+    }
+
+    public void setZeroProduceFreezeDuration(Integer zeroProduceFreezeDuration) {
+        this.zeroProduceFreezeDuration = zeroProduceFreezeDuration;
+    }
+
+    public Integer getZeroProduceFreezeEpoch() {
+        return zeroProduceFreezeEpoch;
+    }
+
+    public void setZeroProduceFreezeEpoch(Integer zeroProduceFreezeEpoch) {
+        this.zeroProduceFreezeEpoch = zeroProduceFreezeEpoch;
+    }
+
+    public Integer getLowRateSlashCount() {
+        return lowRateSlashCount;
+    }
+
+    public void setLowRateSlashCount(Integer lowRateSlashCount) {
+        this.lowRateSlashCount = lowRateSlashCount;
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -574,6 +604,9 @@ public class Node {
         exceptionStatus("exception_status", "exceptionStatus", "INTEGER", false),
         unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
         unStakeEndBlock("un_stake_end_block", "unStakeEndBlock", "BIGINT", false),
+        zeroProduceFreezeDuration("zero_produce_freeze_duration", "zeroProduceFreezeDuration", "INTEGER", false),
+        zeroProduceFreezeEpoch("zero_produce_freeze_epoch", "zeroProduceFreezeEpoch", "INTEGER", false),
+        lowRateSlashCount("low_rate_slash_count", "lowRateSlashCount", "INTEGER", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

@@ -48,32 +48,29 @@ public class OnConsensusConverter {
 
         log.debug("Block Number:{}",block.getNum());
 
-        List<String> validatorList = new ArrayList<>();
-        event.getEpochMessage().getCurValidatorList().forEach(v->validatorList.add(v.getNodeId()));
-
-        BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(validatorList.size()));
+        // 取下一共识周期的节点ID列表
+        List<String> nextConsNodeIdList = new ArrayList<>();
+        event.getEpochMessage().getCurValidatorList().forEach(v->nextConsNodeIdList.add(v.getNodeId()));
+        // 每个共识周期的期望出块数
+        BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(nextConsNodeIdList.size()));
         Consensus consensus = Consensus.builder()
                 .expectBlockNum(expectBlockNum)
-                .validatorList(validatorList)
+                .validatorList(nextConsNodeIdList) // 在sql中，如果节点在下一共识周期列表中，则共识状态设置为1，否则为2
                 .build();
-       
         epochBusinessMapper.consensus(consensus);
 
         // 取出双签参数缓存中的所有被举报节点ID列表
         List<String> reportedNodeIdList = reportMultiSignParamCache.getNodeIdList();
-        // 取出下一共识周期的节点列表
-        List<String> nextConsNodeIdList = new ArrayList<>();
-        event.getEpochMessage().getCurValidatorList().forEach(n->nextConsNodeIdList.add(n.getNodeId()));
-        // 取出本轮应该被处罚的节点列表
-        List<String> slashNodeList = new ArrayList<>();
+        // 如果被举报节点不在下一轮共识周期中，则可对其执行安全的处罚操作
+        List<String> notInNextConsNodeIdList = new ArrayList<>();
         reportedNodeIdList.forEach(reportedNodeId->{
-            if(!nextConsNodeIdList.contains(reportedNodeId)) slashNodeList.add(reportedNodeId);
+            if(!nextConsNodeIdList.contains(reportedNodeId)) notInNextConsNodeIdList.add(reportedNodeId);
         });
 
         List<NodeOpt> nodeOpts = new ArrayList<>();
-        if(!slashNodeList.isEmpty()){
-            // 查询因为被举报而置为异常,且不参与下一轮共识的节点，进行处罚
-            List<Staking> slashList = slashBusinessMapper.getException(slashNodeList);
+        if(!notInNextConsNodeIdList.isEmpty()){
+            // 以数据库中的数据为准，进行处罚
+            List<Staking> slashList = slashBusinessMapper.getException(notInNextConsNodeIdList);
             if(!slashList.isEmpty()){
                 slashList.forEach(slashNode->{
                     List<Report> reportList = reportMultiSignParamCache.getReportList(slashNode.getNodeId());
@@ -97,45 +94,50 @@ public class OnConsensusConverter {
 	private NodeOpt slash(Report businessParam,Block block){
         /**
          * 处理双签处罚
+         * 重要！！！！！！： 一旦节点被双签处罚，节点所有金额都会变成待赎回状态
+         * 锁定状态的金额会被置0
          * */
+        // 根据节点ID和质押区块号查询符合条件得质押记录
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(businessParam.getNodeId());
         stakingKey.setStakingBlockNum(businessParam.getStakingBlockNum().longValue());
         Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-        //惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
-        BigDecimal stakingAmount = staking.getStakingLocked();
-        if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
-        	stakingAmount = staking.getStakingReduction();
+        // 锁定金额和待赎回只有一个会有值，所以取锁定或赎回的金额作为惩罚金的计算基数
+        BigDecimal baseAmount = staking.getStakingLocked();
+        if(baseAmount.compareTo(BigDecimal.ZERO) == 0) {
+            baseAmount = staking.getStakingReduction();
         }
-        BigDecimal codeSlashValue = stakingAmount.multiply(businessParam.getSlashRate());
-        //奖励的金额
+        //惩罚的金额=基数x惩罚比例
+        BigDecimal codeSlashValue = baseAmount.multiply(businessParam.getSlashRate());
+        //奖励的金额=惩罚金x奖励比例
         BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
-        //当前锁定的大于零则扣除金额，不大于则保留
-        BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
+        // 计算扣除惩罚金额后剩下的待赎回的金额
+        BigDecimal codeRemainRedeemAmount = BigDecimal.ZERO;
         if(staking.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
-        	codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
+            codeRemainRedeemAmount = staking.getStakingLocked().subtract(codeSlashValue);
         }
         /**
          * 如果节点状态为退出中则需要reduction进行扣减
+         * 因为处于退出中状态的节点所有钱都在赎回中状态
          */
         if(staking.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
-        	codeCurStakingLocked = staking.getStakingReduction().subtract(codeSlashValue);
+            codeRemainRedeemAmount = staking.getStakingReduction().subtract(codeSlashValue);
         }
-        /**
-         * 如果扣减的结果小于0则设置为0
-         */
-        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-        	codeCurStakingLocked = BigDecimal.ZERO;
-        }
-        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO)>=0){
+
+        if(codeRemainRedeemAmount.compareTo(BigDecimal.ZERO)>=0){
+            // 节点状态置为退出中
             businessParam.setCodeStatus(2);
+            // 设置退出操作所在周期
             businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
         }else {
+            // 节点状态置为已退出
             businessParam.setCodeStatus(3);
             businessParam.setCodeStakingReductionEpoch(0);
+            //如果扣减的结果小于0则设置为0
+            codeRemainRedeemAmount = BigDecimal.ZERO;
         }
         businessParam.setCodeRewardValue(codeRewardValue);
-        businessParam.setCodeCurStakingLocked(codeCurStakingLocked);
+        businessParam.setCodeRemainRedeemAmount(codeRemainRedeemAmount);
         businessParam.setCodeSlashValue(codeSlashValue);
 
         slashBusinessMapper.slashNode(businessParam);

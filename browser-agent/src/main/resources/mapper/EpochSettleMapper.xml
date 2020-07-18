@@ -15,7 +15,9 @@
             `dele_annualized_rate` = #{staking.deleAnnualizedRate},
             `annualized_rate` = #{staking.annualizedRate},
             `annualized_rate_info` = #{staking.annualizedRateInfo},
-            `total_dele_reward` = #{staking.totalDeleReward}
+            `total_dele_reward` = #{staking.totalDeleReward},
+            `exception_status` = #{staking.exceptionStatus},
+            `low_rate_slash_count` = #{staking.lowRateSlashCount}
             where `node_id` =  #{staking.nodeId};
             /*1、更新质押*/
             update `staking` set
@@ -29,7 +31,9 @@
             `pre_dele_annualized_rate` = #{staking.preDeleAnnualizedRate},
             `dele_annualized_rate` = #{staking.deleAnnualizedRate},
             `annualized_rate_info` = #{staking.annualizedRateInfo},
-            `total_dele_reward` = #{staking.totalDeleReward}
+            `total_dele_reward` = #{staking.totalDeleReward},
+            `exception_status` = #{staking.exceptionStatus},
+            `low_rate_slash_count` = #{staking.lowRateSlashCount}
             where `node_id` = #{staking.nodeId}
             and staking_block_num = #{staking.stakingBlockNum};
         </foreach>

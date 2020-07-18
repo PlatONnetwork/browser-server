@@ -6,7 +6,6 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.browser.utils.NetworkParms;
 import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
 import com.platon.sdk.contracts.ppos.dto.resp.ParamItem;
 import com.platon.sdk.contracts.ppos.dto.resp.ParamValue;
@@ -15,11 +14,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.core.env.Environment;
 import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
@@ -186,6 +183,8 @@ public class BlockChainConfig {
     // 说明：用N代表下面字段所设置的值，阐述如下：
     // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
     private Integer zeroProduceCumulativeTime;
+    // 节点零出块惩罚被锁定时间
+    private Integer zeroProduceFreezeDuration;
     // 节点的委托比例调整幅度，需要除以100%
     private Integer rewardPerMaxChangeRange;
     // 调整委托比例的间隔周期
@@ -301,9 +300,18 @@ public class BlockChainConfig {
         this.setZeroProduceCumulativeTime(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
         //【惩罚】零出块阈值
         this.setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
-      //【质押】委托比例调整幅度限制
+
+        try{
+            //TODO:【惩罚】节点零出块惩罚被锁定时间
+            this.setZeroProduceFreezeDuration(dec.getSlashing().getZeroProduceFreezeDuration().intValue());
+        }catch (Exception e){
+            log.error("*******************************ZeroProduceFreezeDuration********************************************");
+            log.error("",e);
+            this.setZeroProduceFreezeDuration(BigDecimal.TEN.intValue());
+        }
+        //【质押】委托比例调整幅度限制
         this.setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
-      //【质押】委托比例调整间隔
+        //【质押】委托比例调整间隔
         this.setRewardPerChangeInterval(dec.getStaking().getRewardPerChangeInterval().intValue());
     }
 
@@ -729,6 +737,14 @@ public class BlockChainConfig {
 
     public void setZeroProduceCumulativeTime(Integer zeroProduceCumulativeTime) {
         this.zeroProduceCumulativeTime = zeroProduceCumulativeTime;
+    }
+
+    public Integer getZeroProduceFreezeDuration() {
+        return zeroProduceFreezeDuration;
+    }
+
+    public void setZeroProduceFreezeDuration(Integer zeroProduceFreezeDuration) {
+        this.zeroProduceFreezeDuration = zeroProduceFreezeDuration;
     }
 
     public Integer getRewardPerMaxChangeRange() {

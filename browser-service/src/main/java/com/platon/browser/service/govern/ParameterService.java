@@ -96,6 +96,8 @@ public class ParameterService {
         chainConfig.setZeroProduceNumberThreshold(modifiableParam.getSlashing().getZeroProduceNumberThreshold());
         // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
         chainConfig.setZeroProduceCumulativeTime(modifiableParam.getSlashing().getZeroProduceCumulativeTime());
+        //零出块锁定结算周期数
+        chainConfig.setZeroProduceFreezeDuration(modifiableParam.getSlashing().getZeroProduceFreezeDuration());
         chainConfig.setRewardPerChangeInterval(modifiableParam.getStaking().getRewardPerChangeInterval());
         chainConfig.setRewardPerMaxChangeRange(modifiableParam.getStaking().getRewardPerMaxChangeRange());
         chainConfig.setAddIssueRate(modifiableParam.getReward().getIncreaseIssuanceRatio().divide(new BigDecimal(10000)));
@@ -159,6 +161,10 @@ public class ParameterService {
             // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
             case ZERO_PRODUCE_CUMULATIVE_TIME:
                 staleValue = chainConfig.getZeroProduceCumulativeTime().toString();
+                break;
+            // 节点零出块惩罚被锁定时间
+            case ZERO_PRODUCE_FREEZE_DURATION:
+                staleValue = chainConfig.getZeroProduceFreezeDuration().toString();
                 break;
             case REWARD_PER_MAX_CHANGE_RANGE:
                 staleValue = chainConfig.getRewardPerMaxChangeRange().toString();

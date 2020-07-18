@@ -233,6 +233,9 @@ public class InitializationService {
             BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock("",curSettleEpochRound,false);
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
             staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
+            staking.setLowRateSlashCount(0);
+            staking.setZeroProduceFreezeDuration(0);
+            staking.setZeroProduceFreezeEpoch(0);
 
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();

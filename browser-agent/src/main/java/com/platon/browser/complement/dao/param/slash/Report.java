@@ -32,8 +32,8 @@ public class Report implements BusinessParam {
     private BigDecimal slash2ReportRate;
     //交易发送者
     private String benefitAddr;
-    //当前锁定的
-    private BigDecimal codeCurStakingLocked;
+    //双签惩罚后剩下的质押金额，因为双签处罚后节点就被置为退出中，所有金额都会移动到待赎回字段中
+    private BigDecimal codeRemainRedeemAmount;
     //奖励的金额
     private BigDecimal codeRewardValue;
     //节点状态

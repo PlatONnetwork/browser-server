@@ -2,6 +2,7 @@ package com.platon.browser.complement.converter.epoch;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
@@ -17,6 +18,7 @@ import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
 import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +48,11 @@ public class OnSettleConverter {
     @Autowired
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
-    public void convert(CollectionEvent event, Block block) {
+    public List<NodeOpt> convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
-	    if(block.getNum()==1) return;
+        // 操作日志列表
+        List<NodeOpt> nodeOpts = new ArrayList<>();
+	    if(block.getNum()==1) return nodeOpts;
 
         log.debug("Block Number:{}",block.getNum());
 
@@ -72,6 +76,7 @@ public class OnSettleConverter {
         List<Integer> statusList = new ArrayList <>();
         statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
         statusList.add(CustomStaking.StatusEnum.EXITING.getCode());
+        statusList.add(CustomStaking.StatusEnum.LOCKED.getCode());
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
@@ -91,6 +96,21 @@ public class OnSettleConverter {
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
                 exitedNodeIds.add(staking.getNodeId());
+            }
+
+            //锁定中记录状态设置（状态为已锁定中且已经经过指定的结算周期数，则把状态置为候选中）
+            if(
+                    staking.getStatus() == CustomStaking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
+                    (staking.getZeroProduceFreezeEpoch() + staking.getZeroProduceFreezeDuration()) < settle.getSettingEpoch()
+                     // 且当前区块号大于等于质押预计的实际退出区块号
+            ){
+                // 低出块处罚次数置0
+                staking.setLowRateSlashCount(0);
+                // 异常状态
+                staking.setExceptionStatus(CustomStaking.ExceptionStatusEnum.NORMAL.getCode());
+                // 从已锁定状态恢复到候选中状态
+                staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+                recoverLog(staking,settle.getSettingEpoch(),block,nodeOpts);
             }
 
 //            // 如果当前节点是因举报而被处罚[exception_status = 5], 则状态直接置为已退出【因为底层实际上已经没有这个节点了】
@@ -164,6 +184,7 @@ public class OnSettleConverter {
         gasEstimateEventPublisher.publish(seq,gasEstimates);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        return nodeOpts;
 	}
 
     /**
@@ -286,5 +307,25 @@ public class OnSettleConverter {
             pves.add(pv);
         }
         // 打地基 END
+    }
+
+    /**
+     * 节点恢复记录日志
+     * @param staking
+     * @param settingEpoch
+     * @param block
+     * @param nodeOpts
+     */
+    private void recoverLog(Staking staking, int settingEpoch, Block block, List<NodeOpt> nodeOpts){
+        String desc = NodeOpt.TypeEnum.UNLOCKED.getTpl().replace("LOCKED_EPOCH",staking.getZeroProduceFreezeEpoch().toString())
+                .replace("UNLOCKED_EPOCH",String.valueOf(settingEpoch))
+                .replace("FREEZE_DURATION",staking.getZeroProduceFreezeDuration().toString());
+        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+        nodeOpt.setNodeId(staking.getNodeId());
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.UNLOCKED.getCode()));
+        nodeOpt.setBNum(block.getNum());
+        nodeOpt.setTime(block.getTime());
+        nodeOpt.setDesc(desc);
+        nodeOpts.add(nodeOpt);
     }
 }
