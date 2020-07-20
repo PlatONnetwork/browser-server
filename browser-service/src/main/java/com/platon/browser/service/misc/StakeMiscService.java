@@ -64,4 +64,16 @@ public class StakeMiscService {
         }
         return new BigInteger(configVal);
     }
+
+    /**
+     * 获取锁定结算周期数
+     * @return
+     */
+    public BigInteger getZeroProduceFreeDuration(){
+        String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.ZERO_PRODUCE_FREEZE_DURATION.getName());
+        if(StringUtils.isBlank(configVal)){
+            throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.ZERO_PRODUCE_FREEZE_DURATION.getName());
+        }
+        return new BigInteger(configVal);
+    }
 }

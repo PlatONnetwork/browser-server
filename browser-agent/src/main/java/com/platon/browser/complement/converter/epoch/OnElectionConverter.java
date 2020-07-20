@@ -13,7 +13,6 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -30,7 +29,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -69,7 +67,6 @@ public class OnElectionConverter {
 				List<Integer> status = new ArrayList<>();
 				status.add(StatusEnum.CANDIDATE.getCode()); //候选中
 				status.add(StatusEnum.EXITING.getCode()); //退出中
-				status.add(StatusEnum.LOCKED.getCode());//已锁定
 				stakingExample.createCriteria()
 						.andStatusIn(status)
 						.andNodeIdIn(slashNodeIdList);
@@ -100,70 +97,71 @@ public class OnElectionConverter {
 	 * @return
 	 */
 	private List<NodeOpt> slash(CollectionEvent event,Block block, int settleEpoch, List<Staking> slashNodeList){
-		// 更新解质押到账需要经过的结算周期数
-		BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+		// 更新锁定结算周期数
+		BigInteger  zeroProduceFreezeDuration = stakeMiscService.getZeroProduceFreeDuration();
 		slashNodeList.forEach(staking -> {
-			if(staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
-				// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-				BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
-				staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
-			}
+			staking.setZeroProduceFreezeDuration(zeroProduceFreezeDuration.intValue());
 		});
 		//惩罚节点
 		Election election = Election.builder()
-				.time(block.getTime())
 				.settingEpoch(settleEpoch)
-				.slashNodeList(slashNodeList)
-				.unStakeFreezeDuration(unStakeFreezeDuration.intValue())
+				.zeroProduceFreezeEpoch(settleEpoch) // 记录零出块被惩罚时所在结算周期
+				.zeroProduceFreezeDuration(zeroProduceFreezeDuration.intValue()) //记录此刻的零出块锁定周期数
 				.build();
 
 		//节点操作日志
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
-		List<NodeOpt> nodeOpts = slashNodeList.stream()
-				.map(node -> {
-					StringBuffer desc = new StringBuffer("0|");
-					/**
-					 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
-					 */
-					String amount =  event.getEpochMessage().getBlockReward()
-							.multiply(chainConfig.getSlashBlockRewardCount()).toString();
-					desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(amount).append( "|1");
-					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-					nodeOpt.setNodeId(node.getNodeId());
-					nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
-					nodeOpt.setBNum(bNum.longValue());
-					nodeOpt.setTime(block.getTime());
-					nodeOpt.setDesc(desc.toString());
 
-					//当前锁定的大于零则扣除金额，不大于则保留
-					BigDecimal codeCurStakingLocked = BigDecimal.ZERO;
-					if(node.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
-						codeCurStakingLocked = node.getStakingLocked().subtract(new BigDecimal(amount));
-					}
-					/**
-					 * 如果节点状态为退出中则需要reduction进行扣减
-					 */
-					if(node.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
-						codeCurStakingLocked = node.getStakingReduction().subtract(new BigDecimal(amount));
-					}
-					/**
-					 * 如果扣减的结果小于0则设置为0
-					 */
-					if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) < 0) {
-						codeCurStakingLocked = BigDecimal.ZERO;
-					}
-					node.setStakingLocked(codeCurStakingLocked);
-					/**
-					 * 候选中则改成退出中
-					 */
-					if(node.getStatus().intValue() ==  StatusEnum.CANDIDATE.getCode()) {
-						node.setStatus(StatusEnum.EXITING.getCode());
-					}
-					//对提案数据进行处罚
-                    proposalParameterService.setSlashParameters(node.getNodeId());
-					return nodeOpt;
-				}).collect(Collectors.toList());
+		List<NodeOpt> nodeOpts = new ArrayList<>();
+		List<Staking> realSlashNodes = new ArrayList<>();
+		for(Staking staking:slashNodeList){
+			if(staking.getLowRateSlashCount()>0){
+				// 如果节点之前因低出块被罚过，且还没被解锁（节点在结算周期切换被解锁时会把低出块处罚次数置零）,则不做任何操作
+				// 进入此处的节点只可能是退出中状态的节点
+				continue;
+			}
+
+			StringBuffer desc = new StringBuffer("0|");
+			/**
+			 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
+			 */
+			BigDecimal slashAmount =  event.getEpochMessage().getBlockReward()
+					.multiply(chainConfig.getSlashBlockRewardCount());
+			desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(slashAmount.toString()).append( "|1");
+			NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+			nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+			nodeOpt.setNodeId(staking.getNodeId());
+			nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
+			nodeOpt.setBNum(bNum.longValue());
+			nodeOpt.setTime(block.getTime());
+			nodeOpt.setDesc(desc.toString());
+
+			// 根据节点不同状态，更新节点实例的各字段
+			if(StatusEnum.EXITING==StatusEnum.getEnum(staking.getStatus())){
+				// 节点之前处于退出中状态，则其所有钱已经变为赎回中了，所以从赎回中扣掉处罚金额
+				BigDecimal remainRedeemAmount = staking.getStakingReduction().subtract(slashAmount);
+				if(remainRedeemAmount.compareTo(BigDecimal.ZERO)<0) remainRedeemAmount=BigDecimal.ZERO;
+				staking.setStakingReduction(remainRedeemAmount);
+				// 低出块处罚次数+1
+				staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
+			}
+			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
+				// 如果节点处于候选中，则从锁定中的质押中扣掉处罚金额
+				BigDecimal remainLockedAmount=staking.getStakingLocked().subtract(slashAmount);
+				if(remainLockedAmount.compareTo(BigDecimal.ZERO)<0) remainLockedAmount=BigDecimal.ZERO;
+				staking.setStakingLocked(remainLockedAmount);
+				// 低出块处罚次数+1
+				staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
+				// 状态置为已锁定
+				staking.setStatus(StatusEnum.LOCKED.getCode());
+			}
+			realSlashNodes.add(staking);
+
+			//对提案数据进行处罚
+//			proposalParameterService.setSlashParameters(staking.getNodeId());
+			nodeOpts.add(nodeOpt);
+		}
+		election.setSlashNodeList(realSlashNodes);
 		epochBusinessMapper.slashNode(election);
 		return nodeOpts;
 	}

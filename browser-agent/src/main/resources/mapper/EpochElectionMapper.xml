@@ -29,50 +29,42 @@
 		and `status` = 1;
 	</select>
 	<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
-		/*1、更新委托*/
 		<foreach collection="slashNodeList" item="item">
-			update `delegation` set
-				`delegate_released` = `delegate_hes` + `delegate_locked` + `delegate_released`,
-				`delegate_hes` = 0,
-				`delegate_locked` = 0
-			where `node_id` = #{item.nodeId}
-			and `staking_block_num` = #{item.stakingBlockNum}
-			and `is_history` = 2;
-			/*2、更新质押*/
+			/*1、更新质押*/
 			update `staking` set
-			`leave_time` = #{time},
 			`status` = #{item.status},
 			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = #{item.stakingLocked},
-			`staking_locked` = 0,
-			`staking_hes` = 0,
-			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
-			`stat_delegate_hes` = 0,
-			`stat_delegate_locked` = 0,
+			`staking_reduction` = #{item.stakingReduction},
+			`staking_locked` = #{item.stakingLocked},
+# 			`staking_hes` = #{item.stakingHes},
+# 			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
+# 			`stat_delegate_hes` = 0,
+# 			`stat_delegate_locked` = 0,
 			`is_consensus` = 2,
 			`is_settle` = 2,
-			`un_stake_freeze_duration` = #{unStakeFreezeDuration},
-			`un_stake_end_block` = #{item.unStakeEndBlock}
+			`zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
+			`zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
+			`low_rate_slash_count` = `low_rate_slash_count`+1
 			where `staking_block_num` = #{item.stakingBlockNum}
 			and `node_id` =  #{item.nodeId} ;
-			/*3、更新节点*/
+			/*2、更新节点*/
 			update `node` n set
-			n.`leave_time` = #{time},
 			n.`status` = #{item.status},
 			n.`staking_reduction_epoch` = #{settingEpoch},
-			n.`staking_reduction` = #{item.stakingLocked},
-			n.`total_value` = 0,
-			n.`staking_locked` = 0,
-			n.`staking_hes` = 0,
-			n.`stat_delegate_released` = n.`stat_delegate_released` + n.`stat_delegate_value`,
-			n.`stat_delegate_value` = 0,
-			n.`stat_valid_addrs` = 0,
-			n.`stat_invalid_addrs` = (select count(distinct d.delegate_addr) from delegation d where d.node_id = n.`node_id` and d.is_history = 2),
+			n.`staking_reduction` = #{item.stakingReduction},
+			n.`staking_locked` = #{item.stakingLocked},
+# 			n.`total_value` = 0,
+# 			n.`staking_hes` = 0,
+# 			n.`stat_delegate_released` = n.`stat_delegate_released` + n.`stat_delegate_value`,
+# 			n.`stat_delegate_value` = 0,
+# 			n.`stat_valid_addrs` = 0,
+# 			n.`stat_invalid_addrs` = (select count(distinct d.delegate_addr) from delegation d where d.node_id = n.`node_id` and d.is_history = 2),
 			n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
 			n.`is_consensus` = 2,
 			n.`is_settle` = 2,
-			n.`un_stake_freeze_duration` = #{unStakeFreezeDuration},
-			n.`un_stake_end_block` = #{item.unStakeEndBlock}
+			n.`zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
+			n.`zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
+			n.`low_rate_slash_count` = n.`low_rate_slash_count`+1
 			where n.`node_id` = #{item.nodeId} ;
 		</foreach>
 	</update>

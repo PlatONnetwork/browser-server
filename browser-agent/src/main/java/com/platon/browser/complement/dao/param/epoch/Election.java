@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,12 +22,10 @@ public class Election implements BusinessParam {
     private List <Staking> slashNodeList;
     //结算周期
     private int settingEpoch;
-    //时间
-    private Date time;
-    //解质押需要经过的结算周期数
-    private int unStakeFreezeDuration;
-    //解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者
-    private BigInteger unStakeEndBlock;
+    //零出块需要锁定的结算周期数
+    private int zeroProduceFreezeDuration;
+    //节点被低出块惩罚时所在结算周期
+    private int zeroProduceFreezeEpoch;
 
     @Override
     public BusinessType getBusinessType () {

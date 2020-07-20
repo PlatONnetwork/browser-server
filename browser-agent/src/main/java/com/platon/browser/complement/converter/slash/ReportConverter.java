@@ -49,6 +49,7 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         if(null==txParam) return null;
         Node staking = nodeMapper.selectByPrimaryKey(txParam.getVerify());
         if(staking != null) {
+            // 回填设置参数中的惩罚奖励信息
         	//惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
             BigDecimal stakingAmount = staking.getStakingLocked();
             if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
@@ -69,7 +70,6 @@ public class ReportConverter extends BusinessParamConverter<NodeOpt> {
         // 举报成功，先把节点设置为异常，后续处罚操作在共识周期切换时执行
         List<String> nodeIdList = new ArrayList<>();
         nodeIdList.add(txParam.getVerify());
-
         slashBusinessMapper.setException(txParam.getVerify(),txParam.getStakingBlockNum().longValue());
 
         // 更新解质押到账需要经过的结算周期数
