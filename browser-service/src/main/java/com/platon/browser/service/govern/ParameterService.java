@@ -41,6 +41,8 @@ public class ParameterService {
      */
     public void initConfigTable() throws Exception {
         configMapper.deleteByExample(null);
+        // 调用提案合约只是为了取得完整的可治理参数列表，至于此时的值是不是链第0块时的值，是不能确定的，所以需要
+        // 使用debugEconomicConfig接口获取回来的最初始的值进行替代
         List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().getData();
         List<Config> configList = new ArrayList<>();
         int id = 1;
@@ -56,11 +58,19 @@ public class ParameterService {
             config.setCreateTime(date);
             config.setUpdateTime(date);
 
-            // 更新内存中的blockChainConfig中在init_value,stale_value,value字段值
+            // 浏览器刚启动时在BlockChainConfig中调用debugEconomicConfig接口取得链刚启动时的参数
+            // 所以从零开始同步时，需要从BlockChainConfig取得初始参数值
             String initValue = getValueInBlockChainConfig(config.getName());
             config.setInitValue(initValue);
             config.setStaleValue(initValue);
-            config.setValue(initValue);
+            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(gp.getParamItem().getName());
+            // TODO: ??????????????????????????
+            if(paramEnum!=ModifiableGovernParamEnum.ZERO_PRODUCE_FREEZE_DURATION){
+                // 如果当前治理参数不是零出块锁定周期数，则把当前值设置为链最初始的值，否则使用提案查询出来的最新参数
+                config.setValue(initValue);
+            }else{
+                config.setValue(gp.getParamValue().getValue());
+            }
             id++;
         }
         configMapper.batchInsert(configList);

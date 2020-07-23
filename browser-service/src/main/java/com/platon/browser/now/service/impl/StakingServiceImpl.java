@@ -5,14 +5,19 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.DelegationAddress;
-import com.platon.browser.dto.CustomStaking.StatusEnum;
-import com.platon.browser.dto.elasticsearch.ESResult;
-import com.platon.browser.dto.DelegationStaking;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.mapper.CustomDelegationMapper;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
+import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomDelegation.YesNoEnum;
+import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
+import com.platon.browser.dto.DelegationAddress;
+import com.platon.browser.dto.DelegationStaking;
+import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -29,7 +34,6 @@ import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.HexTool;
 import com.platon.sdk.contracts.ppos.dto.resp.Reward;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +44,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -532,34 +537,33 @@ public class StakingServiceImpl implements StakingService {
 
 		/** 查询出块节点 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-		for (int i = 0; i < stakingPage.size(); i++) {
+		int i=0;
+		for (Node node:stakingPage) {
 			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();
-			BeanUtils.copyProperties(stakingPage.get(i), lockedStakingListResp);
-			lockedStakingListResp.setBlockQty(stakingPage.get(i).getStatBlockQty());
-			lockedStakingListResp.setDelegateQty(stakingPage.get(i).getStatValidAddrs());
-			lockedStakingListResp.setExpectedIncome(stakingPage.get(i).getAnnualizedRate().toString());
+			BeanUtils.copyProperties(node, lockedStakingListResp);
+			lockedStakingListResp.setBlockQty(node.getStatBlockQty());
+			lockedStakingListResp.setDelegateQty(node.getStatValidAddrs());
+			lockedStakingListResp.setExpectedIncome(node.getAnnualizedRate().toString());
 			/** 委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额) */
-			String sumAmount = stakingPage.get(i).getStatDelegateValue().toString();
+			String sumAmount = node.getStatDelegateValue().toString();
 			lockedStakingListResp.setDelegateValue(sumAmount);
-			lockedStakingListResp.setIsInit(stakingPage.get(i).getIsInit() == 1);
-			lockedStakingListResp.setStakingIcon(stakingPage.get(i).getNodeIcon());
-			if(stakingPage.get(i).getIsRecommend() != null) {
-				lockedStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == stakingPage.get(i).getIsRecommend());
+			lockedStakingListResp.setIsInit(node.getIsInit() == 1);
+			lockedStakingListResp.setStakingIcon(node.getNodeIcon());
+			if(node.getIsRecommend() != null) {
+				lockedStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == node.getIsRecommend());
 			}
 			/** 设置排行 */
 			lockedStakingListResp.setRanking(i + 1);
-			lockedStakingListResp.setSlashLowQty(stakingPage.get(i).getStatSlashLowQty());
-			lockedStakingListResp.setSlashMultiQty(stakingPage.get(i).getStatSlashMultiQty());
-			/** 如果是对应的出块节点则置为出块中，否则为活跃中或者退出 */
-			if(stakingPage.get(i).getNodeId().equals(networkStatRedis.getNodeId())) {
-				lockedStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
-			} else {
-				lockedStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingPage.get(i).getStatus(), stakingPage.get(i).getIsConsensus(), stakingPage.get(i).getIsSettle()));
-			}
+			lockedStakingListResp.setSlashLowQty(node.getStatSlashLowQty());
+			lockedStakingListResp.setSlashMultiQty(node.getStatSlashMultiQty());
+			lockedStakingListResp.setStatus(StatusEnum.LOCKED.getCode());
+			Date leaveTime = node.getLeaveTime();
+			lockedStakingListResp.setLeaveTime(leaveTime==null?null:leaveTime.getTime());
 			/** 质押总数=有效的质押+委托 */
-			lockedStakingListResp.setTotalValue(stakingPage.get(i).getTotalValue().toString());
-			lockedStakingListResp.setDeleAnnualizedRate(stakingPage.get(i).getDeleAnnualizedRate().toString());
+			lockedStakingListResp.setTotalValue(node.getTotalValue().toString());
+			lockedStakingListResp.setDeleAnnualizedRate(node.getDeleAnnualizedRate().toString());
 			lists.add(lockedStakingListResp);
+			i++;
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(stakingPage.getTotal());

@@ -184,7 +184,7 @@ public class BlockChainConfig {
     // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
     private Integer zeroProduceCumulativeTime;
     // 节点零出块惩罚被锁定时间
-    private Integer zeroProduceFreezeDuration;
+    private Integer zeroProduceFreezeDuration=0;
     // 节点的委托比例调整幅度，需要除以100%
     private Integer rewardPerMaxChangeRange;
     // 调整委托比例的间隔周期
@@ -300,15 +300,6 @@ public class BlockChainConfig {
         this.setZeroProduceCumulativeTime(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
         //【惩罚】零出块阈值
         this.setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
-
-        try{
-            //TODO:【惩罚】节点零出块惩罚被锁定时间
-            this.setZeroProduceFreezeDuration(dec.getSlashing().getZeroProduceFreezeDuration().intValue());
-        }catch (Exception e){
-            log.error("*******************************ZeroProduceFreezeDuration********************************************");
-            log.error("",e);
-            this.setZeroProduceFreezeDuration(BigDecimal.TEN.intValue());
-        }
         //【质押】委托比例调整幅度限制
         this.setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
         //【质押】委托比例调整间隔

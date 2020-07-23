@@ -28,6 +28,7 @@ import org.web3j.protocol.Web3j;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -155,6 +156,8 @@ public class OnElectionConverter {
 				// 状态置为已锁定
 				staking.setStatus(StatusEnum.LOCKED.getCode());
 			}
+			// 设置离开验证人列表的时间
+			staking.setLeaveTime(new Date());
 			realSlashNodes.add(staking);
 
 			//对提案数据进行处罚

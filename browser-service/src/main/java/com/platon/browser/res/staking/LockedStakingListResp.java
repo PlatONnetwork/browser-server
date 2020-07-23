@@ -25,7 +25,8 @@ public class LockedStakingListResp {
 	private Long blockQty;          //产生的区块数
 	private String expectedIncome;    //预计年收化率（从验证人加入时刻开始计算）
 	private Boolean isRecommend;     //是否官方推荐
-	private Boolean isInit;          //是否为初始节点 
+	private Boolean isInit;          //是否为初始节点
+	private Long leaveTime;      //退出时间
 	private String deleAnnualizedRate;  //预计委托年化率（从验证人加入时刻开始计算）
 	public Integer getRanking() {
 		return ranking;
@@ -119,6 +120,12 @@ public class LockedStakingListResp {
 	public void setDeleAnnualizedRate(String deleAnnualizedRate) {
 		this.deleAnnualizedRate = deleAnnualizedRate;
 	}
-	
-	
+
+	public Long getLeaveTime() {
+		return leaveTime;
+	}
+
+	public void setLeaveTime(Long leaveTime) {
+		this.leaveTime = leaveTime;
+	}
 }
