@@ -21,9 +21,11 @@ public class TpsCalcCacheTest extends AgentTestBase {
     private TpsCalcCache tpsCalcCache;
     @Test
     public void test1() {
+    	TpsCalcCache tpsCalcCache = new TpsCalcCache();
         CollectionBlock block1 = blockList.get(0);
         CollectionBlock block2 = blockList.get(1);
         CollectionBlock block3 = blockList.get(2);
+//        CollectionBlock block4 = blockList.get(3);
         for (int i=0;i<1500;i++){
             block1.getTransactions().add(new Transaction());
             block2.getTransactions().add(new Transaction());
@@ -31,14 +33,17 @@ public class TpsCalcCacheTest extends AgentTestBase {
         }
         Date date = new Date();
         block1.setTime(date);
-        Date date1 = new Date(date.getTime() + 1000);
+        Date date1 = new Date(date.getTime() + 1100);
         block2.setTime(date);
         Date date2 = new Date(date.getTime() + 11000);
         block3.setTime(date2);
+//        Date date3 = new Date(date.getTime() + 13000);
+//        block4.setTime(date3);
 
         tpsCalcCache.update(block1);
         tpsCalcCache.update(block2);
         tpsCalcCache.update(block3);
+//        tpsCalcCache.update(block4);
         int tps = tpsCalcCache.getTps();
         // 3000 / (0-0+1) = 3000
         assertEquals(300,tps);

@@ -43,7 +43,7 @@ public class TpsCalcCache {
 			tps = BigDecimal.valueOf(txQty).divide(BigDecimal.TEN,0,RoundingMode.CEILING).intValue();
 			startTime = startTime+10;
 			cacheMap.clear();
-			cacheMap.put(startTime, 0);
+			cacheMap.put(startTime, block.getTransactions().size());
 		}
         
         
@@ -58,9 +58,12 @@ public class TpsCalcCache {
         	maxCacheMap.put(maxTime, maxTxQty);
         } else {
         	maxTps = maxTxQty.intValue();
+        	if(maxTps == 0) {
+        		maxTps = block.getTransactions().size();
+        	}
         	maxCacheMap.clear();
         	maxTime = now;
-        	maxCacheMap.put(maxTime, 0);
+        	maxCacheMap.put(maxTime, block.getTransactions().size());
         }
         
 //        cacheMap.putIfAbsent(now, 0L);
