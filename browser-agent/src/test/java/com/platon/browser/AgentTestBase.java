@@ -190,7 +190,6 @@ public class AgentTestBase extends AgentTestData {
         
         Election election = Election.builder()
                 .settingEpoch(3)
-                .time(new Date(System.currentTimeMillis()))
                 .slashNodeList(slashNodeList).build();
         return election;
     }

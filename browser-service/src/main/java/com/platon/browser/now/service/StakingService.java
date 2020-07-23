@@ -1,11 +1,6 @@
 package com.platon.browser.now.service;
 
-import com.platon.browser.req.staking.AliveStakingListReq;
-import com.platon.browser.req.staking.DelegationListByAddressReq;
-import com.platon.browser.req.staking.DelegationListByStakingReq;
-import com.platon.browser.req.staking.HistoryStakingListReq;
-import com.platon.browser.req.staking.StakingDetailsReq;
-import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.req.staking.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.*;
@@ -73,5 +68,6 @@ public interface StakingService {
 	 * @return
 	 */
 	 RespPage<DelegationListByAddressResp> delegationListByAddress( DelegationListByAddressReq req);
-	
+
+    <V> V lockedStakingList(LockedStakingListReq req);
 }

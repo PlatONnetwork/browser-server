@@ -115,12 +115,12 @@ public class AppDocStakingController implements AppDocStaking {
 	}
 
 	@Override
-	public WebAsyncTask<RespPage<AliveStakingListResp>> lockedStakingList(@Valid AliveStakingListReq req) {
+	public WebAsyncTask<RespPage<LockedStakingListResp>> lockedStakingList(@Valid LockedStakingListReq req) {
 		/**
 		 * 异步调用，超时则进入timeout
 		 */
-		WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.aliveStakingList(req));
+		WebAsyncTask<RespPage<LockedStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+				() -> stakingService.lockedStakingList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
 	}

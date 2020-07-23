@@ -1,9 +1,9 @@
 package com.platon.browser.req.staking;
 
+import com.platon.browser.req.PageReq;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-
-import com.platon.browser.req.PageReq;
 
 /**
  *  活跃验证人列表请求对象

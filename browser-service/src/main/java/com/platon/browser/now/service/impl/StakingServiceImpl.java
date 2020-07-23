@@ -515,4 +515,55 @@ public class StakingServiceImpl implements StakingService {
 		return respPage;
 	}
 
+	@Override
+	public RespPage<LockedStakingListResp> lockedStakingList(LockedStakingListReq req) {
+		PageHelper.startPage(req.getPageNo(), req.getPageSize());
+		RespPage<LockedStakingListResp> respPage = new RespPage<>();
+		List<LockedStakingListResp> lists = new LinkedList<>();
+		NodeExample nodeExample = new NodeExample();
+		nodeExample.setOrderByClause(" update_time desc");
+		NodeExample.Criteria criteria = nodeExample.createCriteria();
+		criteria.andStatusEqualTo(StatusEnum.LOCKED.getCode());
+
+		if(StringUtils.isNotBlank(req.getKey())) {
+			criteria.andNodeNameLike("%" + req.getKey() + "%");
+		}
+		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
+
+		/** 查询出块节点 */
+		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+		for (int i = 0; i < stakingPage.size(); i++) {
+			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();
+			BeanUtils.copyProperties(stakingPage.get(i), lockedStakingListResp);
+			lockedStakingListResp.setBlockQty(stakingPage.get(i).getStatBlockQty());
+			lockedStakingListResp.setDelegateQty(stakingPage.get(i).getStatValidAddrs());
+			lockedStakingListResp.setExpectedIncome(stakingPage.get(i).getAnnualizedRate().toString());
+			/** 委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额) */
+			String sumAmount = stakingPage.get(i).getStatDelegateValue().toString();
+			lockedStakingListResp.setDelegateValue(sumAmount);
+			lockedStakingListResp.setIsInit(stakingPage.get(i).getIsInit() == 1);
+			lockedStakingListResp.setStakingIcon(stakingPage.get(i).getNodeIcon());
+			if(stakingPage.get(i).getIsRecommend() != null) {
+				lockedStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == stakingPage.get(i).getIsRecommend());
+			}
+			/** 设置排行 */
+			lockedStakingListResp.setRanking(i + 1);
+			lockedStakingListResp.setSlashLowQty(stakingPage.get(i).getStatSlashLowQty());
+			lockedStakingListResp.setSlashMultiQty(stakingPage.get(i).getStatSlashMultiQty());
+			/** 如果是对应的出块节点则置为出块中，否则为活跃中或者退出 */
+			if(stakingPage.get(i).getNodeId().equals(networkStatRedis.getNodeId())) {
+				lockedStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
+			} else {
+				lockedStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingPage.get(i).getStatus(), stakingPage.get(i).getIsConsensus(), stakingPage.get(i).getIsSettle()));
+			}
+			/** 质押总数=有效的质押+委托 */
+			lockedStakingListResp.setTotalValue(stakingPage.get(i).getTotalValue().toString());
+			lockedStakingListResp.setDeleAnnualizedRate(stakingPage.get(i).getDeleAnnualizedRate().toString());
+			lists.add(lockedStakingListResp);
+		}
+		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
+		page.setTotal(stakingPage.getTotal());
+		respPage.init(page, lists);
+		return respPage;
+	}
 }

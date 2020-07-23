@@ -376,9 +376,7 @@ public interface AppDocStaking {
 	 *   ]
 	 * }
 	 */
-	@ApiOperation(value = "staking/lockedStakingList", nickname = "", notes = "", response = AliveStakingListReq.class, tags = { "Staking" })
+	@ApiOperation(value = "staking/lockedStakingList", nickname = "", notes = "", response = LockedStakingListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/lockedStakingList", produces = { "application/json" })
-	WebAsyncTask<RespPage<AliveStakingListResp>> lockedStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
-
-
+	WebAsyncTask<RespPage<LockedStakingListResp>> lockedStakingList(@ApiParam(value = "LockedStakingListReq", required = true)@Valid @RequestBody LockedStakingListReq req);
 }
