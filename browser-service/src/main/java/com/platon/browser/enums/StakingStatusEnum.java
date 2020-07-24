@@ -16,8 +16,9 @@ public enum StakingStatusEnum {
 	ACTIVE("active", 2),//活跃中
 	BLOCK("block", 3),//出块中
 	EXITING("exiting",4),//退出中
-	EXITED("exited",5);//已退出
-	
+	EXITED("exited",5),//已退出
+	LOCKED("locked",7);//锁定中
+
 	private String name;
 	
 	private Integer code;
@@ -59,6 +60,10 @@ public enum StakingStatusEnum {
 		}
 		if(CustomStaking.StatusEnum.EXITED.getCode() == status) {
 			return StakingStatusEnum.EXITED.getCode();
+		}
+		/**锁定状态*/
+		if(CustomStaking.StatusEnum.LOCKED.getCode() == status) {
+			return StakingStatusEnum.LOCKED.getCode();
 		}
 		return null;
 	}

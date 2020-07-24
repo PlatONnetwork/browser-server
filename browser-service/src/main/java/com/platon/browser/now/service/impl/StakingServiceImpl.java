@@ -556,7 +556,7 @@ public class StakingServiceImpl implements StakingService {
 			lockedStakingListResp.setRanking(i + 1);
 			lockedStakingListResp.setSlashLowQty(node.getStatSlashLowQty());
 			lockedStakingListResp.setSlashMultiQty(node.getStatSlashMultiQty());
-			lockedStakingListResp.setStatus(StatusEnum.LOCKED.getCode());
+			lockedStakingListResp.setStatus(StakingStatusEnum.LOCKED.getCode());
 			Date leaveTime = node.getLeaveTime();
 			lockedStakingListResp.setLeaveTime(leaveTime==null?null:leaveTime.getTime());
 			/** 质押总数=有效的质押+委托 */

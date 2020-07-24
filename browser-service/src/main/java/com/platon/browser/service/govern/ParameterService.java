@@ -64,13 +64,7 @@ public class ParameterService {
             config.setInitValue(initValue);
             config.setStaleValue(initValue);
             ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(gp.getParamItem().getName());
-            // TODO: ??????????????????????????
-            if(paramEnum!=ModifiableGovernParamEnum.ZERO_PRODUCE_FREEZE_DURATION){
-                // 如果当前治理参数不是零出块锁定周期数，则把当前值设置为链最初始的值，否则使用提案查询出来的最新参数
-                config.setValue(initValue);
-            }else{
-                config.setValue(gp.getParamValue().getValue());
-            }
+            config.setValue(initValue);
             id++;
         }
         configMapper.batchInsert(configList);
