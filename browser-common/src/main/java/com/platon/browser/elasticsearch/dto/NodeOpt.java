@@ -29,6 +29,7 @@ public class NodeOpt {
      5 vote 投票
      6 multisign 双签
      7 lowBlockRate 出块率低
+     11 解除锁定
      */
     public enum TypeEnum{
         CREATE("1", "创建",""),
