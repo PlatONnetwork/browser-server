@@ -1,16 +1,5 @@
 package com.platon.browser.now.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
@@ -18,6 +7,16 @@ import com.platon.browser.now.service.ExtraService;
 import com.platon.browser.res.extra.ConfigDetail;
 import com.platon.browser.res.extra.ModuleConfig;
 import com.platon.browser.res.extra.QueryConfigResp;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 实现
@@ -173,6 +172,9 @@ public class ExtraServiceImpl implements ExtraService {
 			}
 			if("zeroProduceNumberThreshold".equals(slashingConfig.getName())) {
 				slashingConfig.setEndValue(zeroProduceCumulativeTime);
+			}
+			if("zeroProduceFreezeDuration".equals(slashingConfig.getName())) {
+				slashingConfig.setEndValue(unStakeFreezeDuration);
 			}
 		}
 		/**
