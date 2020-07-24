@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.epoch;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
@@ -47,6 +48,8 @@ public class OnSettleConverter {
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Autowired
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 
     public List<NodeOpt> convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
@@ -321,6 +324,7 @@ public class OnSettleConverter {
                 .replace("UNLOCKED_EPOCH",String.valueOf(settingEpoch))
                 .replace("FREEZE_DURATION",staking.getZeroProduceFreezeDuration().toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(staking.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.UNLOCKED.getCode()));
         nodeOpt.setBNum(block.getNum());
