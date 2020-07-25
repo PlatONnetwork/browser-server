@@ -203,7 +203,6 @@ public class EpochRetryService {
             applyConfigChange();
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
-            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
     }
@@ -267,7 +266,10 @@ public class EpochRetryService {
 
             if(configChange.getYearStartNum()!=null&&configChange.getYearEndNum()!=null){
                 // 更新增发周期区块数
-                chainConfig.setAddIssuePeriodBlockCount(configChange.getYearEndNum().subtract(configChange.getYearStartNum()).toBigInteger());
+                BigInteger blockCountPerIssue = configChange.getYearEndNum()
+                        .subtract(configChange.getYearStartNum())
+                        .add(BigDecimal.ONE).toBigInteger();
+                chainConfig.setAddIssuePeriodBlockCount(blockCountPerIssue);
                 // 更新每个增发周期的结算周期数
                 chainConfig.setSettlePeriodCountPerIssue(chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount()));
             }

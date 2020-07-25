@@ -266,7 +266,13 @@ public class SpecialApi {
             if(data==null){
                 throw new BlankResponseException(BLANK_RES);
             }
-            return JSON.parseObject(data,EpochInfo.class);
+            EpochInfo ei= JSON.parseObject(data,EpochInfo.class);
+            if(ei.getYearEndNum().compareTo(ei.getYearStartNum())<0){
+                String msg = "查询历史周期信息出错【blockNumber:"+blockNumber+")】:增发周期结束区块号【"+ei.getYearEndNum()+"】<开始区块号【"+ei.getYearStartNum()+"】";
+                log.error(msg);
+                throw new ContractInvokeException(msg);
+            }
+            return ei;
         }else{
             String msg = JSON.toJSONString(br,true);
             throw new ContractInvokeException(String.format("【查询历史周期信息出错】区块号:%s,返回数据:%s",blockNumber,msg));
