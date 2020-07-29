@@ -149,12 +149,23 @@ public class OnElectionConverter {
 			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
 				// 如果节点处于候选中，则从锁定中的质押中扣掉处罚金额
 				BigDecimal remainLockedAmount=staking.getStakingLocked().subtract(slashAmount);
-				if(remainLockedAmount.compareTo(BigDecimal.ZERO)<0) remainLockedAmount=BigDecimal.ZERO;
+				// 状态置为已锁定
+				staking.setStatus(StatusEnum.LOCKED.getCode());
+				if(remainLockedAmount.compareTo(BigDecimal.ZERO)<0) {
+					remainLockedAmount=BigDecimal.ZERO;
+				}
+				if(
+					// 如果扣除处罚金额后小于零，则节点置为退出中
+					remainLockedAmount.compareTo(BigDecimal.ZERO)<0||
+					// 如果扣除处罚金额后小于质押门槛，则节点置为退出中
+					remainLockedAmount.compareTo(chainConfig.getStakeThreshold())<0
+				){
+					// 退出中状态的节点在结算周期切换时会检查是否已达到指定周期数，如果达到，则进行节点的各种金额的移动处理
+					staking.setStatus(StatusEnum.EXITING.getCode());
+				}
 				staking.setStakingLocked(remainLockedAmount);
 				// 低出块处罚次数+1
 				staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
-				// 状态置为已锁定
-				staking.setStatus(StatusEnum.LOCKED.getCode());
 			}
 			// 设置离开验证人列表的时间
 			staking.setLeaveTime(new Date());
