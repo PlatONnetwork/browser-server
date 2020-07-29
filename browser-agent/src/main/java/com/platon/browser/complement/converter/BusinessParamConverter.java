@@ -6,6 +6,7 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.*;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public abstract class BusinessParamConverter<T> {
     			:BusinessParam.YesNoEnum.NO.getCode();
     }
 
-    public abstract T convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException;
+    public abstract T convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException, BlockNumberException;
 
 
     protected void updateTxInfo(TxParam txParam,Transaction tx){

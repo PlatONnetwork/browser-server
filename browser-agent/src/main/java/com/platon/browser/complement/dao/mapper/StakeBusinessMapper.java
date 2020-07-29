@@ -31,10 +31,16 @@ public interface StakeBusinessMapper {
     void modify(BusinessParam param );
 
     /**
-     * 退出质押
+     * 质押金被锁定状态下，退出质押
      */
     @Transactional
-    void exit(BusinessParam param);
+    void lockedExit(BusinessParam param);
+
+    /**
+     * 质押金未被锁定状态下，退出质押
+     */
+    @Transactional
+    void unlockExit(BusinessParam param);
 
     /**
      * 更新节点信息：keybase信息，程序版本号信息

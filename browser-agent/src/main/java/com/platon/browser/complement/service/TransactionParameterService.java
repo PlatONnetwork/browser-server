@@ -19,6 +19,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
@@ -201,7 +202,7 @@ public class TransactionParameterService {
             }
             if(nodeOpt!=null) tar.getNodeOptList().add(nodeOpt);
             if(delegationReward!=null) tar.getDelegationRewardList().add(delegationReward);
-        }catch (BusinessException | NoSuchBeanException e){
+        }catch (BusinessException | NoSuchBeanException | BlockNumberException e){
             log.debug("",e);
         }
     }
