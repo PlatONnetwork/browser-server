@@ -7,8 +7,8 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Election;
-import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
@@ -37,6 +37,8 @@ public class OnElectionConverter {
 	@Autowired
 	private EpochBusinessMapper epochBusinessMapper;
 	@Autowired
+	private StakeBusinessMapper stakeBusinessMapper;
+	@Autowired
 	private NetworkStatCache networkStatCache;
 	@Autowired
 	private BlockChainConfig chainConfig;
@@ -48,8 +50,6 @@ public class OnElectionConverter {
 	private StakingMapper stakingMapper;
 	@Autowired
 	private StakeMiscService stakeMiscService;
-	@Autowired
-    private ProposalParameterService proposalParameterService;
 
 	public List<NodeOpt> convert(CollectionEvent event, Block block) {
 		long startTime = System.currentTimeMillis();
@@ -114,7 +114,8 @@ public class OnElectionConverter {
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
 
 		List<NodeOpt> nodeOpts = new ArrayList<>();
-		List<Staking> realSlashNodes = new ArrayList<>();
+		List<Staking> lockedNodes = new ArrayList<>();
+		List<Staking> exitedNodes = new ArrayList<>();
 		for(Staking staking:slashNodeList){
 			if(staking.getLowRateSlashCount()>0){
 				// 如果节点之前因低出块被罚过，且还没被解锁（节点在结算周期切换被解锁时会把低出块处罚次数置零）,则不做任何操作
@@ -143,6 +144,7 @@ public class OnElectionConverter {
 				BigDecimal remainRedeemAmount = staking.getStakingReduction().subtract(slashAmount);
 				if(remainRedeemAmount.compareTo(BigDecimal.ZERO)<0) remainRedeemAmount=BigDecimal.ZERO;
 				staking.setStakingReduction(remainRedeemAmount);
+				lockedNodes.add(staking);
 			}
 			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
 				// 如果节点处于候选中，则从锁定中的质押中扣掉处罚金额
@@ -158,8 +160,17 @@ public class OnElectionConverter {
 					// 如果扣除处罚金额后小于质押门槛，则节点置为退出中
 					remainLockedAmount.compareTo(chainConfig.getStakeThreshold())<0
 				){
+					// 更新解质押到账需要经过的结算周期数
+					BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+					// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
+					BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
+					election.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
+					election.setUnStakeEndBlock(unStakeEndBlock);
 					// 退出中状态的节点在结算周期切换时会检查是否已达到指定周期数，如果达到，则进行节点的各种金额的移动处理
 					staking.setStatus(StatusEnum.EXITING.getCode());
+					exitedNodes.add(staking);
+				}else{
+					lockedNodes.add(staking);
 				}
 				staking.setStakingLocked(remainLockedAmount);
 			}
@@ -167,13 +178,14 @@ public class OnElectionConverter {
 			staking.setLeaveTime(new Date());
 			// 低出块处罚次数+1
 			staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
-			realSlashNodes.add(staking);
+
 
 			//对提案数据进行处罚
 //			proposalParameterService.setSlashParameters(staking.getNodeId());
 			nodeOpts.add(nodeOpt);
 		}
-		election.setSlashNodeList(realSlashNodes);
+		election.setLockedNodeList(lockedNodes);
+		election.setExitedNodeList(exitedNodes);
 		epochBusinessMapper.slashNode(election);
 		return nodeOpts;
 	}
