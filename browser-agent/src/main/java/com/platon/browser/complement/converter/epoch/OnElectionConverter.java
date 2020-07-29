@@ -143,8 +143,6 @@ public class OnElectionConverter {
 				BigDecimal remainRedeemAmount = staking.getStakingReduction().subtract(slashAmount);
 				if(remainRedeemAmount.compareTo(BigDecimal.ZERO)<0) remainRedeemAmount=BigDecimal.ZERO;
 				staking.setStakingReduction(remainRedeemAmount);
-				// 低出块处罚次数+1
-				staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
 			}
 			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
 				// 如果节点处于候选中，则从锁定中的质押中扣掉处罚金额
@@ -164,11 +162,11 @@ public class OnElectionConverter {
 					staking.setStatus(StatusEnum.EXITING.getCode());
 				}
 				staking.setStakingLocked(remainLockedAmount);
-				// 低出块处罚次数+1
-				staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
 			}
 			// 设置离开验证人列表的时间
 			staking.setLeaveTime(new Date());
+			// 低出块处罚次数+1
+			staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
 			realSlashNodes.add(staking);
 
 			//对提案数据进行处罚
