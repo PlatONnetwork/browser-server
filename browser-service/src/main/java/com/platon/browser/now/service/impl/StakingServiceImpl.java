@@ -197,8 +197,12 @@ public class StakingServiceImpl implements StakingService {
 			} else {
 				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus(), stakings.get(i).getIsSettle()));
 			}
-			/** 质押总数=有效的质押+委托 */
-			aliveStakingListResp.setTotalValue(stakings.get(i).getTotalValue().toString());
+			/** 质押总数=犹豫期+锁定期+委托 */
+			Node staking = stakings.get(i);
+			BigDecimal totalStakeAmount = staking.getStakingHes()
+					.add(staking.getStakingLocked())
+					.add(staking.getStatDelegateValue());
+			aliveStakingListResp.setTotalValue(totalStakeAmount.toString());
 			aliveStakingListResp.setDeleAnnualizedRate(stakings.get(i).getDeleAnnualizedRate().toString());
 			lists.add(aliveStakingListResp);
 		}
