@@ -13,12 +13,10 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationKey;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.entity.GasEstimateKey;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -86,75 +84,94 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .txFrom(tx.getFrom())
                 .stakingBlockNumber(txParam.getStakingBlockNum())
                 .minimumThreshold(chainConfig.getDelegateThreshold())
-                .codeRmDelegateHes(BigDecimal.ZERO)
-                .codeRmDelegateLocked(BigDecimal.ZERO)
-                .codeRmDelegateReleased(BigDecimal.ZERO)
-                .codeDelegateHes(BigDecimal.ZERO)
-                .codeDelegateLocked(BigDecimal.ZERO)
-                .codeDelegateReleased(BigDecimal.ZERO)
                 .delegateReward(txParam.getReward()==null?BigDecimal.ZERO:txParam.getReward())
                 .build();
+
+        /**
+         * 一、已退出 & 退出中的节点，其委记录的犹豫和锁定期金额全部已被移到待领取字段
+         * 此时做赎回委托
+         * 对委托表&节点表记录，从待领取字段扣除真实赎回金额 stat_delegate_released
+         * 对质押表，从待领取字段扣除 stat_delegate_released
+         *
+         * 二、选中，先扣犹豫、不足后扣锁定
+         * 犹豫够扣: 委托和质押表从stat_delegate_hes扣，节点表从stat_delegate_value扣
+         * 犹豫不够扣: 委托和质押从stat_delegate_hes和stat_delegate_locked扣，节点表从stat_delegate_value扣
+         */
+        boolean needDeleteGasEstimate = false; // 是否需要更新估算记录
+        boolean isCandidate = true; // 对应节点是否候选中
+
+        if(delegation.getDelegateReleased().compareTo(BigDecimal.ONE)>0){
+            // 通过待领取金额是否为0可以知道对应节点是[退出中|已退出]，还是[候选中]
+            businessParam.setCodeNodeIsLeave(true);
+            needDeleteGasEstimate = true;
+            isCandidate=false;
+        }
 
         boolean isRefundAll = delegation.getDelegateHes() // 犹豫期金额
                 .add(delegation.getDelegateLocked()) // +锁定期金额
                 .add(delegation.getDelegateReleased()) // +待提取金额
-                .subtract(txParam.getAmount()).compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
-        if(delegation.getDelegateReleased().compareTo(BigDecimal.ONE)>0){
-            // 如果待提取金额大于0,则把节点置为已退出
-            // 如果delegateReleased>0, 证明对应的质押已经退出，同时对应的delegateHes和delegateLocked字段的金额都会被挪到delegateReleased字段
-            // 对应金额移动的逻辑请参考质押退出部分代码
-            businessParam.setCodeNodeIsLeave(true);
-        }
+                .subtract(txParam.getAmount()) // -申请退回金额
+                .compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
 
-        boolean needDeleteGasEstimate = false;
-
+        // 计算真实退回金额
+        BigDecimal realRefundAmount=txParam.getAmount();
         if(isRefundAll){
-            needDeleteGasEstimate = true;
-            // 如果全部退回
-            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()) // 委托状态置为历史
-                .setCodeRealAmount(delegation.getDelegateHes().add(delegation.getDelegateLocked()).add(delegation.getDelegateReleased())) // 真实退回金额=犹豫+锁定+已解锁
-                .setCodeDelegateHes(BigDecimal.ZERO) // 犹豫期金额置零
-                .setCodeDelegateLocked(BigDecimal.ZERO) // 锁定期金额置零
-                .setCodeDelegateReleased(BigDecimal.ZERO); // 已解锁金额置零
-            //全部退回下改为交易实际值
-            txParam.setAmount(delegation.getDelegateHes().add(delegation.getDelegateLocked()).add(delegation.getDelegateReleased()));
+            realRefundAmount = delegation.getDelegateHes() // +犹豫期金额
+                    .add(delegation.getDelegateLocked()) // +锁定期金额
+                    .add(delegation.getDelegateReleased()); // +待提取金额
         }
-        if(!isRefundAll){
-            // 如果不是全部退回
-            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.NO.getCode()) // 委托状态置为非历史
-                    .setCodeRealAmount(txParam.getAmount()); // 真实退回金额=参数申请的金额
-            if(businessParam.isCodeNodeIsLeave()){
-                // 如果节点已经退出，则从此字段扣除真实扣除金额
-                // 设置扣除当前申请金额后，剩余的委托待赎回金额
-                businessParam.setCodeDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeRealAmount()));
-            }else if(delegation.getDelegateHes().compareTo(txParam.getAmount())>=0) {
-                // 如果犹豫期金额大于申请的退出金额，则从犹豫期金额扣除申请金额，且锁定委托金额不变
-                businessParam.setCodeDelegateHes(delegation.getDelegateHes().subtract(txParam.getAmount())) // 从犹豫期金额扣除申请金额
-                    .setCodeDelegateLocked(delegation.getDelegateLocked()); // 锁定委托金额保持不变
+
+        if(isCandidate){
+            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.NO.getCode()); // 委托状态置为非历史
+            // 候选中的节点
+            if(delegation.getDelegateHes().compareTo(realRefundAmount)>=0) {
+                // 犹豫够扣: 委托和质押表从stat_delegate_hes扣，节点表从stat_delegate_value扣
+                BigDecimal remainDelegateHes = delegation.getDelegateHes().subtract(realRefundAmount);
+                if(remainDelegateHes.compareTo(BigDecimal.ZERO)<0) remainDelegateHes=BigDecimal.ZERO;
+
+                businessParam.getBalance()
+                        .setDelegateHes(remainDelegateHes)
+                        .setDelegateLocked(delegation.getDelegateLocked()) // 锁定委托金额保持不变
+                        .setDelegateReleased(delegation.getDelegateReleased()); //待领取金额不变
+
+                businessParam.getDecrease()
+                        .setDelegateHes(realRefundAmount) // -真实扣除金额
+                        .setDelegateLocked(BigDecimal.ZERO) // -0
+                        .setDelegateReleased(BigDecimal.ZERO); // -0
             }else {
-                // 如果犹豫期金额比申请金额小，则需要扣干净犹豫期金额，再从锁定金额中扣除
-                businessParam.setCodeDelegateHes(BigDecimal.ZERO) // 犹豫期金额置0
-                    .setCodeDelegateLocked(delegation.getDelegateLocked().add(delegation.getDelegateHes()).subtract(txParam.getAmount())); // 锁定金额+犹豫金额-申请金额
+                // 犹豫不够扣: 委托和质押从stat_delegate_hes和stat_delegate_locked扣，节点表从stat_delegate_value扣
+                BigDecimal remainDelegateLocked = delegation.getDelegateLocked() // +锁定委托金额
+                        .add(delegation.getDelegateHes()) // +犹豫期委托金额
+                        .subtract(realRefundAmount); // -真实扣除金额
+                if(remainDelegateLocked.compareTo(BigDecimal.ZERO)<0) remainDelegateLocked=BigDecimal.ZERO;
+
+                businessParam.getBalance()
+                        .setDelegateHes(BigDecimal.ZERO) // 犹豫期金额置0
+                        .setDelegateLocked(remainDelegateLocked) // 锁定金额+犹豫金额-真实扣除金额
+                        .setDelegateReleased(delegation.getDelegateReleased()); //待领取金额不变
+
+                businessParam.getDecrease()
+                        .setDelegateHes(BigDecimal.ZERO) // -0
+                        .setDelegateLocked(realRefundAmount) // -真实扣除金额
+                        .setDelegateReleased(BigDecimal.ZERO); // -0
             }
+        }else {
+            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()); // 委托状态置为历史
+            //退出中或已退出的节点
+            // 对委托表&节点表记录，从待领取字段扣除真实赎回金额 stat_delegate_released
+            // 对质押表，从待领取字段扣除 stat_delegate_released
+            BigDecimal delegateReleasedBalance = delegation.getDelegateReleased().subtract(realRefundAmount);
+            businessParam.getBalance().setDelegateReleased(delegateReleasedBalance);
+            businessParam.getBalance().setDelegateHes(BigDecimal.ZERO);
+            businessParam.getBalance().setDelegateLocked(BigDecimal.ZERO);
+
+            businessParam.getDecrease().setDelegateReleased(realRefundAmount);
+            businessParam.getDecrease().setDelegateHes(BigDecimal.ZERO);
+            businessParam.getDecrease().setDelegateLocked(BigDecimal.ZERO);
         }
-
-        // 计算数据库中需要减除的金额 = 数据库空的金额-程序计算后应该剩余的金额
-        businessParam.setCodeRmDelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
-                .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()));
-        Node node = nodeMapper.selectByPrimaryKey(txParam.getNodeId());
-        if (txParam.getStakingBlockNum().compareTo(BigInteger.valueOf(node.getStakingBlockNum())) != 0
-        		|| StatusEnum.CANDIDATE.getCode() != node.getStatus()) {
-        	// 只有不是同一个质押区块的节点的委托下或者状态不为候选中的时候，节点、质押中的待赎回委托需要扣减的金额：真实扣除金额
-
-            // 待赎回委托字段可减实际申请金额的情况：
-            // 1、如果当前解委托的目标质押所对应的质押块号，不等于同一节点的最新质押区块号；
-            // 2、节点对应的状态不是候选中的时候；
-
-            businessParam.setCodeRmDelegateReleased(businessParam.getCodeRealAmount());
-		}
 
         // 补充真实退款金额
-        txParam.setRealAmount(businessParam.getCodeRealAmount());
+        txParam.setRealAmount(realRefundAmount);
         tx.setInfo(txParam.toJSONString());
 
         delegateBusinessMapper.exit(businessParam);
