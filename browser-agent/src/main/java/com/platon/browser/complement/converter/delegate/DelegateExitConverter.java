@@ -9,16 +9,12 @@ import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.DelegationKey;
-import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.entity.GasEstimateKey;
-import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
-import com.platon.browser.dao.mapper.DelegationMapper;
-import com.platon.browser.dao.mapper.GasEstimateMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateExitParam;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +42,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private BlockChainConfig chainConfig;
     @Autowired
     private DelegateBusinessMapper delegateBusinessMapper;
+    @Autowired
+    private StakingMapper stakingMapper;
     @Autowired
     private DelegationMapper delegationMapper;
     @Autowired
@@ -77,9 +75,18 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
 
         if(delegation==null) return der;
+        // 查询出对应的节点信息
+        NodeExample nodeExample = new NodeExample();
+        nodeExample.createCriteria().andNodeIdEqualTo(delegation.getNodeId())
+                .andStakingBlockNumEqualTo(delegation.getStakingBlockNum());
+        List<Node> nodes = nodeMapper.selectByExample(nodeExample);
+
+        if(nodes.isEmpty()) throw new BusinessException("委托者:"+tx.getFrom()+"的质押节点:"+txParam.getNodeId()+"不存在");
+
+        Node node = nodes.get(0);
+
         DelegateExit businessParam= DelegateExit.builder()
                 .nodeId(txParam.getNodeId())
-                .amount(txParam.getAmount())
                 .blockNumber(BigInteger.valueOf(tx.getNum()))
                 .txFrom(tx.getFrom())
                 .stakingBlockNumber(txParam.getStakingBlockNum())
@@ -100,8 +107,9 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         boolean needDeleteGasEstimate = false; // 是否需要更新估算记录
         boolean isCandidate = true; // 对应节点是否候选中
 
-        if(delegation.getDelegateReleased().compareTo(BigDecimal.ONE)>0){
-            // 通过待领取金额是否为0可以知道对应节点是[退出中|已退出]，还是[候选中]
+        if(node.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()
+                ||node.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()){
+            // 节点是[退出中|已退出]
             businessParam.setCodeNodeIsLeave(true);
             needDeleteGasEstimate = true;
             isCandidate=false;
@@ -127,13 +135,12 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             if(delegation.getDelegateHes().compareTo(realRefundAmount)>=0) {
                 // 犹豫够扣: 委托和质押表从stat_delegate_hes扣，节点表从stat_delegate_value扣
                 BigDecimal remainDelegateHes = delegation.getDelegateHes().subtract(realRefundAmount);
-                if(remainDelegateHes.compareTo(BigDecimal.ZERO)<0) remainDelegateHes=BigDecimal.ZERO;
-
+                // 委托记录本身的金额变动
                 businessParam.getBalance()
                         .setDelegateHes(remainDelegateHes)
                         .setDelegateLocked(delegation.getDelegateLocked()) // 锁定委托金额保持不变
                         .setDelegateReleased(delegation.getDelegateReleased()); //待领取金额不变
-
+                // 委托对应节点或质押应减掉的金额
                 businessParam.getDecrease()
                         .setDelegateHes(realRefundAmount) // -真实扣除金额
                         .setDelegateLocked(BigDecimal.ZERO) // -0
@@ -144,16 +151,16 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                         .add(delegation.getDelegateHes()) // +犹豫期委托金额
                         .subtract(realRefundAmount); // -真实扣除金额
                 if(remainDelegateLocked.compareTo(BigDecimal.ZERO)<0) remainDelegateLocked=BigDecimal.ZERO;
-
+                // 委托记录本身的金额变动
                 businessParam.getBalance()
                         .setDelegateHes(BigDecimal.ZERO) // 犹豫期金额置0
                         .setDelegateLocked(remainDelegateLocked) // 锁定金额+犹豫金额-真实扣除金额
                         .setDelegateReleased(delegation.getDelegateReleased()); //待领取金额不变
-
+                // 委托对应节点或质押应减掉的金额
                 businessParam.getDecrease()
                         .setDelegateHes(BigDecimal.ZERO) // -0
                         .setDelegateLocked(realRefundAmount) // -真实扣除金额
-                        .setDelegateReleased(BigDecimal.ZERO); // -0
+                        .setDelegateReleased(delegation.getDelegateReleased()); //待领取金额不变
             }
         }else {
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()); // 委托状态置为历史
@@ -161,6 +168,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             // 对委托表&节点表记录，从待领取字段扣除真实赎回金额 stat_delegate_released
             // 对质押表，从待领取字段扣除 stat_delegate_released
             BigDecimal delegateReleasedBalance = delegation.getDelegateReleased().subtract(realRefundAmount);
+            if(delegateReleasedBalance.compareTo(BigDecimal.ZERO)<0) delegateReleasedBalance=BigDecimal.ZERO;
             businessParam.getBalance().setDelegateReleased(delegateReleasedBalance);
             businessParam.getBalance().setDelegateHes(BigDecimal.ZERO);
             businessParam.getBalance().setDelegateLocked(BigDecimal.ZERO);
@@ -174,6 +182,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         txParam.setRealAmount(realRefundAmount);
         tx.setInfo(txParam.toJSONString());
 
+        businessParam.setRealRefundAmount(realRefundAmount);
         delegateBusinessMapper.exit(businessParam);
 
         der.setDelegateExit(businessParam);

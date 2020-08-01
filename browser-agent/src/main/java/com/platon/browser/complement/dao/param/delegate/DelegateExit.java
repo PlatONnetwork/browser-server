@@ -35,8 +35,8 @@ public class DelegateExit implements BusinessParam {
     }
     //节点id
     private String nodeId;
-    //委托金额
-    private BigDecimal amount;
+    //真实退出委托金额
+    private BigDecimal realRefundAmount;
     //节点质押快高
     private BigInteger stakingBlockNumber;
     //最新委托阈值
