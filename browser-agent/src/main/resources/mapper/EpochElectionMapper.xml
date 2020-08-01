@@ -52,6 +52,7 @@
 			`staking_reduction` = #{item.stakingReduction},
 			`staking_locked` = #{item.stakingLocked},
 			`total_value` = #{item.stakingHes}+#{item.stakingLocked}+#{item.statDelegateHes}+#{item.statDelegateLocked},
+			`stat_delegate_value` = #{item.statDelegateHes}+#{item.statDelegateLocked},
 			`leave_time` = #{item.leaveTime},
 			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
 			`is_consensus` = 2,
