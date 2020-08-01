@@ -35,7 +35,7 @@
 			update `staking` set
 			`status` = #{item.status},
 			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = #{item.stakingReduction},
+			`staking_hes` = #{item.stakingHes},
 			`staking_locked` = #{item.stakingLocked},
 			`leave_time` = #{item.leaveTime},
 			`is_consensus` = 2,
@@ -49,7 +49,7 @@
 			update `node` set
 			`status` = #{item.status},
 			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = #{item.stakingReduction},
+			`staking_hes` = #{item.stakingHes},
 			`staking_locked` = #{item.stakingLocked},
 			`total_value` = `total_value` - #{item.slashAmount},
 			`leave_time` = #{item.leaveTime},
@@ -62,7 +62,7 @@
 			where `node_id` = #{item.nodeId} ;
 		</foreach>
 		/*处理低出块率,罚款后质押金低于质押门槛导致退出的节点: 与质押退出逻辑一样*/
-		<foreach collection="exitedNodeList" item="item">
+		<foreach collection="exitingNodeList" item="item">
 			/*1、更新委托*/
 			update `delegation` set
 			`delegate_released` = `delegate_hes` + `delegate_locked`,
@@ -74,9 +74,9 @@
 			/*2、更新节点*/
 			update `node` set
 			`leave_time` = #{item.leaveTime},
-			`status` = #{item.status},
+			`status` = 2,/*退出中*/
 			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = #{item.stakingLocked} + `staking_hes`,
+			`staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
 			`total_value` = 0,
 			`staking_locked` = 0,
 			`staking_hes` = 0,
@@ -93,7 +93,7 @@
 			`leave_time` = #{item.leaveTime},
 			`status` = #{item.status},
 			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = #{item.stakingLocked} + `staking_hes`,
+			`staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
 			`staking_locked` = 0,
 			`staking_hes` = 0,
 			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,

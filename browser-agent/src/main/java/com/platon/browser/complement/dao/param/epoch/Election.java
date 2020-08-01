@@ -31,7 +31,7 @@ public class Election implements BusinessParam {
 
     /*++++++++++低出块率退出部分+++++++++++*/
     //需要惩罚的列表
-    private List <Staking> exitedNodeList;
+    private List <Staking> exitingNodeList;
     //解质押需要经过的结算周期数
     private int unStakeFreezeDuration;
     //解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者
