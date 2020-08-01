@@ -120,8 +120,7 @@ public class OnElectionConverter {
 		List<Staking> exitedNodes = new ArrayList<>();
 		for(Staking staking:slashNodeList){
 			if(staking.getLowRateSlashCount()>0){
-				// 如果节点之前因低出块被罚过，且还没被解锁（节点在结算周期切换被解锁时会把低出块处罚次数置零）,则不做任何操作
-				// 进入此处的节点只可能是退出中状态的节点
+				// 已经被低出块处罚过一次，则不再处罚
 				continue;
 			}
 
@@ -134,7 +133,7 @@ public class OnElectionConverter {
 			 */
 			BigDecimal slashAmount =  event.getEpochMessage().getBlockReward()
 					.multiply(chainConfig.getSlashBlockRewardCount());
-
+			customStaking.setSlashAmount(slashAmount);
 			desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(slashAmount.toString()).append( "|1");
 			NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 			nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
@@ -161,14 +160,10 @@ public class OnElectionConverter {
 				if(remainLockedAmount.compareTo(BigDecimal.ZERO)<0) {
 					remainLockedAmount=BigDecimal.ZERO;
 				}
-				if(
-					// 如果扣除处罚金额后小于零，则节点置为退出中
-					remainLockedAmount.compareTo(BigDecimal.ZERO)<0||
-					// 如果扣除处罚金额后小于质押门槛，则节点置为退出中
-					remainLockedAmount.compareTo(chainConfig.getStakeThreshold())<0
-				){
+				// 如果扣除处罚金额后小于质押门槛，则节点置为退出中
+				if(remainLockedAmount.compareTo(chainConfig.getStakeThreshold())<0){
 					// 更新解质押到账需要经过的结算周期数
-					BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+					BigInteger unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
 					// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
 					BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
 					election.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());

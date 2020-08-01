@@ -51,10 +51,7 @@
 			`staking_reduction_epoch` = #{settingEpoch},
 			`staking_reduction` = #{item.stakingReduction},
 			`staking_locked` = #{item.stakingLocked},
-			/*节点上的当前有效【质押+委托】=当前生效质押的【犹豫质押+锁定质押+犹豫委托+锁定委托】*/
-			`total_value` = #{item.stakingHes}+#{item.stakingLocked}+#{item.statDelegateHes}+#{item.statDelegateLocked},
-			/*节点上的当前有效【委托】=当前生效质押的【犹豫委托+锁定委托】*/
-			`stat_delegate_value` = #{item.statDelegateHes}+#{item.statDelegateLocked},
+			`total_value` = `total_value` - #{item.slashAmount},
 			`leave_time` = #{item.leaveTime},
 			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
 			`is_consensus` = 2,
