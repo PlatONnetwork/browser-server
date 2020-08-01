@@ -2,7 +2,7 @@ package com.platon.browser.complement.dao.param.epoch;
 
 import com.platon.browser.common.enums.BusinessType;
 import com.platon.browser.complement.dao.param.BusinessParam;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dao.entity.Staking;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -21,7 +21,7 @@ import java.util.List;
 public class Election implements BusinessParam {
     /*++++++++++低出块率锁定部分+++++++++++*/
     //需要惩罚的列表
-    private List <CustomStaking> lockedNodeList;
+    private List <Staking> lockedNodeList;
     //结算周期
     private int settingEpoch;
     //零出块需要锁定的结算周期数
@@ -31,7 +31,7 @@ public class Election implements BusinessParam {
 
     /*++++++++++低出块率退出部分+++++++++++*/
     //需要惩罚的列表
-    private List <CustomStaking> exitedNodeList;
+    private List <Staking> exitedNodeList;
     //解质押需要经过的结算周期数
     private int unStakeFreezeDuration;
     //解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者

@@ -116,8 +116,8 @@ public class OnElectionConverter {
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
 
 		List<NodeOpt> nodeOpts = new ArrayList<>();
-		List<CustomStaking> lockedNodes = new ArrayList<>();
-		List<CustomStaking> exitedNodes = new ArrayList<>();
+		List<Staking> lockedNodes = new ArrayList<>();
+		List<Staking> exitedNodes = new ArrayList<>();
 		for(Staking staking:slashNodeList){
 			if(staking.getLowRateSlashCount()>0){
 				// 如果节点之前因低出块被罚过，且还没被解锁（节点在结算周期切换被解锁时会把低出块处罚次数置零）,则不做任何操作
@@ -134,7 +134,6 @@ public class OnElectionConverter {
 			 */
 			BigDecimal slashAmount =  event.getEpochMessage().getBlockReward()
 					.multiply(chainConfig.getSlashBlockRewardCount());
-			customStaking.setSlashAmount(slashAmount);
 
 			desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(slashAmount.toString()).append( "|1");
 			NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
@@ -151,6 +150,7 @@ public class OnElectionConverter {
 				BigDecimal remainRedeemAmount = staking.getStakingReduction().subtract(slashAmount);
 				if(remainRedeemAmount.compareTo(BigDecimal.ZERO)<0) remainRedeemAmount=BigDecimal.ZERO;
 				staking.setStakingReduction(remainRedeemAmount);
+				// 总质押+委托统计字段也要更新
 				lockedNodes.add(customStaking);
 			}
 			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
@@ -185,7 +185,6 @@ public class OnElectionConverter {
 			staking.setLeaveTime(new Date());
 			// 低出块处罚次数+1
 			staking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
-
 
 			//对提案数据进行处罚
 //			proposalParameterService.setSlashParameters(staking.getNodeId());

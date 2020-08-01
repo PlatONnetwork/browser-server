@@ -190,7 +190,7 @@ public class AgentTestBase extends AgentTestData {
         
         Election election = Election.builder()
                 .settingEpoch(3)
-                .slashNodeList(slashNodeList).build();
+                .lockedNodeList(slashNodeList).build();
         return election;
     }
     
@@ -220,14 +220,7 @@ public class AgentTestBase extends AgentTestData {
                 .stakingBlockNumber(new BigInteger("200"))
                 .minimumThreshold(new BigDecimal("500000"))
                 .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
-                .codeDelegateHes(new BigDecimal("100000000000000"))
-                .codeRmDelegateHes(new BigDecimal("50000000000000"))
-                .codeDelegateLocked(new BigDecimal("100000000000000"))
-                .codeRmDelegateLocked(new BigDecimal("50000000000000"))
-                .codeDelegateReleased(new BigDecimal("50000000000000"))
-                .codeRmDelegateReleased(new BigDecimal("200000000"))
                 .codeIsHistory(2)
-                .codeRealAmount(new BigDecimal("200000000"))
                 .codeNodeIsLeave(false)
                 .build();
         return delegateExit;

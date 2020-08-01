@@ -17,16 +17,8 @@ public class DelegateExitTest extends AgentTestBase {
         DelegateExit target = DelegateExit.builder()
                 .amount(BigDecimal.ONE)
                 .blockNumber(BigInteger.ONE)
-                .codeDelegateHes(BigDecimal.ZERO)
-                .codeDelegateLocked(BigDecimal.TEN)
-                .codeDelegateReleased(BigDecimal.TEN)
-                .codeRmDelegateHes(BigDecimal.TEN)
-                .codeRmDelegateLocked(BigDecimal.TEN)
-                .codeRmDelegateReleased(BigDecimal.TEN)
                 .codeIsHistory(1)
                 .codeNodeIsLeave(false)
-                .codeRealAmount(BigDecimal.TEN)
-                .codeNodeIsLeave(true)
                 .minimumThreshold(BigDecimal.TEN)
                 .nodeId("0xdfd")
                 .stakingBlockNumber(BigInteger.ONE)
@@ -34,15 +26,8 @@ public class DelegateExitTest extends AgentTestBase {
                 .build();
         target.setAmount(null);
         target.setBlockNumber(null);
-        target.setCodeDelegateHes(null);
-        target.setCodeDelegateLocked(null);
-        target.setCodeDelegateReleased(null);
-        target.setCodeRmDelegateHes(null);
-        target.setCodeRmDelegateLocked(null);
-        target.setCodeRmDelegateReleased(null);
         target.setCodeIsHistory(1);
         target.setCodeNodeIsLeave(false);
-        target.setCodeRealAmount(null);
         target.setCodeNodeIsLeave(true);
         target.setMinimumThreshold(null);
         target.setNodeId(null);
@@ -51,15 +36,8 @@ public class DelegateExitTest extends AgentTestBase {
 
         target.getAmount();
         target.getBlockNumber();
-        target.getCodeDelegateHes();
-        target.getCodeDelegateLocked();
-        target.getCodeDelegateReleased();
-        target.getCodeRmDelegateHes();
-        target.getCodeRmDelegateLocked();
-        target.getCodeRmDelegateReleased();
         target.getCodeIsHistory();
         target.isCodeNodeIsLeave();
-        target.getCodeRealAmount();
         target.isCodeNodeIsLeave();
         target.getMinimumThreshold();
         target.getNodeId();

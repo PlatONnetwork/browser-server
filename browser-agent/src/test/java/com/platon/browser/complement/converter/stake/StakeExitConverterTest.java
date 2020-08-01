@@ -10,6 +10,7 @@ import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class StakeExitConverterTest extends AgentTestBase {
 
 
     @Test
-    public void convert(){
+    public void convert() throws BlockNumberException {
         Transaction tx = new Transaction();
         for (Transaction transaction : transactionList){
             if(transaction.getTypeEnum().equals(Transaction.TypeEnum.STAKE_EXIT))

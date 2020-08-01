@@ -16,12 +16,12 @@ public class ElectionTest extends AgentTestBase {
     public void test(){
         Election target = Election.builder()
                 .settingEpoch(2)
-                .slashNodeList(Collections.emptyList())
+                .lockedNodeList(Collections.emptyList())
                 .build();
         target.setSettingEpoch(0)
-                .setSlashNodeList(Collections.emptyList());
+                .setLockedNodeList(Collections.emptyList());
         target.getSettingEpoch();
-        target.getSlashNodeList();
+        target.getLockedNodeList();
         target.getBusinessType();
 
         assertTrue(true);

@@ -51,7 +51,7 @@
 			`staking_reduction_epoch` = #{settingEpoch},
 			`staking_reduction` = #{item.stakingReduction},
 			`staking_locked` = #{item.stakingLocked},
-			`total_value` = `total_value` - #{item.slashAmount},
+			`total_value` = #{item.stakingHes}+#{item.stakingLocked}+#{item.statDelegateHes}+#{item.statDelegateLocked},
 			`leave_time` = #{item.leaveTime},
 			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
 			`is_consensus` = 2,
