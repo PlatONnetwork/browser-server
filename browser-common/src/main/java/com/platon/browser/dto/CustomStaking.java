@@ -19,6 +19,7 @@ import java.util.*;
  */
 @Data
 public class CustomStaking extends Staking {
+    private BigDecimal slashAmount;
 
     public CustomStaking() {
         super();

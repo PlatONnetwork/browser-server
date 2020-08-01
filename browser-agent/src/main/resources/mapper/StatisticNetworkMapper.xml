@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.complement.dao.mapper.StatisticBusinessMapper">
 
 <select id="getNetworkStatisticsFromNode"  resultType="com.platon.browser.task.bean.NetworkStatistics">
-	select sum(staking_hes + staking_locked+stat_delegate_value) as totalValue,
+	select sum(total_value) as totalValue,
 	    sum(staking_hes + staking_locked) as stakingValue
 	 from node 
 	 where status = 1

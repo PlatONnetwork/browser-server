@@ -13,6 +13,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -21,6 +22,7 @@ import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
@@ -114,8 +116,8 @@ public class OnElectionConverter {
 		BigInteger bNum = BigInteger.valueOf(block.getNum());
 
 		List<NodeOpt> nodeOpts = new ArrayList<>();
-		List<Staking> lockedNodes = new ArrayList<>();
-		List<Staking> exitedNodes = new ArrayList<>();
+		List<CustomStaking> lockedNodes = new ArrayList<>();
+		List<CustomStaking> exitedNodes = new ArrayList<>();
 		for(Staking staking:slashNodeList){
 			if(staking.getLowRateSlashCount()>0){
 				// 如果节点之前因低出块被罚过，且还没被解锁（节点在结算周期切换被解锁时会把低出块处罚次数置零）,则不做任何操作
@@ -123,12 +125,17 @@ public class OnElectionConverter {
 				continue;
 			}
 
+			CustomStaking customStaking = new CustomStaking();
+			BeanUtils.copyProperties(staking,customStaking);
+
 			StringBuffer desc = new StringBuffer("0|");
 			/**
 			 * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
 			 */
 			BigDecimal slashAmount =  event.getEpochMessage().getBlockReward()
 					.multiply(chainConfig.getSlashBlockRewardCount());
+			customStaking.setSlashAmount(slashAmount);
+
 			desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(slashAmount.toString()).append( "|1");
 			NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 			nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
@@ -144,7 +151,7 @@ public class OnElectionConverter {
 				BigDecimal remainRedeemAmount = staking.getStakingReduction().subtract(slashAmount);
 				if(remainRedeemAmount.compareTo(BigDecimal.ZERO)<0) remainRedeemAmount=BigDecimal.ZERO;
 				staking.setStakingReduction(remainRedeemAmount);
-				lockedNodes.add(staking);
+				lockedNodes.add(customStaking);
 			}
 			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
 				// 如果节点处于候选中，则从锁定中的质押中扣掉处罚金额
@@ -168,9 +175,9 @@ public class OnElectionConverter {
 					election.setUnStakeEndBlock(unStakeEndBlock);
 					// 退出中状态的节点在结算周期切换时会检查是否已达到指定周期数，如果达到，则进行节点的各种金额的移动处理
 					staking.setStatus(StatusEnum.EXITING.getCode());
-					exitedNodes.add(staking);
+					exitedNodes.add(customStaking);
 				}else{
-					lockedNodes.add(staking);
+					lockedNodes.add(customStaking);
 				}
 				staking.setStakingLocked(remainLockedAmount);
 			}

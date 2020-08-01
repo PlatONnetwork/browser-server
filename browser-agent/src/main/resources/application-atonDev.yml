@@ -1,6 +1,9 @@
 # ***************************Aton开发配置**************************** #
+
+version: 0.13.1.0
+
 # 当前激活的配置名称(请不要修改)
-profile: dev
+profile: atonDev
 # 密码加密配置
 jasypt:
   encryptor:
@@ -9,9 +12,9 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/platon_aton_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)  
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    url: jdbc:mysql://localhost:3306/platon_aton_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: root
   #Redis配置
   redis:
     cluster:
@@ -111,17 +114,17 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 108
+  chainId: 103
 
 task:
-   #地址统计任务
-   address-batch-size: 1000
-   #动态调整参数
-   dynamic-adjust:
-     #agent与实际链上区块号相差多少个块号时触发调整操作
-     threshold: 20
-     #未追上链,批量入ES和Redis的缓存大小
-     cache-batch-max-size: 10
-     #已追上链,批量入ES和Redis的缓存大小
-     cache-batch-min-size: 1
-  
+  #地址统计任务
+  address-batch-size: 1000
+  #动态调整参数
+  dynamic-adjust:
+    #agent与实际链上区块号相差多少个块号时触发调整操作
+    threshold: 20
+    #未追上链,批量入ES和Redis的缓存大小
+    cache-batch-max-size: 10
+    #已追上链,批量入ES和Redis的缓存大小
+    cache-batch-min-size: 1
+

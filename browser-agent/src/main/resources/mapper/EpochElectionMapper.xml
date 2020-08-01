@@ -46,19 +46,20 @@
 			where `staking_block_num` = #{item.stakingBlockNum}
 			and `node_id` =  #{item.nodeId} ;
 			/*2、更新节点*/
-			update `node` n set
-			n.`status` = #{item.status},
-			n.`staking_reduction_epoch` = #{settingEpoch},
-			n.`staking_reduction` = #{item.stakingReduction},
-			n.`staking_locked` = #{item.stakingLocked},
-			n.`leave_time` = #{item.leaveTime},
-			n.`stat_slash_low_qty` = n.`stat_slash_low_qty` + 1,
-			n.`is_consensus` = 2,
-			n.`is_settle` = 2,
-			n.`zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
-			n.`zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
-			n.`low_rate_slash_count` = n.`low_rate_slash_count`+1
-			where n.`node_id` = #{item.nodeId} ;
+			update `node` set
+			`status` = #{item.status},
+			`staking_reduction_epoch` = #{settingEpoch},
+			`staking_reduction` = #{item.stakingReduction},
+			`staking_locked` = #{item.stakingLocked},
+			`total_value` = `total_value` - #{item.slashAmount},
+			`leave_time` = #{item.leaveTime},
+			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
+			`is_consensus` = 2,
+			`is_settle` = 2,
+			`zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
+			`zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
+			`low_rate_slash_count` = `low_rate_slash_count`+1
+			where `node_id` = #{item.nodeId} ;
 		</foreach>
 		/*处理低出块率,罚款后质押金低于质押门槛导致退出的节点: 与质押退出逻辑一样*/
 		<foreach collection="exitedNodeList" item="item">
