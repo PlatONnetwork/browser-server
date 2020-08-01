@@ -6,7 +6,12 @@
     update `node`set
         `total_value` = `total_value` + #{amount},
         `stat_delegate_value` = `stat_delegate_value` + #{amount},
-        `stat_valid_addrs` = if((select 1 from delegation where is_history = 2 and delegate_addr = #{txFrom}  and node_id = #{nodeId} and delegate_released = 0) is null,stat_valid_addrs + 1,stat_valid_addrs)
+         /*更新节点对应的有效委托地址数*/
+        `stat_valid_addrs` = (
+            SELECT COUNT(1) FROM delegation WHERE is_history = 2
+            AND node_id = #{nodeId} AND delegate_released = 0
+            AND delegate_addr != #{txFrom} /*统计除当前委托地址外的所有委托数*/
+         ) + 1 /*+当前委托*/
     where `node_id` = #{nodeId};
     /*2、更新质押*/
     update `staking` set
