@@ -22,7 +22,8 @@
         `have_dele_reward`,
         `total_dele_reward`,
         `un_stake_freeze_duration`,
-        `un_stake_end_block`
+        `un_stake_end_block`,
+        `low_rate_slash_count`
     ) values (
         #{nodeId},
         #{stakingBlockNum},
@@ -42,7 +43,8 @@
         0,
         0,
         #{unStakeFreezeDuration},
-        #{unStakeEndBlock}
+        #{unStakeEndBlock},
+        0
     );
     /*2、node新增或更新*/
     insert into `node` (`node_id`,
@@ -65,7 +67,8 @@
         `total_dele_reward`,
         `exception_status`,
         `un_stake_freeze_duration`,
-        `un_stake_end_block`
+        `un_stake_end_block`,
+        `low_rate_slash_count`
     ) values (
         #{nodeId},
         #{stakingBlockNum},
@@ -87,7 +90,8 @@
         0,
         1,
         #{unStakeFreezeDuration},
-        #{unStakeEndBlock}
+        #{unStakeEndBlock},
+        0
     ) on duplicate key update
         `staking_block_num` =  #{stakingBlockNum},
         `staking_tx_index` = #{stakingTxIndex},
@@ -113,6 +117,7 @@
         `total_dele_reward` = `total_dele_reward`,
         `exception_status` = 1,
         `un_stake_freeze_duration`=#{unStakeFreezeDuration},
-        `un_stake_end_block`=#{unStakeEndBlock};
+        `un_stake_end_block`=#{unStakeEndBlock},
+        `low_rate_slash_count`=0;
   </update>
 </mapper>

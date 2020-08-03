@@ -98,6 +98,7 @@ public class OnSettleConverter {
             ){
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+                staking.setLowRateSlashCount(0);
                 exitedNodeIds.add(staking.getNodeId());
             }
 
