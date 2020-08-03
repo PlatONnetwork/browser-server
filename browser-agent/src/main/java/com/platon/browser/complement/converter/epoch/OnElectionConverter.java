@@ -162,6 +162,7 @@ public class OnElectionConverter {
 					election.setUnStakeEndBlock(unStakeEndBlock);
 					exitingNodes.add(customStaking);
 				}else{
+					customStaking.setStatus(StatusEnum.LOCKED.getCode());
 					// 锁定节点
 					if(customStaking.getStakingHes().compareTo(slashAmount)>=0) {
 						// 犹豫够扣

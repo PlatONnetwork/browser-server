@@ -92,7 +92,7 @@
 			/*3、更新质押*/
 			update `staking` set
 			`leave_time` = #{item.leaveTime},
-			`status` = #{item.status},
+			`status` = 2,
 			`staking_reduction_epoch` = #{settingEpoch},
 			`staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
 			`staking_locked` = 0,
