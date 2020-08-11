@@ -54,23 +54,21 @@ public class AppDocStakingControllerTest {
     
     @Test
     public void stakingDetails() throws Exception{
-    	String requestBody = "{\"nodeId\":\"aaa\"}";
+    	String requestBody = "{\"nodeId\":\"0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/staking/stakingDetails")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
-    
     @Test
     public void stakingOptRecordList() throws Exception{
-    	String requestBody = "{\"nodeId\":\"aaa\"}";
+    	String requestBody = "{\"nodeId\":\"0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/staking/stakingOptRecordList")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
-    
     @Test
     public void delegationListByStaking() throws Exception{
-    	String requestBody = "{\"nodeId\":\"aaa\",\"stakingBlockNum\":\"121\"}";
+    	String requestBody = "{\"nodeId\":\"0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3\",\"stakingBlockNum\":\"121\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/staking/delegationListByStaking")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
@@ -78,7 +76,7 @@ public class AppDocStakingControllerTest {
     
     @Test
     public void delegationListByAddress() throws Exception{
-    	String requestBody = "{\"address\":500}";
+    	String requestBody = "{\"address\":\"lax1cfar6ln7w2wf4thazagqz6xuex6rmhczwfy0te\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/staking/delegationListByAddress")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());

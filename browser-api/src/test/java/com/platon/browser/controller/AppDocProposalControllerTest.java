@@ -45,7 +45,7 @@ public class AppDocProposalControllerTest {
 
     @Test
     public void proposalDetails() throws Exception {
-        String requestBody = "{\"proposalHash\":\"addvdfbnghm\"}";
+        String requestBody = "{\"proposalHash\":\"0xeab60656668daceb7572117fa4ecbe906b91da744677b5c8dc5581426388cb86\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalDetails")
         	.contentType(MediaType.APPLICATION_JSON_UTF8)
         	.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
@@ -53,7 +53,7 @@ public class AppDocProposalControllerTest {
 
     @Test
     public void voteList() throws Exception {
-        String requestBody = "{\"proposalHash\":\"null\"}";
+        String requestBody = "{\"proposalHash\":\"0xeab60656668daceb7572117fa4ecbe906b91da744677b5c8dc5581426388cb86\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/proposal/voteList")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
             .content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());

@@ -52,7 +52,7 @@ public class AppDocBlockControllerTest {
     
     @Test
     public void blockListByNodeId() throws Exception{
-    	String requestBody = "{\"nodeId\":\"001\"}";
+    	String requestBody = "{\"nodeId\":\"0xed52e1686606c6b496bf220c0e450003763a9258cdf3111579cb0d2c2a1b89ea84ec38116f53c4d2fda9860c78de5693d11517228eec9c651fad132b15e12d29\"}";
     	mockMvc
     		.perform(MockMvcRequestBuilders.post("/block/blockListByNodeId")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -64,7 +64,7 @@ public class AppDocBlockControllerTest {
     public void blockListByNodeIdDownload() throws Exception{
     	mockMvc
     		.perform(MockMvcRequestBuilders.get("/block/blockListByNodeIdDownload")
-    		.param("nodeId", "0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc")
+    		.param("nodeId", "0xed52e1686606c6b496bf220c0e450003763a9258cdf3111579cb0d2c2a1b89ea84ec38116f53c4d2fda9860c78de5693d11517228eec9c651fad132b15e12d29")
     		.param("date", "1571813653000")
     		.param("local", "en")
     		.param("timeZone", "+8")
