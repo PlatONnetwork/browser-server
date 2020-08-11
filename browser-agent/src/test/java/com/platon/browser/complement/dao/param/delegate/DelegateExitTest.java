@@ -15,7 +15,6 @@ public class DelegateExitTest extends AgentTestBase {
     @Test
     public void test(){
         DelegateExit target = DelegateExit.builder()
-                .amount(BigDecimal.ONE)
                 .blockNumber(BigInteger.ONE)
                 .codeIsHistory(1)
                 .codeNodeIsLeave(false)
@@ -24,7 +23,6 @@ public class DelegateExitTest extends AgentTestBase {
                 .stakingBlockNumber(BigInteger.ONE)
                 .txFrom("0x33")
                 .build();
-        target.setAmount(null);
         target.setBlockNumber(null);
         target.setCodeIsHistory(1);
         target.setCodeNodeIsLeave(false);
@@ -34,7 +32,6 @@ public class DelegateExitTest extends AgentTestBase {
         target.setStakingBlockNumber(null);
         target.setTxFrom(null);
 
-        target.getAmount();
         target.getBlockNumber();
         target.getCodeIsHistory();
         target.isCodeNodeIsLeave();

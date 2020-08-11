@@ -68,6 +68,7 @@ public class ReportConverterTest extends AgentTestBase {
                 .build();
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
         when(chainConfig.getDuplicateSignSlashRate()).thenReturn(blockChainConfig.getDuplicateSignSlashRate());
+        when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(blockChainConfig.getConsensusPeriodBlockCount());
         when(chainConfig.getDuplicateSignRewardRate()).thenReturn(blockChainConfig.getDuplicateSignRewardRate());
         when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
         when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);

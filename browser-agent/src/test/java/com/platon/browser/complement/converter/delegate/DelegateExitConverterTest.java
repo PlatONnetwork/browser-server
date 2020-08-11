@@ -8,6 +8,7 @@ import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.GasEstimateMapper;
@@ -24,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -92,6 +94,10 @@ public class DelegateExitConverterTest extends AgentTestBase {
         }
         delegation.setDelegateReleased(BigDecimal.ONE);
         when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegation);
+        Node node = new Node();
+        node.setNodeId(delegation.getNodeId());
+        node.setStatus(1);
+        when(nodeMapper.selectByExample(any())).thenReturn(Arrays.asList(node));
 
         CollectionTransaction tx = null;
         for (CollectionTransaction collectionTransaction : transactionList) {

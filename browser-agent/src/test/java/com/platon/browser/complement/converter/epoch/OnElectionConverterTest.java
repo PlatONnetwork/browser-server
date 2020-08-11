@@ -9,7 +9,6 @@ import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
-import com.platon.browser.complement.service.ProposalParameterService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -53,8 +52,6 @@ public class OnElectionConverterTest extends AgentTestBase {
     private StakeMiscService stakeMiscService;
     @Mock
     private BlockChainConfig chainConfig;
-    @Mock
-    private ProposalParameterService proposalParameterService;
 
     @Spy
     private OnElectionConverter target;
@@ -68,12 +65,15 @@ public class OnElectionConverterTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
         ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
         ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
-        ReflectionTestUtils.setField(target,"proposalParameterService",proposalParameterService);
         List<Staking> list = new ArrayList <>();
         for (int i = 0; i < stakingList.size(); i++) {
         	Staking staking = new Staking();
         	staking.setNodeId(stakingList.get(i).getNodeId());
         	staking.setStakingBlockNum(stakingList.get(i).getStakingBlockNum());
+        	staking.setStakingHes(BigDecimal.ONE);
+        	staking.setStatDelegateHes(BigDecimal.ONE);
+        	staking.setStatDelegateLocked(BigDecimal.ONE);
+        	staking.setStatDelegateReleased(BigDecimal.ONE);
         	staking.setStakingLocked(BigDecimal.ONE);
         	staking.setStakingReduction(BigDecimal.ONE);
         	staking.setStatus(StatusEnum.EXITING.getCode());
@@ -82,6 +82,7 @@ public class OnElectionConverterTest extends AgentTestBase {
         	} else {
         		staking.setStakingReduction(new BigDecimal("-1"));
         	}
+        	staking.setLowRateSlashCount(0);
             list.add(staking);
 		}
         
@@ -97,8 +98,10 @@ public class OnElectionConverterTest extends AgentTestBase {
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
         when(chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
+        when(chainConfig.getStakeThreshold()).thenReturn(BigDecimal.TEN);
         when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
         when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(stakeMiscService.getZeroProduceFreeDuration()).thenReturn(BigInteger.TEN);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);

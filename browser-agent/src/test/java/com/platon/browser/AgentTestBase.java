@@ -216,7 +216,6 @@ public class AgentTestBase extends AgentTestData {
     public DelegateExit delegateExitParam () {
         DelegateExit delegateExit = DelegateExit.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
-                .amount(new BigDecimal("100000000000000"))
                 .stakingBlockNumber(new BigInteger("200"))
                 .minimumThreshold(new BigDecimal("500000"))
                 .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
