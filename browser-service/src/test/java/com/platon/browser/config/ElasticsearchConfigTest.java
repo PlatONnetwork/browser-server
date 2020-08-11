@@ -33,6 +33,8 @@ public class ElasticsearchConfigTest {
         ReflectionTestUtils.setField(target,"addresses",addresses);
         ReflectionTestUtils.setField(target,"port",3365);
         ReflectionTestUtils.setField(target,"schema","ws");
+        ReflectionTestUtils.setField(target,"username","u");
+        ReflectionTestUtils.setField(target,"password","p");
     }
 
     @Test

@@ -34,7 +34,6 @@ public class HomeServiceTest extends TestMockBase {
         ReflectionTestUtils.setField(target,"transactionESRepository",transactionESRepository);
         ReflectionTestUtils.setField(target,"nodeMapper",nodeMapper);
         ReflectionTestUtils.setField(target,"addressMapper",addressMapper);
-        ReflectionTestUtils.setField(target,"i18n",i18n);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
         ReflectionTestUtils.setField(target,"commonService",commonService);
         ReflectionTestUtils.setField(target,"customNodeMapper",customNodeMapper);
