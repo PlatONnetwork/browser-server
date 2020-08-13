@@ -20,9 +20,14 @@ public class GasEstimateEventHandler implements IGasEstimateEventHandler {
 
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
+    private Long prevSeq = 0L;
 
     @Override
     public void onEvent(GasEstimateEvent event, long sequence, boolean endOfBatch) {
+        if(prevSeq.equals(event.getSeq())){
+            // 如果当前序列号等于前一次的序列号，证明消息已经处理过
+            return;
+        }
         long startTime = System.currentTimeMillis();
         try {
             List<GasEstimate> estimateList = event.getEstimateList();
@@ -31,6 +36,7 @@ public class GasEstimateEventHandler implements IGasEstimateEventHandler {
             }
             // es入库完成后删除mysql中的日志记录
             gasEstimateLogMapper.deleteByPrimaryKey(event.getSeq());
+            prevSeq=event.getSeq();
         }catch (Exception e){
             log.error("",e);
         }
