@@ -147,6 +147,8 @@ public class OnElectionConverter {
 			if(StatusEnum.EXITING==StatusEnum.getEnum(staking.getStatus())){
 				// 节点之前处于退出中状态，则其所有钱已经变为赎回中了，所以从赎回中扣掉处罚金额
 				// 总质押+委托统计字段也要更新
+				election.setUnStakeFreezeDuration(customStaking.getUnStakeFreezeDuration());
+				election.setUnStakeEndBlock(BigInteger.valueOf(customStaking.getUnStakeEndBlock()));
 				exitingNodes.add(customStaking);
 			}
 			if(StatusEnum.CANDIDATE==StatusEnum.getEnum(staking.getStatus())){
@@ -156,8 +158,8 @@ public class OnElectionConverter {
 				if(remainStakingAmount.compareTo(chainConfig.getStakeThreshold())<0){
 					// 更新解质押到账需要经过的结算周期数
 					BigInteger unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
-					// 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-					BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
+					// 低出块不需要理会对比提案的生效周期
+					BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
 					election.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
 					election.setUnStakeEndBlock(unStakeEndBlock);
 					exitingNodes.add(customStaking);
