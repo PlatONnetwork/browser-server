@@ -87,7 +87,8 @@
 			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{item.nodeId} and is_history = 2),
 		    `is_consensus` = 2,
 			`un_stake_freeze_duration` = #{unStakeFreezeDuration},
-			`un_stake_end_block` = #{unStakeEndBlock}
+			`un_stake_end_block` = #{unStakeEndBlock},
+			`low_rate_slash_count` = `low_rate_slash_count`+1
 			where `node_id` = #{item.nodeId};
 			/*3、更新质押*/
 			update `staking` set
@@ -102,7 +103,8 @@
 			`stat_delegate_locked` = 0,
 			`is_consensus` = 2,
 			`un_stake_freeze_duration` = #{unStakeFreezeDuration},
-			`un_stake_end_block` = #{unStakeEndBlock}
+			`un_stake_end_block` = #{unStakeEndBlock},
+			`low_rate_slash_count` = `low_rate_slash_count`+1
 			where `node_id` = #{item.nodeId}
 			and `staking_block_num` = #{item.stakingBlockNum};
 		</foreach>
