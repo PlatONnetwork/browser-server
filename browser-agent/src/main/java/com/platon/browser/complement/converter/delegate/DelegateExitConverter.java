@@ -100,7 +100,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
          * 对委托表&节点表记录，从待领取字段扣除真实赎回金额 stat_delegate_released
          * 对质押表，从待领取字段扣除 stat_delegate_released
          *
-         * 二、选中，先扣犹豫、不足后扣锁定
+         * 二、侯选中，先扣犹豫、不足后扣锁定
          * 犹豫够扣: 委托和质押表从stat_delegate_hes扣，节点表从stat_delegate_value扣
          * 犹豫不够扣: 委托和质押从stat_delegate_hes和stat_delegate_locked扣，节点表从stat_delegate_value扣
          */
@@ -124,13 +124,17 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
         // 计算真实退回金额
         BigDecimal realRefundAmount=txParam.getAmount();
         if(isRefundAll){
+            // 全部退回，委托置为历史
             realRefundAmount = delegation.getDelegateHes() // +犹豫期金额
                     .add(delegation.getDelegateLocked()) // +锁定期金额
                     .add(delegation.getDelegateReleased()); // +待提取金额
+            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()); // 委托状态置为历史
+        }else{
+            // 部分退回，委托置为非历史
+            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.NO.getCode()); // 委托状态置为非历史
         }
 
         if(isCandidate){
-            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.NO.getCode()); // 委托状态置为非历史
             // 候选中的节点
             if(delegation.getDelegateHes().compareTo(realRefundAmount)>=0) {
                 // 犹豫够扣: 委托和质押表从stat_delegate_hes扣，节点表从stat_delegate_value扣
@@ -163,7 +167,6 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                         .setDelegateReleased(delegation.getDelegateReleased()); //待领取金额不变
             }
         }else {
-            businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()); // 委托状态置为历史
             //退出中或已退出的节点
             // 对委托表&节点表记录，从待领取字段扣除真实赎回金额 stat_delegate_released
             // 对质押表，从待领取字段扣除 stat_delegate_released
