@@ -1,5 +1,6 @@
 package com.platon.browser.queue.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
@@ -44,6 +45,7 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
     public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
         stage.addAll(event.getAddressList());
+        log.info("stat:{},batchSize:{},getTotalCount():{},addressMaxCount:{}",stage.size(),batchSize,getTotalCount(),addressMaxCount);
         if(stage.size()<batchSize){
             // 如果暂存数量小于批次
             if(getTotalCount()>addressMaxCount){
@@ -74,6 +76,7 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
             address.setContractName("");
             address.setContractCreate("");
             address.setContractCreatehash("");
+            address.setHaveReward(BigDecimal.ZERO);
         });
 
         AddressExample example = new AddressExample();
@@ -85,11 +88,16 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         addressMap.keySet().removeAll(existAddresses);
         List<Address> addressList = new ArrayList<>(addressMap.values());
 
-        if(getTotalCount()<addressMaxCount){
-            if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
-            long endTime = System.currentTimeMillis();
-            printTps("地址",addressList.size(),startTime,endTime);
-        }
+        try {
+        	if(getTotalCount()<addressMaxCount){
+                if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
+                long endTime = System.currentTimeMillis();
+                printTps("地址",addressList.size(),startTime,endTime);
+            }
+		} catch (Exception e) {
+			log.error("insert address error", e);
+		}
+        
         stage.clear();
     }
 }

@@ -32,7 +32,7 @@ public class AddressPublisher extends AbstractPublisher {
     @Override
     public AbstractHandler getHandler(){return handler;}
 
-    @Value("${disruptor.queue.block.buffer-size}")
+    @Value("${disruptor.queue.address.buffer-size}")
     private int ringBufferSize;
     @Override
     int getRingBufferSize() {

@@ -19,4 +19,6 @@ public class CounterBean {
     private long nodeOptMaxId;
     private long addressCount;
     private long lastBlockNumber;
+    private long rewardCount;
+    private long estimateCount;
 }

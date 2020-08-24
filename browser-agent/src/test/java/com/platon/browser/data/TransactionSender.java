@@ -217,10 +217,10 @@ public class TransactionSender {
     // 发送解委托交易
     @Test
     public void unDelegate() throws Exception {
-    	BigDecimal delegate = Convert.toVon("65000", Unit.LAT);
+    	BigDecimal delegate = Convert.toVon("5000", Unit.LAT);
         TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
-                BigInteger.valueOf(1514),
+                BigInteger.valueOf(86),
                 delegate.toBigInteger(),new GasProvider() {
         			
         			@Override

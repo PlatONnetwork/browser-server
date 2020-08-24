@@ -1,6 +1,7 @@
 package com.platon.browser.queue.event;
 
-import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+
 import lombok.Data;
 
 import java.util.List;
@@ -11,6 +12,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class VoteEvent {
-    private List <Vote> voteList;
+public class RewardEvent {
+    private List <DelegationReward> delegationRewards;
 }

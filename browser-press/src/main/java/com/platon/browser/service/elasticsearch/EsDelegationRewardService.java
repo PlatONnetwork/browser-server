@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.elasticsearch.DelegationRewardESRepository;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +9,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -22,20 +19,21 @@ import java.util.concurrent.CountDownLatch;
  */
 @Slf4j
 @Service
-public class EsDelegationService extends EsService<Delegation> {
+public class EsDelegationRewardService extends EsService<DelegationReward>{
+
     @Autowired
-    private DelegationESRepository delegationESRepository;
+    private DelegationRewardESRepository delegationRewardESRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void save(StageCache<Delegation> stage) throws IOException, InterruptedException {
-        Set<Delegation> data = stage.getData();
+    public void save(StageCache<DelegationReward> stage) throws IOException, InterruptedException {
+        Set<DelegationReward> data = stage.getData();
         if(data.isEmpty()) return;
         int size = data.size()/POOL_SIZE;
-        Set<Map<String, Delegation>> groups = new HashSet<>();
+        Set<Map<String,DelegationReward>> groups = new HashSet<>();
         try {
-            Map<String,Delegation> group = new HashMap<>();
-            for (Delegation e : data) {
-                // 使用(<节点ID>-<质押区块号>-<委托人地址>)作ES的docId
-                group.put(e.getNodeId()+"-"+e.getStakingBlockNum()+"-"+e.getDelegateAddr(),e);
+            Map<String,DelegationReward> group = new HashMap<>();
+            for (DelegationReward b : data) {
+                // 使用区块号作ES的docId
+                group.put(b.getHash(), b);
                 if(group.size()>=size){
                     groups.add(group);
                     group=new HashMap<>();
@@ -44,9 +42,9 @@ public class EsDelegationService extends EsService<Delegation> {
             if(group.size()>0) groups.add(group);
 
             CountDownLatch latch = new CountDownLatch(groups.size());
-            for (Map<String, Delegation> g : groups) {
+            for (Map<String, DelegationReward> g : groups) {
                 try {
-                    delegationESRepository.bulkAddOrUpdate(g);
+                	delegationRewardESRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

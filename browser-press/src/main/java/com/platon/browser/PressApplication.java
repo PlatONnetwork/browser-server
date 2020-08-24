@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.GracefullyShutdownException;
@@ -66,6 +67,10 @@ public class PressApplication implements ApplicationRunner {
     @Autowired
     private RpPlanPublisher rpPlanPublisher;
     @Autowired
+    private RewardPublisher rewardPublisher;
+    @Autowired
+    private EstimatePublisher estimatePublisher;
+    @Autowired
     private SlashPublisher slashPublisher;
 
     @Autowired
@@ -88,12 +93,16 @@ public class PressApplication implements ApplicationRunner {
     private long voteMaxCount;
     @Value("${platon.rpplanMaxCount}")
     private long rpplanMaxCount;
+    @Value("${platon.rewardMaxCount}")
+    private long rewardMaxCount;
     @Value("${platon.slashMaxCount}")
     private long slashMaxCount;
     @Value("${platon.blockMaxCount}")
     private long blockMaxCount;
     @Value("${platon.nodeoptMaxCount}")
     private long nodeoptMaxCount;
+    @Value("${platon.estimateMaxCount}")
+    private long estimateMaxCount;
 
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
@@ -101,7 +110,9 @@ public class PressApplication implements ApplicationRunner {
     private long currentProposalSum = 0L;
     private long currentVoteSum = 0L;
     private long currentRpplanSum = 0L;
+    private long currentRewardSum = 0L;
     private long currentSlashSum = 0L;
+    private long currentEstimateSum = 0L;
 
     public static void main ( String[] args ) {
         SpringApplication.run(PressApplication.class, args);
@@ -135,6 +146,10 @@ public class PressApplication implements ApplicationRunner {
             makeRpPlan(blockResult);
             // 构造【slash】数据
             makeSlash(blockResult);
+         // 构造【委托奖励】数据
+            makeReward(blockResult);
+         // 构造【gas】数据
+            makeEstimate(blockResult);
             // 区块号累加
             blockNumber=blockNumber.add(BigInteger.ONE);
             /*// 更新网络统计表
@@ -166,7 +181,9 @@ public class PressApplication implements ApplicationRunner {
             currentProposalSum=counterBean.getProposalCount();
             currentVoteSum=counterBean.getVoteCount();
             currentRpplanSum=counterBean.getRpplanCount();
+            currentRewardSum=counterBean.getRewardCount();
             currentSlashSum=counterBean.getSlashCount();
+            currentEstimateSum=counterBean.getEstimateCount();
             blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -203,6 +220,8 @@ public class PressApplication implements ApplicationRunner {
             counter.setVoteCount(currentVoteSum);
             counter.setRpplanCount(currentRpplanSum);
             counter.setSlashCount(currentSlashSum);
+            counter.setRewardCount(currentRewardSum);
+            counter.setEstimateCount(currentEstimateSum);
             String status = JSON.toJSONString(counter,true);
             File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
@@ -371,6 +390,46 @@ public class PressApplication implements ApplicationRunner {
                 }
             }
             rpPlanPublisher.publish(rpPlanList);
+        }
+    }
+    
+    /**
+     * 构造委托奖励
+     * @param blockResult
+     */
+    private void makeReward(BlockResult blockResult) throws BlockNumberException {
+        if(currentRpplanSum<rewardMaxCount){
+            // 构造指定数量的委托奖励记录并入库
+            List <DelegationReward> delegationRewards = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                if(
+                        tx.getTypeEnum()== Transaction.TypeEnum.CLAIM_REWARDS
+                ){
+                	delegationRewards.add(dataGenService.getReward(tx));
+                    currentRewardSum++;
+                }
+            }
+            rewardPublisher.publish(delegationRewards);
+        }
+    }
+    
+    /**
+     * 构造gas
+     * @param blockResult
+     */
+    private void makeEstimate(BlockResult blockResult) throws BlockNumberException {
+        if(currentEstimateSum<estimateMaxCount){
+            // 构造指定数量的委托奖励记录并入库
+            List <GasEstimate> gasEstimates = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                if(
+                        tx.getTypeEnum()== Transaction.TypeEnum.DELEGATE_CREATE
+                ){
+                	gasEstimates.add(dataGenService.getEstimate(tx));
+                	currentEstimateSum++;
+                }
+            }
+            estimatePublisher.publish(gasEstimates);
         }
     }
 }

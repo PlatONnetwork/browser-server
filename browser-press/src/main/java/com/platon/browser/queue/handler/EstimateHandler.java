@@ -1,8 +1,9 @@
 package com.platon.browser.queue.handler;
 
-import com.platon.browser.dao.entity.Vote;
-import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.queue.event.VoteEvent;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.mapper.GasEstimateMapper;
+import com.platon.browser.queue.event.EstimateEvent;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,30 +23,32 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class VoteHandler extends AbstractHandler<VoteEvent> {
+public class EstimateHandler extends AbstractHandler<EstimateEvent> {
 
     @Autowired
-    private VoteMapper voteMapper;
+    private GasEstimateMapper gasEstimateMapper;
 
     @Setter
     @Getter
-    @Value("${disruptor.queue.vote.batch-size}")
+    @Value("${disruptor.queue.estimate.batch-size}")
     private volatile int batchSize;
 
-    private List<Vote> stage = new ArrayList<>();
+    private List<GasEstimate> list = new ArrayList<>();
     @PostConstruct
-    private void init(){this.setLogger(log);}
+    private void init(){
+        this.setLogger(log);
+    }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent (VoteEvent event, long sequence, boolean endOfBatch ) {
+    public void onEvent (EstimateEvent event, long sequence, boolean endOfBatch ) throws IOException, InterruptedException{
         long startTime = System.currentTimeMillis();
         try {
-            stage.addAll(event.getVoteList());
-            if(stage.size()<batchSize) return;
-            voteMapper.batchInsert(stage);
+        	list.addAll(event.getGasEstimates());
+            if(list.size()<batchSize) return;
+            gasEstimateMapper.batchInsert(list);
             long endTime = System.currentTimeMillis();
-            printTps("投票",stage.size(),startTime,endTime);
-            stage.clear();
+            printTps("estimate",list.size(),startTime,endTime);
+            list.clear();
         }catch (Exception e){
             log.error("",e);
             throw e;

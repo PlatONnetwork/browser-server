@@ -4,11 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
+import com.platon.sdk.utlis.Bech32;
+import com.platon.sdk.utlis.NetworkParameters.Hrp;
+
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -18,12 +22,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.Keys;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.*;
 
 @Slf4j
@@ -81,6 +89,16 @@ public class DataGenService {
         return address;
     }
 
+    private String rAddress() {
+    	try {
+			return Bech32.addressEncode(Hrp.LAX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
     private String randomProposalHash(){
         String hash = PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size()));
         return hash;
@@ -95,6 +113,8 @@ public class DataGenService {
     private String proposalStr;
     private String voteStr;
     private String rpPlanStr;
+    private String rewardStr;
+    private String estimateStr;
     private String slashStr;
 
     private NetworkStat networkStat;
@@ -152,9 +172,16 @@ public class DataGenService {
                     case "rpplan.json":
                         rpPlanStr=content;
                         break;
+                    case "delegatinReward.json":
+                        rewardStr=content;
+                        break;
                     case "slash.json":
                         slashStr=content;
                         break;
+                    case "gasEstimate.json":
+                    	estimateStr=content;
+                        break;
+                        
                 }
             } catch (IOException e) {
                 log.error("读取文件内容出错",e);
@@ -232,7 +259,7 @@ public class DataGenService {
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
         copy.setStakingBlockNum(tx.getNum());
         copy.setNodeId(randomNodeId());
-        copy.setDelegateAddr(randomAddress());
+        copy.setDelegateAddr(rAddress());
         return copy;
     }
 
@@ -279,6 +306,26 @@ public class DataGenService {
         copy.setId(null);
         copy.setEpoch(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN));
         copy.setAddress(randomAddress());
+        return copy;
+    }
+    
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public DelegationReward getReward(Transaction tx) throws BlockNumberException {
+    	DelegationReward copy = JSON.parseObject(rewardStr, DelegationReward.class);
+    	copy.setHash(tx.getHash());
+        copy.setAddr(randomAddress());
+        return copy;
+    }
+    
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public GasEstimate getEstimate(Transaction tx) throws BlockNumberException {
+    	GasEstimate copy = JSON.parseObject(estimateStr, GasEstimate.class);
+    	try {
+			copy.setAddr(rAddress());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+        
         return copy;
     }
 
