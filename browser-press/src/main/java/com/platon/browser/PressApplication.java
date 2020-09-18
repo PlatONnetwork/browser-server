@@ -398,7 +398,7 @@ public class PressApplication implements ApplicationRunner {
      * @param blockResult
      */
     private void makeReward(BlockResult blockResult) throws BlockNumberException {
-        if(currentRpplanSum<rewardMaxCount){
+        if(currentRewardSum<rewardMaxCount){
             // 构造指定数量的委托奖励记录并入库
             List <DelegationReward> delegationRewards = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
