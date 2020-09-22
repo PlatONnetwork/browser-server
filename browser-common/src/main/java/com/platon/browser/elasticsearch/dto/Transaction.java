@@ -57,6 +57,8 @@ public class Transaction {
         WASM_CONTRACT_CREATE(3,"WASM合约发布(合约创建)"),
         OTHERS(4,"其他"),
         MPC(5,"MPC交易"),
+        ERC20_CONTRACT_CREATE(6,"ERC20合约发布(合约创建)"),
+        ERC20_CONTRACT_EXEC(7,"ERC20合约调用(合约执行)"),
         STAKE_CREATE(1000,"发起质押(创建验证人)"),
         STAKE_MODIFY(1001,"修改质押信息(编辑验证人)"),
         STAKE_INCREASE(1002,"增持质押(增加自有质押)"),
@@ -127,7 +129,8 @@ public class Transaction {
         ACCOUNT(1, "账户"),
         INNER_CONTRACT(2, "内置合约"),
         EVM_CONTRACT(3, "EVM合约"),
-        WASM_CONTRACT(4, "WASM合约");
+        WASM_CONTRACT(4, "WASM合约"),
+        ERC20_CONTRACT(5, "ERC20-EVM合约");
         private int code;
         private String desc;
         ToTypeEnum(int code, String desc) {

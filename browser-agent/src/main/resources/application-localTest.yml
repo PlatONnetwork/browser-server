@@ -31,6 +31,7 @@ spring:
       delegationIndexName: browser_delegation_2
       nodeOptIndexName: browser_nodeopt_2
       delegationRewardIndexName: browser_delegation_reward_2
+      innerTxIndexName: browser_inner_tx_2
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
