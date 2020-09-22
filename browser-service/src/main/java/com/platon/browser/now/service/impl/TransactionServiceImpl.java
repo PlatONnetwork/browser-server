@@ -6,6 +6,7 @@ import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
+import com.platon.browser.converter.QueryInnerTxByAddrRespConverter;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -15,10 +16,12 @@ import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.keybase.KeyBaseUserInfo;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
+import com.platon.browser.elasticsearch.InnerTxESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.DelegationReward.Extra;
+import com.platon.browser.elasticsearch.dto.InnerTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
@@ -38,8 +41,10 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
+import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
@@ -85,11 +90,13 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionESRepository transactionESRepository;
     @Autowired
     private DelegationRewardESRepository delegationRewardESRepository;
+	@Autowired
+	private InnerTxESRepository innerTxESRepository;
     @Autowired
     private I18nUtil i18n;
-    @Autowired
+    @Autowired(required = false)
     private StakingMapper stakingMapper;
-    @Autowired
+    @Autowired(required = false)
     private ProposalMapper proposalMapper;
     @Autowired
     private StatisticCacheService statisticCacheService;
@@ -671,6 +678,7 @@ public class TransactionServiceImpl implements TransactionService {
 						 */
 					case EVM_CONTRACT_CREATE:
 					case WASM_CONTRACT_CREATE:
+					case ERC20_CONTRACT_CREATE:
 						/**
 						 * to地址设置为合约地址
 						 */
@@ -681,6 +689,13 @@ public class TransactionServiceImpl implements TransactionService {
 						 * 合约执行
 						 */
 					case CONTRACT_EXEC:
+						resp.setTxInfo(transaction.getInput());
+						break;
+					case ERC20_CONTRACT_EXEC:
+						Erc20Param erc20Param  = JSON.parseObject(txInfo, Erc20Param.class);
+						if(erc20Param != null){
+							BeanUtils.copyProperties(erc20Param, resp);
+						}
 						resp.setTxInfo(transaction.getInput());
 						break;
 				default:
@@ -878,6 +893,40 @@ public class TransactionServiceImpl implements TransactionService {
 		
 		RespPage<QueryClaimByStakingResp> result = new RespPage<>();
 		result.init(queryClaimByStakingResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
+		return result;
+	}
+
+	@Override
+	public RespPage<QueryInnerTxByAddrResp> queryInnerByAddr(QueryInnerByAddrReq req) {
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		/**
+		 * 根据不同的类型设置不同的查询条件
+		 */
+		if(req.getType() == 1){
+			constructor.must(new ESQueryBuilders().term("tokenAddr", req.getAddress()));
+		} else {
+			constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
+					.should(QueryBuilders.termQuery("to", req.getAddress())));
+
+		}
+		constructor.setResult(new String[] { "hash", "time", "transValue", "from",
+				"to", "tokenName", "tokenAddr", "symbol", "decimal"});
+		constructor.setDesc("time");
+		ESResult<InnerTx> innerTxESResult = null;
+		try {
+			innerTxESResult = innerTxESRepository.search(constructor, InnerTx.class, req.getPageNo(), req.getPageSize());
+		} catch (Exception e) {
+			logger.error(ERROR_TIPS, e);
+		}
+		List<QueryInnerTxByAddrResp> queryInnerTxByAddrResps = new ArrayList<>();
+		for(InnerTx innerTx : innerTxESResult.getRsData()){
+			QueryInnerTxByAddrResp queryInnerTxByAddrResp = QueryInnerTxByAddrRespConverter.INSTANCE.domain2dto(innerTx);
+			String transValue = (new BigDecimal(innerTx.getTransValue()).divide(new BigDecimal(innerTx.getDecimal())).setScale(12,RoundingMode.DOWN)).toEngineeringString();
+			queryInnerTxByAddrResp.setTransValue(transValue);
+			queryInnerTxByAddrResps.add(queryInnerTxByAddrResp);
+		}
+		RespPage<QueryInnerTxByAddrResp> result = new RespPage<>();
+		result.init(queryInnerTxByAddrResps, innerTxESResult.getTotal(), innerTxESResult.getTotal(), 0l);
 		return result;
 	}
 

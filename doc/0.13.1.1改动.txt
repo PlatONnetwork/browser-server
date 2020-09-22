@@ -75,11 +75,8 @@
           "token_name": {
              "type": "keyword"
           },
-          "receive": {
-            "type": "text",
-            "index": false,
-            "doc_values": false,
-            "norms": false
+          "token_addr": {
+            "type": "keyword"
           },
           "decimal": {
             "type": "keyword"

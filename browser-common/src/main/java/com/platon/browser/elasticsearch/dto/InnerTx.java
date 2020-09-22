@@ -21,14 +21,14 @@ public class InnerTx {
     //日期
     private Date time;
     private String from;
-    //to地址也就是对应的token合约地址
+    //to地址也就是对应的实际接收地址
     private String to;
     //交易value
     private String value;
     //token名称
     private String tokenName;
-    //转账的接收者
-    private String receive;
+    //token合约地址
+    private String tokenAddr;
     //精度
     private String decimal;
     //符号

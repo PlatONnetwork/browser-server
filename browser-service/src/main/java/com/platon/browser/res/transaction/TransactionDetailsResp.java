@@ -77,7 +77,14 @@ public class TransactionDetailsResp {
     
     private String delegationRatio; //委托比例
     private List<TransactionDetailsRewardsResp> rewards;
-    
+
+
+	private String innerFrom; //内部交易from
+	private String innerTo; //内部交易to
+	private String innerValue; //内部交易value
+	private String innerContractAddr; //内部交易对应地址
+	private String innerContractName; //内部交易对应名称
+	private String innerSymbol; //内部交易对应单位
 
 	public String getTxHash() {
 		return txHash;
@@ -451,4 +458,51 @@ public class TransactionDetailsResp {
 		this.contractName = contractName;
 	}
 
+	public String getInnerFrom() {
+		return innerFrom;
+	}
+
+	public void setInnerFrom(String innerFrom) {
+		this.innerFrom = innerFrom;
+	}
+
+	public String getInnerTo() {
+		return innerTo;
+	}
+
+	public void setInnerTo(String innerTo) {
+		this.innerTo = innerTo;
+	}
+
+	public String getInnerValue() {
+		return innerValue;
+	}
+
+	public void setInnerValue(String innerValue) {
+		this.innerValue = innerValue;
+	}
+
+	public String getInnerContractAddr() {
+		return innerContractAddr;
+	}
+
+	public void setInnerContractAddr(String innerContractAddr) {
+		this.innerContractAddr = innerContractAddr;
+	}
+
+	public String getInnerContractName() {
+		return innerContractName;
+	}
+
+	public void setInnerContractName(String innerContractName) {
+		this.innerContractName = innerContractName;
+	}
+
+	public String getInnerSymbol() {
+		return innerSymbol;
+	}
+
+	public void setInnerSymbol(String innerSymbol) {
+		this.innerSymbol = innerSymbol;
+	}
 }
