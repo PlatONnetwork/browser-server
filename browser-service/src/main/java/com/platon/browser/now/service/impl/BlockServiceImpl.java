@@ -49,6 +49,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *  区块方法逻辑具体实现
@@ -73,6 +75,8 @@ public class BlockServiceImpl implements BlockService {
 	
 	@Autowired
 	private CommonService commonService;
+
+	private Lock lock = new ReentrantLock();
 
 	private static final String ERROR_TIPS = "获取区块错误。";
 
@@ -113,10 +117,15 @@ public class BlockServiceImpl implements BlockService {
 			ESResult<Block> blocks = new ESResult<>();
 			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 			constructor.setDesc("num");
+			constructor.setResult(new String[] { "num", "time", "txQty", "reward",
+					"nodeName", "nodeId", "gasUsed", "txGasLimit", "size"});
 			try {
+				lock.lock();
 				blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 			} catch (IOException e) {
 				logger.error(ERROR_TIPS, e);
+			} finally {
+				lock.unlock();
 			}
 			lists.addAll(this.transferBlockListResp(blocks.getRsData()));
 			
@@ -173,6 +182,7 @@ public class BlockServiceImpl implements BlockService {
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
 		constructor.setDesc("num");
+		constructor.setResult(new String[] { "num", "time", "txQty", "reward"});
 		ESResult<Block> blocks = new ESResult<>();
 		try {
 			blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
@@ -220,6 +230,8 @@ public class BlockServiceImpl implements BlockService {
 		constructor.must(new ESQueryBuilders().term("nodeId", nodeId));
 		constructor.must(new ESQueryBuilders().range("time", new Date(date).getTime(), now.getTime()));
 		constructor.setDesc("num");
+		constructor.setResult(new String[] { "num", "time", "txQty", "reward",
+				"txFee"});
 		ESResult<Block> blockList = new ESResult<>();
 		try {
 			blockList = blockESRepository.search(constructor, Block.class, 1, 30000);
