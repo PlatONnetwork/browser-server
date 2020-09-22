@@ -6,11 +6,15 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
+import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
+
+import javax.validation.Valid;
 
 /**
  * 交易模块接口方法定义
@@ -77,4 +81,13 @@ public interface TransactionService {
 	 * @return
 	 */
 	 RespPage<QueryClaimByStakingResp> queryClaimByStaking( QueryClaimByStakingReq req);
+
+
+	/**
+	 * 根据地址查询内部交易
+	 * @method queryClaimByStaking
+	 * @param req
+	 * @return
+	 */
+	RespPage<QueryInnerTxByAddrResp> queryInnerByAddr(QueryInnerByAddrReq req);
 }

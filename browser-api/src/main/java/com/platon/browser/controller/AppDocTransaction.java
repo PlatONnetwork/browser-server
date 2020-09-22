@@ -5,10 +5,12 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
+import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.DelegationListByAddressResp;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
@@ -211,7 +213,7 @@ public interface AppDocTransaction {
      *       "value":"222",            //金额(单位:von)
      *       "actualTxCost":"22",      //交易费用(单位:von)
      *       "txType":"",              //交易类型
-     *                                 0：转账  1：合约发布(合约创建)  2：合约调用(合约执行)    5：MPC交易
+     *                                 0：转账  1：合约发布(合约创建)  2：合约调用(合约执行)    5：MPC交易 6:erc20合约创建  7: erc20合约执行
      *                                 1000: 发起质押 (创建验证人) 1001: 修改质押信息(修改验证人)  1002: 增持质押(增持自由质押)  1003: 撤销质押(退出验证人) 1004: 发起委托 (委托) 1005: 减持/撤销委托(赎回委托)
      *                                 2000: 提交文本提案 (创建提案)2001: 提交升级提案(提交提案) 2002: 提交参数提案(提交提案-去除暂时不要) 2003: 给提案投票(提案投票) 2004: 版本声明  2005: 取消提案
      *                                 3000: 举报多签(举报验证人)
@@ -272,6 +274,12 @@ public interface AppDocTransaction {
      *       "txAmount" : "", //交易金额包括质押数量、提取数量
      *       "voteStatus":"",      //投票选项 1:支持  2:反对 3:弃权
      *       "delegationRatio":"",//委托比例
+	 *       "innerTxFrom":"",//内部交易from
+	 *       "innerTxTo":"",//内部交易to
+	 *       "innerValue":"",//内部交易金额
+	 *       "innerContractAddr":"",//内部交易对应地址
+	 *       "innerContractName":"",//内部交易对应名称
+	 *       "innerSymbol":"",//内部交易对应符号
      *       "rewards":[             //领取奖励
      *          {
      *             "verify":"",        //节点id
@@ -360,4 +368,46 @@ public interface AppDocTransaction {
 	@PostMapping(value = "transaction/queryClaimByStaking", produces = { "application/json" })
 	WebAsyncTask<RespPage<QueryClaimByStakingResp>> queryClaimByStaking(@ApiParam(value = "QueryClaimByStakingReq", required = true)@Valid @RequestBody QueryClaimByStakingReq req);
 
+
+	/**
+	 * @api {post} /transaction/queryInnerByAddr h.根据合约地址查询内部交易
+	 * @apiVersion 1.0.0
+	 * @apiName queryInnerByAddr
+	 * @apiGroup transaction
+	 * @apiDescription
+	 * 1. 功能：合约相关的内部交易查询<br/>
+	 * 2. 实现逻辑：<br/>
+	 * - 查询es中inner_tx
+	 * @apiParamExample {json} Request-Example:
+	 * {
+	 *    "pageNo":1,                  //页数(必填)
+	 *    "pageSize":10,               //页大小(必填)
+	 *    "address":"0x1111"                //合约地址(必填)
+	 *    "type":"1"                //类型(必填)  1- 合约 2-普通地址
+	 * }
+	 * @apiSuccessExample {json} Success-Response:
+	 * HTTP/1.1 200 OK
+	 * {
+	 *   "errMsg":"",                  //描述信息
+	 *   "code":0,                     //成功（0），失败则由相关失败码
+	 *   "totalCount":18,              //总数
+	 *   "totalPages":1,               //总页数
+	 *   "data":[
+	 *      {
+	 *         "hash":"",            //节交易hash
+	 *         "from":"",          //from地址
+	 *         "to":"",     //接收方
+	 *         "time":"",      //时间
+	 *         "nowTime":"",      //现在时间
+	 *         "transValue":"",      //转账金额
+	 *         "tokenName":"",      //token名称
+	 *         "tokenAddr":"",      //token地址
+	 *          "symbol":""     //符号
+	 *      }
+	 *   ]
+	 * }
+	 */
+	@ApiOperation(value = "transaction/queryInnerByAddr", nickname = "", notes = "", response = QueryInnerTxByAddrResp.class, tags = { "Transaction" })
+	@PostMapping(value = "transaction/queryInnerByAddr", produces = { "application/json" })
+	WebAsyncTask<RespPage<QueryInnerTxByAddrResp>> queryInnerByAddr(@ApiParam(value = "QueryInnerByAddrReq", required = true)@Valid @RequestBody QueryInnerByAddrReq req);
 }

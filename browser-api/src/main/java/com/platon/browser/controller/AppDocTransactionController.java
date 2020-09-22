@@ -13,9 +13,11 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
+import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
@@ -140,6 +142,18 @@ public class AppDocTransactionController implements AppDocTransaction {
         );
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask; 
+	}
+
+	@Override
+	public WebAsyncTask<RespPage<QueryInnerTxByAddrResp>> queryInnerByAddr(@Valid QueryInnerByAddrReq req) {
+		/**
+		 * 异步调用，超时则进入timeout
+		 */
+		WebAsyncTask<RespPage<QueryInnerTxByAddrResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
+			transactionService.queryInnerByAddr(req)
+		);
+		CommonMethod.onTimeOut(webAsyncTask);
+		return webAsyncTask;
 	}
 
 }

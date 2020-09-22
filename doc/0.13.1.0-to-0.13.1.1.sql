@@ -19,3 +19,19 @@ CREATE TABLE `erc_contract` (
   PRIMARY KEY (`address`),
   KEY `name` (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for block_node
+-- ----------------------------
+DROP TABLE IF EXISTS `block_node`;
+CREATE TABLE `block_node` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `node_id` varchar(130) NOT NULL COMMENT '节点id',
+  `node_name` varchar(64) NOT NULL DEFAULT '' COMMENT '节点名称(质押节点名称)',
+  `staking_consensus_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '共识周期标识',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `staking_consensus_epoch` (`staking_consensus_epoch`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

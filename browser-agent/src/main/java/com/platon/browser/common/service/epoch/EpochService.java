@@ -2,14 +2,20 @@ package com.platon.browser.common.service.epoch;
 
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.converter.BlockNodeCoverter;
+import com.platon.browser.dao.entity.BlockNode;
+import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
+import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 周期切换服务
@@ -29,6 +35,8 @@ public class EpochService {
     private BlockChainConfig chainConfig;
     @Autowired
     private EpochRetryService epochRetryService;
+    @Autowired
+    private CustomBlockNodeMapper customBlockNodeMapper;
 
     @Getter private BigInteger currentBlockNumber; // 当前区块号
     @Getter private BigInteger consensusEpochRound=BigInteger.ZERO; // 当前所处共识周期轮数
@@ -74,6 +82,24 @@ public class EpochService {
                 epochRetryService.consensusChange(currentBlockNumber);
             } catch (Exception e) {
                 log.error("共识周期变更执行失败:",e);
+            }
+            /**
+             * 存储每一个共识轮的节点数据
+             */
+            List<Node> nodes = epochRetryService.getCurValidators();
+            if(!nodes.isEmpty() ){
+                int max = customBlockNodeMapper.selectMaxNum();
+                /**
+                 * 防止25个共识节点重复插入
+                 */
+                if(prevBlockNumber.longValue()/chainConfig.getConsensusPeriodBlockCount().longValue() > max){
+                    List<BlockNode> blockNodes = new ArrayList<>(32);
+                    nodes.forEach(node->{
+                        BlockNode blockNode = BlockNodeCoverter.INSTANCE.domain2dto(node,max+1);
+                        blockNodes.add(blockNode);
+                    });
+                    customBlockNodeMapper.batchInsert(blockNodes);
+                }
             }
         }
 
