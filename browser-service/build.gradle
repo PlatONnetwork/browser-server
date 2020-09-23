@@ -18,6 +18,8 @@ dependencies {
     compile "org.mapstruct:mapstruct-jdk8:$mapstructVersion"
     compile "org.mapstruct:mapstruct-processor:$mapstructVersion"
 
+    compile 'io.springfox:springfox-swagger2:2.9.2'
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
 }
 
 sonarqube {
