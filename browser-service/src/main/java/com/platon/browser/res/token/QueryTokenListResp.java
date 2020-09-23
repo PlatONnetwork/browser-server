@@ -1,5 +1,6 @@
 package com.platon.browser.res.token;
 
+import com.platon.browser.dao.entity.Erc20Token;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,4 +46,15 @@ public class QueryTokenListResp {
     private Date blockTimestamp;
     @ApiModelProperty(value = "交易记录时间")
     private Date createTime;
+
+    public static QueryTokenListResp fromErc20Token(Erc20Token token) {
+        return QueryTokenListResp.builder()
+                .address(token.getAddress()).name(token.getName())
+                .symbol(token.getSymbol()).decimal(token.getDecimal())
+                .totalSupply(token.getTotalSupply()).icon(token.getIcon())
+                .creator(token.getCreator()).txHash(token.getTxHash())
+                .webSite(token.getWebSite()).blockTimestamp(token.getBlockTimestamp())
+                .createTime(token.getCreateTime())
+                .build();
+    }
 }

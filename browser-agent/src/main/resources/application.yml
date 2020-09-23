@@ -25,5 +25,5 @@ mybatis:
   type-aliases-package: com.platon.browser.dao.entity
 
 task:
-  #地址统计任务
-  address-batch-size: 1000
+   #地址统计任务
+   address-batch-size: 1000  

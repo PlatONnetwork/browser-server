@@ -35,6 +35,8 @@ public class Erc20Token {
 
     private String type;
 
+    private Integer status;
+
     private Date blockTimestamp;
 
     private Date createTime;
