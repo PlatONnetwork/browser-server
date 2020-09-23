@@ -1,0 +1,154 @@
+package com.platon.browser.job;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.config.RedisFactory;
+import com.platon.browser.dao.entity.BlockNode;
+import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
+import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @program: browser-server
+ * @description: 计算奖励的定时器
+ * @author: Rongjin Zhang
+ * @create: 2020-09-23 14:30
+ */
+@Slf4j
+@Component
+public class RewardJob {
+
+    @Autowired
+    private NodeOptESRepository nodeOptESRepository;
+
+    @Autowired
+    private PlatOnClient platOnClient;
+
+    @Autowired
+    private RedisFactory redisFactory;
+
+    @Autowired
+    private BlockChainConfig chainConfig;
+
+    @Autowired
+    private CustomBlockNodeMapper customBlockNodeMapper;
+
+    /**
+     * 需要统计的共识轮数
+     */
+    @Value("${limit.num}")
+    private int limitNum;
+
+    @Value("${output.file.url}")
+    private String fileUrl;
+
+    private final static String rewardKey = "REWARD_KEY";
+
+    private final static String roundKey = "ROUND_KEY";
+
+    @Scheduled(cron = "0/5 * * * * ?")
+    public void exportRewardNode() {
+        try {
+            String v = this.redisFactory.createRedisCommands().setnx(rewardKey, rewardKey, 30000l);
+            if (!"OK".equals(v)) {
+                return;
+            }
+            String consensus = this.redisFactory.createRedisCommands().get(roundKey);
+            int conL = 0;
+            if (StringUtils.isNotBlank(consensus)) {
+                conL = Integer.valueOf(consensus);
+            }
+            /**
+             * 计算查询开始的区块和结束的区块
+             */
+            long startNum = this.chainConfig.getConsensusPeriodBlockCount().longValue() * conL;
+            long endNum = this.chainConfig.getConsensusPeriodBlockCount().longValue() * (conL + this.limitNum);
+            BigInteger blockNumber = this.platOnClient.getLatestBlockNumber();
+            if (StringUtils.isNotBlank(v) && blockNumber.longValue() > endNum) {
+                ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+                constructor.must(new ESQueryBuilders().range("bNum", startNum, endNum));
+                List<Object> types = new ArrayList<>();
+                types.add(NodeOpt.TypeEnum.QUIT.getCode());
+                types.add(NodeOpt.TypeEnum.MULTI_SIGN.getCode());
+                types.add(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode());
+                constructor.must(new ESQueryBuilders().terms("type", types));
+                ESResult<NodeOpt> nodeOpts = this.nodeOptESRepository.search(constructor, NodeOpt.class, 1, 30000);
+                List<BlockNode> blockNodes = this.customBlockNodeMapper.selectNodeByDis(conL, conL + this.limitNum);
+                List<Object[]> rs = new ArrayList<>();
+                /**
+                 * 对于被惩罚的节点需要进行排除
+                 */
+                blockNodes.forEach(blockNode -> {
+                    boolean flag = false;
+                    for (NodeOpt nodeOpt : nodeOpts.getRsData()) {
+                        if (nodeOpt.getNodeId().equals(nodeOpt.getNodeId())) {
+                            nodeOpts.getRsData().remove(nodeOpt);
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (!flag) {
+                        Object[] row = new Object[2];
+                        row[0] = blockNode.getNodeId();
+                        row[1] = blockNode.getNodeName();
+                        rs.add(row);
+                    }
+                });
+                String[] headers = new String[] {"nodeId", "nodeName"};
+                this.buildFile(startNum + "_" + endNum + "_reward.csv", rs, headers);
+                this.redisFactory.createRedisCommands().set(roundKey, String.valueOf(conL + this.limitNum));
+            }
+        } catch (Exception e) {
+            log.error("exportRewardNode fail", e);
+        } finally {
+            this.redisFactory.createRedisCommands().del(rewardKey);
+        }
+
+    }
+
+    private void buildFile(String fileName, List<Object[]> rows, String[] headers) {
+        try {
+            File file = new File(this.fileUrl);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            /** 初始化输出流对象 */
+            FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName);
+            /** 设置返回的头，防止csv乱码 */
+            fis.write(new byte[] {(byte)0xEF, (byte)0xBB, (byte)0xBF});
+            OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
+            /** 厨师书writer对象 */
+            CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+            if (headers != null) {
+                writer.writeHeaders(headers);
+            }
+            writer.writeRowsAndClose(rows);
+        } catch (IOException e) {
+            log.error("数据输出错误:", e);
+            return;
+        }
+        log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
+    }
+}
