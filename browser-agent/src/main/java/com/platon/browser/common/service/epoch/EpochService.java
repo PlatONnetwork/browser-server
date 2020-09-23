@@ -92,7 +92,7 @@ public class EpochService {
                 /**
                  * 防止25个共识节点重复插入
                  */
-                if(prevBlockNumber.longValue()/chainConfig.getConsensusPeriodBlockCount().longValue() > max){
+                if(prevBlockNumber.longValue()/chainConfig.getConsensusPeriodBlockCount().longValue() >= max){
                     List<BlockNode> blockNodes = new ArrayList<>(32);
                     nodes.forEach(node->{
                         BlockNode blockNode = BlockNodeCoverter.INSTANCE.domain2dto(node,max+1);
