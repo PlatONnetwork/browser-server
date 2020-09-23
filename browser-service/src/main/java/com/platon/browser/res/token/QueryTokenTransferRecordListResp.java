@@ -167,4 +167,21 @@ public class QueryTokenTransferRecordListResp {
         this.createTime = createTime;
     }
 
+    public static enum TransferType {
+
+        INPUT("INPUT"),
+        OUT("OUT"),
+        ;
+
+        String type;
+
+        TransferType(String type) {
+            this.type = type;
+        }
+
+        public String val() {
+            return type;
+        }
+    }
+
 }
