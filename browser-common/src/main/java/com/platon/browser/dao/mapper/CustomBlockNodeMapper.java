@@ -1,10 +1,6 @@
 package com.platon.browser.dao.mapper;
 
-import com.platon.browser.dao.entity.BlockNode;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
 *@program: BlockNodeBusinessMapper.java
