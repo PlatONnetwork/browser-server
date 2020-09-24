@@ -62,14 +62,14 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         }
         if (null != req.getAddress()) {
             constructor.buildMust(new BoolQueryBuilder()
-                    .should(QueryBuilders.termQuery("txFrom", req.getAddress()))
-                    .should(QueryBuilders.termQuery("transferTo", req.getAddress())));
+                    .should(QueryBuilders.termQuery("from", req.getAddress()))
+                    .should(QueryBuilders.termQuery("tto", req.getAddress())));
         }
         // Set sort field
-        constructor.setDesc("blockNumber");
+        constructor.setDesc("seq");
         // response filed to show.
-        constructor.setResult(new String[] { "txHash", "blockNumber", "txFrom", "contract",
-                "transferTo", "transferValue", "decimal", "symbol", "blockTimestamp" });
+        constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
+                "tto", "tValue", "decimal", "symbol", "bTime" });
         try {
             queryResultFromES = esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
@@ -96,21 +96,21 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
     public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ESTokenTransferRecord record) {
         QueryTokenTransferRecordListResp resp =  QueryTokenTransferRecordListResp.builder()
-                .txHash(record.getTxHash()).blockNumber(record.getBlockNumber())
-                .txFrom(record.getTxFrom()).contract(record.getContract())
-                .transferTo(record.getTransferTo())
+                .txHash(record.getHash()).blockNumber(record.getBn())
+                .txFrom(record.getFrom()).contract(record.getContract())
+                .transferTo(record.getTto())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
-                .methodSign(record.getMethodSign()).result(record.getResult())
-                .blockTimestamp(record.getBlockTimestamp())
+                .methodSign(record.getSign()).result(record.getResult())
+                .blockTimestamp(record.getBTime())
                 .value(record.getValue())
                 .build();
         // Processing accuracy calculation.
-        BigDecimal transferValue = record.getTransferValue();
+        BigDecimal transferValue = record.getTValue();
         String actualTransferValue = EnergonUtil.format(transferValue.divide(BigDecimal.valueOf(record.getDecimal())).setScale(12, BigDecimal.ROUND_DOWN), 12);
         resp.setTransferValue(new BigDecimal(actualTransferValue));
 
         // input or out
-        if (address.equals(record.getTxFrom())) {
+        if (address.equals(record.getFrom())) {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.INPUT.val());
         } else {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.OUT.val());

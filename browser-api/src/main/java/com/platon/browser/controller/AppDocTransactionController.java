@@ -22,8 +22,6 @@ import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.I18nUtil;
-import com.platon.browser.utils.HexTool;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,11 +147,12 @@ public class AppDocTransactionController implements AppDocTransaction {
 		/**
 		 * 异步调用，超时则进入timeout
 		 */
-		WebAsyncTask<RespPage<QueryInnerTxByAddrResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
+		/*WebAsyncTask<RespPage<QueryInnerTxByAddrResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
 			transactionService.queryInnerByAddr(req)
 		);
 		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+		return webAsyncTask;*/
+		return null;
 	}
 
 }
