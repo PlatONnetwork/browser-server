@@ -1,5 +1,6 @@
 package com.platon.browser.elasticsearch.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  * @create 2020-09-23 17:46
  */
 @Data
+@Builder
 @Accessors(chain = true)
 public class ESTokenTransferRecord {
     private Long id;                    // 序号ID

@@ -5,7 +5,7 @@ import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
-import com.platon.browser.elasticsearch.ESTokenTransferRecordRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -39,7 +39,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
     private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
 
     @Autowired
-    private ESTokenTransferRecordRepository esTokenTransferRecordRepository;
+    private TokenTransferRecordESRepository esTokenTransferRecordRepository;
 
     @Override
     public RespPage<QueryTokenTransferRecordListResp> queryTokenRecordList(QueryTokenTransferRecordListReq req) {
