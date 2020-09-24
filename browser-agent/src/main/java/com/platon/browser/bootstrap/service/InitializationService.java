@@ -24,7 +24,7 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

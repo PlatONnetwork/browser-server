@@ -2,7 +2,7 @@ package com.platon.browser.bootstrap.queue.event;
 
 import com.platon.browser.bootstrap.queue.callback.Callback;
 import com.platon.browser.client.ReceiptResult;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;
 

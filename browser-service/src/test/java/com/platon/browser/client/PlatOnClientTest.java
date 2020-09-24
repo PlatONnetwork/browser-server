@@ -7,10 +7,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.bean.EconomicConfig;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.Request;
-import org.web3j.protocol.core.Response;
+import com.alaya.platon.bean.EconomicConfig;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.Request;
+import com.alaya.protocol.core.Response;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;

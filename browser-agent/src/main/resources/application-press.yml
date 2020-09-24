@@ -79,28 +79,28 @@ platon:
 #    addresses: 192.168.112.171:4788
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
-  #PlatON初始总发行量(LAT)
-  initIssueAmount: 10000000000
+  #PlatON初始总发行量(ATP)
+  initIssueAmount: 100000000
   #每年固定增发比例
-  addIssueRate: 0.025
+  addIssueRate: 0.05
   #每年增发分配给激励池的比例
-  incentiveRateFromIssue: 0.8
+  incentiveRateFromIssue: 0.2
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
   foundationSubsidies: {
-    '1':62215742,
-    '2':55965742,
-    '3':49559492,
-    '4':42993086,
-    '5':36262520,
-    '6':29363689,
-    '7':22292388,
-    '8':15044304,
-    '9':7615018
+    '1':0,
+    '2':0,
+    '3':0,
+    '4':0,
+    '5':0,
+    '6':0,
+    '7':0,
+    '8':0,
+    '9':0
   }
-  # 初始内置节点默认质押金额(LAT)
-  defaultStakingLockedAmount: 1500000
+  # 初始内置节点默认质押金额(ATP)
+  defaultStakingLockedAmount: 10000
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.commons.lang3.StringUtils;
-import org.web3j.utils.Convert;
+import com.alaya.utils.Convert;
 
 import java.io.IOException;
 import java.math.RoundingMode;
@@ -22,7 +22,7 @@ public class CustomLowLatSerializer  extends JsonSerializer<String>{
 	public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 		if(StringUtils.isNotBlank(value)) {
 			/**	金额转换 von统一转换成小数点12位向下取整lat */
-			String transEner = Convert.fromVon(value, Convert.Unit.LAT).setScale(2,RoundingMode.DOWN).toString();
+			String transEner = Convert.fromVon(value, Convert.Unit.ATP).setScale(2,RoundingMode.DOWN).toString();
 			gen.writeString(transEner);
 		}  else {
 			gen.writeString("");

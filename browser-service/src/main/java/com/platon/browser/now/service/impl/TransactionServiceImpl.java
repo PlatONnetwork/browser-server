@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
+import com.alaya.utils.Convert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -254,9 +254,9 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18))
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.ATP).setScale(18,RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.ATP).setScale(18,RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN), 18))
             };
             rows.add(row);
         });

@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.platon.bean.EconomicConfig;
+import com.alaya.platon.bean.EconomicConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -43,7 +43,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithRawTransaction(org.web3j.protocol.core.methods.response.Transaction transaction){
+    CollectionTransaction updateWithRawTransaction(com.alaya.protocol.core.methods.response.Transaction transaction){
         this.setNum(transaction.getBlockNumber().longValue())
             .setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash())

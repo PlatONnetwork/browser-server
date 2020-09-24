@@ -4,8 +4,8 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.utils.HexTool;
-import com.platon.sdk.utlis.Bech32;
-import com.platon.sdk.utlis.NetworkParameters.Hrp;
+import com.alaya.utlis.Bech32;
+import com.alaya.utlis.NetworkParameters.Hrp;
 
 import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;

@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;
 

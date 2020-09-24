@@ -1,8 +1,8 @@
 package com.platon.browser.enums;
 
 
+import com.alaya.parameters.NetworkParameters;
 import com.platon.browser.utils.NetworkParms;
-import com.platon.sdk.utlis.NetworkParameters;
 
 import java.util.Arrays;
 import java.util.HashSet;

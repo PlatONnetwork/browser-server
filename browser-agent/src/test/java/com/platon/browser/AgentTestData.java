@@ -12,12 +12,12 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.*;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.springframework.beans.BeanUtils;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.io.File;
 import java.io.IOException;

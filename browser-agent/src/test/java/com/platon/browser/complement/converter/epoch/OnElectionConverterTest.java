@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.protocol.Web3j;
+import com.alaya.protocol.Web3j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

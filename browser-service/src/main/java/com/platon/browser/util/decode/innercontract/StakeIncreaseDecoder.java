@@ -2,8 +2,8 @@ package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.param.TxParam;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

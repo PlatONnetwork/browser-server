@@ -1,15 +1,14 @@
 package com.platon.browser.util.decode.innercontract;
 
+import com.alaya.bech32.Bech32;
+import com.alaya.parameters.NetworkParameters;
+import com.alaya.rlp.solidity.RlpDecoder;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
+import com.alaya.rlp.solidity.RlpType;
+import com.alaya.utils.Numeric;
 import com.platon.browser.param.RestrictingCreateParam;
 import com.platon.browser.utils.NetworkParms;
-import com.platon.sdk.utlis.Bech32;
-import com.platon.sdk.utlis.NetworkParameters;
-
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

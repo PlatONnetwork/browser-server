@@ -1,22 +1,22 @@
 package com.platon.browser.proxyppos.slash;
 
+import com.alaya.abi.solidity.datatypes.Utf8String;
+import com.alaya.abi.solidity.datatypes.generated.Uint32;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.DuplicateSignType;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
+import com.alaya.parameters.NetworkParameters;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameterName;
+import com.alaya.protocol.http.HttpService;
+import com.alaya.tx.RawTransactionManager;
+import com.alaya.tx.TransactionManager;
 import com.platon.browser.proxyppos.ProxyContract;
 import com.platon.browser.proxyppos.TestBase;
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.DuplicateSignType;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.NetworkParameters;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.abi.datatypes.Utf8String;
-import org.web3j.abi.datatypes.generated.Uint32;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.TransactionManager;
 
 import java.io.File;
 import java.math.BigInteger;

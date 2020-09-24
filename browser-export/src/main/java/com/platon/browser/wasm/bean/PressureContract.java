@@ -1,15 +1,15 @@
 package com.platon.browser.wasm.bean;
 
-import com.platon.rlp.datatypes.Uint64;
-import org.web3j.abi.WasmFunctionEncoder;
-import org.web3j.abi.datatypes.WasmFunction;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.TransactionManager;
-import org.web3j.tx.WasmContract;
-import org.web3j.tx.gas.GasProvider;
+import com.alaya.abi.wasm.WasmFunctionEncoder;
+import com.alaya.abi.wasm.datatypes.WasmFunction;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.RemoteCall;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.rlp.wasm.datatypes.Uint64;
+import com.alaya.tx.TransactionManager;
+import com.alaya.tx.WasmContract;
+import com.alaya.tx.gas.GasProvider;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.Arrays;
  * <p>Auto generated code.
  * <p><strong>Do not modify!</strong>
  * <p>Please use the <a href="https://github.com/PlatONnetwork/client-sdk-java/releases">platon-web3j command line tools</a>,
- * or the org.web3j.codegen.WasmFunctionWrapperGenerator in the 
+ * or the com.alaya.codegen.WasmFunctionWrapperGenerator in the 
  * <a href="https://github.com/PlatONnetwork/client-sdk-java/tree/master/codegen">codegen module</a> to update.
  *
  * <p>Generated with platon-web3j version 0.9.1.2-SNAPSHOT.

@@ -1,14 +1,16 @@
 package com.platon.browser.config;
 
+import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.alaya.contracts.ppos.dto.resp.ParamItem;
+import com.alaya.contracts.ppos.dto.resp.ParamValue;
+import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
+import com.alaya.utils.Convert;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
-import com.platon.sdk.contracts.ppos.dto.resp.ParamItem;
-import com.platon.sdk.contracts.ppos.dto.resp.ParamValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.web3j.platon.bean.EconomicConfig;
-import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -195,7 +195,7 @@ public class BlockChainConfig {
     @PostConstruct
     public void init() throws ConfigLoadingException {
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.LAT);
+        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.ATP);
         updateWithEconomicConfig(client.getEconomicConfig());
 //        updateWithGovernParams(client.getGovernParamValue(""));
     }

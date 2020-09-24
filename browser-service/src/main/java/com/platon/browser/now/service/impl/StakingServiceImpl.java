@@ -33,7 +33,7 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.HexTool;
-import com.platon.sdk.contracts.ppos.dto.resp.Reward;
+import com.alaya.contracts.ppos.dto.resp.Reward;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

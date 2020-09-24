@@ -1,11 +1,11 @@
 package com.platon.browser.data;
 
-import java.math.BigDecimal;
-
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Transfer;
+import com.alaya.utils.Convert.Unit;
 import org.junit.Test;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Transfer;
-import org.web3j.utils.Convert.Unit;
+
+import java.math.BigDecimal;
 
 /**
  * @title 合约销毁
@@ -39,7 +39,7 @@ public class WASMDestructTest extends BaseContractTest {
              * 合约转账的场景
              */
             Transfer transfer = new Transfer(web3j, transactionManager);
-            transfer.sendFunds(contractAddress, BigDecimal.TEN, Unit.LAT,GAS_PRICE,GAS_LIMIT).send();
+            transfer.sendFunds(contractAddress, BigDecimal.TEN, Unit.ATP,GAS_PRICE,GAS_LIMIT).send();
             
             //合约设置值
             TransactionReceipt transactionReceipt = contractDistory.set_string(name).send();

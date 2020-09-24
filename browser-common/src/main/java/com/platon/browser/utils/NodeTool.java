@@ -1,17 +1,16 @@
 package com.platon.browser.utils;
 
+import com.alaya.bech32.Bech32;
+import com.alaya.crypto.ECDSASignature;
+import com.alaya.crypto.Hash;
+import com.alaya.crypto.Sign;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.alaya.rlp.solidity.RlpEncoder;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
+import com.alaya.rlp.solidity.RlpType;
+import com.alaya.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;
-import org.web3j.crypto.ECDSASignature;
-import org.web3j.crypto.Hash;
-import org.web3j.crypto.Sign;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.rlp.RlpEncoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
-
-import com.platon.sdk.utlis.Bech32;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

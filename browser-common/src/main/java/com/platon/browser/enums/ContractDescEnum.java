@@ -1,7 +1,8 @@
 package com.platon.browser.enums;
 
-import com.platon.sdk.utlis.NetworkParameters;
+import com.alaya.parameters.NetworkParameters;
 import com.platon.browser.utils.NetworkParms;
+
 import java.util.*;
 
 /**

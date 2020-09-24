@@ -2,7 +2,7 @@ package com.platon.browser.bean;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.util.List;
 

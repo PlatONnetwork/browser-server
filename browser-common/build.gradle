@@ -7,7 +7,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc:$springbootVersion") {
         force = true
     }
-    compile "com.platon.client:core:$platonClientVersion"
+    compile "com.alaya.client:alaya-core:$alayaClientVersion"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
     testCompile "com.alibaba:druid:$druidVersion"
     testCompile "mysql:mysql-connector-java:$mysqlConnectorVersion"

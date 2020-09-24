@@ -2,7 +2,7 @@ package com.platon.browser.collection.queue.event;
 
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.common.collection.dto.EpochMessage;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;
 

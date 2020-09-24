@@ -2,8 +2,8 @@ package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.StakeExitParam;
 import com.platon.browser.param.TxParam;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
 
 import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.stringResolver;
 

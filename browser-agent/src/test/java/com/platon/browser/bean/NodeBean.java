@@ -1,7 +1,7 @@
 package com.platon.browser.bean;
 
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-import org.web3j.utils.Numeric;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.utils.Numeric;
 
 import java.math.BigInteger;
 

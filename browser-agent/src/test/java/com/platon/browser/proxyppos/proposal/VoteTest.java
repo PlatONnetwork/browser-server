@@ -1,22 +1,22 @@
 package com.platon.browser.proxyppos.proposal;
 
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.dto.enums.VoteOption;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
+import com.alaya.abi.solidity.datatypes.BytesType;
+import com.alaya.abi.solidity.datatypes.generated.Uint32;
+import com.alaya.abi.solidity.datatypes.generated.Uint8;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.dto.enums.VoteOption;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
+import com.alaya.protocol.core.methods.response.bean.ProgramVersion;
+import com.alaya.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.abi.datatypes.BytesType;
-import org.web3j.abi.datatypes.generated.Uint32;
-import org.web3j.abi.datatypes.generated.Uint8;
-import org.web3j.platon.bean.ProgramVersion;
-import org.web3j.utils.Numeric;
 
 import java.util.Arrays;
 
 public class VoteTest extends ProposalBase {
 
-    private byte[] encode(ProgramVersion pv,VoteOption voteOption,String verifier,String proposalID){
+    private byte[] encode(ProgramVersion pv, VoteOption voteOption, String verifier, String proposalID){
         Function function = new Function(FunctionType.VOTE_FUNC_TYPE,
                 Arrays.asList(new BytesType(Numeric.hexStringToByteArray(verifier)),
                         new BytesType(Numeric.hexStringToByteArray(proposalID)), new Uint8(voteOption.getValue()),

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
+import com.alaya.utils.Convert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -234,8 +234,8 @@ public class BlockServiceImpl implements BlockService {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
                     block.getTxQty(),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)))
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN))),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN)))
             };
             rows.add(row);
         });

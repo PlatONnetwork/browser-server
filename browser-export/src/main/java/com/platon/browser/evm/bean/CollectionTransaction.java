@@ -1,5 +1,14 @@
 package com.platon.browser.evm.bean;
 
+import com.alaya.contracts.ppos.dto.common.ErrorCode;
+import com.alaya.protocol.core.DefaultBlockParameter;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.PlatonGetCode;
+import com.alaya.rlp.solidity.RlpDecoder;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
+import com.alaya.rlp.solidity.RlpType;
+import com.alaya.utils.Numeric;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -13,17 +22,8 @@ import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
-import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.PlatonGetCode;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -55,7 +55,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithRawTransaction(org.web3j.protocol.core.methods.response.Transaction transaction){
+    CollectionTransaction updateWithRawTransaction(com.alaya.protocol.core.methods.response.Transaction transaction){
         this.setNum(transaction.getBlockNumber().longValue())
             .setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash())

@@ -1,9 +1,9 @@
 package com.platon.browser.proxyppos.staking;
 
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.dto.req.UpdateStakingParam;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.dto.req.UpdateStakingParam;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
