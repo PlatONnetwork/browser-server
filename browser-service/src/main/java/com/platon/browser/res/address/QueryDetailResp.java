@@ -14,8 +14,8 @@ import java.math.BigDecimal;
  */
 public class QueryDetailResp {
 	private Integer type;                //地址详情  1：账号   2：内置合约   3：EVM合约 4:WASM
-    private BigDecimal balance;             //余额(单位:LAT)
-    private BigDecimal restrictingBalance;  //锁仓余额(单位:LAT)
+    private BigDecimal balance;             //余额(单位:ATP)
+    private BigDecimal restrictingBalance;  //锁仓余额(单位:ATP)
     private BigDecimal stakingValue;        //质押的金额
     private BigDecimal delegateValue;       //委托的金额
     private BigDecimal redeemedValue;       //赎回中的金额
@@ -25,12 +25,12 @@ public class QueryDetailResp {
     private Integer stakingQty;          //验证人交易总数
     private Integer proposalQty;         //治理交易总数
     private Integer candidateCount;      //已委托验证人
-    private BigDecimal delegateHes;         //未锁定委托（LAT）
-    private BigDecimal delegateLocked;      //已锁定委托（LAT）
-    private BigDecimal delegateUnlock;      //已解除委托（LAT）   
-    private BigDecimal delegateReleased;    //待赎回委托（LAT）  
-    private BigDecimal delegateClaim;    //待提取委托（LAT）  
-    private BigDecimal haveReward;    //已提取委托（LAT）  
+    private BigDecimal delegateHes;         //未锁定委托（ATP）
+    private BigDecimal delegateLocked;      //已锁定委托（ATP）
+    private BigDecimal delegateUnlock;      //已解除委托（ATP）
+    private BigDecimal delegateReleased;    //待赎回委托（ATP）
+    private BigDecimal delegateClaim;    //待提取委托（ATP）
+    private BigDecimal haveReward;    //已提取委托（ATP）
     private String contractName;        //合约名称
     private String contractCreate;      //合约创建者地址
     private String contractCreateHash; //合约创建哈希

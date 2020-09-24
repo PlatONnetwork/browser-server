@@ -14,9 +14,9 @@ import java.util.List;
  *  @data 2019年8月31日
  */
 public class QueryRPPlanDetailResp {
-	private BigDecimal restrictingBalance;           //锁仓余额(单位:LAT)
-	private BigDecimal stakingValue;  //锁仓质押\委托(单位:LAT)
-	private BigDecimal underReleaseValue;        //欠释放(单位:LAT)
+	private BigDecimal restrictingBalance;           //锁仓余额(单位:ATP)
+	private BigDecimal stakingValue;  //锁仓质押\委托(单位:ATP)
+	private BigDecimal underReleaseValue;        //欠释放(单位:ATP)
 	private List<DetailsRPPlanResp> rpPlans;  //锁仓计划
 	private Long total;
 	private BigDecimal totalValue;//总计锁仓

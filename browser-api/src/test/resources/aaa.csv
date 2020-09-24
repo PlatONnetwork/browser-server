@@ -1,4 +1,4 @@
-﻿Block,Timestamp(UTC),Txn,Block Reward(LAT),Block Txn Fee(LAT)
+﻿Block,Timestamp(UTC),Txn,Block Reward(ATP),Block Txn Fee(ATP)
 127468,"Thu, 19 Sep 2019 12:14:01 GMT",0,4.15964565,0
 127467,"Thu, 19 Sep 2019 12:13:59 GMT",0,4.15964565,0
 127466,"Thu, 19 Sep 2019 12:13:58 GMT",0,4.15964565,0

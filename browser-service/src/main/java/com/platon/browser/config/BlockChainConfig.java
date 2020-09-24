@@ -158,7 +158,7 @@ public class BlockChainConfig {
     /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
-    // PlatON初始总发行量(LAT)
+    // PlatON初始总发行量(ATP)
     private BigDecimal initIssueAmount;
     // 每年固定增发比例
     private BigDecimal addIssueRate;
@@ -166,7 +166,7 @@ public class BlockChainConfig {
     private BigDecimal incentiveRateFromIssue;
     //每个共识轮中回退多少个块是选举下一轮验证人的时机
     private BigInteger electionBackwardBlockCount;
-    //10年内基金会向激励池填充额度(LAT)
+    //10年内基金会向激励池填充额度(ATP)
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
     private String proposalUrlTemplate;

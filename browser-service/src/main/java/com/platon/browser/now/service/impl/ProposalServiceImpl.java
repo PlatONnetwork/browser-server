@@ -157,8 +157,8 @@ public class ProposalServiceImpl implements ProposalService {
 				 * 如果参数是需要转换lat的，则进一步转换
 				 */
 				if(BrowserConst.EXTRA_LAT_PARAM.contains(proposal.getName())) {
-					currentValue = Convert.fromVon(currentValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "LAT";
-					newValue = Convert.fromVon(newValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "LAT";
+					currentValue = Convert.fromVon(currentValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
+					newValue = Convert.fromVon(newValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
 				} 
 				/**
 				 * 去除无用的0

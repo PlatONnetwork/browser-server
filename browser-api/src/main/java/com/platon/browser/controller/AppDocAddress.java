@@ -45,8 +45,8 @@ public interface AppDocAddress {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
      *       "type":"",                //地址类型   1：账号   2：内置合约   3：EVM合约 4:WASM
-     *       "balance":"",             //余额(单位:LAT)
-     *       "restrictingBalance":"",  //锁仓余额(单位:LAT)
+     *       "balance":"",             //余额(单位:ATP)
+     *       "restrictingBalance":"",  //锁仓余额(单位:ATP)
      *       "stakingValue":"",        //质押的金额
      *       "delegateValue":"",       //委托的金额
      *       "redeemedValue":"",       //赎回中的金额
@@ -56,12 +56,12 @@ public interface AppDocAddress {
      *       "stakingQty":11,          //验证人交易总数
      *       "proposalQty":11,         //治理交易总数
      *       "candidateCount":11,      //已委托验证人
-     *       "delegateHes":"",         //未锁定委托（LAT）
-     *       "delegateLocked":"",      //已锁定委托（LAT）
-     *       "delegateUnlock":"",      //已解除委托（LAT）   
-     *       "delegateReleased":"",    //待赎回委托（LAT）   
-     *       "delegateClaim":"",      //待领取奖励（LAT）   
-     *       "haveReward":"",      //累积领取委托奖励（LAT）   
+     *       "delegateHes":"",         //未锁定委托（ATP）
+     *       "delegateLocked":"",      //已锁定委托（ATP）
+     *       "delegateUnlock":"",      //已解除委托（ATP）
+     *       "delegateReleased":"",    //待赎回委托（ATP）
+     *       "delegateClaim":"",      //待领取奖励（ATP）
+     *       "haveReward":"",      //累积领取委托奖励（ATP）
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希
@@ -98,10 +98,10 @@ public interface AppDocAddress {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "restrictingBalance":"",             //锁仓余额(单位:LAT)
-     *       "stakingValue":"",  //锁仓质押\委托(单位:LAT)
-     *       "underreleaseValue":"",        //欠释放(单位:LAT)
-     *       "totalValue":"",        //锁仓计划总计锁仓(单位:LAT)
+     *       "restrictingBalance":"",             //锁仓余额(单位:ATP)
+     *       "stakingValue":"",  //锁仓质押\委托(单位:ATP)
+     *       "underreleaseValue":"",        //欠释放(单位:ATP)
+     *       "totalValue":"",        //锁仓计划总计锁仓(单位:ATP)
      *       "total":"",  //计划总数
      *       "RPPlan":[
      *          {
