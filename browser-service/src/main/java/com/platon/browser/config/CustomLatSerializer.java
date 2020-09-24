@@ -17,7 +17,7 @@ import java.math.RoundingMode;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-public class CustomLatSerializer  extends JsonSerializer<BigDecimal>{
+public class CustomLatSerializer extends JsonSerializer<BigDecimal>{
 
 	@Override
 	public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider serializers) throws IOException {

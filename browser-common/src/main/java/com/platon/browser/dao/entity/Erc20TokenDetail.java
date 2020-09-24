@@ -1,9 +1,20 @@
 package com.platon.browser.dao.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+@Builder
+@Data
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Erc20TokenDetail {
     private Long id;
 

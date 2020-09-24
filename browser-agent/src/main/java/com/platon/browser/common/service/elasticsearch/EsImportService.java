@@ -1,9 +1,6 @@
 package com.platon.browser.common.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -32,17 +29,20 @@ public class EsImportService {
     @Autowired
     private EsDelegateRewardService delegateRewardService;
 
-    private static final int SERVICE_COUNT = 4;
+    @Autowired
+    private EsTokenTransferRecordService esTokenTransferRecordService;
+
+    private static final int SERVICE_COUNT = 5;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
-    private <T> void submit(EsService<T> service,Set<T> data,CountDownLatch latch){
-        EXECUTOR.submit(()->{
+    private <T> void submit(EsService<T> service, Set<T> data, CountDownLatch latch) {
+        EXECUTOR.submit(() -> {
             try {
                 service.save(data);
             } catch (IOException e) {
-                log.error("",e);
-            }finally {
+                log.error("", e);
+            } finally {
                 latch.countDown();
             }
         });
@@ -60,6 +60,33 @@ public class EsImportService {
             submit(nodeOptService,nodeOpts,latch);
             submit(delegateRewardService,delegationRewards,latch);
             latch.await();
+            log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        }catch (Exception e){
+            log.error("",e);
+            throw e;
+        }
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions,
+                            Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards,
+                            Set<ESTokenTransferRecord> recordSet) throws InterruptedException {
+        if (log.isDebugEnabled()) {
+            log.debug("ES batch import: {}(blocks({}), transactions({}), nodeOpts({}), delegationRewards({}), tokenTransfer({}))",
+                    Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size(),
+                    nodeOpts.size(), delegationRewards.size(), recordSet.size());
+        }
+        try{
+            long startTime = System.currentTimeMillis();
+            CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
+
+            submit(blockService, blocks, latch);
+            submit(transactionService, transactions, latch);
+            submit(nodeOptService, nodeOpts, latch);
+            submit(delegateRewardService, delegationRewards, latch);
+            submit(esTokenTransferRecordService, recordSet, latch);
+            latch.await();
+
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         }catch (Exception e){
             log.error("",e);

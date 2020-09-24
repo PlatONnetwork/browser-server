@@ -13,6 +13,7 @@
     <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
     <result column="web_site" jdbcType="VARCHAR" property="webSite" />
     <result column="type" jdbcType="CHAR" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="block_timestamp" jdbcType="TIMESTAMP" property="blockTimestamp" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -76,7 +77,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, address, `name`, symbol, `decimal`, total_supply, icon, creator, tx_hash, web_site, 
-    `type`, block_timestamp, create_time
+    `type`, status, block_timestamp, create_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenExample" resultMap="BaseResultMap">
     select
@@ -93,15 +94,46 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from erc20_token
     where id = #{id,jdbcType=BIGINT}
   </select>
+
+  <select id="selectByAddress" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from erc20_token
+    where address = #{address,jdbcType=VARCHAR}
+  </select>
+
+  <select id="listErc20Token" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from erc20_token
+    where 1 = 1
+    <if test="status != null">
+      status = #{status}
+    </if>
+    order by id desc
+    limit #{offset}, #{size}
+  </select>
+
+  <select id="totalErc20Token" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select
+    count(*) total
+    from erc20_token
+    where 1 = 1
+    <if test="status != null">
+      status = #{status}
+    </if>
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from erc20_token
     where id = #{id,jdbcType=BIGINT}
   </delete>
+
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenExample">
     delete from erc20_token
     <if test="_parameter != null">

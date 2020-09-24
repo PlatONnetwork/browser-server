@@ -1,10 +1,17 @@
 package com.platon.browser.dao.entity;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+@Builder
+@Data
+@Accessors(chain = true)
 public class Erc20Token {
     private Long id;
 
@@ -27,6 +34,8 @@ public class Erc20Token {
     private String webSite;
 
     private String type;
+
+    private Integer status;
 
     private Date blockTimestamp;
 

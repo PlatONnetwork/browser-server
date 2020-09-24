@@ -114,6 +114,16 @@
     from erc20_token_detail
     where id = #{id,jdbcType=BIGINT}
   </select>
+
+  <select id="selectByAddress" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from erc20_token_detail
+    where contract = #{contract,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from erc20_token_detail
     where id = #{id,jdbcType=BIGINT}
