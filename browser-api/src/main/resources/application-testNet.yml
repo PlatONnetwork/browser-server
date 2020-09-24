@@ -135,3 +135,8 @@ system.username: admin
 system.password: admin
 client.username: guest
 client.password: guest
+limit:
+  num: 10
+output:
+  file:
+    url: D:/

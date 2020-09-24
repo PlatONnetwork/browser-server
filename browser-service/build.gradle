@@ -10,11 +10,10 @@ dependencies {
     compile "org.jsoup:jsoup:$jsoupVersion"
     compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
 
-	testCompile "org.springframework:spring-test:5.1.6.RELEASE"
-	testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
-	testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
-    compile group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.2'
-    compile group: 'redis.clients', name: 'jedis', version: '3.1.0'
+    testCompile "org.springframework:spring-test:$springbootVersion"
+    testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
+    compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2"
     compile "org.mapstruct:mapstruct-jdk8:$mapstructVersion"
     compile "org.mapstruct:mapstruct-processor:$mapstructVersion"
 
