@@ -4,7 +4,8 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Erc20TokenDetail">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="contract" jdbcType="VARCHAR" property="contract" />
-    <result column="tx_count" jdbcType="INTEGER" property="txCount" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Erc20TokenDetailWithBLOBs">
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, contract, tx_count, create_time
+    id, contract, icon, web_site, create_time
   </sql>
   <sql id="Blob_Column_List">
     abi, bin_code, source_code
@@ -135,11 +136,11 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Erc20TokenDetailWithBLOBs" useGeneratedKeys="true" keyProperty="id">
-    insert into erc20_token_detail (contract, tx_count,
+    insert into erc20_token_detail (contract, icon, web_site,
       create_time, abi, bin_code, 
       source_code)
-    values (#{contract,jdbcType=VARCHAR}, #{txCount,jdbcType=INTEGER},
-      #{createTime,jdbcType=TIMESTAMP}, #{abi,jdbcType=LONGVARCHAR}, #{binCode,jdbcType=LONGVARCHAR}, 
+    values (#{contract,jdbcType=VARCHAR}, #{icon,jdbcType=VARCHAR},#{webSite,jdbcType=VARCHAR},
+      now(), #{abi,jdbcType=LONGVARCHAR}, #{binCode,jdbcType=LONGVARCHAR},
       #{sourceCode,jdbcType=LONGVARCHAR})
   </insert>
 
@@ -149,6 +150,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+
   <update id="updateByExampleSelective" parameterType="map">
     update erc20_token_detail
     <set>
@@ -158,8 +160,11 @@
       <if test="record.contract != null">
         contract = #{record.contract,jdbcType=VARCHAR},
       </if>
-      <if test="record.txCount != null">
-        tx_count = #{record.txCount,jdbcType=INTEGER},
+      <if test="record.icon != null">
+        icon = #{record.icon,jdbcType=VARCHAR},
+      </if>
+      <if test="record.webSite != null">
+        web_site = #{record.webSite,jdbcType=VARCHAR},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -207,8 +212,11 @@
       <if test="contract != null">
         contract = #{contract,jdbcType=VARCHAR},
       </if>
-      <if test="txCount != null">
-        tx_count = #{txCount,jdbcType=INTEGER},
+      <if test="record.icon != null">
+        icon = #{record.icon,jdbcType=VARCHAR},
+      </if>
+      <if test="record.webSite != null">
+        web_site = #{record.webSite,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -244,10 +252,10 @@
   </update>
   <insert id="batchInsert" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     insert into erc20_token_detail
-    (contract, tx_count, create_time, abi, bin_code, source_code)
+    (contract, icon, web_site, create_time, abi, bin_code, source_code)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.contract,jdbcType=VARCHAR}, #{item.txCount,jdbcType=INTEGER},
+      (#{item.contract,jdbcType=VARCHAR}, #{item.icon,jdbcType=VARCHAR}, #{item.webSite,jdbcType=VARCHAR},
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.abi,jdbcType=LONGVARCHAR}, #{item.binCode,jdbcType=LONGVARCHAR}, 
         #{item.sourceCode,jdbcType=LONGVARCHAR})
     </foreach>

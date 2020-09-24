@@ -20,7 +20,9 @@ public class Erc20TokenDetail {
 
     private String contract;
 
-    private Integer txCount;
+    private String icon;
+
+    private String webSite;
 
     private Date createTime;
 
@@ -40,12 +42,20 @@ public class Erc20TokenDetail {
         this.contract = contract == null ? null : contract.trim();
     }
 
-    public Integer getTxCount() {
-        return txCount;
+    public String getIcon() {
+        return icon;
     }
 
-    public void setTxCount(Integer txCount) {
-        this.txCount = txCount;
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getWebSite() {
+        return webSite;
+    }
+
+    public void setWebSite(String webSite) {
+        this.webSite = webSite;
     }
 
     public Date getCreateTime() {

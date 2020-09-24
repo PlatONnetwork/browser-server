@@ -8,13 +8,12 @@
     <result column="symbol" jdbcType="VARCHAR" property="symbol" />
     <result column="decimal" jdbcType="INTEGER" property="decimal" />
     <result column="total_supply" jdbcType="DECIMAL" property="totalSupply" />
-    <result column="icon" jdbcType="VARCHAR" property="icon" />
     <result column="creator" jdbcType="VARCHAR" property="creator" />
     <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
-    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
     <result column="type" jdbcType="CHAR" property="type" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="block_timestamp" jdbcType="TIMESTAMP" property="blockTimestamp" />
+    <result column="tx_count" jdbcType="INTEGER" property="txCount" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -76,8 +75,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, address, `name`, symbol, `decimal`, total_supply, icon, creator, tx_hash, web_site, 
-    `type`, status, block_timestamp, create_time
+    id, address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,
+    `type`, status, block_timestamp, tx_count, create_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenExample" resultMap="BaseResultMap">
     select
@@ -113,7 +112,7 @@
     from erc20_token
     where 1 = 1
     <if test="status != null">
-      status = #{status}
+      AND status = #{status}
     </if>
     order by id desc
     limit #{offset}, #{size}
@@ -125,7 +124,7 @@
     from erc20_token
     where 1 = 1
     <if test="status != null">
-      status = #{status}
+      AND status = #{status}
     </if>
   </select>
 
@@ -143,13 +142,13 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Erc20Token" useGeneratedKeys="true" keyProperty="id">
     insert into erc20_token (address, `name`,
       symbol, `decimal`, total_supply, 
-      icon, creator, tx_hash, 
-      web_site, `type`, block_timestamp, 
+      creator, tx_hash,
+      `type`, block_timestamp, tx_count,
       create_time)
     values ( #{address,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
       #{symbol,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, #{totalSupply,jdbcType=DECIMAL}, 
-      #{icon,jdbcType=VARCHAR}, #{creator,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR}, 
-      #{webSite,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, #{blockTimestamp,jdbcType=TIMESTAMP}, 
+      #{creator,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR},
+      #{type,jdbcType=CHAR}, #{blockTimestamp,jdbcType=TIMESTAMP}, #{txCount,jdbcType=INTEGER},
       #{createTime,jdbcType=TIMESTAMP})
   </insert>
 
@@ -180,17 +179,14 @@
       <if test="record.totalSupply != null">
         total_supply = #{record.totalSupply,jdbcType=DECIMAL},
       </if>
-      <if test="record.icon != null">
-        icon = #{record.icon,jdbcType=VARCHAR},
+      <if test="record.txCount != null">
+        tx_count = #{record.txCount,jdbcType=VARCHAR},
       </if>
       <if test="record.creator != null">
         creator = #{record.creator,jdbcType=VARCHAR},
       </if>
       <if test="record.txHash != null">
         tx_hash = #{record.txHash,jdbcType=VARCHAR},
-      </if>
-      <if test="record.webSite != null">
-        web_site = #{record.webSite,jdbcType=VARCHAR},
       </if>
       <if test="record.type != null">
         `type` = #{record.type,jdbcType=CHAR},
@@ -202,26 +198,6 @@
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-
-  <update id="updateByExample" parameterType="map">
-    update erc20_token
-    set id = #{record.id,jdbcType=BIGINT},
-      address = #{record.address,jdbcType=VARCHAR},
-      `name` = #{record.name,jdbcType=VARCHAR},
-      symbol = #{record.symbol,jdbcType=VARCHAR},
-      `decimal` = #{record.decimal,jdbcType=INTEGER},
-      total_supply = #{record.totalSupply,jdbcType=DECIMAL},
-      icon = #{record.icon,jdbcType=VARCHAR},
-      creator = #{record.creator,jdbcType=VARCHAR},
-      tx_hash = #{record.txHash,jdbcType=VARCHAR},
-      web_site = #{record.webSite,jdbcType=VARCHAR},
-      `type` = #{record.type,jdbcType=CHAR},
-      block_timestamp = #{record.blockTimestamp,jdbcType=TIMESTAMP},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -245,17 +221,14 @@
       <if test="totalSupply != null">
         total_supply = #{totalSupply,jdbcType=DECIMAL},
       </if>
-      <if test="icon != null">
-        icon = #{icon,jdbcType=VARCHAR},
+      <if test="txCount != null">
+        tx_count = #{txCount,jdbcType=VARCHAR},
       </if>
       <if test="creator != null">
         creator = #{creator,jdbcType=VARCHAR},
       </if>
       <if test="txHash != null">
         tx_hash = #{txHash,jdbcType=VARCHAR},
-      </if>
-      <if test="webSite != null">
-        web_site = #{webSite,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
         `type` = #{type,jdbcType=CHAR},
@@ -270,34 +243,17 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Erc20Token">
-    update erc20_token
-    set address = #{address,jdbcType=VARCHAR},
-      `name` = #{name,jdbcType=VARCHAR},
-      symbol = #{symbol,jdbcType=VARCHAR},
-      `decimal` = #{decimal,jdbcType=INTEGER},
-      total_supply = #{totalSupply,jdbcType=DECIMAL},
-      icon = #{icon,jdbcType=VARCHAR},
-      creator = #{creator,jdbcType=VARCHAR},
-      tx_hash = #{txHash,jdbcType=VARCHAR},
-      web_site = #{webSite,jdbcType=VARCHAR},
-      `type` = #{type,jdbcType=CHAR},
-      block_timestamp = #{blockTimestamp,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-
   <insert id="batchInsert" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     insert into erc20_token
-    (address, `name`, symbol, `decimal`, total_supply, icon, creator, tx_hash, web_site,
-      `type`, block_timestamp, create_time)
+        (address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,
+          `type`, block_timestamp, tx_countcreate_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
         #{item.symbol,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, #{item.totalSupply,jdbcType=DECIMAL}, 
-        #{item.icon,jdbcType=VARCHAR}, #{item.creator,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR}, 
-        #{item.webSite,jdbcType=VARCHAR}, #{item.type,jdbcType=CHAR}, #{item.blockTimestamp,jdbcType=TIMESTAMP}, 
-        #{item.createTime,jdbcType=TIMESTAMP})
+        #{item.creator,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR},
+        #{item.type,jdbcType=CHAR}, #{item.blockTimestamp,jdbcType=TIMESTAMP},
+        #{txCount,jdbcType=INTEGER}, now())
     </foreach>
   </insert>
 </mapper>

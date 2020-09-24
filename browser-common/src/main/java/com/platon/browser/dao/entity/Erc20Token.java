@@ -1,7 +1,9 @@
 package com.platon.browser.dao.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
@@ -11,8 +13,11 @@ import java.util.Date;
 
 @Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Accessors(chain = true)
 public class Erc20Token {
+
     private Long id;
 
     private String address;
@@ -25,13 +30,9 @@ public class Erc20Token {
 
     private BigDecimal totalSupply;
 
-    private String icon;
-
     private String creator;
 
     private String txHash;
-
-    private String webSite;
 
     private String type;
 
@@ -39,7 +40,25 @@ public class Erc20Token {
 
     private Date blockTimestamp;
 
+    private Integer txCount;
+
     private Date createTime;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getTxCount() {
+        return txCount;
+    }
+
+    public void setTxCount(Integer txCount) {
+        this.txCount = txCount;
+    }
 
     public Long getId() {
         return id;
@@ -89,14 +108,6 @@ public class Erc20Token {
         this.totalSupply = totalSupply;
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon == null ? null : icon.trim();
-    }
-
     public String getCreator() {
         return creator;
     }
@@ -111,14 +122,6 @@ public class Erc20Token {
 
     public void setTxHash(String txHash) {
         this.txHash = txHash == null ? null : txHash.trim();
-    }
-
-    public String getWebSite() {
-        return webSite;
-    }
-
-    public void setWebSite(String webSite) {
-        this.webSite = webSite == null ? null : webSite.trim();
     }
 
     public String getType() {

@@ -1,8 +1,9 @@
 package com.platon.browser.util;
 
-import java.math.BigInteger;
-
 import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * 数据转换工具类
@@ -32,4 +33,10 @@ public class ConvertUtil {
 		return String.valueOf(cs);
 
 	}
+
+	public static BigDecimal convertByFactor(BigDecimal value, int factor){
+		return new BigDecimal(EnergonUtil.format(value.divide(BigDecimal.TEN.pow(factor))
+				.setScale(12, BigDecimal.ROUND_DOWN), 12));
+	}
+
 }

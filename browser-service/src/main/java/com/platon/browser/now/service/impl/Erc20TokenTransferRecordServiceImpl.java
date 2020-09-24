@@ -13,7 +13,7 @@ import com.platon.browser.now.service.Erc20TokenTransferRecordService;
 import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.token.QueryTokenTransferRecordListResp;
-import com.platon.browser.util.EnergonUtil;
+import com.platon.browser.util.ConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -106,8 +106,8 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 .build();
         // Processing accuracy calculation.
         BigDecimal transferValue = new BigDecimal(record.getTValue());
-        String actualTransferValue = EnergonUtil.format(transferValue.divide(BigDecimal.valueOf(record.getDecimal())).setScale(12, BigDecimal.ROUND_DOWN), 12);
-        resp.setTransferValue(new BigDecimal(actualTransferValue));
+        BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+        resp.setTransferValue(actualTransferValue);
 
         // input or out
         if (address.equals(record.getFrom())) {

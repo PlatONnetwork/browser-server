@@ -1,6 +1,7 @@
 package com.platon.browser.res.token;
 
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.util.ConvertUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,9 +52,9 @@ public class QueryTokenListResp {
         return QueryTokenListResp.builder()
                 .address(token.getAddress()).name(token.getName())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(token.getTotalSupply()).icon(token.getIcon())
+                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal()))
                 .creator(token.getCreator()).txHash(token.getTxHash())
-                .webSite(token.getWebSite()).blockTimestamp(token.getBlockTimestamp())
+                .blockTimestamp(token.getBlockTimestamp())
                 .createTime(token.getCreateTime())
                 .build();
     }
