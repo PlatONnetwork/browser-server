@@ -6,8 +6,10 @@ import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
-import com.platon.browser.converter.QueryInnerTxByAddrRespConverter;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
@@ -16,12 +18,10 @@ import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.keybase.KeyBaseUserInfo;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
-import com.platon.browser.elasticsearch.InnerTxESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.DelegationReward.Extra;
-import com.platon.browser.elasticsearch.dto.InnerTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
@@ -41,16 +41,9 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
-import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
-import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
-import com.platon.browser.res.transaction.QueryClaimByAddressResp;
-import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
-import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
-import com.platon.browser.res.transaction.TransactionDetailsResp;
-import com.platon.browser.res.transaction.TransactionDetailsRewardsResp;
-import com.platon.browser.res.transaction.TransactionListResp;
+import com.platon.browser.res.transaction.*;
 import com.platon.browser.util.*;
 import com.platon.browser.utils.HexTool;
 import com.univocity.parsers.csv.CsvWriter;
@@ -90,8 +83,6 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionESRepository transactionESRepository;
     @Autowired
     private DelegationRewardESRepository delegationRewardESRepository;
-	@Autowired
-	private InnerTxESRepository innerTxESRepository;
     @Autowired
     private I18nUtil i18n;
     @Autowired(required = false)
@@ -896,12 +887,12 @@ public class TransactionServiceImpl implements TransactionService {
 		return result;
 	}
 
-	@Override
+	/*@Override
 	public RespPage<QueryInnerTxByAddrResp> queryInnerByAddr(QueryInnerByAddrReq req) {
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		/**
+		*//**
 		 * 根据不同的类型设置不同的查询条件
-		 */
+		 *//*
 		if(req.getType() == 1){
 			constructor.must(new ESQueryBuilders().term("tokenAddr", req.getAddress()));
 		} else {
@@ -928,6 +919,6 @@ public class TransactionServiceImpl implements TransactionService {
 		RespPage<QueryInnerTxByAddrResp> result = new RespPage<>();
 		result.init(queryInnerTxByAddrResps, innerTxESResult.getTotal(), innerTxESResult.getTotal(), 0l);
 		return result;
-	}
+	}*/
 
 }

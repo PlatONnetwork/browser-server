@@ -1,6 +1,6 @@
 package com.platon.browser.converter;
 
-import com.platon.browser.elasticsearch.dto.InnerTx;
+import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,8 +22,8 @@ public interface QueryInnerTxByAddrRespConverter {
     @Mappings({
             @Mapping(target = "nowTime", expression = "java(new java.util.Date().getTime())")
     })
-    QueryInnerTxByAddrResp domain2dto(InnerTx person);
+    QueryInnerTxByAddrResp domain2dto(ESTokenTransferRecord person);
 
-    List<QueryInnerTxByAddrResp> domain2dto(List<InnerTx> innerList);
+    List<QueryInnerTxByAddrResp> domain2dto(List<ESTokenTransferRecord> innerList);
 
 }
