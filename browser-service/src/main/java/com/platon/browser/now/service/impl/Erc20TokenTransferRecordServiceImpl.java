@@ -98,14 +98,14 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         QueryTokenTransferRecordListResp resp =  QueryTokenTransferRecordListResp.builder()
                 .txHash(record.getHash()).blockNumber(record.getBn())
                 .txFrom(record.getFrom()).contract(record.getContract())
-                .transferTo(record.getTto())
+                .transferTo(record.getTto()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
                 .methodSign(record.getSign()).result(record.getResult())
                 .blockTimestamp(record.getBTime())
-                .value(record.getValue())
+                .value(new BigDecimal(record.getValue()))
                 .build();
         // Processing accuracy calculation.
-        BigDecimal transferValue = record.getTValue();
+        BigDecimal transferValue = new BigDecimal(record.getTValue());
         String actualTransferValue = EnergonUtil.format(transferValue.divide(BigDecimal.valueOf(record.getDecimal())).setScale(12, BigDecimal.ROUND_DOWN), 12);
         resp.setTransferValue(new BigDecimal(actualTransferValue));
 

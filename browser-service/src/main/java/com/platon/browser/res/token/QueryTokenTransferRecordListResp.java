@@ -41,6 +41,8 @@ public class QueryTokenTransferRecordListResp {
     private Integer decimal;
     @ApiModelProperty(value = "代币符号")
     private String symbol;
+    @ApiModelProperty(value = "代币名称")
+    private String name;
     @ApiModelProperty(value = "交易函数签名")
     private String methodSign;
     @ApiModelProperty(value = "交易结果 0 失败，1 成功")
