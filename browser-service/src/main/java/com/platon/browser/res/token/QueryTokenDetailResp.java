@@ -58,6 +58,9 @@ public class QueryTokenDetailResp {
     private String sourceCode;
 
     public static QueryTokenDetailResp fromErc20Token(Erc20Token token) {
+        if (null == token) {
+            return null;
+        }
         return QueryTokenDetailResp.builder()
                 .address(token.getAddress()).name(token.getName())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())

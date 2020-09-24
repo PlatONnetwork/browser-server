@@ -10,11 +10,13 @@ import com.platon.browser.req.token.QueryTokenListReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.token.QueryTokenDetailResp;
 import com.platon.browser.res.token.QueryTokenListResp;
+import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
             return result;
         }
         // convert data
-        List<QueryTokenListResp> queryTokenList = tokenList.parallelStream().map(p -> {
+        List<QueryTokenListResp> queryTokenList = tokenList.parallelStream().filter(p -> p != null).map(p -> {
             return QueryTokenListResp.fromErc20Token(p);
         }).collect(Collectors.toList());
 
@@ -69,10 +71,15 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         // attach info.
         Erc20TokenDetailWithBLOBs detailWithBLOBs = erc20TokenDetailMapper.selectByAddress(req.getAddress());
         QueryTokenDetailResp response = QueryTokenDetailResp.fromErc20Token(erc20Token);
-        if (detailWithBLOBs != null) {
+        if (detailWithBLOBs != null && response != null) {
             response.setAbi(detailWithBLOBs.getAbi());
             response.setBinCode(detailWithBLOBs.getBinCode());
             response.setSourceCode(detailWithBLOBs.getSourceCode());
+        }
+        // cal total supply -> decimal
+        if(erc20Token != null){
+            BigDecimal totalSupply = ConvertUtil.convertByFactor(erc20Token.getTotalSupply(), erc20Token.getDecimal());
+            response.setTotalSupply(totalSupply);
         }
         return response;
     }
