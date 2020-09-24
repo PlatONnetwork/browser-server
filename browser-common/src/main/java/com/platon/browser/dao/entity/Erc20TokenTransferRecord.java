@@ -31,6 +31,8 @@ public class Erc20TokenTransferRecord {
 
     private String symbol;
 
+    private String name;
+
     private String methodSign;
 
     private Integer result;
@@ -151,6 +153,14 @@ public class Erc20TokenTransferRecord {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

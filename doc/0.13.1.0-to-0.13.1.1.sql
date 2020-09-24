@@ -35,6 +35,7 @@ CREATE TABLE `erc20_token_detail` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Token合约附加数据表 记录满足ERC20合约的附属信息，用于对主合约进行一定的数据补充';
 
 -- 合约内部转账记录表
+
 CREATE TABLE `erc20_token_transfer_record` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
   `tx_hash` varchar(128) DEFAULT NULL COMMENT '交易哈希',
@@ -44,7 +45,9 @@ CREATE TABLE `erc20_token_transfer_record` (
   `transfer_to` varchar(64) DEFAULT NULL COMMENT '代币接收者',
   `transfer_value` decimal(64,0) DEFAULT NULL COMMENT '转账金额',
   `decimal` int(11) DEFAULT NULL COMMENT '代币精度',
+  `name` varchar(32) DEFAULT NULL COMMENT '代币名称',
   `symbol` varchar(32) DEFAULT NULL COMMENT '代币符号',
+  `method_sign` varchar(32) DEFAULT NULL COMMENT '函数方法签名',
   `result` int(11) DEFAULT '1' COMMENT '转账结果 1成功，0失败',
   `block_timestamp` datetime DEFAULT NULL COMMENT '转账时间',
   `value` decimal(64,0) DEFAULT NULL COMMENT '交易value金额',
