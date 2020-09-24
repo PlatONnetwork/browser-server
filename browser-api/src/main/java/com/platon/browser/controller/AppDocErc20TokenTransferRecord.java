@@ -23,10 +23,13 @@ public interface AppDocErc20TokenTransferRecord {
      * @apiDescription
      * 1. 实现逻辑：<br/>
      * - 查询ES中索引数据
+     * - 如果传入合约地址，则返回当前合约内的所有转账记录
+     * - 如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录
+     * - 如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）
      * @apiParamExample {json} Request-Example:
      * {
-     *    "contract":"",               // 合约地址
-     *    "address":"",                // 用户地址（检索时可能为：from或to）
+     *    "contract":"",               // 合约地址（可选）
+     *    "address":"",                // 用户地址（可选，检索时可能为：from或to）
      *    "pageNo":1,                  // 页数(必填)
      *    "pageSize":10                // 页大小(必填)
      * }
