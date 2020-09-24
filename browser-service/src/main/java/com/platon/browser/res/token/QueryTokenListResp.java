@@ -52,9 +52,9 @@ public class QueryTokenListResp {
         return QueryTokenListResp.builder()
                 .address(token.getAddress()).name(token.getName())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal())).icon(token.getIcon())
+                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal()))
                 .creator(token.getCreator()).txHash(token.getTxHash())
-                .webSite(token.getWebSite()).blockTimestamp(token.getBlockTimestamp())
+                .blockTimestamp(token.getBlockTimestamp())
                 .createTime(token.getCreateTime())
                 .build();
     }

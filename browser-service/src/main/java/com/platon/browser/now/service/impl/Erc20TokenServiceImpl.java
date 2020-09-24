@@ -72,6 +72,8 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         Erc20TokenDetailWithBLOBs detailWithBLOBs = erc20TokenDetailMapper.selectByAddress(req.getAddress());
         QueryTokenDetailResp response = QueryTokenDetailResp.fromErc20Token(erc20Token);
         if (detailWithBLOBs != null && response != null) {
+            response.setIcon(detailWithBLOBs.getIcon());
+            response.setWebSite(detailWithBLOBs.getWebSite());
             response.setAbi(detailWithBLOBs.getAbi());
             response.setBinCode(detailWithBLOBs.getBinCode());
             response.setSourceCode(detailWithBLOBs.getSourceCode());
