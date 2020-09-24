@@ -64,7 +64,7 @@ public abstract class ESRepository {
 	 * 索引模板发布
 	 */
 	public void putIndexTemplate(String indexTemplateName, XContentBuilder builder) throws IOException {
-		if (exists(indexTemplateName)) {
+		if (existsTemplate(indexTemplateName)) {
 			log.warn("{" + indexTemplateName + "} index template already exist.");
 			return;
 		}

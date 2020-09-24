@@ -102,13 +102,16 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
                 .methodSign(record.getSign()).result(record.getResult())
                 .blockTimestamp(record.getBTime())
-                .value(new BigDecimal(record.getValue()))
+                .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .build();
         // Processing accuracy calculation.
-        BigDecimal transferValue = new BigDecimal(record.getTValue());
-        BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
-        resp.setTransferValue(actualTransferValue);
-
+        if (null != record.getTValue()) {
+            BigDecimal transferValue = new BigDecimal(record.getTValue());
+            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            resp.setTransferValue(actualTransferValue);
+        } else {
+            resp.setTransferValue(BigDecimal.ZERO);
+        }
         // input or out
         if (address.equals(record.getFrom())) {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.INPUT.val());
