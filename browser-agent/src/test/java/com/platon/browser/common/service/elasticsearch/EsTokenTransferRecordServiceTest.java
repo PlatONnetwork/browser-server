@@ -1,6 +1,6 @@
 package com.platon.browser.common.service.elasticsearch;
 
-import com.platon.browser.TestAgentApplication;
+import com.platon.browser.AgentApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @Version 1.0
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestAgentApplication.class)
+@SpringBootTest(classes = AgentApplication.class)
 public class EsTokenTransferRecordServiceTest {
 
     @Autowired
