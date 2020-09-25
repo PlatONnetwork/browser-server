@@ -15,6 +15,7 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.res.token.QueryTokenTransferRecordListResp;
 import com.platon.browser.util.ConvertUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,13 +58,16 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
 
         // condition: txHash/contract/txFrom/transferTo
-        if (null != req.getContract()) {
+        if (StringUtils.isNotEmpty(req.getContract())) {
             constructor.must(new ESQueryBuilders().terms("contract", Collections.singletonList(req.getContract())));
         }
-        if (null != req.getAddress()) {
+        if (StringUtils.isNotEmpty(req.getAddress())) {
             constructor.buildMust(new BoolQueryBuilder()
                     .should(QueryBuilders.termQuery("from", req.getAddress()))
                     .should(QueryBuilders.termQuery("tto", req.getAddress())));
+        }
+        if (StringUtils.isNotEmpty(req.getTxHash())) {
+            constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
         }
         // Set sort field
         constructor.setDesc("seq");

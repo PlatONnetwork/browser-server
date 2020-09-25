@@ -1,16 +1,11 @@
 package com.platon.browser.dto;
 
+import com.platon.browser.dao.entity.Erc20Token;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.platon.browser.dao.entity.Erc20Token;
-
-import lombok.Builder;
-import lombok.Data;
-
-@Builder
-@Data
 public class CustomErc20Token extends Erc20Token {
 
     /**

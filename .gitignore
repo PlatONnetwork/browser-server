@@ -36,3 +36,5 @@ HELP.md
 /build/*
 /out/ 
 /bin/
+
+apidoc.zip
