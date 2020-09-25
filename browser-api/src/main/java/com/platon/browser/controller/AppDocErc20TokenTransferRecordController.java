@@ -26,7 +26,8 @@ public class AppDocErc20TokenTransferRecordController implements AppDocErc20Toke
 
     @Override
     public WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> tokenTransferList(@Valid QueryTokenTransferRecordListReq req) {
-        WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> erc20TokenTransferRecordService.queryTokenRecordList(req));
+        WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
+                erc20TokenTransferRecordService.queryTokenRecordList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;
     }
