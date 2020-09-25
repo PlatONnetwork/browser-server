@@ -16,15 +16,21 @@ public interface NetworkStatMapper {
 
     int insertSelective(NetworkStat record);
 
+    List<NetworkStat> selectByExampleWithBLOBs(NetworkStatExample example);
+
     List<NetworkStat> selectByExample(NetworkStatExample example);
 
     NetworkStat selectByPrimaryKey(Integer id);
 
     int updateByExampleSelective(@Param("record") NetworkStat record, @Param("example") NetworkStatExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") NetworkStat record, @Param("example") NetworkStatExample example);
+
     int updateByExample(@Param("record") NetworkStat record, @Param("example") NetworkStatExample example);
 
     int updateByPrimaryKeySelective(NetworkStat record);
+
+    int updateByPrimaryKeyWithBLOBs(NetworkStat record);
 
     int updateByPrimaryKey(NetworkStat record);
 

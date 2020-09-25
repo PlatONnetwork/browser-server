@@ -253,7 +253,12 @@ public class AddressCache {
         return erc20Token;
     }
 
-    public void updateErcTx(String addr) {
+    /**
+     * 对地址进行更新加1
+     * 
+     * @param addr
+     */
+    public synchronized void updateErcTx(String addr) {
         Erc20Token erc20Token = this.createDefaultErc20(addr);
         erc20Token.setTxCount(erc20Token.getTxCount() + 1);
     }

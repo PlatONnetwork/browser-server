@@ -72,6 +72,7 @@ public class CollectionBlock extends Block {
                     .updateWithRawTransaction(rawTransaction).updateWithBlockAndReceipt(this,
                         receiptMap.get(rawTransaction.getHash()), platOnClient, addressCache, specialApi, ercInterface);
                 this.transactions.add(transaction);
+                this.setTokenQty(this.getTokenQty() + transaction.getEsTokenTransferRecords().size());
             }
         }
         return this;

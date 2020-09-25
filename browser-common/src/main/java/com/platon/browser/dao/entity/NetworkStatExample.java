@@ -1516,73 +1516,63 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesIsNull() {
-            addCriterion("issue_rates is null");
+        public Criteria andTokenQtyIsNull() {
+            addCriterion("token_qty is null");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesIsNotNull() {
-            addCriterion("issue_rates is not null");
+        public Criteria andTokenQtyIsNotNull() {
+            addCriterion("token_qty is not null");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesEqualTo(String value) {
-            addCriterion("issue_rates =", value, "issueRates");
+        public Criteria andTokenQtyEqualTo(Integer value) {
+            addCriterion("token_qty =", value, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesNotEqualTo(String value) {
-            addCriterion("issue_rates <>", value, "issueRates");
+        public Criteria andTokenQtyNotEqualTo(Integer value) {
+            addCriterion("token_qty <>", value, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesGreaterThan(String value) {
-            addCriterion("issue_rates >", value, "issueRates");
+        public Criteria andTokenQtyGreaterThan(Integer value) {
+            addCriterion("token_qty >", value, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesGreaterThanOrEqualTo(String value) {
-            addCriterion("issue_rates >=", value, "issueRates");
+        public Criteria andTokenQtyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("token_qty >=", value, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesLessThan(String value) {
-            addCriterion("issue_rates <", value, "issueRates");
+        public Criteria andTokenQtyLessThan(Integer value) {
+            addCriterion("token_qty <", value, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesLessThanOrEqualTo(String value) {
-            addCriterion("issue_rates <=", value, "issueRates");
+        public Criteria andTokenQtyLessThanOrEqualTo(Integer value) {
+            addCriterion("token_qty <=", value, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesLike(String value) {
-            addCriterion("issue_rates like", value, "issueRates");
+        public Criteria andTokenQtyIn(List<Integer> values) {
+            addCriterion("token_qty in", values, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesNotLike(String value) {
-            addCriterion("issue_rates not like", value, "issueRates");
+        public Criteria andTokenQtyNotIn(List<Integer> values) {
+            addCriterion("token_qty not in", values, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesIn(List<String> values) {
-            addCriterion("issue_rates in", values, "issueRates");
+        public Criteria andTokenQtyBetween(Integer value1, Integer value2) {
+            addCriterion("token_qty between", value1, value2, "tokenQty");
             return (Criteria) this;
         }
 
-        public Criteria andIssueRatesNotIn(List<String> values) {
-            addCriterion("issue_rates not in", values, "issueRates");
-            return (Criteria) this;
-        }
-
-        public Criteria andIssueRatesBetween(String value1, String value2) {
-            addCriterion("issue_rates between", value1, value2, "issueRates");
-            return (Criteria) this;
-        }
-
-        public Criteria andIssueRatesNotBetween(String value1, String value2) {
-            addCriterion("issue_rates not between", value1, value2, "issueRates");
+        public Criteria andTokenQtyNotBetween(Integer value1, Integer value2) {
+            addCriterion("token_qty not between", value1, value2, "tokenQty");
             return (Criteria) this;
         }
 

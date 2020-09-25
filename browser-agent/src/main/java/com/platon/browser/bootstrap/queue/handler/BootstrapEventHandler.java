@@ -79,6 +79,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,
                 receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.ercInterface);
+            this.ercInterface.initContractData(block.getTransactions(), this.addressCache);
 
             this.clear();
             this.blocks.add(block);
