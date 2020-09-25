@@ -56,7 +56,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,
                 receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.ercInterface);
-
+            this.ercInterface.initContractData(block.getTransactions(), this.addressCache);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
 
             this.collectionEventPublisher.publish(block, block.getTransactions(), event.getEpochMessage());

@@ -37,7 +37,6 @@ task createDirs() {
 	file('build/lib').mkdirs()
     file('build/package/browser-agent').mkdirs()
     file('build/package/lib').mkdirs()
-    file('build/package/sql').mkdirs()
 }
 //task 用来复制build出来的主jar包
 task copyLibs(type: Copy) {
@@ -79,11 +78,6 @@ task copyDep(type: Copy) {
 task copyJasypt(type: Copy) {
     from 'build/lib/jasypt-1.9.2.jar'
     into 'build/package/lib'
-}
-// task 用来复制对应sql
-task copySql(type: Copy) {
-    from 'src/main/resources/sql'
-    into 'build/package/sql'
 }
 
 // task 用来删除lib

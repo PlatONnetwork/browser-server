@@ -1,4 +1,5 @@
 ALTER TABLE `address` CHANGE `type` `type` int(2)   NOT NULL COMMENT '地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约,5EVM-ERC合约,4WASM-ERC合约' after `address` ;
+ALTER TABLE `network_stat` ADD COLUMN `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数' after `issue_rates` ;
 
 -- 合约表
 CREATE TABLE `erc20_token` (

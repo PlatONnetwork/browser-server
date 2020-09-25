@@ -1,7 +1,10 @@
 package com.platon.browser.erc.client;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.converter.TransferEventConverter;
@@ -19,6 +23,7 @@ import com.platon.browser.dto.ERCData;
 import com.platon.browser.dto.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.erc.ERCInterface;
+import com.platon.browser.param.Erc20Param;
 import com.platon.browser.utils.NetworkParms;
 
 import lombok.Data;
@@ -155,18 +160,33 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public void initContractData(List<Transaction> transactions, AddressCache addressCache) {
-        transactions.forEach(transaction -> {
-            transaction.getEsTokenTransferRecords().forEach(esTokenTransferRecord -> {
-                Erc20Token erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
-                if (erc20Token != null) {
-                    esTokenTransferRecord.setDecimal(esTokenTransferRecord.getDecimal());
-                    esTokenTransferRecord.setName(esTokenTransferRecord.getName());
-                    esTokenTransferRecord.setSymbol(esTokenTransferRecord.getSymbol());
-                }
-                addressCache.updateErcTx(esTokenTransferRecord.getContract());
+        Map<String, Erc20Token> erc20Tokens = new ConcurrentHashMap<>();
+        transactions.stream().filter(transaction -> transaction.getEsTokenTransferRecords().size() > 0)
+            .forEach(transaction -> {
+                List<Erc20Param> erc20Params = new ArrayList<>();
+                transaction.getEsTokenTransferRecords().stream().forEach(esTokenTransferRecord -> {
+                    // 存量的erc20参数，提高访问速度
+                    Erc20Token erc20Token = erc20Tokens.get(esTokenTransferRecord.getContract());
+                    if (erc20Token == null) {
+                        erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
+                        erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);
+                    }
+                    if (erc20Token != null) {
+                        esTokenTransferRecord.setDecimal(erc20Token.getDecimal());
+                        esTokenTransferRecord.setName(erc20Token.getName());
+                        esTokenTransferRecord.setSymbol(erc20Token.getSymbol());
+                    }
+                    // 更新erc交易数
+                    addressCache.updateErcTx(esTokenTransferRecord.getContract());
+                    // 存储erc20参数到交易的info中
+                    Erc20Param erc20Param = Erc20Param.builder().innerContractAddr(esTokenTransferRecord.getContract())
+                        .innerContractName(esTokenTransferRecord.getName()).innerFrom(esTokenTransferRecord.getFrom())
+                        .innerSymbol(esTokenTransferRecord.getSymbol()).innerTo(esTokenTransferRecord.getTto())
+                        .innerValue(esTokenTransferRecord.getTValue()).build();
+                    erc20Params.add(erc20Param);
+                });
+                transaction.setInfo(JSONObject.toJSONString(erc20Params));
             });
-        });
-
     }
 
 }

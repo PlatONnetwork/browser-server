@@ -378,7 +378,8 @@ public class TransactionUtil {
         List<TransferEvent> transferEvents = ercInterface.getTransferEvents(transactionReceipt);
         List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
         AtomicInteger i = new AtomicInteger();
-        transferEvents.forEach(transferEvent -> {
+        transferEvents.stream().forEach(transferEvent -> {
+            // 转换参数进行设置内部交易
             ESTokenTransferRecord esTokenTransferRecord = ESTokenTransferRecord.builder().from(transferEvent.getFrom())
                 .tto(transferEvent.getTo()).tValue(transferEvent.getValue().toString()).bn(tx.getNum())
                 .hash(tx.getHash()).contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
