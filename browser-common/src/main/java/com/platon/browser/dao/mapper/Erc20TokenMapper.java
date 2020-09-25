@@ -1,6 +1,7 @@
 package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Erc20TokenExample;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,6 +16,8 @@ public interface Erc20TokenMapper {
     Erc20Token selectByPrimaryKey(Long id);
 
     Erc20Token selectByAddress(@Param("address") String address);
+
+    List<Erc20Token> selectByExample(Erc20TokenExample example);
 
     List<Erc20Token> listErc20Token(Map params);
 

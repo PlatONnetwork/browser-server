@@ -1,14 +1,5 @@
 package com.platon.browser.complement.converter.statistic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -18,12 +9,19 @@ import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Erc20TokenExample;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Slf4j
 @Service
@@ -35,6 +33,9 @@ public class StatisticsAddressConverter {
     private StatisticBusinessMapper statisticBusinessMapper;
     @Autowired
     private AddressMapper addressMapper;
+
+    @Autowired
+    private Erc20TokenMapper erc20TokenMapper;
 
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
@@ -139,5 +140,49 @@ public class StatisticsAddressConverter {
         this.statisticBusinessMapper.addressChange(addressStatChange);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+    }
+
+    public void erc20TokenConvert(CollectionEvent event, Block block, EpochMessage epochMessage) {
+        long startTime = System.currentTimeMillis();
+        if (log.isDebugEnabled()) {
+            log.debug("erc20TokenConvert ~ block({}), transactions({}), consensus({}), settlement({}), issue({})",
+                    block.getNum(), event.getTransactions().size(), epochMessage.getConsensusEpochRound(),
+                    epochMessage.getSettleEpochRound(), epochMessage.getIssueEpochRound());
+        }
+        Collection<Erc20Token> erc20TokenList = addressCache.getAllErc20Token();
+        if(erc20TokenList.isEmpty()) {
+            return;
+        }
+
+        Map<String, Erc20Token> erc20TokenMap = new HashMap<>();
+        List<String> addresses = new ArrayList<>();
+        erc20TokenList.forEach(cacheErc20Token -> {
+            erc20TokenMap.put(cacheErc20Token.getAddress(), cacheErc20Token);
+            addresses.add(cacheErc20Token.getAddress());
+        });
+        this.addressCache.cleanErc20TokenCache();
+
+        // 排除地址重复的数据
+        Erc20TokenExample tokenCondition = new Erc20TokenExample();
+        tokenCondition.createCriteria().andAddressIn(addresses);
+        List<Erc20Token> tokenList = erc20TokenMapper.selectByExample(tokenCondition);
+
+        // 过滤重复的数据，DB 中已经存在的，则不进行再次插入
+        tokenList.forEach(dbToken -> {
+            erc20TokenMap.remove(dbToken.getAddress());
+        });
+
+        // 将增量新增的代币合约录入DB
+        List<Erc20Token> params = new ArrayList<>();
+        erc20TokenMap.values().forEach(t -> {
+            params.add(t);
+        });
+
+        // batch save data.
+        int result = erc20TokenMapper.batchInsert(params);
+        if (log.isDebugEnabled()) {
+            log.debug("erc20TokenConvert ~ 处理耗时:{} ms", System.currentTimeMillis() - startTime
+                    + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
+        }
     }
 }

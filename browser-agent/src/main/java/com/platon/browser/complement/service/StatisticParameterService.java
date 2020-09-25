@@ -50,6 +50,9 @@ public class StatisticParameterService {
         	statisticsAddressConverter.convert(event, block, epochMessage);
         }
 
+        // 代币统计处理
+        statisticsAddressConverter.erc20TokenConvert(event, block, epochMessage);
+
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 
