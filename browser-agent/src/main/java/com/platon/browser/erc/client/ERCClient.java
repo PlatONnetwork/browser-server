@@ -1,18 +1,5 @@
 package com.platon.browser.erc.client;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -25,9 +12,19 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.param.Erc20Param;
 import com.platon.browser.utils.NetworkParms;
-
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @program: browser-server
@@ -35,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author: Rongjin Zhang
  * @create: 2020-09-23 10:36
  */
-@Data
 @Slf4j
 @Component
 public class ERCClient implements ERCInterface {
