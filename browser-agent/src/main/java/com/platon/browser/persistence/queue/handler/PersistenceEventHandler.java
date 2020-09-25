@@ -6,10 +6,7 @@ import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
 import com.platon.browser.common.utils.BakDataDeleteUtil;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.persistence.queue.event.PersistenceEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -58,8 +56,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
         long startTime = System.currentTimeMillis();
 
         log.debug("PersistenceEvent处理:{}(event(block({}),transactions({}),nodeOpts({}),delegateRewards({})),sequence({}),endOfBatch({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),
-                event.getNodeOpts().size(),event.getDelegationRewards().size(),sequence,endOfBatch);
+                Thread.currentThread().getStackTrace()[1].getMethodName(), event.getBlock().getNum(), event.getTransactions().size(),
+                event.getNodeOpts().size(), event.getDelegationRewards().size(), sequence, endOfBatch);
         try {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
@@ -76,7 +74,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             }
 
             // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(blockStage,transactionStage,nodeOptStage,delegationRewardStage);
+            esImportService.batchImport(blockStage, transactionStage, nodeOptStage, delegationRewardStage,
+                    retryRecordSet(transactionStage));
+
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             statistics.add(networkStatCache.getNetworkStat());
@@ -116,5 +116,22 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
         }
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+    }
+
+    /**
+     * retry transfer record from transactions.
+     */
+    public Set<ESTokenTransferRecord> retryRecordSet(Set<Transaction> txSet){
+        Set<ESTokenTransferRecord> recordSet = new HashSet<>();
+        if (txSet != null && txSet.size() != 0) {
+            Iterator<Transaction> transactionIterator = txSet.iterator();
+            while (transactionIterator.hasNext()) {
+                Transaction tx = transactionIterator.next();
+                if (null != tx && null != tx.getEsTokenTransferRecords() && tx.getEsTokenTransferRecords().size() != 0) {
+                    recordSet.addAll(tx.getEsTokenTransferRecords());
+                }
+            }
+        }
+        return recordSet;
     }
 }
