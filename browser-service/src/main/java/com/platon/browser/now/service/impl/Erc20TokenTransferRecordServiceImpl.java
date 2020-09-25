@@ -113,7 +113,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
             resp.setTransferValue(BigDecimal.ZERO);
         }
         // input or out
-        if (address.equals(record.getFrom())) {
+        if (null != address && address.equals(record.getFrom())) {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.INPUT.val());
         } else {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.OUT.val());
