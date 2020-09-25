@@ -11,9 +11,13 @@ import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.converter.TransferEventConverter;
+import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dto.ERCData;
 import com.platon.browser.dto.TransferEvent;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.utils.NetworkParms;
 
@@ -34,20 +38,21 @@ public class ERCClient implements ERCInterface {
     @Autowired
     private PlatOnClient platOnClient;
 
-    private String contractAddress;
+    @Autowired
+    private Erc20TokenMapper erc20TokenMapper;
 
     private ERC20Client erc20Client;
 
     private Lock lock = new ReentrantLock();
 
-    private void init() {
-        if (StringUtils.isBlank(this.contractAddress)) {
+    private void init(String contractAddress) {
+        if (StringUtils.isBlank(contractAddress)) {
             throw new RuntimeException("contractAddress is not null");
         }
         if (this.erc20Client == null) {
             try {
                 this.lock.lock();
-                this.erc20Client = new ERC20Client(this.contractAddress, this.platOnClient.getWeb3jWrapper().getWeb3j(),
+                this.erc20Client = new ERC20Client(contractAddress, this.platOnClient.getWeb3jWrapper().getWeb3j(),
                     null, NetworkParms.getChainId());
             } finally {
                 this.lock.unlock();
@@ -56,8 +61,8 @@ public class ERCClient implements ERCInterface {
     }
 
     @Override
-    public String getName() {
-        this.init();
+    public String getName(String contractAddress) {
+        this.init(contractAddress);
         String name = "";
         try {
             name = this.erc20Client.name().send();
@@ -68,8 +73,8 @@ public class ERCClient implements ERCInterface {
     }
 
     @Override
-    public String getSymbol() {
-        this.init();
+    public String getSymbol(String contractAddress) {
+        this.init(contractAddress);
         String symbol = "";
         try {
             symbol = this.erc20Client.symbol().send();
@@ -80,8 +85,8 @@ public class ERCClient implements ERCInterface {
     }
 
     @Override
-    public BigInteger getDecimals() {
-        this.init();
+    public BigInteger getDecimals(String contractAddress) {
+        this.init(contractAddress);
         BigInteger decimal = null;
         try {
             decimal = this.erc20Client.decimals().send();
@@ -92,8 +97,8 @@ public class ERCClient implements ERCInterface {
     }
 
     @Override
-    public BigInteger getTotalSupply() {
-        this.init();
+    public BigInteger getTotalSupply(String contractAddress) {
+        this.init(contractAddress);
         BigInteger totalSupply = null;
         try {
             totalSupply = this.erc20Client.totalSupply().send();
@@ -104,17 +109,20 @@ public class ERCClient implements ERCInterface {
     }
 
     @Override
-    public ERCData getErcData() {
-        String name = this.getName();
-        String symbol = this.getSymbol();
-        BigInteger decimals = this.getDecimals();
-        BigInteger totalSupply = this.getTotalSupply();
-        if (StringUtils.isBlank(name) || StringUtils.isBlank(symbol) || decimals == null || totalSupply == null) {
+    public ERCData getErcData(String contractAddress) {
+        String name = this.getName(contractAddress);
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+        String symbol = this.getSymbol(contractAddress);
+        BigInteger decimals = this.getDecimals(contractAddress);
+        BigInteger totalSupply = this.getTotalSupply(contractAddress);
+        if (StringUtils.isBlank(symbol) || decimals == null || totalSupply == null) {
             return null;
         }
         ERCData ercData = new ERCData();
         ercData.setName(name);
-        ercData.setDecimal(decimals);
+        ercData.setDecimal(decimals.intValue());
         ercData.setSymbol(symbol);
         ercData.setTotalSupply(totalSupply);
         return ercData;
@@ -143,6 +151,22 @@ public class ERCClient implements ERCInterface {
             log.error(" erc get transferEvents error", e);
         }
         return transferEvents;
+    }
+
+    @Override
+    public void initContractData(List<Transaction> transactions, AddressCache addressCache) {
+        transactions.forEach(transaction -> {
+            transaction.getEsTokenTransferRecords().forEach(esTokenTransferRecord -> {
+                Erc20Token erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
+                if (erc20Token != null) {
+                    esTokenTransferRecord.setDecimal(esTokenTransferRecord.getDecimal());
+                    esTokenTransferRecord.setName(esTokenTransferRecord.getName());
+                    esTokenTransferRecord.setSymbol(esTokenTransferRecord.getSymbol());
+                }
+                addressCache.updateErcTx(esTokenTransferRecord.getContract());
+            });
+        });
+
     }
 
 }

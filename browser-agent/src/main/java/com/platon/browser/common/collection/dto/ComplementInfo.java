@@ -3,10 +3,10 @@ package com.platon.browser.common.collection.dto;
 import lombok.Data;
 
 @Data
-public class ComplementInfo{
+public class ComplementInfo {
     // 交易类型
-    Integer type=null;
-    Integer toType=null;
+    Integer type = null;
+    Integer toType = null;
     // 合约代码
     String binCode = null;
     // 合约方法

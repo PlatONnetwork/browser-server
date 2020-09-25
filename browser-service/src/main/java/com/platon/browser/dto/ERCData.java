@@ -1,8 +1,8 @@
 package com.platon.browser.dto;
 
-import lombok.Data;
-
 import java.math.BigInteger;
+
+import lombok.Data;
 
 /**
  * @program: browser-server
@@ -17,7 +17,7 @@ public class ERCData {
 
     private String symbol;
 
-    private BigInteger decimal;
+    private Integer decimal;
 
     private BigInteger totalSupply;
 }
