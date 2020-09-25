@@ -49,7 +49,7 @@ public class EsImportService {
             }
         });
     }
-    
+
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions,
                             Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
