@@ -31,4 +31,7 @@ public class QueryTokenTransferRecordListReq extends PageReq {
     @ApiModelProperty(value = "用户地址（from/to）")
     @Size(min = 42, max = 42)
     private String address;
+
+    @ApiModelProperty(value = "交易哈希")
+    private String txHash;
 }

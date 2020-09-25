@@ -30,6 +30,7 @@ public interface AppDocErc20TokenTransferRecord {
      * {
      *    "contract":"",               // 合约地址（可选）
      *    "address":"",                // 用户地址（可选，检索时可能为：from或to）
+     *    "txHash":"",                 // 交易哈希（可选，如果存在则根据该哈希强检索）
      *    "pageNo":1,                  // 页数(必填)
      *    "pageSize":10                // 页大小(必填)
      * }

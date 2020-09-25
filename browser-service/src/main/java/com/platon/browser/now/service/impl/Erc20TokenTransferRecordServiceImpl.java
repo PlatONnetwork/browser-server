@@ -65,6 +65,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                     .should(QueryBuilders.termQuery("from", req.getAddress()))
                     .should(QueryBuilders.termQuery("tto", req.getAddress())));
         }
+        if (null != req.getTxHash()) {
+            constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
+        }
         // Set sort field
         constructor.setDesc("seq");
         // response filed to show.
