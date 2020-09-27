@@ -1,5 +1,10 @@
 package com.platon.browser.common.complement.cache;
 
+import java.math.BigDecimal;
+import java.util.*;
+
+import org.springframework.stereotype.Component;
+
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
@@ -11,10 +16,6 @@ import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 /**
  * 地址统计缓存
@@ -227,7 +228,6 @@ public class AddressCache {
             erc20Token = Erc20Token.builder().address(addr).createTime(new Date()).symbol("")
                 .totalSupply(BigDecimal.ZERO).name("").decimal(0).status(CustomErc20Token.StatusEnum.VISIBLE.getCode())
                 .creator("").txHash("").blockTimestamp(new Date()).type("").txCount(0).build();
-            this.erc20TokenMap.put(addr, erc20Token);
         }
         return erc20Token;
     }
@@ -257,6 +257,7 @@ public class AddressCache {
         erc20Token.setBlockTimestamp(time);
         erc20Token.setType(type);
         erc20Token.setTxCount(0);
+        this.erc20TokenMap.put(addr, erc20Token);
         return erc20Token;
     }
 
@@ -268,6 +269,7 @@ public class AddressCache {
     public synchronized void updateErcTx(String addr) {
         Erc20Token erc20Token = this.createDefaultErc20(addr);
         erc20Token.setTxCount(erc20Token.getTxCount() + 1);
+        this.erc20TokenMap.put(addr, erc20Token);
     }
 
     /**
