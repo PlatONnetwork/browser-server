@@ -179,10 +179,14 @@ public class StatisticsAddressConverter {
         });
 
         // batch save data.
-        int result = erc20TokenMapper.batchInsert(params);
+        int result = 0;
+        if(null != params && params.size() != 0){
+            result = erc20TokenMapper.batchInsert(params);
+        }
         if (log.isDebugEnabled()) {
             log.debug("erc20TokenConvert ~ 处理耗时:{} ms", System.currentTimeMillis() - startTime
                     + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
         }
+
     }
 }
