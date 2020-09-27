@@ -253,7 +253,7 @@
         #{item.symbol,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, #{item.totalSupply,jdbcType=DECIMAL}, 
         #{item.creator,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR},
         #{item.type,jdbcType=CHAR}, #{item.blockTimestamp,jdbcType=TIMESTAMP},
-        #{txCount,jdbcType=INTEGER}, now())
+        #{item.txCount,jdbcType=INTEGER}, now())
     </foreach>
   </insert>
 </mapper>
