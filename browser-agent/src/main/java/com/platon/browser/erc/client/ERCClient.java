@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import com.alibaba.fastjson.JSONObject;
@@ -58,7 +59,8 @@ public class ERCClient implements ERCInterface {
             try {
                 this.lock.lock();
                 this.erc20Client = new ERC20Client(contractAddress, this.platOnClient.getWeb3jWrapper().getWeb3j(),
-                    null, NetworkParms.getChainId());
+                    Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
+                    NetworkParms.getChainId());
             } finally {
                 this.lock.unlock();
             }
