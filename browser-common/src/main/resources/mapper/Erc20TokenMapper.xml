@@ -246,7 +246,7 @@
   <insert id="batchInsert" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     insert into erc20_token
         (address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,
-          `type`, block_timestamp, tx_countcreate_time)
+          `type`, block_timestamp, tx_count, create_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
