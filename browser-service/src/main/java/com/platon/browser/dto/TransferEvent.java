@@ -2,6 +2,8 @@ package com.platon.browser.dto;
 
 import java.math.BigInteger;
 
+import org.web3j.protocol.core.methods.response.Log;
+
 import lombok.Data;
 
 /**
@@ -17,4 +19,6 @@ public class TransferEvent {
     public String to;
 
     public BigInteger value;
+    
+    public Log log;
 }

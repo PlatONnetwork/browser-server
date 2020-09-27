@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.crypto.Credentials;
@@ -144,11 +145,19 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public List<TransferEvent> getTransferEvents(TransactionReceipt transactionReceipt) {
-        List<TransferEvent> transferEvents = null;
+    	this.init(transactionReceipt.getContractAddress());
+        List<TransferEvent> transferEvents = new ArrayList<>();
         try {
             List<ERC20Client.TransferEventResponse> transferEventResponses =
                 this.erc20Client.getTransferEvents(transactionReceipt);
-            transferEvents = TransferEventConverter.INSTANCE.domain2dto(transferEventResponses);
+            transferEventResponses.forEach(transferEventRespon ->{
+            	TransferEvent transferEvent = new TransferEvent();
+            	transferEvent.setFrom(transferEventRespon.from);
+            	transferEvent.setTo(transferEventRespon.to);
+            	transferEvent.setValue(transferEventRespon.value);
+            	transferEvent.setLog(transferEventRespon.log);
+            	transferEvents.add(transferEvent);
+            });
         } catch (Exception e) {
             log.error(" erc get transferEvents error", e);
         }

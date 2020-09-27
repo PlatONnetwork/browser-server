@@ -93,6 +93,7 @@ public class CollectionTransaction extends Transaction {
                 // 把回执里的合约地址回填到交易的to字段
                 this.setTo(receipt.getContractAddress());
                 TransactionUtil.resolveErcContract(this, ci, receipt.getContractAddress(), ercInterface, addressCache);
+                addressCache.updateFirst(receipt.getContractAddress(), ci);
                 // 把合约地址添加至缓存
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(this.getTo(), ContractTypeEnum.getEnum(ci.contractType));
             } else {

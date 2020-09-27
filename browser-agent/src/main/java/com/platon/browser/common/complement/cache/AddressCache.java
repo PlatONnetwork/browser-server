@@ -3,8 +3,10 @@ package com.platon.browser.common.complement.cache;
 import java.math.BigDecimal;
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.platon.browser.common.collection.dto.ComplementInfo;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
@@ -14,6 +16,7 @@ import com.platon.browser.dto.ERCData;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractDescEnum;
+import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
 
@@ -91,6 +94,31 @@ public class AddressCache {
         }
     }
 
+    // 先初始化合约map，防止后续合约交易找不到对应的合约而统计错误
+    public void updateFirst(String addr,ComplementInfo ci) {
+        Address address = this.addressMap.get(addr);
+        if (address == null) {
+            address = this.createDefaultAddress(addr);
+            switch (ContractTypeEnum.getEnum(ci.getContractType())) {
+                case EVM:
+                    address.setType(AddressTypeEnum.EVM_CONTRACT.getCode());
+                    this.evmContractAddressCache.add(addr);
+                    break;
+                case WASM:
+                    address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
+                    this.wasmContractAddressCache.add(addr);
+                    break;
+                case ERC20_EVM:
+                    address.setType(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
+                    this.evmErc20ContractAddressCache.add(addr);
+                    break;
+                default:
+                    break;
+            }
+            this.addressMap.put(addr, address);
+        }
+    }
+
     public Collection<Address> getAll() {
         return this.addressMap.values();
     }
@@ -156,7 +184,7 @@ public class AddressCache {
                 address.setContractCreate(tx.getFrom());
                 // 覆盖createDefaultAddress()中设置的值
                 address.setType(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
-                this.evmContractAddressCache.add(addr);
+                this.evmErc20ContractAddressCache.add(addr);
                 address.setContractBin(tx.getBin());
                 break;
             case WASM_CONTRACT_CREATE:

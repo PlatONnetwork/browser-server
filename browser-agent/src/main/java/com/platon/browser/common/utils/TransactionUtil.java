@@ -375,18 +375,22 @@ public class TransactionUtil {
         List<Log> logs, ERCInterface ercInterface, AddressCache addressCache) {
         TransactionReceipt transactionReceipt = new TransactionReceipt();
         transactionReceipt.setLogs(logs);
+        transactionReceipt.setContractAddress(tx.getTo());
         List<TransferEvent> transferEvents = ercInterface.getTransferEvents(transactionReceipt);
         List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
         AtomicInteger i = new AtomicInteger();
-        transferEvents.stream().forEach(transferEvent -> {
-            // 转换参数进行设置内部交易
-            ESTokenTransferRecord esTokenTransferRecord = ESTokenTransferRecord.builder().from(transferEvent.getFrom())
-                .tto(transferEvent.getTo()).tValue(transferEvent.getValue().toString()).bn(tx.getNum())
-                .hash(tx.getHash()).contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
-                .info(JSONObject.toJSONString(logs.get(i.get()))).ctime(new Date()).build();
-            i.getAndIncrement();
-            esTokenTransferRecords.add(esTokenTransferRecord);
-        });
+        if (transferEvents != null) {
+            transferEvents.stream().forEach(transferEvent -> {
+                // 转换参数进行设置内部交易
+                ESTokenTransferRecord esTokenTransferRecord =
+                    ESTokenTransferRecord.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
+                        .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
+                        .contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
+                        .info(transferEvent.getLog().getData()).ctime(new Date()).build();
+                i.getAndIncrement();
+                esTokenTransferRecords.add(esTokenTransferRecord);
+            });
+        }
         return esTokenTransferRecords;
     }
 }
