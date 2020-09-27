@@ -50,6 +50,7 @@ public interface AppDocErc20TokenTransferRecord {
      *          "transferTo":"",            // 代币转移接收者
      *          "transferValue":1,          // 代币转移金额（精度转换后）
      *          "decimal":1,                // 合约精度
+     *          "name":"",                  // 合约名称
      *          "symbol":"",                // 合约符号
      *          "methodSign":"",            // 调用的方法签名
      *          "result":1,                 // 转账结果（1 成功，0 失败）
