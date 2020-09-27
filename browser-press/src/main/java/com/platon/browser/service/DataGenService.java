@@ -1,5 +1,8 @@
 package com.platon.browser.service;
 
+import com.alaya.bech32.Bech32;
+import com.alaya.crypto.Keys;
+import com.alaya.parameters.NetworkParameters;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -10,9 +13,6 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
-import com.alaya.utlis.Bech32;
-import com.alaya.utlis.NetworkParameters.Hrp;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -22,16 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import com.alaya.crypto.Keys;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URL;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.*;
 
 @Slf4j
@@ -91,7 +86,7 @@ public class DataGenService {
 
     private String rAddress() {
     	try {
-			return Bech32.addressEncode(Hrp.LAX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
+			return Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

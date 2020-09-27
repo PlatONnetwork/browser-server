@@ -769,7 +769,7 @@ public class ExportService {
 		Object value;
 		try {
 			method = node.getClass().getMethod(getter, new Class[] {});
-			value = method.invoke(node, new com.alaya.contracts.ppos.dto.resp.Node[] {});
+			value = method.invoke(node, new Node[] {});
 			return value;
 		} catch (Exception e) {
 			e.printStackTrace();
