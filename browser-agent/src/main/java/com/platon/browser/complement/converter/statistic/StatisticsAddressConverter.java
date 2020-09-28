@@ -172,7 +172,6 @@ public class StatisticsAddressConverter {
 
         // 过滤重复的数据，DB 中已经存在的，则不进行再次插入
         // 重复的数据实施更新，添加txCount数量
-        List<Erc20Token> updateParams = new ArrayList<>();
         tokenList.forEach(dbToken -> {
         	Erc20Token erc20Token = erc20TokenMap.remove(dbToken.getAddress());
         	if(erc20Token.getTxCount() != 0) {
