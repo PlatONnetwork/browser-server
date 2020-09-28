@@ -7,6 +7,7 @@ import com.platon.browser.collection.queue.event.BlockEvent;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.queue.collection.publisher.CollectionEventPublisher;
+import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -40,6 +41,9 @@ public class BlockEventHandlerTest extends AgentTestBase {
     private PlatOnClient platOnClient;
     @Mock
     private AddressCache addressCache;
+    @Mock
+    private ERCInterface ercInterface;
+    
     @Spy
     private BlockEventHandler target;
 
@@ -50,6 +54,7 @@ public class BlockEventHandlerTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "collectionEventPublisher", collectionEventPublisher);
         ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
         ReflectionTestUtils.setField(target, "addressCache", addressCache);
+        ReflectionTestUtils.setField(target, "ercInterface", ercInterface);
         receiptResult = receiptResultList.get(0);
     }
 
