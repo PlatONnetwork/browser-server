@@ -717,8 +717,14 @@ public class TransactionServiceImpl implements TransactionService {
                         resp.setTxInfo(transaction.getInput());
                         break;
                     case ERC20_CONTRACT_EXEC:
-                        List<Erc20Param> erc20Params = JSON.parseObject(txInfo, List.class);
+                        List<Erc20Param> erc20Params = JSON.parseArray(txInfo, Erc20Param.class);
                         if (erc20Params != null && !erc20Params.isEmpty()) {
+                            // decimal convert
+                            erc20Params.forEach(erc -> {
+                                int decimal = Integer.parseInt(erc.getInnerDecimal());
+                                BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc.getInnerValue()), decimal);
+                                erc.setInnerValue(afterConverValue.toString());
+                            });
                             resp.setErc20Params(erc20Params);
                         }
                         resp.setTxInfo(transaction.getInput());
