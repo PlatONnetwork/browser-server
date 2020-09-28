@@ -1,12 +1,9 @@
 package com.platon.browser.param;
 
-import com.platon.browser.param.claim.Reward;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.util.List;
 
 /**
  * User: chendongming
@@ -25,4 +22,5 @@ public class Erc20Param extends TxParam{
     private String innerContractAddr; //内部交易对应地址
     private String innerContractName; //内部交易对应名称
     private String innerSymbol; //内部交易对应单位
+    private String innerDecimal;    // 合约精度
 }
