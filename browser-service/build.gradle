@@ -1,6 +1,3 @@
-plugins {
-    id "net.ltgt.apt" version "0.10"
-}
 dependencies {
     compile project(":browser-common")
     compile "com.alibaba:druid:$druidVersion"
@@ -18,7 +15,7 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
     compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2"
     compile "org.mapstruct:mapstruct-jdk8:$mapstructVersion"
-    apt "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    compile "org.mapstruct:mapstruct-processor:$mapstructVersion"
 
     compile 'io.springfox:springfox-swagger2:2.9.2'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'

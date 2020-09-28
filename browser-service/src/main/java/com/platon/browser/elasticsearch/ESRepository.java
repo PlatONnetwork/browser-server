@@ -142,6 +142,17 @@ public abstract class ESRepository {
 		log.debug("existsIndex:{}", response);
 		return response;
 	}
+	
+	/**
+	 * 初始化index
+	 * @return
+	 * @throws IOException
+	 */
+	public boolean initIndex() throws IOException {
+		if(this.existsIndex()) this.deleteIndex();
+		this.createIndex(null);
+		return true;
+	}
 
 	/**
 	 * 增加记录

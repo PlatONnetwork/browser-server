@@ -26,6 +26,11 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.DelegationRewardESRepository;
+import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
@@ -75,6 +80,16 @@ public class InitializationService {
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Autowired
     private StakeMiscService stakeMiscService;
+    @Autowired
+    private BlockESRepository blockESRepository;
+    @Autowired
+    private TransactionESRepository transactionESRepository;
+    @Autowired
+    private DelegationRewardESRepository delegationRewardESRepository;
+    @Autowired
+    private TokenTransferRecordESRepository transferRecordESRepository;
+    @Autowired
+    private NodeOptESRepository nodeOptESRepository;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
@@ -115,6 +130,8 @@ public class InitializationService {
             this.networkStatCache.init(networkStat);
             // 初始化内置地址
             this.addressCache.initOnFirstStart();
+            
+            this.initEs();
 
             return initialResult;
         }
@@ -268,5 +285,18 @@ public class InitializationService {
         if (!stakingList.isEmpty())
             this.stakingMapper.batchInsert(new ArrayList<>(stakingList));
         return returnData;
+    }
+    
+    private void initEs() {
+    	try {
+    		blockESRepository.initIndex();
+        	transactionESRepository.initIndex();
+        	delegationRewardESRepository.initIndex();
+        	transferRecordESRepository.initIndex();
+        	nodeOptESRepository.initIndex();
+		} catch (Exception e) {
+			log.error("init es error",e);
+		}
+    	
     }
 }

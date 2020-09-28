@@ -92,7 +92,6 @@ task prepareFile(dependsOn: [
         'copyBin',
         'copyDep',
         'copyJasypt',
-        'copySql',
         'deleteLib'
 ]){}
 //指定打包的tar包的名字，以及文件来源目录
