@@ -73,7 +73,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         constructor.setDesc("seq");
         // response filed to show.
         constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
-                "tto", "tValue", "decimal", "symbol", "bTime" });
+                "tto", "tValue", "decimal", "name", "symbol", "result", "bTime" });
         try {
             queryResultFromES = esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
@@ -118,9 +118,12 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         }
         // input or out
         if (null != address && address.equals(record.getFrom())) {
-            resp.setType(QueryTokenTransferRecordListResp.TransferType.INPUT.val());
-        } else {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.OUT.val());
+        } else {
+            resp.setType(QueryTokenTransferRecordListResp.TransferType.INPUT.val());
+        }
+        if(null == address){
+            resp.setType(QueryTokenTransferRecordListResp.TransferType.NONE.val());
         }
         return resp;
     }
