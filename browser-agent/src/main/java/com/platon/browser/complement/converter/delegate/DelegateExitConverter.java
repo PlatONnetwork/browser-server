@@ -133,6 +133,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
             log.error("全部退回：{}",realRefundAmount);
             log.error("犹豫期金额：{}",delegation.getDelegateHes());
             log.error("锁定期金额：{}",delegation.getDelegateLocked());
+
             log.error("待提取金额：{}",delegation.getDelegateReleased());
         }else{
             // 部分退回，委托置为非历史
