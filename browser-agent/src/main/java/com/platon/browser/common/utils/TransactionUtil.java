@@ -315,6 +315,7 @@ public class TransactionUtil {
         ci.setType(Transaction.TypeEnum.CONTRACT_EXEC.getCode());
         if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode());
         }
 
     }
@@ -365,11 +366,21 @@ public class TransactionUtil {
         if (ercData != null && ci.getContractType() == ContractTypeEnum.EVM.getCode()) {
             ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
             addressCache.createFirstErc20(contractAddress, tx.getFrom(), tx.getHash(), tx.getTime(),
                 CustomErc20Token.TypeEnum.EVM.getCode(), ercData);
         }
     }
 
+    /**
+     * 解析token交易
+     * @param tx
+     * @param ci
+     * @param logs
+     * @param ercInterface
+     * @param addressCache
+     * @return
+     */
     public static List<ESTokenTransferRecord> resolveInnerToken(CollectionTransaction tx, ComplementInfo ci,
         List<Log> logs, ERCInterface ercInterface, AddressCache addressCache) {
         TransactionReceipt transactionReceipt = new TransactionReceipt();

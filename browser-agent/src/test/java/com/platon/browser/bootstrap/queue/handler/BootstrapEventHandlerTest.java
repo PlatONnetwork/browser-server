@@ -11,6 +11,7 @@ import com.platon.browser.common.service.redis.RedisImportService;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
+import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -51,6 +52,8 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     private PlatOnClient platOnClient;
     @Mock
     private AddressCache addressCache;
+    @Mock
+    private ERCInterface ercInterface;
     @Spy
     private BootstrapEventHandler target;
     private ReceiptResult receiptResult;
@@ -63,6 +66,7 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "nOptBakMapper", nOptBakMapper);
         ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
         ReflectionTestUtils.setField(target, "addressCache", addressCache);
+        ReflectionTestUtils.setField(target, "ercInterface", ercInterface);
         receiptResult = receiptResultList.get(0);
     }
 

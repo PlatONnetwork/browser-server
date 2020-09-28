@@ -12,6 +12,7 @@ import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenExample;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.CustomErc20TokenMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -33,10 +34,10 @@ public class StatisticsAddressConverter {
     private StatisticBusinessMapper statisticBusinessMapper;
     @Autowired
     private AddressMapper addressMapper;
-
     @Autowired
     private Erc20TokenMapper erc20TokenMapper;
-
+    @Autowired
+    private CustomErc20TokenMapper customErc20TokenMapper;
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
         log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})", block.getNum(),
@@ -155,6 +156,8 @@ public class StatisticsAddressConverter {
         }
 
         Map<String, Erc20Token> erc20TokenMap = new HashMap<>();
+        
+        List<Erc20Token> erc20TokenUpdateList = new ArrayList<>();
         List<String> addresses = new ArrayList<>();
         erc20TokenList.forEach(cacheErc20Token -> {
             erc20TokenMap.put(cacheErc20Token.getAddress(), cacheErc20Token);
@@ -171,8 +174,10 @@ public class StatisticsAddressConverter {
         // 重复的数据实施更新，添加txCount数量
         List<Erc20Token> updateParams = new ArrayList<>();
         tokenList.forEach(dbToken -> {
-            updateParams.add(dbToken);
-            erc20TokenMap.remove(dbToken.getAddress());
+        	Erc20Token erc20Token = erc20TokenMap.remove(dbToken.getAddress());
+        	if(erc20Token.getTxCount() != 0) {
+        		erc20TokenUpdateList.add(erc20Token);
+        	}
         });
 
         // 将增量新增的代币合约录入DB
@@ -186,10 +191,9 @@ public class StatisticsAddressConverter {
         if(null != params && params.size() != 0){
             result = erc20TokenMapper.batchInsert(params);
         }
-        if (updateParams.size() != 0) {
-            int updateCount = erc20TokenMapper.batchUpdateTxCount(updateParams);
+        if(!erc20TokenUpdateList.isEmpty()) {
+        	customErc20TokenMapper.batchUpdate(erc20TokenUpdateList);
         }
-
         if (log.isDebugEnabled()) {
             log.debug("erc20TokenConvert ~ 处理耗时:{} ms", System.currentTimeMillis() - startTime
                     + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
