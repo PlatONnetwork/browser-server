@@ -56,8 +56,7 @@ public interface AppDocErc20TokenTransferRecord {
      *          "result":1,                 // 转账结果（1 成功，0 失败）
      *          "blockTimestamp":11,        // 转账时间（时间戳）
      *          "value":11,                 // 交易对应的value值
-     *          "createTime":11,            // 交易处理时间（时间戳）
-     *          "type":1,                   // 交易方向（相对于检索条件address: INPUT 进账，OUT 出账）
+     *          "type":1,                   // 交易方向（相对于检索条件address: INPUT 进账，OUT 出账，NONE 无方向）
      *      }...{}
      *   ]
      * }

@@ -27,4 +27,6 @@ public interface Erc20TokenMapper {
 
     int batchInsert(@Param("list") List<Erc20Token> list);
 
+    int batchUpdateTxCount(@Param("list") List<Erc20Token> list);
+
 }

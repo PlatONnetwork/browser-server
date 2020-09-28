@@ -173,6 +173,7 @@ public class QueryTokenTransferRecordListResp {
 
         INPUT("INPUT"),
         OUT("OUT"),
+        NONE("NONE"),
         ;
 
         String type;
