@@ -256,4 +256,14 @@
         #{item.txCount,jdbcType=INTEGER}, now())
     </foreach>
   </insert>
+
+  <update id="batchUpdateTxCount">
+    <foreach collection="list" item="item" index="index" separator="">
+      update `erc20_token` set
+      `tx_count` = `tx_count` + #{item.txCount}
+      where
+      `address` = #{item.address};
+    </foreach>
+  </update>
+
 </mapper>

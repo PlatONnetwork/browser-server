@@ -168,7 +168,10 @@ public class StatisticsAddressConverter {
         List<Erc20Token> tokenList = erc20TokenMapper.selectByExample(tokenCondition);
 
         // 过滤重复的数据，DB 中已经存在的，则不进行再次插入
+        // 重复的数据实施更新，添加txCount数量
+        List<Erc20Token> updateParams = new ArrayList<>();
         tokenList.forEach(dbToken -> {
+            updateParams.add(dbToken);
             erc20TokenMap.remove(dbToken.getAddress());
         });
 
@@ -183,6 +186,10 @@ public class StatisticsAddressConverter {
         if(null != params && params.size() != 0){
             result = erc20TokenMapper.batchInsert(params);
         }
+        if (updateParams.size() != 0) {
+            int updateCount = erc20TokenMapper.batchUpdateTxCount(updateParams);
+        }
+
         if (log.isDebugEnabled()) {
             log.debug("erc20TokenConvert ~ 处理耗时:{} ms", System.currentTimeMillis() - startTime
                     + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
