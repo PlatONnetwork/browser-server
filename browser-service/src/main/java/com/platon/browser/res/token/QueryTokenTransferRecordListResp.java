@@ -52,7 +52,7 @@ public class QueryTokenTransferRecordListResp {
     @ApiModelProperty(value = "交易value金额（单位：LAT）")
     private BigDecimal value;
     @ApiModelProperty(value = "数据记录时间")
-    private Date createTime;
+    private Date systemTimestamp;
     @ApiModelProperty(value = "交易方向：INPUT 入账，OUT 出账")
     private String type;   // 交易类型：input 进账， out 出账
 
@@ -161,12 +161,12 @@ public class QueryTokenTransferRecordListResp {
         this.value = value;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getSystemTimestamp() {
+        return systemTimestamp;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setSystemTimestamp(Date systemTimestamp) {
+        this.systemTimestamp = systemTimestamp;
     }
 
     public static enum TransferType {
