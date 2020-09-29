@@ -119,7 +119,7 @@ public class TransactionServiceImpl implements TransactionService {
          */
         List<TransactionListResp> lists = this.transferList(items);
         NetworkStat networkStat = this.statisticCacheService.getNetworkStatCache();
-        result.init(lists, networkStat.getTxQty(), transactionCacheDto.getPage().getTotalCount(),
+        result.init(lists, null == networkStat.getTxQty() ? 0 : networkStat.getTxQty(), transactionCacheDto.getPage().getTotalCount(),
             transactionCacheDto.getPage().getTotalPages());
         return result;
     }
