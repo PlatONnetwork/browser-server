@@ -107,7 +107,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 .transferTo(record.getTto()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
                 .methodSign(record.getSign()).result(record.getResult())
-                .blockTimestamp(record.getBTime()).systemTimestamp(new Date())
+                .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
                 .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .build();
         // Processing accuracy calculation.
