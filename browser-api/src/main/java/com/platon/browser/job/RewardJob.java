@@ -64,18 +64,18 @@ public class RewardJob {
     @Value("${output.file.url}")
     private String fileUrl;
 
-    private final static String rewardKey = "REWARD_KEY";
+    private final static String REWARD_KEY = "REWARD_KEY";
 
-    private final static String roundKey = "ROUND_KEY";
+    private final static String ROUND_KEY = "ROUND_KEY";
 
     @Scheduled(cron = "0/5 * * * * ?")
     public void exportRewardNode() {
         try {
-            String v = this.redisFactory.createRedisCommands().setnx(rewardKey, rewardKey, 30000l);
+            String v = this.redisFactory.createRedisCommands().setnx(REWARD_KEY, REWARD_KEY, 30000l);
             if (!"OK".equals(v)) {
                 return;
             }
-            String consensus = this.redisFactory.createRedisCommands().get(roundKey);
+            String consensus = this.redisFactory.createRedisCommands().get(ROUND_KEY);
             int conL = 0;
             if (StringUtils.isNotBlank(consensus)) {
                 conL = Integer.valueOf(consensus);
@@ -118,27 +118,29 @@ public class RewardJob {
                 });
                 String[] headers = new String[] {"nodeId", "nodeName"};
                 this.buildFile(startNum + "_" + endNum + "_reward.csv", rs, headers);
-                this.redisFactory.createRedisCommands().set(roundKey, String.valueOf(conL + this.limitNum));
+                this.redisFactory.createRedisCommands().set(ROUND_KEY, String.valueOf(conL + this.limitNum));
             }
         } catch (Exception e) {
             log.error("exportRewardNode fail", e);
         } finally {
-            this.redisFactory.createRedisCommands().del(rewardKey);
+            this.redisFactory.createRedisCommands().del(REWARD_KEY);
         }
 
     }
 
     private void buildFile(String fileName, List<Object[]> rows, String[] headers) {
+        FileOutputStream fis = null;
+        OutputStreamWriter outputWriter = null;
         try {
             File file = new File(this.fileUrl);
             if (!file.exists()) {
                 file.mkdir();
             }
             /** 初始化输出流对象 */
-            FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName);
+            fis = new FileOutputStream(this.fileUrl + fileName);
             /** 设置返回的头，防止csv乱码 */
             fis.write(new byte[] {(byte)0xEF, (byte)0xBB, (byte)0xBF});
-            OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
+            outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
             /** 厨师书writer对象 */
             CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
             if (headers != null) {
@@ -148,6 +150,18 @@ public class RewardJob {
         } catch (IOException e) {
             log.error("数据输出错误:", e);
             return;
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+                if (outputWriter != null) {
+                    outputWriter.close();
+                }
+            } catch (IOException e) {
+                log.info("关闭失败", e);
+            }
+
         }
         log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
     }

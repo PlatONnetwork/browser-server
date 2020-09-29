@@ -53,6 +53,7 @@ spring:
       delegationIndexName: browser_delegation_testsonar
       nodeOptIndexName: browser_nodeopt_testsonar
       delegationRewardIndexName: browser_delegation_reward_testsonar
+      innerTxIndexName: browser_inner_tx_testsonar
 #redis配置
 redisCluster:
   configKey: DEFAULT

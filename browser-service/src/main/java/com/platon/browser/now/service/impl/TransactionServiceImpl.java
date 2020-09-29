@@ -1,5 +1,25 @@
 package com.platon.browser.now.service.impl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -53,25 +73,6 @@ import com.platon.browser.util.*;
 import com.platon.browser.utils.HexTool;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * 交易方法逻辑实现
@@ -499,7 +500,7 @@ public class TransactionServiceImpl implements TransactionService {
                         // 通过txHash关联un_delegation表
                         DelegateExitParam unDelegateParam = JSON.parseObject(txInfo, DelegateExitParam.class);
                         resp.setNodeId(unDelegateParam.getNodeId());
-                        resp.setApplyAmount(unDelegateParam.getAmount());
+                        resp.setApplyAmount(unDelegateParam.getRealAmount());
                         resp.setTxAmount(unDelegateParam.getReward());
                         resp.setNodeName(
                             this.commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
@@ -722,7 +723,8 @@ public class TransactionServiceImpl implements TransactionService {
                             // decimal convert
                             erc20Params.forEach(erc -> {
                                 int decimal = Integer.parseInt(erc.getInnerDecimal());
-                                BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc.getInnerValue()), decimal);
+                                BigDecimal afterConverValue =
+                                    ConvertUtil.convertByFactor(new BigDecimal(erc.getInnerValue()), decimal);
                                 erc.setInnerValue(afterConverValue.toString());
                             });
                             resp.setErc20Params(erc20Params);
@@ -935,6 +937,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public RespPage<QueryInnerTxByAddrResp> queryInnerByAddr(QueryInnerByAddrReq req) {
+        RespPage<QueryInnerTxByAddrResp> result = new RespPage<>();
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         /*
          * 根据不同的类型设置不同的查询条件
@@ -955,6 +958,7 @@ public class TransactionServiceImpl implements TransactionService {
                 req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
+            return result;
         }
         List<QueryInnerTxByAddrResp> queryInnerTxByAddrResps = new ArrayList<>();
         for (ESTokenTransferRecord esTokenTransferRecord : esTokenTransferRecordESResult.getRsData()) {
@@ -966,7 +970,6 @@ public class TransactionServiceImpl implements TransactionService {
             queryInnerTxByAddrResp.setTransValue(transValue);
             queryInnerTxByAddrResps.add(queryInnerTxByAddrResp);
         }
-        RespPage<QueryInnerTxByAddrResp> result = new RespPage<>();
         long total = esTokenTransferRecordESResult.getTotal() > 5000 ? 5000 : esTokenTransferRecordESResult.getTotal();
         result.init(queryInnerTxByAddrResps, total, total, 0l);
         return result;

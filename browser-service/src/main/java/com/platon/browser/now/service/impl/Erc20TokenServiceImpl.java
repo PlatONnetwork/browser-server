@@ -1,5 +1,14 @@
 package com.platon.browser.now.service.impl;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenDetailWithBLOBs;
 import com.platon.browser.dao.mapper.Erc20TokenDetailMapper;
@@ -12,15 +21,8 @@ import com.platon.browser.res.token.QueryTokenDetailResp;
 import com.platon.browser.res.token.QueryTokenListResp;
 import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.PageHelper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Token模块实现类
@@ -48,8 +50,8 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         params.put("offset", pageParams.getOffset());
         params.put("status", "1");
 
-        List<Erc20Token> tokenList = erc20TokenMapper.listErc20Token(params);
-        int totalCount = erc20TokenMapper.totalErc20Token(params);
+        List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20Token(params);
+        int totalCount = this.erc20TokenMapper.totalErc20Token(params);
         if (null == tokenList) {
             return result;
         }
@@ -59,17 +61,17 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         }).collect(Collectors.toList());
 
         result.init(queryTokenList, totalCount, tokenList.size(),
-                PageHelper.getPageTotal(totalCount, pageParams.getSize()));
+            PageHelper.getPageTotal(totalCount, pageParams.getSize()));
         return result;
     }
 
     @Override
     public QueryTokenDetailResp queryTokenDetail(QueryTokenDetailReq req) {
         // main info.
-        Erc20Token erc20Token = erc20TokenMapper.selectByAddress(req.getAddress());
+        Erc20Token erc20Token = this.erc20TokenMapper.selectByAddress(req.getAddress());
 
         // attach info.
-        Erc20TokenDetailWithBLOBs detailWithBLOBs = erc20TokenDetailMapper.selectByAddress(req.getAddress());
+        Erc20TokenDetailWithBLOBs detailWithBLOBs = this.erc20TokenDetailMapper.selectByAddress(req.getAddress());
         QueryTokenDetailResp response = QueryTokenDetailResp.fromErc20Token(erc20Token);
         if (detailWithBLOBs != null && response != null) {
             response.setIcon(detailWithBLOBs.getIcon());
@@ -77,22 +79,23 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
             response.setAbi(detailWithBLOBs.getAbi());
             response.setBinCode(detailWithBLOBs.getBinCode());
             response.setSourceCode(detailWithBLOBs.getSourceCode());
-        }
-        // cal total supply -> decimal
-        if(erc20Token != null){
-            BigDecimal totalSupply = ConvertUtil.convertByFactor(erc20Token.getTotalSupply(), erc20Token.getDecimal());
-            response.setTotalSupply(totalSupply);
+            // cal total supply -> decimal
+            if (erc20Token != null) {
+                BigDecimal totalSupply =
+                    ConvertUtil.convertByFactor(erc20Token.getTotalSupply(), erc20Token.getDecimal());
+                response.setTotalSupply(totalSupply);
+            }
         }
         return response;
     }
 
     @Override
     public int save(Erc20Token token) {
-        return erc20TokenMapper.insert(token);
+        return this.erc20TokenMapper.insert(token);
     }
 
     @Override
     public int batchSave(List<Erc20Token> list) {
-        return erc20TokenMapper.batchInsert(list);
+        return this.erc20TokenMapper.batchInsert(list);
     }
 }
