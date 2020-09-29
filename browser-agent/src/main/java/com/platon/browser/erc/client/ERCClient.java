@@ -176,7 +176,7 @@ public class ERCClient implements ERCInterface {
                     Erc20Token erc20Token = erc20Tokens.get(esTokenTransferRecord.getContract());
                     // 先缓存中获取
                     if (erc20Token == null) {
-                        erc20Token = addressCache.getAllErc20TokenMap().get(esTokenTransferRecord.getContract());
+                        erc20Token = addressCache.getErc20Token(esTokenTransferRecord.getContract());
                         // 防止参数erc数据为null
                         if (null == erc20Token || StringUtils.isBlank(erc20Token.getName())) {
                             erc20Token = null;

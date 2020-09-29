@@ -2,6 +2,7 @@ package com.platon.browser.common.complement.cache;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
@@ -26,9 +27,11 @@ import com.platon.browser.param.claim.Reward;
 public class AddressCache {
     // 当前地址缓存，此缓存会在StatisticsAddressConverter执行完业务逻辑后被清除，
     // 所以这是上一次执行StatisticsAddressConverter业务时到当前的累计地址缓存，并不是全部的
-    private Map<String, Address> addressMap = new HashMap<>();
+    private Map<String, Address> addressMap = new ConcurrentHashMap<>();
 
-    private Map<String, Erc20Token> erc20TokenMap = new HashMap<>();
+    private Map<String, Erc20Token> erc20TokenMap = new ConcurrentHashMap<>();
+
+    private Map<String, Erc20Token> preErc20TokenMap = new ConcurrentHashMap<>();
 
     // 全量EVM合约地址缓存
     private Set<String> evmContractAddressCache = new HashSet<>();
@@ -126,15 +129,22 @@ public class AddressCache {
         return this.erc20TokenMap.values();
     }
 
-    public Map<String, Erc20Token> getAllErc20TokenMap() {
-        return this.erc20TokenMap;
+    public Erc20Token getErc20Token(String contractAddress) {
+        Erc20Token erc20Token = this.erc20TokenMap.get(contractAddress);
+        // 防止参数erc数据为null
+        if (null == erc20Token) {
+            erc20Token = this.preErc20TokenMap.get(contractAddress);
+        }
+        return erc20Token;
     }
 
     public void cleanAll() {
         this.addressMap.clear();
     }
 
-    public void cleanErc20TokenCache() {
+    public synchronized void cleanErc20TokenCache() {
+        this.preErc20TokenMap.clear();
+        this.preErc20TokenMap.putAll(this.erc20TokenMap);
         this.erc20TokenMap.clear();
     }
 
