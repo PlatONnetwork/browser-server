@@ -486,7 +486,7 @@ public class TransactionServiceImpl implements TransactionService {
 						// 通过txHash关联un_delegation表
 						DelegateExitParam unDelegateParam = JSON.parseObject(txInfo, DelegateExitParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
-						resp.setApplyAmount(unDelegateParam.getAmount());
+						resp.setApplyAmount(unDelegateParam.getRealAmount());
 						resp.setTxAmount(unDelegateParam.getReward());
 						resp.setNodeName(commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						break;

@@ -122,7 +122,6 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
         log.error("犹豫期金额：{}",delegation.getDelegateHes());
         log.error("锁定期金额：{}",delegation.getDelegateLocked());
-
         log.error("待提取金额：{}",delegation.getDelegateReleased());
         log.error("申请赎回：{}",txParam.getAmount());
         log.error("委托门槛：{}",chainConfig.getDelegateThreshold());
