@@ -126,6 +126,7 @@ subprojects {
 	    exclude '**/CustomNodeMapperTest.class'
 	    exclude '**/StakingContractTest.class'
 	    exclude '**/WASMUploadTest.class'
+	    exclude '**/WASMDestructTest.class'
 	    exclude '**/SuicideAndSelfdestructTest.class'
 	    exclude '**/HumanStandardTokenTest.class'
 	    exclude '**/proxyppos/*Test.class'

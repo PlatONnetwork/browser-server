@@ -1,5 +1,19 @@
 package com.platon.browser.erc.client;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -11,20 +25,8 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.param.Erc20Param;
 import com.platon.browser.utils.NetworkParms;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @program: browser-server
@@ -132,18 +134,18 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public List<TransferEvent> getTransferEvents(TransactionReceipt transactionReceipt) {
-    	this.init(transactionReceipt.getContractAddress());
+        this.init(transactionReceipt.getContractAddress());
         List<TransferEvent> transferEvents = new ArrayList<>();
         try {
             List<ERC20Client.TransferEventResponse> transferEventResponses =
                 this.erc20Client.getTransferEvents(transactionReceipt);
-            transferEventResponses.forEach(transferEventRespon ->{
-            	TransferEvent transferEvent = new TransferEvent();
-            	transferEvent.setFrom(transferEventRespon.from);
-            	transferEvent.setTo(transferEventRespon.to);
-            	transferEvent.setValue(transferEventRespon.value);
-            	transferEvent.setLog(transferEventRespon.log);
-            	transferEvents.add(transferEvent);
+            transferEventResponses.forEach(transferEventRespon -> {
+                TransferEvent transferEvent = new TransferEvent();
+                transferEvent.setFrom(transferEventRespon.from);
+                transferEvent.setTo(transferEventRespon.to);
+                transferEvent.setValue(transferEventRespon.value);
+                transferEvent.setLog(transferEventRespon.log);
+                transferEvents.add(transferEvent);
             });
         } catch (Exception e) {
             log.error(" erc get transferEvents error", e);
@@ -172,6 +174,17 @@ public class ERCClient implements ERCInterface {
                 transaction.getEsTokenTransferRecords().stream().forEach(esTokenTransferRecord -> {
                     // 存量的erc20参数，提高访问速度
                     Erc20Token erc20Token = erc20Tokens.get(esTokenTransferRecord.getContract());
+                    // 先缓存中获取
+                    if (erc20Token == null) {
+                        erc20Token = addressCache.getAllErc20TokenMap().get(esTokenTransferRecord.getContract());
+                        // 防止参数erc数据为null
+                        if (StringUtils.isBlank(erc20Token.getName())) {
+                            erc20Token = null;
+                        } else {
+                            erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);
+                        }
+                    }
+                    // 如果数据不存在再从从数据库中获取数据
                     if (erc20Token == null) {
                         erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
                         erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);

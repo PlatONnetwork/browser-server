@@ -4,16 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platon.browser.config.BrowserCache;
 import com.platon.browser.config.MessageDto;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.BlockService;
+import com.platon.browser.now.service.Erc20TokenService;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.now.service.TransactionService;
+import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.newblock.BlockDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.AliveStakingListReq;
+import com.platon.browser.req.token.QueryTokenDetailReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.home.BlockStatisticNewResp;
@@ -61,15 +65,29 @@ public class StompPushJob {
     private TransactionService transactionService;
     @Autowired
     private ParameterService parameterService;
+    @Autowired
+    private StatisticCacheService statisticCacheService;
+    @Autowired
+    private Erc20TokenService erc20TokenService;
+    
+    private boolean checkData() {
+    	NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+    	if(networkStatRedis == null) {
+    		return false;
+    	}
+    	return true;
+    }
     
     /**
      * 	推送统计相关信息
      */
     @Scheduled(cron="0/3 * * * * ?")
     public void pushChainStatisticNew(){
-    	ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
-    	BaseResp<ChainStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
-		messagingTemplate.convertAndSend("/topic/chain/statistic/new", resp);
+    	if(checkData()) {
+			ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
+			BaseResp<ChainStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
+			messagingTemplate.convertAndSend("/topic/chain/statistic/new", resp);
+    	}
     }
     
     /**
@@ -77,9 +95,11 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/3 * * * * ?")
     public void pushBlockStatisticNew(){
-    	BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
-    	BaseResp<BlockStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
-		messagingTemplate.convertAndSend("/topic/block/statistic/new", resp);
+    	if(checkData()) {
+	    	BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
+	    	BaseResp<BlockStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
+			messagingTemplate.convertAndSend("/topic/block/statistic/new", resp);
+    	}
     }
     
     /**
@@ -87,9 +107,11 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushStakingListNew() {
-    	StakingListNewResp stakingListNewResp = homeService.stakingListNew();
-		BaseResp<StakingListNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
-		messagingTemplate.convertAndSend("/topic/staking/list/new", resp);
+    	if(checkData()) {
+	    	StakingListNewResp stakingListNewResp = homeService.stakingListNew();
+			BaseResp<StakingListNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
+			messagingTemplate.convertAndSend("/topic/staking/list/new", resp);
+    	}
     }
     
     
@@ -98,9 +120,11 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushStakingStatisticNew() {
-    	StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
-		BaseResp<StakingStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingStatisticNewResp);
-		messagingTemplate.convertAndSend("/topic/staking/statistic/new", resp);
+    	if(checkData()) {
+	    	StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
+			BaseResp<StakingStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingStatisticNewResp);
+			messagingTemplate.convertAndSend("/topic/staking/statistic/new", resp);
+    	}
     }
     
     /**
@@ -109,29 +133,31 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushStakingChangeNew() throws JsonProcessingException {
-    	for (Entry<String, List<String>> m : BrowserCache.getKeys().entrySet()) {
-    		MessageDto messageDto = new MessageDto();
-    		messageDto = messageDto.analysisKey(m.getKey());
-    		AliveStakingListReq req = new AliveStakingListReq();
-    		BeanUtils.copyProperties(messageDto, req);
-    		RespPage<AliveStakingListResp> alives = stakingService.aliveStakingList(req);
-    		for(String userNo:  m.getValue()) {
-    			try {
-    				ObjectMapper mapper = new ObjectMapper();  
-    				BrowserCache.sendMessage(userNo, mapper.writeValueAsString(alives));
-    			}catch (Exception e) {
-    				BrowserCache.getWebSocketSet().remove(userNo);
-    				m.getValue().remove(userNo);
-    				/**
-    				 * 只有没有用户列表时候才需要remove整个key
-    				 */
-    				if(m.getValue().isEmpty()) {
-    					BrowserCache.getKeys().remove(m.getKey());
-    					break;
-    				}
-					logger.error("连接异常清楚连接",e);
-				}
-    		}
+    	if(checkData()) {
+	    	for (Entry<String, List<String>> m : BrowserCache.getKeys().entrySet()) {
+	    		MessageDto messageDto = new MessageDto();
+	    		messageDto = messageDto.analysisKey(m.getKey());
+	    		AliveStakingListReq req = new AliveStakingListReq();
+	    		BeanUtils.copyProperties(messageDto, req);
+	    		RespPage<AliveStakingListResp> alives = stakingService.aliveStakingList(req);
+	    		for(String userNo:  m.getValue()) {
+	    			try {
+	    				ObjectMapper mapper = new ObjectMapper();  
+	    				BrowserCache.sendMessage(userNo, mapper.writeValueAsString(alives));
+	    			}catch (Exception e) {
+	    				BrowserCache.getWebSocketSet().remove(userNo);
+	    				m.getValue().remove(userNo);
+	    				/**
+	    				 * 只有没有用户列表时候才需要remove整个key
+	    				 */
+	    				if(m.getValue().isEmpty()) {
+	    					BrowserCache.getKeys().remove(m.getKey());
+	    					break;
+	    				}
+						logger.error("连接异常清楚连接",e);
+					}
+	    		}
+	    	}
     	}
     }
     
@@ -140,26 +166,34 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/20 * * * * ?")
     public void eswarm() {
-    	/**
-    	 * 区块index做warm
-    	 */
-    	BlockDetailsReq blockDetailsReq = new BlockDetailsReq();
-    	blockDetailsReq.setNumber(1);
-    	blockService.blockDetails(blockDetailsReq);
-    	TransactionListByBlockRequest transactionListByBlockRequest = new TransactionListByBlockRequest();
-    	/**
-    	 * 交易index做warm
-    	 */
-    	transactionListByBlockRequest.setBlockNumber(1);
-    	transactionListByBlockRequest.setPageNo(1);
-    	transactionListByBlockRequest.setPageSize(10);
-    	transactionService.getTransactionListByBlock(transactionListByBlockRequest);
-    	/**
-    	 * 交易index做warm
-    	 */
-    	TransactionDetailsReq transactionDetailsReq = new TransactionDetailsReq();
-    	transactionDetailsReq.setTxHash("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
-    	transactionService.transactionDetails(transactionDetailsReq);
+    	if(checkData()) {
+	    	/**
+	    	 * 区块index做warm
+	    	 */
+	    	BlockDetailsReq blockDetailsReq = new BlockDetailsReq();
+	    	blockDetailsReq.setNumber(1);
+	    	blockService.blockDetails(blockDetailsReq);
+	    	TransactionListByBlockRequest transactionListByBlockRequest = new TransactionListByBlockRequest();
+	    	/**
+	    	 * 交易index做warm
+	    	 */
+	    	transactionListByBlockRequest.setBlockNumber(1);
+	    	transactionListByBlockRequest.setPageNo(1);
+	    	transactionListByBlockRequest.setPageSize(10);
+	    	transactionService.getTransactionListByBlock(transactionListByBlockRequest);
+	    	/**
+	    	 * 交易index做warm
+	    	 */
+	    	TransactionDetailsReq transactionDetailsReq = new TransactionDetailsReq();
+	    	transactionDetailsReq.setTxHash("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
+	    	transactionService.transactionDetails(transactionDetailsReq);
+	    	/**
+	    	 * token交易index做warm
+	    	 */
+	    	QueryTokenDetailReq queryTokenDetailReq = new QueryTokenDetailReq();
+	    	queryTokenDetailReq.setAddress("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
+	    	erc20TokenService.queryTokenDetail(queryTokenDetailReq);
+    	}
     }
     
     
@@ -168,6 +202,8 @@ public class StompPushJob {
      */
     @Scheduled(cron="0 0/30 * * * ?")
     public void updateConfig() {
-    	parameterService.overrideBlockChainConfig();
+    	if(checkData()) {
+    		parameterService.overrideBlockChainConfig();
+    	}
     }
 }

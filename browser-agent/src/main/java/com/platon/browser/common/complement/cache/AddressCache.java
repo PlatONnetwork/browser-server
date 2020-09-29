@@ -3,7 +3,6 @@ package com.platon.browser.common.complement.cache;
 import java.math.BigDecimal;
 import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.platon.browser.common.collection.dto.ComplementInfo;
@@ -95,7 +94,7 @@ public class AddressCache {
     }
 
     // 先初始化合约map，防止后续合约交易找不到对应的合约而统计错误
-    public void updateFirst(String addr,ComplementInfo ci) {
+    public void updateFirst(String addr, ComplementInfo ci) {
         Address address = this.addressMap.get(addr);
         if (address == null) {
             address = this.createDefaultAddress(addr);
@@ -125,6 +124,10 @@ public class AddressCache {
 
     public Collection<Erc20Token> getAllErc20Token() {
         return this.erc20TokenMap.values();
+    }
+
+    public Map<String, Erc20Token> getAllErc20TokenMap() {
+        return this.erc20TokenMap;
     }
 
     public void cleanAll() {
