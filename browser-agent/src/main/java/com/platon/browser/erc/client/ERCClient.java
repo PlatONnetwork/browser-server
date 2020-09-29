@@ -187,7 +187,9 @@ public class ERCClient implements ERCInterface {
                     // 如果数据不存在再从从数据库中获取数据
                     if (erc20Token == null) {
                         erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
-                        erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);
+                        if (null != erc20Token) {
+                            erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);
+                        }
                     }
                     if (erc20Token != null) {
                         esTokenTransferRecord.setDecimal(erc20Token.getDecimal());
@@ -200,7 +202,7 @@ public class ERCClient implements ERCInterface {
                     Erc20Param erc20Param = Erc20Param.builder().innerContractAddr(esTokenTransferRecord.getContract())
                         .innerContractName(esTokenTransferRecord.getName()).innerFrom(esTokenTransferRecord.getFrom())
                         .innerSymbol(esTokenTransferRecord.getSymbol()).innerTo(esTokenTransferRecord.getTto())
-                        .innerValue(esTokenTransferRecord.getTValue()).build();
+                        .innerDecimal(String.valueOf(esTokenTransferRecord.getDecimal())).innerValue(esTokenTransferRecord.getTValue()).build();
                     erc20Params.add(erc20Param);
                 });
                 transaction.setInfo(JSONObject.toJSONString(erc20Params));

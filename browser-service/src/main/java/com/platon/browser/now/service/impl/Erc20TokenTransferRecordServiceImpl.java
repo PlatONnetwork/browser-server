@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,6 +89,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         }
 
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
+                .filter(p -> p != null && p.getDecimal() != null)
                 .map(p -> {
                     return toQueryTokenTransferRecordListResp(req.getAddress(), p);
                 }).collect(Collectors.toList());
@@ -105,7 +107,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 .transferTo(record.getTto()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
                 .methodSign(record.getSign()).result(record.getResult())
-                .blockTimestamp(record.getBTime())
+                .blockTimestamp(record.getBTime()).systemTimestamp(new Date())
                 .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .build();
         // Processing accuracy calculation.
