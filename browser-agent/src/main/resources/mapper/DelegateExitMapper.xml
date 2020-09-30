@@ -21,7 +21,7 @@
         </if>
         `total_value` = `total_value` - #{realRefundAmount},
         <if test="codeNodeIsLeave == false">
-        `stat_delegate_value` = `stat_delegate_value` -  #{realRefundAmount}, /*未退出节点需要在此处减掉真实退出金额*/
+        `stat_delegate_value` = `stat_delegate_value` -  #{realRefundAmount},
         </if>
         `stat_delegate_released` = `stat_delegate_released` - #{decrease.delegateReleased},
         `have_dele_reward` = `have_dele_reward` + #{delegateReward}
