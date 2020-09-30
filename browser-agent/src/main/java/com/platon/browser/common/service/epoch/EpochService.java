@@ -112,7 +112,11 @@ public class EpochService {
                         blockNode.setNodeId(node.getNodeId());
                         blockNode.setNodeName("");
                         com.platon.browser.dao.entity.Node nodeT = this.nodeMapper.selectByPrimaryKey(node.getNodeId());
-                        if(nodeT!=null) blockNode.setNodeName(nodeT.getNodeName());
+                        if (nodeT == null) {
+                            blockNode.setNodeName("");
+                        } else {
+                            blockNode.setNodeName(nodeT.getNodeName());
+                        }
                         blockNode.setStakingConsensusEpoch(max);
                         blockNode.setCreateTime(date);
                         blockNode.setUpdateTime(date);

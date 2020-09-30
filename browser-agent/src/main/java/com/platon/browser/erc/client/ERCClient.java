@@ -42,32 +42,24 @@ public class ERCClient implements ERCInterface {
     @Autowired
     private Erc20TokenMapper erc20TokenMapper;
 
-    private ERC20Client erc20Client;
-
-    private Lock lock = new ReentrantLock();
-
-    private void init(String contractAddress) {
+    private ERC20Client init(String contractAddress) {
         if (StringUtils.isBlank(contractAddress)) {
             throw new RuntimeException("contractAddress is not null");
         }
-        if (this.erc20Client == null) {
-            try {
-                this.lock.lock();
-                this.erc20Client = new ERC20Client(contractAddress, this.platOnClient.getWeb3jWrapper().getWeb3j(),
-                    Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
-                    NetworkParms.getChainId());
-            } finally {
-                this.lock.unlock();
-            }
-        }
+        ERC20Client erc20Client = new ERC20Client(contractAddress, this.platOnClient.getWeb3jWrapper().getWeb3j(),
+            Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
+            NetworkParms.getChainId());
+        return erc20Client;
     }
 
     @Override
     public String getName(String contractAddress) {
-        this.init(contractAddress);
+        ERC20Client erc20Client = this.init(contractAddress);
         String name = "";
         try {
-            name = this.erc20Client.name().send();
+            name = erc20Client.name().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.debug(" erc get name error", e);
         }
@@ -76,10 +68,12 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public String getSymbol(String contractAddress) {
-        this.init(contractAddress);
+        ERC20Client erc20Client = this.init(contractAddress);
         String symbol = "";
         try {
-            symbol = this.erc20Client.symbol().send();
+            symbol = erc20Client.symbol().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get symbol error", e);
         }
@@ -88,10 +82,12 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public BigInteger getDecimals(String contractAddress) {
-        this.init(contractAddress);
+        ERC20Client erc20Client = this.init(contractAddress);
         BigInteger decimal = null;
         try {
-            decimal = this.erc20Client.decimals().send();
+            decimal = erc20Client.decimals().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get decimal error", e);
         }
@@ -100,10 +96,12 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public BigInteger getTotalSupply(String contractAddress) {
-        this.init(contractAddress);
+        ERC20Client erc20Client = this.init(contractAddress);
         BigInteger totalSupply = null;
         try {
-            totalSupply = this.erc20Client.totalSupply().send();
+            totalSupply = erc20Client.totalSupply().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get totalSupply error", e);
         }
@@ -132,11 +130,11 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public List<TransferEvent> getTransferEvents(TransactionReceipt transactionReceipt) {
-        this.init(transactionReceipt.getContractAddress());
+        ERC20Client erc20Client = this.init(transactionReceipt.getContractAddress());
         List<TransferEvent> transferEvents = new ArrayList<>();
         try {
             List<ERC20Client.TransferEventResponse> transferEventResponses =
-                this.erc20Client.getTransferEvents(transactionReceipt);
+                erc20Client.getTransferEvents(transactionReceipt);
             transferEventResponses.forEach(transferEventRespon -> {
                 TransferEvent transferEvent = new TransferEvent();
                 transferEvent.setFrom(transferEventRespon.from);
@@ -153,10 +151,11 @@ public class ERCClient implements ERCInterface {
 
     @Override
     public List<TransferEvent> getApprovalEvents(TransactionReceipt transactionReceipt) {
+        ERC20Client erc20Client = this.init(transactionReceipt.getContractAddress());
         List<TransferEvent> transferEvents = null;
         try {
             List<ERC20Client.ApprovalEventResponse> approvalEventResponses =
-                this.erc20Client.getApprovalEvents(transactionReceipt);
+                erc20Client.getApprovalEvents(transactionReceipt);
         } catch (Exception e) {
             log.error(" erc get transferEvents error", e);
         }
