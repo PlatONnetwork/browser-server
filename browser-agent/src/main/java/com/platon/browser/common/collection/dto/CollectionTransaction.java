@@ -1,11 +1,5 @@
 package com.platon.browser.common.collection.dto;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.SpecialApi;
@@ -21,8 +15,12 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
 
 @Slf4j
 public class CollectionTransaction extends Transaction {
@@ -43,7 +41,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithRawTransaction(org.web3j.protocol.core.methods.response.Transaction transaction) {
+    CollectionTransaction updateWithRawTransaction(com.alaya.protocol.core.methods.response.Transaction transaction) {
         this.setNum(transaction.getBlockNumber().longValue()).setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash()).setValue(transaction.getValue().toString())
             .setIndex(transaction.getTransactionIndex().intValue()).setGasPrice(transaction.getGasPrice().toString())

@@ -8,6 +8,9 @@ import com.alaya.rlp.solidity.RlpType;
 import com.alaya.utils.Numeric;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigInteger;
+import java.util.List;
+
 public class Receipt {
     private static final int SUCCESS = 1;
     private static final int FAILURE = 2;

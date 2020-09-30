@@ -1,26 +1,25 @@
 package com.platon.browser.erc.client;
 
+import com.alaya.abi.solidity.EventEncoder;
+import com.alaya.abi.solidity.TypeReference;
+import com.alaya.abi.solidity.datatypes.*;
+import com.alaya.abi.solidity.datatypes.generated.Uint256;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameter;
+import com.alaya.protocol.core.RemoteCall;
+import com.alaya.protocol.core.methods.request.PlatonFilter;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Contract;
+import com.alaya.tx.gas.GasProvider;
+import rx.Observable;
+import rx.functions.Func1;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.*;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.request.PlatonFilter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Contract;
-import org.web3j.tx.gas.GasProvider;
-
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * @program: browser-server
@@ -128,7 +127,7 @@ public class ERC20Client extends Contract {
     public static final Event UNPAUSE_EVENT = new Event("Unpause", Arrays.<TypeReference<?>>asList());
 
     public ERC20Client(final String contractAddress, final Web3j web3j, final Credentials credentials,
-        final GasProvider gasProvider, final long chainId) {
+                       final GasProvider gasProvider, final long chainId) {
         super("", contractAddress, web3j, credentials, gasProvider, chainId);
     }
 

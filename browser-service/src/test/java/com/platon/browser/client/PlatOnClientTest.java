@@ -1,5 +1,9 @@
 package com.platon.browser.client;
 
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.Request;
+import com.alaya.protocol.core.Response;
+import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,10 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.platon.bean.EconomicConfig;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.Request;
-import com.alaya.protocol.core.Response;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;

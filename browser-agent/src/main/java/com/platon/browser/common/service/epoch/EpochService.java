@@ -1,12 +1,6 @@
 package com.platon.browser.common.service.epoch;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.alaya.contracts.ppos.dto.resp.Node;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.BlockNode;
@@ -14,10 +8,15 @@ import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 周期切换服务
@@ -107,12 +106,16 @@ public class EpochService {
                 if (prevBlockNumber.longValue() / this.chainConfig.getConsensusPeriodBlockCount().longValue() >= max) {
                     max = max + 1;
                     List<BlockNode> blockNodes = new ArrayList<>(32);
+                    Date date = new Date();
                     nodes.forEach(node -> {
                         BlockNode blockNode = new BlockNode();
                         blockNode.setNodeId(node.getNodeId());
+                        blockNode.setNodeName("");
                         com.platon.browser.dao.entity.Node nodeT = this.nodeMapper.selectByPrimaryKey(node.getNodeId());
-                        blockNode.setNodeName(nodeT.getNodeName());
+                        if(nodeT!=null) blockNode.setNodeName(nodeT.getNodeName());
                         blockNode.setStakingConsensusEpoch(max);
+                        blockNode.setCreateTime(date);
+                        blockNode.setUpdateTime(date);
                         blockNodes.add(blockNode);
                     });
                     this.customBlockNodeMapper.batchInsert(blockNodes);
