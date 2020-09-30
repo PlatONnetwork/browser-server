@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.tx.exceptions.ContractCallException;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
@@ -58,6 +59,8 @@ public class ERCClient implements ERCInterface {
         String name = "";
         try {
             name = erc20Client.name().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get name error", e);
         }
@@ -70,6 +73,8 @@ public class ERCClient implements ERCInterface {
         String symbol = "";
         try {
             symbol = erc20Client.symbol().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get symbol error", e);
         }
@@ -82,6 +87,8 @@ public class ERCClient implements ERCInterface {
         BigInteger decimal = null;
         try {
             decimal = erc20Client.decimals().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get decimal error", e);
         }
@@ -94,6 +101,8 @@ public class ERCClient implements ERCInterface {
         BigInteger totalSupply = null;
         try {
             totalSupply = erc20Client.totalSupply().send();
+        } catch (ContractCallException e) {
+            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
             log.error(" erc get totalSupply error", e);
         }

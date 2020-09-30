@@ -111,7 +111,11 @@ public class EpochService {
                         BlockNode blockNode = new BlockNode();
                         blockNode.setNodeId(node.getNodeId());
                         com.platon.browser.dao.entity.Node nodeT = this.nodeMapper.selectByPrimaryKey(node.getNodeId());
-                        blockNode.setNodeName(nodeT.getNodeName());
+                        if (nodeT == null) {
+                            blockNode.setNodeName("");
+                        } else {
+                            blockNode.setNodeName(nodeT.getNodeName());
+                        }
                         blockNode.setStakingConsensusEpoch(max);
                         blockNodes.add(blockNode);
                     });
