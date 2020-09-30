@@ -1,20 +1,14 @@
 package com.platon.browser.evm.bean;
 
-import com.platon.browser.client.Receipt;
-import com.platon.browser.client.ReceiptResult;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 public class CollectionBlock extends Block {
     private CollectionBlock(){}

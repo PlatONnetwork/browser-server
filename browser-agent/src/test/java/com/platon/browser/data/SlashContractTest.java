@@ -1,15 +1,15 @@
 package com.platon.browser.data;//package com.platon.browser.data;
 
-import com.platon.sdk.contracts.ppos.SlashContract;
-import com.platon.sdk.contracts.ppos.dto.CallResponse;
-import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
-import com.platon.sdk.contracts.ppos.dto.common.DuplicateSignType;
+import com.alaya.contracts.ppos.SlashContract;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.TransactionResponse;
+import com.alaya.contracts.ppos.dto.common.DuplicateSignType;
 import org.junit.Before;
 import org.junit.Test;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
-import org.web3j.protocol.http.HttpService;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
+import com.alaya.protocol.http.HttpService;
 
 import java.math.BigInteger;
 

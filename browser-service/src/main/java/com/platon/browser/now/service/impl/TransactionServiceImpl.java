@@ -1,25 +1,5 @@
 package com.platon.browser.now.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -73,10 +53,29 @@ import com.platon.browser.util.*;
 import com.platon.browser.utils.HexTool;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.alaya.utils.Convert;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 交易方法逻辑实现
- * 
+ *
  * @file TransactionServiceImpl.java
  * @description
  * @author zhangrj
@@ -250,22 +249,23 @@ public class TransactionServiceImpl implements TransactionService {
              * 判断是否为to地址 如果为to地址则导出报表为收入金额 如果为from地址则导出报表为支出金额
              */
             boolean toIsAddress = address.equals(transaction.getTo());
-            String valueIn = toIsAddress ? transaction.getValue() : "0";
-            String valueOut = !toIsAddress ? transaction.getValue() : "0";
-            Object[] row = {transaction.getHash(), transaction.getNum(),
-                DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
-                /**
-                 * 枚举类型名称需要对应
-                 */
-                this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
-                transaction.getFrom(), transaction.getTo(),
-                /** 数值von转换成lat，并保留十八位精确度 */
-                HexTool.append(
-                    EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
-                HexTool.append(EnergonUtil
-                    .format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
-                HexTool.append(EnergonUtil.format(
-                    Convert.fromVon(transaction.getCost(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))};
+            String valueIn = toIsAddress? transaction.getValue() : "0";
+            String valueOut = !toIsAddress? transaction.getValue() : "0";
+            Object[] row = {
+                    transaction.getHash(),
+                    transaction.getNum(),
+                    DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
+                    /**
+                     * 枚举类型名称需要对应
+                     */
+                    i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
+                    transaction.getFrom(),
+                    transaction.getTo(),
+                    /** 数值von转换成lat，并保留十八位精确度 */
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.ATP).setScale(18,RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.ATP).setScale(18,RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN), 18))
+            };
             rows.add(row);
         });
         /** 初始化输出流对象 */
@@ -741,7 +741,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * 提案信息统一转换
-     * 
+     *
      * @method transferTransaction
      * @param resp
      * @param hash
@@ -764,7 +764,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * 统一设置验证人keybaseurl
-     * 
+     *
      * @method getStakingUrl
      * @param externalId
      * @param txReceiptStatus

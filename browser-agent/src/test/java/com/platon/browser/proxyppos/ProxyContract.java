@@ -1,21 +1,18 @@
 package com.platon.browser.proxyppos;
 
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.DynamicBytes;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.request.PlatonFilter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Contract;
-import org.web3j.tx.TransactionManager;
-import org.web3j.tx.gas.GasProvider;
+import com.alaya.abi.solidity.EventEncoder;
+import com.alaya.abi.solidity.TypeReference;
+import com.alaya.abi.solidity.datatypes.*;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameter;
+import com.alaya.protocol.core.RemoteCall;
+import com.alaya.protocol.core.methods.request.PlatonFilter;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Contract;
+import com.alaya.tx.TransactionManager;
+import com.alaya.tx.gas.GasProvider;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -28,7 +25,7 @@ import java.util.List;
  * <p>Auto generated code.
  * <p><strong>Do not modify!</strong>
  * <p>Please use the <a href="https://github.com/PlatONnetwork/client-sdk-java/releases">platon-web3j command line tools</a>,
- * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the 
+ * or the com.alaya.codegen.SolidityFunctionWrapperGenerator in the 
  * <a href="https://github.com/PlatONnetwork/client-sdk-java/tree/master/codegen">codegen module</a> to update.
  *
  * <p>Generated with web3j version 0.13.0.7.
@@ -38,7 +35,7 @@ public class ProxyContract extends Contract {
 
     public static final String FUNC_PROXYSEND = "proxySend";
 
-    public static final Event PROXYEVENT_EVENT = new Event("ProxyEvent", 
+    public static final Event PROXYEVENT_EVENT = new Event("ProxyEvent",
             Arrays.<TypeReference<?>>asList(new TypeReference<DynamicBytes>() {}, new TypeReference<DynamicBytes>() {}));
     ;
 
@@ -87,9 +84,9 @@ public class ProxyContract extends Contract {
         final Function function = new Function(
                 FUNC_PROXYSEND, 
                 Arrays.<Type>asList(new DynamicBytes(oneData),
-                new org.web3j.abi.datatypes.Address(oneAddr), 
+                new Address(oneAddr),
                 new DynamicBytes(twoData),
-                new org.web3j.abi.datatypes.Address(twoAddr)), 
+                new Address(twoAddr)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }

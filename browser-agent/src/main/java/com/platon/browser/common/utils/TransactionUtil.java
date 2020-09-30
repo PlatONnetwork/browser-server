@@ -1,7 +1,16 @@
 package com.platon.browser.common.utils;
 
+import com.alaya.contracts.ppos.dto.common.ErrorCode;
+import com.alaya.protocol.core.DefaultBlockParameter;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.PlatonGetCode;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.rlp.solidity.RlpDecoder;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
+import com.alaya.rlp.solidity.RlpType;
+import com.alaya.utils.Numeric;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.*;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -27,18 +36,8 @@ import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
-import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.PlatonGetCode;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -52,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TransactionUtil {
     /**
      * 根据合约内部调用PPOS的输入信息生成虚拟PPOS交易列表
-     * 
+     *
      * @param block
      *            合约调用交易所在区块信息
      * @param parentTx
@@ -107,7 +106,7 @@ public class TransactionUtil {
 
     /**
      * 通用解委托奖励日志数据解析
-     * 
+     *
      * @param log
      * @return
      */
@@ -132,7 +131,7 @@ public class TransactionUtil {
 
     /**
      * 处理虚拟交易
-     * 
+     *
      * @param block
      * @param specialApi
      * @param platOnClient
@@ -245,7 +244,7 @@ public class TransactionUtil {
 
     /**
      * 获取合约的Bin代码
-     * 
+     *
      * @param platOnClient
      * @param contractAddress
      * @return
@@ -267,7 +266,7 @@ public class TransactionUtil {
 
     /**
      * 创建普通合约交易,解析补充信息
-     * 
+     *
      * @param contractAddress
      * @param ci
      * @throws IOException
@@ -293,7 +292,7 @@ public class TransactionUtil {
 
     /**
      * 调用普通合约交易,解析补充信息
-     * 
+     *
      * @param ci
      * @throws IOException
      */
@@ -322,7 +321,7 @@ public class TransactionUtil {
 
     /**
      * 发起普通交易,解析补充信息
-     * 
+     *
      * @param ci
      */
     public static void resolveGeneralTransferTxComplementInfo(CollectionTransaction tx, ComplementInfo ci,
@@ -354,7 +353,7 @@ public class TransactionUtil {
 
     /**
      * 解析erc合约交易
-     * 
+     *
      * @param tx
      * @param ci
      * @param contractAddress

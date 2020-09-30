@@ -1,6 +1,6 @@
 package com.platon.browser.proxyppos.proposal;
 
-import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
+import com.alaya.contracts.ppos.dto.resp.Proposal;
 import org.junit.Test;
 
 public class TextTest extends ProposalBase {

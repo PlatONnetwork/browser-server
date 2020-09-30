@@ -1,19 +1,19 @@
 package com.platon.browser.client;
 
+import com.alaya.contracts.ppos.*;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.Web3jService;
+import com.alaya.protocol.http.HttpService;
+import com.alaya.protocol.websocket.WebSocketService;
 import com.platon.browser.enums.Web3jProtocolEnum;
 import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.utils.NetworkParms;
-import com.platon.sdk.contracts.ppos.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.protocol.websocket.WebSocketService;
 
 import java.math.BigInteger;
 import java.net.ConnectException;

@@ -1,16 +1,15 @@
 package com.platon.browser.service;
 
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.parameters.NetworkParameters;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.RemoteCall;
+
 import java.math.BigInteger;
 import java.util.List;
-
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.RemoteCall;
-
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.CallResponse;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-import com.platon.sdk.utlis.NetworkParameters;
 
 public class DeNodeContract extends DeContract{
 

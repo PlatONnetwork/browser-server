@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.protocol.Web3j;
+import com.alaya.protocol.Web3j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

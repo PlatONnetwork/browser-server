@@ -3,7 +3,7 @@ package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.common.service.epoch.EpochService;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

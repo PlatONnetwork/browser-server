@@ -21,7 +21,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
+import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

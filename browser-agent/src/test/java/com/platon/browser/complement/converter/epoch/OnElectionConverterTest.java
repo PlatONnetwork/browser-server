@@ -1,24 +1,5 @@
 package com.platon.browser.complement.converter.epoch;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.protocol.Web3j;
-
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.HistoryLowRateSlash;
 import com.platon.browser.client.PlatOnClient;
@@ -35,6 +16,24 @@ import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.service.misc.StakeMiscService;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import com.alaya.protocol.Web3j;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class OnElectionConverterTest extends AgentTestBase {

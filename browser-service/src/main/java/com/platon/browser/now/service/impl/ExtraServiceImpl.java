@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
+import com.alaya.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -90,16 +90,16 @@ public class ExtraServiceImpl implements ExtraService {
 			 */
 			if(BrowserConst.EXTRA_LAT_PARAM.contains(config.getName())) {
 				if(StringUtils.isNotBlank(res2)) {
-					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(res3)) {
-					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(config.getValue())) {
-					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(config.getInitValue())) {
-					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 			} else {
 				configDetail.setStartValue(res2.trim());

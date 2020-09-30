@@ -3,11 +3,11 @@ package com.platon.browser.utils;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.Sign;
-import org.web3j.crypto.Sign.SignatureData;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.utils.Numeric;
+import com.alaya.crypto.Credentials;
+import com.alaya.crypto.Sign;
+import com.alaya.crypto.Sign.SignatureData;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.alaya.utils.Numeric;
 
 public class NodeToolTest {
 

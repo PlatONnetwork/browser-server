@@ -17,7 +17,7 @@ public class DelegationListByStakingResp {
 	private String delegateAddr; // 委托人地址
 	private BigDecimal delegateValue; // 委托金额
 	private BigDecimal delegateTotalValue;// 验证人委托的总金额
-	private BigDecimal delegateLocked;    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
+	private BigDecimal delegateLocked;    //已锁定委托（ATP）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
 	private BigDecimal delegateReleased; //当前验证人待赎回委托
 	public String getDelegateAddr() {
 		return delegateAddr;

@@ -1,14 +1,16 @@
 package com.platon.browser.config;
 
+import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.alaya.contracts.ppos.dto.resp.ParamItem;
+import com.alaya.contracts.ppos.dto.resp.ParamValue;
+import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
+import com.alaya.utils.Convert;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
-import com.platon.sdk.contracts.ppos.dto.resp.ParamItem;
-import com.platon.sdk.contracts.ppos.dto.resp.ParamValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.web3j.platon.bean.EconomicConfig;
-import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -158,7 +158,7 @@ public class BlockChainConfig {
     /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
-    // PlatON初始总发行量(LAT)
+    // PlatON初始总发行量(ATP)
     private BigDecimal initIssueAmount;
     // 每年固定增发比例
     private BigDecimal addIssueRate;
@@ -166,7 +166,7 @@ public class BlockChainConfig {
     private BigDecimal incentiveRateFromIssue;
     //每个共识轮中回退多少个块是选举下一轮验证人的时机
     private BigInteger electionBackwardBlockCount;
-    //10年内基金会向激励池填充额度(LAT)
+    //10年内基金会向激励池填充额度(ATP)
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
     private String proposalUrlTemplate;
@@ -195,7 +195,7 @@ public class BlockChainConfig {
     @PostConstruct
     public void init() throws ConfigLoadingException {
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.LAT);
+        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.ATP);
         updateWithEconomicConfig(client.getEconomicConfig());
 //        updateWithGovernParams(client.getGovernParamValue(""));
     }

@@ -1,21 +1,21 @@
 package com.platon.browser.proxyppos.proposal;
 
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
+import com.alaya.abi.solidity.datatypes.BytesType;
+import com.alaya.abi.solidity.datatypes.generated.Uint32;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
+import com.alaya.protocol.core.methods.response.bean.ProgramVersion;
+import com.alaya.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.abi.datatypes.BytesType;
-import org.web3j.abi.datatypes.generated.Uint32;
-import org.web3j.platon.bean.ProgramVersion;
-import org.web3j.utils.Numeric;
 
 import java.util.Arrays;
 
 public class VersionTest extends ProposalBase {
 
 
-    protected byte[] encode(String nodeId,ProgramVersion pv){
+    protected byte[] encode(String nodeId, ProgramVersion pv){
         Function function = new Function(FunctionType.DECLARE_VERSION_FUNC_TYPE,
                 Arrays.asList(new BytesType(Numeric.hexStringToByteArray(nodeId)),
                         new Uint32(pv.getProgramVersion()),

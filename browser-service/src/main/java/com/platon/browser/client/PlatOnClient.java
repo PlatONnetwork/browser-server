@@ -1,11 +1,12 @@
 package com.platon.browser.client;
 
+import com.alaya.contracts.ppos.*;
+import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.sdk.contracts.ppos.*;
-import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.bean.EconomicConfig;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;

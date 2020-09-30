@@ -1,22 +1,23 @@
 package com.platon.browser.data;
 
-import com.platon.rlp.datatypes.Uint64;
+import com.alaya.abi.wasm.WasmFunctionEncoder;
+import com.alaya.abi.wasm.datatypes.WasmFunction;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.RemoteCall;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.rlp.wasm.datatypes.Uint64;
+import com.alaya.tx.TransactionManager;
+import com.alaya.tx.WasmContract;
+import com.alaya.tx.gas.GasProvider;
+
 import java.util.Arrays;
-import org.web3j.abi.WasmFunctionEncoder;
-import org.web3j.abi.datatypes.WasmFunction;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.TransactionManager;
-import org.web3j.tx.WasmContract;
-import org.web3j.tx.gas.GasProvider;
 
 /**
  * <p>Auto generated code.
  * <p><strong>Do not modify!</strong>
  * <p>Please use the <a href="https://docs.web3j.io/command_line.html">web3j command line tools</a>,
- * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the 
+ * or the com.alaya.codegen.SolidityFunctionWrapperGenerator in the
  * <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to update.
  *
  * <p>Generated with web3j version 0.8.1.0-SNAPSHOT.

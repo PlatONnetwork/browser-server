@@ -1,12 +1,11 @@
 package com.platon.browser.data;
 
-import org.junit.Before;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Transfer;
+import com.alaya.utils.Convert.Unit;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Transfer;
-import org.web3j.utils.Convert.Unit;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -34,7 +33,7 @@ public class SuicideAndSelfdestructTest extends BaseContractTest {
 
 
             Transfer transfer = new Transfer(web3j, transactionManager);
-            transfer.sendFunds(contractAddress, BigDecimal.TEN, Unit.LAT,GAS_PRICE,GAS_LIMIT).send();
+            transfer.sendFunds(contractAddress, BigDecimal.TEN, Unit.ATP,GAS_PRICE,GAS_LIMIT).send();
             
             TransactionReceipt transactionReceipt = suicideAndSelfdestruct.increment().send();
 

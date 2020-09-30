@@ -1,7 +1,7 @@
 package com.platon.browser.client;
 
 import com.platon.browser.utils.HexTool;
-import org.web3j.protocol.core.Response;
+import com.alaya.protocol.core.Response;
 
 import java.util.List;
 import java.util.Map;

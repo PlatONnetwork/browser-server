@@ -1,12 +1,11 @@
 package com.platon.browser.service;
 
+import com.alaya.bech32.Bech32;
+import com.alaya.parameters.NetworkParameters;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.utils.HexTool;
-import com.platon.sdk.utlis.Bech32;
-import com.platon.sdk.utlis.NetworkParameters.Hrp;
-
 import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -51,9 +50,9 @@ public class BlockResult {
             String txHash = HexTool.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
             tx.setHash(txHash);
             String from = HexTool.prefix(DigestUtils.sha1Hex(txHash));
-            tx.setFrom(FROM_ADDRESS.get(Bech32.addressEncode(Hrp.LAX.getHrp(), from),addressReusedTimes));
+            tx.setFrom(FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), from),addressReusedTimes));
             String to = HexTool.prefix(DigestUtils.sha1Hex(from));
-            tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(Hrp.LAX.getHrp(), to),addressReusedTimes));
+            tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), to),addressReusedTimes));
             tx.setIndex(i);
             long seq = tx.getNum()*10000+i;
             tx.setSeq(seq);

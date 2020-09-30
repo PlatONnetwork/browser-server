@@ -2,9 +2,9 @@ package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.ProposalCancelParam;
 import com.platon.browser.param.TxParam;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.utils.Numeric;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
+import com.alaya.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

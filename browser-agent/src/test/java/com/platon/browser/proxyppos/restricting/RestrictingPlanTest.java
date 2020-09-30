@@ -1,23 +1,23 @@
 package com.platon.browser.proxyppos.restricting;
 
+import com.alaya.abi.solidity.datatypes.BytesType;
+import com.alaya.bech32.Bech32;
+import com.alaya.contracts.ppos.abi.CustomStaticArray;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.dto.resp.RestrictingPlan;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
+import com.alaya.crypto.Credentials;
+import com.alaya.parameters.NetworkParameters;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameterName;
+import com.alaya.protocol.http.HttpService;
+import com.alaya.tx.RawTransactionManager;
+import com.alaya.tx.TransactionManager;
 import com.platon.browser.proxyppos.ProxyContract;
 import com.platon.browser.proxyppos.TestBase;
-import com.platon.sdk.contracts.ppos.abi.CustomStaticArray;
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.dto.resp.RestrictingPlan;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.Bech32;
-import com.platon.sdk.utlis.NetworkParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.abi.datatypes.BytesType;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.TransactionManager;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

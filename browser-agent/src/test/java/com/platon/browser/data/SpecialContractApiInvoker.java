@@ -1,21 +1,19 @@
 package com.platon.browser.data;
 
+import com.alaya.contracts.ppos.DelegateContract;
+import com.alaya.contracts.ppos.NodeContract;
+import com.alaya.contracts.ppos.ProposalContract;
+import com.alaya.contracts.ppos.RestrictingPlanContract;
+import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameterName;
+import com.alaya.protocol.websocket.WebSocketService;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.sdk.contracts.ppos.DelegateContract;
-import com.platon.sdk.contracts.ppos.NodeContract;
-import com.platon.sdk.contracts.ppos.ProposalContract;
-import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
-import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.websocket.WebSocketService;
 
 import java.math.BigInteger;
 import java.net.ConnectException;

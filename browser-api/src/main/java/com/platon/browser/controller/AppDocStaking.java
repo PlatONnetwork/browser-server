@@ -286,7 +286,7 @@ public interface AppDocStaking {
      *         "delegateAddr":"",      //委托人地址    delegation
      *         "delegateValue":"",     //委托金额       delegation   delegate_has+delegate_locked
      *         "delegateTotalValue":"",//验证人委托的总金额    staking    delegate_has+delegate_locked
-     *         "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
+     *         "delegateLocked":"",    //已锁定委托（ATP）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
      *         "delegateReleased":""//当前验证人待赎回委托
      *      }
      *   ]
@@ -324,11 +324,11 @@ public interface AppDocStaking {
      *         "nodeId":"",            //节点id
      *         "nodeName":"",          //节点名称
      *         "delegateValue":"",     //委托数量 delegation   delegateHas+delegateLocked
-     *         "delegateHas":"",       //未锁定委托（LAT） 如果关联的验证人状态正常则正常显示，如果其他情况则为零 （delegation）
-     *         "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
-     *         "delegateUnlock":"",    //已解除委托（LAT）  如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation）
-     *         "delegateReleased":"",  //待赎回委托（LAT） delegation
-     *         "delegateClaim":""  //待领取委托（LAT） 
+     *         "delegateHas":"",       //未锁定委托（ATP） 如果关联的验证人状态正常则正常显示，如果其他情况则为零 （delegation）
+     *         "delegateLocked":"",    //已锁定委托（ATP）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
+     *         "delegateUnlock":"",    //已解除委托（ATP）  如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation）
+     *         "delegateReleased":"",  //待赎回委托（ATP） delegation
+     *         "delegateClaim":""  //待领取委托（ATP）
      *      }
      *   ]
      * }

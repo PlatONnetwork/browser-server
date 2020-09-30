@@ -1,15 +1,15 @@
 package com.platon.browser.proxyppos.delegate;
 
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
+import com.alaya.abi.solidity.datatypes.BytesType;
+import com.alaya.abi.solidity.datatypes.generated.Uint256;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
+import com.alaya.abi.solidity.datatypes.generated.Uint64;
+import com.alaya.utils.Convert;
+import com.alaya.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.abi.datatypes.BytesType;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.abi.datatypes.generated.Uint64;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -20,7 +20,7 @@ public class UnDelegateTest extends DelegateBase {
     private String nodeId2 = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
 
     private byte[] encode(String nodeId,BigInteger stakingBlockNum, String delegateAmount){
-        BigDecimal amount = Convert.toVon(delegateAmount, Convert.Unit.LAT);
+        BigDecimal amount = Convert.toVon(delegateAmount, Convert.Unit.ATP);
         Function f = new Function(FunctionType.WITHDREW_DELEGATE_FUNC_TYPE,
                 Arrays.asList(new Uint64(stakingBlockNum)
                         , new BytesType(Numeric.hexStringToByteArray(nodeId))

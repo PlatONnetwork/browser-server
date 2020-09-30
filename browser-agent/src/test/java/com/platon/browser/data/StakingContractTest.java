@@ -1,33 +1,35 @@
 package com.platon.browser.data;
 
-import com.platon.sdk.contracts.ppos.DelegateContract;
-import com.platon.sdk.contracts.ppos.StakingContract;
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.CallResponse;
-import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.dto.enums.StakingAmountType;
-import com.platon.sdk.contracts.ppos.dto.req.StakingParam;
-import com.platon.sdk.contracts.ppos.dto.req.UpdateStakingParam;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
-import com.platon.sdk.utlis.NetworkParameters;
-
+import com.alaya.abi.solidity.datatypes.BytesType;
+import com.alaya.abi.solidity.datatypes.generated.Uint16;
+import com.alaya.abi.solidity.datatypes.generated.Uint256;
+import com.alaya.contracts.ppos.DelegateContract;
+import com.alaya.contracts.ppos.StakingContract;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.TransactionResponse;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.dto.enums.StakingAmountType;
+import com.alaya.contracts.ppos.dto.req.StakingParam;
+import com.alaya.contracts.ppos.dto.req.UpdateStakingParam;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
+import com.alaya.crypto.Credentials;
+import com.alaya.crypto.Hash;
+import com.alaya.crypto.RawTransaction;
+import com.alaya.crypto.TransactionEncoder;
+import com.alaya.parameters.NetworkParameters;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameterName;
+import com.alaya.protocol.core.methods.response.PlatonGetTransactionCount;
+import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
+import com.alaya.protocol.http.HttpService;
+import com.alaya.tx.Transfer;
+import com.alaya.utils.Convert;
+import com.alaya.utils.Convert.Unit;
+import com.alaya.utils.Numeric;
 import org.junit.Before;
 import org.junit.Test;
-import org.web3j.abi.datatypes.BytesType;
-import org.web3j.abi.datatypes.generated.Uint16;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.*;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.PlatonGetTransactionCount;
-import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.Transfer;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Convert.Unit;
-import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -68,7 +70,7 @@ public class StakingContractTest {
     
     @Test
     public void transfer() throws Exception {
-    	Transfer.sendFunds(web3j, superCredentials, chainId, "0xfbdf3c5bf983cdf67685883f8eaabfd4e31249ec", new BigDecimal("10000000"), Unit.LAT).send();
+    	Transfer.sendFunds(web3j, superCredentials, chainId, "0xfbdf3c5bf983cdf67685883f8eaabfd4e31249ec", new BigDecimal("10000000"), Unit.ATP).send();
     	System.out.println("stakingCredentials balance="+ web3j.platonGetBalance(stakingCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
     }
     
@@ -121,7 +123,7 @@ public class StakingContractTest {
             String nodeName = "chendai-node3";
             String webSite = "www.baidu.com";
             String details = "chendai-node3-details";
-            BigDecimal stakingAmount = Convert.toVon("5000000", Unit.LAT);
+            BigDecimal stakingAmount = Convert.toVon("5000000", Unit.ATP);
             BigInteger rewardPer = BigInteger.valueOf(10L);
 
         	
@@ -177,7 +179,7 @@ public class StakingContractTest {
     public void addStaking() {
         try {
         	StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
-            BigDecimal addStakingAmount = Convert.toVon("4000000", Unit.LAT).add(new BigDecimal("999999999999999998"));
+            BigDecimal addStakingAmount = Convert.toVon("4000000", Unit.ATP).add(new BigDecimal("999999999999999998"));
         	
             PlatonSendTransaction platonSendTransaction = stakingContract.addStakingReturnTransaction(nodeId, stakingAmountType, addStakingAmount.toBigInteger()).send();
             TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
@@ -257,7 +259,7 @@ public class StakingContractTest {
         String nodeName = "chendai-node3";
         String webSite = "www.baidu.com";
         String details = "chendai-node3-details";
-        BigDecimal stakingAmount = Convert.toVon("5000000", Unit.LAT);
+        BigDecimal stakingAmount = Convert.toVon("5000000", Unit.ATP);
         BigInteger rewardPer = BigInteger.valueOf(10L);
 
         StakingParam stakingParam =  new StakingParam.Builder()
@@ -296,7 +298,7 @@ public class StakingContractTest {
 
         StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
 
-        BigDecimal delegate = Convert.toVon("20", Unit.LAT);
+        BigDecimal delegate = Convert.toVon("20", Unit.ATP);
         Function function = new Function(FunctionType.DELEGATE_FUNC_TYPE,
 				Arrays.asList(new Uint16(stakingAmountType.getValue())
 				, new BytesType(Numeric.hexStringToByteArray(nodeId))

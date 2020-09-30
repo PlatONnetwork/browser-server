@@ -1,20 +1,20 @@
 package com.platon.browser.evm.bean;
 
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.*;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.request.PlatonFilter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Contract;
-import org.web3j.tx.TransactionManager;
-import org.web3j.tx.gas.GasProvider;
+import com.alaya.abi.solidity.EventEncoder;
+import com.alaya.abi.solidity.FunctionEncoder;
+import com.alaya.abi.solidity.TypeReference;
+import com.alaya.abi.solidity.datatypes.*;
+import com.alaya.abi.solidity.datatypes.generated.Uint256;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameter;
+import com.alaya.protocol.core.RemoteCall;
+import com.alaya.protocol.core.methods.request.PlatonFilter;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Contract;
+import com.alaya.tx.TransactionManager;
+import com.alaya.tx.gas.GasProvider;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * <p>Auto generated code.
  * <p><strong>Do not modify!</strong>
  * <p>Please use the <a href="https://docs.web3j.io/command_line.html">web3j command line tools</a>,
- * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the 
+ * or the com.alaya.codegen.SolidityFunctionWrapperGenerator in the 
  * <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to update.
  *
  * <p>Generated with web3j version 0.7.5.0.

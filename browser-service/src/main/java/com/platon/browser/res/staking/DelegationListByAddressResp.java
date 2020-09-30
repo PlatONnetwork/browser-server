@@ -16,11 +16,11 @@ public class DelegationListByAddressResp {
 	private String nodeId;            //节点id
     private String nodeName;          //节点名称
     private BigDecimal delegateValue;     //委托数量
-    private BigDecimal delegateHas;       //未锁定委托（LAT）
-    private BigDecimal delegateLocked;    //已锁定委托（LAT）
-    private BigDecimal delegateUnlock;    //已解除委托（LAT） 
-    private BigDecimal delegateReleased;  //赎回中委托（LAT） 
-    private BigDecimal delegateClaim;    //待提取委托（LAT） 
+    private BigDecimal delegateHas;       //未锁定委托（ATP）
+    private BigDecimal delegateLocked;    //已锁定委托（ATP）
+    private BigDecimal delegateUnlock;    //已解除委托（ATP）
+    private BigDecimal delegateReleased;  //赎回中委托（ATP）
+    private BigDecimal delegateClaim;    //待提取委托（ATP）
 	public String getNodeId() {
 		return nodeId;
 	}

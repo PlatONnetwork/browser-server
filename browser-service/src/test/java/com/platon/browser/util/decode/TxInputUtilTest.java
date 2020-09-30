@@ -1,22 +1,21 @@
 package com.platon.browser.util.decode;
 
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.rlp.solidity.RlpEncoder;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
-
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.rlp.RlpEncoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @description:

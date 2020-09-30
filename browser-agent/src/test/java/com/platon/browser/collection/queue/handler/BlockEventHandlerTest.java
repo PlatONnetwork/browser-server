@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;

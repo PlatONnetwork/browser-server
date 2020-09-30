@@ -120,7 +120,11 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .add(delegation.getDelegateReleased()) // +待提取金额
                 .subtract(txParam.getAmount()) // -申请退回金额
                 .compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
-
+        log.error("犹豫期金额：{}",delegation.getDelegateHes());
+        log.error("锁定期金额：{}",delegation.getDelegateLocked());
+        log.error("待提取金额：{}",delegation.getDelegateReleased());
+        log.error("申请赎回：{}",txParam.getAmount());
+        log.error("委托门槛：{}",chainConfig.getDelegateThreshold());
         // 计算真实退回金额
         BigDecimal realRefundAmount=txParam.getAmount();
         if(isRefundAll){
@@ -129,6 +133,11 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                     .add(delegation.getDelegateLocked()) // +锁定期金额
                     .add(delegation.getDelegateReleased()); // +待提取金额
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.YES.getCode()); // 委托状态置为历史
+            log.error("全部退回：{}",realRefundAmount);
+            log.error("犹豫期金额：{}",delegation.getDelegateHes());
+            log.error("锁定期金额：{}",delegation.getDelegateLocked());
+
+            log.error("待提取金额：{}",delegation.getDelegateReleased());
         }else{
             // 部分退回，委托置为非历史
             businessParam.setCodeIsHistory(BusinessParam.YesNoEnum.NO.getCode()); // 委托状态置为非历史

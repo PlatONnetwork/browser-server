@@ -1,13 +1,6 @@
 package com.platon.browser.collection.queue.handler;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
@@ -20,8 +13,13 @@ import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 区块事件处理器

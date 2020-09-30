@@ -1,15 +1,15 @@
 package com.platon.browser.proxyppos.staking;
 
-import com.platon.sdk.contracts.ppos.abi.Function;
-import com.platon.sdk.contracts.ppos.dto.common.FunctionType;
-import com.platon.sdk.contracts.ppos.dto.enums.StakingAmountType;
-import com.platon.sdk.contracts.ppos.dto.req.StakingParam;
-import com.platon.sdk.contracts.ppos.utils.EncoderUtils;
+import com.alaya.contracts.ppos.abi.Function;
+import com.alaya.contracts.ppos.dto.common.FunctionType;
+import com.alaya.contracts.ppos.dto.enums.StakingAmountType;
+import com.alaya.contracts.ppos.dto.req.StakingParam;
+import com.alaya.contracts.ppos.utils.EncoderUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.utils.Convert;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.http.HttpService;
+import com.alaya.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -42,7 +42,7 @@ public class StakingTest extends StakingBase {
         String nodeName = "chendai-node1";
         String webSite = "www.baidu.com";
         String details = "chendai-node1-details";
-        BigDecimal stakingAmount = Convert.toVon("5000000", Convert.Unit.LAT);
+        BigDecimal stakingAmount = Convert.toVon("5000000", Convert.Unit.ATP);
         BigInteger rewardPer = BigInteger.valueOf(1L);
 
         StakingParam stakingParam = new StakingParam.Builder()
@@ -74,7 +74,7 @@ public class StakingTest extends StakingBase {
         String nodeName = "chendai-node2";
         String webSite = "www.baidu.com";
         String details = "chendai-node2-details";
-        BigDecimal stakingAmount = Convert.toVon("5000000", Convert.Unit.LAT);
+        BigDecimal stakingAmount = Convert.toVon("5000000", Convert.Unit.ATP);
         BigInteger rewardPer = BigInteger.valueOf(1L);
 
         StakingParam stakingParam = new StakingParam.Builder()

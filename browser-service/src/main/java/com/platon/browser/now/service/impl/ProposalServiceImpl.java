@@ -33,7 +33,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.web3j.utils.Convert;
+import com.alaya.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -157,8 +157,8 @@ public class ProposalServiceImpl implements ProposalService {
 				 * 如果参数是需要转换lat的，则进一步转换
 				 */
 				if(BrowserConst.EXTRA_LAT_PARAM.contains(proposal.getName())) {
-					currentValue = Convert.fromVon(currentValue, Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "LAT";
-					newValue = Convert.fromVon(newValue, Convert.Unit.LAT).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "LAT";
+					currentValue = Convert.fromVon(currentValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
+					newValue = Convert.fromVon(newValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
 				} 
 				/**
 				 * 去除无用的0

@@ -1,35 +1,35 @@
 package com.platon.browser.data;
 
-import com.platon.sdk.contracts.ppos.DelegateContract;
-import com.platon.sdk.contracts.ppos.NodeContract;
-import com.platon.sdk.contracts.ppos.ProposalContract;
-import com.platon.sdk.contracts.ppos.RewardContract;
-import com.platon.sdk.contracts.ppos.StakingContract;
-import com.platon.sdk.contracts.ppos.dto.BaseResponse;
-import com.platon.sdk.contracts.ppos.dto.CallResponse;
-import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
-import com.platon.sdk.contracts.ppos.dto.common.ProposalType;
-import com.platon.sdk.contracts.ppos.dto.enums.StakingAmountType;
-import com.platon.sdk.contracts.ppos.dto.req.StakingParam;
-import com.platon.sdk.contracts.ppos.dto.req.UpdateStakingParam;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
+import com.alaya.contracts.ppos.DelegateContract;
+import com.alaya.contracts.ppos.NodeContract;
+import com.alaya.contracts.ppos.ProposalContract;
+import com.alaya.contracts.ppos.RewardContract;
+import com.alaya.contracts.ppos.StakingContract;
+import com.alaya.contracts.ppos.dto.BaseResponse;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.TransactionResponse;
+import com.alaya.contracts.ppos.dto.common.ProposalType;
+import com.alaya.contracts.ppos.dto.enums.StakingAmountType;
+import com.alaya.contracts.ppos.dto.req.StakingParam;
+import com.alaya.contracts.ppos.dto.req.UpdateStakingParam;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.contracts.ppos.dto.resp.Proposal;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
-import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.Transfer;
-import org.web3j.tx.gas.GasProvider;
-import org.web3j.utils.Convert;
-import org.web3j.utils.Convert.Unit;
+import com.alaya.crypto.CipherException;
+import com.alaya.crypto.Credentials;
+import com.alaya.crypto.WalletUtils;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameterName;
+import com.alaya.protocol.core.methods.response.PlatonBlockNumber;
+import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
+import com.alaya.protocol.http.HttpService;
+import com.alaya.tx.Transfer;
+import com.alaya.tx.gas.GasProvider;
+import com.alaya.utils.Convert;
+import com.alaya.utils.Convert.Unit;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class TransactionSender {
 			        chainId,
 			        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 			        BigDecimal.valueOf(1000000000),
-			        Unit.LAT
+			        Unit.ATP
 			).send();
 //			Transfer.sendFunds(
 //			        currentValidWeb3j,
@@ -90,7 +90,7 @@ public class TransactionSender {
 //			        chainId,
 //			        "0xfd9d508df262a1c968e0d6c757ab08b96d741f4b",
 //			        BigDecimal.valueOf(10),
-//			        Convert.Unit.LAT
+//			        Convert.Unit.ATP
 //			).sendAsync();
 //			Transfer.sendFunds(
 //			        currentValidWeb3j,
@@ -98,7 +98,7 @@ public class TransactionSender {
 //			        chainId,
 //			        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 //			        BigDecimal.valueOf(10),
-//			        Convert.Unit.LAT
+//			        Convert.Unit.ATP
 //			).sendAsync();
 			BigInteger balance = currentValidWeb3j.platonGetBalance("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e", DefaultBlockParameterName.LATEST).send().getBalance();
 	        logger.debug("balance:{}",balance);
@@ -112,7 +112,7 @@ public class TransactionSender {
         String nodeName = "zrj-node1";
         String webSite = "www.baidu.com";
         String details = "chendai-node1-details";
-        BigDecimal stakingAmount = Convert.toVon("20000000", Unit.LAT);
+        BigDecimal stakingAmount = Convert.toVon("20000000", Unit.ATP);
         PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTransaction(new StakingParam.Builder()
                .setNodeId(stakingPubKey)
                .setAmount(stakingAmount.toBigInteger())
@@ -152,7 +152,7 @@ public class TransactionSender {
     // 增持质押(增加自有质押)
     @Test
     public void addStaking() throws Exception {
-    	BigDecimal stakingAmount = Convert.toVon("5000000", Unit.LAT);
+    	BigDecimal stakingAmount = Convert.toVon("5000000", Unit.ATP);
         TransactionResponse res = stakingContract.addStaking(
         		stakingPubKey,
                 StakingAmountType.FREE_AMOUNT_TYPE,
@@ -173,7 +173,7 @@ public class TransactionSender {
     // 发送委托交易
     @Test
     public void delegate() throws Exception {
-    	BigDecimal delegate = Convert.toVon("65000", Unit.LAT);
+    	BigDecimal delegate = Convert.toVon("65000", Unit.ATP);
         TransactionResponse res = delegateContract.delegate(
         		stakingPubKey,
                 StakingAmountType.FREE_AMOUNT_TYPE,
@@ -217,7 +217,7 @@ public class TransactionSender {
     // 发送解委托交易
     @Test
     public void unDelegate() throws Exception {
-    	BigDecimal delegate = Convert.toVon("5000", Unit.LAT);
+    	BigDecimal delegate = Convert.toVon("5000", Unit.ATP);
         TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
                 BigInteger.valueOf(86),
@@ -269,7 +269,7 @@ public class TransactionSender {
 //			        chainId,
 //			        credentialsTemp.getAddress(),
 //			        BigDecimal.valueOf(10000),
-//			        Convert.Unit.LAT
+//			        Convert.Unit.ATP
 //			).send();
 //    		byte[] byteArray = credentials.getEcKeyPair().getPrivateKey().toByteArray();
 //            String privateKey = Hex.toHexString(byteArray);
@@ -301,7 +301,7 @@ public class TransactionSender {
 //			        chainId,
 //			        c.getAddress(),
 //			        BigDecimal.valueOf(100),
-//			        Convert.Unit.LAT
+//			        Convert.Unit.ATP
 //			).send();
 //		}
 		
@@ -322,7 +322,7 @@ public class TransactionSender {
 					        chainId,
 					        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 					        BigDecimal.valueOf(1),
-					        Convert.Unit.LAT
+					        Convert.Unit.ATP
 					).sendAsync();
 					System.out.println("发送交易："+i);
 				}
@@ -394,9 +394,9 @@ public class TransactionSender {
         }
 
 
-        BigDecimal bg = Convert.toVon("1", Unit.LAT);
+        BigDecimal bg = Convert.toVon("1", Unit.ATP);
         System.out.println(bg);
-        bg = Convert.fromVon("10000000000000000000000000", Unit.LAT);
+        bg = Convert.fromVon("10000000000000000000000000", Unit.ATP);
         System.out.println(bg);
 
         CallResponse<Node> nodes = stakingContract.getStakingInfo("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc").send();

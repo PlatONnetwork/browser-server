@@ -3,13 +3,6 @@ package com.platon.browser.util.decode.generalcontract;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-
-import java.util.List;
 
 /**
  * 普通合约（EVM||WASM）交易解析工具：

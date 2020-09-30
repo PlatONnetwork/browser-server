@@ -1,32 +1,29 @@
 package com.platon.browser.data;
 
+import com.alaya.abi.solidity.EventEncoder;
+import com.alaya.abi.solidity.FunctionEncoder;
+import com.alaya.abi.solidity.TypeReference;
+import com.alaya.abi.solidity.datatypes.*;
+import com.alaya.abi.solidity.datatypes.generated.Uint256;
+import com.alaya.abi.solidity.datatypes.generated.Uint8;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameter;
+import com.alaya.protocol.core.RemoteCall;
+import com.alaya.protocol.core.methods.request.PlatonFilter;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Contract;
+import com.alaya.tx.TransactionManager;
+import com.alaya.tx.gas.GasProvider;
+import rx.Observable;
+import rx.functions.Func1;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
-import org.web3j.abi.datatypes.Utf8String;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.abi.datatypes.generated.Uint8;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.request.PlatonFilter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Contract;
-import org.web3j.tx.TransactionManager;
-import org.web3j.tx.gas.GasProvider;
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * <p>
@@ -35,7 +32,7 @@ import rx.functions.Func1;
  * <strong>Do not modify!</strong>
  * <p>
  * Please use the <a href="https://docs.web3j.io/command_line.html">web3j command line tools</a>, or the
- * org.web3j.codegen.SolidityFunctionWrapperGenerator in the <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to
+ * com.alaya.codegen.SolidityFunctionWrapperGenerator in the <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to
  * update.
  *
  * <p>
@@ -94,7 +91,7 @@ public class HumanStandardToken extends Contract {
 
 	public RemoteCall<TransactionReceipt> approve(String _spender, BigInteger _value) {
 		final Function function = new Function(FUNC_APPROVE,
-				Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(_spender), new org.web3j.abi.datatypes.generated.Uint256(_value)),
+				Arrays.<Type>asList(new Address(_spender), new Uint256(_value)),
 				Collections.<TypeReference<?>>emptyList());
 		return executeRemoteCallTransaction(function);
 	}
@@ -106,8 +103,8 @@ public class HumanStandardToken extends Contract {
 	}
 
 	public RemoteCall<TransactionReceipt> transferFrom(String _from, String _to, BigInteger _value) {
-		final Function function = new Function(FUNC_TRANSFERFROM, Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(_from),
-				new org.web3j.abi.datatypes.Address(_to), new org.web3j.abi.datatypes.generated.Uint256(_value)),
+		final Function function = new Function(FUNC_TRANSFERFROM, Arrays.<Type>asList(new Address(_from),
+				new Address(_to), new Uint256(_value)),
 				Collections.<TypeReference<?>>emptyList());
 		return executeRemoteCallTransaction(function);
 	}
@@ -125,7 +122,7 @@ public class HumanStandardToken extends Contract {
 	}
 
 	public RemoteCall<BigInteger> balanceOf(String _owner) {
-		final Function function = new Function(FUNC_BALANCEOF, Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(_owner)),
+		final Function function = new Function(FUNC_BALANCEOF, Arrays.<Type>asList(new Address(_owner)),
 				Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {
 				}));
 		return executeRemoteCallSingleValueReturn(function, BigInteger.class);
@@ -139,22 +136,22 @@ public class HumanStandardToken extends Contract {
 
 	public RemoteCall<TransactionReceipt> transfer(String _to, BigInteger _value) {
 		final Function function = new Function(FUNC_TRANSFER,
-				Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(_to), new org.web3j.abi.datatypes.generated.Uint256(_value)),
+				Arrays.<Type>asList(new Address(_to), new Uint256(_value)),
 				Collections.<TypeReference<?>>emptyList());
 		return executeRemoteCallTransaction(function);
 	}
 
 	public RemoteCall<TransactionReceipt> approveAndCall(String _spender, BigInteger _value, byte[] _extraData) {
 		final Function function = new Function(
-				FUNC_APPROVEANDCALL, Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(_spender),
-						new org.web3j.abi.datatypes.generated.Uint256(_value), new org.web3j.abi.datatypes.DynamicBytes(_extraData)),
+				FUNC_APPROVEANDCALL, Arrays.<Type>asList(new Address(_spender),
+						new Uint256(_value), new DynamicBytes(_extraData)),
 				Collections.<TypeReference<?>>emptyList());
 		return executeRemoteCallTransaction(function);
 	}
 
 	public RemoteCall<BigInteger> allowance(String _owner, String _spender) {
 		final Function function = new Function(FUNC_ALLOWANCE,
-				Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(_owner), new org.web3j.abi.datatypes.Address(_spender)),
+				Arrays.<Type>asList(new Address(_owner), new Address(_spender)),
 				Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {
 				}));
 		return executeRemoteCallSingleValueReturn(function, BigInteger.class);
@@ -163,16 +160,16 @@ public class HumanStandardToken extends Contract {
 	public static RemoteCall<HumanStandardToken> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider,
 			BigInteger _initialAmount, String _tokenName, BigInteger _decimalUnits, String _tokenSymbol,Long chainId) {
 		String encodedConstructor = FunctionEncoder.encodeConstructor(
-				Arrays.<Type>asList(new org.web3j.abi.datatypes.generated.Uint256(_initialAmount), new org.web3j.abi.datatypes.Utf8String(_tokenName),
-						new org.web3j.abi.datatypes.generated.Uint8(_decimalUnits), new org.web3j.abi.datatypes.Utf8String(_tokenSymbol)));
+				Arrays.<Type>asList(new Uint256(_initialAmount), new Utf8String(_tokenName),
+						new Uint8(_decimalUnits), new Utf8String(_tokenSymbol)));
 		return deployRemoteCall(HumanStandardToken.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor,chainId);
 	}
 
 	public static RemoteCall<HumanStandardToken> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,
 			BigInteger _initialAmount, String _tokenName, BigInteger _decimalUnits, String _tokenSymbol,Long chainId) {
 		String encodedConstructor = FunctionEncoder.encodeConstructor(
-				Arrays.<Type>asList(new org.web3j.abi.datatypes.generated.Uint256(_initialAmount), new org.web3j.abi.datatypes.Utf8String(_tokenName),
-						new org.web3j.abi.datatypes.generated.Uint8(_decimalUnits), new org.web3j.abi.datatypes.Utf8String(_tokenSymbol)));
+				Arrays.<Type>asList(new Uint256(_initialAmount), new Utf8String(_tokenName),
+						new Uint8(_decimalUnits), new Utf8String(_tokenSymbol)));
 		return deployRemoteCall(HumanStandardToken.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor,chainId);
 	}
 

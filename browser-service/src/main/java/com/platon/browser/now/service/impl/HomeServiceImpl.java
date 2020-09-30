@@ -1,5 +1,6 @@
 package com.platon.browser.now.service.impl;
 
+import com.alaya.utils.Convert;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
@@ -126,7 +127,7 @@ public class HomeServiceImpl implements HomeService {
 					queryNavigationStructResp.setNodeId(HexTool.prefix(node.getNodeId()));
 				}
 			}
-			if (keyword.startsWith("lat")||keyword.startsWith("lax")) {
+			if (keyword.startsWith("atp")||keyword.startsWith("atx")) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */
 					Address address = addressMapper.selectByPrimaryKey(keyword);

@@ -1,21 +1,21 @@
 package com.platon.browser.data;
 
-import com.platon.sdk.contracts.ppos.ProposalContract;
-import com.platon.sdk.contracts.ppos.dto.BaseResponse;
-import com.platon.sdk.contracts.ppos.dto.CallResponse;
-import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
-import com.platon.sdk.contracts.ppos.dto.enums.VoteOption;
-import com.platon.sdk.contracts.ppos.dto.resp.GovernParam;
-import com.platon.sdk.contracts.ppos.dto.resp.Proposal;
-import com.platon.sdk.contracts.ppos.dto.resp.TallyResult;
+import com.alaya.contracts.ppos.ProposalContract;
+import com.alaya.contracts.ppos.dto.BaseResponse;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.TransactionResponse;
+import com.alaya.contracts.ppos.dto.enums.VoteOption;
+import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.alaya.contracts.ppos.dto.resp.Proposal;
+import com.alaya.contracts.ppos.dto.resp.TallyResult;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.DefaultBlockParameterName;
+import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
+import com.alaya.protocol.core.methods.response.bean.ProgramVersion;
+import com.alaya.protocol.http.HttpService;
 import org.junit.Before;
 import org.junit.Test;
-import org.web3j.crypto.Credentials;
-import org.web3j.platon.bean.ProgramVersion;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
-import org.web3j.protocol.http.HttpService;
 
 import java.math.BigInteger;
 import java.util.List;

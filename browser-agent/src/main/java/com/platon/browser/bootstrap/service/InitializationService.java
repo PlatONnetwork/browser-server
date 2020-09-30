@@ -37,8 +37,7 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.sdk.contracts.ppos.dto.resp.Node;
-
+import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -130,7 +129,7 @@ public class InitializationService {
             this.networkStatCache.init(networkStat);
             // 初始化内置地址
             this.addressCache.initOnFirstStart();
-            
+
             this.initEs();
 
             return initialResult;
@@ -187,7 +186,7 @@ public class InitializationService {
 
     /**
      * 初始化入库内部质押节点
-     * 
+     *
      * @throws Exception
      */
     private List<com.platon.browser.dao.entity.Node> initInnerStake() throws BlockNumberException {
@@ -286,7 +285,7 @@ public class InitializationService {
             this.stakingMapper.batchInsert(new ArrayList<>(stakingList));
         return returnData;
     }
-    
+
     private void initEs() {
     	try {
     		blockESRepository.initIndex();
@@ -297,6 +296,6 @@ public class InitializationService {
 		} catch (Exception e) {
 			log.error("init es error",e);
 		}
-    	
+
     }
 }
