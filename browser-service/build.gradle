@@ -34,6 +34,6 @@ sonarqube {
                 "**/DownFileCommon.java,**/AccountDownload.java,**/BlockDownload.java," +
                 "**/BrowserCache.java,**/JedisNoResultCall.java,**/CommonMethod.java," +
                 "**/NullStringJsonSerializer.java,**/AccuVerifiersCount.java,**/BlockListResp.java," +
-                "**/AliveStakingListResp.java,**/QueryDetailResp.java"
+                "**/AliveStakingListResp.java,**/QueryDetailResp.java,**/res/token/*.java,**/converter/*.java"
     }
 }

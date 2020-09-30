@@ -1,32 +1,40 @@
 package com.platon.browser.common.complement.cache;
 
-import com.platon.browser.AgentTestBase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.platon.browser.AgentTestBase;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class NetworkStatCacheTest extends AgentTestBase {
 
+    @Mock
+    private TpsCalcCache tpsCalcCache;
     @Spy
     private NetworkStatCache networkStatCache;
+
     @Test
-    public void test(){
-        networkStatCache.init(networkStatList.get(0));
+    public void test() {
+        ReflectionTestUtils.setField(this.networkStatCache, "tpsCalcCache", this.tpsCalcCache);
+        this.networkStatCache.init(this.networkStatList.get(0));
         TpsCalcCache tpsCalcCache = new TpsCalcCache();
-        networkStatCache.setTpsCalcCache(tpsCalcCache);
-        assertEquals(networkStatCache.getTpsCalcCache(),tpsCalcCache);
-        networkStatCache.setNetworkStat(networkStatList.get(0));
-        assertEquals(networkStatCache.getNetworkStat(),networkStatList.get(0));
-        networkStatCache.updateByBlock(blockList.get(0),333);
-        networkStatCache.updateByTask(BigDecimal.TEN,BigDecimal.ONE,BigDecimal.ONE,BigDecimal.TEN,BigDecimal.ONE,33,33,BigDecimal.TEN);
-        networkStatCache.getNetworkStat();
-        networkStatCache.getAndIncrementNodeOptSeq();
-        networkStatCache.getTpsCalcCache();
+        this.networkStatCache.setTpsCalcCache(tpsCalcCache);
+        assertEquals(this.networkStatCache.getTpsCalcCache(), tpsCalcCache);
+        this.networkStatCache.setNetworkStat(this.networkStatList.get(0));
+        assertEquals(this.networkStatCache.getNetworkStat(), this.networkStatList.get(0));
+        this.networkStatCache.updateByBlock(this.blockList.get(0), 333);
+        this.networkStatCache.updateByTask(BigDecimal.TEN, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.TEN,
+            BigDecimal.ONE, 33, 33, BigDecimal.TEN);
+        this.networkStatCache.getNetworkStat();
+        this.networkStatCache.getAndIncrementNodeOptSeq();
+        this.networkStatCache.getTpsCalcCache();
     }
 }
