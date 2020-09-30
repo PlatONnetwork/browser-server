@@ -74,6 +74,7 @@
 			/*2、更新节点*/
 			update `node` set
 			`leave_time` = #{item.leaveTime},
+			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
 			`status` = 2,/*退出中*/
 			`staking_reduction_epoch` = #{settingEpoch},
 			`staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
