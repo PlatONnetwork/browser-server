@@ -41,6 +41,7 @@ public class EsTokenTransferRecordService implements EsService<ESTokenTransferRe
     }
 
     public String generateUniqueDocId(String txHash, String from, String to) {
-        return txHash.substring(0, txHash.length() / 2) + from.substring(0, from.length() / 2);
+        return txHash.substring(0, txHash.length() / 2) + from.substring(0, from.length() / 2)
+                + from.substring(0, to.length() / 2);
     }
 }
