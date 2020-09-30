@@ -51,8 +51,8 @@ public class QueryTokenTransferRecordListResp {
     private Date blockTimestamp;
     @ApiModelProperty(value = "交易value金额（单位：LAT）")
     private BigDecimal value;
-    @ApiModelProperty(value = "数据记录时间")
-    private Date systemTimestamp;
+    @ApiModelProperty(value = "服务器时间")
+    private Long systemTimestamp;
     @ApiModelProperty(value = "交易方向：INPUT 入账，OUT 出账")
     private String type;   // 交易类型：input 进账， out 出账
 
@@ -161,11 +161,11 @@ public class QueryTokenTransferRecordListResp {
         this.value = value;
     }
 
-    public Date getSystemTimestamp() {
+    public Long getSystemTimestamp() {
         return systemTimestamp;
     }
 
-    public void setSystemTimestamp(Date systemTimestamp) {
+    public void setSystemTimestamp(Long systemTimestamp) {
         this.systemTimestamp = systemTimestamp;
     }
 

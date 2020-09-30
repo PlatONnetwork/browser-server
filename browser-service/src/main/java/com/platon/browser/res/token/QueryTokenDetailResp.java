@@ -67,6 +67,7 @@ public class QueryTokenDetailResp {
                 .totalSupply(token.getTotalSupply())
                 .creator(token.getCreator()).txHash(token.getTxHash())
                 .blockTimestamp(token.getBlockTimestamp())
+                .txCount(token.getTxCount())
                 .createTime(token.getCreateTime())
                 .build();
     }

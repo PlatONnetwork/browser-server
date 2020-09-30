@@ -31,7 +31,7 @@ public class EsTokenTransferRecordService implements EsService<ESTokenTransferRe
             // key: _doc id
             Map<String, ESTokenTransferRecord> recordHashMap = new HashMap<>();
             recordSet.forEach(t-> {
-                recordHashMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTto()), t);
+                recordHashMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTto(), t.getSeq()), t);
             });
             tokenTransferRecordESRepository.bulkAddOrUpdate(recordHashMap);
         }catch (Exception e){
@@ -40,7 +40,8 @@ public class EsTokenTransferRecordService implements EsService<ESTokenTransferRe
         }
     }
 
-    public String generateUniqueDocId(String txHash, String from, String to) {
-        return txHash.substring(0, txHash.length() / 2) + from.substring(0, from.length() / 2);
+    public String generateUniqueDocId(String txHash, String from, String to, long seq) {
+        return seq + "_" + txHash.substring(0, txHash.length() / 2) + from.substring(0, from.length() / 2)
+                + from.substring(0, to.length() / 2);
     }
 }
