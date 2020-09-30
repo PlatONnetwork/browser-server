@@ -31,6 +31,7 @@ spring:
       delegationIndexName: browser_delegation_aton_${profile}
       nodeOptIndexName: browser_nodeopt_aton_${profile}
       delegationRewardIndexName: browser_delegation_reward_aton_${profile}
+      innerTxIndexName: browser_inner_tx_${profile}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

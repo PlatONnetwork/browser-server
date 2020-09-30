@@ -6,31 +6,36 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
+import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
+import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 
 /**
  * 交易模块接口方法定义
- *  @file TransactionService.java
- *  @description 
- *	@author zhangrj
- *  @data 2019年8月31日
+ * 
+ * @file TransactionService.java
+ * @description
+ * @author zhangrj
+ * @data 2019年8月31日
  */
 public interface TransactionService {
 
-	/**
-	 * 分页查询交易列表
-	 * @method getTransactionList
-	 * @param req
-	 * @return
-	 */
-    RespPage<TransactionListResp> getTransactionList( PageReq req);
+    /**
+     * 分页查询交易列表
+     * 
+     * @method getTransactionList
+     * @param req
+     * @return
+     */
+    RespPage<TransactionListResp> getTransactionList(PageReq req);
 
     /**
      * 根据区块号查询交易列表
+     * 
      * @method getTransactionListByBlock
      * @param req
      * @return
@@ -39,6 +44,7 @@ public interface TransactionService {
 
     /**
      * 根据地址查询交易列表
+     * 
      * @method getTransactionListByAddress
      * @param req
      * @return
@@ -47,6 +53,7 @@ public interface TransactionService {
 
     /**
      * 地址交易列表下载
+     * 
      * @method transactionListByAddressDownload
      * @param address
      * @param date
@@ -56,25 +63,37 @@ public interface TransactionService {
 
     /**
      * 根据交易hash查询交易详情
+     * 
      * @method transactionDetails
      * @param req
      * @return
      */
-	TransactionDetailsResp transactionDetails( TransactionDetailsReq req);
-	
-	/**
-	 * 根据地址查询委托奖励提取
-	 * @method queryClaimByStaking
-	 * @param req
-	 * @return
-	 */
-	 RespPage<QueryClaimByAddressResp> queryClaimByAddress( TransactionListByAddressRequest req);
-	
-	 /**
-	 * 根据质押查询委托奖励提取
-	 * @method queryClaimByStaking
-	 * @param req
-	 * @return
-	 */
-	 RespPage<QueryClaimByStakingResp> queryClaimByStaking( QueryClaimByStakingReq req);
+    TransactionDetailsResp transactionDetails(TransactionDetailsReq req);
+
+    /**
+     * 根据地址查询委托奖励提取
+     * 
+     * @method queryClaimByStaking
+     * @param req
+     * @return
+     */
+    RespPage<QueryClaimByAddressResp> queryClaimByAddress(TransactionListByAddressRequest req);
+
+    /**
+     * 根据质押查询委托奖励提取
+     * 
+     * @method queryClaimByStaking
+     * @param req
+     * @return
+     */
+    RespPage<QueryClaimByStakingResp> queryClaimByStaking(QueryClaimByStakingReq req);
+
+    /**
+     * 根据地址查询内部交易
+     * 
+     * @method queryClaimByStaking
+     * @param req
+     * @return
+     */
+    RespPage<QueryInnerTxByAddrResp> queryInnerByAddr(QueryInnerByAddrReq req);
 }

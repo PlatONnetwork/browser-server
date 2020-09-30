@@ -1,10 +1,11 @@
 package com.platon.browser.common.collection.dto;
 
-import com.platon.browser.dao.entity.NetworkStat;
-import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.platon.browser.dao.entity.NetworkStat;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @description: 网络统计类
@@ -13,8 +14,9 @@ import java.util.Date;
  **/
 @Slf4j
 public class CollectionNetworkStat extends NetworkStat {
-    private CollectionNetworkStat(){}
-    public static CollectionNetworkStat newInstance(){
+    private CollectionNetworkStat() {}
+
+    public static CollectionNetworkStat newInstance() {
         CollectionNetworkStat stat = new CollectionNetworkStat();
         Date date = new Date();
         stat.setCreateTime(date);
@@ -35,6 +37,7 @@ public class CollectionNetworkStat extends NetworkStat {
         stat.setProposalQty(0);
         stat.setStakingDelegationValue(BigDecimal.ZERO);
         stat.setTxQty(0);
+        stat.setTokenQty(0);
         stat.setTurnValue(BigDecimal.ZERO);
         stat.setAvailableStaking(BigDecimal.ZERO);
         stat.setStakingValue(BigDecimal.ZERO);

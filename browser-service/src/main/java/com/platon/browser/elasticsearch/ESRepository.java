@@ -5,7 +5,6 @@ import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.elasticsearch.ESSortDto;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.util.SpringUtils;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -26,9 +25,8 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.*;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
@@ -37,13 +35,12 @@ import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 /**
  * @Auther: Chendongming
@@ -55,17 +52,48 @@ public abstract class ESRepository {
 
 	@Resource(name = "restHighLevelClient")
 	private RestHighLevelClient client;
-	
+
 	@Autowired
 	private SpringUtils springUtils;
 
 	public abstract String getIndexName();
-	
+
 	private static final String CONSUME_TIME_TIPS="处理耗时:{} ms";
 
 	/**
+	 * 索引模板发布
+	 */
+	public void putIndexTemplate(String indexTemplateName, XContentBuilder builder) throws IOException {
+		if (existsTemplate(indexTemplateName)) {
+			log.warn("{" + indexTemplateName + "} index template already exist.");
+			return;
+		}
+		long startTime = System.currentTimeMillis();
+		PutIndexTemplateRequest request = new PutIndexTemplateRequest(indexTemplateName);
+		if (builder != null) {
+			request.source(builder);
+		}
+		AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
+		if (log.isDebugEnabled()) {
+			log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+			log.debug("createIndexWithMapping:{}", JSON.toJSONString(response, true));
+		}
+	}
+
+	public boolean existsTemplate(String templateName) throws IOException {
+		long startTime = System.currentTimeMillis();
+		IndexTemplatesExistRequest request = new IndexTemplatesExistRequest(templateName);
+		boolean response = client.indices().existsTemplate(request, RequestOptions.DEFAULT);
+		if (log.isDebugEnabled()) {
+			log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+			log.debug("existsTemplate: {}", response);
+		}
+		return response;
+	}
+
+	/**
 	 * 创建索引
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void createIndex(Map<String, ?> mapping) throws IOException {
@@ -83,7 +111,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 删除索引
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void deleteIndex() throws IOException {
@@ -99,7 +127,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 判断索引是否存在
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -114,10 +142,21 @@ public abstract class ESRepository {
 		log.debug("existsIndex:{}", response);
 		return response;
 	}
+	
+	/**
+	 * 初始化index
+	 * @return
+	 * @throws IOException
+	 */
+	public boolean initIndex() throws IOException {
+		if(this.existsIndex()) this.deleteIndex();
+		this.createIndex(null);
+		return true;
+	}
 
 	/**
 	 * 增加记录
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public <T> void add(String id, T doc) throws IOException {
@@ -134,7 +173,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 判断记录是都存在
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -153,7 +192,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 获取记录信息
-	 * 
+	 *
 	 * @param id
 	 * @throws IOException
 	 */
@@ -172,7 +211,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 更新记录信息
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public <T> void update(String id, T block) throws IOException {
@@ -189,7 +228,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 删除记录
-	 * 
+	 *
 	 * @param id
 	 * @throws IOException
 	 */
@@ -206,7 +245,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 搜索
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public <T> ESResult<T> search(Map<String, Object> filter, Class<T> clazz, List<ESSortDto> esSortDtos, int pageNo,
@@ -241,7 +280,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 搜索
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz,int pageNo,
@@ -280,10 +319,10 @@ public abstract class ESRepository {
 
 		return esResult;
 	}
-	
+
 	/**
 	 * 查询总数
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public ESResult<?> Count(ESQueryBuilderConstructor constructor) throws IOException {
@@ -314,7 +353,7 @@ public abstract class ESRepository {
 
 	/**
 	 * 批量增加或更新
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public <T> void bulkAddOrUpdate(Map<String, T> docs) throws IOException {
@@ -338,14 +377,14 @@ public abstract class ESRepository {
 				BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
 				log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
 				log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
-			} 
+			}
 		}
-		
+
 	}
 
 	/**
 	 * 批量删除
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void bulkDelete(List<String> ids) throws IOException {

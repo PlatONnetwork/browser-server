@@ -37,7 +37,6 @@ task createDirs() {
 	file('build/lib').mkdirs()
     file('build/package/browser-agent').mkdirs()
     file('build/package/lib').mkdirs()
-    file('build/package/sql').mkdirs()
 }
 //task 用来复制build出来的主jar包
 task copyLibs(type: Copy) {
@@ -80,11 +79,6 @@ task copyJasypt(type: Copy) {
     from 'build/lib/jasypt-1.9.2.jar'
     into 'build/package/lib'
 }
-// task 用来复制对应sql
-task copySql(type: Copy) {
-    from 'src/main/resources/sql'
-    into 'build/package/sql'
-}
 
 // task 用来删除lib
 task deleteLib(type: Delete) {
@@ -98,7 +92,6 @@ task prepareFile(dependsOn: [
         'copyBin',
         'copyDep',
         'copyJasypt',
-        'copySql',
         'deleteLib'
 ]){}
 //指定打包的tar包的名字，以及文件来源目录
@@ -133,6 +126,6 @@ sonarqube {
                 "**/OnSettleConverter.java,**/PersistenceEvent.java,**/AddressTypeEnum.java," +
                 "**/ConfigChange.java,**/TxAnalyseResult.java,**/DelegateExitResult.java," +
                 "**/CalculateUtils.java,**/PersistenceEventHandler.java,**/DelegateRewardClaimConverter.java," +
-                "**/EsDelegateRewardService.java"
+                "**/EsDelegateRewardService.java,**/ERC20Client.java"
     }
 }

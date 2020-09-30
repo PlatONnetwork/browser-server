@@ -58,8 +58,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
         long startTime = System.currentTimeMillis();
 
         log.debug("PersistenceEvent处理:{}(event(block({}),transactions({}),nodeOpts({}),delegateRewards({})),sequence({}),endOfBatch({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),
-                event.getNodeOpts().size(),event.getDelegationRewards().size(),sequence,endOfBatch);
+                Thread.currentThread().getStackTrace()[1].getMethodName(), event.getBlock().getNum(), event.getTransactions().size(),
+                event.getNodeOpts().size(), event.getDelegationRewards().size(), sequence, endOfBatch);
         try {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
@@ -76,7 +76,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             }
 
             // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(blockStage,transactionStage,nodeOptStage,delegationRewardStage);
+            esImportService.batchImport(blockStage, transactionStage, nodeOptStage, delegationRewardStage);
+
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             statistics.add(networkStatCache.getNetworkStat());

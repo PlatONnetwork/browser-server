@@ -62,6 +62,8 @@ subprojects {
         compile "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "commons-io:commons-io:$commonIoVersion"
+        compile "redis.clients:jedis:$jedisVersion"
+        compile "org.yaml:snakeyaml:1.23"
         testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-api-easymock', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
@@ -125,6 +127,7 @@ subprojects {
 	    exclude '**/CustomNodeMapperTest.class'
 	    exclude '**/StakingContractTest.class'
 	    exclude '**/WASMUploadTest.class'
+	    exclude '**/WASMDestructTest.class'
 	    exclude '**/SuicideAndSelfdestructTest.class'
 	    exclude '**/HumanStandardTokenTest.class'
 	    exclude '**/proxyppos/*Test.class'

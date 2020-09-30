@@ -47,6 +47,7 @@ spring:
       delegationIndexName: browser_delegation_1
       nodeOptIndexName: browser_nodeopt_1
       delegationRewardIndexName: browser_delegation_reward_1
+      innerTxIndexName: browser_inner_tx_1
 #redis配置
 redisCluster:
   configKey: DEFAULT
@@ -134,3 +135,8 @@ system.username: admin
 system.password: admin
 client.username: guest
 client.password: guest
+limit:
+  num: 10
+output:
+  file:
+    url: D:/

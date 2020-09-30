@@ -1,3 +1,4 @@
+*/build
 HELP.md
 .gradle
 /build/
@@ -35,3 +36,5 @@ HELP.md
 /build/*
 /out/ 
 /bin/
+
+apidoc.zip
