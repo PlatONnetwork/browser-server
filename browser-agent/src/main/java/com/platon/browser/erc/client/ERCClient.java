@@ -2,6 +2,7 @@ package com.platon.browser.erc.client;
 
 import com.alaya.crypto.Credentials;
 import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.exceptions.ContractCallException;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -23,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @program: browser-server
