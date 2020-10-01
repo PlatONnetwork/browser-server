@@ -1,5 +1,14 @@
 package com.platon.browser.common.collection.dto;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.web3j.protocol.core.methods.response.PlatonBlock;
+import org.web3j.protocol.core.methods.response.Transaction;
+
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
@@ -40,7 +49,7 @@ public class CollectionBlock extends Block {
 
     public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult,
         PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi, ERCInterface ercInterface)
-        throws BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
+        throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         String nodeId;
         if (block.getNumber().longValue() == 0) {
             nodeId = "000000000000000000000000000000000";

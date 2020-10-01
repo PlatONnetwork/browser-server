@@ -13,11 +13,8 @@ import java.math.BigInteger;
  */
 @Data
 public class TransferEvent {
-    public String from;
-
-    public String to;
-
-    public BigInteger value;
-    
-    public Log log;
+    private String from;
+    private String to;
+    private BigInteger value;
+    private Log log;
 }
