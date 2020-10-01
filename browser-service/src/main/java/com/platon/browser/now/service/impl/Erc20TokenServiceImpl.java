@@ -1,14 +1,5 @@
 package com.platon.browser.now.service.impl;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenDetailWithBLOBs;
 import com.platon.browser.dao.mapper.Erc20TokenDetailMapper;
@@ -21,8 +12,15 @@ import com.platon.browser.res.token.QueryTokenDetailResp;
 import com.platon.browser.res.token.QueryTokenListResp;
 import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.PageHelper;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Token模块实现类
@@ -79,12 +77,12 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
             response.setAbi(detailWithBLOBs.getAbi());
             response.setBinCode(detailWithBLOBs.getBinCode());
             response.setSourceCode(detailWithBLOBs.getSourceCode());
-            // cal total supply -> decimal
-            if (erc20Token != null) {
-                BigDecimal totalSupply =
+        }
+        // cal total supply -> decimal
+        if (response != null && erc20Token != null) {
+            BigDecimal totalSupply =
                     ConvertUtil.convertByFactor(erc20Token.getTotalSupply(), erc20Token.getDecimal());
-                response.setTotalSupply(totalSupply);
-            }
+            response.setTotalSupply(totalSupply.toString());
         }
         return response;
     }
