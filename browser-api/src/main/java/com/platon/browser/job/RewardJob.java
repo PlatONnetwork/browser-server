@@ -1,20 +1,5 @@
 package com.platon.browser.job;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
@@ -27,8 +12,21 @@ import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: browser-server
@@ -129,40 +127,21 @@ public class RewardJob {
     }
 
     private void buildFile(String fileName, List<Object[]> rows, String[] headers) {
-        FileOutputStream fis = null;
-        OutputStreamWriter outputWriter = null;
-        try {
-            File file = new File(this.fileUrl);
-            if (!file.exists()) {
-                file.mkdir();
-            }
-            /** 初始化输出流对象 */
-            fis = new FileOutputStream(this.fileUrl + fileName);
-            /** 设置返回的头，防止csv乱码 */
+        File file = new File(this.fileUrl);
+        if (!file.exists()) file.mkdir();
+        try(FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName)) {
+            /* 设置返回的头，防止csv乱码 */
             fis.write(new byte[] {(byte)0xEF, (byte)0xBB, (byte)0xBF});
-            outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
-            /** 厨师书writer对象 */
-            CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-            if (headers != null) {
-                writer.writeHeaders(headers);
+            try (OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8)){
+                CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+                if (headers != null) writer.writeHeaders(headers);
+                writer.writeRowsAndClose(rows);
+                log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
+            } catch (IOException e) {
+                log.error("导出报表失败:", e);
             }
-            writer.writeRowsAndClose(rows);
         } catch (IOException e) {
             log.error("数据输出错误:", e);
-            return;
-        } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-                if (outputWriter != null) {
-                    outputWriter.close();
-                }
-            } catch (IOException e) {
-                log.info("关闭失败", e);
-            }
-
         }
-        log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
     }
 }
