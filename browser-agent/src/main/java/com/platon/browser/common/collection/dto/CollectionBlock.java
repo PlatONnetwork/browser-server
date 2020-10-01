@@ -1,14 +1,7 @@
 package com.platon.browser.common.collection.dto;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.Transaction;
-
+import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.alaya.protocol.core.methods.response.Transaction;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
@@ -22,12 +15,8 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
-
 import lombok.extern.slf4j.Slf4j;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
-import com.alaya.protocol.core.methods.response.Transaction;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
