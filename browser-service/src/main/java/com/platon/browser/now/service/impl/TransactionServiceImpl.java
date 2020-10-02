@@ -422,10 +422,8 @@ public class TransactionServiceImpl implements TransactionService {
                         resp.setDetails(createValidatorParam.getDetails());
                         resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
                         resp.setTxAmount(createValidatorParam.getAmount());
-                        resp.setExternalUrl(
-                            this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-                        resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer())
-                            .divide(BrowserConst.PERCENTAGE).toString());
+                        resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
+                        resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
                         break;
                     /**
                      * 编辑验证人
@@ -437,12 +435,9 @@ public class TransactionServiceImpl implements TransactionService {
                         resp.setExternalId(editValidatorParam.getExternalId());
                         resp.setWebsite(editValidatorParam.getWebsite());
                         resp.setDetails(editValidatorParam.getDetails());
-                        resp.setNodeName(this.commonService.getNodeName(editValidatorParam.getNodeId(),
-                            editValidatorParam.getNodeName()));
-                        resp.setExternalUrl(
-                            this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-                        resp.setDelegationRatio(new BigDecimal(editValidatorParam.getDelegateRewardPer())
-                            .divide(BrowserConst.PERCENTAGE).toString());
+                        resp.setNodeName(this.commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
+                        resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
+                        resp.setDelegationRatio(new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
                         break;
                     /**
                      * 增加质押
@@ -454,8 +449,7 @@ public class TransactionServiceImpl implements TransactionService {
                         /**
                          * 节点名称设置
                          */
-                        resp.setNodeName(this.commonService.getNodeName(increaseStakingParam.getNodeId(),
-                            increaseStakingParam.getNodeName()));
+                        resp.setNodeName(this.commonService.getNodeName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
                         break;
                     /**
                      * 退出验证人
@@ -464,8 +458,7 @@ public class TransactionServiceImpl implements TransactionService {
                         // nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
                         StakeExitParam exitValidatorParam = JSON.parseObject(txInfo, StakeExitParam.class);
                         resp.setNodeId(exitValidatorParam.getNodeId());
-                        resp.setNodeName(this.commonService.getNodeName(exitValidatorParam.getNodeId(),
-                            exitValidatorParam.getNodeName()));
+                        resp.setNodeName(this.commonService.getNodeName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
                         resp.setApplyAmount(exitValidatorParam.getAmount());
                         StakingKey stakingKeyE = new StakingKey();
                         stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
@@ -489,8 +482,7 @@ public class TransactionServiceImpl implements TransactionService {
                         DelegateCreateParam delegateParam = JSON.parseObject(txInfo, DelegateCreateParam.class);
                         resp.setNodeId(delegateParam.getNodeId());
                         resp.setTxAmount(delegateParam.getAmount());
-                        resp.setNodeName(
-                            this.commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
+                        resp.setNodeName(this.commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
                         break;
                     /**
                      * 委托赎回
@@ -502,8 +494,7 @@ public class TransactionServiceImpl implements TransactionService {
                         resp.setNodeId(unDelegateParam.getNodeId());
                         resp.setApplyAmount(unDelegateParam.getRealAmount());
                         resp.setTxAmount(unDelegateParam.getReward());
-                        resp.setNodeName(
-                            this.commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
+                        resp.setNodeName(this.commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
                         break;
                     /**
                      * 文本提案
