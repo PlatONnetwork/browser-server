@@ -10,7 +10,10 @@ import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.GasEstimateMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -52,8 +55,6 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
     private CustomGasEstimateMapper customGasEstimateMapper;
     @Autowired
     private GasEstimateMapper gasEstimateMapper;
-    @Autowired
-    private NodeMapper nodeMapper;
 	
     @Override
     public DelegateExitResult convert(CollectionEvent event, Transaction tx) {
@@ -76,14 +77,14 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         if(delegation==null) return der;
         // 查询出对应的节点信息
-        NodeExample nodeExample = new NodeExample();
-        nodeExample.createCriteria().andNodeIdEqualTo(delegation.getNodeId())
+        StakingExample stakingExample = new StakingExample();
+        stakingExample.createCriteria().andNodeIdEqualTo(delegation.getNodeId())
                 .andStakingBlockNumEqualTo(delegation.getStakingBlockNum());
-        List<Node> nodes = nodeMapper.selectByExample(nodeExample);
+        List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 
-        if(nodes.isEmpty()) throw new BusinessException("委托者:"+tx.getFrom()+"的质押节点:"+txParam.getNodeId()+"不存在");
+        if(stakings.isEmpty()) throw new BusinessException("委托者:"+tx.getFrom()+"的质押节点:"+txParam.getNodeId()+"不存在");
 
-        Node node = nodes.get(0);
+        Staking staking = stakings.get(0);
 
         DelegateExit businessParam= DelegateExit.builder()
                 .nodeId(txParam.getNodeId())
@@ -104,14 +105,12 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
          * 犹豫够扣: 委托和质押表从stat_delegate_hes扣，节点表从stat_delegate_value扣
          * 犹豫不够扣: 委托和质押从stat_delegate_hes和stat_delegate_locked扣，节点表从stat_delegate_value扣
          */
-        boolean needDeleteGasEstimate = false; // 是否需要更新估算记录
         boolean isCandidate = true; // 对应节点是否候选中
 
-        if(node.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()
-                ||node.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()){
+        if(staking.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()
+                ||staking.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()){
             // 节点是[退出中|已退出]
             businessParam.setCodeNodeIsLeave(true);
-            needDeleteGasEstimate = true;
             isCandidate=false;
         }
 
@@ -120,7 +119,6 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
                 .add(delegation.getDelegateReleased()) // +待提取金额
                 .subtract(txParam.getAmount()) // -申请退回金额
                 .compareTo(chainConfig.getDelegateThreshold())<0; // 小于委托门槛
-
         // 计算真实退回金额
         BigDecimal realRefundAmount=txParam.getAmount();
         if(isRefundAll){
@@ -224,7 +222,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExitRe
 
         addressCache.update(businessParam);
 
-        if(needDeleteGasEstimate){
+        if(isRefundAll){
             // 1. 全部赎回： 删除对应记录
             GasEstimateKey gek = new GasEstimateKey();
             gek.setNodeId(txParam.getNodeId());
