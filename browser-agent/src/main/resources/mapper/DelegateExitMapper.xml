@@ -19,8 +19,8 @@
         <if test="codeIsHistory == 1 and codeNodeIsLeave == true">
           	`stat_invalid_addrs` = `stat_invalid_addrs` - 1,
         </if>
-        `total_value` = `total_value` - #{realRefundAmount},
         <if test="codeNodeIsLeave == false">
+        `total_value` = `total_value` - #{realRefundAmount},
         `stat_delegate_value` = `stat_delegate_value` -  #{realRefundAmount},
         </if>
         `stat_delegate_released` = `stat_delegate_released` - #{decrease.delegateReleased},
