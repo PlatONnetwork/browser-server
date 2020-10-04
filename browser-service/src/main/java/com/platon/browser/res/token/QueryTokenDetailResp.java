@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -33,7 +32,7 @@ public class QueryTokenDetailResp {
     @ApiModelProperty(value = "合约精度")
     private Integer decimal;
     @ApiModelProperty(value = "合约发行总量")
-    private BigDecimal totalSupply;
+    private String totalSupply;
     @ApiModelProperty(value = "合约图标（base64编码）")
     private String icon;
     @ApiModelProperty(value = "合约创建者")
@@ -64,7 +63,7 @@ public class QueryTokenDetailResp {
         return QueryTokenDetailResp.builder()
                 .address(token.getAddress()).name(token.getName())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(token.getTotalSupply())
+                .totalSupply(token.getTotalSupply().toString())
                 .creator(token.getCreator()).txHash(token.getTxHash())
                 .blockTimestamp(token.getBlockTimestamp())
                 .txCount(token.getTxCount())
