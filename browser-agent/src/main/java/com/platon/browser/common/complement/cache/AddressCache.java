@@ -11,6 +11,7 @@ import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dto.CustomErc20Token;
 import com.platon.browser.dto.ERCData;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -30,6 +31,8 @@ public class AddressCache {
     private Map<String, Address> addressMap = new ConcurrentHashMap<>();
 
     private Map<String, Erc20Token> erc20TokenMap = new ConcurrentHashMap<>();
+
+    private Map<String, Erc20TokenAddressRel> erc20TokenAddressRelMap = new ConcurrentHashMap<>();
 
     private Map<String, Erc20Token> preErc20TokenMap = new ConcurrentHashMap<>();
 
@@ -146,6 +149,14 @@ public class AddressCache {
         this.preErc20TokenMap.clear();
         this.preErc20TokenMap.putAll(this.erc20TokenMap);
         this.erc20TokenMap.clear();
+    }
+
+    public void cleanErcAddressCache() {
+        this.evmErc20ContractAddressCache.clear();
+    }
+
+    public Map<String, Erc20TokenAddressRel> getErc20TokenAddressRelMap() {
+        return this.erc20TokenAddressRelMap;
     }
 
     private void updateAddress(Transaction tx, String addr) {

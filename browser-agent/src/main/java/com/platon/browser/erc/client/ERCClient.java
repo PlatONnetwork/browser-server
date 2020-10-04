@@ -1,9 +1,11 @@
 package com.platon.browser.erc.client;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dto.ERCData;
 import com.platon.browser.dto.TransferEvent;
@@ -203,6 +206,21 @@ public class ERCClient implements ERCInterface {
                         .innerDecimal(String.valueOf(esTokenTransferRecord.getDecimal()))
                         .innerValue(esTokenTransferRecord.getTValue()).build();
                     erc20Params.add(erc20Param);
+
+                    Erc20TokenAddressRel erc20TokenAddressRelTo =
+                        Erc20TokenAddressRel.builder().decimal(esTokenTransferRecord.getDecimal())
+                            .contract(esTokenTransferRecord.getContract()).name(esTokenTransferRecord.getName())
+                            .symbol(esTokenTransferRecord.getSymbol()).address(esTokenTransferRecord.getTto())
+                            .balance(new BigDecimal(esTokenTransferRecord.getTValue())).build();
+                    addressCache.getErc20TokenAddressRelMap().put("to" + UUID.randomUUID().toString(),
+                        erc20TokenAddressRelTo);
+                    Erc20TokenAddressRel erc20TokenAddressRelFrom =
+                        Erc20TokenAddressRel.builder().decimal(esTokenTransferRecord.getDecimal())
+                            .contract(esTokenTransferRecord.getContract()).name(esTokenTransferRecord.getName())
+                            .symbol(esTokenTransferRecord.getSymbol()).address(esTokenTransferRecord.getFrom())
+                            .balance(new BigDecimal(esTokenTransferRecord.getTValue()).negate()).build();
+                    addressCache.getErc20TokenAddressRelMap().put("form" + UUID.randomUUID().toString(),
+                        erc20TokenAddressRelFrom);
                 });
                 transaction.setInfo(JSONObject.toJSONString(erc20Params));
             });
