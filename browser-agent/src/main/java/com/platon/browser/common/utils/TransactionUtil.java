@@ -1,7 +1,24 @@
 package com.platon.browser.common.utils;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.springframework.beans.BeanUtils;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.Log;
+import org.web3j.protocol.core.methods.response.PlatonGetCode;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
+import org.web3j.utils.Numeric;
+
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.*;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -28,23 +45,6 @@ import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResu
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
 import com.platon.sdk.contracts.ppos.dto.common.ErrorCode;
-import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.PlatonGetCode;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 虚拟交易工具
@@ -400,10 +400,14 @@ public class TransactionUtil {
                         .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
                         .contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
                         .info(transferEvent.getLog().getData()).ctime(new Date()).build();
+                esTokenTransferRecord.setFromType(addressCache.getTypeData(tx.getFrom()));
+                esTokenTransferRecord.setToType(addressCache.getTypeData(tx.getTo()));
                 i.getAndIncrement();
                 esTokenTransferRecords.add(esTokenTransferRecord);
             });
+
         }
         return esTokenTransferRecords;
     }
+
 }

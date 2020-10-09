@@ -1,5 +1,17 @@
 package com.platon.browser.now.service.impl;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
@@ -14,18 +26,8 @@ import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.token.QueryTokenTransferRecordListResp;
 import com.platon.browser.util.ConvertUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 合约内部转账交易记录
@@ -74,9 +76,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         constructor.setDesc("seq");
         // response filed to show.
         constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
-                "tto", "tValue", "decimal", "name", "symbol", "result", "bTime" });
+            "tto", "tValue", "decimal", "name", "symbol", "result", "bTime", "fromType", "toType"});
         try {
-            queryResultFromES = esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class, req.getPageNo(), req.getPageSize());
+            queryResultFromES = this.esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class,
+                req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             log.error("检索代币交易列表失败", e);
             return result;
@@ -91,7 +94,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
                 .filter(p -> p != null && p.getDecimal() != null)
                 .map(p -> {
-                    return toQueryTokenTransferRecordListResp(req.getAddress(), p);
+                return this.toQueryTokenTransferRecordListResp(req.getAddress(), p);
                 }).collect(Collectors.toList());
 
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -109,6 +112,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 .methodSign(record.getSign()).result(record.getResult())
                 .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
                 .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
+            .fromType(record.getFromType()).toType(record.getToType())
                 .build();
         // Processing accuracy calculation.
         if (null != record.getTValue()) {
@@ -132,11 +136,11 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
     @Override
     public int save(Erc20TokenTransferRecord record) {
-        return erc20TokenTransferRecordMapper.insert(record);
+        return this.erc20TokenTransferRecordMapper.insert(record);
     }
 
     @Override
     public int batchSave(List<Erc20TokenTransferRecord> list) {
-        return erc20TokenTransferRecordMapper.batchInsert(list);
+        return this.erc20TokenTransferRecordMapper.batchInsert(list);
     }
 }
