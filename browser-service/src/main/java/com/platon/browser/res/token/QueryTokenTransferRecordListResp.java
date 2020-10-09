@@ -1,16 +1,17 @@
 package com.platon.browser.res.token;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * Erc20 合约内部转账交易数据
@@ -55,9 +56,13 @@ public class QueryTokenTransferRecordListResp {
     private Long systemTimestamp;
     @ApiModelProperty(value = "交易方向：INPUT 入账，OUT 出账")
     private String type;   // 交易类型：input 进账， out 出账
+    @ApiModelProperty(value = "from 类型")
+    private Integer fromType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
+    @ApiModelProperty(value = "to类型")
+    private Integer toType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(String type) {
@@ -65,7 +70,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public String getTxHash() {
-        return txHash;
+        return this.txHash;
     }
 
     public void setTxHash(String txHash) {
@@ -73,7 +78,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public Long getBlockNumber() {
-        return blockNumber;
+        return this.blockNumber;
     }
 
     public void setBlockNumber(Long blockNumber) {
@@ -81,7 +86,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public String getTxFrom() {
-        return txFrom;
+        return this.txFrom;
     }
 
     public void setTxFrom(String txFrom) {
@@ -89,7 +94,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public String getContract() {
-        return contract;
+        return this.contract;
     }
 
     public void setContract(String contract) {
@@ -97,7 +102,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public String getTransferTo() {
-        return transferTo;
+        return this.transferTo;
     }
 
     public void setTransferTo(String transferTo) {
@@ -105,7 +110,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public BigDecimal getTransferValue() {
-        return transferValue;
+        return this.transferValue;
     }
 
     public void setTransferValue(BigDecimal transferValue) {
@@ -113,7 +118,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public Integer getDecimal() {
-        return decimal;
+        return this.decimal;
     }
 
     public void setDecimal(Integer decimal) {
@@ -121,7 +126,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public String getSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
     public void setSymbol(String symbol) {
@@ -129,7 +134,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public String getMethodSign() {
-        return methodSign;
+        return this.methodSign;
     }
 
     public void setMethodSign(String methodSign) {
@@ -137,7 +142,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public Integer getResult() {
-        return result;
+        return this.result;
     }
 
     public void setResult(Integer result) {
@@ -145,7 +150,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public Date getBlockTimestamp() {
-        return blockTimestamp;
+        return this.blockTimestamp;
     }
 
     public void setBlockTimestamp(Date blockTimestamp) {
@@ -154,7 +159,7 @@ public class QueryTokenTransferRecordListResp {
 
     @JsonSerialize(using = CustomLatSerializer.class)
     public BigDecimal getValue() {
-        return value;
+        return this.value;
     }
 
     public void setValue(BigDecimal value) {
@@ -162,7 +167,7 @@ public class QueryTokenTransferRecordListResp {
     }
 
     public Long getSystemTimestamp() {
-        return systemTimestamp;
+        return this.systemTimestamp;
     }
 
     public void setSystemTimestamp(Long systemTimestamp) {
@@ -183,7 +188,7 @@ public class QueryTokenTransferRecordListResp {
         }
 
         public String val() {
-            return type;
+            return this.type;
         }
     }
 

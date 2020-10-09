@@ -1,12 +1,12 @@
 package com.platon.browser.elasticsearch.dto;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.util.Date;
 
 /**
  * @author AgentRJ
@@ -33,5 +33,7 @@ public class ESTokenTransferRecord {
     private Date bTime;                 // 区块时间
     private String value;               // 交易value
     private String info;                // 回执信息
+    private Integer fromType; // 发送方类型
+    private Integer toType; // 接收方类型
     private Date ctime;                 // 记录创建时间（以录入ES时间为主）
 }

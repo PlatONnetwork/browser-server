@@ -87,6 +87,12 @@
           "status": {
              "type": "integer"
           },
+          "fromType": {
+             "type": "integer"
+          },
+          "toType": {
+             "type": "integer"
+          },
           "info": {
             "type": "text",
             "index": false,

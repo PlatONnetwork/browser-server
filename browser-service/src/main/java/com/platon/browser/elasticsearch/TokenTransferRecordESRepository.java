@@ -1,14 +1,16 @@
 package com.platon.browser.elasticsearch;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+
+import javax.annotation.PostConstruct;
+
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 针对处理合约内部转账记录的ES处理器
@@ -27,7 +29,7 @@ public class TokenTransferRecordESRepository extends ESRepository {
     public void init() {
         try {
             // Self-test index template.
-            putIndexTemplate(defaultIndexTemplateName, defaultIndexTemplate());
+            this.putIndexTemplate(this.defaultIndexTemplateName, this.defaultIndexTemplate());
         } catch (IOException e) {
             log.error("Automatic detection of internal transaction index template failed.", e);
             throw new RuntimeException(e);
@@ -36,7 +38,7 @@ public class TokenTransferRecordESRepository extends ESRepository {
 
     @Override
     public String getIndexName() {
-        return indexName;
+        return this.indexName;
     }
 
     public XContentBuilder defaultIndexTemplate() throws IOException {
@@ -62,6 +64,8 @@ public class TokenTransferRecordESRepository extends ESRepository {
                             .startObject("symbol").field("type", "keyword").endObject()
                             .startObject("sign").field("type", "keyword").endObject()
                             .startObject("result").field("type", "integer").endObject()
+            .startObject("fromType").field("type", "integer").endObject().startObject("toType").field("type", "integer")
+            .endObject()
                             .startObject("bTime").field("type", "date").field("format", "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis").endObject()
                             .startObject("value").field("type", "keyword").endObject()
                             .startObject("info").field("type", "text").endObject()

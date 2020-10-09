@@ -68,11 +68,22 @@ public class AddressCache {
 
     // 判断是不是普通合约（EVM||WASM）地址
     public boolean isGeneralContractAddress(String address) {
-        boolean bool = this.evmContractAddressCache.contains(address);
-        if (!bool) {
-            bool = this.wasmContractAddressCache.contains(address);
+        return this.evmContractAddressCache.contains(address) && this.wasmContractAddressCache.contains(address)
+            && this.evmErc20ContractAddressCache.contains(address);
+    }
+
+    public Integer getTypeData(String address) {
+        if (InnerContractAddrEnum.getAddresses().contains(address)) {
+            return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
+        } else if (this.isEvmContractAddress(address)) {
+            return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
+        } else if (this.isWasmContractAddress(address)) {
+            return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
+        } else if (this.isEvmErc20ContractAddress(address)) {
+            return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
+        } else {
+            return Transaction.ToTypeEnum.ACCOUNT.getCode();
         }
-        return bool;
     }
 
     public void update(Transaction tx) {

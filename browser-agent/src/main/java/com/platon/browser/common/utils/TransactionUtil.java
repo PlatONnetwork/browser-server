@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TransactionUtil {
     /**
      * 根据合约内部调用PPOS的输入信息生成虚拟PPOS交易列表
-     *
+     * 
      * @param block
      *            合约调用交易所在区块信息
      * @param parentTx
@@ -106,7 +106,7 @@ public class TransactionUtil {
 
     /**
      * 通用解委托奖励日志数据解析
-     *
+     * 
      * @param log
      * @return
      */
@@ -131,7 +131,7 @@ public class TransactionUtil {
 
     /**
      * 处理虚拟交易
-     *
+     * 
      * @param block
      * @param specialApi
      * @param platOnClient
@@ -244,7 +244,7 @@ public class TransactionUtil {
 
     /**
      * 获取合约的Bin代码
-     *
+     * 
      * @param platOnClient
      * @param contractAddress
      * @return
@@ -266,7 +266,7 @@ public class TransactionUtil {
 
     /**
      * 创建普通合约交易,解析补充信息
-     *
+     * 
      * @param contractAddress
      * @param ci
      * @throws IOException
@@ -292,7 +292,7 @@ public class TransactionUtil {
 
     /**
      * 调用普通合约交易,解析补充信息
-     *
+     * 
      * @param ci
      * @throws IOException
      */
@@ -321,7 +321,7 @@ public class TransactionUtil {
 
     /**
      * 发起普通交易,解析补充信息
-     *
+     * 
      * @param ci
      */
     public static void resolveGeneralTransferTxComplementInfo(CollectionTransaction tx, ComplementInfo ci,
@@ -353,7 +353,7 @@ public class TransactionUtil {
 
     /**
      * 解析erc合约交易
-     *
+     * 
      * @param tx
      * @param ci
      * @param contractAddress
