@@ -337,7 +337,11 @@ public class StakingServiceImpl implements StakingService {
 					resp.setTotalValue(BigDecimal.ZERO);
 					resp.setStakingValue(BigDecimal.ZERO);
 				} else {
-					resp.setStakingValue(stakingNode.getStakingReduction());
+                    if (stakingNode.getStatus().intValue() == StatusEnum.LOCKED.getCode()) {
+                        resp.setStakingValue(stakingNode.getStakingLocked());
+                    } else {
+                        resp.setStakingValue(stakingNode.getStakingReduction());
+                    }
 					BigDecimal totalValue = resp.getStakingValue().add(resp.getDelegateValue());
 					resp.setTotalValue(totalValue);
 				}
@@ -446,7 +450,7 @@ public class StakingServiceImpl implements StakingService {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			BeanUtils.copyProperties(delegationStaking, byStakingResp);
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
-		   /**已锁定委托（ATP）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
+		   /**已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
 			byStakingResp.setDelegateTotalValue(node.getStatDelegateValue());
 			/**
 			 * 委托金额等于has加上实际lock金额
