@@ -1,5 +1,19 @@
 package com.platon.browser.now.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatOnClient;
@@ -34,19 +48,6 @@ import com.platon.browser.res.staking.*;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.HexTool;
 import com.platon.sdk.contracts.ppos.dto.resp.Reward;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  *  验证人模块方法
@@ -90,7 +91,7 @@ public class StakingServiceImpl implements StakingService {
 	@Override
 	public StakingStatisticNewResp stakingStatisticNew() {
 		/** 获取统计信息 */
-		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+        NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
 		StakingStatisticNewResp stakingStatisticNewResp = new StakingStatisticNewResp();
 		if(networkStatRedis != null) {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
@@ -99,7 +100,7 @@ public class StakingServiceImpl implements StakingService {
 			stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue()
 					.subtract(networkStatRedis.getStakingValue()));
 			//实时除以现有的结算周期人数
-			Integer count= customStakingMapper.selectCountByActive();
+            Integer count = this.customStakingMapper.selectCountByActive();
 			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
 			
 		}
@@ -169,10 +170,10 @@ public class StakingServiceImpl implements StakingService {
 			nodeExample.or(criteria2);
 		}
 
-		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
+        Page<Node> stakingPage = this.customNodeMapper.selectListByExample(nodeExample);
 		List<Node> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
-		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+        NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
@@ -230,7 +231,7 @@ public class StakingServiceImpl implements StakingService {
 		if(StringUtils.isNotBlank(req.getKey())) {
 			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
-		Page<Node> stakings = customNodeMapper.selectListByExample(nodeExample);
+        Page<Node> stakings = this.customNodeMapper.selectListByExample(nodeExample);
 		
 		for (Node stakingNode:stakings.getResult()) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
@@ -261,7 +262,7 @@ public class StakingServiceImpl implements StakingService {
 		/**
 		 * 先查询是否活跃节点，查不到再查询是否历史汇总
 		 */
-		Node stakingNode = nodeMapper.selectByPrimaryKey(req.getNodeId());
+        Node stakingNode = this.nodeMapper.selectByPrimaryKey(req.getNodeId());
 		StakingDetailsResp resp = new StakingDetailsResp();
 		// 只有一条数据
 		if (stakingNode != null) {
@@ -306,9 +307,9 @@ public class StakingServiceImpl implements StakingService {
 			resp.setWebsite(webSite);
 			/** 实际跳转地址是url拼接上名称 */
 			if (StringUtils.isNotBlank(stakingNode.getExternalName())) {
-				resp.setExternalUrl(blockChainConfig.getKeyBase() + stakingNode.getExternalName());
+                resp.setExternalUrl(this.blockChainConfig.getKeyBase() + stakingNode.getExternalName());
 			} else {
-				resp.setExternalUrl(blockChainConfig.getKeyBase());
+                resp.setExternalUrl(this.blockChainConfig.getKeyBase());
 			}
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
@@ -337,7 +338,11 @@ public class StakingServiceImpl implements StakingService {
 					resp.setTotalValue(BigDecimal.ZERO);
 					resp.setStakingValue(BigDecimal.ZERO);
 				} else {
-					resp.setStakingValue(stakingNode.getStakingReduction());
+                    if (stakingNode.getStatus().intValue() == StatusEnum.LOCKED.getCode()) {
+                        resp.setStakingValue(stakingNode.getStakingLocked());
+                    } else {
+                        resp.setStakingValue(stakingNode.getStakingReduction());
+                    }
 					BigDecimal totalValue = resp.getStakingValue().add(resp.getDelegateValue());
 					resp.setTotalValue(totalValue);
 				}
@@ -345,7 +350,7 @@ public class StakingServiceImpl implements StakingService {
 				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
 			}
 		}
-		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
+        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), resp);
 	}
 
 	@Override
@@ -356,9 +361,9 @@ public class StakingServiceImpl implements StakingService {
 		ESResult<NodeOpt> items = new ESResult<>();
 		constructor.setDesc("id");
 		try {
-			items = nodeOptESRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
+            items = this.nodeOptESRepository.search(constructor, NodeOpt.class, req.getPageNo(), req.getPageSize());
 		} catch (Exception e) {
-			logger.error("获取节点操作错误。", e);
+            this.logger.error("获取节点操作错误。", e);
 			return respPage;
 		}
 		List<NodeOpt> nodeOpts = items.getRsData();
@@ -437,11 +442,11 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req) {
-		Node node = nodeMapper.selectByPrimaryKey(req.getNodeId());
+        Node node = this.nodeMapper.selectByPrimaryKey(req.getNodeId());
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		List<DelegationListByStakingResp> lists = new LinkedList<>();
 		/** 根据节点id和区块查询验证委托信息 */
-		Page<DelegationStaking> delegationStakings = customDelegationMapper.selectStakingByNodeId(req.getNodeId());
+        Page<DelegationStaking> delegationStakings = this.customDelegationMapper.selectStakingByNodeId(req.getNodeId());
 		for (DelegationStaking delegationStaking: delegationStakings.getResult()) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			BeanUtils.copyProperties(delegationStaking, byStakingResp);
@@ -470,7 +475,7 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByAddressResp> lists = new LinkedList<>();
 		/** 根据地址分页查询委托列表 */
 		Page<DelegationAddress> delegationAddresses =
-				customDelegationMapper.selectAddressByAddr(req.getAddress());
+            this.customDelegationMapper.selectAddressByAddr(req.getAddress());
 		/**
 		 * 初始化奖励节点id列表，用来后续查询对应的待领取奖励使用
 		 */
@@ -483,9 +488,9 @@ public class StakingServiceImpl implements StakingService {
 		 */
 		List<Reward> rewards = new ArrayList<>();
 		try {
-			rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
+            rewards = this.platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
 		} catch (Exception e) {
-			logger.error("获取奖励数据错误：{}",e.getMessage());
+            this.logger.error("获取奖励数据错误：{}", e.getMessage());
 			rewards = new ArrayList<>();
 		}
 		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
@@ -533,10 +538,10 @@ public class StakingServiceImpl implements StakingService {
 		if(StringUtils.isNotBlank(req.getKey())) {
 			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
-		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
+        Page<Node> stakingPage = this.customNodeMapper.selectListByExample(nodeExample);
 
 		/** 查询出块节点 */
-		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+        NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
 		int i=0;
 		for (Node node:stakingPage) {
 			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();
