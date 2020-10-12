@@ -1,10 +1,6 @@
 package com.platon.browser.dao.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,10 +8,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Builder
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Accessors(chain = true)
 public class Erc20TokenAddressRel {
     private Long id;
 
@@ -34,7 +26,7 @@ public class Erc20TokenAddressRel {
     private Date updateTime;
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -42,7 +34,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getContract() {
-        return contract;
+        return this.contract;
     }
 
     public void setContract(String contract) {
@@ -50,7 +42,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -58,7 +50,7 @@ public class Erc20TokenAddressRel {
     }
 
     public BigDecimal getBalance() {
-        return balance;
+        return this.balance;
     }
 
     public void setBalance(BigDecimal balance) {
@@ -66,7 +58,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -74,7 +66,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
     public void setSymbol(String symbol) {
@@ -82,7 +74,7 @@ public class Erc20TokenAddressRel {
     }
 
     public Integer getDecimal() {
-        return decimal;
+        return this.decimal;
     }
 
     public void setDecimal(Integer decimal) {
@@ -90,7 +82,7 @@ public class Erc20TokenAddressRel {
     }
 
     public Date getUpdateTime() {
-        return updateTime;
+        return this.updateTime;
     }
 
     public void setUpdateTime(Date updateTime) {

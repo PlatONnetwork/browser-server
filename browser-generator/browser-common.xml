@@ -148,7 +148,7 @@
         <table tableName="erc20_token_transfer_record" domainObjectName="Erc20TokenTransferRecord">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>-->
-        <table tableName="address" domainObjectName="Address">
+        <table tableName="erc20_token_address_rel" domainObjectName="Erc20TokenAddressRel">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

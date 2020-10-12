@@ -1,9 +1,9 @@
 package com.platon.browser.res.address;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
-
-import java.math.BigDecimal;
 
 /**
  *  查询地址的返回的对象
@@ -20,6 +20,7 @@ public class QueryDetailResp {
     private BigDecimal delegateValue;       //委托的金额
     private BigDecimal redeemedValue;       //赎回中的金额
     private Integer txQty;             //交易总数
+    private Integer tokenQty; // token交易总数
     private Integer transferQty;         //转账交易总数
     private Integer delegateQty;         //委托交易总数
     private Integer stakingQty;          //验证人交易总数
@@ -39,165 +40,172 @@ public class QueryDetailResp {
     private Integer isDestroy; //是否销毁 
     private String destroyHash; //合约销毁哈希
 	public Integer getType() {
-		return type;
+		return this.type;
 	}
 	public void setType(Integer type) {
 		this.type = type;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getBalance() {
-		return balance;
+		return this.balance;
 	}
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getRestrictingBalance() {
-		return restrictingBalance;
+		return this.restrictingBalance;
 	}
 	public void setRestrictingBalance(BigDecimal restrictingBalance) {
 		this.restrictingBalance = restrictingBalance;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getStakingValue() {
-		return stakingValue;
+		return this.stakingValue;
 	}
 	public void setStakingValue(BigDecimal stakingValue) {
 		this.stakingValue = stakingValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDelegateValue() {
-		return delegateValue;
+		return this.delegateValue;
 	}
 	public void setDelegateValue(BigDecimal delegateValue) {
 		this.delegateValue = delegateValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getRedeemedValue() {
-		return redeemedValue;
+		return this.redeemedValue;
 	}
 	public void setRedeemedValue(BigDecimal redeemedValue) {
 		this.redeemedValue = redeemedValue;
 	}
 	public Integer getTxQty() {
-		return txQty;
+		return this.txQty;
 	}
 	public void setTxQty(Integer txQty) {
 		this.txQty = txQty;
 	}
 	public Integer getTransferQty() {
-		return transferQty;
+		return this.transferQty;
 	}
 	public void setTransferQty(Integer transferQty) {
 		this.transferQty = transferQty;
 	}
 	public Integer getDelegateQty() {
-		return delegateQty;
+		return this.delegateQty;
 	}
 	public void setDelegateQty(Integer delegateQty) {
 		this.delegateQty = delegateQty;
 	}
 	public Integer getStakingQty() {
-		return stakingQty;
+		return this.stakingQty;
 	}
 	public void setStakingQty(Integer stakingQty) {
 		this.stakingQty = stakingQty;
 	}
 	public Integer getProposalQty() {
-		return proposalQty;
+		return this.proposalQty;
 	}
 	public void setProposalQty(Integer proposalQty) {
 		this.proposalQty = proposalQty;
 	}
 	public Integer getCandidateCount() {
-		return candidateCount;
+		return this.candidateCount;
 	}
 	public void setCandidateCount(Integer candidateCount) {
 		this.candidateCount = candidateCount;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDelegateHes() {
-		return delegateHes;
+		return this.delegateHes;
 	}
 	public void setDelegateHes(BigDecimal delegateHes) {
 		this.delegateHes = delegateHes;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDelegateLocked() {
-		return delegateLocked;
+		return this.delegateLocked;
 	}
 	public void setDelegateLocked(BigDecimal delegateLocked) {
 		this.delegateLocked = delegateLocked;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDelegateUnlock() {
-		return delegateUnlock;
+		return this.delegateUnlock;
 	}
 	public void setDelegateUnlock(BigDecimal delegateUnlock) {
 		this.delegateUnlock = delegateUnlock;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDelegateReleased() {
-		return delegateReleased;
+		return this.delegateReleased;
 	}
 	public void setDelegateReleased(BigDecimal delegateReleased) {
 		this.delegateReleased = delegateReleased;
 	}
 	public String getContractName() {
-		return contractName;
+		return this.contractName;
 	}
 	public void setContractName(String contractName) {
 		this.contractName = contractName;
 	}
 	public String getContractCreate() {
-		return contractCreate;
+		return this.contractCreate;
 	}
 	public void setContractCreate(String contractCreate) {
 		this.contractCreate = contractCreate;
 	}
 	public String getContractCreateHash() {
-		return contractCreateHash;
+		return this.contractCreateHash;
 	}
 	public void setContractCreateHash(String contractCreateHash) {
 		this.contractCreateHash = contractCreateHash;
 	}
 	public Integer getIsRestricting() {
-		return isRestricting;
+		return this.isRestricting;
 	}
 	public void setIsRestricting(Integer isRestricting) {
 		this.isRestricting = isRestricting;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getDelegateClaim() {
-		return delegateClaim;
+		return this.delegateClaim;
 	}
 	public void setDelegateClaim(BigDecimal delegateClaim) {
 		this.delegateClaim = delegateClaim;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getHaveReward() {
-		return haveReward;
+		return this.haveReward;
 	}
 	public void setHaveReward(BigDecimal haveReward) {
 		this.haveReward = haveReward;
 	}
 	public String getContractBin() {
-		return contractBin;
+		return this.contractBin;
 	}
 	public void setContractBin(String contractBin) {
 		this.contractBin = contractBin;
 	}
 	public Integer getIsDestroy() {
-		return isDestroy;
+		return this.isDestroy;
 	}
 	public void setIsDestroy(Integer isDestroy) {
 		this.isDestroy = isDestroy;
 	}
 	public String getDestroyHash() {
-		return destroyHash;
+		return this.destroyHash;
 	}
 	public void setDestroyHash(String destroyHash) {
 		this.destroyHash = destroyHash;
 	}
-    
+
+    public Integer getTokenQty() {
+        return this.tokenQty;
+    }
+
+    public void setTokenQty(Integer tokenQty) {
+        this.tokenQty = tokenQty;
+    }
 }
