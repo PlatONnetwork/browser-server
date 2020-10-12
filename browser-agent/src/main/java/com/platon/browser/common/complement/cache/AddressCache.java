@@ -159,6 +159,10 @@ public class AddressCache {
         return this.erc20TokenAddressRelMap;
     }
 
+    public Erc20TokenAddressRel putErc20TokenAddressRelMap(String key, Erc20TokenAddressRel erc20TokenAddressRel) {
+        return this.erc20TokenAddressRelMap.put(key, erc20TokenAddressRel);
+    }
+
     private void updateAddress(Transaction tx, String addr) {
         if (addr == null)
             return;
@@ -234,6 +238,17 @@ public class AddressCache {
         }
 
         address.setTxQty(address.getTxQty() + 1);
+    }
+
+    public void updateTokenAddress(String addr) {
+        if (addr == null)
+            return;
+        Address address = this.addressMap.get(addr);
+        if (address == null) {
+            address = this.createDefaultAddress(addr);
+            this.addressMap.put(addr, address);
+        }
+        address.setTokenQty(address.getTokenQty() + 1);
     }
 
     private Address createDefaultAddress(String addr) {

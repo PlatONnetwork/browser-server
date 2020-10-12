@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper">
+  <update id="updateAddressData" parameterType="com.platon.browser.dao.entity.Erc20TokenAddressRel">
+      <foreach collection="list" item="item">
+    insert into `erc20_token_address_rel`
+    (
+        SELECT id FROM erc20_token_address_rel e WHERE e.contract=#{item.contract} AND e.address=#{item.address}),
+        `contract`,
+        `address`,
+        `balance`,
+        `name`,
+        `symbol`,
+        `decimal`,
+        `update_time`
+    )
+    values
+    (
+        #{id},
+        #{contract},
+        #{address},
+        #{balance},
+        #{name},
+        #{symbol},
+        #{decimal},
+        #{update_time}
+    )
+    on duplicate
+    key update
+        `balance` = `balance` + #{item.balance},
+        `update_time` = now()
+        ;
+      </foreach>
+</update>
+</mapper>

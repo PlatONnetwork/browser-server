@@ -6,7 +6,8 @@
     replace into `address` (
         `address`,
         `type`,
-        `tx_qty`,
+        `tx_qty`,,
+        `token_qty`,
         `transfer_qty`,
         `delegate_qty`,
         `staking_qty`,
@@ -23,6 +24,7 @@
         #{item.address},
         #{item.type},
         #{item.txQty},
+        #{item.tokenQty},
         #{item.transferQty},
         #{item.delegateQty},
         #{item.stakingQty},

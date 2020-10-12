@@ -15,6 +15,7 @@ import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.CustomErc20TokenMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dto.CustomAddress;
@@ -37,6 +38,8 @@ public class StatisticsAddressConverter {
     private Erc20TokenMapper erc20TokenMapper;
     @Autowired
     private CustomErc20TokenMapper customErc20TokenMapper;
+    @Autowired
+    private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
 
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
@@ -48,7 +51,8 @@ public class StatisticsAddressConverter {
         List<String> addresses = new ArrayList<>();
         this.addressCache.getAll().forEach(cache -> {
             AddressStatItem item = AddressStatItem.builder().address(cache.getAddress()).type(cache.getType())
-                .txQty(cache.getTxQty()).transferQty(cache.getTransferQty()).delegateQty(cache.getDelegateQty())
+                .txQty(cache.getTxQty()).tokenQty(cache.getTokenQty()).transferQty(cache.getTransferQty())
+                .delegateQty(cache.getDelegateQty())
                 .stakingQty(cache.getStakingQty()).proposalQty(cache.getProposalQty())
                 .contractName(cache.getContractName()).contractCreate(cache.getContractCreate())
                 .contractCreatehash(cache.getContractCreatehash()).contractDestroyHash(cache.getContractDestroyHash())
@@ -88,6 +92,7 @@ public class StatisticsAddressConverter {
             Address fromDb = dbMap.get(fromCache.getAddress());
             if (null != fromDb) {
                 fromCache.setTxQty(fromDb.getTxQty() + fromCache.getTxQty()); // 交易数量
+                fromCache.setTokenQty(fromDb.getTokenQty() + fromCache.getTokenQty()); // token交易数量
                 fromCache.setTransferQty(fromDb.getTransferQty() + fromCache.getTransferQty()); // 转账数量
                 fromCache.setDelegateQty(fromDb.getDelegateQty() + fromCache.getDelegateQty()); // 委托数量
                 fromCache.setStakingQty(fromDb.getStakingQty() + fromCache.getStakingQty()); // 质押数量
@@ -211,13 +216,14 @@ public class StatisticsAddressConverter {
         if (erc20TokenAddressRelMap.isEmpty()) {
             return;
         }
-        Map<String, Erc20TokenAddressRel> erc20TokenAddressRelHashMap = new HashMap<>();
-        List<String> addresses = new ArrayList<>();
-        erc20TokenAddressRelHashMap.putAll(erc20TokenAddressRelMap);
+        List<Erc20TokenAddressRel> params = new ArrayList<>();
+        params.addAll(erc20TokenAddressRelMap.values());
+
+        int result = this.customErc20TokenAddressRelMapper.updateAddressData(params);
         this.addressCache.cleanErcAddressCache();
         if (log.isDebugEnabled()) {
-            // log.debug("erc20AddressConvert ~ 处理耗时:{} ms",
-            // System.currentTimeMillis() - startTime + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
+            log.debug("erc20AddressConvert ~ 处理耗时:{} ms",
+                System.currentTimeMillis() - startTime + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
         }
     }
 }

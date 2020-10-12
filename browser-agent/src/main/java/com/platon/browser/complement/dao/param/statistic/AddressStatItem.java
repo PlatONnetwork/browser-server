@@ -1,10 +1,10 @@
 package com.platon.browser.complement.dao.param.statistic;
 
+import java.math.BigDecimal;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -24,6 +24,11 @@ public class AddressStatItem {
 	 * 交易总数
 	 */
     private Integer txQty;
+
+    /**
+     * token交易总数
+     */
+    private Integer tokenQty;
 
 	/**
 	 * 转账交易总数
