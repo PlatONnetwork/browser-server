@@ -56,6 +56,7 @@ public interface AppDocErc20Token {
      *       "txCount":11,              // 合约内部转账交易数
      *       "abi":"",                  // 合约的ABI描述
      *       "binCode":"",              // 合约的二进制码
+     *       "holder":10000,    // 持有人数
      *       "sourceCode":""            // 合约源代码
      *    }
      * }
@@ -99,6 +100,7 @@ public interface AppDocErc20Token {
      *          "txHash":"",               // 创建合约的交易哈希
      *          "webSite":"",              // 合约对应官方站点
      *          "blockTimestamp":10000,    // 合约创建时间（时间戳）
+     *          "holder":10000,    // 持有人数
      *          "createTime":11,           // 合约入库时间（时间戳）
      *      }...{}
      *   ]

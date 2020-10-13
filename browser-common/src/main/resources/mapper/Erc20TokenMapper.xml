@@ -14,6 +14,7 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="block_timestamp" jdbcType="TIMESTAMP" property="blockTimestamp" />
     <result column="tx_count" jdbcType="INTEGER" property="txCount" />
+    <result column="holder" jdbcType="INTEGER" property="holder"/>
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -114,7 +115,7 @@
     <if test="status != null">
       AND status = #{status}
     </if>
-    order by id desc
+    order by total_supply,holder desc
     limit #{offset}, #{size}
   </select>
 
@@ -143,13 +144,13 @@
     insert into erc20_token (address, `name`,
       symbol, `decimal`, total_supply, 
       creator, tx_hash,
-      `type`, block_timestamp, tx_count,
+      `type`, block_timestamp, tx_count,holder,
       create_time)
     values ( #{address,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
       #{symbol,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, #{totalSupply,jdbcType=DECIMAL}, 
       #{creator,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR},
       #{type,jdbcType=CHAR}, #{blockTimestamp,jdbcType=TIMESTAMP}, #{txCount,jdbcType=INTEGER},
-      #{createTime,jdbcType=TIMESTAMP})
+      #{holder,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
   </insert>
 
   <select id="countByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenExample" resultType="java.lang.Long">
@@ -181,6 +182,9 @@
       </if>
       <if test="record.txCount != null">
         tx_count = #{record.txCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.holder != null">
+        holder = #{record.holder,jdbcType=VARCHAR},
       </if>
       <if test="record.creator != null">
         creator = #{record.creator,jdbcType=VARCHAR},
@@ -222,7 +226,10 @@
         total_supply = #{totalSupply,jdbcType=DECIMAL},
       </if>
       <if test="txCount != null">
-        tx_count = #{txCount,jdbcType=VARCHAR},
+        tx_count = #{txCount,jdbcType=INTEGER},
+      </if>
+      <if test="holder != null">
+        holder = #{holder,jdbcType=INTEGER},
       </if>
       <if test="creator != null">
         creator = #{creator,jdbcType=VARCHAR},
@@ -245,15 +252,15 @@
 
   <insert id="batchInsert" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     insert into erc20_token
-        (address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,
-          `type`, block_timestamp, tx_count, create_time)
+    (address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,
+    `type`, block_timestamp, tx_count,holder, create_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
-        #{item.symbol,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, #{item.totalSupply,jdbcType=DECIMAL}, 
-        #{item.creator,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR},
-        #{item.type,jdbcType=CHAR}, #{item.blockTimestamp,jdbcType=TIMESTAMP},
-        #{item.txCount,jdbcType=INTEGER}, now())
+      #{item.symbol,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, #{item.totalSupply,jdbcType=DECIMAL},
+      #{item.creator,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR},
+      #{item.type,jdbcType=CHAR}, #{item.blockTimestamp,jdbcType=TIMESTAMP},
+      #{item.txCount,jdbcType=INTEGER},#{item.holder,jdbcType=INTEGER}, now())
     </foreach>
   </insert>
 

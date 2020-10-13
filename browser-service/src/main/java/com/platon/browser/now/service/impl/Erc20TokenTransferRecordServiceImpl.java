@@ -7,9 +7,11 @@ import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.entity.Erc20TokenAddressRelExample;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
+import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
+import com.platon.browser.dto.CustomErc20TokenAddressRel;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
@@ -74,6 +76,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
     @Autowired
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
+
+    @Autowired
+    private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
 
     @Autowired
     private DownFileCommon downFileCommon;
@@ -243,12 +248,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         /**
          * 倒序查询持有人列表
          */
-        Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
-        Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
-        criteria.andAddressEqualTo(req.getAddress());
-        example.setOrderByClause(" update_time desc");
-        PageHelper.startPage(req.getPageNo(), req.getPageSize());
-        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
+        Page<CustomErc20TokenAddressRel> erc20TokenAddressRels = this.customErc20TokenAddressRelMapper.selectByAddress(req.getAddress());
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
@@ -296,19 +296,15 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
     @Override
     public AccountDownload exportHolderTokenList(String address, String local, String timeZone, String token, HttpServletResponse response) {
 
-        Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
-        Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
-        criteria.andAddressEqualTo(address);
-        example.setOrderByClause(" update_time desc");
         PageHelper.startPage(1, 3000);
-        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
+        Page<CustomErc20TokenAddressRel> erc20TokenAddressRels = this.customErc20TokenAddressRelMapper.selectByAddress(address);
 
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
             Object[] row = {erc20TokenAddressRel.getName(), erc20TokenAddressRel.getSymbol(),
                     HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal()).toString()),
-                    erc20TokenAddressRel.getDecimal(), erc20TokenAddressRel.getContract()
+                    erc20TokenAddressRel.getDecimal(), erc20TokenAddressRel.getTxCount(), erc20TokenAddressRel.getContract()
             };
             rows.add(row);
         });
@@ -317,6 +313,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local)
         };
         return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);

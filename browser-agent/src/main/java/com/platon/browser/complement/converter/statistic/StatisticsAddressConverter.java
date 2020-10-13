@@ -177,7 +177,7 @@ public class StatisticsAddressConverter {
         // 重复的数据实施更新，添加txCount数量
         tokenList.forEach(dbToken -> {
             Erc20Token erc20Token = erc20TokenMap.remove(dbToken.getAddress());
-            if (erc20Token.getTxCount() != 0) {
+            if (erc20Token.getTxCount() != 0 || erc20Token.getHolder() != 0) {
                 erc20TokenUpdateList.add(erc20Token);
             }
         });
@@ -221,7 +221,7 @@ public class StatisticsAddressConverter {
         /**
          *查询已经存在的数据
          */
-        List<Erc20TokenAddressRel> existsList = this.customErc20TokenAddressRelMapper.selectData(queryList);
+        List<Erc20TokenAddressRel> existsList = this.customErc20TokenAddressRelMapper.selectExistData(queryList);
 
         List<Erc20TokenAddressRel> updateParams = new ArrayList<>();
 
@@ -245,6 +245,9 @@ public class StatisticsAddressConverter {
                 }
             }
         }
+        queryList.forEach(erc20TokenAddressRel -> {
+            this.addressCache.updateErcHolder(erc20TokenAddressRel.getContract());
+        });
         //移除之后的队列就可以直接插入
         int result = 0;
         if (queryList.size() > 0) result = this.erc20TokenAddressRelMapper.batchInsert(queryList);

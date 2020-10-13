@@ -42,10 +42,12 @@ public class Erc20Token {
 
     private Integer txCount;
 
+    private Integer holder;
+
     private Date createTime;
 
     public Integer getStatus() {
-        return status;
+        return this.status;
     }
 
     public void setStatus(Integer status) {
@@ -53,7 +55,7 @@ public class Erc20Token {
     }
 
     public Integer getTxCount() {
-        return txCount;
+        return this.txCount;
     }
 
     public void setTxCount(Integer txCount) {
@@ -61,7 +63,7 @@ public class Erc20Token {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -69,7 +71,7 @@ public class Erc20Token {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -77,7 +79,7 @@ public class Erc20Token {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -85,7 +87,7 @@ public class Erc20Token {
     }
 
     public String getSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
     public void setSymbol(String symbol) {
@@ -93,7 +95,7 @@ public class Erc20Token {
     }
 
     public Integer getDecimal() {
-        return decimal;
+        return this.decimal;
     }
 
     public void setDecimal(Integer decimal) {
@@ -101,7 +103,7 @@ public class Erc20Token {
     }
 
     public BigDecimal getTotalSupply() {
-        return totalSupply;
+        return this.totalSupply;
     }
 
     public void setTotalSupply(BigDecimal totalSupply) {
@@ -109,7 +111,7 @@ public class Erc20Token {
     }
 
     public String getCreator() {
-        return creator;
+        return this.creator;
     }
 
     public void setCreator(String creator) {
@@ -117,7 +119,7 @@ public class Erc20Token {
     }
 
     public String getTxHash() {
-        return txHash;
+        return this.txHash;
     }
 
     public void setTxHash(String txHash) {
@@ -125,7 +127,7 @@ public class Erc20Token {
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(String type) {
@@ -133,7 +135,7 @@ public class Erc20Token {
     }
 
     public Date getBlockTimestamp() {
-        return blockTimestamp;
+        return this.blockTimestamp;
     }
 
     public void setBlockTimestamp(Date blockTimestamp) {
@@ -141,7 +143,7 @@ public class Erc20Token {
     }
 
     public Date getCreateTime() {
-        return createTime;
+        return this.createTime;
     }
 
     public void setCreateTime(Date createTime) {

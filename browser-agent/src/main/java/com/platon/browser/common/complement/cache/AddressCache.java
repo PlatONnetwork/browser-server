@@ -300,16 +300,16 @@ public class AddressCache {
 
     /**
      * 初始化默认参数填入erc数据中
-     * 
+     *
      * @param addr
      * @return
      */
-    public Erc20Token createDefaultErc20(String addr) {
+    public synchronized Erc20Token createDefaultErc20(String addr) {
         Erc20Token erc20Token = this.erc20TokenMap.get(addr);
         if (erc20Token == null) {
             erc20Token = Erc20Token.builder().address(addr).createTime(new Date()).symbol("")
-                .totalSupply(BigDecimal.ZERO).name("").decimal(0).status(CustomErc20Token.StatusEnum.VISIBLE.getCode())
-                .creator("").txHash("").blockTimestamp(new Date()).type("").txCount(0).build();
+                    .totalSupply(BigDecimal.ZERO).name("").decimal(0).status(CustomErc20Token.StatusEnum.VISIBLE.getCode())
+                    .creator("").txHash("").blockTimestamp(new Date()).type("").txCount(0).holder(0).build();
         }
         return erc20Token;
     }
@@ -339,13 +339,14 @@ public class AddressCache {
         erc20Token.setBlockTimestamp(time);
         erc20Token.setType(type);
         erc20Token.setTxCount(0);
+        erc20Token.setHolder(0);
         this.erc20TokenMap.put(addr, erc20Token);
         return erc20Token;
     }
 
     /**
      * 对地址进行更新加1
-     * 
+     *
      * @param addr
      */
     public synchronized void updateErcTx(String addr) {
@@ -355,10 +356,20 @@ public class AddressCache {
     }
 
     /**
+     * 对地址进行持有加1
+     *
+     * @param addr
+     */
+    public synchronized void updateErcHolder(String addr) {
+        Erc20Token erc20Token = this.createDefaultErc20(addr);
+        erc20Token.setHolder(erc20Token.getHolder() + 1);
+        this.erc20TokenMap.put(addr, erc20Token);
+    }
+
+    /**
      * 初始化EVM地址缓存
-     * 
-     * @param addressList
-     *            地址实体列表
+     *
+     * @param addressList 地址实体列表
      */
     public void initEvmContractAddressCache(List<Address> addressList) {
         if (addressList.isEmpty())

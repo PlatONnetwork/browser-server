@@ -11,7 +11,19 @@
         <result column="decimal" jdbcType="INTEGER" property="decimal"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <select id="selectData" resultMap="BaseResultMap">
+    <resultMap id="CustomBaseResultMap" type="com.platon.browser.dto.CustomErc20TokenAddressRel">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="contract" jdbcType="VARCHAR" property="contract"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="balance" jdbcType="DECIMAL" property="balance"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="symbol" jdbcType="VARCHAR" property="symbol"/>
+        <result column="decimal" jdbcType="INTEGER" property="decimal"/>
+        <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectExistData" resultMap="BaseResultMap">
         select id,balance,contract,address from `erc20_token_address_rel` where (`contract`,`address`) in
         <trim prefix="(" suffix=")">
             <foreach collection="list" item="item" index="index" separator=",">
@@ -20,6 +32,11 @@
                 </trim>
             </foreach>
         </trim>
+    </select>
+    <select id="selectByAddress" resultMap="CustomBaseResultMap">
+        select e.contract,e.address,e.name,e.symbol,e.decimal,t.tx_count from `erc20_token_address_rel` e left join `erc20_token` t on e.contract = t.address
+        where e.address = #{address,jdbcType=VARCHAR}
+        order by t.tx_count desc
     </select>
     <update id="updateAddressData">
         <foreach collection="list" item="item" index="index" separator=";">

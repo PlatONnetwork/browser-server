@@ -96,7 +96,65 @@ public interface AppDocErc20TokenTransferRecord {
 
 
     /**
-     * @api {post} /token/tokenHolderList c.合约持有人信息列表
+     * @api {post} /token/tokenHolderList c.erc20合约持有人信息列表
+     * @apiVersion 1.0.0
+     * @apiName holderTokenList
+     * @apiGroup token
+     * @apiDescription 1. 实现逻辑：<br/>
+     * - 查询数据库中数据
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "address":"",                // 用户地址（必选）
+     * "pageNo":1,                  // 页数(必填)
+     * "pageSize":10                // 页大小(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     * "errMsg":"",                   // 描述信息
+     * "code":0,                      // 成功（0），失败则由相关失败码
+     * "totalCount":18,               // 总数
+     * "totalPages":1,                // 总页数
+     * "data":[
+     * {
+     * "contract":6,               // 合约地址（也是交易to地址）
+     * "balance":11,                 // 交易对应的balance值
+     * "percent":11%,                 // 持有百分比
+     * }...{}
+     * ]
+     * }
+     */
+    @ApiOperation(value = "token/tokenHolderList", nickname = "token hodler list",
+            notes = "查询合约token持有列表", response = QueryTokenHolderListResp.class, tags = {"Token"})
+    @PostMapping(value = "token/tokenHolderList", produces = {"application/json"})
+    WebAsyncTask<RespPage<QueryTokenHolderListResp>> tokenHolderList(@ApiParam(value = "QueryTokenHolderListReq", required = true)
+                                                                     @Valid @RequestBody QueryTokenHolderListReq req);
+
+    /**
+     * @api {post} /token/exportTokenHolderList d.导出erc20合约持有人信息列表
+     * @apiVersion 1.0.0
+     * @apiName exportTokenHolderList
+     * @apiGroup token
+     * @apiDescription 1. 实现逻辑：<br/>
+     * @apiParam {String} address 合约地址
+     * @apiParam {String} date 数据结束日期
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     */
+    @ApiOperation(value = "token/exportTokenHolderList", nickname = "token list",
+            notes = "导出合约token持有人列表", response = QueryTokenTransferRecordListResp.class, tags = {"Token"})
+    @PostMapping(value = "token/exportTokenHolderList", produces = {"application/json"})
+    void exportTokenHolderList(@ApiParam(value = "contract ", required = false) @RequestParam(value = "contract",
+            required = true) String contract,
+                               @ApiParam(value = "local en或者zh-cn", required = true) @RequestParam(value = "local",
+                                       required = true) String local,
+                               @ApiParam(value = "time zone", required = true) @RequestParam(value = "timeZone",
+                                       required = true) String timeZone,
+                               @ApiParam(value = "token", required = false) @RequestParam(value = "token", required = false) String token,
+                               HttpServletResponse response);
+
+    /**
+     * @api {post} /token/tokenHolderList e.持有人持有token信息列表
      * @apiVersion 1.0.0
      * @apiName tokenHolderList
      * @apiGroup token
@@ -125,70 +183,13 @@ public interface AppDocErc20TokenTransferRecord {
      * "name":"",                  // 合约名称
      * "symbol":"",                // 合约符号
      * "balance":11,                 // 交易对应的balance值
-     * }...{}
-     * ]
-     * }
-     */
-    @ApiOperation(value = "token/tokenHolderList", nickname = "token hodler list",
-            notes = "查询合约token持有列表", response = QueryTokenHolderListResp.class, tags = {"Token"})
-    @PostMapping(value = "token/tokenHolderList", produces = {"application/json"})
-    WebAsyncTask<RespPage<QueryTokenHolderListResp>> tokenHolderList(@ApiParam(value = "QueryTokenHolderListReq", required = true)
-                                                                     @Valid @RequestBody QueryTokenHolderListReq req);
-
-    /**
-     * @api {post} /token/exportTokenHolderList d.导出合约内部交易列表
-     * @apiVersion 1.0.0
-     * @apiName exportTokenHolderList
-     * @apiGroup token
-     * @apiDescription 1. 实现逻辑：<br/>
-     * @apiParam {String} address 合约地址
-     * @apiParam {String} date 数据结束日期
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     */
-    @ApiOperation(value = "token/exportTokenHolderList", nickname = "token list",
-            notes = "导出合约token持有人列表", response = QueryTokenTransferRecordListResp.class, tags = {"Token"})
-    @PostMapping(value = "token/exportTokenHolderList", produces = {"application/json"})
-    void exportTokenHolderList(@ApiParam(value = "contract ", required = false) @RequestParam(value = "contract",
-            required = true) String contract,
-                               @ApiParam(value = "local en或者zh-cn", required = true) @RequestParam(value = "local",
-                                       required = true) String local,
-                               @ApiParam(value = "time zone", required = true) @RequestParam(value = "timeZone",
-                                       required = true) String timeZone,
-                               @ApiParam(value = "token", required = false) @RequestParam(value = "token", required = false) String token,
-                               HttpServletResponse response);
-
-    /**
-     * @api {post} /token/holderTokenList e.erc20持有信息列表
-     * @apiVersion 1.0.0
-     * @apiName holderTokenList
-     * @apiGroup token
-     * @apiDescription 1. 实现逻辑：<br/>
-     * - 查询数据库中数据
-     * @apiParamExample {json} Request-Example:
-     * {
-     * "address":"",                // 用户地址（必选）
-     * "pageNo":1,                  // 页数(必填)
-     * "pageSize":10                // 页大小(必填)
-     * }
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     * "errMsg":"",                   // 描述信息
-     * "code":0,                      // 成功（0），失败则由相关失败码
-     * "totalCount":18,               // 总数
-     * "totalPages":1,                // 总页数
-     * "data":[
-     * {
-     * "contract":6,               // 合约地址（也是交易to地址）
-     * "balance":11,                 // 交易对应的balance值
-     * "percent":11%,                 // 持有百分比
+     * "txCount":11,                 // 交易数
      * }...{}
      * ]
      * }
      */
     @ApiOperation(value = "token/holderTokenList", nickname = "holder token list",
-            notes = "查询持有token列表", response = QueryTokenHolderListResp.class, tags = {"Token"})
+            notes = "查询持有人持有token信息列表", response = QueryTokenHolderListResp.class, tags = {"Token"})
     @PostMapping(value = "token/holderTokenList", produces = {"application/json"})
     WebAsyncTask<RespPage<QueryHolderTokenListResp>> holderTokenList(@ApiParam(value = "QueryHolderTokenListReq", required = true)
                                                                      @Valid @RequestBody QueryHolderTokenListReq req);

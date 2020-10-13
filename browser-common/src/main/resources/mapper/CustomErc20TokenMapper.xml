@@ -5,7 +5,7 @@
 	<foreach collection="list" item="item"  open="" separator=";" close="">
 		update erc20_token
 		<set>
-			tx_count = tx_count + #{item.txCount,jdbcType=INTEGER}
+			tx_count = tx_count + #{item.txCount,jdbcType=INTEGER},holder = holder + #{item.holder,jdbcType=INTEGER}
 		</set>
 		where address = #{item.address,jdbcType=VARCHAR}
 	</foreach>

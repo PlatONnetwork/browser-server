@@ -16,6 +16,7 @@ CREATE TABLE `erc20_token` (
   `status` int(11) DEFAULT '1' COMMENT '合约状态 1 可见，0 隐藏',
   `block_timestamp` datetime DEFAULT NULL COMMENT '上链时间',
   `tx_count` int(11) DEFAULT NULL COMMENT '合约内交易数',
+  `holder` int(11) DEFAULT NULL COMMENT '合约持有人',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_address` (`address`),
