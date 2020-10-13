@@ -2,7 +2,6 @@ package com.platon.browser.dao.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
@@ -12,9 +11,8 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Builder
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Accessors(chain = true)
 public class Erc20TokenAddressRel {
     private Long id;
@@ -31,10 +29,12 @@ public class Erc20TokenAddressRel {
 
     private Integer decimal;
 
+    private BigDecimal totalSupply;
+
     private Date updateTime;
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -42,7 +42,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getContract() {
-        return contract;
+        return this.contract;
     }
 
     public void setContract(String contract) {
@@ -50,7 +50,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -58,7 +58,7 @@ public class Erc20TokenAddressRel {
     }
 
     public BigDecimal getBalance() {
-        return balance;
+        return this.balance;
     }
 
     public void setBalance(BigDecimal balance) {
@@ -66,7 +66,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -74,7 +74,7 @@ public class Erc20TokenAddressRel {
     }
 
     public String getSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
     public void setSymbol(String symbol) {
@@ -82,15 +82,23 @@ public class Erc20TokenAddressRel {
     }
 
     public Integer getDecimal() {
-        return decimal;
+        return this.decimal;
     }
 
     public void setDecimal(Integer decimal) {
         this.decimal = decimal;
     }
 
+    public BigDecimal getTotalSupply() {
+        return this.totalSupply;
+    }
+
+    public void setTotalSupply(BigDecimal totalSupply) {
+        this.totalSupply = totalSupply;
+    }
+
     public Date getUpdateTime() {
-        return updateTime;
+        return this.updateTime;
     }
 
     public void setUpdateTime(Date updateTime) {
@@ -112,6 +120,7 @@ public class Erc20TokenAddressRel {
         name("name", "name", "VARCHAR", true),
         symbol("symbol", "symbol", "VARCHAR", false),
         decimal("decimal", "decimal", "INTEGER", true),
+        totalSupply("total_supply", "totalSupply", "DECIMAL", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
         /**

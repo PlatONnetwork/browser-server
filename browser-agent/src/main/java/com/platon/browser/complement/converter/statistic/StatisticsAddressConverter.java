@@ -7,13 +7,8 @@ import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.entity.Erc20Token;
-import com.platon.browser.dao.entity.Erc20TokenExample;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.CustomErc20TokenMapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -22,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Slf4j
@@ -38,17 +34,23 @@ public class StatisticsAddressConverter {
     private Erc20TokenMapper erc20TokenMapper;
     @Autowired
     private CustomErc20TokenMapper customErc20TokenMapper;
+    @Autowired
+    private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
+    @Autowired
+    private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
+
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
         log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})", block.getNum(),
-            event.getTransactions().size(), epochMessage.getConsensusEpochRound(), epochMessage.getSettleEpochRound(),
-            epochMessage.getIssueEpochRound());
+                event.getTransactions().size(), epochMessage.getConsensusEpochRound(), epochMessage.getSettleEpochRound(),
+                epochMessage.getIssueEpochRound());
         // 使用缓存中的地址统计信息构造入库参数列表
         List<AddressStatItem> itemFromCache = new ArrayList<>();
         List<String> addresses = new ArrayList<>();
         this.addressCache.getAll().forEach(cache -> {
             AddressStatItem item = AddressStatItem.builder().address(cache.getAddress()).type(cache.getType())
-                .txQty(cache.getTxQty()).transferQty(cache.getTransferQty()).delegateQty(cache.getDelegateQty())
+                .txQty(cache.getTxQty()).tokenQty(cache.getTokenQty()).transferQty(cache.getTransferQty())
+                .delegateQty(cache.getDelegateQty())
                 .stakingQty(cache.getStakingQty()).proposalQty(cache.getProposalQty())
                 .contractName(cache.getContractName()).contractCreate(cache.getContractCreate())
                 .contractCreatehash(cache.getContractCreatehash()).contractDestroyHash(cache.getContractDestroyHash())
@@ -88,6 +90,7 @@ public class StatisticsAddressConverter {
             Address fromDb = dbMap.get(fromCache.getAddress());
             if (null != fromDb) {
                 fromCache.setTxQty(fromDb.getTxQty() + fromCache.getTxQty()); // 交易数量
+                fromCache.setTokenQty(fromDb.getTokenQty() + fromCache.getTokenQty()); // token交易数量
                 fromCache.setTransferQty(fromDb.getTransferQty() + fromCache.getTransferQty()); // 转账数量
                 fromCache.setDelegateQty(fromDb.getDelegateQty() + fromCache.getDelegateQty()); // 委托数量
                 fromCache.setStakingQty(fromDb.getStakingQty() + fromCache.getStakingQty()); // 质押数量
@@ -147,16 +150,16 @@ public class StatisticsAddressConverter {
         long startTime = System.currentTimeMillis();
         if (log.isDebugEnabled()) {
             log.debug("erc20TokenConvert ~ block({}), transactions({}), consensus({}), settlement({}), issue({})",
-                    block.getNum(), event.getTransactions().size(), epochMessage.getConsensusEpochRound(),
-                    epochMessage.getSettleEpochRound(), epochMessage.getIssueEpochRound());
+                block.getNum(), event.getTransactions().size(), epochMessage.getConsensusEpochRound(),
+                epochMessage.getSettleEpochRound(), epochMessage.getIssueEpochRound());
         }
-        Collection<Erc20Token> erc20TokenList = addressCache.getAllErc20Token();
-        if(erc20TokenList.isEmpty()) {
+        Collection<Erc20Token> erc20TokenList = this.addressCache.getAllErc20Token();
+        if (erc20TokenList.isEmpty()) {
             return;
         }
 
         Map<String, Erc20Token> erc20TokenMap = new HashMap<>();
-        
+
         List<Erc20Token> erc20TokenUpdateList = new ArrayList<>();
         List<String> addresses = new ArrayList<>();
         erc20TokenList.forEach(cacheErc20Token -> {
@@ -168,15 +171,15 @@ public class StatisticsAddressConverter {
         // 排除地址重复的数据
         Erc20TokenExample tokenCondition = new Erc20TokenExample();
         tokenCondition.createCriteria().andAddressIn(addresses);
-        List<Erc20Token> tokenList = erc20TokenMapper.selectByExample(tokenCondition);
+        List<Erc20Token> tokenList = this.erc20TokenMapper.selectByExample(tokenCondition);
 
         // 过滤重复的数据，DB 中已经存在的，则不进行再次插入
         // 重复的数据实施更新，添加txCount数量
         tokenList.forEach(dbToken -> {
-        	Erc20Token erc20Token = erc20TokenMap.remove(dbToken.getAddress());
-        	if(erc20Token.getTxCount() != 0) {
-        		erc20TokenUpdateList.add(erc20Token);
-        	}
+            Erc20Token erc20Token = erc20TokenMap.remove(dbToken.getAddress());
+            if (erc20Token.getTxCount() != 0 || erc20Token.getHolder() != 0) {
+                erc20TokenUpdateList.add(erc20Token);
+            }
         });
 
         // 将增量新增的代币合约录入DB
@@ -187,16 +190,72 @@ public class StatisticsAddressConverter {
 
         // batch save data.
         int result = 0;
-        if(null != params && params.size() != 0){
-            result = erc20TokenMapper.batchInsert(params);
+        if (null != params && params.size() != 0) {
+            result = this.erc20TokenMapper.batchInsert(params);
         }
-        if(!erc20TokenUpdateList.isEmpty()) {
-        	customErc20TokenMapper.batchUpdate(erc20TokenUpdateList);
+        if (!erc20TokenUpdateList.isEmpty()) {
+            this.customErc20TokenMapper.batchUpdate(erc20TokenUpdateList);
         }
         if (log.isDebugEnabled()) {
-            log.debug("erc20TokenConvert ~ 处理耗时:{} ms", System.currentTimeMillis() - startTime
-                    + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
+            log.debug("erc20TokenConvert ~ 处理耗时:{} ms",
+                System.currentTimeMillis() - startTime + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
         }
 
+    }
+
+    public void erc20AddressConvert(CollectionEvent event, Block block, EpochMessage epochMessage) {
+        long startTime = System.currentTimeMillis();
+        if (log.isDebugEnabled()) {
+            log.debug("erc20AddressConvert ~ block({}), transactions({}), consensus({}), settlement({}), issue({})",
+                    block.getNum(), event.getTransactions().size(), epochMessage.getConsensusEpochRound(),
+                    epochMessage.getSettleEpochRound(), epochMessage.getIssueEpochRound());
+        }
+        Map<String, Erc20TokenAddressRel> erc20TokenAddressRelMap = this.addressCache.getErc20TokenAddressRelMap();
+        if (erc20TokenAddressRelMap.isEmpty()) {
+            return;
+        }
+        List<Erc20TokenAddressRel> queryList = new ArrayList<>(erc20TokenAddressRelMap.size());
+        queryList.addAll(erc20TokenAddressRelMap.values());
+        this.addressCache.cleanErc20TokenAddressRelMap();
+
+        /**
+         *查询已经存在的数据
+         */
+        List<Erc20TokenAddressRel> existsList = this.customErc20TokenAddressRelMapper.selectExistData(queryList);
+
+        List<Erc20TokenAddressRel> updateParams = new ArrayList<>();
+
+        //进行数据匹配然后切换
+        for (int i = 0; i < queryList.size(); i++) {
+            Erc20TokenAddressRel qT = queryList.get(i);
+            for (int j = 0; j < existsList.size(); j++) {
+                //数据匹配，则1、进行余额计算， 2、移除队列
+                Erc20TokenAddressRel eT = queryList.get(i);
+                if (eT.getAddress().equals(qT.getAddress()) && eT.getContract().equals(qT.getContract())) {
+                    if (eT.getBalance().add(qT.getBalance()).compareTo(BigDecimal.ZERO) > 0) {
+                        eT.setBalance(eT.getBalance().add(qT.getBalance()));
+                        eT.setUpdateTime(new Date());
+                        updateParams.add(eT);
+                    }
+                    queryList.remove(i);
+                    i--;
+                    existsList.remove(j);
+                    j--;
+                    break;
+                }
+            }
+        }
+        queryList.forEach(erc20TokenAddressRel -> {
+            this.addressCache.updateErcHolder(erc20TokenAddressRel.getContract());
+        });
+        //移除之后的队列就可以直接插入
+        int result = 0;
+        if (queryList.size() > 0) result = this.erc20TokenAddressRelMapper.batchInsert(queryList);
+        if (updateParams.size() > 0) result = this.customErc20TokenAddressRelMapper.updateAddressData(updateParams);
+
+        if (log.isDebugEnabled()) {
+            log.debug("erc20AddressConvert ~ 处理耗时:{} ms",
+                    System.currentTimeMillis() - startTime + " 参数条数：{" + queryList.size() + "}，成功数量：{" + result + "}");
+        }
     }
 }

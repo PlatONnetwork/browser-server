@@ -1,21 +1,23 @@
 package com.platon.browser.queue.handler;
 
-import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.queue.event.AddressEvent;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import java.math.BigDecimal;
+import java.util.*;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
-import java.util.*;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.queue.event.AddressEvent;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Auther: dongqile
@@ -44,17 +46,17 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) {
         long startTime = System.currentTimeMillis();
-        stage.addAll(event.getAddressList());
-        log.info("stat:{},batchSize:{},getTotalCount():{},addressMaxCount:{}",stage.size(),batchSize,getTotalCount(),addressMaxCount);
-        if(stage.size()<batchSize){
+        this.stage.addAll(event.getAddressList());
+        log.info("stat:{},batchSize:{},getTotalCount():{},addressMaxCount:{}", this.stage.size(), this.batchSize, this.getTotalCount(), this.addressMaxCount);
+        if(this.stage.size()< this.batchSize){
             // 如果暂存数量小于批次
-            if(getTotalCount()>addressMaxCount){
+            if(this.getTotalCount()> this.addressMaxCount){
                 // 且当前地址数未达到指定数量
                 return;
             }
         }
         Map<String,Address> addressMap = new HashMap<>();
-        stage.forEach(address -> addressMap.put(address.getAddress(),address));
+        this.stage.forEach(address -> addressMap.put(address.getAddress(),address));
         addressMap.values().forEach(address -> {
             address.setBalance(BigDecimal.ZERO);
             address.setCandidateCount(0);
@@ -71,6 +73,7 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
             address.setStakingValue(BigDecimal.ZERO);
             address.setTransferQty(0);
             address.setTxQty(0);
+            address.setTokenQty(0);
             address.setUpdateTime(new Date());
             address.setType(1);
             address.setContractName("");
@@ -81,7 +84,7 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
 
         AddressExample example = new AddressExample();
         example.createCriteria().andAddressIn(new ArrayList<>(addressMap.keySet()));
-        List<Address> existList = addressMapper.selectByExample(example);
+        List<Address> existList = this.addressMapper.selectByExample(example);
         List<String> existAddresses = new ArrayList<>();
         existList.forEach(address -> existAddresses.add(address.getAddress()));
 
@@ -89,15 +92,15 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         List<Address> addressList = new ArrayList<>(addressMap.values());
 
         try {
-        	if(getTotalCount()<addressMaxCount){
-                if(!addressList.isEmpty()) addressMapper.batchInsert(addressList);
+        	if(this.getTotalCount()< this.addressMaxCount){
+                if(!addressList.isEmpty()) this.addressMapper.batchInsert(addressList);
                 long endTime = System.currentTimeMillis();
-                printTps("地址",addressList.size(),startTime,endTime);
+                this.printTps("地址",addressList.size(),startTime,endTime);
             }
 		} catch (Exception e) {
 			log.error("insert address error", e);
 		}
-        
-        stage.clear();
+
+        this.stage.clear();
     }
 }

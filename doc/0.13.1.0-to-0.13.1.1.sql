@@ -1,5 +1,6 @@
 ALTER TABLE `address` CHANGE `type` `type` int(2)   NOT NULL COMMENT '地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约,5EVM-ERC合约,4WASM-ERC合约' after `address` ;
 ALTER TABLE `network_stat` ADD COLUMN `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数' after `issue_rates` ;
+ALTER TABLE `address` ADD COLUMN `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数' after `tx_qty` ;
 
 -- 合约表
 CREATE TABLE `erc20_token` (
@@ -15,6 +16,7 @@ CREATE TABLE `erc20_token` (
   `status` int(11) DEFAULT '1' COMMENT '合约状态 1 可见，0 隐藏',
   `block_timestamp` datetime DEFAULT NULL COMMENT '上链时间',
   `tx_count` int(11) DEFAULT NULL COMMENT '合约内交易数',
+  `holder` int(11) DEFAULT NULL COMMENT '合约持有人',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_address` (`address`),
@@ -67,6 +69,7 @@ CREATE TABLE `erc20_token_address_rel` (
   `name` varchar(32) DEFAULT NULL COMMENT '合约名称',
   `symbol` varchar(32) DEFAULT NULL COMMENT '合约符号',
   `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
+  `total_supply` decimal(64,0) DEFAULT NULL COMMENT '供应总量',
   `update_time` datetime DEFAULT NULL COMMENT '最后更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Token合约与地址映射表 主要记录每个token合约的地址与其持有者的映射关系';

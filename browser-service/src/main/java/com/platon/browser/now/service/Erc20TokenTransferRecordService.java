@@ -1,10 +1,17 @@
 package com.platon.browser.now.service;
 
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
+import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.req.token.QueryHolderTokenListReq;
+import com.platon.browser.req.token.QueryTokenHolderListReq;
 import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
 import com.platon.browser.res.RespPage;
+import com.platon.browser.res.token.QueryHolderTokenListResp;
+import com.platon.browser.res.token.QueryTokenHolderListResp;
 import com.platon.browser.res.token.QueryTokenTransferRecordListResp;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -23,6 +30,42 @@ public interface Erc20TokenTransferRecordService {
      * @return
      */
     RespPage<QueryTokenTransferRecordListResp> queryTokenRecordList(QueryTokenTransferRecordListReq req);
+
+
+    /**
+     * 导出内部交易列表
+     *
+     * @return
+     */
+    AccountDownload exportTokenTransferList(String address, String contract, Long date, String local, String timeZone, String token, HttpServletResponse response);
+
+    /**
+     * 合约持有人列表
+     *
+     * @return
+     */
+    RespPage<QueryTokenHolderListResp> tokenHolderList(QueryTokenHolderListReq req);
+
+    /**
+     * 导出合约持有人列表
+     *
+     * @return
+     */
+    AccountDownload exportTokenHolderList(String contract, String local, String timeZone, String token, HttpServletResponse response);
+
+    /**
+     * 持有人对应token列表
+     *
+     * @return
+     */
+    RespPage<QueryHolderTokenListResp> holderTokenList(@Valid QueryHolderTokenListReq req);
+
+    /**
+     * 导出持有人对应token列表
+     *
+     * @return
+     */
+    AccountDownload exportHolderTokenList(String address, String local, String timeZone, String token, HttpServletResponse response);
 
     /**
      * 保存转账记录

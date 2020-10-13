@@ -43,6 +43,8 @@ public class QueryTokenListResp {
     private String txHash;
     @ApiModelProperty(value = "合约对应官方网站")
     private String webSite;
+    @ApiModelProperty(value = "持有人数")
+    private Integer holder;
     @ApiModelProperty(value = "合约创建时间")
     private Date blockTimestamp;
     @ApiModelProperty(value = "交易记录时间")
@@ -56,6 +58,7 @@ public class QueryTokenListResp {
                 .creator(token.getCreator()).txHash(token.getTxHash())
                 .blockTimestamp(token.getBlockTimestamp())
                 .createTime(token.getCreateTime())
+                .holder(token.getHolder())
                 .build();
     }
 }

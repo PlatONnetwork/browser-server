@@ -1,16 +1,11 @@
 package com.platon.browser.common.complement.cache;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.stereotype.Component;
-
 import com.platon.browser.common.collection.dto.ComplementInfo;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dto.CustomErc20Token;
 import com.platon.browser.dto.ERCData;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -19,6 +14,11 @@ import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 地址统计缓存
@@ -30,6 +30,8 @@ public class AddressCache {
     private Map<String, Address> addressMap = new ConcurrentHashMap<>();
 
     private Map<String, Erc20Token> erc20TokenMap = new ConcurrentHashMap<>();
+
+    private Map<String, Erc20TokenAddressRel> erc20TokenAddressRelMap = new ConcurrentHashMap<>();
 
     private Map<String, Erc20Token> preErc20TokenMap = new ConcurrentHashMap<>();
 
@@ -159,6 +161,22 @@ public class AddressCache {
         this.erc20TokenMap.clear();
     }
 
+    public void cleanErcAddressCache() {
+        this.evmErc20ContractAddressCache.clear();
+    }
+
+    public Map<String, Erc20TokenAddressRel> getErc20TokenAddressRelMap() {
+        return this.erc20TokenAddressRelMap;
+    }
+
+    public Erc20TokenAddressRel putErc20TokenAddressRelMap(String key, Erc20TokenAddressRel erc20TokenAddressRel) {
+        return this.erc20TokenAddressRelMap.put(key, erc20TokenAddressRel);
+    }
+
+    public void cleanErc20TokenAddressRelMap() {
+        this.erc20TokenAddressRelMap.clear();
+    }
+
     private void updateAddress(Transaction tx, String addr) {
         if (addr == null)
             return;
@@ -236,6 +254,17 @@ public class AddressCache {
         address.setTxQty(address.getTxQty() + 1);
     }
 
+    public void updateTokenAddress(String addr) {
+        if (addr == null)
+            return;
+        Address address = this.addressMap.get(addr);
+        if (address == null) {
+            address = this.createDefaultAddress(addr);
+            this.addressMap.put(addr, address);
+        }
+        address.setTokenQty(address.getTokenQty() + 1);
+    }
+
     private Address createDefaultAddress(String addr) {
         Address address = new Address();
         address.setAddress(addr);
@@ -260,6 +289,7 @@ public class AddressCache {
         }
 
         address.setTxQty(0);
+        address.setTokenQty(0);
         address.setTransferQty(0);
         address.setStakingQty(0);
         address.setDelegateQty(0);
@@ -270,16 +300,16 @@ public class AddressCache {
 
     /**
      * 初始化默认参数填入erc数据中
-     * 
+     *
      * @param addr
      * @return
      */
-    public Erc20Token createDefaultErc20(String addr) {
+    public synchronized Erc20Token createDefaultErc20(String addr) {
         Erc20Token erc20Token = this.erc20TokenMap.get(addr);
         if (erc20Token == null) {
             erc20Token = Erc20Token.builder().address(addr).createTime(new Date()).symbol("")
-                .totalSupply(BigDecimal.ZERO).name("").decimal(0).status(CustomErc20Token.StatusEnum.VISIBLE.getCode())
-                .creator("").txHash("").blockTimestamp(new Date()).type("").txCount(0).build();
+                    .totalSupply(BigDecimal.ZERO).name("").decimal(0).status(CustomErc20Token.StatusEnum.VISIBLE.getCode())
+                    .creator("").txHash("").blockTimestamp(new Date()).type("").txCount(0).holder(0).build();
         }
         return erc20Token;
     }
@@ -309,13 +339,14 @@ public class AddressCache {
         erc20Token.setBlockTimestamp(time);
         erc20Token.setType(type);
         erc20Token.setTxCount(0);
+        erc20Token.setHolder(0);
         this.erc20TokenMap.put(addr, erc20Token);
         return erc20Token;
     }
 
     /**
      * 对地址进行更新加1
-     * 
+     *
      * @param addr
      */
     public synchronized void updateErcTx(String addr) {
@@ -325,10 +356,20 @@ public class AddressCache {
     }
 
     /**
+     * 对地址进行持有加1
+     *
+     * @param addr
+     */
+    public synchronized void updateErcHolder(String addr) {
+        Erc20Token erc20Token = this.createDefaultErc20(addr);
+        erc20Token.setHolder(erc20Token.getHolder() + 1);
+        this.erc20TokenMap.put(addr, erc20Token);
+    }
+
+    /**
      * 初始化EVM地址缓存
-     * 
-     * @param addressList
-     *            地址实体列表
+     *
+     * @param addressList 地址实体列表
      */
     public void initEvmContractAddressCache(List<Address> addressList) {
         if (addressList.isEmpty())

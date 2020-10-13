@@ -1,14 +1,5 @@
 package com.platon.browser.common.utils;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
-
 import com.alaya.contracts.ppos.dto.common.ErrorCode;
 import com.alaya.protocol.core.DefaultBlockParameter;
 import com.alaya.protocol.core.methods.response.Log;
@@ -45,6 +36,14 @@ import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
 import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
 import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
+import org.slf4j.Logger;
+import org.springframework.beans.BeanUtils;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 虚拟交易工具
@@ -396,10 +395,10 @@ public class TransactionUtil {
             transferEvents.stream().forEach(transferEvent -> {
                 // 转换参数进行设置内部交易
                 ESTokenTransferRecord esTokenTransferRecord =
-                    ESTokenTransferRecord.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
-                        .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
-                        .contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
-                        .info(transferEvent.getLog().getData()).ctime(new Date()).build();
+                        ESTokenTransferRecord.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
+                                .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
+                                .contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
+                                .info(transferEvent.getLog().getData()).ctime(new Date()).build();
                 esTokenTransferRecord.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
                 esTokenTransferRecord.setToType(addressCache.getTypeData(transferEvent.getTo()));
                 i.getAndIncrement();

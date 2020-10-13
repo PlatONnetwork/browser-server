@@ -43,6 +43,8 @@ public class QueryTokenDetailResp {
     private String webSite;
     @ApiModelProperty(value = "合约创建时间")
     private Date blockTimestamp;
+    @ApiModelProperty(value = "持有人数")
+    private Integer holder;
     @ApiModelProperty(value = "交易记录时间")
     private Date createTime;
 
@@ -68,6 +70,7 @@ public class QueryTokenDetailResp {
                 .blockTimestamp(token.getBlockTimestamp())
                 .txCount(token.getTxCount())
                 .createTime(token.getCreateTime())
+                .holder(token.getHolder())
                 .build();
     }
 }

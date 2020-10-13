@@ -23,7 +23,7 @@
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.13.1.1_sun?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.13.1.1_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="root"
                         password="Juzhen123!"/>
 
@@ -148,6 +148,9 @@
         <table tableName="erc20_token_transfer_record" domainObjectName="Erc20TokenTransferRecord">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>-->
-
+        <table tableName="erc20_token_address_rel" domainObjectName="Erc20TokenAddressRel">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
     </context>
 </generatorConfiguration>

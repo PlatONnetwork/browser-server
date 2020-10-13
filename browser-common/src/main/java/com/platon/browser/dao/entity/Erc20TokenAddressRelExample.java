@@ -566,6 +566,66 @@ public class Erc20TokenAddressRelExample {
             return (Criteria) this;
         }
 
+        public Criteria andTotalSupplyIsNull() {
+            addCriterion("total_supply is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyIsNotNull() {
+            addCriterion("total_supply is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyEqualTo(BigDecimal value) {
+            addCriterion("total_supply =", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyNotEqualTo(BigDecimal value) {
+            addCriterion("total_supply <>", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyGreaterThan(BigDecimal value) {
+            addCriterion("total_supply >", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("total_supply >=", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyLessThan(BigDecimal value) {
+            addCriterion("total_supply <", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("total_supply <=", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyIn(List<BigDecimal> values) {
+            addCriterion("total_supply in", values, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyNotIn(List<BigDecimal> values) {
+            addCriterion("total_supply not in", values, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("total_supply between", value1, value2, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("total_supply not between", value1, value2, "totalSupply");
+            return (Criteria) this;
+        }
+
         public Criteria andUpdateTimeIsNull() {
             addCriterion("update_time is null");
             return (Criteria) this;

@@ -10,6 +10,7 @@
     <result column="delegate_value" jdbcType="DECIMAL" property="delegateValue" />
     <result column="redeemed_value" jdbcType="DECIMAL" property="redeemedValue" />
     <result column="tx_qty" jdbcType="INTEGER" property="txQty" />
+    <result column="token_qty" jdbcType="INTEGER" property="tokenQty" />
     <result column="transfer_qty" jdbcType="INTEGER" property="transferQty" />
     <result column="delegate_qty" jdbcType="INTEGER" property="delegateQty" />
     <result column="staking_qty" jdbcType="INTEGER" property="stakingQty" />
@@ -89,9 +90,9 @@
   </sql>
   <sql id="Base_Column_List">
     address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
-    tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes, 
-    delegate_locked, delegate_released, contract_name, contract_create, contract_createHash, 
-    contract_destroy_hash, create_time, update_time, have_reward
+    tx_qty, token_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
+    delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
+    contract_createHash, contract_destroy_hash, create_time, update_time, have_reward
   </sql>
   <sql id="Blob_Column_List">
     contract_bin
@@ -147,20 +148,20 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Address">
     insert into address (address, `type`, balance, 
       restricting_balance, staking_value, delegate_value, 
-      redeemed_value, tx_qty, transfer_qty, 
-      delegate_qty, staking_qty, proposal_qty, 
-      candidate_count, delegate_hes, delegate_locked, 
-      delegate_released, contract_name, contract_create, 
-      contract_createHash, contract_destroy_hash, 
+      redeemed_value, tx_qty, token_qty, 
+      transfer_qty, delegate_qty, staking_qty, 
+      proposal_qty, candidate_count, delegate_hes, 
+      delegate_locked, delegate_released, contract_name, 
+      contract_create, contract_createHash, contract_destroy_hash, 
       create_time, update_time, have_reward, 
       contract_bin)
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
       #{restrictingBalance,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{delegateValue,jdbcType=DECIMAL}, 
-      #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
-      #{delegateQty,jdbcType=INTEGER}, #{stakingQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
-      #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, 
-      #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, #{contractCreate,jdbcType=VARCHAR}, 
-      #{contractCreatehash,jdbcType=VARCHAR}, #{contractDestroyHash,jdbcType=VARCHAR}, 
+      #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{tokenQty,jdbcType=INTEGER}, 
+      #{transferQty,jdbcType=INTEGER}, #{delegateQty,jdbcType=INTEGER}, #{stakingQty,jdbcType=INTEGER}, 
+      #{proposalQty,jdbcType=INTEGER}, #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, 
+      #{delegateLocked,jdbcType=DECIMAL}, #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, 
+      #{contractCreate,jdbcType=VARCHAR}, #{contractCreatehash,jdbcType=VARCHAR}, #{contractDestroyHash,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{haveReward,jdbcType=DECIMAL}, 
       #{contractBin,jdbcType=LONGVARCHAR})
   </insert>
@@ -190,6 +191,9 @@
       </if>
       <if test="txQty != null">
         tx_qty,
+      </if>
+      <if test="tokenQty != null">
+        token_qty,
       </if>
       <if test="transferQty != null">
         transfer_qty,
@@ -264,6 +268,9 @@
       </if>
       <if test="txQty != null">
         #{txQty,jdbcType=INTEGER},
+      </if>
+      <if test="tokenQty != null">
+        #{tokenQty,jdbcType=INTEGER},
       </if>
       <if test="transferQty != null">
         #{transferQty,jdbcType=INTEGER},
@@ -348,6 +355,9 @@
       <if test="record.txQty != null">
         tx_qty = #{record.txQty,jdbcType=INTEGER},
       </if>
+      <if test="record.tokenQty != null">
+        token_qty = #{record.tokenQty,jdbcType=INTEGER},
+      </if>
       <if test="record.transferQty != null">
         transfer_qty = #{record.transferQty,jdbcType=INTEGER},
       </if>
@@ -411,6 +421,7 @@
       delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{record.txQty,jdbcType=INTEGER},
+      token_qty = #{record.tokenQty,jdbcType=INTEGER},
       transfer_qty = #{record.transferQty,jdbcType=INTEGER},
       delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
       staking_qty = #{record.stakingQty,jdbcType=INTEGER},
@@ -441,6 +452,7 @@
       delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{record.txQty,jdbcType=INTEGER},
+      token_qty = #{record.tokenQty,jdbcType=INTEGER},
       transfer_qty = #{record.transferQty,jdbcType=INTEGER},
       delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
       staking_qty = #{record.stakingQty,jdbcType=INTEGER},
@@ -483,6 +495,9 @@
       </if>
       <if test="txQty != null">
         tx_qty = #{txQty,jdbcType=INTEGER},
+      </if>
+      <if test="tokenQty != null">
+        token_qty = #{tokenQty,jdbcType=INTEGER},
       </if>
       <if test="transferQty != null">
         transfer_qty = #{transferQty,jdbcType=INTEGER},
@@ -544,6 +559,7 @@
       delegate_value = #{delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{txQty,jdbcType=INTEGER},
+      token_qty = #{tokenQty,jdbcType=INTEGER},
       transfer_qty = #{transferQty,jdbcType=INTEGER},
       delegate_qty = #{delegateQty,jdbcType=INTEGER},
       staking_qty = #{stakingQty,jdbcType=INTEGER},
@@ -571,6 +587,7 @@
       delegate_value = #{delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{txQty,jdbcType=INTEGER},
+      token_qty = #{tokenQty,jdbcType=INTEGER},
       transfer_qty = #{transferQty,jdbcType=INTEGER},
       delegate_qty = #{delegateQty,jdbcType=INTEGER},
       staking_qty = #{stakingQty,jdbcType=INTEGER},
@@ -596,7 +613,7 @@
     -->
     insert into address
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
-      tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
+      tx_qty, token_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
       delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
       contract_createHash, contract_destroy_hash, create_time, update_time, have_reward, 
       contract_bin)
@@ -605,14 +622,14 @@
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
         #{item.restrictingBalance,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL}, 
         #{item.delegateValue,jdbcType=DECIMAL}, #{item.redeemedValue,jdbcType=DECIMAL}, 
-        #{item.txQty,jdbcType=INTEGER}, #{item.transferQty,jdbcType=INTEGER}, #{item.delegateQty,jdbcType=INTEGER}, 
-        #{item.stakingQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, #{item.candidateCount,jdbcType=INTEGER}, 
-        #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
-        #{item.delegateReleased,jdbcType=DECIMAL}, #{item.contractName,jdbcType=VARCHAR}, 
-        #{item.contractCreate,jdbcType=VARCHAR}, #{item.contractCreatehash,jdbcType=VARCHAR}, 
-        #{item.contractDestroyHash,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}, #{item.contractBin,jdbcType=LONGVARCHAR}
-        )
+        #{item.txQty,jdbcType=INTEGER}, #{item.tokenQty,jdbcType=INTEGER}, #{item.transferQty,jdbcType=INTEGER}, 
+        #{item.delegateQty,jdbcType=INTEGER}, #{item.stakingQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, 
+        #{item.candidateCount,jdbcType=INTEGER}, #{item.delegateHes,jdbcType=DECIMAL}, 
+        #{item.delegateLocked,jdbcType=DECIMAL}, #{item.delegateReleased,jdbcType=DECIMAL}, 
+        #{item.contractName,jdbcType=VARCHAR}, #{item.contractCreate,jdbcType=VARCHAR}, 
+        #{item.contractCreatehash,jdbcType=VARCHAR}, #{item.contractDestroyHash,jdbcType=VARCHAR}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}, 
+        #{item.contractBin,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -653,6 +670,9 @@
         </if>
         <if test="'tx_qty'.toString() == column.value">
           #{item.txQty,jdbcType=INTEGER}
+        </if>
+        <if test="'token_qty'.toString() == column.value">
+          #{item.tokenQty,jdbcType=INTEGER}
         </if>
         <if test="'transfer_qty'.toString() == column.value">
           #{item.transferQty,jdbcType=INTEGER}
