@@ -1,11 +1,5 @@
 package com.platon.browser.common.complement.cache;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.stereotype.Component;
-
 import com.platon.browser.common.collection.dto.ComplementInfo;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.complement.dao.param.delegate.DelegateRewardClaim;
@@ -20,6 +14,11 @@ import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 地址统计缓存
@@ -174,6 +173,10 @@ public class AddressCache {
         return this.erc20TokenAddressRelMap.put(key, erc20TokenAddressRel);
     }
 
+    public void cleanErc20TokenAddressRelMap() {
+        this.erc20TokenAddressRelMap.clear();
+    }
+
     private void updateAddress(Transaction tx, String addr) {
         if (addr == null)
             return;
@@ -286,6 +289,7 @@ public class AddressCache {
         }
 
         address.setTxQty(0);
+        address.setTokenQty(0);
         address.setTransferQty(0);
         address.setStakingQty(0);
         address.setDelegateQty(0);

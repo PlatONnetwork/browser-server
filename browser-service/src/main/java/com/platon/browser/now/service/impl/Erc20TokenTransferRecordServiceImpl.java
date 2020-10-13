@@ -3,6 +3,7 @@ package com.platon.browser.now.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.entity.Erc20TokenAddressRelExample;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
@@ -16,6 +17,7 @@ import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.erc.ErcService;
 import com.platon.browser.now.service.Erc20TokenTransferRecordService;
 import com.platon.browser.req.token.QueryHolderTokenListReq;
 import com.platon.browser.req.token.QueryTokenHolderListReq;
@@ -28,8 +30,6 @@ import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.utils.HexTool;
-import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -40,11 +40,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +74,12 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
     @Autowired
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
+
+    @Autowired
+    private DownFileCommon downFileCommon;
+
+    @Autowired
+    private ErcService ercService;
 
     @Override
     public RespPage<QueryTokenTransferRecordListResp> queryTokenRecordList(QueryTokenTransferRecordListReq req) {
@@ -138,6 +142,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
     @Override
     public AccountDownload exportTokenTransferList(String address, String contract, Long date, String local, String timeZone, String token, HttpServletResponse response) {
         AccountDownload accountDownload = new AccountDownload();
+        if (StringUtils.isBlank(address) && StringUtils.isBlank(contract)) {
+            return accountDownload;
+        }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -150,7 +157,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         constructor.must(new ESQueryBuilders().range("bTime", new Date(date).getTime(), currentServerTime.getTime()));
         ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
         // condition: txHash/contract/txFrom/transferTo
-        constructor.must(new ESQueryBuilders().terms("contract", Collections.singletonList(contract)));
+        if (StringUtils.isNotBlank(contract)) constructor.must(new ESQueryBuilders().term("contract", contract));
+        if (StringUtils.isNotBlank(address)) constructor.buildMust(new BoolQueryBuilder()
+                .should(QueryBuilders.termQuery("from", address))
+                .should(QueryBuilders.termQuery("tto", address)));
         // Set sort field
         constructor.setDesc("seq");
         // response filed to show.
@@ -177,31 +187,14 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
             };
             rows.add(row);
         });
-        /** 初始化输出流对象 */
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            /** 设置导出的csv头，防止乱码 */
-            byteArrayOutputStream.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
-        } catch (Exception e) {
-            this.log.error("输出数据错误:", e);
-            return accountDownload;
-        }
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
-        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        /** 设置导出表的表头 */
-        writer.writeHeaders(this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
                 this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local));
-        writer.writeRowsAndClose(rows);
-        /** 设置返回对象 */
-        accountDownload.setData(byteArrayOutputStream.toByteArray());
-        accountDownload.setFilename("InnerTransaction-" + address + "-" + date + ".CSV");
-        accountDownload.setLength(byteArrayOutputStream.size());
-        return accountDownload;
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local)};
+        return this.downFileCommon.writeDate("InnerTransaction-" + address + "-" + date + ".CSV", rows, headers);
     }
 
     @Override
@@ -216,20 +209,23 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andContractEqualTo(req.getContract());
-        example.setOrderByClause(" id desc");
+        example.setOrderByClause(" update_time desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
         List<QueryTokenHolderListResp> listResps = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
+            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
             //金额转换成对应的值
-            if (null != queryTokenHolderListResp.getBalance()) {
-                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(queryTokenHolderListResp.getBalance(), erc20TokenAddressRel.getDecimal());
+            if (null != balance) {
+                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal());
                 queryTokenHolderListResp.setBalance(actualTransferValue);
             } else {
                 queryTokenHolderListResp.setBalance(BigDecimal.ZERO);
             }
             queryTokenHolderListResp.setAddress(erc20TokenAddressRel.getAddress());
+            queryTokenHolderListResp.setPercent(new BigDecimal(balance).divide(erc20TokenAddressRel.getTotalSupply())
+                    .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%");
             listResps.add(queryTokenHolderListResp);
         });
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
@@ -250,16 +246,17 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andAddressEqualTo(req.getAddress());
-        example.setOrderByClause(" id desc");
+        example.setOrderByClause(" update_time desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(erc20TokenAddressRel, queryHolderTokenListResp);
+            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
             //金额转换成对应的值
-            if (null != queryHolderTokenListResp.getBalance()) {
-                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(queryHolderTokenListResp.getBalance(), erc20TokenAddressRel.getDecimal());
+            if (null != balance) {
+                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal());
                 queryHolderTokenListResp.setBalance(actualTransferValue);
             } else {
                 queryHolderTokenListResp.setBalance(BigDecimal.ZERO);
@@ -274,87 +271,55 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
     @Override
     public AccountDownload exportTokenHolderList(String contract, String local, String timeZone, String token, HttpServletResponse response) {
-        AccountDownload accountDownload = new AccountDownload();
-
         Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andContractEqualTo(contract);
-        example.setOrderByClause(" id desc");
+        example.setOrderByClause(" update_time desc");
         PageHelper.startPage(1, 3000);
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
-
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
-            Object[] row = {erc20TokenAddressRel.getAddress(), HexTool.append(ConvertUtil.convertByFactor(erc20TokenAddressRel.getBalance(), erc20TokenAddressRel.getDecimal()).toString()),
-
+            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
+            Object[] row = {erc20TokenAddressRel.getAddress(), HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(balance),
+                    erc20TokenAddressRel.getDecimal()).toString()),
+                    new BigDecimal(balance).divide(erc20TokenAddressRel.getTotalSupply())
+                            .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
             };
             rows.add(row);
         });
-        /** 初始化输出流对象 */
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            /** 设置导出的csv头，防止乱码 */
-            byteArrayOutputStream.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
-        } catch (Exception e) {
-            this.log.error("输出数据错误:", e);
-            return accountDownload;
-        }
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
-        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        /** 设置导出表的表头 */
-        writer.writeHeaders(this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_ADDRESS, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_BALANCE, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_PERCENT, local));
-        writer.writeRowsAndClose(rows);
-        /** 设置返回对象 */
-        accountDownload.setData(byteArrayOutputStream.toByteArray());
-        accountDownload.setFilename("TokenHolder-" + contract + "-" + new Date().getTime() + ".CSV");
-        accountDownload.setLength(byteArrayOutputStream.size());
-        return accountDownload;
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+        return this.downFileCommon.writeDate("TokenHolder-" + contract + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
     @Override
     public AccountDownload exportHolderTokenList(String address, String local, String timeZone, String token, HttpServletResponse response) {
-        AccountDownload accountDownload = new AccountDownload();
 
         Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andAddressEqualTo(address);
-        example.setOrderByClause(" id desc");
+        example.setOrderByClause(" update_time desc");
         PageHelper.startPage(1, 3000);
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
 
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
+            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
             Object[] row = {erc20TokenAddressRel.getName(), erc20TokenAddressRel.getSymbol(),
-                    HexTool.append(ConvertUtil.convertByFactor(erc20TokenAddressRel.getBalance(), erc20TokenAddressRel.getDecimal()).toString()),
+                    HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal()).toString()),
                     erc20TokenAddressRel.getDecimal(), erc20TokenAddressRel.getContract()
             };
             rows.add(row);
         });
-        /** 初始化输出流对象 */
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            /** 设置导出的csv头，防止乱码 */
-            byteArrayOutputStream.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
-        } catch (Exception e) {
-            this.log.error("输出数据错误:", e);
-            return accountDownload;
-        }
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
-        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        /** 设置导出表的表头 */
-        writer.writeHeaders(this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_NAME, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_SYMBOL, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_BALANCE, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_DECIMALS, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTEACT_CSV_CONTRACT, local));
-        writer.writeRowsAndClose(rows);
-        /** 设置返回对象 */
-        accountDownload.setData(byteArrayOutputStream.toByteArray());
-        accountDownload.setFilename("HolderToken-" + address + "-" + new Date().getTime() + ".CSV");
-        accountDownload.setLength(byteArrayOutputStream.size());
-        return accountDownload;
+        String[] headers = {
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local)
+        };
+        return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
     public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ESTokenTransferRecord record) {
@@ -382,10 +347,14 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         } else {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.INPUT.val());
         }
-        if(null == address){
+        if (null == address) {
             resp.setType(QueryTokenTransferRecordListResp.TransferType.NONE.val());
         }
         return resp;
+    }
+
+    private BigInteger getAddressBalance(String contract, String address) {
+        return this.ercService.getBalance(contract, address);
     }
 
     @Override

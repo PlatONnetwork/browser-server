@@ -64,7 +64,7 @@ public class AppDocErc20TokenTransferRecordController implements AppDocErc20Toke
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error(e.getMessage());
+            this.log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
@@ -112,7 +112,7 @@ public class AppDocErc20TokenTransferRecordController implements AppDocErc20Toke
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error(e.getMessage());
+            this.log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }

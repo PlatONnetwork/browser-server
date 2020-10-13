@@ -1,11 +1,5 @@
 package com.platon.browser.complement.converter.statistic;
 
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -14,15 +8,17 @@ import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.CustomErc20TokenMapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,12 +36,14 @@ public class StatisticsAddressConverter {
     private CustomErc20TokenMapper customErc20TokenMapper;
     @Autowired
     private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
+    @Autowired
+    private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
 
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
         log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})", block.getNum(),
-            event.getTransactions().size(), epochMessage.getConsensusEpochRound(), epochMessage.getSettleEpochRound(),
-            epochMessage.getIssueEpochRound());
+                event.getTransactions().size(), epochMessage.getConsensusEpochRound(), epochMessage.getSettleEpochRound(),
+                epochMessage.getIssueEpochRound());
         // 使用缓存中的地址统计信息构造入库参数列表
         List<AddressStatItem> itemFromCache = new ArrayList<>();
         List<String> addresses = new ArrayList<>();
@@ -209,21 +207,52 @@ public class StatisticsAddressConverter {
         long startTime = System.currentTimeMillis();
         if (log.isDebugEnabled()) {
             log.debug("erc20AddressConvert ~ block({}), transactions({}), consensus({}), settlement({}), issue({})",
-                block.getNum(), event.getTransactions().size(), epochMessage.getConsensusEpochRound(),
-                epochMessage.getSettleEpochRound(), epochMessage.getIssueEpochRound());
+                    block.getNum(), event.getTransactions().size(), epochMessage.getConsensusEpochRound(),
+                    epochMessage.getSettleEpochRound(), epochMessage.getIssueEpochRound());
         }
         Map<String, Erc20TokenAddressRel> erc20TokenAddressRelMap = this.addressCache.getErc20TokenAddressRelMap();
         if (erc20TokenAddressRelMap.isEmpty()) {
             return;
         }
-        List<Erc20TokenAddressRel> params = new ArrayList<>();
-        params.addAll(erc20TokenAddressRelMap.values());
+        List<Erc20TokenAddressRel> queryList = new ArrayList<>(erc20TokenAddressRelMap.size());
+        queryList.addAll(erc20TokenAddressRelMap.values());
+        this.addressCache.cleanErc20TokenAddressRelMap();
 
-        int result = this.customErc20TokenAddressRelMapper.updateAddressData(params);
-        this.addressCache.cleanErcAddressCache();
+        /**
+         *查询已经存在的数据
+         */
+        List<Erc20TokenAddressRel> existsList = this.customErc20TokenAddressRelMapper.selectData(queryList);
+
+        List<Erc20TokenAddressRel> updateParams = new ArrayList<>();
+
+        //进行数据匹配然后切换
+        for (int i = 0; i < queryList.size(); i++) {
+            Erc20TokenAddressRel qT = queryList.get(i);
+            for (int j = 0; j < existsList.size(); j++) {
+                //数据匹配，则1、进行余额计算， 2、移除队列
+                Erc20TokenAddressRel eT = queryList.get(i);
+                if (eT.getAddress().equals(qT.getAddress()) && eT.getContract().equals(qT.getContract())) {
+                    if (eT.getBalance().add(qT.getBalance()).compareTo(BigDecimal.ZERO) > 0) {
+                        eT.setBalance(eT.getBalance().add(qT.getBalance()));
+                        eT.setUpdateTime(new Date());
+                        updateParams.add(eT);
+                    }
+                    queryList.remove(i);
+                    i--;
+                    existsList.remove(j);
+                    j--;
+                    break;
+                }
+            }
+        }
+        //移除之后的队列就可以直接插入
+        int result = 0;
+        if (queryList.size() > 0) result = this.erc20TokenAddressRelMapper.batchInsert(queryList);
+        if (updateParams.size() > 0) result = this.customErc20TokenAddressRelMapper.updateAddressData(updateParams);
+
         if (log.isDebugEnabled()) {
             log.debug("erc20AddressConvert ~ 处理耗时:{} ms",
-                System.currentTimeMillis() - startTime + " 参数条数：{" + params.size() + "}，成功数量：{" + result + "}");
+                    System.currentTimeMillis() - startTime + " 参数条数：{" + queryList.size() + "}，成功数量：{" + result + "}");
         }
     }
 }

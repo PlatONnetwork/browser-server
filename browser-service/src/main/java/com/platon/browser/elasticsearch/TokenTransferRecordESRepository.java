@@ -1,16 +1,14 @@
 package com.platon.browser.elasticsearch;
 
-import java.io.IOException;
-
-import javax.annotation.PostConstruct;
-
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 /**
  * 针对处理合约内部转账记录的ES处理器
@@ -54,18 +52,19 @@ public class TokenTransferRecordESRepository extends ESRepository {
                         .startObject("properties")
                             .startObject("seq").field("type", "long").endObject()
                             .startObject("hash").field("type", "keyword").endObject()
-                            .startObject("bn").field("type", "long").endObject()
-                            .startObject("from").field("type", "keyword").endObject()
-                            .startObject("contract").field("type", "keyword").endObject()
-                            .startObject("tto").field("type", "keyword").endObject()
-                            .startObject("tValue").field("type", "keyword").endObject()
-                            .startObject("decimal").field("type", "integer").endObject()
-                            .startObject("name").field("type", "text").endObject()
-                            .startObject("symbol").field("type", "keyword").endObject()
-                            .startObject("sign").field("type", "keyword").endObject()
-                            .startObject("result").field("type", "integer").endObject()
-            .startObject("fromType").field("type", "integer").endObject().startObject("toType").field("type", "integer")
-            .endObject()
+                .startObject("bn").field("type", "long").endObject()
+                .startObject("from").field("type", "keyword").endObject()
+                .startObject("contract").field("type", "keyword").endObject()
+                .startObject("tto").field("type", "keyword").endObject()
+                .startObject("tValue").field("type", "keyword").endObject()
+                .startObject("decimal").field("type", "integer").endObject()
+                .startObject("name").field("type", "text").endObject()
+                .startObject("symbol").field("type", "keyword").endObject()
+                .startObject("sign").field("type", "keyword").endObject()
+                .startObject("result").field("type", "integer").endObject()
+                .startObject("fromType").field("type", "integer").endObject()
+                .startObject("toType").field("type", "integer").endObject()
+                .startObject("txFee").field("type", "keyword").endObject()
                             .startObject("bTime").field("type", "date").field("format", "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis").endObject()
                             .startObject("value").field("type", "keyword").endObject()
                             .startObject("info").field("type", "text").endObject()

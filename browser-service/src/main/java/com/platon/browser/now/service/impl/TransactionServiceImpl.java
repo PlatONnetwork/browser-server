@@ -1,29 +1,10 @@
 package com.platon.browser.now.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
+import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
 import com.platon.browser.converter.QueryInnerTxByAddrRespConverter;
@@ -71,8 +52,21 @@ import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.*;
 import com.platon.browser.util.*;
 import com.platon.browser.utils.HexTool;
-import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
+import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 交易方法逻辑实现
@@ -106,6 +100,8 @@ public class TransactionServiceImpl implements TransactionService {
     private CommonService commonService;
     @Autowired
     private RedisFactory redisFactory;
+    @Autowired
+    private DownFileCommon downFileCommon;
     private static final String ERROR_TIPS = "获取区块错误。";
 
     @Override
@@ -113,7 +109,7 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
         /** 分页查询redis交易数据 */
         TransactionCacheDto transactionCacheDto =
-            this.statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
+                this.statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
         List<Transaction> items = transactionCacheDto.getTransactionList();
         /**
          * 数据转换
@@ -258,44 +254,26 @@ public class TransactionServiceImpl implements TransactionService {
                  * 枚举类型名称需要对应
                  */
                 this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
-                transaction.getFrom(), transaction.getTo(),
-                /** 数值von转换成lat，并保留十八位精确度 */
-                HexTool.append(
-                    EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
-                HexTool.append(EnergonUtil
-                    .format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
-                HexTool.append(EnergonUtil.format(
-                    Convert.fromVon(transaction.getCost(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))};
+                    transaction.getFrom(), transaction.getTo(),
+                    /** 数值von转换成lat，并保留十八位精确度 */
+                    HexTool.append(
+                            EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil
+                            .format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(
+                            Convert.fromVon(transaction.getCost(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))};
             rows.add(row);
         });
-        /** 初始化输出流对象 */
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            /** 设置导出的csv头，防止乱码 */
-            byteArrayOutputStream.write(new byte[] {(byte)0xEF, (byte)0xBB, (byte)0xBF});
-        } catch (Exception e) {
-            this.logger.error("输出数据错误:", e);
-            return accountDownload;
-        }
-        Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
-        this.logger.error("download Charset.defaultCharset():{}", StandardCharsets.UTF_8);
-        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        /** 设置导出表的表头 */
-        writer.writeHeaders(this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local),
-            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE, local));
-        writer.writeRowsAndClose(rows);
-        /** 设置返回对象 */
-        accountDownload.setData(byteArrayOutputStream.toByteArray());
-        accountDownload.setFilename("Transaction-" + address + "-" + date + ".CSV");
-        accountDownload.setLength(byteArrayOutputStream.size());
-        return accountDownload;
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE, local)};
+        return this.downFileCommon.writeDate("Transaction-" + address + "-" + date + ".CSV", rows, headers);
     }
 
     @Override

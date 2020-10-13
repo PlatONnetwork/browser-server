@@ -6,8 +6,8 @@
     replace into `address` (
         `address`,
         `type`,
-        `tx_qty`,,
-        `token_qty`,
+    `tx_qty`,
+    `token_qty`,
         `transfer_qty`,
         `delegate_qty`,
         `staking_qty`,

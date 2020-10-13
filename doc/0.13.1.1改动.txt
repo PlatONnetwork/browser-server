@@ -108,6 +108,9 @@
           "seq": {
             "type": "long"
           },
+          "txFee": {
+             "type": "keyword"
+          },
           "cre_time": {
             "type": "date",
     		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"

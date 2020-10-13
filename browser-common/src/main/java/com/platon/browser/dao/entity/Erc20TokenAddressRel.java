@@ -1,6 +1,9 @@
 package com.platon.browser.dao.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,6 +11,9 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class Erc20TokenAddressRel {
     private Long id;
 
@@ -22,6 +28,8 @@ public class Erc20TokenAddressRel {
     private String symbol;
 
     private Integer decimal;
+
+    private BigDecimal totalSupply;
 
     private Date updateTime;
 
@@ -81,6 +89,14 @@ public class Erc20TokenAddressRel {
         this.decimal = decimal;
     }
 
+    public BigDecimal getTotalSupply() {
+        return this.totalSupply;
+    }
+
+    public void setTotalSupply(BigDecimal totalSupply) {
+        this.totalSupply = totalSupply;
+    }
+
     public Date getUpdateTime() {
         return this.updateTime;
     }
@@ -104,6 +120,7 @@ public class Erc20TokenAddressRel {
         name("name", "name", "VARCHAR", true),
         symbol("symbol", "symbol", "VARCHAR", false),
         decimal("decimal", "decimal", "INTEGER", true),
+        totalSupply("total_supply", "totalSupply", "DECIMAL", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
         /**
