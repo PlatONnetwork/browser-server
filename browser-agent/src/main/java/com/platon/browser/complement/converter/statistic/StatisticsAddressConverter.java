@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -230,21 +231,30 @@ public class StatisticsAddressConverter {
             Erc20TokenAddressRel qT = queryList.get(i);
             for (int j = 0; j < existsList.size(); j++) {
                 //数据匹配，则1、进行余额计算， 2、移除队列
-                Erc20TokenAddressRel eT = queryList.get(i);
+                Erc20TokenAddressRel eT = existsList.get(j);
                 if (eT.getAddress().equals(qT.getAddress()) && eT.getContract().equals(qT.getContract())) {
                     if (eT.getBalance().add(qT.getBalance()).compareTo(BigDecimal.ZERO) > 0) {
                         eT.setBalance(eT.getBalance().add(qT.getBalance()));
                     }
                     eT.setTxCount(eT.getTxCount() + 1);
                     eT.setUpdateTime(new Date());
-                    updateParams.add(eT);
+                    if (!updateParams.contains(eT)) {
+                        updateParams.add(eT);
+                    }
                     queryList.remove(i);
                     i--;
                     break;
                 }
             }
         }
-        queryList.forEach(erc20TokenAddressRel -> {
+        //对重复的相同的合约和地址的数据进行汇总总数
+        Map<String, Long> map = queryList.stream().collect(Collectors.groupingBy(e -> this.fetchGroupKey(e), Collectors.counting()));
+        //插入的合约与地址映射关系不应该存在重复的情况，故需要以合约和地址两个参数维度进行去重
+        queryList = queryList.stream().collect(Collectors.collectingAndThen(
+                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> this.fetchGroupKey(o)))), ArrayList::new));
+        //遍历去重之后的队列数据，对数据进行交易数据的设置（防止由于在同一时间有多笔交易导致刚插入数据的交易数为1的情况）和erc合约持有人叠加
+        queryList.stream().forEach(erc20TokenAddressRel -> {
+            erc20TokenAddressRel.setTxCount(map.get(this.fetchGroupKey(erc20TokenAddressRel)).intValue());
             this.addressCache.updateErcHolder(erc20TokenAddressRel.getContract());
         });
         //移除之后的队列就可以直接插入
@@ -256,5 +266,9 @@ public class StatisticsAddressConverter {
             log.debug("erc20AddressConvert ~ 处理耗时:{} ms",
                     System.currentTimeMillis() - startTime + " 参数条数：{" + queryList.size() + "}，成功数量：{" + result + "}");
         }
+    }
+
+    private String fetchGroupKey(Erc20TokenAddressRel erc20TokenAddressRel) {
+        return erc20TokenAddressRel.getContract() + "#" + erc20TokenAddressRel.getAddress();
     }
 }
