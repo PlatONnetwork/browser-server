@@ -234,13 +234,12 @@ public class StatisticsAddressConverter {
                 if (eT.getAddress().equals(qT.getAddress()) && eT.getContract().equals(qT.getContract())) {
                     if (eT.getBalance().add(qT.getBalance()).compareTo(BigDecimal.ZERO) > 0) {
                         eT.setBalance(eT.getBalance().add(qT.getBalance()));
-                        eT.setUpdateTime(new Date());
-                        updateParams.add(eT);
                     }
+                    eT.setTxCount(eT.getTxCount() + 1);
+                    eT.setUpdateTime(new Date());
+                    updateParams.add(eT);
                     queryList.remove(i);
                     i--;
-                    existsList.remove(j);
-                    j--;
                     break;
                 }
             }

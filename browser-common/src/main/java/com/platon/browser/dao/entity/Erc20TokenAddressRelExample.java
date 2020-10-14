@@ -566,6 +566,66 @@ public class Erc20TokenAddressRelExample {
             return (Criteria) this;
         }
 
+        public Criteria andTxCountIsNull() {
+            addCriterion("tx_count is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountIsNotNull() {
+            addCriterion("tx_count is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountEqualTo(Integer value) {
+            addCriterion("tx_count =", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountNotEqualTo(Integer value) {
+            addCriterion("tx_count <>", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountGreaterThan(Integer value) {
+            addCriterion("tx_count >", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("tx_count >=", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountLessThan(Integer value) {
+            addCriterion("tx_count <", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountLessThanOrEqualTo(Integer value) {
+            addCriterion("tx_count <=", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountIn(List<Integer> values) {
+            addCriterion("tx_count in", values, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountNotIn(List<Integer> values) {
+            addCriterion("tx_count not in", values, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountBetween(Integer value1, Integer value2) {
+            addCriterion("tx_count between", value1, value2, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("tx_count not between", value1, value2, "txCount");
+            return (Criteria) this;
+        }
+
         public Criteria andTotalSupplyIsNull() {
             addCriterion("total_supply is null");
             return (Criteria) this;
