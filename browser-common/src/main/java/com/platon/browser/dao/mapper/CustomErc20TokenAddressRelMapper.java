@@ -17,4 +17,5 @@ public interface CustomErc20TokenAddressRelMapper {
 
     int updateAddressData(@Param("list") List<Erc20TokenAddressRel> list);
 
+    int updateAddressBalance(@Param("list") List<Erc20TokenAddressRel> list);
 }

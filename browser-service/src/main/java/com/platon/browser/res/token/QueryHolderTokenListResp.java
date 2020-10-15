@@ -34,7 +34,7 @@ public class QueryHolderTokenListResp {
     private String symbol;
     @ApiModelProperty(value = "代币名称")
     private String name;
-    @ApiModelProperty(value = "交易总数")
+    @ApiModelProperty(value = "地址对应合约交易总数")
     private Integer txCount;
 
 }

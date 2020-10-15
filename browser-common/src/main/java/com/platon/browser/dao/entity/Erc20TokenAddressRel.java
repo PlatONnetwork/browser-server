@@ -3,7 +3,6 @@ package com.platon.browser.dao.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 public class Erc20TokenAddressRel {
     private Long id;
 
@@ -28,6 +26,8 @@ public class Erc20TokenAddressRel {
     private String symbol;
 
     private Integer decimal;
+
+    private Integer txCount;
 
     private BigDecimal totalSupply;
 
@@ -89,6 +89,14 @@ public class Erc20TokenAddressRel {
         this.decimal = decimal;
     }
 
+    public Integer getTxCount() {
+        return this.txCount;
+    }
+
+    public void setTxCount(Integer txCount) {
+        this.txCount = txCount;
+    }
+
     public BigDecimal getTotalSupply() {
         return this.totalSupply;
     }
@@ -120,6 +128,7 @@ public class Erc20TokenAddressRel {
         name("name", "name", "VARCHAR", true),
         symbol("symbol", "symbol", "VARCHAR", false),
         decimal("decimal", "decimal", "INTEGER", true),
+        txCount("tx_count", "txCount", "INTEGER", false),
         totalSupply("total_supply", "totalSupply", "DECIMAL", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
