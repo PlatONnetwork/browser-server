@@ -1,5 +1,6 @@
 package com.platon.browser.complement.converter.statistic;
 
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -15,11 +16,10 @@ import com.platon.browser.enums.ContractTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,6 +39,8 @@ public class StatisticsAddressConverter {
     private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
     @Autowired
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
+    @Autowired
+    protected RedisTemplate<String, String> redisTemplate;
 
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
@@ -226,49 +228,64 @@ public class StatisticsAddressConverter {
 
         List<Erc20TokenAddressRel> updateParams = new ArrayList<>();
 
+        Map<String, Erc20TokenAddressRel> insertParams = new HashMap<>();
+
+        Set<String> balanceList = new HashSet<>();
         //进行数据匹配然后切换
         for (int i = 0; i < queryList.size(); i++) {
             Erc20TokenAddressRel qT = queryList.get(i);
+            balanceList.add(this.fetchGroupKey(qT));
             for (int j = 0; j < existsList.size(); j++) {
                 //数据匹配，则1、进行余额计算， 2、移除队列
                 Erc20TokenAddressRel eT = existsList.get(j);
                 if (eT.getAddress().equals(qT.getAddress()) && eT.getContract().equals(qT.getContract())) {
-                    if (eT.getBalance().add(qT.getBalance()).compareTo(BigDecimal.ZERO) > 0) {
-                        eT.setBalance(eT.getBalance().add(qT.getBalance()));
-                    }
+                    //如果余额为正数则进行扣减
+//                    if (eT.getBalance().add(qT.getBalance()).compareTo(BigDecimal.ZERO) > 0) {
+//                        eT.setBalance(eT.getBalance().add(qT.getBalance()));
+//                    } else {
+//                        //余额为负数则查询余额
+//                        eT.setBalance(new BigDecimal(this.getAddressBalance(eT.getContract(), eT.getAddress())));
+//                    }
                     eT.setTxCount(eT.getTxCount() + 1);
                     eT.setUpdateTime(new Date());
                     if (!updateParams.contains(eT)) {
                         updateParams.add(eT);
                     }
-                    queryList.remove(i);
-                    i--;
+                    qT = null;
                     break;
                 }
             }
+            if (qT != null) {
+                //对重复的相同的合约和地址的数据进行汇总总数
+                String key = this.fetchGroupKey(qT);
+                //插入的合约与地址映射关系不应该存在重复的情况，故需要以合约和地址两个参数维度进行去重
+                Erc20TokenAddressRel temp = insertParams.get(key);
+                if (temp == null) {
+                    temp = qT;
+                    //第一次插入的时候需要交易数累加
+                    this.addressCache.updateErcHolder(temp.getContract());
+                    insertParams.put(key, temp);
+                } else {
+                    temp.setTxCount(temp.getTxCount() + 1);
+                }
+            }
         }
-        //对重复的相同的合约和地址的数据进行汇总总数
-        Map<String, Long> map = queryList.stream().collect(Collectors.groupingBy(e -> this.fetchGroupKey(e), Collectors.counting()));
-        //插入的合约与地址映射关系不应该存在重复的情况，故需要以合约和地址两个参数维度进行去重
-        queryList = queryList.stream().collect(Collectors.collectingAndThen(
-                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> this.fetchGroupKey(o)))), ArrayList::new));
-        //遍历去重之后的队列数据，对数据进行交易数据的设置（防止由于在同一时间有多笔交易导致刚插入数据的交易数为1的情况）和erc合约持有人叠加
-        queryList.stream().forEach(erc20TokenAddressRel -> {
-            erc20TokenAddressRel.setTxCount(map.get(this.fetchGroupKey(erc20TokenAddressRel)).intValue());
-            this.addressCache.updateErcHolder(erc20TokenAddressRel.getContract());
-        });
+        //余额丢到redis，由另一个队列进行查询补充
+        this.redisTemplate.opsForSet().add(BrowserConst.ERC_BALANCE_KEY, balanceList.toArray(new String[]{}));
         //移除之后的队列就可以直接插入
         int result = 0;
-        if (queryList.size() > 0) result = this.erc20TokenAddressRelMapper.batchInsert(queryList);
+        if (insertParams.size() > 0)
+            result = this.erc20TokenAddressRelMapper.batchInsert(new ArrayList<>(insertParams.values()));
         if (updateParams.size() > 0) result = this.customErc20TokenAddressRelMapper.updateAddressData(updateParams);
 
         if (log.isDebugEnabled()) {
             log.debug("erc20AddressConvert ~ 处理耗时:{} ms",
-                    System.currentTimeMillis() - startTime + " 参数条数：{" + queryList.size() + "}，成功数量：{" + result + "}");
+                    System.currentTimeMillis() - startTime + " 参数条数：{" + insertParams.size() + "}，成功数量：{" + result + "}");
         }
     }
 
     private String fetchGroupKey(Erc20TokenAddressRel erc20TokenAddressRel) {
-        return erc20TokenAddressRel.getContract() + "#" + erc20TokenAddressRel.getAddress();
+        return erc20TokenAddressRel.getContract() + BrowserConst.ERC_SPILT + erc20TokenAddressRel.getAddress();
     }
+
 }

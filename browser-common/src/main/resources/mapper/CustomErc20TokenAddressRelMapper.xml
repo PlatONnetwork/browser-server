@@ -50,4 +50,15 @@
             where contract=#{item.contract,jdbcType=VARCHAR} AND address=#{item.address,jdbcType=VARCHAR}
         </foreach>
     </update>
+    <update id="updateAddressBalance">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update `erc20_token_address_rel`
+            <set>
+                `balance` = #{item.balance},
+                `update_time` = now()
+            </set>
+            where contract=#{item.contract,jdbcType=VARCHAR} AND address=#{item.address,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
 </mapper>

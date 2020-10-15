@@ -42,7 +42,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -220,16 +219,16 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         List<QueryTokenHolderListResp> listResps = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
-            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
+            BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
             //金额转换成对应的值
             if (null != balance) {
-                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal());
+                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(balance, erc20TokenAddressRel.getDecimal());
                 queryTokenHolderListResp.setBalance(actualTransferValue);
             } else {
                 queryTokenHolderListResp.setBalance(BigDecimal.ZERO);
             }
             queryTokenHolderListResp.setAddress(erc20TokenAddressRel.getAddress());
-            queryTokenHolderListResp.setPercent(new BigDecimal(balance).divide(erc20TokenAddressRel.getTotalSupply())
+            queryTokenHolderListResp.setPercent(balance.divide(erc20TokenAddressRel.getTotalSupply())
                     .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%");
             listResps.add(queryTokenHolderListResp);
         });
@@ -261,10 +260,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(erc20TokenAddressRel, queryHolderTokenListResp);
-            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
+            BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
             //金额转换成对应的值
             if (null != balance) {
-                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal());
+                BigDecimal actualTransferValue = ConvertUtil.convertByFactor(balance, erc20TokenAddressRel.getDecimal());
                 queryHolderTokenListResp.setBalance(actualTransferValue);
             } else {
                 queryHolderTokenListResp.setBalance(BigDecimal.ZERO);
@@ -288,10 +287,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
-            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
-            Object[] row = {erc20TokenAddressRel.getAddress(), HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(balance),
+            BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
+            Object[] row = {erc20TokenAddressRel.getAddress(), HexTool.append(ConvertUtil.convertByFactor(balance,
                     erc20TokenAddressRel.getDecimal()).toString()),
-                    new BigDecimal(balance).divide(erc20TokenAddressRel.getTotalSupply())
+                    balance.divide(erc20TokenAddressRel.getTotalSupply())
                             .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
             };
             rows.add(row);
@@ -315,9 +314,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
-            BigInteger balance = this.getAddressBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
+            BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
             Object[] row = {erc20TokenAddressRel.getName(), erc20TokenAddressRel.getSymbol(),
-                    HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(balance), erc20TokenAddressRel.getDecimal()).toString()),
+                    HexTool.append(ConvertUtil.convertByFactor(balance, erc20TokenAddressRel.getDecimal()).toString()),
                     erc20TokenAddressRel.getDecimal(), erc20TokenAddressRel.getTxCount(), erc20TokenAddressRel.getContract()
             };
             rows.add(row);
@@ -364,8 +363,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         return resp;
     }
 
-    private BigInteger getAddressBalance(String contract, String address) {
-        return this.ercService.getBalance(contract, address);
+    private BigDecimal getAddressBalance(Erc20TokenAddressRel erc20TokenAddressRel) {
+        //暂时由后台统计余额
+        return erc20TokenAddressRel.getBalance();
+//        return this.ercService.getBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
     }
 
     @Override

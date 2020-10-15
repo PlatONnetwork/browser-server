@@ -399,8 +399,8 @@ public class TransactionUtil {
                                 .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
                                 .contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
                                 .info(transferEvent.getLog().getData()).ctime(new Date()).build();
-                esTokenTransferRecord.setFromType(addressCache.getTypeData(tx.getFrom()));
-                esTokenTransferRecord.setToType(addressCache.getTypeData(tx.getTo()));
+                esTokenTransferRecord.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
+                esTokenTransferRecord.setToType(addressCache.getTypeData(transferEvent.getTo()));
                 i.getAndIncrement();
                 esTokenTransferRecords.add(esTokenTransferRecord);
             });
