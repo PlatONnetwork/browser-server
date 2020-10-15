@@ -59,6 +59,7 @@ public interface AppDocAddress {
      *       "stakingQty":11,          //验证人交易总数
      *       "proposalQty":11,         //治理交易总数
 	 *       "tokenQty":11,         //erc20交易总数
+	 *       "tokenQty":11,         //erc20交易总数
      *       "candidateCount":11,      //已委托验证人
      *       "delegateHes":"",         //未锁定委托（ATP）
      *       "delegateLocked":"",      //已锁定委托（ATP）
