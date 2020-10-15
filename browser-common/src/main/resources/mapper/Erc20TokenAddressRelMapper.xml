@@ -9,6 +9,7 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="symbol" jdbcType="VARCHAR" property="symbol" />
     <result column="decimal" jdbcType="INTEGER" property="decimal" />
+    <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
     <result column="total_supply" jdbcType="DECIMAL" property="totalSupply" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -71,7 +72,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, contract, address, balance, `name`, symbol, `decimal`, total_supply, update_time
+    id, contract, address, balance, `name`, symbol, `decimal`, tx_count, total_supply, 
+    update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenAddressRelExample" resultMap="BaseResultMap">
     select
@@ -106,12 +108,12 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Erc20TokenAddressRel">
     insert into erc20_token_address_rel (id, contract, address, 
       balance, `name`, symbol, 
-      `decimal`, total_supply, update_time
-      )
+      `decimal`, tx_count, total_supply, 
+      update_time)
     values (#{id,jdbcType=BIGINT}, #{contract,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
       #{balance,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, #{symbol,jdbcType=VARCHAR}, 
-      #{decimal,jdbcType=INTEGER}, #{totalSupply,jdbcType=DECIMAL}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{decimal,jdbcType=INTEGER}, #{txCount,jdbcType=INTEGER}, #{totalSupply,jdbcType=DECIMAL}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Erc20TokenAddressRel">
     insert into erc20_token_address_rel
@@ -128,21 +130,24 @@
       <if test="balance != null">
         balance,
       </if>
-      <if test="name != null">
-        `name`,
-      </if>
-      <if test="symbol != null">
-        symbol,
-      </if>
-      <if test="decimal != null">
-        `decimal`,
-      </if>
-      <if test="totalSupply != null">
-        total_supply,
-      </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
+        <if test="name != null">
+            `name`,
+        </if>
+        <if test="symbol != null">
+            symbol,
+        </if>
+        <if test="decimal != null">
+            `decimal`,
+        </if>
+        <if test="txCount != null">
+            tx_count,
+        </if>
+        <if test="totalSupply != null">
+            total_supply,
+        </if>
+        <if test="updateTime != null">
+            update_time,
+        </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -157,21 +162,24 @@
       <if test="balance != null">
         #{balance,jdbcType=DECIMAL},
       </if>
-      <if test="name != null">
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="symbol != null">
-        #{symbol,jdbcType=VARCHAR},
-      </if>
-      <if test="decimal != null">
-        #{decimal,jdbcType=INTEGER},
-      </if>
-      <if test="totalSupply != null">
-        #{totalSupply,jdbcType=DECIMAL},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
+        <if test="name != null">
+            #{name,jdbcType=VARCHAR},
+        </if>
+        <if test="symbol != null">
+            #{symbol,jdbcType=VARCHAR},
+        </if>
+        <if test="decimal != null">
+            #{decimal,jdbcType=INTEGER},
+        </if>
+        <if test="txCount != null">
+            #{txCount,jdbcType=INTEGER},
+        </if>
+        <if test="totalSupply != null">
+            #{totalSupply,jdbcType=DECIMAL},
+        </if>
+        <if test="updateTime != null">
+            #{updateTime,jdbcType=TIMESTAMP},
+        </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenAddressRelExample" resultType="java.lang.Long">
@@ -195,38 +203,42 @@
       <if test="record.balance != null">
         balance = #{record.balance,jdbcType=DECIMAL},
       </if>
-      <if test="record.name != null">
-        `name` = #{record.name,jdbcType=VARCHAR},
-      </if>
-      <if test="record.symbol != null">
-        symbol = #{record.symbol,jdbcType=VARCHAR},
-      </if>
-      <if test="record.decimal != null">
-        `decimal` = #{record.decimal,jdbcType=INTEGER},
-      </if>
-      <if test="record.totalSupply != null">
-        total_supply = #{record.totalSupply,jdbcType=DECIMAL},
-      </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
+        <if test="record.name != null">
+            `name` = #{record.name,jdbcType=VARCHAR},
+        </if>
+        <if test="record.symbol != null">
+            symbol = #{record.symbol,jdbcType=VARCHAR},
+        </if>
+        <if test="record.decimal != null">
+            `decimal` = #{record.decimal,jdbcType=INTEGER},
+        </if>
+        <if test="record.txCount != null">
+            tx_count = #{record.txCount,jdbcType=INTEGER},
+        </if>
+        <if test="record.totalSupply != null">
+            total_supply = #{record.totalSupply,jdbcType=DECIMAL},
+        </if>
+        <if test="record.updateTime != null">
+            update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update erc20_token_address_rel
-    set id = #{record.id,jdbcType=BIGINT},
+      update erc20_token_address_rel
+      set id = #{record.id,jdbcType=BIGINT},
       contract = #{record.contract,jdbcType=VARCHAR},
       address = #{record.address,jdbcType=VARCHAR},
       balance = #{record.balance,jdbcType=DECIMAL},
       `name` = #{record.name,jdbcType=VARCHAR},
       symbol = #{record.symbol,jdbcType=VARCHAR},
       `decimal` = #{record.decimal,jdbcType=INTEGER},
+      tx_count = #{record.txCount,jdbcType=INTEGER},
       total_supply = #{record.totalSupply,jdbcType=DECIMAL},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null">
+      <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
@@ -240,23 +252,26 @@
         address = #{address,jdbcType=VARCHAR},
       </if>
       <if test="balance != null">
-        balance = #{balance,jdbcType=DECIMAL},
+          balance = #{balance,jdbcType=DECIMAL},
       </if>
-      <if test="name != null">
-        `name` = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="symbol != null">
-        symbol = #{symbol,jdbcType=VARCHAR},
-      </if>
-      <if test="decimal != null">
-        `decimal` = #{decimal,jdbcType=INTEGER},
-      </if>
-      <if test="totalSupply != null">
-        total_supply = #{totalSupply,jdbcType=DECIMAL},
-      </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
+        <if test="name != null">
+            `name` = #{name,jdbcType=VARCHAR},
+        </if>
+        <if test="symbol != null">
+            symbol = #{symbol,jdbcType=VARCHAR},
+        </if>
+        <if test="decimal != null">
+            `decimal` = #{decimal,jdbcType=INTEGER},
+        </if>
+        <if test="txCount != null">
+            tx_count = #{txCount,jdbcType=INTEGER},
+        </if>
+        <if test="totalSupply != null">
+            total_supply = #{totalSupply,jdbcType=DECIMAL},
+        </if>
+        <if test="updateTime != null">
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+        </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -268,6 +283,7 @@
       `name` = #{name,jdbcType=VARCHAR},
       symbol = #{symbol,jdbcType=VARCHAR},
       `decimal` = #{decimal,jdbcType=INTEGER},
+      tx_count = #{txCount,jdbcType=INTEGER},
       total_supply = #{totalSupply,jdbcType=DECIMAL},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
@@ -278,16 +294,16 @@
       This element is automatically generated by MyBatis Generator, do not modify.
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
-    insert into erc20_token_address_rel
-    (id, contract, address, balance, `name`, symbol, `decimal`, total_supply, update_time
-      )
-    values
-    <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=BIGINT}, #{item.contract,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, 
-        #{item.balance,jdbcType=DECIMAL}, #{item.name,jdbcType=VARCHAR}, #{item.symbol,jdbcType=VARCHAR}, 
-        #{item.decimal,jdbcType=INTEGER}, #{item.totalSupply,jdbcType=DECIMAL}, #{item.updateTime,jdbcType=TIMESTAMP}
-        )
-    </foreach>
+      insert into erc20_token_address_rel
+      (id, contract, address, balance, `name`, symbol, `decimal`, tx_count, total_supply,
+      update_time)
+      values
+      <foreach collection="list" item="item" separator=",">
+          (#{item.id,jdbcType=BIGINT}, #{item.contract,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR},
+          #{item.balance,jdbcType=DECIMAL}, #{item.name,jdbcType=VARCHAR}, #{item.symbol,jdbcType=VARCHAR},
+          #{item.decimal,jdbcType=INTEGER}, #{item.txCount,jdbcType=INTEGER}, #{item.totalSupply,jdbcType=DECIMAL},
+          #{item.updateTime,jdbcType=TIMESTAMP})
+      </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
     <!--
@@ -314,23 +330,26 @@
           #{item.address,jdbcType=VARCHAR}
         </if>
         <if test="'balance'.toString() == column.value">
-          #{item.balance,jdbcType=DECIMAL}
+            #{item.balance,jdbcType=DECIMAL}
         </if>
-        <if test="'name'.toString() == column.value">
-          #{item.name,jdbcType=VARCHAR}
-        </if>
-        <if test="'symbol'.toString() == column.value">
-          #{item.symbol,jdbcType=VARCHAR}
-        </if>
-        <if test="'decimal'.toString() == column.value">
-          #{item.decimal,jdbcType=INTEGER}
-        </if>
-        <if test="'total_supply'.toString() == column.value">
-          #{item.totalSupply,jdbcType=DECIMAL}
-        </if>
-        <if test="'update_time'.toString() == column.value">
-          #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
+          <if test="'name'.toString() == column.value">
+              #{item.name,jdbcType=VARCHAR}
+          </if>
+          <if test="'symbol'.toString() == column.value">
+              #{item.symbol,jdbcType=VARCHAR}
+          </if>
+          <if test="'decimal'.toString() == column.value">
+              #{item.decimal,jdbcType=INTEGER}
+          </if>
+          <if test="'tx_count'.toString() == column.value">
+              #{item.txCount,jdbcType=INTEGER}
+          </if>
+          <if test="'total_supply'.toString() == column.value">
+              #{item.totalSupply,jdbcType=DECIMAL}
+          </if>
+          <if test="'update_time'.toString() == column.value">
+              #{item.updateTime,jdbcType=TIMESTAMP}
+          </if>
       </foreach>
       )
     </foreach>

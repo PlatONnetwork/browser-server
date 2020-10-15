@@ -98,13 +98,13 @@ public interface AppDocErc20TokenTransferRecord {
     /**
      * @api {post} /token/tokenHolderList c.erc20合约持有人信息列表
      * @apiVersion 1.0.0
-     * @apiName holderTokenList
+     * @apiName tokenHolderList
      * @apiGroup token
      * @apiDescription 1. 实现逻辑：<br/>
      * - 查询数据库中数据
      * @apiParamExample {json} Request-Example:
      * {
-     * "address":"",                // 用户地址（必选）
+     * "contract":"",                // 用户地址（必选）
      * "pageNo":1,                  // 页数(必填)
      * "pageSize":10                // 页大小(必填)
      * }
@@ -136,7 +136,7 @@ public interface AppDocErc20TokenTransferRecord {
      * @apiName exportTokenHolderList
      * @apiGroup token
      * @apiDescription 1. 实现逻辑：<br/>
-     * @apiParam {String} address 合约地址
+     * @apiParam {String} contract 合约地址
      * @apiParam {String} date 数据结束日期
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -154,9 +154,9 @@ public interface AppDocErc20TokenTransferRecord {
                                HttpServletResponse response);
 
     /**
-     * @api {post} /token/tokenHolderList e.持有人持有token信息列表
+     * @api {post} /token/holderTokenList e.持有人持有token信息列表
      * @apiVersion 1.0.0
-     * @apiName tokenHolderList
+     * @apiName holderTokenList
      * @apiGroup token
      * @apiDescription 1. 实现逻辑：<br/>
      * - 查询数据库中数据
@@ -164,7 +164,7 @@ public interface AppDocErc20TokenTransferRecord {
      * - 如果传入用户地址，则返回该地址持有的token记录
      * @apiParamExample {json} Request-Example:
      * {
-     * "contract":"",               // 合约地址（可选）
+     * "address":"",               // 合约地址（可选）
      * "pageNo":1,                  // 页数(必填)
      * "pageSize":10                // 页大小(必填)
      * }

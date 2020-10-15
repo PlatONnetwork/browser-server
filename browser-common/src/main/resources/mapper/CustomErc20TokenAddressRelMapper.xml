@@ -9,6 +9,7 @@
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="symbol" jdbcType="VARCHAR" property="symbol"/>
         <result column="decimal" jdbcType="INTEGER" property="decimal"/>
+        <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <resultMap id="CustomBaseResultMap" type="com.platon.browser.dto.CustomErc20TokenAddressRel">
@@ -24,7 +25,7 @@
     </resultMap>
 
     <select id="selectExistData" resultMap="BaseResultMap">
-        select id,balance,contract,address from `erc20_token_address_rel` where (`contract`,`address`) in
+        select id,balance,contract,address,tx_count from `erc20_token_address_rel` where (`contract`,`address`) in
         <trim prefix="(" suffix=")">
             <foreach collection="list" item="item" index="index" separator=",">
                 <trim prefix="(" suffix=")">
@@ -43,6 +44,7 @@
             update `erc20_token_address_rel`
             <set>
                 `balance` = #{item.balance},
+                `tx_count` = #{item.txCount},
                 `update_time` = now()
             </set>
             where contract=#{item.contract,jdbcType=VARCHAR} AND address=#{item.address,jdbcType=VARCHAR}

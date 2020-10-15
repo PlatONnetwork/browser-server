@@ -43,38 +43,36 @@ public interface AppDocAddress {
      * {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
-     *    "data":{
-     *       "type":"",                //地址类型   1：账号   2：内置合约   3：EVM合约 4:WASM  5:EVM-Token
-     *       "balance":"",             //余额(单位:LAT)
-     *       "restrictingBalance":"",  //锁仓余额(单位:LAT)
-     *       "type":"",                //地址类型   1：账号   2：内置合约   3：EVM合约 4:WASM
-     *       "balance":"",             //余额(单位:ATP)
-     *       "restrictingBalance":"",  //锁仓余额(单位:ATP)
-     *       "stakingValue":"",        //质押的金额
-     *       "delegateValue":"",       //委托的金额
-     *       "redeemedValue":"",       //赎回中的金额
-     *       "txQty":1288,             //交易总数
-     *       "transferQty":11,         //转账交易总数
-     *       "delegateQty":11,         //委托交易总数
-     *       "stakingQty":11,          //验证人交易总数
-     *       "proposalQty":11,         //治理交易总数
-     *       "candidateCount":11,      //已委托验证人
-     *       "delegateHes":"",         //未锁定委托（ATP）
-     *       "delegateLocked":"",      //已锁定委托（ATP）
-     *       "delegateUnlock":"",      //已解除委托（ATP）
-     *       "delegateReleased":"",    //待赎回委托（ATP）
-     *       "delegateClaim":"",      //待领取奖励（ATP）
-     *       "haveReward":"",      //累积领取委托奖励（ATP）
-     *       "contractName":"",        //合约名称
-     *       "contractCreate":"",      //合约创建者地址
-     *       "contractCreateHash":"",  //合约创建哈希
-     *       "contractBin":"",  //合约bin
-     *       "isRestricting":"",  //是否有锁仓交易 0-无  1-有
-     *       "isDestroy":"",  //是否被销毁 1是自毁，0是正常
-     *       "destroyHash":""  //销毁hash
-     *    }
-     * }
-     */
+	 *    "data":{
+	 *       "type":"",                //地址类型   1：账号   2：内置合约   3：EVM合约 4:WASM  5:EVM-Token
+	 *       "balance":"",             //余额(单位:LAT)
+	 *       "restrictingBalance":"",  //锁仓余额(单位:LAT)
+	 *       "stakingValue":"",        //质押的金额
+	 *       "delegateValue":"",       //委托的金额
+	 *       "redeemedValue":"",       //赎回中的金额
+	 *       "txQty":1288,             //交易总数
+	 *       "transferQty":11,         //转账交易总数
+	 *       "delegateQty":11,         //委托交易总数
+	 *       "stakingQty":11,          //验证人交易总数
+	 *       "proposalQty":11,         //治理交易总数
+	 *       "tokenQty":11,         //erc20交易总数
+	 *       "candidateCount":11,      //已委托验证人
+	 *       "delegateHes":"",         //未锁定委托（ATP）
+	 *       "delegateLocked":"",      //已锁定委托（ATP）
+	 *       "delegateUnlock":"",      //已解除委托（ATP）
+	 *       "delegateReleased":"",    //待赎回委托（ATP）
+	 *       "delegateClaim":"",      //待领取奖励（ATP）
+	 *       "haveReward":"",      //累积领取委托奖励（ATP）
+	 *       "contractName":"",        //合约名称
+	 *       "contractCreate":"",      //合约创建者地址
+	 *       "contractCreateHash":"",  //合约创建哈希
+	 *       "contractBin":"",  //合约bin
+	 *       "isRestricting":"",  //是否有锁仓交易 0-无  1-有
+	 *       "isDestroy":"",  //是否被销毁 1是自毁，0是正常
+	 *       "destroyHash":""  //销毁hash
+	 *    }
+	 * }
+	 */
 	@ApiOperation(value = "address/details", nickname = "address details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
 	@PostMapping(value = "address/details", produces = { "application/json" })
 	WebAsyncTask<BaseResp<QueryDetailResp>> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);

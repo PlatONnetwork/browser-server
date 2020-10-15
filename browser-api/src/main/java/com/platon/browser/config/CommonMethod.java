@@ -1,17 +1,15 @@
 package com.platon.browser.config;
 
-import java.util.concurrent.TimeoutException;
-
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.util.HttpUtil;
+import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.WebAsyncTask;
 
-import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.HttpUtil;
-import com.platon.browser.util.I18nUtil;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 统一静态方法
@@ -41,17 +39,18 @@ public class CommonMethod {
 			throw new TimeoutException("System busy!");
 		});
 	}
-	
+
 	/**
 	 * recaptcha鉴权方法
-	 * @method onTimeOut
-	 * @param webAsyncTask
+	 *
+	 * @param token
+	 * @method recaptchaAuth
 	 */
 	public void recaptchaAuth(String token) {
 		try {
-			RecaptchaDto recaptchaDto = HttpUtil.get(String.format(recaptchaUrl, token), RecaptchaDto.class);
+			RecaptchaDto recaptchaDto = HttpUtil.get(String.format(this.recaptchaUrl, token), RecaptchaDto.class);
 			if(!recaptchaDto.getSuccess().booleanValue()) {
-				throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
+				throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
