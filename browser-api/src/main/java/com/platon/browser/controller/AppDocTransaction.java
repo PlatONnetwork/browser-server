@@ -5,12 +5,10 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
-import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.DelegationListByAddressResp;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
-import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.QueryClaimByAddressResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
@@ -393,47 +391,4 @@ public interface AppDocTransaction {
     WebAsyncTask<RespPage<QueryClaimByStakingResp>> queryClaimByStaking(
         @ApiParam(value = "QueryClaimByStakingReq", required = true) @Valid @RequestBody QueryClaimByStakingReq req);
 
-    /**
-     * @api {post} /transaction/queryInnerByAddr h.根据合约地址查询内部交易
-     * @apiVersion 1.0.0
-     * @apiName queryInnerByAddr
-     * @apiGroup transaction
-     * @apiDescription
-     * 1. 功能：合约相关的内部交易查询<br/>
-     * 2. 实现逻辑：<br/>
-     * - 查询es中inner_tx
-     * @apiParamExample {json} Request-Example:
-     * {
-     *    "pageNo":1,                  //页数(必填)
-     *    "pageSize":10,               //页大小(必填)
-     *    "address":"0x1111"                //合约地址(必填)
-     *    "type":"1"                //类型(必填)  1- 合约 2-普通地址
-     * }
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *   "errMsg":"",                  //描述信息
-     *   "code":0,                     //成功（0），失败则由相关失败码
-     *   "totalCount":18,              //总数
-     *   "totalPages":1,               //总页数
-     *   "data":[
-     *      {
-     *         "hash":"",            //节交易hash
-     *         "from":"",          //from地址
-     *         "to":"",     //接收方
-     *         "time":"",      //时间
-     *         "nowTime":"",      //现在时间
-     *         "transValue":"",      //转账金额
-     *         "tokenName":"",      //token名称
-     *         "tokenAddr":"",      //token地址
-     *          "symbol":""     //符号
-     *      }
-     *   ]
-     * }
-     */
-    @ApiOperation(value = "transaction/queryInnerByAddr", nickname = "", notes = "",
-        response = QueryInnerTxByAddrResp.class, tags = {"Transaction"})
-    @PostMapping(value = "transaction/queryInnerByAddr", produces = {"application/json"})
-    WebAsyncTask<RespPage<QueryInnerTxByAddrResp>> queryInnerByAddr(
-        @ApiParam(value = "QueryInnerByAddrReq", required = true) @Valid @RequestBody QueryInnerByAddrReq req);
 }
