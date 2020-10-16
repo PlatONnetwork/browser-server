@@ -20,6 +20,7 @@ sonarqube {
 }
 
 subprojects {
+    def shortCommitId = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
     def bootApps = ['browser-agent','browser-api','browser-common','browser-export','browser-press','browser-sync']
     if(project.name in bootApps){
         def testOrMain='main'
@@ -45,6 +46,7 @@ subprojects {
 
     group 'com.platon.browser'
     version "${projectVersion}"
+    version "$projectVersion-$shortCommitId"
     sourceCompatibility = '1.8'
 
     repositories {
