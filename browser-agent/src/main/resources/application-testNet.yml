@@ -77,7 +77,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 18.140.20.252:6789
+    addresses: 192.168.120.151:6789,192.168.120.151:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)
@@ -113,7 +113,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
   #链id
-  chainId: 108
+  chainId: 201018
 
 task:
    #地址统计任务

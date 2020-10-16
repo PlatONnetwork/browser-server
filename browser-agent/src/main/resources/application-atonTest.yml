@@ -112,7 +112,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 108
+  chainId: 201018
 
 task:
    #地址统计任务
