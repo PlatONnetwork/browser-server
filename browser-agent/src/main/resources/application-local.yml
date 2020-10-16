@@ -84,7 +84,7 @@ platon:
   #每年固定增发比例
   addIssueRate: 0.05
   #每年增发分配给激励池的比例
-  incentiveRateFromIssue: 0.2
+  incentiveRateFromIssue: 0.4
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
@@ -100,7 +100,7 @@ platon:
     '9':0
   }
   # 初始内置节点默认质押金额(ATP)
-  defaultStakingLockedAmount: 10000
+  defaultStakingLockedAmount: 10500
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板
