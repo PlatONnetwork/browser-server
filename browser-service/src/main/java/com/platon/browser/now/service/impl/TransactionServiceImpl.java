@@ -7,7 +7,6 @@ import com.platon.browser.common.BrowserConst;
 import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.RedisFactory;
-import com.platon.browser.converter.QueryInnerTxByAddrRespConverter;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Staking;
@@ -25,7 +24,6 @@ import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.DelegationReward.Extra;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
@@ -45,10 +43,8 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.staking.QueryClaimByStakingReq;
-import com.platon.browser.req.staking.QueryInnerByAddrReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.QueryClaimByStakingResp;
-import com.platon.browser.res.staking.QueryInnerTxByAddrResp;
 import com.platon.browser.res.transaction.*;
 import com.platon.browser.util.*;
 import com.platon.browser.utils.HexTool;
@@ -910,46 +906,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         RespPage<QueryClaimByStakingResp> result = new RespPage<>();
         result.init(queryClaimByStakingResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
-        return result;
-    }
-
-    @Override
-    public RespPage<QueryInnerTxByAddrResp> queryInnerByAddr(QueryInnerByAddrReq req) {
-        RespPage<QueryInnerTxByAddrResp> result = new RespPage<>();
-        ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-        /*
-         * 根据不同的类型设置不同的查询条件
-         */
-        if (req.getType() == 1) {
-            constructor.must(new ESQueryBuilders().term("tokenAddr", req.getAddress()));
-        } else {
-            constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
-                .should(QueryBuilders.termQuery("to", req.getAddress())));
-
-        }
-        constructor.setResult(
-            new String[] {"hash", "time", "transValue", "from", "to", "tokenName", "tokenAddr", "symbol", "decimal"});
-        constructor.setDesc("time");
-        ESResult<ESTokenTransferRecord> esTokenTransferRecordESResult = null;
-        try {
-            esTokenTransferRecordESResult = this.innerTxESRepository.search(constructor, ESTokenTransferRecord.class,
-                req.getPageNo(), req.getPageSize());
-        } catch (Exception e) {
-            this.logger.error(ERROR_TIPS, e);
-            return result;
-        }
-        List<QueryInnerTxByAddrResp> queryInnerTxByAddrResps = new ArrayList<>();
-        for (ESTokenTransferRecord esTokenTransferRecord : esTokenTransferRecordESResult.getRsData()) {
-            QueryInnerTxByAddrResp queryInnerTxByAddrResp =
-                QueryInnerTxByAddrRespConverter.INSTANCE.domain2dto(esTokenTransferRecord);
-            String transValue = (new BigDecimal(esTokenTransferRecord.getTValue())
-                .divide(BigDecimal.TEN.pow(esTokenTransferRecord.getDecimal())).setScale(12, RoundingMode.DOWN))
-                    .toEngineeringString();
-            queryInnerTxByAddrResp.setTransValue(transValue);
-            queryInnerTxByAddrResps.add(queryInnerTxByAddrResp);
-        }
-        long total = esTokenTransferRecordESResult.getTotal() > 5000 ? 5000 : esTokenTransferRecordESResult.getTotal();
-        result.init(queryInnerTxByAddrResps, total, total, 0l);
         return result;
     }
 

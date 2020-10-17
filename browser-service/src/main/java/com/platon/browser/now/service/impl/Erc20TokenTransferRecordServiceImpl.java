@@ -228,8 +228,8 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 queryTokenHolderListResp.setBalance(BigDecimal.ZERO);
             }
             queryTokenHolderListResp.setAddress(erc20TokenAddressRel.getAddress());
-            queryTokenHolderListResp.setPercent(balance.divide(erc20TokenAddressRel.getTotalSupply())
-                    .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%");
+            queryTokenHolderListResp.setPercent(balance.divide(erc20TokenAddressRel.getTotalSupply(), 10, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
             listResps.add(queryTokenHolderListResp);
         });
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());

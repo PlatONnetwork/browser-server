@@ -106,11 +106,11 @@ public class TransactionUtil {
 
     /**
      * 通用解委托奖励日志数据解析
-     * 
+     *
      * @param log
      * @return
      */
-    public static BigInteger getDelegateReward(Log log) {
+    private static BigInteger getDelegateReward(Log log) {
         if (log == null)
             return BigInteger.ZERO;
         String logData = log.getData();
@@ -118,8 +118,8 @@ public class TransactionUtil {
             return BigInteger.ZERO;
 
         RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
-        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
-        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
+        List<RlpType> rlpList = ((RlpList) (rlp.getValues().get(0))).getValues();
+        String decodedStatus = new String(((RlpString) rlpList.get(0)).getBytes());
         int statusCode = Integer.parseInt(decodedStatus);
 
         if (statusCode != ErrorCode.SUCCESS)
