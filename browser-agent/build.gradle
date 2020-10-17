@@ -126,6 +126,6 @@ sonarqube {
                 "**/OnSettleConverter.java,**/PersistenceEvent.java,**/AddressTypeEnum.java," +
                 "**/ConfigChange.java,**/TxAnalyseResult.java,**/DelegateExitResult.java," +
                 "**/CalculateUtils.java,**/PersistenceEventHandler.java,**/DelegateRewardClaimConverter.java," +
-                "**/EsDelegateRewardService.java,**/ERC20Client.java"
+                "**/EsDelegateRewardService.java,**/ERC20Client.java,**/TransferEventConverter.java"
     }
 }

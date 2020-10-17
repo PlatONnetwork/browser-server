@@ -14,12 +14,7 @@ import com.platon.browser.dto.DelegationStaking;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.req.staking.AliveStakingListReq;
-import com.platon.browser.req.staking.DelegationListByAddressReq;
-import com.platon.browser.req.staking.DelegationListByStakingReq;
-import com.platon.browser.req.staking.HistoryStakingListReq;
-import com.platon.browser.req.staking.StakingDetailsReq;
-import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.req.staking.*;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.staking.DelegationListByAddressResp;
 import com.platon.browser.res.staking.DelegationListByStakingResp;
@@ -61,15 +56,15 @@ public class StakingServiceTest extends TestMockBase{
 
     @Before
 	public void setup() {
-        ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
-        ReflectionTestUtils.setField(target,"customStakingMapper",customStakingMapper);
-        ReflectionTestUtils.setField(target,"customDelegationMapper",customDelegationMapper);
-        ReflectionTestUtils.setField(target,"nodeMapper",nodeMapper);
-        ReflectionTestUtils.setField(target,"nodeOptESRepository",nodeOptESRepository);
-        ReflectionTestUtils.setField(target,"i18n",i18n);
-        ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
-        ReflectionTestUtils.setField(target,"platonClient",platonClient);
-        ReflectionTestUtils.setField(target,"customNodeMapper",customNodeMapper);
+        ReflectionTestUtils.setField(this.target,"statisticCacheService", this.statisticCacheService);
+        ReflectionTestUtils.setField(this.target,"customStakingMapper", this.customStakingMapper);
+        ReflectionTestUtils.setField(this.target,"customDelegationMapper", this.customDelegationMapper);
+        ReflectionTestUtils.setField(this.target,"nodeMapper", this.nodeMapper);
+        ReflectionTestUtils.setField(this.target,"nodeOptESRepository", this.nodeOptESRepository);
+        ReflectionTestUtils.setField(this.target,"i18n", this.i18n);
+        ReflectionTestUtils.setField(this.target,"blockChainConfig", this.blockChainConfig);
+        ReflectionTestUtils.setField(this.target,"platonClient", this.platonClient);
+        ReflectionTestUtils.setField(this.target,"customNodeMapper", this.customNodeMapper);
 
     }
 
@@ -79,17 +74,21 @@ public class StakingServiceTest extends TestMockBase{
         req.setKey("test");
 
         Page<Node> nodeListPage = new Page<>();
-        nodeListPage.addAll(nodeList);
-        when(customNodeMapper.selectListByExample(any())).thenReturn(nodeListPage);
-        target.historyStakingList(req);
-        AliveStakingListReq aliveStakingListReq = new AliveStakingListReq(); 
+        nodeListPage.addAll(this.nodeList);
+        when(this.customNodeMapper.selectListByExample(any())).thenReturn(nodeListPage);
+        this.target.historyStakingList(req);
+        AliveStakingListReq aliveStakingListReq = new AliveStakingListReq();
         aliveStakingListReq.setQueryStatus("all");
-        target.aliveStakingList(aliveStakingListReq);
+        this.target.aliveStakingList(aliveStakingListReq);
+
+        LockedStakingListReq lockedStakingListReq = new LockedStakingListReq();
+        lockedStakingListReq.setKey("test");
+        this.target.lockedStakingList(lockedStakingListReq);
 
 
         StakingDetailsReq stakingDetailsReq = new StakingDetailsReq();
         stakingDetailsReq.setNodeId("0xdssfsf");
-        
+
         Node staking = new Node();
         staking.setNodeName("test");
         staking.setNodeIcon("icon");
@@ -110,14 +109,14 @@ public class StakingServiceTest extends TestMockBase{
         staking.setStatDelegateValue(BigDecimal.ONE);
         staking.setStakingReduction(BigDecimal.ONE);
         staking.setJoinTime(new Date());
-        when(nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
-        target.stakingDetails(stakingDetailsReq);
+        when(this.nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
+        this.target.stakingDetails(stakingDetailsReq);
 
         staking.setStakingHes(BigDecimal.ONE);
         staking.setStakingLocked(BigDecimal.ONE);
         staking.setWebSite("www.cdm.com");
         staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
-        target.stakingDetails(stakingDetailsReq);
+        this.target.stakingDetails(stakingDetailsReq);
 
         StakingOptRecordListReq stakingOptRecordListReq = new StakingOptRecordListReq();
         stakingOptRecordListReq.setNodeId("test");
@@ -134,28 +133,28 @@ public class StakingServiceTest extends TestMockBase{
         nodeOpt.setTime(new Date());
         nodeOpt.setDesc("test|4|3|4|5");
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.PROPOSALS.getCode()));
-        when(nodeOptESRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(items);
-        target.stakingOptRecordList(stakingOptRecordListReq);
+        when(this.nodeOptESRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(items);
+        this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.VOTE.getCode()));
-        target.stakingOptRecordList(stakingOptRecordListReq);
+        this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.MULTI_SIGN.getCode()));
-        target.stakingOptRecordList(stakingOptRecordListReq);
+        this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
-        target.stakingOptRecordList(stakingOptRecordListReq);
+        this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.PARAMETER.getCode()));
-        target.stakingOptRecordList(stakingOptRecordListReq);
+        this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         assertTrue(true);
     }
     
     @Test
 	public void testStakingStatisticNew() {
-		when(customStakingMapper.selectCountByActive()).thenReturn(10);
-		StakingStatisticNewResp resp = target.stakingStatisticNew();
+		when(this.customStakingMapper.selectCountByActive()).thenReturn(10);
+		StakingStatisticNewResp resp = this.target.stakingStatisticNew();
 		assertNotNull(resp);
 	}
     
@@ -169,8 +168,8 @@ public class StakingServiceTest extends TestMockBase{
     	delegationStaking.setDelegateLocked(BigDecimal.TEN);
     	delegationStakings.add(delegationStaking);
     	delegationStakingPage.add(delegationStaking);
-    	when(customDelegationMapper.selectStakingByNodeId(any())).thenReturn(delegationStakingPage);
-    	RespPage<DelegationListByStakingResp> resp = target.delegationListByStaking(req);
+    	when(this.customDelegationMapper.selectStakingByNodeId(any())).thenReturn(delegationStakingPage);
+    	RespPage<DelegationListByStakingResp> resp = this.target.delegationListByStaking(req);
     	assertNotNull(resp);
     }
     
@@ -184,8 +183,8 @@ public class StakingServiceTest extends TestMockBase{
     	delegationAddress.setDelegateLocked(BigDecimal.TEN);
     	delegationAddresses.add(delegationAddress);
     	delegationAddressPage.add(delegationAddress);
-    	when(customDelegationMapper.selectAddressByAddr(any())).thenReturn(delegationAddressPage);
-    	RespPage<DelegationListByAddressResp> resp = target.delegationListByAddress(req);
+    	when(this.customDelegationMapper.selectAddressByAddr(any())).thenReturn(delegationAddressPage);
+    	RespPage<DelegationListByAddressResp> resp = this.target.delegationListByAddress(req);
     	assertNotNull(resp);
     }
 }

@@ -1,0 +1,47 @@
+[
+  {
+    "address": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "name": "My Token",
+    "symbol": "MT",
+    "decimal": 2,
+    "total_supply": 10000000000000,
+    "creator": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "tx_hash": "0xdc614aaea2137ca0fadec98ef9795b7d2bb161a88a91ccb87b9e9df23dd30c5d",
+    "type": "E",
+    "status": 1,
+    "block_timestamp": "2020-10-14 15:19:35",
+    "tx_count": 2,
+    "holder": 4,
+    "create_time": "2019-11-13 19:01:25"
+  },
+  {
+    "address": "lax1xeqw29ncjfy8ec0pv6r0u6ulaue608jgduewvp",
+    "name": "My Token1",
+    "symbol": "MT",
+    "decimal": 2,
+    "total_supply": 10000000000000,
+    "creator": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "tx_hash": "0xf535d62891a7588a668336e7f6ad0063655f8c62485775354590e407fa8868bb",
+    "type": "E",
+    "status": 1,
+    "block_timestamp": "2020-10-14 15:19:35",
+    "tx_count": 2,
+    "holder": 4,
+    "create_time": "2019-11-13 19:01:25"
+  },
+  {
+    "address": "lax1chfux2qgyg28m4fx0fkp5wy8q7d946jn8syr52",
+    "name": "My Token2",
+    "symbol": "MT",
+    "decimal": 2,
+    "total_supply": 10000000000000,
+    "creator": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "tx_hash": "0x9db3b0bb2cbeb0d49a22e7571e19245971871d25d3882213df24579d90209366",
+    "type": "E",
+    "status": 1,
+    "block_timestamp": "2020-10-14 15:19:35",
+    "tx_count": 2,
+    "holder": 4,
+    "create_time": "2019-11-13 19:01:25"
+  }
+]
