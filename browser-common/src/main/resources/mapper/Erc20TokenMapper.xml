@@ -115,7 +115,7 @@
     <if test="status != null">
       AND status = #{status}
     </if>
-    order by total_supply,holder desc
+    order by id desc
     limit #{offset}, #{size}
   </select>
 
