@@ -4,6 +4,7 @@ import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.util.HttpUtil;
 import com.platon.browser.util.I18nUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,25 +14,33 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 统一静态方法
- *  @file CommonMethod.java
- *  @description 
- *	@author zhangrj
- *  @data 2019年12月19日
+ *
+ * @author zhangrj
+ * @file CommonMethod.java
+ * @description
+ * @data 2019年12月19日
  */
+@Slf4j
 @Service
 public class CommonMethod {
-	
+
 	@Value("${recaptchaUrl:}")
 	private String recaptchaUrl;
-	
+
+	@Value("${isRecaptcha:false}")
+	private Boolean isRecaptcha;
+
 	@Autowired
 	private I18nUtil i18n;
-	
-	private CommonMethod(){}
+
+	private CommonMethod() {
+	}
+
 	/**
 	 * web异步请求超时方法调用
-	 * @method onTimeOut
+	 *
 	 * @param webAsyncTask
+	 * @method onTimeOut
 	 */
 	public static <T> void onTimeOut(WebAsyncTask<T> webAsyncTask) {
 		webAsyncTask.onTimeout(() -> {
@@ -48,12 +57,18 @@ public class CommonMethod {
 	 */
 	public void recaptchaAuth(String token) {
 		try {
+			if (!this.isRecaptcha) {
+				log.debug("not recaptchaAuth ");
+				return;
+			}
 			RecaptchaDto recaptchaDto = HttpUtil.get(String.format(this.recaptchaUrl, token), RecaptchaDto.class);
-			if(!recaptchaDto.getSuccess().booleanValue()) {
+			log.debug("recaptchaAuth token:{}", token);
+			if (!recaptchaDto.getSuccess().booleanValue()) {
 				throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
 			}
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			log.error("google recaptchaAuth error.", e1);
+			throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
 		}
 	}
 }
