@@ -10,6 +10,7 @@ import com.platon.browser.res.token.QueryTokenTransferRecordListResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -81,7 +82,7 @@ public interface AppDocErc20TokenTransferRecord {
      */
     @ApiOperation(value = "token/exportTokenTransferList", nickname = "token list",
             notes = "导出合约token转账交易列表", response = QueryTokenTransferRecordListResp.class, tags = {"Token"})
-    @PostMapping(value = "token/exportTokenTransferList", produces = {"application/json"})
+    @GetMapping(value = "token/exportTokenTransferList", produces = {"application/json"})
     void exportTokenTransferList(@ApiParam(value = "address ", required = false) @RequestParam(value = "address",
             required = false) String address,
                                  @ApiParam(value = "contract ", required = false) @RequestParam(value = "contract",
@@ -143,7 +144,7 @@ public interface AppDocErc20TokenTransferRecord {
      */
     @ApiOperation(value = "token/exportTokenHolderList", nickname = "token list",
             notes = "导出合约token持有人列表", response = QueryTokenTransferRecordListResp.class, tags = {"Token"})
-    @PostMapping(value = "token/exportTokenHolderList", produces = {"application/json"})
+    @GetMapping(value = "token/exportTokenHolderList", produces = {"application/json"})
     void exportTokenHolderList(@ApiParam(value = "contract ", required = false) @RequestParam(value = "contract",
             required = true) String contract,
                                @ApiParam(value = "local en或者zh-cn", required = true) @RequestParam(value = "local",
@@ -207,7 +208,7 @@ public interface AppDocErc20TokenTransferRecord {
      */
     @ApiOperation(value = "token/exportHolderTokenList", nickname = "export holder token list",
             notes = "导出合约token持有人列表", response = QueryTokenTransferRecordListResp.class, tags = {"Token"})
-    @PostMapping(value = "token/exportHolderTokenList", produces = {"application/json"})
+    @GetMapping(value = "token/exportHolderTokenList", produces = {"application/json"})
     void exportHolderTokenList(@ApiParam(value = "address ", required = false) @RequestParam(value = "address",
             required = true) String address,
                                @ApiParam(value = "local en或者zh-cn", required = true) @RequestParam(value = "local",
