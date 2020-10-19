@@ -80,7 +80,7 @@ public class AppDocErc20TokenTransferControllerTest {
     @Test
     public void exportTokenTransferList() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.post("/token/exportTokenTransferList")
+                .perform(MockMvcRequestBuilders.get("/token/exportTokenTransferList")
                         .param("address", "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e")
                         .param("contract", "lax1jzcc0xqvkglwmr3txeaf2c9jxp6pzmse3gxk9n")
                         .param("date", "1571813653000")
@@ -104,7 +104,7 @@ public class AppDocErc20TokenTransferControllerTest {
     @Test
     public void exportTokenHolderList() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.post("/token/exportTokenHolderList")
+                .perform(MockMvcRequestBuilders.get("/token/exportTokenHolderList")
                         .param("contract", "lax1jzcc0xqvkglwmr3txeaf2c9jxp6pzmse3gxk9n")
                         .param("date", "1571813653000")
                         .param("local", "en")
@@ -126,7 +126,7 @@ public class AppDocErc20TokenTransferControllerTest {
     @Test
     public void exportHolderTokenList() throws Exception {
         this.mockMvc
-                .perform(MockMvcRequestBuilders.post("/token/exportHolderTokenList")
+                .perform(MockMvcRequestBuilders.get("/token/exportHolderTokenList")
                         .param("address", "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e")
                         .param("date", "1571813653000")
                         .param("local", "en")

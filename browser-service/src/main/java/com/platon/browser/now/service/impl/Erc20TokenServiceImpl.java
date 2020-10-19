@@ -49,7 +49,7 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         params.put("status", "1");
 
         List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20Token(params);
-        int totalCount = this.erc20TokenMapper.totalErc20Token(params);
+        int totalCount = this.erc20TokenMapper.totalErc20Token(new HashMap<>());
         if (null == tokenList) {
             return result;
         }
