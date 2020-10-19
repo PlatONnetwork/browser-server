@@ -150,7 +150,7 @@ public class PressApplication implements ApplicationRunner {
             // 构造【区块&交易&操作日志】数据
             BlockResult blockResult = makeBlock(blockNumber);
             // 构造【节点&质押】数据
-            /*makeStake(blockResult);
+            makeStake(blockResult);
             // 构造【委托】数据
             makeDelegation(blockResult);
             // 构造【提案】数据
@@ -164,7 +164,7 @@ public class PressApplication implements ApplicationRunner {
             // 构造【委托奖励】数据
             makeReward(blockResult);
             // 构造【gas】数据
-            makeEstimate(blockResult);*/
+            makeEstimate(blockResult);
 
             // 构造【代币】数据
             makeErc20Token(blockResult);
