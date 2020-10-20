@@ -179,7 +179,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         }
         List<Object[]> rows = new ArrayList<>();
         queryResultFromES.getRsData().stream().forEach(esTokenTransferRecord -> {
-            if (StringUtils.isBlank(address)) {
+            if (StringUtils.isNotBlank(address)) {
                 boolean toIsAddress = address.equals(esTokenTransferRecord.getTto());
                 String valueIn = toIsAddress ? esTokenTransferRecord.getTValue() : "0";
                 String valueOut = !toIsAddress ? esTokenTransferRecord.getTValue() : "0";
@@ -191,7 +191,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                         HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal()).toString()),
                 };
                 rows.add(row);
-            } else if (StringUtils.isBlank(contract)) {
+            } else if (StringUtils.isNotBlank(contract)) {
                 Object[] row = {esTokenTransferRecord.getHash(), esTokenTransferRecord.getBn(),
                         DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone),
                         esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTto(),
@@ -202,7 +202,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
             }
         });
         String[] headers = {};
-        if (StringUtils.isBlank(address)) {
+        if (StringUtils.isNotBlank(address)) {
             headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
@@ -210,7 +210,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local)};
-        } else if (StringUtils.isBlank(contract)) {
+        } else if (StringUtils.isNotBlank(contract)) {
             headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
