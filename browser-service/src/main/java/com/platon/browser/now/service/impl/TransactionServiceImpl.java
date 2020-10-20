@@ -701,6 +701,22 @@ public class TransactionServiceImpl implements TransactionService {
                         break;
                 }
             }
+            //补充填充合约的相关数据
+            switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
+                /**
+                 * 合约
+                 */
+                case EVM_CONTRACT_CREATE:
+                case WASM_CONTRACT_CREATE:
+                case ERC20_CONTRACT_CREATE:
+                case CONTRACT_EXEC:
+                case ERC20_CONTRACT_EXEC:
+                    /**
+                     * to地址设置为合约地址
+                     */
+                    resp.setTxInfo(transaction.getInput());
+                    break;
+            }
         }
         return resp;
     }
