@@ -1,5 +1,8 @@
 package com.platon.browser.service;
 
+import com.alaya.bech32.Bech32;
+import com.alaya.crypto.Keys;
+import com.alaya.parameters.NetworkParameters;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -7,8 +10,6 @@ import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
-import com.platon.sdk.utlis.Bech32;
-import com.platon.sdk.utlis.NetworkParameters.Hrp;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.web3j.crypto.Keys;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -84,7 +84,7 @@ public class DataGenService {
 
     private String rAddress() {
     	try {
-			return Bech32.addressEncode(Hrp.LAX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
+			return Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,7 +94,7 @@ public class DataGenService {
 
     private String rMockAddress() {
         try {
-            return Hrp.LAX.getHrp() + "0000000"
+            return NetworkParameters.Hrp.ATX.getHrp() + "0000000"
                     + UUID.randomUUID().toString().replace("-","");
         } catch (Exception e) {
             // TODO Auto-generated catch block
