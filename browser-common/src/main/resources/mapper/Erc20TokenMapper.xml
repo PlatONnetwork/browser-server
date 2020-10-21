@@ -111,22 +111,18 @@
     select
     <include refid="Base_Column_List" />
     from erc20_token
-    where 1 = 1
-    <if test="status != null">
-      AND status = #{status}
-    </if>
-    order by holder desc,id desc
-    limit #{offset}, #{size}
+    where id in (
+        select a.id from
+        (
+            select id from erc20_token order by holder desc, id desc limit #{offset}, #{size}
+        ) as a
+    )
   </select>
 
   <select id="totalErc20Token" parameterType="java.util.Map" resultType="java.lang.Integer">
     select
     count(*) total
     from erc20_token
-    where 1 = 1
-    <if test="status != null">
-      AND status = #{status}
-    </if>
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
