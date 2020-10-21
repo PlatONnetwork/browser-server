@@ -13,7 +13,7 @@ CREATE TABLE `erc20_token` (
   `creator` varchar(64) DEFAULT NULL COMMENT '合约创建者',
   `tx_hash` varchar(128) DEFAULT NULL COMMENT '合约创建所在交易哈希',
   `type` char(1) DEFAULT NULL COMMENT '合约类型 E，evm的代币合约，W，wasm的代币合约',
-  `status` int(11) DEFAULT '1' COMMENT '合约状态 1 可见，0 隐藏',
+  `status` int(11) DEFAULT '0' COMMENT '合约状态 1 可见，0 隐藏',
   `block_timestamp` datetime DEFAULT NULL COMMENT '上链时间',
   `tx_count` int(11) DEFAULT NULL COMMENT '合约内交易数',
   `holder` int(11) DEFAULT NULL COMMENT '合约持有人',
