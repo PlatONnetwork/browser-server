@@ -183,20 +183,22 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 boolean toIsAddress = address.equals(esTokenTransferRecord.getTto());
                 String valueIn = toIsAddress ? esTokenTransferRecord.getTValue() : "0";
                 String valueOut = !toIsAddress ? esTokenTransferRecord.getTValue() : "0";
-                Object[] row = {esTokenTransferRecord.getHash(), esTokenTransferRecord.getBn(),
+                Object[] row = {esTokenTransferRecord.getHash(),
                         DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone),
                         esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTto(),
                         /** 数值von转换成lat，并保留十八位精确度 */
                         HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()),
                         HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal()).toString()),
+                        esTokenTransferRecord.getSymbol()
                 };
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
-                Object[] row = {esTokenTransferRecord.getHash(), esTokenTransferRecord.getBn(),
+                Object[] row = {esTokenTransferRecord.getHash(),
                         DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone),
                         esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTto(),
                         /** 数值von转换成lat，并保留十八位精确度 */
                         HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getTValue()), esTokenTransferRecord.getDecimal()).toString()),
+                        esTokenTransferRecord.getSymbol()
                 };
                 rows.add(row);
             }
@@ -204,19 +206,19 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         String[] headers = {};
         if (StringUtils.isNotBlank(address)) {
             headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local)};
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_IN, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_OUT, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
         } else if (StringUtils.isNotBlank(contract)) {
             headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE, local)};
+                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
         }
         return this.downFileCommon.writeDate("InnerTransaction-" + address + "-" + date + ".CSV", rows, headers);
     }
