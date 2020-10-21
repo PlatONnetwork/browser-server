@@ -31,6 +31,7 @@ spring:
       transactionIndexName: browser_transaction_${profile}
       nodeOptIndexName: browser_nodeopt_${profile}
       delegationRewardIndexName: browser_delegation_reward_${profile}
+      innerTxIndexName: browser_inner_tx_${profile}
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -85,6 +86,15 @@ disruptor:
       buffer-size: 1024
       batch-size: 3
     address:
+      buffer-size: 1024
+      batch-size: 1024
+    erc20-token:
+      buffer-size: 1024
+      batch-size: 100
+    token-address:
+      buffer-size: 1024
+      batch-size: 5000
+    token-transfer:
       buffer-size: 1024
       batch-size: 1024
 #PlatOn相关配置
@@ -154,6 +164,10 @@ platon:
   blockMaxCount: 28799250
   #日志最大条数
   nodeoptMaxCount: 1788000
+  #代币合约最大条数
+  tokenMaxCount: 100000
+  #每个代币与地址建立关系的数量
+  addressCountPerToken: 1000000000
   #每个区块的交易数
   txCountPerBlock: 100
   #每个委托奖励数

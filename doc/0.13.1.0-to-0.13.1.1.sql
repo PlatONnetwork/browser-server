@@ -20,7 +20,8 @@ CREATE TABLE `erc20_token` (
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_address` (`address`),
-  KEY `idx_name` (`name`)
+  KEY `idx_name` (`name`),
+  KEY `idx_holder` (`holder`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Token合约表 用于记录所有满足ERC20表中的代币合约信息（仅记录满足ERC20标准的代币）';
 
 -- 合约详细信息
@@ -70,9 +71,11 @@ CREATE TABLE `erc20_token_address_rel` (
   `symbol` varchar(32) DEFAULT NULL COMMENT '合约符号',
   `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
   `total_supply` decimal(64,0) DEFAULT NULL COMMENT '供应总量',
-  `tx_count` int(11) DEFAULT 0 COMMENT '地址对应合约交易数',
+  `tx_count` int(11) DEFAULT '0' COMMENT '地址对应合约交易数',
   `update_time` datetime DEFAULT NULL COMMENT '最后更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_contract` (`contract`),
+  KEY `idx_address` (`address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Token合约与地址映射表 主要记录每个token合约的地址与其持有者的映射关系';
 
 
