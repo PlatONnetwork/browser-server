@@ -20,7 +20,8 @@ CREATE TABLE `erc20_token` (
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_address` (`address`),
-  KEY `idx_name` (`name`)
+  KEY `idx_name` (`name`),
+  KEY `idx_holder` (`holder`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Token合约表 用于记录所有满足ERC20表中的代币合约信息（仅记录满足ERC20标准的代币）';
 
 -- 合约详细信息
