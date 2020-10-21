@@ -76,8 +76,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,
-    `type`, status, block_timestamp, tx_count, create_time
+    id, address, `name`, symbol, `decimal`, total_supply, creator, tx_hash,tx_hash,
+    `type`, status, block_timestamp, tx_count, holder,create_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.Erc20TokenExample" resultMap="BaseResultMap">
     select
@@ -115,7 +115,7 @@
     <if test="status != null">
       AND status = #{status}
     </if>
-    order by total_supply,holder desc
+    order by holder desc,id desc
     limit #{offset}, #{size}
   </select>
 

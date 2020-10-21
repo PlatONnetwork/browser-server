@@ -109,13 +109,8 @@ platon:
   #链id
   chainId: 108
 
-
-brokenHost: 192.168.16.173
-brokenPort: 61613
-system.username: admin
-system.password: admin
-client.username: guest
-client.password: guest
+recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
+isRecaptcha: false
 limit:
   num: 10
 output:
