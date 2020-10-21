@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -37,6 +38,7 @@ public class ErcBalanceUpdateTask {
     protected ErcService ercService;
     @Value("${task.erc20-batch-size:4}")
     private int batchSize;
+    private ExecutorService EXECUTOR = Executors.newFixedThreadPool(30);
 
     @Scheduled(cron = "0/5  * * * * ?")
     public void cron() {
@@ -48,33 +50,21 @@ public class ErcBalanceUpdateTask {
                 return;
             }
             int size = data.size();
-            List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>(data.size());
-            int threadNum = this.batchSize;
-            if (this.batchSize > data.size()) {
-                threadNum = size;
-            }
-            ExecutorService EXECUTOR = Executors.newFixedThreadPool(threadNum);
-            for (int i = 0; i < size; ) {
-                if (size - i < this.batchSize) {
-                    threadNum = size - i;
-                }
-                CountDownLatch countDownLatch = new CountDownLatch(threadNum);
-                data.stream().forEach(d -> {
-                            String[] ds = d.split(BrowserConst.ERC_SPILT);
-                            EXECUTOR.submit(() -> {
-                                //查询余额并回填
-                                BigInteger balance = this.ercService.getBalance(ds[0], ds[1]);
-                                //更新成功则删除对应的数据
-                                Erc20TokenAddressRel erc20TokenAddressRel = Erc20TokenAddressRel.builder().contract(ds[0])
-                                        .address(ds[1]).balance(new BigDecimal(balance)).build();
-                                erc20TokenAddressRelList.add(erc20TokenAddressRel);
-                                countDownLatch.countDown();
-                            });
-                        }
-                );
-                countDownLatch.await();
-                i = i + threadNum;
-            }
+            List<Erc20TokenAddressRel> erc20TokenAddressRelList = Collections.synchronizedList(new ArrayList<>(size));
+            CountDownLatch countDownLatch = new CountDownLatch(size);
+            data.forEach(d->{
+                String[] ds = d.split(BrowserConst.ERC_SPILT);
+                EXECUTOR.submit(() -> {
+                    //查询余额并回填
+                    BigInteger balance = this.ercService.getBalance(ds[0], ds[1]);
+                    //更新成功则删除对应的数据
+                    Erc20TokenAddressRel erc20TokenAddressRel = Erc20TokenAddressRel.builder().contract(ds[0])
+                            .address(ds[1]).balance(new BigDecimal(balance)).build();
+                    erc20TokenAddressRelList.add(erc20TokenAddressRel);
+                    countDownLatch.countDown();
+                });
+            });
+            countDownLatch.await();
 
             //更新成功则删除对应的数据
             this.customErc20TokenAddressRelMapper.updateAddressBalance(erc20TokenAddressRelList);
