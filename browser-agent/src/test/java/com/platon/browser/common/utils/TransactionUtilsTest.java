@@ -1,5 +1,6 @@
 package com.platon.browser.common.utils;//package com.platon.browser.common.utils;
 
+import com.alaya.protocol.core.methods.response.Log;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PPosInvokeContractInput;
 import com.platon.browser.client.TransData;
@@ -9,7 +10,6 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.web3j.protocol.core.methods.response.Log;
 
 import java.util.ArrayList;
 import java.util.List;
