@@ -1,7 +1,6 @@
 package com.platon.browser.queue.handler;
 
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.event.TransactionEvent;
 import com.platon.browser.queue.publisher.AddressPublisher;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

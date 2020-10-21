@@ -1,18 +1,14 @@
 package com.platon.browser.service;
 
-import com.alaya.bech32.Bech32;
-import com.alaya.crypto.Keys;
-import com.alaya.parameters.NetworkParameters;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
+import com.platon.sdk.utlis.Bech32;
+import com.platon.sdk.utlis.NetworkParameters.Hrp;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -22,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.Keys;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -86,14 +84,25 @@ public class DataGenService {
 
     private String rAddress() {
     	try {
-			return Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
+			return Bech32.addressEncode(Hrp.LAX.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	return null;
     }
-    
+
+    private String rMockAddress() {
+        try {
+            return Hrp.LAX.getHrp() + "0000000"
+                    + UUID.randomUUID().toString().replace("-","");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private String randomProposalHash(){
         String hash = PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size()));
         return hash;
@@ -111,10 +120,13 @@ public class DataGenService {
     private String rewardStr;
     private String estimateStr;
     private String slashStr;
+    private String erc20TokenStr;
+    private String esTokenTransferRecordStr;
 
     private NetworkStat networkStat;
     private List<Config> configList;
     private String transferTxStr;
+    private String tokenTransferTxStr;
 
 
     @Value("${platon.txCountPerBlock}")
@@ -137,6 +149,9 @@ public class DataGenService {
                         transactionList.forEach(tx->{
                             if(tx.getTypeEnum()==Transaction.TypeEnum.TRANSFER){
                                 transferTxStr=JSON.toJSONString(tx);
+                            }
+                            if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
+                                tokenTransferTxStr = JSON.toJSONString(tx);
                             }
                         });
                         break;
@@ -176,7 +191,13 @@ public class DataGenService {
                     case "gasEstimate.json":
                     	estimateStr=content;
                         break;
-                        
+                    case "erc20Token.json":
+                        erc20TokenStr = content;
+                        break;
+                    case "tokenTransfer.json":
+                        esTokenTransferRecordStr = content;
+                        break;
+
                 }
             } catch (IOException e) {
                 log.error("读取文件内容出错",e);
@@ -202,7 +223,8 @@ public class DataGenService {
         List<Transaction> transactionList = JSON.parseArray(transactionListStr,Transaction.class);
 
         for(int i=transactionList.size();i<txCountPerBlock;i++){
-            Transaction tx = JSON.parseObject(transferTxStr,Transaction.class);
+            //Transaction tx = JSON.parseObject(transferTxStr,Transaction.class);
+            Transaction tx = JSON.parseObject(tokenTransferTxStr, Transaction.class);
             transactionList.add(tx);
         }
 
@@ -331,5 +353,59 @@ public class DataGenService {
         copy.setBenefitAddr(randomAddress());
         copy.setNodeId(randomNodeId());
         return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Erc20Token getErc20Token(Transaction tx){
+        Erc20Token copy = JSON.parseObject(erc20TokenStr, Erc20Token.class);
+        copy.setTxHash(tx.getHash());
+        copy.setAddress(rAddress());
+        copy.setName("Token-" + tx.getSeq());
+        copy.setSymbol(tx.getSeq() + "");
+        copy.setDecimal(18);
+        copy.setTotalSupply(new BigDecimal("10000000000000000000000000"));
+        copy.setCreator(tx.getFrom());
+        copy.setType("E");
+        copy.setStatus(1);
+        copy.setTxCount(100);
+        copy.setBlockTimestamp(tx.getTime());
+        copy.setCreateTime(new Date());
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public ESTokenTransferRecord getESTokenTransferRecord(Transaction tx){
+        ESTokenTransferRecord transferRecord = JSON.parseObject(esTokenTransferRecordStr, ESTokenTransferRecord.class);
+        transferRecord.setBTime(tx.getTime());
+        transferRecord.setBn(tx.getNum());
+        transferRecord.setContract(tx.getContractAddress());
+        transferRecord.setCtime(new Date());
+        transferRecord.setDecimal(17);
+        transferRecord.setFrom(tx.getFrom());
+        transferRecord.setHash(tx.getHash());
+        transferRecord.setName("Token-" + tx.getSeq());
+        transferRecord.setSymbol("" + tx.getSeq());
+        transferRecord.setTValue("100000000000000000000");
+        transferRecord.setResult(1);
+        transferRecord.setTto(tx.getTo());
+        transferRecord.setTxFee(tx.getCost());
+        return transferRecord;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock){
+        List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
+        for (int i = 0; i < addressCountPerBlock; i++) {
+            Erc20TokenAddressRel rel = Erc20TokenAddressRel.builder()
+                    .contract(token.getAddress())
+                    .address(rMockAddress())
+                    .balance(new BigDecimal("10000000000000000000"))
+                    .name(token.getName()).symbol(token.getSymbol())
+                    .decimal(token.getDecimal()).txCount(i)
+                    .totalSupply(token.getTotalSupply()).updateTime(new Date())
+                    .build();
+            erc20TokenAddressRelList.add(rel);
+        }
+        return erc20TokenAddressRelList;
     }
 }
