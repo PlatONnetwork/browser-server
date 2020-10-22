@@ -3,6 +3,7 @@ package com.platon.browser.erc.client;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
+import com.platon.browser.common.service.erc.Erc20RetryService;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
@@ -40,6 +41,9 @@ public class ERCClient implements ERCInterface {
 
     @Autowired
     private Erc20TokenMapper erc20TokenMapper;
+
+    @Autowired
+    private Erc20RetryService erc20RetryService;
 
     private ERC20Client init(String contractAddress) {
         if (StringUtils.isBlank(contractAddress)) {
@@ -184,7 +188,7 @@ public class ERCClient implements ERCInterface {
                     }
                     // 如果数据不存在再从从数据库中获取数据
                     if (erc20Token == null) {
-                        erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
+                        erc20Token = erc20RetryService.getErc20Token(esTokenTransferRecord.getContract());
                         if (null != erc20Token) {
                             erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);
                         }
