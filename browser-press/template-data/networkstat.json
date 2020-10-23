@@ -22,6 +22,7 @@
 "add_issue_end":6400,
 "next_settle":65,
 "node_opt_seq":3,
+"token_qty":3,
 "issue_rates":"0.025",
 "avg_pack_time":1288,
 "create_time":"2019-12-03 10:28:11",

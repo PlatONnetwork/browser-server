@@ -21,4 +21,6 @@ public class CounterBean {
     private long lastBlockNumber;
     private long rewardCount;
     private long estimateCount;
+
+    private long tokenCount;
 }

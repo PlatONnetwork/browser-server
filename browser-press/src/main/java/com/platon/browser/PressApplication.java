@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.GracefullyShutdownException;
@@ -61,6 +62,10 @@ public class PressApplication implements ApplicationRunner {
     @Autowired
     private DelegationPublisher delegationPublisher;
     @Autowired
+    private Erc20TokenPublisher erc20TokenPublisher;
+    @Autowired
+    private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
+    @Autowired
     private ProposalPublisher proposalPublisher;
     @Autowired
     private VotePublisher votePublisher;
@@ -72,6 +77,8 @@ public class PressApplication implements ApplicationRunner {
     private EstimatePublisher estimatePublisher;
     @Autowired
     private SlashPublisher slashPublisher;
+    @Autowired
+    private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -104,6 +111,12 @@ public class PressApplication implements ApplicationRunner {
     @Value("${platon.estimateMaxCount}")
     private long estimateMaxCount;
 
+    @Value("${platon.tokenMaxCount}")
+    private long tokenMaxCount;
+    @Value("${platon.addressCountPerToken}")
+    private int addressCountPerToken;
+
+
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
     private long currentDelegationSum = 0L;
@@ -113,6 +126,8 @@ public class PressApplication implements ApplicationRunner {
     private long currentRewardSum = 0L;
     private long currentSlashSum = 0L;
     private long currentEstimateSum = 0L;
+
+    private long currentTokenCount = 0l;
 
     public static void main ( String[] args ) {
         SpringApplication.run(PressApplication.class, args);
@@ -146,10 +161,16 @@ public class PressApplication implements ApplicationRunner {
             makeRpPlan(blockResult);
             // 构造【slash】数据
             makeSlash(blockResult);
-         // 构造【委托奖励】数据
+            // 构造【委托奖励】数据
             makeReward(blockResult);
-         // 构造【gas】数据
+            // 构造【gas】数据
             makeEstimate(blockResult);
+
+            // 构造【代币】数据
+            makeErc20Token(blockResult);
+            // 构造【代币转账】数据
+            makeTokenTransferRecord(blockResult);
+
             // 区块号累加
             blockNumber=blockNumber.add(BigInteger.ONE);
             /*// 更新网络统计表
@@ -184,6 +205,7 @@ public class PressApplication implements ApplicationRunner {
             currentRewardSum=counterBean.getRewardCount();
             currentSlashSum=counterBean.getSlashCount();
             currentEstimateSum=counterBean.getEstimateCount();
+            currentTokenCount = counterBean.getTokenCount();
             blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -431,5 +453,42 @@ public class PressApplication implements ApplicationRunner {
             }
             estimatePublisher.publish(gasEstimates);
         }
+    }
+
+    /**
+     * 构造代币合约
+     * @param blockResult
+     */
+    private void makeErc20Token(BlockResult blockResult){
+        if (currentTokenCount < tokenMaxCount) {
+            List<Erc20Token> tokenList = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
+                    tokenList.add(dataGenService.getErc20Token(tx));
+                    currentTokenCount++;
+                }
+            }
+            erc20TokenPublisher.publish(tokenList);
+
+            // 代币与地址关系：1:1000000，按此关系来（一般）
+            List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
+            tokenList.forEach(token -> {
+                erc20TokenAddressRelList.addAll(dataGenService.getErc20TokenAddressRel(token, addressCountPerToken));
+            });
+            erc20TokenAddressRelPublisher.publish(erc20TokenAddressRelList);
+        }
+    }
+
+    /**
+     * 构建代币转账交易
+     */
+    private void makeTokenTransferRecord(BlockResult blockResult){
+        List<ESTokenTransferRecord> transferRecordList = new ArrayList<>();
+        for (Transaction tx : blockResult.getTransactionList()) {
+            if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
+                transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
+            }
+        }
+        esTokenTransferRecordPublisher.publish(transferRecordList);
     }
 }

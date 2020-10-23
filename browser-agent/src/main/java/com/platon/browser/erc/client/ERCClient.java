@@ -3,6 +3,7 @@ package com.platon.browser.erc.client;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
+import com.platon.browser.common.service.erc.Erc20RetryService;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
@@ -40,6 +41,9 @@ public class ERCClient implements ERCInterface {
 
     @Autowired
     private Erc20TokenMapper erc20TokenMapper;
+
+    @Autowired
+    private Erc20RetryService erc20RetryService;
 
     private ERC20Client init(String contractAddress) {
         if (StringUtils.isBlank(contractAddress)) {
@@ -170,6 +174,8 @@ public class ERCClient implements ERCInterface {
                 transaction.getEsTokenTransferRecords().stream().forEach(esTokenTransferRecord -> {
                     // 存量的erc20参数，提高访问速度
                     Erc20Token erc20Token = erc20Tokens.get(esTokenTransferRecord.getContract());
+
+                    BigDecimal totalSupply = BigDecimal.ZERO;
                     // 先缓存中获取
                     if (erc20Token == null) {
                         erc20Token = addressCache.getErc20Token(esTokenTransferRecord.getContract());
@@ -182,7 +188,7 @@ public class ERCClient implements ERCInterface {
                     }
                     // 如果数据不存在再从从数据库中获取数据
                     if (erc20Token == null) {
-                        erc20Token = this.erc20TokenMapper.selectByAddress(esTokenTransferRecord.getContract());
+                        erc20Token = erc20RetryService.getErc20Token(esTokenTransferRecord.getContract());
                         if (null != erc20Token) {
                             erc20Tokens.put(esTokenTransferRecord.getContract(), erc20Token);
                         }
@@ -192,6 +198,7 @@ public class ERCClient implements ERCInterface {
                         esTokenTransferRecord.setDecimal(erc20Token.getDecimal());
                         esTokenTransferRecord.setName(erc20Token.getName());
                         esTokenTransferRecord.setSymbol(erc20Token.getSymbol());
+                        totalSupply = erc20Token.getTotalSupply();
                     }
                     esTokenTransferRecord.setTxFee(transaction.getCost());
                     // 更新token交易数
@@ -207,7 +214,7 @@ public class ERCClient implements ERCInterface {
                                 Erc20TokenAddressRel.builder().decimal(esTokenTransferRecord.getDecimal())
                                         .contract(esTokenTransferRecord.getContract()).name(esTokenTransferRecord.getName())
                                         .symbol(esTokenTransferRecord.getSymbol()).address(esTokenTransferRecord.getFrom())
-                                        .balance(BigDecimal.ZERO).updateTime(new Date()).totalSupply(erc20Token.getTotalSupply()).txCount(1)
+                                        .balance(BigDecimal.ZERO).updateTime(new Date()).totalSupply(totalSupply).txCount(1)
                                         .build();
                         addressCache.putErc20TokenAddressRelMap(UUID.randomUUID().toString(),
                                 erc20TokenAddressRelFrom);
@@ -217,14 +224,14 @@ public class ERCClient implements ERCInterface {
                                 Erc20TokenAddressRel.builder().decimal(esTokenTransferRecord.getDecimal())
                                         .contract(esTokenTransferRecord.getContract()).name(esTokenTransferRecord.getName())
                                         .symbol(esTokenTransferRecord.getSymbol()).address(esTokenTransferRecord.getTto())
-                                        .balance(new BigDecimal(esTokenTransferRecord.getTValue())).updateTime(new Date()).totalSupply(erc20Token.getTotalSupply()).txCount(1).build();
+                                        .balance(new BigDecimal(esTokenTransferRecord.getTValue())).updateTime(new Date()).totalSupply(totalSupply).txCount(1).build();
                         addressCache.putErc20TokenAddressRelMap("to" + UUID.randomUUID().toString(),
                                 erc20TokenAddressRelTo);
                         Erc20TokenAddressRel erc20TokenAddressRelFrom =
                                 Erc20TokenAddressRel.builder().decimal(esTokenTransferRecord.getDecimal())
                                         .contract(esTokenTransferRecord.getContract()).name(esTokenTransferRecord.getName())
                                         .symbol(esTokenTransferRecord.getSymbol()).address(esTokenTransferRecord.getFrom())
-                                        .balance(new BigDecimal(esTokenTransferRecord.getTValue()).negate()).updateTime(new Date()).totalSupply(erc20Token.getTotalSupply()).txCount(1)
+                                        .balance(new BigDecimal(esTokenTransferRecord.getTValue()).negate()).updateTime(new Date()).totalSupply(totalSupply).txCount(1)
                                         .build();
                         addressCache.putErc20TokenAddressRelMap("form" + UUID.randomUUID().toString(),
                                 erc20TokenAddressRelFrom);

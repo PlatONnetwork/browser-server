@@ -1,0 +1,14 @@
+{
+  "address": "atp13p7sgp3lst4eptmrjsfjaaytvrds35gj8ah2pd",
+  "name": "Crypto.com Coin",
+  "symbol": "CRO",
+  "decimal": 17,
+  "totalSupply": 4000000000000,
+  "icon": "",
+  "creator": "atp1cy2uat0eukfrxv897s5s8lnljfka5ewjj943gf",
+  "txHash": "0x8b6d6d76417c76941dfaab182dddb33aeb6143dac13892a50e5aca49bfedc50c",
+  "webSite": "",
+  "holder": 0,
+  "blockTimestamp": 1602834670000,
+  "createTime": 1602805873000
+}
