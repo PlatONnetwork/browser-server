@@ -1,19 +1,16 @@
 package com.platon.browser.erc.client;
 
-import java.math.BigInteger;
-
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.erc.ErcService;
+import com.platon.browser.utils.NetworkParms;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.crypto.Credentials;
 import org.web3j.tx.exceptions.ContractCallException;
 
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.erc.ErcService;
-import com.platon.browser.utils.NetworkParms;
-
-import lombok.extern.slf4j.Slf4j;
+import java.math.BigInteger;
 
 /**
  * @program: browser-server
@@ -27,9 +24,6 @@ public class ErcServiceImpl implements ErcService {
 
     @Autowired
     private PlatOnClient platOnClient;
-
-    @Autowired
-    private Erc20TokenMapper erc20TokenMapper;
 
     private ERC20Client init(String contractAddress) {
         if (StringUtils.isBlank(contractAddress)) {

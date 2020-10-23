@@ -2,39 +2,18 @@ package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.client.NodeVersion;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.DelegationExample;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.RpPlan;
-import com.platon.browser.dao.entity.Vote;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.DelegationMapper;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dao.mapper.RpPlanMapper;
-import com.platon.browser.dao.mapper.VoteMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.ContractDescEnum;
-import com.platon.browser.param.DelegateCreateParam;
-import com.platon.browser.param.DelegateExitParam;
-import com.platon.browser.param.DelegateRewardClaimParam;
-import com.platon.browser.param.StakeCreateParam;
-import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.param.StakeIncreaseParam;
+import com.platon.browser.param.*;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.utils.HexTool;
@@ -47,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonGetBalance;
 import org.web3j.utils.Convert;
@@ -140,7 +118,7 @@ public class ExportService {
 	private void init() {
 		eblock = new BigInteger(exportBlock);
 		dbblock = new BigInteger(exportDBBlock);
-		File destDir = new File(fileUrl);
+		File destDir = new File(this.fileUrl);
 		if (destDir.exists())
 			destDir.delete();
 		if (!destDir.exists())
@@ -157,9 +135,9 @@ public class ExportService {
 		constructor.setDesc("seq");
 		// 分页查询区块数据
 		ESResult<Transaction> esResult = null;
-		for (int pageNo = 0; pageNo * transactionPageSize <= maxCount; pageNo++) {
+		for (int pageNo = 0; pageNo * this.transactionPageSize <= this.maxCount; pageNo++) {
 			try {
-				esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
+				esResult = this.transactionESRepository.search(constructor, Transaction.class, pageNo, this.transactionPageSize);
 			} catch (Exception e) {
 				if (e.getMessage().contains("all shards failed")) {
 					break;
@@ -174,14 +152,14 @@ public class ExportService {
 			}
 			List<Transaction> txList = esResult.getRsData();
 			try {
-				txList.forEach(tx -> csvRows.add(new Object[] { tx.getHash() }));
+				txList.forEach(tx -> csvRows.add(new Object[]{tx.getHash()}));
 				log.info("【exportTxHash()】第{}页,{}条记录", pageNo, txList.size());
 			} catch (Exception e) {
 				log.error("【exportTxHash()】导出出错:", e);
 				throw e;
 			}
 		}
-		buildFile("txhash.csv", csvRows, null);
+		this.buildFile("txhash.csv", csvRows, null);
 		log.info("交易HASH导出成功,总行数：{}", csvRows.size());
 		txHashExportDone = true;
 	}
@@ -192,12 +170,12 @@ public class ExportService {
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
 	public void exportAddress() {
 		List<Object[]> rows = new ArrayList<>();
-		for (int pageNo = 1; pageNo * transactionPageSize < maxCount; pageNo++) {
-			PageHelper.startPage(pageNo, transactionPageSize);
-			List<Address> data = addressMapper.selectByExample(null);
+		for (int pageNo = 1; pageNo * this.transactionPageSize < this.maxCount; pageNo++) {
+			PageHelper.startPage(pageNo, this.transactionPageSize);
+			List<Address> data = this.addressMapper.selectByExample(null);
 			if (data.isEmpty())
 				break;
-			data.forEach(e -> rows.add(new Object[] { e.getAddress() }));
+			data.forEach(e -> rows.add(new Object[]{e.getAddress()}));
 			log.info("【exportAddress()】第{}页,{}条记录", pageNo, rows.size());
 		}
 		this.buildFile("address.csv", rows, null);
@@ -214,7 +192,7 @@ public class ExportService {
 		try {
 			for (int pageNo = 1; pageNo < 20; pageNo++) {
 				PageHelper.startPage(pageNo, 1000);
-				List<RpPlan> rpPlans = rpPlanMapper.selectByExample(null);
+				List<RpPlan> rpPlans = this.rpPlanMapper.selectByExample(null);
 				if (rpPlans == null || rpPlans.size() == 0) {
 					break;
 				}
@@ -244,7 +222,7 @@ public class ExportService {
 		try {
 			for (int pageNo = 1; pageNo < 200; pageNo++) {
 				PageHelper.startPage(pageNo, 1000);
-				List<Proposal> proposals = proposalMapper.selectByExample(null);
+				List<Proposal> proposals = this.proposalMapper.selectByExample(null);
 				if (proposals == null || proposals.size() == 0) {
 					break;
 				}
@@ -274,7 +252,7 @@ public class ExportService {
 		try {
 			for (int pageNo = 1; pageNo < 200; pageNo++) {
 				PageHelper.startPage(pageNo, 1000);
-				List<Vote> votes = voteMapper.selectByExample(null);
+				List<Vote> votes = this.voteMapper.selectByExample(null);
 				if (votes == null || votes.size() == 0) {
 					break;
 				}
@@ -300,8 +278,8 @@ public class ExportService {
 	public void exportNodeId() {
 		List<Object[]> rows = new ArrayList<>();
 		PageHelper.startPage(1, 1500);
-		List<Node> data = nodeMapper.selectByExample(null);
-		data.forEach(e -> rows.add(new Object[] { e.getNodeId() }));
+		List<Node> data = this.nodeMapper.selectByExample(null);
+		data.forEach(e -> rows.add(new Object[]{e.getNodeId()}));
 		this.buildFile("node.csv", rows, null);
 		log.info("nodes导出成功,总行数：{}", rows.size());
 		nodeExportDone = true;
@@ -314,11 +292,11 @@ public class ExportService {
 	public void exportDelegationInfo() {
 		List<Object[]> rows = new ArrayList<>();
 		try {
-			for (int pageNo = 1; pageNo * transactionPageSize < maxCount; pageNo++) {
-				PageHelper.startPage(pageNo, transactionPageSize);
+			for (int pageNo = 1; pageNo * this.transactionPageSize < this.maxCount; pageNo++) {
+				PageHelper.startPage(pageNo, this.transactionPageSize);
 				DelegationExample delegationExample = new DelegationExample();
 				delegationExample.setOrderByClause(" sequence desc");
-				List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
+				List<Delegation> delegations = this.delegationMapper.selectByExample(delegationExample);
 				if (delegations == null | delegations.size() == 0) {
 					break;
 				}
@@ -343,14 +321,14 @@ public class ExportService {
 
 	public void buildFile(String fileName, List<Object[]> rows, String[] headers) {
 		try {
-			File file = new File(fileUrl);
+			File file = new File(this.fileUrl);
 			if (!file.exists()) {
 				file.mkdir();
 			}
 			/** 初始化输出流对象 */
-			FileOutputStream fis = new FileOutputStream(fileUrl + fileName);
+			FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName);
 			/** 设置返回的头，防止csv乱码 */
-			fis.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+			fis.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
 			OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8);
 			/** 厨师书writer对象 */
 			CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
@@ -362,7 +340,7 @@ public class ExportService {
 			log.error("数据输出错误:", e);
 			return;
 		}
-		log.info("导出报表成功，路径：{}", fileUrl + fileName);
+		log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
 	}
 
 	/**
@@ -378,10 +356,10 @@ public class ExportService {
 		List<String> address = new ArrayList<>();
 		try {
 			for (int pageNo = 1; pageNo < Integer.MAX_VALUE; pageNo++) {
-				PageHelper.startPage(pageNo, transactionPageSize);
+				PageHelper.startPage(pageNo, this.transactionPageSize);
 				DelegationExample delegationExample = new DelegationExample();
 				delegationExample.setOrderByClause(" sequence desc");
-				List<Delegation> delegations = delegationMapper.selectByExample(delegationExample);
+				List<Delegation> delegations = this.delegationMapper.selectByExample(delegationExample);
 				if (delegations == null | delegations.size() == 0) {
 					break;
 				}
@@ -393,7 +371,7 @@ public class ExportService {
 					Object[] row = new Object[2];
 					row[0] = d.getDelegateAddr();
 					List<String> nodes = new ArrayList<>();
-					List<Reward> rewards = platonClient.getRewardContract()
+					List<Reward> rewards = this.platonClient.getRewardContract()
 							.getDelegateReward(d.getDelegateAddr(), nodes).send().getData();
 					/**
 					 * 当奖励为空时直接return
@@ -441,15 +419,15 @@ public class ExportService {
 		rowHead[10] = "tx info";
 		csvRows.add(rowHead);
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.must(new ESQueryBuilders().range("num", eblock.subtract(blockChainConfig.getSettlePeriodBlockCount()).longValue(), eblock.longValue()));
-		rowHead[11] = eblock.subtract(blockChainConfig.getSettlePeriodBlockCount());
+		constructor.must(new ESQueryBuilders().range("num", eblock.subtract(this.blockChainConfig.getSettlePeriodBlockCount()).longValue(), eblock.longValue()));
+		rowHead[11] = eblock.subtract(this.blockChainConfig.getSettlePeriodBlockCount());
 		rowHead[12] = eblock;
 		constructor.setDesc("seq");
 		// 分页查询区块数据
 		ESResult<Transaction> esResult = null;
 		for (int pageNo = 0; pageNo <= Integer.MAX_VALUE; pageNo++) {
 			try {
-				esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
+				esResult = this.transactionESRepository.search(constructor, Transaction.class, pageNo, this.transactionPageSize);
 			} catch (Exception e) {
 				if (e.getMessage().contains("all shards failed")) {
 					break;
@@ -537,7 +515,7 @@ public class ExportService {
 									Convert.fromVon(txAmount, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
 							HexTool.append(EnergonUtil.format(
 									Convert.fromVon(reward, Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18)),
-							tx.getInfo(), };
+							tx.getInfo(),};
 					csvRows.add(row);
 				});
 				log.info("【exportTxh()】第{}页,{}条记录", pageNo, txList.size());
@@ -546,21 +524,20 @@ public class ExportService {
 				throw e;
 			}
 		}
-		buildFile(eblock.toString()+"txhash.csv", csvRows, null);
+		this.buildFile(eblock.toString() + "txhash.csv", csvRows, null);
 		log.info("交易数据导出成功,总行数：{}", csvRows.size());
 //		txInfoExportDone = true;
 	}
 
 	/**
-	 * @throws Exception 
-	 * 导出验证人信息表
-	 * @throws  
+	 * @throws Exception 导出验证人信息表
+	 * @throws
 	 */
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-	public void exportStaking() throws Exception  {
+	public void exportStaking() throws Exception {
 //		BigInteger blockNumer = this.checkNumer();
-	//		List<com.platon.sdk.contracts.ppos.dto.resp.Node> nodes =platonClient.getNodeContract().getValidatorList().send().getData();
-		DeNodeContract deNodeContract = DeNodeContract.load(platonClient.getWeb3jWrapper().getWeb3j());
+		//		List<com.platon.sdk.contracts.ppos.dto.resp.Node> nodes =platonClient.getNodeContract().getValidatorList().send().getData();
+		DeNodeContract deNodeContract = DeNodeContract.load(this.platonClient.getWeb3jWrapper().getWeb3j());
 		List<com.platon.sdk.contracts.ppos.dto.resp.Node> nodes = deNodeContract.getValidatorList(eblock).send().getData();
 		List<Object[]> rows = new ArrayList<>();
 		Object[] rowHead = new Object[26];
@@ -575,17 +552,17 @@ public class ExportService {
 		try {
 			for (com.platon.sdk.contracts.ppos.dto.resp.Node node : nodes) {
 				Object[] row = new Object[26];
-				for(int i = 0; i < rowHead.length -2; i++) {
-					Object value = this.getFieldValueByName((String)rowHead[i], node);
-					if("shares,released,releasedHes,restrictingPlan,restrictingPlanHes,delegateEpoch,delegateTotal,delegateTotalHes,delegateRewardTotal"
-							.contains((String)rowHead[i]) && value != null) {
+				for (int i = 0; i < rowHead.length - 2; i++) {
+					Object value = this.getFieldValueByName((String) rowHead[i], node);
+					if ("shares,released,releasedHes,restrictingPlan,restrictingPlanHes,delegateEpoch,delegateTotal,delegateTotalHes,delegateRewardTotal"
+							.contains((String) rowHead[i]) && value != null) {
 						value = HexTool.append(EnergonUtil
-								.format(Convert.fromVon(new BigDecimal((BigInteger)value), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
+								.format(Convert.fromVon(new BigDecimal((BigInteger) value), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
 					}
 					row[i] = value;
 				}
-				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(node.getBenifitAddress(), DefaultBlockParameter.valueOf(eblock))
-					.send();
+				PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(node.getBenifitAddress(), DefaultBlockParameter.valueOf(eblock))
+						.send();
 				row[24] = HexTool.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
 				row[25] = eblock;
@@ -609,7 +586,7 @@ public class ExportService {
 			row[0] = eblock;
 			row[1] = address;
 			row[2] = ContractDescEnum.getMap().get(address).getContractName();
-			PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(eblock))
+			PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(eblock))
 					.send();
 			row[3] = HexTool.append(EnergonUtil
 					.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
@@ -619,17 +596,16 @@ public class ExportService {
 		log.info("contactValue导出成功,总行数：{}", rows.size());
 		stakingExportDone = true;
 	}
-	
+
 	/**
-	 * @throws Exception 
-	 * 导出验证人信息表
-	 * @throws  
+	 * @throws Exception 导出验证人信息表
+	 * @throws
 	 */
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-	public void exportAllStaking() throws Exception  {
+	public void exportAllStaking() throws Exception {
 //		BigInteger blockNumer = this.checkNumer();
-	//		List<com.platon.sdk.contracts.ppos.dto.resp.Node> nodes =platonClient.getNodeContract().getValidatorList().send().getData();
-		DeNodeContract deNodeContract = DeNodeContract.load(platonClient.getWeb3jWrapper().getWeb3j());
+		//		List<com.platon.sdk.contracts.ppos.dto.resp.Node> nodes =platonClient.getNodeContract().getValidatorList().send().getData();
+		DeNodeContract deNodeContract = DeNodeContract.load(this.platonClient.getWeb3jWrapper().getWeb3j());
 		List<com.platon.sdk.contracts.ppos.dto.resp.Node> nodes = deNodeContract.getCandidateList(eblock).send().getData();
 		List<Object[]> rows = new ArrayList<>();
 		Object[] rowHead = new Object[26];
@@ -644,17 +620,17 @@ public class ExportService {
 		try {
 			for (com.platon.sdk.contracts.ppos.dto.resp.Node node : nodes) {
 				Object[] row = new Object[26];
-				for(int i = 0; i < rowHead.length -2; i++) {
-					Object value = this.getFieldValueByName((String)rowHead[i], node);
-					if("shares,released,releasedHes,restrictingPlan,restrictingPlanHes,delegateEpoch,delegateTotal,delegateTotalHes,delegateRewardTotal"
-							.contains((String)rowHead[i]) && value != null) {
+				for (int i = 0; i < rowHead.length - 2; i++) {
+					Object value = this.getFieldValueByName((String) rowHead[i], node);
+					if ("shares,released,releasedHes,restrictingPlan,restrictingPlanHes,delegateEpoch,delegateTotal,delegateTotalHes,delegateRewardTotal"
+							.contains((String) rowHead[i]) && value != null) {
 						value = HexTool.append(EnergonUtil
-								.format(Convert.fromVon(new BigDecimal((BigInteger)value), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
+								.format(Convert.fromVon(new BigDecimal((BigInteger) value), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
 					}
 					row[i] = value;
 				}
-				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(node.getBenifitAddress(), DefaultBlockParameter.valueOf(eblock))
-					.send();
+				PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(node.getBenifitAddress(), DefaultBlockParameter.valueOf(eblock))
+						.send();
 				row[24] = HexTool.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
 				row[25] = eblock;
@@ -678,7 +654,7 @@ public class ExportService {
 			row[0] = eblock;
 			row[1] = address;
 			row[2] = ContractDescEnum.getMap().get(address).getContractName();
-			PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(eblock))
+			PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(eblock))
 					.send();
 			row[3] = HexTool.append(EnergonUtil
 					.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
@@ -689,15 +665,14 @@ public class ExportService {
 		
 		stakingExportDone = true;
 	}
-	
+
 	/**
-	 * @throws Exception 
-	 * 导出验证人信息表
-	 * @throws  
+	 * @throws Exception 导出验证人信息表
+	 * @throws
 	 */
 	@Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-	public void exportBalance() throws Exception  {
-		BigInteger blockNumer = platonClient.getLatestBlockNumber();
+	public void exportBalance() throws Exception {
+		BigInteger blockNumer = this.platonClient.getLatestBlockNumber();
 		Object[] rowHead = new Object[4];
 		rowHead[0] = "blockNumber";
 		rowHead[1] = "address";
@@ -706,19 +681,19 @@ public class ExportService {
 		List<Object[]> rows = new ArrayList<>();
 		rows.add(rowHead);
 		BigInteger balanceBlock = BigInteger.valueOf(10750);
-		while(balanceBlock.compareTo(blockNumer) < 0) {
-			for(String address  :ContractDescEnum.getAddresses()) {
+		while (balanceBlock.compareTo(blockNumer) < 0) {
+			for (String address : ContractDescEnum.getAddresses()) {
 				Object[] row = new Object[4];
 				row[0] = balanceBlock;
 				row[1] = address;
 				row[2] = ContractDescEnum.getMap().get(address).getContractName();
-				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(balanceBlock))
+				PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(balanceBlock))
 						.send();
 				row[3] = HexTool.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
 				rows.add(row);
 			}
-			balanceBlock = balanceBlock.add(blockChainConfig.getSettlePeriodBlockCount());
+			balanceBlock = balanceBlock.add(this.blockChainConfig.getSettlePeriodBlockCount());
 		}
 		this.buildFile("allcontract.csv", rows, null);
 		log.info("contactValue导出成功,总行数：{}", rows.size());
@@ -769,7 +744,7 @@ public class ExportService {
 			Object[] row = new Object[3];
 			row[0] = balanceBlock;
 			row[1] = address;
-			PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(balanceBlock))
+			PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(balanceBlock))
 					.send();
 			row[2] = HexTool.append(EnergonUtil
 					.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18));
@@ -778,7 +753,7 @@ public class ExportService {
 		this.buildFile("allbenefit111.csv", rows, null);
 		log.info("allbenefit导出成功,总行数：{}", rows.size());
 	}
-	
+
 	/**
 	 * * * @Description 根据属性名 获取值（value） * @param name * @param user * @return
 	 * * @throws IllegalAccessException
@@ -790,8 +765,8 @@ public class ExportService {
 		Method method;
 		Object value;
 		try {
-			method = node.getClass().getMethod(getter, new Class[] {});
-			value = method.invoke(node, new com.platon.sdk.contracts.ppos.dto.resp.Node[] {});
+			method = node.getClass().getMethod(getter, new Class[]{});
+			value = method.invoke(node, new Object[]{});
 			return value;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -807,7 +782,7 @@ public class ExportService {
 //		}
 		BigInteger blockNumer = BigInteger.ZERO;
 		try {
-			blockNumer = platonClient.getLatestBlockNumber();
+			blockNumer = this.platonClient.getLatestBlockNumber();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -819,8 +794,8 @@ public class ExportService {
 	}
 	
 	public boolean checkDatabaseNumer() {
-		List<NetworkStat> networkStat = networkStatMapper.selectByExample(null);
-		if(BigInteger.valueOf(networkStat.get(0).getCurNumber()).compareTo(dbblock) <= 0) {
+		List<NetworkStat> networkStat = this.networkStatMapper.selectByExample(null);
+		if (BigInteger.valueOf(networkStat.get(0).getCurNumber()).compareTo(dbblock) <= 0) {
 			return true;
 		}
 		return false;
@@ -841,24 +816,24 @@ public class ExportService {
 		List<Object[]> rows = new ArrayList<>();
 		rows.add(rowHead);
 		for (int pageNo = 1; pageNo < Integer.MAX_VALUE; pageNo++) {
-			PageHelper.startPage(pageNo, transactionPageSize);
-			List<Node> data = nodeMapper.selectByExample(null);
+			PageHelper.startPage(pageNo, this.transactionPageSize);
+			List<Node> data = this.nodeMapper.selectByExample(null);
 			if (data.isEmpty())
 				break;
-			for(Node node: data) {
-				rows.add(new Object[] { node.getNodeId() ,node.getNodeName() 
-						,HexTool.append(EnergonUtil
-								.format(Convert.fromVon(node.getStatBlockRewardValue(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))
+			for (Node node : data) {
+				rows.add(new Object[]{node.getNodeId(), node.getNodeName()
 						, HexTool.append(EnergonUtil
-								.format(Convert.fromVon(node.getStatStakingRewardValue(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))
+						.format(Convert.fromVon(node.getStatBlockRewardValue(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))
 						, HexTool.append(EnergonUtil
-										.format(Convert.fromVon(node.getStatFeeRewardValue(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))});
+						.format(Convert.fromVon(node.getStatStakingRewardValue(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))
+						, HexTool.append(EnergonUtil
+						.format(Convert.fromVon(node.getStatFeeRewardValue(), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))});
 			}
 			log.info("【exportNodeInfo()】第{}页,{}条记录", pageNo, rows.size());
 		}
 		this.buildFile(dbblock.toString() + "NodeInfo.csv", rows, null);
 		log.info("节点信息表导出成功,总行数：{}", rows.size());
-		dbblock = dbblock.add(blockChainConfig.getSettlePeriodBlockCount());
+		dbblock = dbblock.add(this.blockChainConfig.getSettlePeriodBlockCount());
 		addressExportDone = true;
 	}
 	
@@ -871,14 +846,14 @@ public class ExportService {
 	public void exportAddressBalance() throws IOException {
 		List<Object[]> rows = new ArrayList<>();
 		for (int pageNo = 1; pageNo < Integer.MAX_VALUE; pageNo++) {
-			PageHelper.startPage(pageNo, transactionPageSize);
-			List<Address> data = addressMapper.selectByExample(null);
+			PageHelper.startPage(pageNo, this.transactionPageSize);
+			List<Address> data = this.addressMapper.selectByExample(null);
 			if (data.isEmpty())
 				break;
-			for(Address address: data) {
-				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address.getAddress(), DefaultBlockParameter.valueOf(eblock))
+			for (Address address : data) {
+				PlatonGetBalance balance = this.platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address.getAddress(), DefaultBlockParameter.valueOf(eblock))
 						.send();
-				rows.add(new Object[] { address.getAddress() ,HexTool.append(EnergonUtil
+				rows.add(new Object[]{address.getAddress(), HexTool.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.LAT).setScale(18, RoundingMode.DOWN), 18))});
 			}
 			log.info("【exportAddressBalance()】第{}页,{}条记录", pageNo, rows.size());
@@ -887,9 +862,9 @@ public class ExportService {
 		log.info("地址表导出成功,总行数：{}", rows.size());
 		addressExportDone = true;
 	}
-	
-	public void addCount(){
-		eblock = eblock.add(blockChainConfig.getSettlePeriodBlockCount());
+
+	public void addCount() {
+		eblock = eblock.add(this.blockChainConfig.getSettlePeriodBlockCount());
 	}
 
 

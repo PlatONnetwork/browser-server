@@ -1,11 +1,5 @@
 package com.platon.browser.common.collection.dto;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.SpecialApi;
@@ -21,8 +15,12 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
 
 @Slf4j
 public class CollectionTransaction extends Transaction {
@@ -60,14 +58,18 @@ public class CollectionTransaction extends Transaction {
         return Collections.unmodifiableMap(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP);
     }
 
+    public static void setGeneralContractAddressCache(String key, ContractTypeEnum contractTypeEnum) {
+        GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(key, contractTypeEnum);
+    }
+
     private void initGeneralContractCache(AddressCache addressCache) {
         if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.isEmpty()) {
             addressCache.getEvmContractAddressCache()
-                .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
+                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
             addressCache.getWasmContractAddressCache()
-                .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
+                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
             addressCache.getEvmErc20ContractAddressCache()
-                .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
+                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
         }
     }
 

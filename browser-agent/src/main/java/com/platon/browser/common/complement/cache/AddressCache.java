@@ -68,12 +68,6 @@ public class AddressCache {
         return this.evmErc20ContractAddressCache.contains(address);
     }
 
-    // 判断是不是普通合约（EVM||WASM）地址
-    public boolean isGeneralContractAddress(String address) {
-        return this.evmContractAddressCache.contains(address) && this.wasmContractAddressCache.contains(address)
-            && this.evmErc20ContractAddressCache.contains(address);
-    }
-
     public Integer getTypeData(String address) {
         if (InnerContractAddrEnum.getAddresses().contains(address)) {
             return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
@@ -159,10 +153,6 @@ public class AddressCache {
         this.preErc20TokenMap.clear();
         this.preErc20TokenMap.putAll(this.erc20TokenMap);
         this.erc20TokenMap.clear();
-    }
-
-    public void cleanErcAddressCache() {
-        this.evmErc20ContractAddressCache.clear();
     }
 
     public Map<String, Erc20TokenAddressRel> getErc20TokenAddressRelMap() {

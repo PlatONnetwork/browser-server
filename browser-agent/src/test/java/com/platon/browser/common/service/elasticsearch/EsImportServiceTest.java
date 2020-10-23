@@ -1,6 +1,9 @@
 package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,8 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -22,14 +24,20 @@ public class EsImportServiceTest extends AgentTestBase {
     private EsTransactionService transactionService;
     @Mock
     private EsNodeOptService nodeOptService;
+    @Mock
+    private EsDelegateRewardService delegateRewardService;
+    @Mock
+    private EsTokenTransferRecordService esTokenTransferRecordService;
     @Spy
     private EsImportService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "blockService", blockService);
-        ReflectionTestUtils.setField(target, "transactionService", transactionService);
-        ReflectionTestUtils.setField(target, "nodeOptService", nodeOptService);
+        ReflectionTestUtils.setField(this.target, "blockService", this.blockService);
+        ReflectionTestUtils.setField(this.target, "transactionService", this.transactionService);
+        ReflectionTestUtils.setField(this.target, "nodeOptService", this.nodeOptService);
+        ReflectionTestUtils.setField(this.target, "delegateRewardService", this.delegateRewardService);
+        ReflectionTestUtils.setField(this.target, "esTokenTransferRecordService", this.esTokenTransferRecordService);
     }
 
     /**
@@ -37,7 +45,20 @@ public class EsImportServiceTest extends AgentTestBase {
      */
     @Test
     public void batchImport() throws InterruptedException {
-        target.batchImport(Collections.emptySet(),Collections.emptySet(),Collections.emptySet(), Collections.emptySet());
-        verify(target, times(1)).batchImport(anySet(),anySet(),anySet(),anySet());
+        this.target.batchImport(Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
+        verify(this.target, times(1)).batchImport(anySet(), anySet(), anySet(), anySet());
+    }
+
+    @Test
+    public void retryRecordSet() {
+        Set<Transaction> transactions = new HashSet<>();
+        Transaction transaction = new Transaction();
+        List<ESTokenTransferRecord> esTokenTransferRecordList = new ArrayList<>();
+        ESTokenTransferRecord esTokenTransferRecord = new ESTokenTransferRecord();
+        esTokenTransferRecordList.add(esTokenTransferRecord);
+        transaction.setEsTokenTransferRecords(esTokenTransferRecordList);
+        transactions.add(transaction);
+        this.target.retryRecordSet(transactions);
+        Assert.assertTrue(true);
     }
 }
