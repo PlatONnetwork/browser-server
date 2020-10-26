@@ -541,7 +541,7 @@ public class StakingServiceImpl implements StakingService {
 
 		/** 查询出块节点 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-		int i=0;
+		int i=(req.getPageNo()-1)*req.getPageSize();
 		for (Node node:stakingPage) {
 			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();
 			BeanUtils.copyProperties(node, lockedStakingListResp);
