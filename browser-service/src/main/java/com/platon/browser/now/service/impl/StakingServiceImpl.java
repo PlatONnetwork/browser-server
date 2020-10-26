@@ -202,6 +202,7 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
 			aliveStakingListResp.setDeleAnnualizedRate(staking.getDeleAnnualizedRate().toString());
 			lists.add(aliveStakingListResp);
+			i++;
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(stakingPage.getTotal());
