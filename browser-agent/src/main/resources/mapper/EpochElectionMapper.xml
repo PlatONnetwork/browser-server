@@ -65,7 +65,8 @@
 		<foreach collection="exitingNodeList" item="item">
 			/*1、更新委托*/
 			update `delegation` set
-			`delegate_released` = `delegate_hes` + `delegate_locked`,
+			/*为防止节点主动退出质押，导致delegate_hes和delegate_locked都为0，最终导致delegate_released为0的情况，需要累加delegate_released本身*/
+			`delegate_released` = `delegate_released` + `delegate_hes` + `delegate_locked`,
 			`delegate_hes` = 0,
 			`delegate_locked` = 0
 			where `node_id` = #{item.nodeId}

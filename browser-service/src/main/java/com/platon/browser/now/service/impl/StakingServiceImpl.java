@@ -174,34 +174,36 @@ public class StakingServiceImpl implements StakingService {
 		List<Node> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
-		for (int i = 0; i < stakings.size(); i++) {
+		int i=(req.getPageNo()-1)*req.getPageSize();
+		for (Node staking:stakings) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
-			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
-			aliveStakingListResp.setBlockQty(stakings.get(i).getStatBlockQty());
-			aliveStakingListResp.setDelegateQty(stakings.get(i).getStatValidAddrs());
-			aliveStakingListResp.setExpectedIncome(stakings.get(i).getAnnualizedRate().toString());
+			BeanUtils.copyProperties(staking, aliveStakingListResp);
+			aliveStakingListResp.setBlockQty(staking.getStatBlockQty());
+			aliveStakingListResp.setDelegateQty(staking.getStatValidAddrs());
+			aliveStakingListResp.setExpectedIncome(staking.getAnnualizedRate().toString());
 			/** 委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额) */
-			String sumAmount = stakings.get(i).getStatDelegateValue().toString();
+			String sumAmount = staking.getStatDelegateValue().toString();
 			aliveStakingListResp.setDelegateValue(sumAmount);
-			aliveStakingListResp.setIsInit(stakings.get(i).getIsInit() == 1);
-			aliveStakingListResp.setStakingIcon(stakings.get(i).getNodeIcon());
-			if(stakings.get(i).getIsRecommend() != null) {
-				aliveStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == stakings.get(i).getIsRecommend());
+			aliveStakingListResp.setIsInit(staking.getIsInit() == 1);
+			aliveStakingListResp.setStakingIcon(staking.getNodeIcon());
+			if(staking.getIsRecommend() != null) {
+				aliveStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == staking.getIsRecommend());
 			}
 			/** 设置排行 */
 			aliveStakingListResp.setRanking(i + 1);
-			aliveStakingListResp.setSlashLowQty(stakings.get(i).getStatSlashLowQty());
-			aliveStakingListResp.setSlashMultiQty(stakings.get(i).getStatSlashMultiQty());
+			aliveStakingListResp.setSlashLowQty(staking.getStatSlashLowQty());
+			aliveStakingListResp.setSlashMultiQty(staking.getStatSlashMultiQty());
 			/** 如果是对应的出块节点则置为出块中，否则为活跃中或者退出 */
-			if(stakings.get(i).getNodeId().equals(networkStatRedis.getNodeId())) {
+			if(staking.getNodeId().equals(networkStatRedis.getNodeId())) {
 				aliveStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
 			} else {
-				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus(), stakings.get(i).getIsSettle()));
+				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(staking.getStatus(), staking.getIsConsensus(), staking.getIsSettle()));
 			}
 			/** 质押总数=有效的质押+委托 */
-			aliveStakingListResp.setTotalValue(stakings.get(i).getTotalValue().toString());
-			aliveStakingListResp.setDeleAnnualizedRate(stakings.get(i).getDeleAnnualizedRate().toString());
+			aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
+			aliveStakingListResp.setDeleAnnualizedRate(staking.getDeleAnnualizedRate().toString());
 			lists.add(aliveStakingListResp);
+			i++;
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(stakingPage.getTotal());
@@ -542,7 +544,7 @@ public class StakingServiceImpl implements StakingService {
 
 		/** 查询出块节点 */
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
-		int i=0;
+		int i=(req.getPageNo()-1)*req.getPageSize();
 		for (Node node:stakingPage) {
 			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();
 			BeanUtils.copyProperties(node, lockedStakingListResp);
