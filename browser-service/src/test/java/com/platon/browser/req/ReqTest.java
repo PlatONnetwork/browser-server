@@ -1,23 +1,25 @@
 package com.platon.browser.req;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.req.token.QueryHolderTokenListReq;
+import com.platon.browser.req.token.QueryTokenHolderListReq;
+import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
+import com.platon.browser.utils.ClassUtil;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.utils.ClassUtil;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ReqTest {
@@ -41,7 +43,7 @@ public class ReqTest {
     }
 
     @Test
-    public void test() throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public void test() {
         for (Class<?> clazz : this.target) {
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
@@ -96,4 +98,18 @@ public class ReqTest {
         }
         assertTrue(true);
     }
+
+    @Test
+    public void test_method() {
+        QueryHolderTokenListReq queryHolderTokenListReq = new QueryHolderTokenListReq("");
+        assertNotNull(queryHolderTokenListReq);
+
+        QueryTokenHolderListReq queryTokenHolderListReq = new QueryTokenHolderListReq("");
+        assertNotNull(queryTokenHolderListReq);
+
+        QueryTokenTransferRecordListReq queryTokenTransferRecordListReq = new QueryTokenTransferRecordListReq("", "", "");
+        assertNotNull(queryTokenTransferRecordListReq);
+
+    }
+
 }

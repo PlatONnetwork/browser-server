@@ -5,8 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 /**
  * @Auther: Chendongming
@@ -32,6 +31,6 @@ public class ComplementInfoTest {
         assertEquals(complementInfo.getMethod(), "");
         complementInfo.toString();
         complementInfo.hashCode();
-        complementInfo.equals(complementInfo);
+        assertTrue(complementInfo.equals(complementInfo));
     }
 }

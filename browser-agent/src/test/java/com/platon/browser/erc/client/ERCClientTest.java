@@ -3,6 +3,7 @@ package com.platon.browser.erc.client;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.common.complement.cache.AddressCache;
+import com.platon.browser.common.service.erc.Erc20RetryService;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dto.ERCData;
@@ -51,15 +52,19 @@ public class ERCClientTest {
 
     public ERCClient target;
 
+    public Erc20RetryService erc20RetryService;
+
     @Before
     public void setup() throws Exception {
         this.platOnClient = PowerMockito.mock(PlatOnClient.class);
         this.web3jWrapper = PowerMockito.mock(Web3jWrapper.class);
         this.web3j = PowerMockito.mock(Web3j.class);
         this.erc20TokenMapper = PowerMockito.mock(Erc20TokenMapper.class);
+        this.erc20RetryService = PowerMockito.mock(Erc20RetryService.class);
         this.target = PowerMockito.spy(new ERCClient());
         ReflectionTestUtils.setField(this.target, "platOnClient", this.platOnClient);
         ReflectionTestUtils.setField(this.target, "erc20TokenMapper", this.erc20TokenMapper);
+        ReflectionTestUtils.setField(this.target, "erc20RetryService", this.erc20RetryService);
         doReturn(this.web3jWrapper).when(this.platOnClient).getWeb3jWrapper();
         when(this.web3jWrapper.getWeb3j()).thenReturn(this.web3j);
     }
@@ -160,6 +165,7 @@ public class ERCClientTest {
         when(this.erc20TokenMapper.selectByAddress(any())).thenReturn(erc20Token);
         addressCache.createDefaultErc20(contractAddress);
         transactions.add(transaction);
+        when(this.erc20RetryService.getErc20Token(any())).thenReturn(erc20Token);
         this.target.initContractData(transactions, addressCache);
         Assert.assertTrue(true);
     }

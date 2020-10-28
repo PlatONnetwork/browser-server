@@ -2,15 +2,12 @@ package com.platon.browser.dto;
 
 import java.math.BigInteger;
 
-import lombok.Data;
-
 /**
  * @program: browser-server
  * @description: erc data
  * @author: Rongjin Zhang
  * @create: 2020-09-23 11:00
  */
-@Data
 public class ERCData {
 
     private String name;
@@ -20,4 +17,36 @@ public class ERCData {
     private Integer decimal;
 
     private BigInteger totalSupply;
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSymbol() {
+        return this.symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public Integer getDecimal() {
+        return this.decimal;
+    }
+
+    public void setDecimal(Integer decimal) {
+        this.decimal = decimal;
+    }
+
+    public BigInteger getTotalSupply() {
+        return this.totalSupply;
+    }
+
+    public void setTotalSupply(BigInteger totalSupply) {
+        this.totalSupply = totalSupply;
+    }
 }

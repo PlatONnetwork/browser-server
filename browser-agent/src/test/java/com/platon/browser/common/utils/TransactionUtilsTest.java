@@ -16,6 +16,7 @@ import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,9 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonGetCode;
+import org.web3j.rlp.RlpEncoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -141,9 +145,13 @@ public class TransactionUtilsTest extends AgentTestBase {
         transData.setCode("0x21345698");
         transDatas.add(transData);
         TransData transData2 = new TransData();
-        transData2.setCode("1");
+        transData2.setInput("0xf858838203ed83820d70b842b84077fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c820554990508b8a69e10de76676d0800000");
+        transData2.setCode("0");
         transDatas.add(transData2);
         TransData transData3 = new TransData();
+        byte[] data = RlpEncoder.encode(new RlpList(RlpString.create(RlpEncoder.encode(RlpString.create(5000)))));
+        String txInput = Hex.toHexString(data);
+        transData3.setInput(txInput);
         transData3.setCode("0");
         transDatas.add(transData3);
         pPosInvokeContractInput.setTransDatas(transDatas);
@@ -157,6 +165,16 @@ public class TransactionUtilsTest extends AgentTestBase {
         when(this.platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);
         when(web3jWrapper.getWeb3j()).thenReturn(web3j);
+
+        List<Log> logs = new ArrayList<>();
+        Log log = new Log();
+        log.setData("0xf84e30b84bf849f847b840362003c50ed3a523cdede37a001803b8f0fed27cb402b3d6127a1a96661ec202318f68f4c76d9b0bfbabfd551a178d4335eaeaa9b7981a4df30dfc8c0bfe3384830f424064");
+        logs.add(log);
+        Log log2 = new Log();
+        log2.setData("0xf84e30b84bf849f847b840362003c50ed3a523cdede37a001803b8f0fed27cb402b3d6127a1a96661ec202318f68f4c76d9b0bfbabfd551a178d4335eaeaa9b7981a4df30dfc8c0bfe3384830f424064");
+        logs.add(log);
+        logs.add(log2);
+        receipt.setLogs(logs);
         TransactionUtil.processVirtualTx(collectionBlock, specialApi, this.platOnClient, collectionTransaction, receipt, logger);
     }
 

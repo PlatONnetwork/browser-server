@@ -1,23 +1,28 @@
 package com.platon.browser.res;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import com.github.pagehelper.Page;
+import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.res.token.*;
+import com.platon.browser.utils.ClassUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.utils.ClassUtil;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ResTest {
@@ -54,8 +59,6 @@ public class ResTest {
                 if (method.getName().equals("init"))
                     continue;
                 if (clazz.isEnum())
-                    continue;
-                if (!clazz.isInstance(clazz))
                     continue;
                 Class<?>[] types = method.getParameterTypes();
 
@@ -122,4 +125,53 @@ public class ResTest {
         assertTrue(true);
     }
 
+    @Test
+    public void test_method() {
+        QueryHolderTokenListResp queryHolderTokenListResp = QueryHolderTokenListResp.builder()
+                .address("").balance(BigDecimal.TEN).contract("").decimal(0).name("").symbol("").txCount(0).build();
+        queryHolderTokenListResp = new QueryHolderTokenListResp("", "", BigDecimal.TEN, 1, "", "", 0);
+        assertNotNull(queryHolderTokenListResp);
+        QueryTokenDetailResp queryTokenDetailResp = QueryTokenDetailResp.builder()
+                .address("").blockTimestamp(new Date()).createTime(new Date()).creator("")
+                .decimal(0).holder(0).name("").symbol("").totalSupply("").txCount(0).txHash("")
+                .abi("").sourceCode("").binCode("").icon("").build();
+        queryTokenDetailResp = new QueryTokenDetailResp("", "", "", 0,
+                "", "", "", "", "", new Date(), 0, new Date(), 0, "", "", "");
+        queryTokenDetailResp = QueryTokenDetailResp.fromErc20Token(Erc20Token.builder().
+                decimal(1).totalSupply(BigDecimal.TEN).build());
+        assertNotNull(queryTokenDetailResp);
+
+        QueryTokenHolderListResp queryTokenHolderListResp = QueryTokenHolderListResp.builder()
+                .address("").balance(BigDecimal.TEN).percent("").build();
+        queryTokenHolderListResp = new QueryTokenHolderListResp("", "", BigDecimal.TEN);
+        assertNotNull(queryTokenHolderListResp);
+
+        QueryTokenListResp queryTokenListResp = QueryTokenListResp.builder()
+                .address("").blockTimestamp(new Date()).createTime(new Date()).creator("")
+                .decimal(0).holder(0).name("").symbol("").totalSupply(BigDecimal.TEN).txHash("")
+                .webSite("").icon("").build();
+        queryTokenListResp = new QueryTokenListResp("", "", "", 0,
+                BigDecimal.TEN, "", "", "", "", 1, new Date(), new Date());
+        queryTokenListResp = QueryTokenListResp.fromErc20Token(Erc20Token.builder()
+                .decimal(1).totalSupply(BigDecimal.TEN).build());
+        assertNotNull(queryTokenListResp);
+
+        QueryTokenTransferRecordListResp queryTokenTransferRecordListResp = QueryTokenTransferRecordListResp.builder()
+                .transferTo("").blockNumber(10l).blockTimestamp(new Date()).contract("").decimal(0)
+                .fromType(0).methodSign("").name("").result(0).symbol("").systemTimestamp(0l)
+                .toType(0).txFrom("").txHash("").value(BigDecimal.TEN).transferValue(BigDecimal.TEN)
+                .type("").build();
+        queryTokenTransferRecordListResp = new QueryTokenTransferRecordListResp("", 10l, "", "",
+                "", BigDecimal.TEN, 1, "", "", "", 0, new Date(),
+                BigDecimal.TEN, 10l, "", 0, 00);
+        assertNotNull(queryTokenTransferRecordListResp);
+
+        BaseResp baseResp = new BaseResp(1, "aaa", "");
+        baseResp = BaseResp.build(1, "", "");
+        assertNotNull(baseResp);
+
+        RespPage respPage = new RespPage();
+        respPage.init(new Page<>(), new ArrayList());
+        respPage.init(new ArrayList(), 0l, 0l, 0l);
+    }
 }
