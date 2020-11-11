@@ -1,7 +1,6 @@
 package com.platon.browser.dto;
 
 import com.alaya.protocol.core.methods.response.Log;
-import lombok.Data;
 
 import java.math.BigInteger;
 

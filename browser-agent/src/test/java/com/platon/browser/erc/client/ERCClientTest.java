@@ -1,13 +1,9 @@
 package com.platon.browser.erc.client;
 
-import com.alaya.crypto.Credentials;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.RemoteCall;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.dto.ERCData;
-import com.platon.browser.utils.NetworkParms;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.common.complement.cache.AddressCache;
@@ -27,10 +23,16 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.*;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 
 /**

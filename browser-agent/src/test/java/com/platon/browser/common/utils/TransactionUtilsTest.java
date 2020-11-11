@@ -1,17 +1,39 @@
 package com.platon.browser.common.utils;//package com.platon.browser.common.utils;
 
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.Request;
 import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.PlatonGetCode;
+import com.alaya.rlp.solidity.RlpEncoder;
+import com.alaya.rlp.solidity.RlpList;
+import com.alaya.rlp.solidity.RlpString;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PPosInvokeContractInput;
-import com.platon.browser.client.TransData;
+import com.platon.browser.client.*;
+import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.collection.dto.ComplementInfo;
+import com.platon.browser.common.complement.cache.AddressCache;
+import com.platon.browser.dto.ERCData;
+import com.platon.browser.dto.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ContractTypeEnum;
+import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.erc.ERCInterface;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
