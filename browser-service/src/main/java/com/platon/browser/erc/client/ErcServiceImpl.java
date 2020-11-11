@@ -26,16 +26,13 @@ public class ErcServiceImpl implements ErcService {
     @Autowired
     private PlatOnClient platOnClient;
 
-    @Autowired
-    private Erc20TokenMapper erc20TokenMapper;
-
     private ERC20Client init(String contractAddress) {
         if (StringUtils.isBlank(contractAddress)) {
             throw new RuntimeException("contractAddress is not null");
         }
         ERC20Client erc20Client = new ERC20Client(contractAddress, this.platOnClient.getWeb3jWrapper().getWeb3j(),
-                Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
-                NetworkParms.getChainId());
+            Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
+            NetworkParms.getChainId());
         return erc20Client;
     }
 

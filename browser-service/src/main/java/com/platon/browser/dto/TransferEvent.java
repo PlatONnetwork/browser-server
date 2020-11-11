@@ -11,10 +11,41 @@ import java.math.BigInteger;
  * @author: Rongjin Zhang
  * @create: 2020-09-23 12:02
  */
-@Data
 public class TransferEvent {
     private String from;
     private String to;
     private BigInteger value;
     private Log log;
+
+    public String getFrom() {
+        return this.from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getTo() {
+        return this.to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public BigInteger getValue() {
+        return this.value;
+    }
+
+    public void setValue(BigInteger value) {
+        this.value = value;
+    }
+
+    public Log getLog() {
+        return this.log;
+    }
+
+    public void setLog(Log log) {
+        this.log = log;
+    }
 }

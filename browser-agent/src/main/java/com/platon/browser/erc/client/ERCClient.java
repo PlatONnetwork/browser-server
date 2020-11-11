@@ -62,7 +62,7 @@ public class ERCClient implements ERCInterface {
         try {
             name = erc20Client.name().send();
         } catch (ContractCallException e) {
-            log.debug(" not erc contract,{}", contractAddress);
+            log.debug(" not erc contract,{}", contractAddress, e);
         } catch (Exception e) {
             log.debug(" erc get name error", e);
         }

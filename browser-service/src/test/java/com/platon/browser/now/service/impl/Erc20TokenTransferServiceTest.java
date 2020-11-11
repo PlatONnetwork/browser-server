@@ -3,13 +3,14 @@ package com.platon.browser.now.service.impl;
 import com.github.pagehelper.Page;
 import com.platon.browser.TestMockBase;
 import com.platon.browser.common.DownFileCommon;
-import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.req.token.QueryHolderTokenListReq;
 import com.platon.browser.req.token.QueryTokenHolderListReq;
 import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
@@ -35,8 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class Erc20TokenTransferServiceTest extends TestMockBase {
@@ -77,15 +77,21 @@ public class Erc20TokenTransferServiceTest extends TestMockBase {
 		req.setPageNo(1);
 		req.setPageSize(10);
 
-		ESResult<Object> queryResultFromES = new ESResult<>();
+		ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
 		List<Object> o = new ArrayList<>();
 		this.esTokenTransferRecords.forEach(esTokenTransferRecord -> {
 			o.add(esTokenTransferRecord);
 		});
-		queryResultFromES.setRsData(o);
+		queryResultFromES.setRsData(this.esTokenTransferRecords);
 		queryResultFromES.setTotal(3l);
-		when(this.esTokenTransferRecordRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(queryResultFromES);
+		doReturn(queryResultFromES).when(this.esTokenTransferRecordRepository).search(any(), any(), anyInt(), anyInt());
 		RespPage<QueryTokenTransferRecordListResp> queryTokenListResp = this.target.queryTokenRecordList(req);
+		req.setAddress("lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj");
+		queryTokenListResp = this.target.queryTokenRecordList(req);
+		req.setContract("lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj");
+		queryTokenListResp = this.target.queryTokenRecordList(req);
+		req.setTxHash("lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj");
+		queryTokenListResp = this.target.queryTokenRecordList(req);
 		assertTrue(true);
 	}
 
@@ -143,17 +149,29 @@ public class Erc20TokenTransferServiceTest extends TestMockBase {
 
 	@Test
 	public void test_exportTokenTransferList() throws IOException {
-		Erc20Token erc20Token = new Erc20Token();
 		ESResult<Object> queryResultFromES = new ESResult<>();
 		List<Object> o = new ArrayList<>();
 		this.esTokenTransferRecords.forEach(esTokenTransferRecord -> {
 			o.add(esTokenTransferRecord);
 		});
 		queryResultFromES.setTotal(3l);
+		queryResultFromES.setRsData(o);
 		when(this.esTokenTransferRecordRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(queryResultFromES);
 		HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
 		this.target.exportTokenTransferList("", "", new Date().getTime(), "en", "+8", "", httpServletResponse);
+
+		when(this.esTokenTransferRecordRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(queryResultFromES);
+		this.target.exportTokenTransferList("lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj", "", new Date().getTime(), "en", "+8", "", httpServletResponse);
+		this.target.exportTokenTransferList("", "lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj", new Date().getTime(), "en", "+8", "", httpServletResponse);
 		assertTrue(true);
 	}
+
+	@Test
+	public void test_save() {
+		this.target.save(new Erc20TokenTransferRecord());
+		this.target.batchSave(new ArrayList<>());
+		assertTrue(true);
+	}
+
 
 }

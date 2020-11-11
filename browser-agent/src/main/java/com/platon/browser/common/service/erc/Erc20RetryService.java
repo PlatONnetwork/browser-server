@@ -18,11 +18,12 @@ public class Erc20RetryService {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public Erc20Token getErc20Token (String contractAddress ) {
-        Erc20Token erc20Token = erc20TokenMapper.selectByAddress(contractAddress);
+        Erc20Token erc20Token = this.erc20TokenMapper.selectByAddress(contractAddress);
         if (null == erc20Token) {
             try {
                 TimeUnit.SECONDS.sleep(5L);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new BusinessException("合约查询线程被中断！");
             }
             throw new BusinessException("合约【"+contractAddress+"】未入库，稍后重试...");

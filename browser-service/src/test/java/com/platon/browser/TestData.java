@@ -29,7 +29,8 @@ public class TestData {
             "block",
             "erc20Token",
             "erc20TokenDetail",
-            "erc20TokenAddressRel"
+            "erc20TokenAddressRel",
+            "erc20TokenTransfer"
     };
     protected List<Transaction> transactionList = Collections.emptyList();
     protected BlockChainConfig blockChainConfig = new BlockChainConfig();
@@ -77,8 +78,10 @@ public class TestData {
                         break;
                     case "erc20TokenAddressRel":
                         this.erc20TokenAddressRels = JSON.parseArray(content, Erc20TokenAddressRel.class);
+                        break;
                     case "erc20TokenTransfer":
                         this.esTokenTransferRecords = JSON.parseArray(content, ESTokenTransferRecord.class);
+                        break;
                 }
             } catch (IOException e) {
                 e.printStackTrace();

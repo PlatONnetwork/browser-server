@@ -1,5 +1,6 @@
 package com.platon.browser.now.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.TestMockBase;
 import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.config.RedisFactory;
@@ -17,6 +18,7 @@ import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.Erc20Param;
 import com.platon.browser.redis.RedisCommands;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
@@ -179,13 +181,26 @@ public class TransactionServiceTest extends TestMockBase{
 		this.target.transactionDetails(req);
 
 		transaction.setType(Transaction.TypeEnum.CLAIM_REWARDS.getCode());
-		transaction.setInfo("{\"rewardList\":[{\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"zrj-node1\",\"reward\":234884281013318097782607,\"stakingNum\":21319}]}");
+		transaction.setInfo("{\"rewardList\":[{\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"zrj-node1\",\"reward\":234884281013318097782607,\"stakingNum\":21319}," +
+				"{\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"zrj-node1\",\"reward\":234884281013318097782607,\"stakingNum\":21319}," +
+				"{\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e8\",\"nodeName\":\"zrj-node2\",\"reward\":234884281013318097782607,\"stakingNum\":21319}]}");
 		this.target.transactionDetails(req);
 
 		transaction.setType(Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
 		this.target.transactionDetails(req);
 
 		transaction.setType(Transaction.TypeEnum.CONTRACT_EXEC.getCode());
+		this.target.transactionDetails(req);
+
+		transaction.setType(Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode());
+		List<Erc20Param> list = new ArrayList<>();
+		Erc20Param erc20Param = Erc20Param.builder().innerValue("123").innerTo("122").innerSymbol("t").innerFrom("12").innerContractName("name")
+				.innerContractAddr("addr").innerDecimal("10").build();
+		Erc20Param erc20Param1 = Erc20Param.builder().innerValue("123").innerTo("122").innerSymbol("t").innerFrom("12").innerContractName("name")
+				.innerContractAddr("addr").innerDecimal("10").build();
+		list.add(erc20Param);
+		list.add(erc20Param1);
+		transaction.setInfo(JSONObject.toJSONString(list));
 		this.target.transactionDetails(req);
 
 		assertTrue(true);

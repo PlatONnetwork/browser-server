@@ -53,6 +53,7 @@ public class InnerTxESRepositoryTest {
         Map<String, String> map = new HashMap<>();
         map.put("", "");
         this.target.createIndex(map);
+        this.target.setIndexName("a");
     }
 
     @Test

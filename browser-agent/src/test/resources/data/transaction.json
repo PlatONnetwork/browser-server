@@ -476,5 +476,30 @@
         "typeEnum": "PROPOSAL_PARAMETER",
         "updTime": 1575597948451,
         "value": "0"
+    },
+    {
+        "bHash": "0x253b5731ad9517b91665d7143c7c6dcc551acadebd5c4f39a7adec38e2d524f6",
+        "cost": "1074008000000000000000",
+        "creTime": 1575597948451,
+        "from": "lat196278ns22j23awdfj9f2d4vz0pedld8anl5k3a",
+        "gasLimit": "537004",
+        "gasPrice": "2000000000000000",
+        "gasUsed": "537004",
+        "hash": "0xfa918714e40c5aa3265d72402073cad763e20633b9800c58ebbc4ad64484d26b",
+        "id": 9,
+        "index": 0,
+        "info": "{\"module\":\"staking\",\"name\":\"maxValidators\",\"newValue\":\"20\",\"nodeName\":\"zrj-node1\",\"pIDID\":\"5\",\"verifier\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\"}",
+        "input": "0xf865838207d2b842b8400aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e73588877374616b696e678e8d6d617856616c696461746f727383823230",
+        "nonce": "6",
+        "num": 3067,
+        "seq": 30670000,
+        "status": 1,
+        "time": 1575598235083,
+        "to": "lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq93t3hkm",
+        "toType": 1,
+        "type": 2002,
+        "typeEnum": "PROPOSAL_PARAMETER",
+        "updTime": 1575597948451,
+        "value": "0"
     }
 ]

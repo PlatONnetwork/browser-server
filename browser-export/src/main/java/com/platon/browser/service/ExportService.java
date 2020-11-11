@@ -118,7 +118,7 @@ public class ExportService {
 	private void init() {
 		eblock = new BigInteger(exportBlock);
 		dbblock = new BigInteger(exportDBBlock);
-		File destDir = new File(fileUrl);
+		File destDir = new File(this.fileUrl);
 		if (destDir.exists())
 			destDir.delete();
 		if (!destDir.exists())
@@ -135,7 +135,7 @@ public class ExportService {
 		constructor.setDesc("seq");
 		// 分页查询区块数据
 		ESResult<Transaction> esResult = null;
-		for (int pageNo = 0; pageNo * transactionPageSize <= maxCount; pageNo++) {
+		for (int pageNo = 0; pageNo * this.transactionPageSize <= this.maxCount; pageNo++) {
 			try {
 				esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
 			} catch (Exception e) {
