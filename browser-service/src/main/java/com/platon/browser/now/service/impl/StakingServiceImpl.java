@@ -287,6 +287,8 @@ public class StakingServiceImpl implements StakingService {
 			resp.setStakingIcon(stakingNode.getNodeIcon());
 			resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
 			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
+			// TODO: ChenDongMing setNextRewardPer
+			resp.setNextRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
 			resp.setTotalDeleReward(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()));
 			/**
 			 * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
