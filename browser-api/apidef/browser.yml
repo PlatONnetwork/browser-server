@@ -2,35 +2,7 @@ swagger: '2.0'
 info:
   version: 0.13.4
   title: 浏览器接口文档
-  description: |
-    1、无分页的数据列表响应<br/>
-    {<br/>
-        "msg": "success",<br/>
-        "code": 0,<br/>
-        "list": []<br/>
-    }<br/>
-
-    2、有分页的数据列表响应<br/>
-    {<br/>
-      "msg": "success", // 错误消息<br/>
-      "code": 0, // 0-成功，非0-失败<br/>
-      "page": { // 分页对象<br/>
-        "totalCount": 1,<br/>
-        "pageSize": 90,<br/>
-        "totalPage": 1,<br/>
-        "currPage": 1,<br/>
-        "list": [] // 列表数据<br/>
-      }<br/>
-    }<br/>
-
-    3、详情数据响应<br/>
-    {<br/>
-      "msg": "success", // 错误消息<br/>
-      "code": 0, // 0-成功，非0-失败<br/>
-      "detail": {}// 详情数据<br/>
-    }<br/>
-
-
+  description:
 host: localhost:9061
 basePath: /browser-server
 
