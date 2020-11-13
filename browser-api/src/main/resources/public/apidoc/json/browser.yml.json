@@ -2908,7 +2908,11 @@
           "type" : "boolean"
         },
         "rewardPer" : {
-          "description" : "委托奖励比例",
+          "description" : "当前委托奖励比例",
+          "type" : "string"
+        },
+        "nextRewardPer" : {
+          "description" : "下一结算周期委托奖励比例",
           "type" : "string"
         },
         "haveDeleReward" : {
