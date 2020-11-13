@@ -38,6 +38,7 @@ public class ExtraServiceImpl implements ExtraService {
 	private static String blockValue = "block";
 	
 	private static String rewardValue = "reward";
+	private static String restrictingValue = "restricting";
 
 	@Override
 	public QueryConfigResp queryConfig() {
@@ -64,10 +65,17 @@ public class ExtraServiceImpl implements ExtraService {
 		 */
 		ModuleConfig rewardModuleConfig = new ModuleConfig();
 		rewardModuleConfig.setModule(rewardValue);
+		/**
+		 * 设置M参数模块的配置
+		 */
+		ModuleConfig restrictingModuleConfig = new ModuleConfig();
+		restrictingModuleConfig.setModule(restrictingValue);
+
 		List<ConfigDetail> stakingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> slashingConfigDetails = new ArrayList<>();
 		List<ConfigDetail> blockConfigDetails = new ArrayList<>();
 		List<ConfigDetail> rewardConfigDetails = new ArrayList<>();
+		List<ConfigDetail> restrictingConfigDetails = new ArrayList<>();
 		String maxEvidenceAge = "";
 		String unStakeFreezeDuration = "";
 		String zeroProduceCumulativeTime = "";
@@ -124,6 +132,9 @@ public class ExtraServiceImpl implements ExtraService {
 				break;
 			case "reward":
 				rewardConfigDetails.add(configDetail);
+				break;
+			case "restricting":
+				restrictingConfigDetails.add(configDetail);
 				break;
 			default:
 				break;
@@ -184,10 +195,12 @@ public class ExtraServiceImpl implements ExtraService {
 		slashingModuleConfig.setDetail(slashingConfigDetails);
 		blockModuleConfig.setDetail(blockConfigDetails);
 		rewardModuleConfig.setDetail(rewardConfigDetails);
+		restrictingModuleConfig.setDetail(restrictingConfigDetails);
 		moduleConfigs.add(stakingModuleConfig);
 		moduleConfigs.add(slashingModuleConfig);
 		moduleConfigs.add(blockModuleConfig);
 		moduleConfigs.add(rewardModuleConfig);
+		moduleConfigs.add(restrictingModuleConfig);
 		queryConfigResp.setConfig(moduleConfigs);
 		return queryConfigResp;
 	}
