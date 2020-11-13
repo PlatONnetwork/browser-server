@@ -1,6 +1,7 @@
 package com.platon.browser.now.service.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
@@ -251,6 +252,11 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReleased());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSettle()));
 			historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
+
+			// 设置预估解锁块高
+			Long unlockBlockNum = stakingNode.getUnStakeEndBlock();
+			historyStakingListResp.setUnlockBlockNum(unlockBlockNum);
+
 			lists.add(historyStakingListResp);
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
@@ -569,6 +575,12 @@ public class StakingServiceImpl implements StakingService {
 			/** 质押总数=有效的质押+委托 */
 			lockedStakingListResp.setTotalValue(node.getTotalValue().toString());
 			lockedStakingListResp.setDeleAnnualizedRate(node.getDeleAnnualizedRate().toString());
+
+			// 设置预估解锁块高
+			int epoches = node.getZeroProduceFreezeEpoch()+ node.getZeroProduceFreezeDuration();
+			BigInteger unlockBlockNum = blockChainConfig.getSettlePeriodBlockCount().multiply(BigInteger.valueOf(epoches));
+			lockedStakingListResp.setUnlockBlockNum(unlockBlockNum.longValue());
+
 			lists.add(lockedStakingListResp);
 			i++;
 		}
