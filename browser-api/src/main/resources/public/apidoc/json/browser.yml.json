@@ -3,7 +3,7 @@
   "info" : {
     "version" : "0.13.4",
     "title" : "浏览器接口文档",
-    "description" : "1、无分页的数据列表响应<br/>\n{<br/>\n    \"msg\": \"success\",<br/>\n    \"code\": 0,<br/>\n    \"list\": []<br/>\n}<br/>\n\n2、有分页的数据列表响应<br/>\n{<br/>\n  \"msg\": \"success\", // 错误消息<br/>\n  \"code\": 0, // 0-成功，非0-失败<br/>\n  \"page\": { // 分页对象<br/>\n    \"totalCount\": 1,<br/>\n    \"pageSize\": 90,<br/>\n    \"totalPage\": 1,<br/>\n    \"currPage\": 1,<br/>\n    \"list\": [] // 列表数据<br/>\n  }<br/>\n}<br/>\n\n3、详情数据响应<br/>\n{<br/>\n  \"msg\": \"success\", // 错误消息<br/>\n  \"code\": 0, // 0-成功，非0-失败<br/>\n  \"detail\": {}// 详情数据<br/>\n}<br/>\n"
+    "description" : null
   },
   "host" : "localhost:9061",
   "basePath" : "/browser-server",
