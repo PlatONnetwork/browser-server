@@ -21,20 +21,6 @@ sonarqube {
 
 subprojects {
     def shortCommitId = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
-    def bootApps = ['browser-agent','browser-api','browser-common','browser-export','browser-press','browser-sync']
-    if(project.name in bootApps){
-        def testOrMain='main'
-        if(project.name.contains('common')){
-            testOrMain='test'
-        }
-        // 更新应用中的配置文件版本号
-        def appConfTpl = file(projectDir.path+"/conftpl/application.yml")
-        def appConfStr = appConfTpl.text
-                .replace('_VERSION_',"$projectVersion")
-                .replace('_DESCRIPTION_','通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录')
-        file(projectDir.path+"/src/${testOrMain}/resources/application.yml").write(appConfStr)
-    }
-
 
     // 设置编译器使用的编码
     tasks.withType(JavaCompile) {
@@ -92,7 +78,42 @@ subprojects {
 
     }
 
-	//sonar扫描的路径
+    // 配置文件更新&生成
+    def bootApps = ['browser-agent','browser-api','browser-common','browser-export','browser-press','browser-sync']
+    if(project.name in bootApps){
+        def desc='通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录'
+        def tplPath="${projectDir.path}/conftpl/"
+        def mainRes="${projectDir.path}/src/main/resources/"
+        def testRes="${projectDir.path}/src/test/resources/"
+        def tpl = file(projectDir.path+"/conftpl/application.yml")
+        if(tpl.exists()){
+            def txt = tpl.text.replace('_VERSION_',"$projectVersion").replace('_DESCRIPTION_',desc)
+            file("${mainRes}application.yml").write(txt)
+            file("${testRes}application.yml").write(txt)
+        }
+
+        tpl = file("${tplPath}application-dev.yml")
+        if(tpl.exists()){
+            def txt = tpl.text.replace('_VERSION_',"$projectVersion").replace('_DESCRIPTION_',desc)
+                    .replace('_DB_HOST_',"$dbHost")
+                    .replace('_DB_PORT_',"$dbPort")
+                    .replace('_DB_NAME_',"$dbName")
+                    .replace('_DB_USER_',"$dbUser")
+                    .replace('_DB_PASS_',"$dbPass")
+                    .replace('_REDIS_IPS_',"$redisIps")
+                    .replace('_REDIS_PWD_',"$redisPwd")
+                    .replace('_REDIS_DB_',"$redisDb")
+                    .replace('_ES_IPS_',"$esIps")
+                    .replace('_ES_PORT_',"$esPort")
+                    .replace('_ES_USER_',"$esUser")
+                    .replace('_ES_PWD_',"$esPwd")
+            file("${mainRes}application-dev.yml").write(txt)
+            file("${testRes}application-dev.yml").write(txt)
+        }
+    }
+
+
+    //sonar扫描的路径
     sonarqube {
         properties {
             property "sonar.sources", "src/main/java"

@@ -38,22 +38,21 @@ public interface AppDocExtra {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "config":{					//配置详情
-     *       [
-     *       	"module":"Staking",  //模块名
-     *       	"detail":{
-     *       		"name":"",//参数名称
-     *       		"initValue":"",//初始值
-     *       		"staleValue":"",//旧值
-     *       		"value":"",//新值
-     *       		"startValue":"",//开始值
-     *       		"endValue":"",//结束值
-     *       		"start":"[", //是否包含开始
-     *       		"end":")" //是否包含结束
-     *       	}
-     *       ]
-     *       }
-     *    }
+     *       "config":				//配置详情
+		 *       [{
+		 *       	"module":"Staking",  //模块名
+		 *       	"detail":[{
+		 *       		"name":"",//参数名称
+		 *       		"initValue":"",//初始值
+		 *       		"staleValue":"",//旧值
+		 *       		"value":"",//新值
+		 *       		"startValue":"",//开始值
+		 *       		"endValue":"",//结束值
+		 *       		"start":"[", //是否包含开始
+		 *       		"end":")" //是否包含结束
+		 *       	}]
+		 *       }]
+	 *    }
      * }
      */
 	@ApiOperation(value = "extra/queryConfig", nickname = "extra queryConfig", notes = "", response = QueryConfigResp.class, tags = { "Extra" })
