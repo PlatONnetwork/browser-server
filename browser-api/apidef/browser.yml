@@ -649,6 +649,28 @@ paths:
           description: 返回历史节点详情
           schema:
             $ref: '#/definitions/HistoryStakingListResult'
+  /staking/lockedStakingList:
+    post:
+      tags:
+        - 验证人接口
+      summary: 已锁定验证人列表
+      description: |
+        1. 功能：已锁定验证人列表查询<br/>
+        2. 实现逻辑：<br/>
+          查询mysql中node表并关联staking表
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/LockedStakingListParam'
+      responses:
+        '200':
+          description: 返回节点详情
+          schema:
+            $ref: '#/definitions/LockedStakingListResult'
   /staking/stakingDetails:
     post:
       tags:
@@ -738,28 +760,7 @@ paths:
           description: 返回节点详情
           schema:
             $ref: '#/definitions/DelegationListByAddressListResult'
-  /staking/lockedStakingList:
-    post:
-      tags:
-        - 验证人接口
-      summary: 已锁定验证人列表
-      description: |
-        1. 功能：已锁定验证人列表查询<br/>
-        2. 实现逻辑：<br/>
-          查询mysql中node表并关联staking表
-      produces:
-        - application/json
-      parameters:
-        - name: body
-          description: 参数对象
-          in: body
-          schema:
-            $ref: '#/definitions/LockedStakingListParam'
-      responses:
-        '200':
-          description: 返回节点详情
-          schema:
-            $ref: '#/definitions/LockedStakingListResult'
+
   #交易相关接口
   /transaction/transactionList:
     post:
@@ -2253,6 +2254,9 @@ definitions:
       leaveTime:
         description: 退出时间
         type: integer
+      unlockBlockNum:
+        description: 预估解锁块高
+        type: integer
   HistoryStakingListResult:
     type: object
     properties:
@@ -2641,6 +2645,9 @@ definitions:
         type: integer
       blockQty:
         description: 产生的区块数
+        type: integer
+      unlockBlockNum:
+        description: 预估解锁块高
         type: integer
   LockedStakingListResult:
     type: object
