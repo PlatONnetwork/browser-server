@@ -47,7 +47,12 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         params.put("size", pageParams.getSize());
         params.put("offset", pageParams.getOffset());
 
-        List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20Token(params);
+        List<Erc20Token> tokenIdList = this.erc20TokenMapper.listErc20TokenIds(params);
+        if(tokenIdList == null || tokenIdList.size() == 0){
+            return result;
+        }
+        List<Long> tokenIds = tokenIdList.stream().map(Erc20Token::getId).collect(Collectors.toList());
+        List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20TokenByIds(tokenIds);
         int totalCount = this.erc20TokenMapper.totalErc20Token(new HashMap<>());
         if (null == tokenList) {
             return result;

@@ -44,10 +44,7 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -232,14 +229,31 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         /**
          * 倒序查询持有人列表
          */
-        Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
+        /*Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andContractEqualTo(req.getContract());
         example.setOrderByClause(" update_time desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
-        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
+        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);*/
+
+        com.platon.browser.util.PageHelper.PageParams pageParams = com.platon.browser.util.PageHelper.buildPageParams(req);
+        Map params = new HashMap<>();
+        params.put("size", pageParams.getSize());
+        params.put("offset", pageParams.getOffset());
+        params.put("contract", req.getContract());
+        List<Erc20TokenAddressRel> ids = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelIds(params);
+        if (ids == null || ids.size() == 0) {
+            return result;
+        }
+        List<Long> tokenIds = ids.stream().map(Erc20TokenAddressRel::getId).collect(Collectors.toList());
+        List<Erc20TokenAddressRel> erc20TokenAddressRelList = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelByIds(tokenIds);
+        int totalCount = this.customErc20TokenAddressRelMapper.countByContract(params);
+        if (null == erc20TokenAddressRelList) {
+            return result;
+        }
+
         List<QueryTokenHolderListResp> listResps = new ArrayList<>();
-        erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
+        erc20TokenAddressRelList.stream().forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
             BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
             //金额转换成对应的值
@@ -250,14 +264,19 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 queryTokenHolderListResp.setBalance(BigDecimal.ZERO);
             }
             queryTokenHolderListResp.setAddress(erc20TokenAddressRel.getAddress());
-            queryTokenHolderListResp.setPercent(balance.divide(erc20TokenAddressRel.getTotalSupply(), 10, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
+            balance = null == balance ? BigDecimal.ZERO : balance;
+            if (null != erc20TokenAddressRel.getTotalSupply()) {
+                queryTokenHolderListResp.setPercent(balance.divide(erc20TokenAddressRel.getTotalSupply(), 10, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
+            } else {
+                queryTokenHolderListResp.setPercent("0%");
+            }
             listResps.add(queryTokenHolderListResp);
         });
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, listResps);
-        result.setTotalCount(erc20TokenAddressRels.getTotal());
-        result.setDisplayTotalCount(erc20TokenAddressRels.getTotal());
+        result.setTotalCount(totalCount);
+        result.setDisplayTotalCount(erc20TokenAddressRelList.size());
         return result;
     }
 
@@ -270,16 +289,32 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         /**
          * 倒序查询持有人列表
          */
-        PageHelper.startPage(req.getPageNo(), req.getPageSize());
-//        Page<CustomErc20TokenAddressRel> erc20TokenAddressRels = this.customErc20TokenAddressRelMapper.selectByAddress(req.getAddress());
 
+        /*PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andAddressEqualTo(req.getAddress());
         example.setOrderByClause(" update_time desc");
-        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
+        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);*/
+
+        com.platon.browser.util.PageHelper.PageParams pageParams = com.platon.browser.util.PageHelper.buildPageParams(req);
+        Map params = new HashMap<>();
+        params.put("size", pageParams.getSize());
+        params.put("offset", pageParams.getOffset());
+        params.put("address", req.getAddress());
+        List<Erc20TokenAddressRel> ids = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelIds(params);
+        if (ids == null || ids.size() == 0) {
+            return result;
+        }
+        List<Long> tokenIds = ids.stream().map(Erc20TokenAddressRel::getId).collect(Collectors.toList());
+        List<Erc20TokenAddressRel> erc20TokenAddressRelList = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelByIds(tokenIds);
+        int totalCount = this.customErc20TokenAddressRelMapper.countByAddress(params);
+        if (null == erc20TokenAddressRelList) {
+            return result;
+        }
+
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
-        erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
+        erc20TokenAddressRelList.stream().forEach(erc20TokenAddressRel -> {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(erc20TokenAddressRel, queryHolderTokenListResp);
             BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
@@ -294,8 +329,8 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         });
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, listResps);
-        result.setTotalCount(erc20TokenAddressRels.getTotal());
-        result.setDisplayTotalCount(erc20TokenAddressRels.getTotal());
+        result.setTotalCount(totalCount);
+        result.setDisplayTotalCount(erc20TokenAddressRelList.size());
         return result;
     }
 

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CustomErc20TokenAddressRelMapper {
@@ -18,4 +19,12 @@ public interface CustomErc20TokenAddressRelMapper {
     int updateAddressData(@Param("list") List<Erc20TokenAddressRel> list);
 
     int updateAddressBalance(@Param("list") List<Erc20TokenAddressRel> list);
+
+    List<Erc20TokenAddressRel> listErc20TokenAddressRelIds(Map params);
+
+    List<Erc20TokenAddressRel> listErc20TokenAddressRelByIds(List<Long> list);
+
+    int countByContract(Map params);
+
+    int countByAddress(Map params);
 }
