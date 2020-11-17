@@ -46,7 +46,7 @@ public class ESTokenTransferRecordHandler extends AbstractHandler<ESTokenTransfe
             }
             esTokenTransferRecordService.save(stage);
             long endTime = System.currentTimeMillis();
-            printTps("交易", cache.size(), startTime, endTime);
+            printTps("Token交易", cache.size(), startTime, endTime);
             cache.clear();
         } catch (Exception e) {
             log.error("", e);

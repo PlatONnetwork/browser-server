@@ -23,4 +23,5 @@ public class CounterBean {
     private long estimateCount;
 
     private long tokenCount;
+    private long tokenTransferCount;
 }
