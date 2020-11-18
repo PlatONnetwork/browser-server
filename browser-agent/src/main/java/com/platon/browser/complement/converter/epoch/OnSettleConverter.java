@@ -1,6 +1,8 @@
 package com.platon.browser.complement.converter.epoch;
 
+import com.alaya.contracts.ppos.dto.resp.GovernParam;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
@@ -11,15 +13,14 @@ import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.entity.GasEstimateLog;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +30,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -53,20 +52,56 @@ public class OnSettleConverter {
     @Autowired
     private NetworkStatCache networkStatCache;
 
-    // TODO: alaya版本特殊处理版本升级，在结算周期调用proposalContract的getActiveVersion()方法，看返回值是否与本字段值一致，
+    // alaya版本特殊处理版本升级，在结算周期调用proposalContract的getActiveVersion()方法，看返回值是否与本字段值一致，
     // 如果一致，则把检测数据库中是否存在锁仓最小释放金额配置，如果不存在则插入此数据
     @Value("${platon.restrictingMinimumReleaseActiveVersion}")
-    private String restrictingMinimumReleaseActiveVersion;
-    // 最小锁仓释放金额(VON)  M值的治理范围：主网：默认值500 lat [500, 10000000] / Alaya：默认值80 atp [80, 100000]
-    @Value("${platon.restrictingMinimumRelease}")
-    private BigDecimal restrictingMinimumRelease;
-    // 锁仓释放金额范围(VON)
-    @Value("${platon.restrictingMinimumReleaseRange}")
-    private String restrictingMinimumReleaseRange;
+    private BigInteger restrictingMinimumReleaseActiveVersion;
 
-    @PostConstruct
-    private void init(){
-        chainConfig.setRestrictingMinimumRelease(restrictingMinimumRelease);
+    @Resource
+    private ConfigMapper configMapper;
+    @Resource
+    private PlatOnClient platOnClient;
+
+    private void checkRestrictingMinimumReleaseParam(Block block) throws Exception {
+        ConfigExample example = new ConfigExample();
+        String moduleName = ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE.getModule();
+        String paramName = ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE.getName();
+        example.createCriteria().andNameEqualTo(paramName);
+        List<Config> configs = configMapper.selectByExample(example);
+
+        if(configs.isEmpty()){
+            // 检查链上生效版本是否与配置文件中指定的一致，如果一致则插入锁仓最小释放金额参数
+            BigInteger chainVersion = platOnClient.getProposalContract().getActiveVersion().send().getData();
+            if(chainVersion.compareTo(restrictingMinimumReleaseActiveVersion)!=0) return;
+
+            // 如果不存在minimumRelease则从链上查询指定模块的参数插入
+            String restrictingMinimumRelease=null;
+            String restrictingMinimumReleaseDesc = "";
+            List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList(moduleName).send().getData();
+            if(governParamList!=null&&!governParamList.isEmpty()){
+                for (GovernParam e : governParamList) {
+                    if(
+                            ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE.getModule().equals(e.getParamItem().getModule())&&
+                                    ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE.getName().equals(e.getParamItem().getName())
+                    ){
+                        restrictingMinimumRelease = e.getParamValue().getValue();
+                        restrictingMinimumReleaseDesc = e.getParamItem().getDesc();
+                    }
+                }
+            }
+            Config config = new Config();
+            config.setActiveBlock(block.getNum());
+            config.setModule(moduleName);
+            config.setName(paramName);
+            config.setInitValue(restrictingMinimumRelease);
+            config.setStaleValue(restrictingMinimumRelease);
+            config.setValue(restrictingMinimumRelease);
+            config.setRangeDesc(restrictingMinimumReleaseDesc);
+            Date date = new Date();
+            config.setCreateTime(date);
+            config.setUpdateTime(date);
+            configMapper.insert(config);
+        }
     }
 
     public List<NodeOpt> convert(CollectionEvent event, Block block) {
@@ -206,6 +241,13 @@ public class OnSettleConverter {
         gasEstimateEventPublisher.publish(seq,gasEstimates);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
+        try {
+            checkRestrictingMinimumReleaseParam(block);
+        } catch (Exception e) {
+            log.error("检查链上生效版本出错：",e);
+        }
+
         return nodeOpts;
 	}
 
