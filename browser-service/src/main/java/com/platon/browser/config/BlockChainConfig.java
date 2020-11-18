@@ -157,8 +157,6 @@ public class BlockChainConfig {
 
     // 【锁仓】最小释放金额(LAT)
     private BigDecimal restrictingMinimumRelease;
-    // 【锁仓】锁仓释放金额范围
-    private String restrictingMinimumReleaseRange;
 
     /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
@@ -785,11 +783,4 @@ public class BlockChainConfig {
         this.restrictingMinimumRelease = restrictingMinimumRelease;
     }
 
-    public String getRestrictingMinimumReleaseRange() {
-        return restrictingMinimumReleaseRange;
-    }
-
-    public void setRestrictingMinimumReleaseRange(String restrictingMinimumReleaseRange) {
-        this.restrictingMinimumReleaseRange = restrictingMinimumReleaseRange;
-    }
 }
