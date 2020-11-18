@@ -19,6 +19,7 @@ public class ModifiableParam {
     private Slashing slashing;
     private Block block;
     private Reward reward;
+    private Restricting restricting;
 
     public ModifiableParam init(List<Config> configList) {
         this.staking=Staking.builder()
@@ -42,6 +43,7 @@ public class ModifiableParam {
                 .maxBlockGasLimit(BigDecimal.ZERO)
                 .build();
         this.reward=Reward.builder().increaseIssuanceRatio(BigDecimal.ZERO).build();
+        this.restricting=Restricting.builder().minimumRelease(BigDecimal.ZERO).build();
         configList.forEach(config -> {
             ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
             switch (paramEnum){
@@ -93,6 +95,9 @@ public class ModifiableParam {
                 case INCREASE_ISSUANCE_RATIO:
                 	reward.setIncreaseIssuanceRatio(new BigDecimal(config.getValue()));
                     break;
+                case RESTRICTING_MINIMUM_RELEASE:
+                    restricting.setMinimumRelease(new BigDecimal(config.getValue()));
+                    break;
                 default:
                     break;
             }
@@ -131,5 +136,12 @@ public class ModifiableParam {
 	public void setReward(Reward reward) {
 		this.reward = reward;
 	}
-    
+
+    public Restricting getRestricting() {
+        return restricting;
+    }
+
+    public void setRestricting(Restricting restricting) {
+        this.restricting = restricting;
+    }
 }
