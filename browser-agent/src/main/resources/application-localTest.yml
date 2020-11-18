@@ -9,7 +9,7 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/platon_browser_${version}_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://localhost:3306/browser_0.14.0_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: root
     password: root
   #Redis配置
@@ -79,7 +79,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.112.172:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -116,6 +116,12 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 201018
+  #锁仓最小释放金额参数生效版本
+  restrictingMinimumReleaseActiveVersion:
+  #最小锁仓释放金额(VON)  M值的治理范围：主网：默认值500 lat [500, 10000000] / Alaya：默认值80 atp [80, 100000]
+  restrictingMinimumRelease: 80000000000000000000
+  #锁仓释放金额范围(VON)
+  restrictingMinimumReleaseRange: '[80000000000000000000, 100000000000000000000000]'
 
 task:
    #地址统计任务

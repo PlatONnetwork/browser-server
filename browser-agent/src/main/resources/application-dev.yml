@@ -112,7 +112,13 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 108
+  chainId: 201018
+  #锁仓最小释放金额参数生效版本
+  restrictingMinimumReleaseActiveVersion:
+  #最小锁仓释放金额(VON)  M值的治理范围：主网：默认值500 lat [500, 10000000] / Alaya：默认值80 atp [80, 100000]
+  restrictingMinimumRelease: 80000000000000000000
+  #锁仓释放金额范围(VON)
+  restrictingMinimumReleaseRange: '[80000000000000000000, 100000000000000000000000]'
 
 task:
    #地址统计任务

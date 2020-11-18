@@ -25,8 +25,10 @@ import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -50,6 +52,22 @@ public class OnSettleConverter {
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
     @Autowired
     private NetworkStatCache networkStatCache;
+
+    // TODO: alaya版本特殊处理版本升级，在结算周期调用proposalContract的getActiveVersion()方法，看返回值是否与本字段值一致，
+    // 如果一致，则把检测数据库中是否存在锁仓最小释放金额配置，如果不存在则插入此数据
+    @Value("${platon.restrictingMinimumReleaseActiveVersion}")
+    private String restrictingMinimumReleaseActiveVersion;
+    // 最小锁仓释放金额(VON)  M值的治理范围：主网：默认值500 lat [500, 10000000] / Alaya：默认值80 atp [80, 100000]
+    @Value("${platon.restrictingMinimumRelease}")
+    private BigDecimal restrictingMinimumRelease;
+    // 锁仓释放金额范围(VON)
+    @Value("${platon.restrictingMinimumReleaseRange}")
+    private String restrictingMinimumReleaseRange;
+
+    @PostConstruct
+    private void init(){
+        chainConfig.setRestrictingMinimumRelease(restrictingMinimumRelease);
+    }
 
     public List<NodeOpt> convert(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
