@@ -58,6 +58,7 @@ public class ParameterService {
             config.setCreateTime(date);
             config.setUpdateTime(date);
 
+            // TODO: 此块初始值填充逻辑，待SDK升级完成后，需要移到BlockChainConfig中
             ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
             if(paramEnum == ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE){
                 // 如果参数是锁仓最小释放金额，则把blockChainConfig中的锁仓最小释放金额属性设置为当前查询的值

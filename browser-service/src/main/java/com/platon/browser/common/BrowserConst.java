@@ -48,7 +48,7 @@ public class BrowserConst {
 	/**
 	 * lat转换的name名
 	 */
-	public static final String EXTRA_LAT_PARAM = "stakeThreshold,operatingThreshold";
+	public static final String EXTRA_LAT_PARAM = "stakeThreshold,operatingThreshold,minimumRelease";
 
 	/**
 	 * 百分比转换的name名
