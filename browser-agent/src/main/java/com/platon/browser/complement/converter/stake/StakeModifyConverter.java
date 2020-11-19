@@ -54,7 +54,8 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         		.details(txParam.getDetails())
         		.isInit(isInit(txParam.getBenefitAddress())) 
         		.stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
-                .delegateRewardPer(txParam.getDelegateRewardPer())
+                .nextRewardPer(txParam.getDelegateRewardPer())
+                .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
         
 
@@ -80,10 +81,10 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         /**
          * 参数有值且与初始不相等的情况下设置desc
          */
-        if(txParam.getDelegateRewardPer() != null && !String.valueOf(businessParam.getDelegateRewardPer()).equals(preDelegateRewardRate)) {
+        if(txParam.getDelegateRewardPer() != null && !String.valueOf(businessParam.getNextRewardPer()).equals(preDelegateRewardRate)) {
         	desc = NodeOpt.TypeEnum.MODIFY.getTpl()
                     .replace("BEFORERATE",preDelegateRewardRate)
-                    .replace("AFTERRATE",String.valueOf(businessParam.getDelegateRewardPer()));
+                    .replace("AFTERRATE",String.valueOf(businessParam.getNextRewardPer()));
         }
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();

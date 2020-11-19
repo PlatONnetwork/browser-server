@@ -2376,6 +2376,126 @@ public class StakingHistoryExample {
             return (Criteria) this;
         }
 
+        public Criteria andNextRewardPerIsNull() {
+            addCriterion("next_reward_per is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerIsNotNull() {
+            addCriterion("next_reward_per is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerEqualTo(Integer value) {
+            addCriterion("next_reward_per =", value, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerNotEqualTo(Integer value) {
+            addCriterion("next_reward_per <>", value, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerGreaterThan(Integer value) {
+            addCriterion("next_reward_per >", value, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerGreaterThanOrEqualTo(Integer value) {
+            addCriterion("next_reward_per >=", value, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerLessThan(Integer value) {
+            addCriterion("next_reward_per <", value, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerLessThanOrEqualTo(Integer value) {
+            addCriterion("next_reward_per <=", value, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerIn(List<Integer> values) {
+            addCriterion("next_reward_per in", values, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerNotIn(List<Integer> values) {
+            addCriterion("next_reward_per not in", values, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerBetween(Integer value1, Integer value2) {
+            addCriterion("next_reward_per between", value1, value2, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerNotBetween(Integer value1, Integer value2) {
+            addCriterion("next_reward_per not between", value1, value2, "nextRewardPer");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochIsNull() {
+            addCriterion("next_reward_per_mod_epoch is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochIsNotNull() {
+            addCriterion("next_reward_per_mod_epoch is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochEqualTo(Integer value) {
+            addCriterion("next_reward_per_mod_epoch =", value, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochNotEqualTo(Integer value) {
+            addCriterion("next_reward_per_mod_epoch <>", value, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochGreaterThan(Integer value) {
+            addCriterion("next_reward_per_mod_epoch >", value, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochGreaterThanOrEqualTo(Integer value) {
+            addCriterion("next_reward_per_mod_epoch >=", value, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochLessThan(Integer value) {
+            addCriterion("next_reward_per_mod_epoch <", value, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochLessThanOrEqualTo(Integer value) {
+            addCriterion("next_reward_per_mod_epoch <=", value, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochIn(List<Integer> values) {
+            addCriterion("next_reward_per_mod_epoch in", values, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochNotIn(List<Integer> values) {
+            addCriterion("next_reward_per_mod_epoch not in", values, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochBetween(Integer value1, Integer value2) {
+            addCriterion("next_reward_per_mod_epoch between", value1, value2, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextRewardPerModEpochNotBetween(Integer value1, Integer value2) {
+            addCriterion("next_reward_per_mod_epoch not between", value1, value2, "nextRewardPerModEpoch");
+            return (Criteria) this;
+        }
+
         public Criteria andHaveDeleRewardIsNull() {
             addCriterion("have_dele_reward is null");
             return (Criteria) this;

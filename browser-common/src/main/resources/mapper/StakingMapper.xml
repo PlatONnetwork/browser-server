@@ -38,6 +38,8 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="reward_per" jdbcType="INTEGER" property="rewardPer" />
+    <result column="next_reward_per" jdbcType="INTEGER" property="nextRewardPer" />
+    <result column="next_reward_per_mod_epoch" jdbcType="INTEGER" property="nextRewardPerModEpoch" />
     <result column="have_dele_reward" jdbcType="DECIMAL" property="haveDeleReward" />
     <result column="pre_dele_annualized_rate" jdbcType="DOUBLE" property="preDeleAnnualizedRate" />
     <result column="dele_annualized_rate" jdbcType="DOUBLE" property="deleAnnualizedRate" />
@@ -117,9 +119,9 @@
     leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, stat_delegate_locked, 
     stat_delegate_released, block_reward_value, predict_staking_reward, staking_reward_value, 
     fee_reward_value, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time, 
-    reward_per, have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward, 
-    exception_status, un_stake_freeze_duration, un_stake_end_block, zero_produce_freeze_duration, 
-    zero_produce_freeze_epoch, low_rate_slash_count
+    reward_per, next_reward_per, next_reward_per_mod_epoch, have_dele_reward, pre_dele_annualized_rate, 
+    dele_annualized_rate, total_dele_reward, exception_status, un_stake_freeze_duration, 
+    un_stake_end_block, zero_produce_freeze_duration, zero_produce_freeze_epoch, low_rate_slash_count
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -187,12 +189,12 @@
       block_reward_value, predict_staking_reward, 
       staking_reward_value, fee_reward_value, cur_cons_block_qty, 
       pre_cons_block_qty, create_time, update_time, 
-      reward_per, have_dele_reward, pre_dele_annualized_rate, 
-      dele_annualized_rate, total_dele_reward, exception_status, 
-      un_stake_freeze_duration, un_stake_end_block, 
-      zero_produce_freeze_duration, zero_produce_freeze_epoch, 
-      low_rate_slash_count, annualized_rate_info
-      )
+      reward_per, next_reward_per, next_reward_per_mod_epoch, 
+      have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, 
+      total_dele_reward, exception_status, un_stake_freeze_duration, 
+      un_stake_end_block, zero_produce_freeze_duration, 
+      zero_produce_freeze_epoch, low_rate_slash_count, 
+      annualized_rate_info)
     values (#{nodeId,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{stakingTxIndex,jdbcType=INTEGER}, 
       #{stakingHes,jdbcType=DECIMAL}, #{stakingLocked,jdbcType=DECIMAL}, #{stakingReduction,jdbcType=DECIMAL}, 
       #{stakingReductionEpoch,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, #{nodeIcon,jdbcType=VARCHAR}, 
@@ -205,12 +207,12 @@
       #{blockRewardValue,jdbcType=DECIMAL}, #{predictStakingReward,jdbcType=DECIMAL}, 
       #{stakingRewardValue,jdbcType=DECIMAL}, #{feeRewardValue,jdbcType=DECIMAL}, #{curConsBlockQty,jdbcType=BIGINT}, 
       #{preConsBlockQty,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{rewardPer,jdbcType=INTEGER}, #{haveDeleReward,jdbcType=DECIMAL}, #{preDeleAnnualizedRate,jdbcType=DOUBLE}, 
-      #{deleAnnualizedRate,jdbcType=DOUBLE}, #{totalDeleReward,jdbcType=DECIMAL}, #{exceptionStatus,jdbcType=INTEGER}, 
-      #{unStakeFreezeDuration,jdbcType=INTEGER}, #{unStakeEndBlock,jdbcType=BIGINT}, 
-      #{zeroProduceFreezeDuration,jdbcType=INTEGER}, #{zeroProduceFreezeEpoch,jdbcType=INTEGER}, 
-      #{lowRateSlashCount,jdbcType=INTEGER}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
-      )
+      #{rewardPer,jdbcType=INTEGER}, #{nextRewardPer,jdbcType=INTEGER}, #{nextRewardPerModEpoch,jdbcType=INTEGER}, 
+      #{haveDeleReward,jdbcType=DECIMAL}, #{preDeleAnnualizedRate,jdbcType=DOUBLE}, #{deleAnnualizedRate,jdbcType=DOUBLE}, 
+      #{totalDeleReward,jdbcType=DECIMAL}, #{exceptionStatus,jdbcType=INTEGER}, #{unStakeFreezeDuration,jdbcType=INTEGER}, 
+      #{unStakeEndBlock,jdbcType=BIGINT}, #{zeroProduceFreezeDuration,jdbcType=INTEGER}, 
+      #{zeroProduceFreezeEpoch,jdbcType=INTEGER}, #{lowRateSlashCount,jdbcType=INTEGER}, 
+      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Staking">
     insert into staking
@@ -322,6 +324,12 @@
       </if>
       <if test="rewardPer != null">
         reward_per,
+      </if>
+      <if test="nextRewardPer != null">
+        next_reward_per,
+      </if>
+      <if test="nextRewardPerModEpoch != null">
+        next_reward_per_mod_epoch,
       </if>
       <if test="haveDeleReward != null">
         have_dele_reward,
@@ -465,6 +473,12 @@
       </if>
       <if test="rewardPer != null">
         #{rewardPer,jdbcType=INTEGER},
+      </if>
+      <if test="nextRewardPer != null">
+        #{nextRewardPer,jdbcType=INTEGER},
+      </if>
+      <if test="nextRewardPerModEpoch != null">
+        #{nextRewardPerModEpoch,jdbcType=INTEGER},
       </if>
       <if test="haveDeleReward != null">
         #{haveDeleReward,jdbcType=DECIMAL},
@@ -618,6 +632,12 @@
       <if test="record.rewardPer != null">
         reward_per = #{record.rewardPer,jdbcType=INTEGER},
       </if>
+      <if test="record.nextRewardPer != null">
+        next_reward_per = #{record.nextRewardPer,jdbcType=INTEGER},
+      </if>
+      <if test="record.nextRewardPerModEpoch != null">
+        next_reward_per_mod_epoch = #{record.nextRewardPerModEpoch,jdbcType=INTEGER},
+      </if>
       <if test="record.haveDeleReward != null">
         have_dele_reward = #{record.haveDeleReward,jdbcType=DECIMAL},
       </if>
@@ -694,6 +714,8 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       reward_per = #{record.rewardPer,jdbcType=INTEGER},
+      next_reward_per = #{record.nextRewardPer,jdbcType=INTEGER},
+      next_reward_per_mod_epoch = #{record.nextRewardPerModEpoch,jdbcType=INTEGER},
       have_dele_reward = #{record.haveDeleReward,jdbcType=DECIMAL},
       pre_dele_annualized_rate = #{record.preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
@@ -747,6 +769,8 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       reward_per = #{record.rewardPer,jdbcType=INTEGER},
+      next_reward_per = #{record.nextRewardPer,jdbcType=INTEGER},
+      next_reward_per_mod_epoch = #{record.nextRewardPerModEpoch,jdbcType=INTEGER},
       have_dele_reward = #{record.haveDeleReward,jdbcType=DECIMAL},
       pre_dele_annualized_rate = #{record.preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
@@ -866,6 +890,12 @@
       <if test="rewardPer != null">
         reward_per = #{rewardPer,jdbcType=INTEGER},
       </if>
+      <if test="nextRewardPer != null">
+        next_reward_per = #{nextRewardPer,jdbcType=INTEGER},
+      </if>
+      <if test="nextRewardPerModEpoch != null">
+        next_reward_per_mod_epoch = #{nextRewardPerModEpoch,jdbcType=INTEGER},
+      </if>
       <if test="haveDeleReward != null">
         have_dele_reward = #{haveDeleReward,jdbcType=DECIMAL},
       </if>
@@ -939,6 +969,8 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       reward_per = #{rewardPer,jdbcType=INTEGER},
+      next_reward_per = #{nextRewardPer,jdbcType=INTEGER},
+      next_reward_per_mod_epoch = #{nextRewardPerModEpoch,jdbcType=INTEGER},
       have_dele_reward = #{haveDeleReward,jdbcType=DECIMAL},
       pre_dele_annualized_rate = #{preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
@@ -989,6 +1021,8 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       reward_per = #{rewardPer,jdbcType=INTEGER},
+      next_reward_per = #{nextRewardPer,jdbcType=INTEGER},
+      next_reward_per_mod_epoch = #{nextRewardPerModEpoch,jdbcType=INTEGER},
       have_dele_reward = #{haveDeleReward,jdbcType=DECIMAL},
       pre_dele_annualized_rate = #{preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
@@ -1015,10 +1049,10 @@
       join_time, leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, 
       stat_delegate_locked, stat_delegate_released, block_reward_value, predict_staking_reward, 
       staking_reward_value, fee_reward_value, cur_cons_block_qty, pre_cons_block_qty, 
-      create_time, update_time, reward_per, have_dele_reward, pre_dele_annualized_rate, 
-      dele_annualized_rate, total_dele_reward, exception_status, un_stake_freeze_duration, 
-      un_stake_end_block, zero_produce_freeze_duration, zero_produce_freeze_epoch, low_rate_slash_count, 
-      annualized_rate_info)
+      create_time, update_time, reward_per, next_reward_per, next_reward_per_mod_epoch, 
+      have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward, 
+      exception_status, un_stake_freeze_duration, un_stake_end_block, zero_produce_freeze_duration, 
+      zero_produce_freeze_epoch, low_rate_slash_count, annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
@@ -1034,7 +1068,8 @@
         #{item.predictStakingReward,jdbcType=DECIMAL}, #{item.stakingRewardValue,jdbcType=DECIMAL}, 
         #{item.feeRewardValue,jdbcType=DECIMAL}, #{item.curConsBlockQty,jdbcType=BIGINT}, 
         #{item.preConsBlockQty,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardPer,jdbcType=INTEGER}, #{item.haveDeleReward,jdbcType=DECIMAL}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardPer,jdbcType=INTEGER}, #{item.nextRewardPer,jdbcType=INTEGER}, 
+        #{item.nextRewardPerModEpoch,jdbcType=INTEGER}, #{item.haveDeleReward,jdbcType=DECIMAL}, 
         #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}, #{item.deleAnnualizedRate,jdbcType=DOUBLE}, 
         #{item.totalDeleReward,jdbcType=DECIMAL}, #{item.exceptionStatus,jdbcType=INTEGER}, 
         #{item.unStakeFreezeDuration,jdbcType=INTEGER}, #{item.unStakeEndBlock,jdbcType=BIGINT}, 
@@ -1166,6 +1201,12 @@
         <if test="'reward_per'.toString() == column.value">
           #{item.rewardPer,jdbcType=INTEGER}
         </if>
+        <if test="'next_reward_per'.toString() == column.value">
+          #{item.nextRewardPer,jdbcType=INTEGER}
+        </if>
+        <if test="'next_reward_per_mod_epoch'.toString() == column.value">
+          #{item.nextRewardPerModEpoch,jdbcType=INTEGER}
+        </if>
         <if test="'have_dele_reward'.toString() == column.value">
           #{item.haveDeleReward,jdbcType=DECIMAL}
         </if>
@@ -1203,4 +1244,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

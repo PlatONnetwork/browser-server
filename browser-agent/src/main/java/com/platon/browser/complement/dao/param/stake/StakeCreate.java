@@ -57,6 +57,8 @@ public class StakeCreate implements BusinessParam {
     private int unStakeFreezeDuration;
     //解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者
     private BigInteger unStakeEndBlock;
+    //质押创建时所属结算周期轮数
+    private int settleEpoch;
 
     @Override
     public BusinessType getBusinessType() {
