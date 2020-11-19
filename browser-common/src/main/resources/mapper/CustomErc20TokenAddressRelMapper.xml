@@ -87,7 +87,7 @@
     <!-- 根据ID查询 -->
     <select id="listErc20TokenAddressRelByIds" resultMap="BaseResultMap">
         select
-        e.contract,e.address,e.name,e.symbol,e.decimal, e.tx_count
+        e.id,e.contract,e.address,e.name,e.symbol,e.decimal, e.tx_count
         from erc20_token_address_rel e where e.id in
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}

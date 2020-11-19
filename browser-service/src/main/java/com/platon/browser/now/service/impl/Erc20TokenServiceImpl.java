@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         params.put("offset", pageParams.getOffset());
 
         List<Erc20Token> tokenIdList = this.erc20TokenMapper.listErc20TokenIds(params);
-        if(tokenIdList == null || tokenIdList.size() == 0){
+        if (tokenIdList == null || tokenIdList.size() == 0) {
             return result;
         }
         List<Long> tokenIds = tokenIdList.stream().map(Erc20Token::getId).collect(Collectors.toList());
@@ -57,8 +58,14 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         if (null == tokenList) {
             return result;
         }
+
+        // 排序：holder id
+        List<Erc20Token> sortedTokenList = tokenList
+                .stream().sorted(Comparator.comparing(Erc20Token::getHolder, Comparator.reverseOrder()).thenComparing(Erc20Token::getId, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
         // convert data
-        List<QueryTokenListResp> queryTokenList = tokenList.parallelStream().filter(p -> p != null).map(p -> {
+        List<QueryTokenListResp> queryTokenList = sortedTokenList.parallelStream().filter(p -> p != null).map(p -> {
             return QueryTokenListResp.fromErc20Token(p);
         }).collect(Collectors.toList());
 

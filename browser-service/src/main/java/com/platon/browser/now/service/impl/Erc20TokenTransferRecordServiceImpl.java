@@ -252,8 +252,13 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
             return result;
         }
 
+        // sorted
+        List<Erc20TokenAddressRel> sortedErc20TokenAddressRelList = erc20TokenAddressRelList
+                .stream().sorted(Comparator.comparing(Erc20TokenAddressRel::getId, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
         List<QueryTokenHolderListResp> listResps = new ArrayList<>();
-        erc20TokenAddressRelList.stream().forEach(erc20TokenAddressRel -> {
+        sortedErc20TokenAddressRelList.stream().forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
             BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
             //金额转换成对应的值
@@ -308,13 +313,19 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         }
         List<Long> tokenIds = ids.stream().map(Erc20TokenAddressRel::getId).collect(Collectors.toList());
         List<Erc20TokenAddressRel> erc20TokenAddressRelList = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelByIds(tokenIds);
+
         int totalCount = this.customErc20TokenAddressRelMapper.countByAddress(params);
         if (null == erc20TokenAddressRelList) {
             return result;
         }
 
+        // 排序：id 倒序（in 使用可能导致随机问题）
+        List<Erc20TokenAddressRel> sortedErc20TokenAddressRelList = erc20TokenAddressRelList
+                .stream().sorted(Comparator.comparing(Erc20TokenAddressRel::getId, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
-        erc20TokenAddressRelList.stream().forEach(erc20TokenAddressRel -> {
+        sortedErc20TokenAddressRelList.stream().forEach(erc20TokenAddressRel -> {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(erc20TokenAddressRel, queryHolderTokenListResp);
             BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
