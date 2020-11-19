@@ -90,6 +90,10 @@ public class Node {
 
     private Integer rewardPer;
 
+    private Integer nextRewardPer;
+
+    private Integer nextRewardPerModEpoch;
+
     private BigDecimal haveDeleReward;
 
     private Double preDeleAnnualizedRate;
@@ -450,6 +454,22 @@ public class Node {
         this.rewardPer = rewardPer;
     }
 
+    public Integer getNextRewardPer() {
+        return nextRewardPer;
+    }
+
+    public void setNextRewardPer(Integer nextRewardPer) {
+        this.nextRewardPer = nextRewardPer;
+    }
+
+    public Integer getNextRewardPerModEpoch() {
+        return nextRewardPerModEpoch;
+    }
+
+    public void setNextRewardPerModEpoch(Integer nextRewardPerModEpoch) {
+        this.nextRewardPerModEpoch = nextRewardPerModEpoch;
+    }
+
     public BigDecimal getHaveDeleReward() {
         return haveDeleReward;
     }
@@ -596,6 +616,8 @@ public class Node {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         rewardPer("reward_per", "rewardPer", "INTEGER", false),
+        nextRewardPer("next_reward_per", "nextRewardPer", "INTEGER", false),
+        nextRewardPerModEpoch("next_reward_per_mod_epoch", "nextRewardPerModEpoch", "INTEGER", false),
         haveDeleReward("have_dele_reward", "haveDeleReward", "DECIMAL", false),
         preDeleAnnualizedRate("pre_dele_annualized_rate", "preDeleAnnualizedRate", "DOUBLE", false),
         deleAnnualizedRate("dele_annualized_rate", "deleAnnualizedRate", "DOUBLE", false),

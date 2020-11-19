@@ -10,7 +10,8 @@
 		`web_site` = #{webSite},
 		`details` = #{details},
 		`is_init` =  #{isInit},
-		`reward_per` = #{delegateRewardPer}
+		`next_reward_per` = #{nextRewardPer},
+		`next_reward_per_mod_epoch` = #{settleEpoch}
 	 where `node_id` = #{nodeId} and `staking_block_num` = #{stakingBlockNum};
 	/*2、node 更新*/
 	update `node` set
@@ -20,7 +21,8 @@
 		`web_site` = #{webSite},
 		`details` = #{details},
 		`is_init` = #{isInit},
-		`reward_per` = #{delegateRewardPer}
+		`next_reward_per` = #{nextRewardPer},
+		`next_reward_per_mod_epoch` = #{settleEpoch}
 	where `node_id` = #{nodeId};
 </update>
 </mapper>

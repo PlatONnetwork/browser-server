@@ -82,6 +82,7 @@ public class StakeCreateConverter extends BusinessParamConverter<NodeOpt> {
 				.delegateRewardPer(txParam.getDelegateRewardPer())
 				.unStakeFreezeDuration(unStakeFreezeDuration.intValue())
 				.unStakeEndBlock(unStakeEndBlock)
+				.settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
 
         stakeBusinessMapper.create(businessParam);
