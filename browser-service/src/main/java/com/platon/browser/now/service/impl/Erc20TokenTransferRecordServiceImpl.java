@@ -13,6 +13,7 @@ import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.dto.transaction.TokenTransferRecordCacheDto;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -20,6 +21,7 @@ import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.erc.ErcService;
 import com.platon.browser.now.service.Erc20TokenTransferRecordService;
+import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.token.QueryHolderTokenListReq;
 import com.platon.browser.req.token.QueryTokenHolderListReq;
 import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
@@ -70,6 +72,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
     private I18nUtil i18n;
 
     @Autowired
+    private StatisticCacheService statisticCacheService;
+
+    @Autowired
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
 
     @Autowired
@@ -86,45 +91,58 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         if (log.isDebugEnabled()) {
             log.debug("~ queryTokenRecordList, params: " + JSON.toJSONString(req));
         }
+
         // logic:
         // 1、合约内部交易列表中，数据存储于ES，列表的获取走ES获取
         // 2、所有查询直接走ES，不进行DB检索
         RespPage<QueryTokenTransferRecordListResp> result = new RespPage<>();
 
-        // construct of params
-        ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+        List<ESTokenTransferRecord> records = new ArrayList<>();
+        long totalCount = 0;
+        long displayTotalCount = 0;
+        if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
+            // 仅分页查询，直接走缓存
+            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = this.statisticCacheService.getTokenTransferRecordCache(req.getPageNo(), req.getPageSize());
+            records = tokenTransferRecordCacheDto.getTransferRecordList();
+            totalCount = tokenTransferRecordCacheDto.getPage().getTotalCount();
+            displayTotalCount = tokenTransferRecordCacheDto.getPage().getTotalPages();
+        } else {
+            // construct of params
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
 
-        ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
+            // condition: txHash/contract/txFrom/transferTo
+            if (StringUtils.isNotEmpty(req.getContract())) {
+                constructor.must(new ESQueryBuilders().terms("contract", Collections.singletonList(req.getContract())));
+            }
+            if (StringUtils.isNotEmpty(req.getAddress())) {
+                constructor.buildMust(new BoolQueryBuilder()
+                        .should(QueryBuilders.termQuery("from", req.getAddress()))
+                        .should(QueryBuilders.termQuery("tto", req.getAddress())));
+            }
+            if (StringUtils.isNotEmpty(req.getTxHash())) {
+                constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
+            }
+            // Set sort field
+            constructor.setDesc("seq");
+            // response filed to show.
+            constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
+                    "tto", "tValue", "decimal", "name", "symbol", "result", "bTime", "fromType", "toType"});
+            try {
+                queryResultFromES = this.esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class,
+                        req.getPageNo(), req.getPageSize());
+                totalCount = queryResultFromES.getTotal();
+                displayTotalCount = queryResultFromES.getTotal();
+            } catch (Exception e) {
+                log.error("检索代币交易列表失败", e);
+                return result;
+            }
 
-        // condition: txHash/contract/txFrom/transferTo
-        if (StringUtils.isNotEmpty(req.getContract())) {
-            constructor.must(new ESQueryBuilders().terms("contract", Collections.singletonList(req.getContract())));
-        }
-        if (StringUtils.isNotEmpty(req.getAddress())) {
-            constructor.buildMust(new BoolQueryBuilder()
-                    .should(QueryBuilders.termQuery("from", req.getAddress()))
-                    .should(QueryBuilders.termQuery("tto", req.getAddress())));
-        }
-        if (StringUtils.isNotEmpty(req.getTxHash())) {
-            constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
-        }
-        // Set sort field
-        constructor.setDesc("seq");
-        // response filed to show.
-        constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
-            "tto", "tValue", "decimal", "name", "symbol", "result", "bTime", "fromType", "toType"});
-        try {
-            queryResultFromES = this.esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class,
-                req.getPageNo(), req.getPageSize());
-        } catch (Exception e) {
-            log.error("检索代币交易列表失败", e);
-            return result;
-        }
-
-        List<ESTokenTransferRecord> records = queryResultFromES.getRsData();
-        if (null == records || records.size() == 0) {
-            log.debug("未检索到有效数据，参数：" + JSON.toJSONString(req));
-            return result;
+            records = queryResultFromES.getRsData();
+            if (null == records || records.size() == 0) {
+                log.debug("未检索到有效数据，参数：" + JSON.toJSONString(req));
+                return result;
+            }
         }
 
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
@@ -135,9 +153,14 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, recordListResp);
-        result.setTotalCount(queryResultFromES.getTotal());
-        result.setDisplayTotalCount(queryResultFromES.getTotal());
+        result.setTotalCount(totalCount);
+        result.setDisplayTotalCount(displayTotalCount);
         return result;
+    }
+
+    public List<ESTokenTransferRecord> queryFromCache(QueryTokenTransferRecordListReq req){
+        TokenTransferRecordCacheDto tokenTransferRecordCacheDto = this.statisticCacheService.getTokenTransferRecordCache(req.getPageNo(), req.getPageSize());
+        return tokenTransferRecordCacheDto.getTransferRecordList();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.platon.browser.now.service.cache;
 
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dto.transaction.TokenTransferRecordCacheDto;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.dto.Block;
 
@@ -43,4 +44,12 @@ public interface StatisticCacheService {
 	 * @return
 	 */
 	public TransactionCacheDto getTransactionCache(Integer pageNum, Integer pageSize);
+
+	/**
+	 * 分页获取代币交易记录列表
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	public TokenTransferRecordCacheDto getTokenTransferRecordCache(Integer pageNum, Integer pageSize);
 }

@@ -3,6 +3,7 @@ package com.platon.browser.queue.handler;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.queue.event.ESTokenTransferRecordEvent;
 import com.platon.browser.service.elasticsearch.EsTokenTransferRecordService;
+import com.platon.browser.service.redis.RedisTransferTokenRecordService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,9 @@ public class ESTokenTransferRecordHandler extends AbstractHandler<ESTokenTransfe
 
     @Autowired
     private EsTokenTransferRecordService esTokenTransferRecordService;
+
+    @Autowired
+    private RedisTransferTokenRecordService redisTransferTokenRecordService;
 
     @Setter
     @Getter
@@ -45,6 +49,7 @@ public class ESTokenTransferRecordHandler extends AbstractHandler<ESTokenTransfe
                 return;
             }
             esTokenTransferRecordService.save(stage);
+            redisTransferTokenRecordService.save(cache, false);
             long endTime = System.currentTimeMillis();
             printTps("Token交易", cache.size(), startTime, endTime);
             cache.clear();

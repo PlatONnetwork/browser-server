@@ -14,4 +14,6 @@ spring:
       transactions: browser:${version}:${profile}:transactions
       #统计信息
       networkStat: browser:${version}:${profile}:networkStat
+      #代币交易
+      innerTx: browser:${version}:${profile}:innerTx
     max-item: 500000
