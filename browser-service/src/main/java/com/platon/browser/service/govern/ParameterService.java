@@ -58,15 +58,6 @@ public class ParameterService {
             config.setCreateTime(date);
             config.setUpdateTime(date);
 
-            // TODO: 此块初始值填充逻辑，待SDK升级完成后，需要移到BlockChainConfig中
-            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
-            if(paramEnum == ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE){
-                // 如果参数是锁仓最小释放金额，则把blockChainConfig中的锁仓最小释放金额属性设置为当前查询的值
-                String minimumRelease = gp.getParamValue().getValue();
-                chainConfig.setRestrictingMinimumRelease(new BigDecimal(minimumRelease));
-                // 接下来的代码就可以从blockChainConfig实例中获取此值了
-            }
-
             // 浏览器刚启动时在BlockChainConfig中调用debugEconomicConfig接口取得链刚启动时的参数
             // 所以从零开始同步时，需要从BlockChainConfig取得初始参数值
             String initValue = getValueInBlockChainConfig(config.getName());
