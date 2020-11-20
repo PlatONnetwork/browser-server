@@ -2,9 +2,9 @@ package com.platon.browser.data;
 
 import com.platon.sdk.contracts.ppos.RestrictingPlanContract;
 import com.platon.sdk.contracts.ppos.dto.CallResponse;
+import com.platon.sdk.contracts.ppos.dto.RestrictingPlan;
 import com.platon.sdk.contracts.ppos.dto.TransactionResponse;
 import com.platon.sdk.contracts.ppos.dto.resp.RestrictingItem;
-import com.platon.sdk.contracts.ppos.dto.resp.RestrictingPlan;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
