@@ -2,9 +2,9 @@ package com.platon.browser.data;
 
 import com.alaya.contracts.ppos.RestrictingPlanContract;
 import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.RestrictingPlan;
 import com.alaya.contracts.ppos.dto.TransactionResponse;
 import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
-import com.alaya.contracts.ppos.dto.resp.RestrictingPlan;
 import org.junit.Before;
 import org.junit.Test;
 import com.alaya.crypto.Credentials;
