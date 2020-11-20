@@ -309,8 +309,9 @@ public class BlockChainConfig {
         this.setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
         //【质押】委托比例调整间隔
         this.setRewardPerChangeInterval(dec.getStaking().getRewardPerChangeInterval().intValue());
-        //【锁仓】最小锁仓释放金额
-        this.setRestrictingMinimumRelease(new BigDecimal(dec.getRestricting().getMinimumRelease()));
+        //【锁仓】最小锁仓释放金额,（debug_economic接口platon版本会返回minimumRelease，alaya版本不会返回minimumRelease
+        // 此值在alaya版本浏览器需要在ParameterService.initConfigTable()中进行设置
+        //this.setRestrictingMinimumRelease(new BigDecimal(dec.getRestricting().getMinimumRelease()));
     }
 
     public ConfigMapper getConfigMapper () {
