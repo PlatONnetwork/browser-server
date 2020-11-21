@@ -425,6 +425,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
     public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ESTokenTransferRecord record) {
         QueryTokenTransferRecordListResp resp = QueryTokenTransferRecordListResp.builder()
+                .seq(record.getSeq())
                 .txHash(record.getHash()).blockNumber(record.getBn())
                 .txFrom(record.getFrom()).contract(record.getContract())
                 .transferTo(record.getTto()).name(record.getName())
