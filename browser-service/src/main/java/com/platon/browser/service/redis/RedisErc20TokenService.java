@@ -27,13 +27,16 @@ public class RedisErc20TokenService extends RedisService<Long> {
         return prefixKey + suffixKey;
     }
 
-    private boolean isInit;
+    private boolean isInit = false;
+    private long lastCheckTime = 0;
 
     public void addTokenCount(long increment) {
-        if (!isInit) {
+        long currentTime = System.currentTimeMillis();
+        if (!isInit || lastCheckTime == 0 || (currentTime - lastCheckTime > 36000)) {
             int count = erc20TokenMapper.totalErc20Token(new HashMap());
             redisTemplate.opsForValue().set(getCacheKey(), count + "");
             isInit = true;
+            lastCheckTime = System.currentTimeMillis();
         }
         redisTemplate.opsForValue().increment(getCacheKey(), increment);
     }
