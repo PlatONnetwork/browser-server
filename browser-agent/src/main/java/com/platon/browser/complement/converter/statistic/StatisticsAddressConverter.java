@@ -13,6 +13,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
+import com.platon.browser.service.redis.RedisErc20TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class StatisticsAddressConverter {
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
     @Autowired
     protected RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    private RedisErc20TokenService dbHelperCache;
 
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
@@ -195,6 +198,8 @@ public class StatisticsAddressConverter {
         int result = 0;
         if (null != params && params.size() != 0) {
             result = this.erc20TokenMapper.batchInsert(params);
+            // 记录新增数据行数
+            dbHelperCache.addTokenCount(params.size());
         }
         if (!erc20TokenUpdateList.isEmpty()) {
             this.customErc20TokenMapper.batchUpdate(erc20TokenUpdateList);

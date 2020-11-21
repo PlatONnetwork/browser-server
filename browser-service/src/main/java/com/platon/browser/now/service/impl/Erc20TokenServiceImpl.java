@@ -10,6 +10,7 @@ import com.platon.browser.req.token.QueryTokenListReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.token.QueryTokenDetailResp;
 import com.platon.browser.res.token.QueryTokenListResp;
+import com.platon.browser.service.redis.RedisErc20TokenService;
 import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,9 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
     @Autowired
     private Erc20TokenDetailMapper erc20TokenDetailMapper;
 
+    @Autowired
+    private RedisErc20TokenService dbHelperCache;
+
     @Override
     public RespPage<QueryTokenListResp> queryTokenList(QueryTokenListReq req) {
         // page params: #{offset}, #{size}
@@ -54,7 +58,8 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         }
         List<Long> tokenIds = tokenIdList.stream().map(Erc20Token::getId).collect(Collectors.toList());
         List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20TokenByIds(tokenIds);
-        int totalCount = this.erc20TokenMapper.totalErc20Token(new HashMap<>());
+        //int totalCount = this.erc20TokenMapper.totalErc20Token(new HashMap<>());
+        long totalCount = dbHelperCache.getTokenCount();
         if (null == tokenList) {
             return result;
         }
@@ -70,7 +75,7 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         }).collect(Collectors.toList());
 
         result.init(queryTokenList, totalCount, tokenList.size(),
-            PageHelper.getPageTotal(totalCount, pageParams.getSize()));
+            PageHelper.getPageTotal(Long.valueOf(totalCount).intValue(), pageParams.getSize()));
         return result;
     }
 
@@ -105,6 +110,8 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
 
     @Override
     public int batchSave(List<Erc20Token> list) {
-        return this.erc20TokenMapper.batchInsert(list);
+        int rows = this.erc20TokenMapper.batchInsert(list);
+        dbHelperCache.addTokenCount(list.size());
+        return rows;
     }
 }
