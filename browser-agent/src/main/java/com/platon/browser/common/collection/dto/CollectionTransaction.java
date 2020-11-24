@@ -17,6 +17,7 @@ import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -65,11 +66,11 @@ public class CollectionTransaction extends Transaction {
     private void initGeneralContractCache(AddressCache addressCache) {
         if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.isEmpty()) {
             addressCache.getEvmContractAddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
+                .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
             addressCache.getWasmContractAddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
+                .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
             addressCache.getEvmErc20ContractAddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
+                .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
         }
     }
 
@@ -87,6 +88,23 @@ public class CollectionTransaction extends Transaction {
             // 如果to地址是内置合约地址，则解码交易输入
             TransactionUtil.resolveInnerContractInvokeTxComplementInfo(this, receipt.getLogs(), ci);
         } else {
+
+            // 检测是否包指定代币的创建事件
+            TransactionReceipt transactionReceipt = new TransactionReceipt();
+            transactionReceipt.setLogs(receipt.getLogs());
+            List<String> contractAddress = ercInterface.getContractFromReceiptByEvents(transactionReceipt);
+            if (null != contractAddress && contractAddress.size() != 0) {
+                for (int i = 0; i < contractAddress.size(); i++) {
+                    ComplementInfo complementInfo = new ComplementInfo();
+                    // 如果to地址为空则是普通合约创建
+                    TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, contractAddress.get(i), platOnClient, complementInfo, log);
+                    TransactionUtil.resolveErcContract(this, complementInfo, contractAddress.get(i), ercInterface, addressCache);
+                    addressCache.updateFirst(contractAddress.get(i), complementInfo);
+                    // 把合约地址添加至缓存
+                    GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contractAddress.get(i), ContractTypeEnum.getEnum(complementInfo.contractType));
+                }
+            }
+
             if (StringUtils.isBlank(this.getTo())) {
                 // 如果to地址为空则是普通合约创建
                 TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, receipt.getContractAddress(),
@@ -112,11 +130,26 @@ public class CollectionTransaction extends Transaction {
                         // 把成功的虚拟交易挂到当前普通合约交易上
                         this.setVirtualTransactions(successVirtualTransactions);
                         // 如果是erc20地址则需要查询转账记录
-                        if (addressCache.isEvmErc20ContractAddress(this.getTo())) {
-                            List<ESTokenTransferRecord> erc20Tokens = TransactionUtil.resolveInnerToken(this, ci,
-                                receipt.getLogs(), ercInterface, addressCache);
-                            this.setEsTokenTransferRecords(erc20Tokens);
-                        }
+                        // 跨合约调用：需要取回执中的地址判定是否有代币交易
+                        List<String> uniAddressList = new ArrayList<>();
+                        receipt.getLogs().stream().forEach(log -> {
+                            if (StringUtils.isEmpty(log.getAddress())) {
+                                return;
+                            }
+                            if (!uniAddressList.contains(log.getAddress())) {
+                                uniAddressList.add(log.getAddress());
+                            }
+                        });
+                        // 提取产生Event的合约地址，并进行解析
+                        uniAddressList.stream().forEach(addr -> {
+                            if (addressCache.isEvmErc20ContractAddress(addr)) {
+                                List<ESTokenTransferRecord> erc20Tokens = TransactionUtil.resolveInnerToken(this, ci,
+                                        receipt.getLogs(), ercInterface, addressCache, addr);
+                                if (erc20Tokens != null && erc20Tokens.size() != 0) {
+                                    this.getEsTokenTransferRecords().addAll((erc20Tokens));
+                                }
+                            }
+                        });
                     }
                 } else {
                     BigInteger value =

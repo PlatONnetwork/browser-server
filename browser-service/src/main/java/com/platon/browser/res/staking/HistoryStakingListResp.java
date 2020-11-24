@@ -22,6 +22,7 @@ public class HistoryStakingListResp {
 	private Integer slashMultiQty;     //多签举报次数
 	private Long leaveTime;      //退出时间
 	private Long blockQty;          //产生的区块数
+	private Long unlockBlockNum; //预估解锁块高
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -77,6 +78,12 @@ public class HistoryStakingListResp {
 	public void setBlockQty(Long blockQty) {
 		this.blockQty = blockQty;
 	}
-	
-	
+
+	public Long getUnlockBlockNum() {
+		return unlockBlockNum;
+	}
+
+	public void setUnlockBlockNum(Long unlockBlockNum) {
+		this.unlockBlockNum = unlockBlockNum;
+	}
 }

@@ -155,6 +155,9 @@ public class BlockChainConfig {
     //【通用】当前增发周期结束区块号
     private BigDecimal issueEpochEndBlockNumber;
 
+    // 【锁仓】最小释放金额(LAT)
+    private BigDecimal restrictingMinimumRelease;
+
     /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
@@ -191,6 +194,9 @@ public class BlockChainConfig {
     private Integer rewardPerChangeInterval;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakingList=new ArrayList<>();
+
+    // 代币定义事件
+    private Map<String, String> eventDefine;
 
     @PostConstruct
     public void init() throws ConfigLoadingException {
@@ -306,6 +312,8 @@ public class BlockChainConfig {
         this.setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
         //【质押】委托比例调整间隔
         this.setRewardPerChangeInterval(dec.getStaking().getRewardPerChangeInterval().intValue());
+        //【锁仓】最小锁仓释放金额
+        this.setRestrictingMinimumRelease(new BigDecimal(dec.getRestricting().getMinimumRelease()));
     }
 
     public ConfigMapper getConfigMapper () {
@@ -772,5 +780,18 @@ public class BlockChainConfig {
 		INNER_CONTRACT_ADDR = iNNER_CONTRACT_ADDR;
 	}
 
-	
+    public Map<String, String> getEventDefine() {
+        return eventDefine;
+    }
+    public void setEventDefine(Map<String, String> eventDefine) {
+        this.eventDefine = eventDefine;
+    }
+
+    public BigDecimal getRestrictingMinimumRelease() {
+        return restrictingMinimumRelease;
+    }
+
+    public void setRestrictingMinimumRelease(BigDecimal restrictingMinimumRelease) {
+        this.restrictingMinimumRelease = restrictingMinimumRelease;
+    }
 }

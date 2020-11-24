@@ -23,9 +23,9 @@
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.13.1.1_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://localhost:3306/browser_0.14.0_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="root"
-                        password="Juzhen123!"/>
+                        password="root"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="../browser-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
@@ -148,7 +148,15 @@
         <table tableName="erc20_token_transfer_record" domainObjectName="Erc20TokenTransferRecord">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>-->
-        <table tableName="erc20_token_address_rel" domainObjectName="Erc20TokenAddressRel">
+        <table tableName="node" domainObjectName="Node">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+        <table tableName="staking" domainObjectName="Staking">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+        <table tableName="staking_history" domainObjectName="StakingHistory">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

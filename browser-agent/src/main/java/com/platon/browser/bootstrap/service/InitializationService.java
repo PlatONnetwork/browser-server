@@ -247,6 +247,8 @@ public class InitializationService {
             staking.setPredictStakingReward(this.epochRetryService.getStakeReward());
 
             staking.setRewardPer(0);
+            staking.setNextRewardPer(0); // 下一结算周期委托奖励比例
+            staking.setNextRewardPerModEpoch(0); // 【下一结算周期委托奖励比例】修改所在结算周期
             staking.setDeleAnnualizedRate(0.0);
             staking.setPreDeleAnnualizedRate(0.0);
             staking.setHaveDeleReward(BigDecimal.ZERO);

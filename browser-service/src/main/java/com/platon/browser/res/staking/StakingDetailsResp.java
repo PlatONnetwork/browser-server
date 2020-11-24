@@ -41,6 +41,7 @@ public class StakingDetailsResp {
     private Boolean isInit;          //是否为初始节点 
     private String deleAnnualizedRate;      //预计委托年收化率（从委托开始计算）
     private String rewardPer;      //委托奖励比例
+    private String nextRewardPer;      //下一结算周期委托奖励比例
     private BigDecimal haveDeleReward;      //节点当前质押已领取委托奖励
     private BigDecimal totalDeleReward;      //节点当前质押累积委托奖励
     private BigDecimal deleRewardRed;      //节点当前质押待领取委托奖励
@@ -217,6 +218,15 @@ public class StakingDetailsResp {
 	public void setRewardPer(String rewardPer) {
 		this.rewardPer = rewardPer;
 	}
+
+	public String getNextRewardPer() {
+		return nextRewardPer;
+	}
+
+	public void setNextRewardPer(String nextRewardPer) {
+		this.nextRewardPer = nextRewardPer;
+	}
+
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public BigDecimal getHaveDeleReward() {
 		return haveDeleReward;

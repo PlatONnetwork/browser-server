@@ -11,7 +11,7 @@ server.port: 9061
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://192.168.16.171:3306/platon_browser_0.13.3.0_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
     username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
     password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
     type: com.alibaba.druid.pool.DruidDataSource
@@ -92,8 +92,8 @@ platon:
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: WS
-    addresses: 192.168.112.172:8788
+    protocol: HTTP
+    addresses: 192.168.112.171:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

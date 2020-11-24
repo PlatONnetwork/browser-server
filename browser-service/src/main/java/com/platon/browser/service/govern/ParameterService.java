@@ -63,7 +63,6 @@ public class ParameterService {
             String initValue = getValueInBlockChainConfig(config.getName());
             config.setInitValue(initValue);
             config.setStaleValue(initValue);
-            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(gp.getParamItem().getName());
             config.setValue(initValue);
             id++;
         }
@@ -102,9 +101,14 @@ public class ParameterService {
         chainConfig.setZeroProduceCumulativeTime(modifiableParam.getSlashing().getZeroProduceCumulativeTime());
         //零出块锁定结算周期数
         chainConfig.setZeroProduceFreezeDuration(modifiableParam.getSlashing().getZeroProduceFreezeDuration());
+        //奖励比例改变周期
         chainConfig.setRewardPerChangeInterval(modifiableParam.getStaking().getRewardPerChangeInterval());
+        //奖励比例最大变更范围+/-xxx
         chainConfig.setRewardPerMaxChangeRange(modifiableParam.getStaking().getRewardPerMaxChangeRange());
+        //增发比例
         chainConfig.setAddIssueRate(modifiableParam.getReward().getIncreaseIssuanceRatio().divide(new BigDecimal(10000)));
+        //锁仓释放最小金额
+        chainConfig.setRestrictingMinimumRelease(modifiableParam.getRestricting().getMinimumRelease());
     }
 
     /**
@@ -178,6 +182,10 @@ public class ParameterService {
                 break;
             case INCREASE_ISSUANCE_RATIO:
                 staleValue = chainConfig.getAddIssueRate().multiply(new BigDecimal(10000)).setScale(0).toPlainString();
+                break;
+            case RESTRICTING_MINIMUM_RELEASE:
+                //最小锁仓释放金额(LAT)
+                staleValue = chainConfig.getRestrictingMinimumRelease().toString();
                 break;
             default:
                 break;

@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: zrj
+profile: dev
 # 密码加密配置
 jasypt:
   encryptor:
@@ -9,14 +9,14 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.16.171:3306/platon_browser_0.14.0_test?useUnicode=true
     username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
     password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
   #Redis配置
   redis:
     cluster:
       max-redirects: 3
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+      nodes: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
     password: platscan
   #ES配置
   elasticsearch:
@@ -26,12 +26,12 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_zrj
-      transactionIndexName: browser_transaction_zrj
-      delegationIndexName: browser_delegation_zrj
-      nodeOptIndexName: browser_nodeopt_zrj
-      delegationRewardIndexName: browser_delegation_reward_zrj
-      innerTxIndexName: browser_inner_tx_zrj
+      blockIndexName: browser_block_${profile}
+      transactionIndexName: browser_transaction_${profile}
+      delegationIndexName: browser_delegation_${profile}
+      nodeOptIndexName: browser_nodeopt_${profile}
+      delegationRewardIndexName: browser_delegation_reward_${profile}
+      innerTxIndexName: browser_inner_tx_${profile}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -113,6 +113,10 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 108
+  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
+  eventDefine: {
+    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
+  }
 
 task:
    #地址统计任务

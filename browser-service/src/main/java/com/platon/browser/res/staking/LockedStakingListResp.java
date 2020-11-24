@@ -9,10 +9,19 @@ package com.platon.browser.res.staking;
  */
 public class LockedStakingListResp extends AliveStakingListResp {
 	private Long leaveTime;      //退出时间
+	private Long unlockBlockNum; //预估解锁块高
 	public Long getLeaveTime() {
 		return leaveTime;
 	}
 	public void setLeaveTime(Long leaveTime) {
 		this.leaveTime = leaveTime;
+	}
+
+	public Long getUnlockBlockNum() {
+		return unlockBlockNum;
+	}
+
+	public void setUnlockBlockNum(Long unlockBlockNum) {
+		this.unlockBlockNum = unlockBlockNum;
 	}
 }
