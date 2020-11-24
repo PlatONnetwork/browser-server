@@ -381,10 +381,10 @@ public class TransactionUtil {
      * @return
      */
     public static List<ESTokenTransferRecord> resolveInnerToken(CollectionTransaction tx, ComplementInfo ci,
-        List<Log> logs, ERCInterface ercInterface, AddressCache addressCache) {
+        List<Log> logs, ERCInterface ercInterface, AddressCache addressCache, String contractAddress) {
         TransactionReceipt transactionReceipt = new TransactionReceipt();
         transactionReceipt.setLogs(logs);
-        transactionReceipt.setContractAddress(tx.getTo());
+        transactionReceipt.setContractAddress(contractAddress);
         List<TransferEvent> transferEvents = ercInterface.getTransferEvents(transactionReceipt);
         List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
         if(transferEvents == null || transferEvents.size() == 0){
@@ -393,16 +393,19 @@ public class TransactionUtil {
         AtomicInteger i = new AtomicInteger();
         if (transferEvents != null) {
             transferEvents.stream().forEach(transferEvent -> {
-                // 转换参数进行设置内部交易
-                ESTokenTransferRecord esTokenTransferRecord =
-                        ESTokenTransferRecord.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
-                                .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
-                                .contract(tx.getTo()).result(1).bTime(tx.getTime()).value(tx.getValue())
-                                .info(transferEvent.getLog().getData()).ctime(new Date()).build();
-                esTokenTransferRecord.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
-                esTokenTransferRecord.setToType(addressCache.getTypeData(transferEvent.getTo()));
-                i.getAndIncrement();
-                esTokenTransferRecords.add(esTokenTransferRecord);
+                // 仅添加与指定的合约地址相同的记录
+                if (transferEvent.getLog().getAddress().equalsIgnoreCase(contractAddress)) {
+                    // 转换参数进行设置内部交易
+                    ESTokenTransferRecord esTokenTransferRecord =
+                            ESTokenTransferRecord.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
+                                    .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
+                                    .contract(contractAddress).result(1).bTime(tx.getTime()).value(tx.getValue())
+                                    .info(transferEvent.getLog().getData()).ctime(new Date()).build();
+                    esTokenTransferRecord.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
+                    esTokenTransferRecord.setToType(addressCache.getTypeData(transferEvent.getTo()));
+                    i.getAndIncrement();
+                    esTokenTransferRecords.add(esTokenTransferRecord);
+                }
             });
         }
         return esTokenTransferRecords;
