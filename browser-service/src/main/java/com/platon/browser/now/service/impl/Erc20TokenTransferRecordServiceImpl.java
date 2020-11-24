@@ -172,7 +172,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 "tto", "tValue", "decimal", "name", "symbol", "result", "bTime", "fromType", "toType"});
         try {
             queryResultFromES = this.esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class,
-                    1, 3000);
+                    1, 30000);
         } catch (Exception e) {
             log.error("检索代币交易列表失败", e);
             return accountDownload;
