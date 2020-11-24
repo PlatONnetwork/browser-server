@@ -195,6 +195,9 @@ public class BlockChainConfig {
     // 初始内置节点信息
     private List<CustomStaking> defaultStakingList=new ArrayList<>();
 
+    // 代币定义事件
+    private Map<String, String> eventDefine;
+
     @PostConstruct
     public void init() throws ConfigLoadingException {
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
@@ -777,6 +780,13 @@ public class BlockChainConfig {
 		INNER_CONTRACT_ADDR = iNNER_CONTRACT_ADDR;
 	}
 
+    public Map<String, String> getEventDefine() {
+        return eventDefine;
+    }
+    public void setEventDefine(Map<String, String> eventDefine) {
+        this.eventDefine = eventDefine;
+    }
+
     public BigDecimal getRestrictingMinimumRelease() {
         return restrictingMinimumRelease;
     }
@@ -784,5 +794,4 @@ public class BlockChainConfig {
     public void setRestrictingMinimumRelease(BigDecimal restrictingMinimumRelease) {
         this.restrictingMinimumRelease = restrictingMinimumRelease;
     }
-
 }
