@@ -107,6 +107,19 @@
     where address = #{address,jdbcType=VARCHAR}
   </select>
 
+  <select id="listErc20TokenIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select id from erc20_token order by holder desc, id desc limit #{offset}, #{size}
+  </select>
+
+  <select id="listErc20TokenByIds" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from erc20_token where id in
+    <foreach collection="list" item="item" separator="," open="(" close=")">
+      #{item}
+    </foreach>
+  </select>
+
   <select id="listErc20Token" parameterType="java.util.Map" resultMap="BaseResultMap">
     select
     t.id, t.address, t.`name`, t.symbol, t.`decimal`, t.total_supply, t.creator, t.tx_hash,t.tx_hash,
