@@ -14,8 +14,5 @@ UPDATE `node` SET next_reward_per=reward_per;
 UPDATE `staking` SET next_reward_per=reward_per;
 UPDATE `staking_history` SET next_reward_per=reward_per;
 
-ALTER TABLE `erc20_token`
-ADD KEY `idx_holder`(`holder`) ;
-ALTER TABLE `erc20_token_address_rel`
-ADD KEY `idx_address`(`address`) ,
-ADD KEY `idx_contract`(`contract`) ;
+ALTER TABLE `erc20_token` ADD KEY `idx_holder`(`holder`) ;
+ALTER TABLE `erc20_token_address_rel` ADD KEY `idx_address`(`address`) , ADD KEY `idx_contract`(`contract`) ;
