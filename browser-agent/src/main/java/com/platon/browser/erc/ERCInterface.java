@@ -5,7 +5,6 @@ import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.dto.ERCData;
 import com.platon.browser.dto.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Transaction;
-
 import java.math.BigInteger;
 import java.util.List;
 
@@ -32,5 +31,13 @@ public interface ERCInterface {
      * @param addressCache
      */
     void initContractData(List<Transaction> transactions, AddressCache addressCache);
+
+    /**
+     *  从配置中特定的Event判定回执中是否存在合约地址
+     *
+     * @param transactionReceipt
+     * @return
+     */
+    List<String> getContractFromReceiptByEvents(TransactionReceipt transactionReceipt);
 
 }
