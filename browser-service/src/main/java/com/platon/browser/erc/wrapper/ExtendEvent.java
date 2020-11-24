@@ -1,17 +1,17 @@
 package com.platon.browser.erc.wrapper;
 
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Utf8String;
-import org.web3j.abi.datatypes.generated.*;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Contract;
-import org.web3j.tx.TransactionManager;
-import org.web3j.tx.gas.GasProvider;
+import com.alaya.abi.solidity.TypeReference;
+import com.alaya.abi.solidity.datatypes.Address;
+import com.alaya.abi.solidity.datatypes.Event;
+import com.alaya.abi.solidity.datatypes.Utf8String;
+import com.alaya.abi.solidity.datatypes.generated.*;
+import com.alaya.crypto.Credentials;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.methods.response.Log;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.alaya.tx.Contract;
+import com.alaya.tx.TransactionManager;
+import com.alaya.tx.gas.GasProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
