@@ -203,9 +203,10 @@ public class TransactionUtilsTest extends AgentTestBase {
         transferEvent2.setValue(BigInteger.TEN);
         transferEvent2.setLog(new Log());
         transferEvents.add(transferEvent2);
+        String contractAddress = "atp19t25777unzaxrwd95a5y42nlkkwma0dv50zqgx";
         when(ercInterface.getTransferEvents(any())).thenReturn(transferEvents);
         TransactionUtil.resolveInnerToken(collectionTransaction, ci, logs,
-                ercInterface, this.addressCache);
+                ercInterface, this.addressCache,contractAddress);
     }
 
 }
