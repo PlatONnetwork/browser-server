@@ -38,3 +38,8 @@ HELP.md
 /bin/
 
 apidoc.zip
+
+browser-agent/out
+browser-api/out
+browser-common/out
+browser-service/out
