@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.service.erc.Erc20RetryService;
+import com.platon.browser.common.utils.CalculateUtils;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
@@ -14,6 +16,7 @@ import com.platon.browser.dto.ERCData;
 import com.platon.browser.dto.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.erc.ERCInterface;
+import com.platon.browser.erc.wrapper.ExtendEvent;
 import com.platon.browser.param.Erc20Param;
 import com.platon.browser.utils.NetworkParms;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +48,9 @@ public class ERCClient implements ERCInterface {
     @Autowired
     private Erc20RetryService erc20RetryService;
 
+    @Autowired
+    private BlockChainConfig blockChainConfig;
+
     private ERC20Client init(String contractAddress) {
         if (StringUtils.isBlank(contractAddress)) {
             throw new RuntimeException("contractAddress is not null");
@@ -64,7 +70,7 @@ public class ERCClient implements ERCInterface {
         } catch (ContractCallException e) {
             log.debug(" not erc contract,{}", contractAddress, e);
         } catch (Exception e) {
-            log.debug(" erc get name error", e);
+            log.error(" erc get name error", e);
         }
         return name;
     }
@@ -248,6 +254,33 @@ public class ERCClient implements ERCInterface {
                 });
                 transaction.setInfo(JSONObject.toJSONString(erc20Params));
             });
+    }
+
+    @Override
+    public List<String> getContractFromReceiptByEvents(TransactionReceipt transactionReceipt) {
+        List<ExtendEvent.EventWrapper> eventWrappers = CalculateUtils.buildEvents(blockChainConfig);
+        if (null == eventWrappers || eventWrappers.size() == 0) {
+            return null;
+        }
+        List<String> contractList = new ArrayList<>();
+        ExtendEvent extendEvent = new ExtendEvent("", this.platOnClient.getWeb3jWrapper().getWeb3j(),
+                new ReadonlyTransactionManager(this.platOnClient.getWeb3jWrapper().getWeb3j(), ""),
+                new DefaultGasProvider(),
+                NetworkParms.getChainId());
+        for (int i = 0; i < eventWrappers.size(); i++) {
+            ExtendEvent.EventWrapper eventWrapper = eventWrappers.get(i);
+            Event event = ExtendEvent.buildEvent(eventWrapper.getEventName(), eventWrapper.getEventDefineList());
+            // 根据地址位置，判定是否为 indexed
+            boolean indexed = eventWrapper.getEventDefineList().get(eventWrapper.getAddressIndex()).isIndexed();
+            List<ExtendEvent.TokenContractResponse> tokenContractResponseList = extendEvent.getContractAddressList(event, transactionReceipt, eventWrapper.getAddressIndex(), indexed);
+            if (tokenContractResponseList != null && tokenContractResponseList.size() != 0) {
+                for (int n = 0; n < tokenContractResponseList.size(); n++) {
+                    contractList.add(tokenContractResponseList.get(n).address);
+                }
+            }
+        }
+        log.info("根据事件解析代币地址，获取到的合约地址为：" + JSON.toJSONString(contractList));
+        return contractList;
     }
 
 }

@@ -33,4 +33,12 @@ public interface ERCInterface {
      */
     void initContractData(List<Transaction> transactions, AddressCache addressCache);
 
+    /**
+     *  从配置中特定的Event判定回执中是否存在合约地址
+     *
+     * @param transactionReceipt
+     * @return
+     */
+    List<String> getContractFromReceiptByEvents(TransactionReceipt transactionReceipt);
+
 }
