@@ -141,7 +141,9 @@ public class CollectionTransaction extends Transaction {
                             if (addressCache.isEvmErc20ContractAddress(addr)) {
                                 List<ESTokenTransferRecord> erc20Tokens = TransactionUtil.resolveInnerToken(this, ci,
                                         receipt.getLogs(), ercInterface, addressCache, addr);
-                                this.getEsTokenTransferRecords().addAll((erc20Tokens));
+                                if (erc20Tokens != null && erc20Tokens.size() != 0) {
+                                    this.getEsTokenTransferRecords().addAll((erc20Tokens));
+                                }
                             }
                         });
                     }
