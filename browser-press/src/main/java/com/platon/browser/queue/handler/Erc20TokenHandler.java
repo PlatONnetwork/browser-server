@@ -3,6 +3,7 @@ package com.platon.browser.queue.handler;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.queue.event.Erc20TokenEvent;
+import com.platon.browser.service.redis.RedisErc20TokenService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,9 @@ public class Erc20TokenHandler extends AbstractHandler<Erc20TokenEvent> {
 
     @Autowired
     private Erc20TokenMapper erc20TokenMapper;
+
+    @Autowired
+    private RedisErc20TokenService dbHelperCache;
 
     @Setter
     @Getter
@@ -42,6 +46,7 @@ public class Erc20TokenHandler extends AbstractHandler<Erc20TokenEvent> {
             if (stage.size() < batchSize) return;
 
             erc20TokenMapper.batchInsert(stage);
+            dbHelperCache.addTokenCount(stage.size());
             long endTime = System.currentTimeMillis();
             printTps("Erc20代币", stage.size(), startTime, endTime);
             stage.clear();

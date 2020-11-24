@@ -1,17 +1,16 @@
 package com.platon.browser.res.token;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Erc20 合约内部转账交易数据
@@ -26,6 +25,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class QueryTokenTransferRecordListResp {
 
+    @ApiModelProperty(value = "序号")
+    private Long seq;
     @ApiModelProperty(value = "交易哈希")
     private String txHash;
     @ApiModelProperty(value = "区块高度")
@@ -60,6 +61,14 @@ public class QueryTokenTransferRecordListResp {
     private Integer fromType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
     @ApiModelProperty(value = "to类型")
     private Integer toType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
+
+    public Long getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Long seq) {
+        this.seq = seq;
+    }
 
     public String getType() {
         return this.type;

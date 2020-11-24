@@ -161,7 +161,7 @@ public class ResTest {
                 .fromType(0).methodSign("").name("").result(0).symbol("").systemTimestamp(0l)
                 .toType(0).txFrom("").txHash("").value(BigDecimal.TEN).transferValue(BigDecimal.TEN)
                 .type("").build();
-        queryTokenTransferRecordListResp = new QueryTokenTransferRecordListResp("", 10l, "", "",
+        queryTokenTransferRecordListResp = new QueryTokenTransferRecordListResp(10l,"", 10l, "", "",
                 "", BigDecimal.TEN, 1, "", "", "", 0, new Date(),
                 BigDecimal.TEN, 10l, "", 0, 00);
         assertNotNull(queryTokenTransferRecordListResp);

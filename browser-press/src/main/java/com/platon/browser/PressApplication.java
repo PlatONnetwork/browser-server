@@ -115,7 +115,8 @@ public class PressApplication implements ApplicationRunner {
     private long tokenMaxCount;
     @Value("${platon.addressCountPerToken}")
     private int addressCountPerToken;
-
+    @Value("${platon.tokenTransferMaxCount}")
+    private long tokenTransferMaxCount;
 
     private long currentNodeSum = 0L;
     private long currentStakeSum = 0L;
@@ -128,6 +129,7 @@ public class PressApplication implements ApplicationRunner {
     private long currentEstimateSum = 0L;
 
     private long currentTokenCount = 0l;
+    private long currentTokenTransferCount = 0l;
 
     public static void main ( String[] args ) {
         SpringApplication.run(PressApplication.class, args);
@@ -149,7 +151,7 @@ public class PressApplication implements ApplicationRunner {
             checkAppStatus(blockNumber);
             // 构造【区块&交易&操作日志】数据
             BlockResult blockResult = makeBlock(blockNumber);
-            // 构造【节点&质押】数据
+            /*// 构造【节点&质押】数据
             makeStake(blockResult);
             // 构造【委托】数据
             makeDelegation(blockResult);
@@ -164,7 +166,7 @@ public class PressApplication implements ApplicationRunner {
             // 构造【委托奖励】数据
             makeReward(blockResult);
             // 构造【gas】数据
-            makeEstimate(blockResult);
+            makeEstimate(blockResult);*/
 
             // 构造【代币】数据
             makeErc20Token(blockResult);
@@ -173,6 +175,12 @@ public class PressApplication implements ApplicationRunner {
 
             // 区块号累加
             blockNumber=blockNumber.add(BigInteger.ONE);
+            log.info("当前块高：" + blockNumber);
+
+            if (blockNumber.intValue() % 1000 == 0) {
+                flushCount(blockNumber);
+            }
+
             /*// 更新网络统计表
             dataGenService.getNetworkStat().setCurNumber(blockNumber.longValue());
             EXECUTOR_SERVICE.submit(()->{
@@ -206,6 +214,7 @@ public class PressApplication implements ApplicationRunner {
             currentSlashSum=counterBean.getSlashCount();
             currentEstimateSum=counterBean.getEstimateCount();
             currentTokenCount = counterBean.getTokenCount();
+            currentTokenTransferCount = counterBean.getTokenTransferCount();
             blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -228,7 +237,7 @@ public class PressApplication implements ApplicationRunner {
             GracefullyUtil.monitor();
         } catch (GracefullyShutdownException | InterruptedException e) {
             log.warn("检测到SHUTDOWN钩子,放弃执行业务逻辑,写入当前状态...");
-            CounterBean counter = new CounterBean();
+            /*CounterBean counter = new CounterBean();
             counter.setBlockCount(blockPublisher.getTotalCount());
             counter.setTransactionCount(transactionPublisher.getTotalCount());
             counter.setNodeOptCount(nodeOptPublisher.getTotalCount());
@@ -244,14 +253,45 @@ public class PressApplication implements ApplicationRunner {
             counter.setSlashCount(currentSlashSum);
             counter.setRewardCount(currentRewardSum);
             counter.setEstimateCount(currentEstimateSum);
+            counter.setTokenCount(currentTokenCount);
             String status = JSON.toJSONString(counter,true);
             File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
                 bw.write(status);
             }
-            log.warn("状态写入完成,可安全停机:{}",status);
+            log.warn("状态写入完成,可安全停机:{}",status);*/
+            flushCount(blockNumber);
             System.exit(0);
         }
+    }
+
+    private void flushCount(BigInteger blockNumber){
+        CounterBean counter = new CounterBean();
+        counter.setBlockCount(blockPublisher.getTotalCount());
+        counter.setTransactionCount(transactionPublisher.getTotalCount());
+        counter.setNodeOptCount(nodeOptPublisher.getTotalCount());
+        counter.setNodeOptMaxId(dataGenService.getNodeOptMaxId());
+        counter.setAddressCount(addressPublisher.getTotalCount());
+        counter.setLastBlockNumber(blockNumber.longValue());
+        counter.setNodeCount(currentNodeSum);
+        counter.setStakingCount(currentStakeSum);
+        counter.setDelegationCount(currentDelegationSum);
+        counter.setProposalCount(currentProposalSum);
+        counter.setVoteCount(currentVoteSum);
+        counter.setRpplanCount(currentRpplanSum);
+        counter.setSlashCount(currentSlashSum);
+        counter.setRewardCount(currentRewardSum);
+        counter.setEstimateCount(currentEstimateSum);
+        counter.setTokenCount(currentTokenCount);
+        counter.setTokenTransferCount(currentTokenTransferCount);
+        String status = JSON.toJSONString(counter,true);
+        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
+            bw.write(status);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        log.warn("状态写入完成,可安全停机:{}",status);
     }
 
     /**
@@ -482,13 +522,16 @@ public class PressApplication implements ApplicationRunner {
     /**
      * 构建代币转账交易
      */
-    private void makeTokenTransferRecord(BlockResult blockResult){
-        List<ESTokenTransferRecord> transferRecordList = new ArrayList<>();
-        for (Transaction tx : blockResult.getTransactionList()) {
-            if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
-                transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
+    private void makeTokenTransferRecord(BlockResult blockResult) {
+        if (currentTokenTransferCount < tokenTransferMaxCount) {
+            List<ESTokenTransferRecord> transferRecordList = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
+                    transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
+                    currentTokenTransferCount++;
+                }
             }
+            esTokenTransferRecordPublisher.publish(transferRecordList);
         }
-        esTokenTransferRecordPublisher.publish(transferRecordList);
     }
 }

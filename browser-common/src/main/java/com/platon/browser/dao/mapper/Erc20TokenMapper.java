@@ -21,6 +21,10 @@ public interface Erc20TokenMapper {
 
     List<Erc20Token> listErc20Token(Map params);
 
+    List<Erc20Token> listErc20TokenIds(Map params);
+
+    List<Erc20Token> listErc20TokenByIds(List<Long> list);
+
     int totalErc20Token(Map params);
 
     int updateByPrimaryKeySelective(Erc20Token record);

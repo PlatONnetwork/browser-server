@@ -41,6 +41,7 @@ public class Erc20TokenAddressRelHandler extends AbstractHandler<Erc20TokenAddre
             stage.addAll(event.getErc20TokenAddressRelList());
             if (stage.size() < batchSize) return;
             int round = stage.size() / batchSize;
+            log.info("合约地址关系，准备开始入库，数量：{}", stage.size());
             for (int i = 0; i < round; i++) {
                 List<Erc20TokenAddressRel> saveEle = stage.subList(i * batchSize, i * batchSize + batchSize);
                 erc20TokenAddressRelMapper.batchInsert(saveEle);
@@ -48,6 +49,7 @@ public class Erc20TokenAddressRelHandler extends AbstractHandler<Erc20TokenAddre
             if (stage.size() > round * batchSize) {
                 erc20TokenAddressRelMapper.batchInsert(stage.subList(round * batchSize, stage.size()));
             }
+            log.info("合约地址关系，结束入库完成，数量：{}", stage.size());
             long endTime = System.currentTimeMillis();
             printTps("Erc20代币与地址关系", stage.size(), startTime, endTime);
             stage.clear();

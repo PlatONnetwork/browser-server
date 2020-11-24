@@ -10,6 +10,7 @@ import com.platon.browser.req.token.QueryTokenListReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.token.QueryTokenDetailResp;
 import com.platon.browser.res.token.QueryTokenListResp;
+import com.platon.browser.service.redis.RedisErc20TokenService;
 import com.platon.browser.util.ConvertUtil;
 import com.platon.browser.util.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,9 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
     @Autowired
     private Erc20TokenDetailMapper erc20TokenDetailMapper;
 
+    @Autowired
+    private RedisErc20TokenService dbHelperCache;
+
     @Override
     public RespPage<QueryTokenListResp> queryTokenList(QueryTokenListReq req) {
         // page params: #{offset}, #{size}
@@ -47,18 +52,30 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         params.put("size", pageParams.getSize());
         params.put("offset", pageParams.getOffset());
 
-        List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20Token(params);
-        int totalCount = this.erc20TokenMapper.totalErc20Token(new HashMap<>());
+        List<Erc20Token> tokenIdList = this.erc20TokenMapper.listErc20TokenIds(params);
+        if (tokenIdList == null || tokenIdList.size() == 0) {
+            return result;
+        }
+        List<Long> tokenIds = tokenIdList.stream().map(Erc20Token::getId).collect(Collectors.toList());
+        List<Erc20Token> tokenList = this.erc20TokenMapper.listErc20TokenByIds(tokenIds);
+        //int totalCount = this.erc20TokenMapper.totalErc20Token(new HashMap<>());
+        long totalCount = dbHelperCache.getTokenCount();
         if (null == tokenList) {
             return result;
         }
+
+        // 排序：holder id
+        List<Erc20Token> sortedTokenList = tokenList
+                .stream().sorted(Comparator.comparing(Erc20Token::getHolder, Comparator.reverseOrder()).thenComparing(Erc20Token::getId, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
         // convert data
-        List<QueryTokenListResp> queryTokenList = tokenList.parallelStream().filter(p -> p != null).map(p -> {
+        List<QueryTokenListResp> queryTokenList = sortedTokenList.parallelStream().filter(p -> p != null).map(p -> {
             return QueryTokenListResp.fromErc20Token(p);
         }).collect(Collectors.toList());
 
         result.init(queryTokenList, totalCount, tokenList.size(),
-            PageHelper.getPageTotal(totalCount, pageParams.getSize()));
+            PageHelper.getPageTotal(Long.valueOf(totalCount).intValue(), pageParams.getSize()));
         return result;
     }
 
@@ -93,6 +110,8 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
 
     @Override
     public int batchSave(List<Erc20Token> list) {
-        return this.erc20TokenMapper.batchInsert(list);
+        int rows = this.erc20TokenMapper.batchInsert(list);
+        dbHelperCache.addTokenCount(list.size());
+        return rows;
     }
 }

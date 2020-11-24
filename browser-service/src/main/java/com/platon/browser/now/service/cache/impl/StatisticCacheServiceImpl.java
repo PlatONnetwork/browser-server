@@ -3,8 +3,10 @@ package com.platon.browser.now.service.cache.impl;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.RedisFactory;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dto.transaction.TokenTransferRecordCacheDto;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.util.I18nUtil;
@@ -39,6 +41,10 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	/** 统计缓存key */
 	@Value("${spring.redis.key.networkStat}")
 	private String networkStatCacheKey;
+
+	/** 代币交易缓存key */
+	@Value("${spring.redis.key.innerTx}")
+	private String innerTxCacheKey;
 
 	/** 最大item数目*/
 	@Value("${spring.redis.max-item}")
@@ -97,4 +103,16 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 		return blockRedisList;
 	}
 
+	@Override
+	public TokenTransferRecordCacheDto getTokenTransferRecordCache(Integer pageNum, Integer pageSize) {
+		/* 分页根据key来获取交易数据  */
+		CachePageInfo<Class<ESTokenTransferRecord>> cpi = this.getCachePageInfo(innerTxCacheKey, pageNum, pageSize, i18n, maxItemNum, redisFactory);
+		List<ESTokenTransferRecord> esTokenTransferRecordList = new LinkedList<>();
+		cpi.data.forEach(str -> {
+			/* 获取数据转换成对象 */
+			ESTokenTransferRecord tokenTransferRedis = JSON.parseObject(str, ESTokenTransferRecord.class);
+			esTokenTransferRecordList.add(tokenTransferRedis);
+		});
+		return new TokenTransferRecordCacheDto(esTokenTransferRecordList, cpi.page);
+	}
 }
