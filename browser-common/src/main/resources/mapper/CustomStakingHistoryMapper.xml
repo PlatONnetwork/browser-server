@@ -119,6 +119,12 @@
         <if test="'reward_per'.toString() == column.value">
           #{item.rewardPer,jdbcType=INTEGER}
         </if>
+        <if test="'next_reward_per'.toString() == column.value">
+          #{item.nextRewardPer,jdbcType=INTEGER}
+        </if>
+        <if test="'next_reward_per_mod_epoch'.toString() == column.value">
+          #{item.nextRewardPerModEpoch,jdbcType=INTEGER}
+        </if>
         <if test="'have_dele_reward'.toString() == column.value">
           #{item.haveDeleReward,jdbcType=DECIMAL}
         </if>
