@@ -25,24 +25,27 @@ public interface InnerContractDecoder {
 
     static BigInteger bigIntegerResolver(RlpString rlpString) {
         RlpList integersList = RlpDecoder.decode(rlpString.getBytes());
+        if(integersList.getValues().isEmpty()) return null;
         RlpString integersString = (RlpString) integersList.getValues().get(0);
         return new BigInteger(1, integersString.getBytes());
     }
 
     static String stringResolver(RlpString rlpString) {
         RlpList stringsList = RlpDecoder.decode(rlpString.getBytes());
+        if(stringsList.getValues().isEmpty()) return null;
         RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
         return Numeric.toHexString(stringsListString.getBytes());
     }
     
     static String addressResolver(RlpString rlpString) {
         RlpList stringsList = RlpDecoder.decode(rlpString.getBytes());
+        if (stringsList.getValues().isEmpty()) return null;
         RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
         /**
          * 判断是否为主网
          */
         String hrp = NetworkParameters.TestNetParams.getHrp();
-        if(NetworkParms.getChainId() == 100l) {
+        if(NetworkParms.getChainId() == NetworkParameters.MainNetParams.getChainId()) {
         	hrp = NetworkParameters.MainNetParams.getHrp();
         }
         return Bech32.addressEncode(hrp,Numeric.toHexString(stringsListString.getBytes()));

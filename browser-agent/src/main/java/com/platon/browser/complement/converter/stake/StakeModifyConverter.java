@@ -52,12 +52,12 @@ public class StakeModifyConverter extends BusinessParamConverter<NodeOpt> {
         		.benefitAddr(txParam.getBenefitAddress())
         		.webSite(txParam.getWebsite())
         		.details(txParam.getDetails())
-        		.isInit(isInit(txParam.getBenefitAddress())) 
+        		.isInit(isInit(txParam.getBenefitAddress()))
         		.stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
                 .nextRewardPer(txParam.getDelegateRewardPer())
                 .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
-        
+
 
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(txParam.getNodeId());

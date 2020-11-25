@@ -2,6 +2,7 @@ package com.platon.browser.util.decode.innercontract;
 
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.param.TxParam;
+import org.apache.commons.lang3.StringUtils;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.utils.Numeric;
@@ -22,7 +23,7 @@ public class StakeModifyDecoder {
     static TxParam decode(RlpList rootList) {
         // 修改质押信息
         //用于接受出块奖励和质押奖励的收益账户
-        String address = addressResolver((RlpString) rootList.getValues().get(1));
+        String benefitAddress = addressResolver((RlpString) rootList.getValues().get(1));
         //被质押的节点的NodeId
         String nodeId = stringResolver((RlpString) rootList.getValues().get(2));
         //外部Id
@@ -42,12 +43,12 @@ public class StakeModifyDecoder {
 
         return StakeModifyParam.builder()
                 .nodeId(nodeId)
-                .benefitAddress(address)
-                .externalId("0x".equals(externalId)?"":externalId)
-                .nodeName(nodeName)
-                .website(website)
-                .details(detail)
-                .delegateRewardPer(rewardPer.intValue()) // 非必填
+                .benefitAddress(StringUtils.isBlank(benefitAddress)?null:benefitAddress) // 非必填
+                .externalId("0x".equals(externalId)?"":StringUtils.isBlank(externalId)?null:externalId) // 非必填
+                .nodeName(StringUtils.isBlank(nodeName)?null:nodeName) // 非必填
+                .website(StringUtils.isBlank(website)?null:website) // 非必填
+                .details(StringUtils.isBlank(detail)?null:detail) // 非必填
+                .delegateRewardPer(rewardPer==null?null:rewardPer.intValue()) // 非必填
                 .build();
     }
 }
