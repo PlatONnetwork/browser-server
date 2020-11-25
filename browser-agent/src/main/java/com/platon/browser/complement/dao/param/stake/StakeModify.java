@@ -36,7 +36,7 @@ public class StakeModify implements BusinessParam {
     //质押所在区块号
     private BigInteger stakingBlockNum;
     //委托奖励比例
-    private int nextRewardPer;
+    private Integer nextRewardPer;
     //质押修改时所属结算周期轮数
     private int settleEpoch;
 

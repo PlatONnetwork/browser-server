@@ -44,19 +44,19 @@ import java.util.List;
  * @Description:
  */
 public class TransactionSender {
-	private static Long chainId = 108l;
+	private static Long chainId = 201018l;
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
+    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:6778"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:5789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
-    private Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
+    private static  Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
 //    private Credentials credentials1 = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
-    private Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
-    NodeContract nodeContract = NodeContract.load(currentValidWeb3j,chainId);
-    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
-    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
-    RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);
-    ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
+    private static Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
+    private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j,chainId);
+    private static StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
+    private static DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
+    private static RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);
+    private static ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
     private String stakingPubKey = "0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
     private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 
@@ -183,14 +183,32 @@ public class TransactionSender {
     }
 
 
-    public static void main(String[] args) throws IOException, CipherException {
-    	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
-//    	Credentials credentials = WalletUtils.loadCredentials("11111111", "D:\\blockchain\\file\\60ceca9c1290ee56b98d4e160ef0453f7c40d219");
-    	byte[] byteArray = credentials.getEcKeyPair().getPrivateKey().toByteArray();
-        String privateKey = Hex.toHexString(byteArray);
-        logger.debug("Private Key:{}",privateKey);
-//    	Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
-//    	WalletUtils.generateWalletFile("88888888", credentials.getEcKeyPair(), new File("d://"), true);
+    public static void main(String[] args) throws Exception {
+        TransactionSender ts = new TransactionSender();
+
+
+        UpdateStakingParam.Builder uBuilder = new UpdateStakingParam.Builder();
+//        uBuilder.setBenifitAddress("atp1cy2uat0eukfrxv897s5s8lnljfka5ewjj943gf");
+        uBuilder.setDetails("Node of CDM");
+//        uBuilder.setExternalId("5FD68B690010632B");
+        uBuilder.setNodeId("0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
+//        uBuilder.setNodeName("cdm-004");
+//        uBuilder.setWebSite("WWW.CCC.COM");
+        uBuilder.setRewardPer(new BigInteger("950"));
+        UpdateStakingParam updateStakingParam = new UpdateStakingParam(uBuilder);
+        TransactionResponse res = stakingContract.updateStakingInfo(updateStakingParam).send();
+        logger.debug("res:{}",res);
+
+
+
+
+//    	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
+////    	Credentials credentials = WalletUtils.loadCredentials("11111111", "D:\\blockchain\\file\\60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+//    	byte[] byteArray = credentials.getEcKeyPair().getPrivateKey().toByteArray();
+//        String privateKey = Hex.toHexString(byteArray);
+//        logger.debug("Private Key:{}",privateKey);
+////    	Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
+////    	WalletUtils.generateWalletFile("88888888", credentials.getEcKeyPair(), new File("d://"), true);
     }
 
     //提案交易
