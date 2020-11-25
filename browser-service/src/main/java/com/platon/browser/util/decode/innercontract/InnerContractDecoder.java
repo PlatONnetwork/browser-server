@@ -45,7 +45,7 @@ public interface InnerContractDecoder {
          * 判断是否为主网
          */
         String hrp = NetworkParameters.TestNetParams.getHrp();
-        if(NetworkParms.getChainId() == NetworkParameters.MainNetParams.getChainId()) {
+        if(NetworkParms.getChainId().compareTo(NetworkParameters.MainNetParams.getChainId())==0) {
         	hrp = NetworkParameters.MainNetParams.getHrp();
         }
         return Bech32.addressEncode(hrp,Numeric.toHexString(stringsListString.getBytes()));
