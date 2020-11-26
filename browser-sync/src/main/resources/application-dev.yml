@@ -34,6 +34,9 @@ paging:
   transaction:
     pageSize: 2000
     pageCount: 250
+  erc20-transaction:
+    pageSize: 2000
+    pageCount: 250
 
 #PlatOn相关配置
 platon:
