@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
+import com.platon.browser.service.redis.RedisErc20TokenService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +51,8 @@ public class StatisticsAddressConverterTest extends AgentTestBase {
     private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
     @Mock
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
+    @Mock
+    private RedisErc20TokenService dbHelperCache;
 
     @Spy
     private StatisticsAddressConverter target;
@@ -57,6 +60,7 @@ public class StatisticsAddressConverterTest extends AgentTestBase {
 
     @Before
     public void setup() throws Exception {
+        ReflectionTestUtils.setField(this.target, "dbHelperCache", this.dbHelperCache);
         ReflectionTestUtils.setField(this.target, "addressCache", this.addressCache);
         ReflectionTestUtils.setField(this.target, "statisticBusinessMapper", this.statisticBusinessMapper);
         ReflectionTestUtils.setField(this.target, "addressMapper", this.addressMapper);
