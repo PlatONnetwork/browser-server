@@ -9,8 +9,10 @@ import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.dto.transaction.TokenTransferRecordCacheDto;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.token.QueryHolderTokenListReq;
 import com.platon.browser.req.token.QueryTokenHolderListReq;
 import com.platon.browser.req.token.QueryTokenTransferRecordListReq;
@@ -55,12 +57,15 @@ public class Erc20TokenTransferServiceTest extends TestMockBase {
 	private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
 	@Mock
 	private DownFileCommon downFileCommon;
+	@Mock
+	private StatisticCacheService statisticCacheService;
 
 	@Spy
 	private Erc20TokenTransferRecordServiceImpl target;
 
 	@Before
 	public void setup() {
+		ReflectionTestUtils.setField(this.target, "statisticCacheService", this.statisticCacheService);
 		ReflectionTestUtils.setField(this.target, "erc20TokenMapper", this.erc20TokenMapper);
 		ReflectionTestUtils.setField(this.target, "erc20TokenTransferRecordMapper", this.erc20TokenTransferRecordMapper);
 		ReflectionTestUtils.setField(this.target, "esTokenTransferRecordRepository", this.esTokenTransferRecordRepository);
@@ -85,6 +90,14 @@ public class Erc20TokenTransferServiceTest extends TestMockBase {
 		queryResultFromES.setRsData(this.esTokenTransferRecords);
 		queryResultFromES.setTotal(3l);
 		doReturn(queryResultFromES).when(this.esTokenTransferRecordRepository).search(any(), any(), anyInt(), anyInt());
+		TokenTransferRecordCacheDto trrcd = new TokenTransferRecordCacheDto();
+		trrcd.setTransferRecordList(new ArrayList<>());
+		RespPage page = new RespPage();
+		page.setTotalCount(500);
+		page.setTotalPages(40);
+		trrcd.setPage(page);
+
+		when(statisticCacheService.getTokenTransferRecordCache(any(),any())).thenReturn(trrcd);
 		RespPage<QueryTokenTransferRecordListResp> queryTokenListResp = this.target.queryTokenRecordList(req);
 		req.setAddress("lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj");
 		queryTokenListResp = this.target.queryTokenRecordList(req);
