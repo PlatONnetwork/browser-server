@@ -1,4 +1,6 @@
+CREATE DATABASE `platon_browser` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+USE `platon_browser`;
 
 DROP TABLE IF EXISTS `address`;
 
