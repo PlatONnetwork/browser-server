@@ -189,22 +189,26 @@ public class TransactionUtilsTest extends AgentTestBase {
         TransactionUtil.resolveErcContract(collectionTransaction, ci, "123",
                 ercInterface, this.addressCache);
 
+        String contractAddress = "atp19t25777unzaxrwd95a5y42nlkkwma0dv50zqgx";
         List<Log> logs = new ArrayList<>();
         List<TransferEvent> transferEvents = new ArrayList<>();
         TransferEvent transferEvent = new TransferEvent();
         transferEvent.setFrom("123");
         transferEvent.setTo("123");
         transferEvent.setValue(BigInteger.TEN);
-        transferEvent.setLog(new Log());
+        Log log = new Log();
+        log.setAddress(contractAddress);
+        transferEvent.setLog(log);
         transferEvents.add(transferEvent);
         TransferEvent transferEvent2 = new TransferEvent();
         transferEvent2.setFrom("193");
         transferEvent2.setTo("456");
         transferEvent2.setValue(BigInteger.TEN);
-        transferEvent2.setLog(new Log());
+        Log log2 = new Log();
+        log2.setAddress(contractAddress);
+        transferEvent2.setLog(log2);
         transferEvents.add(transferEvent2);
         when(ercInterface.getTransferEvents(any())).thenReturn(transferEvents);
-        String contractAddress = "atp19t25777unzaxrwd95a5y42nlkkwma0dv50zqgx";
         TransactionUtil.resolveInnerToken(collectionTransaction, ci, logs,
                 ercInterface, this.addressCache,contractAddress);
     }

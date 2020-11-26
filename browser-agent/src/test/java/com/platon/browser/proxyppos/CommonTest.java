@@ -82,10 +82,10 @@ public class CommonTest extends TestBase {
         WasmFunction wasmFunction = new WasmFunction("record", Arrays.asList(pubkey), Void.class);
         data = WasmFunctionEncoder.encode(wasmFunction);
 
-        Transaction transaction = Transaction.createEthCallTransaction(proxyDelegateContractAddress, proxyDelegateContractAddress, data);
-        PlatonEstimateGas platonEstimateGas = defaultWeb3j.platonEstimateGas(transaction).send();
-        BigInteger amount = platonEstimateGas.getAmountUsed();
-        System.out.println(amount);
+//        Transaction transaction = Transaction.createEthCallTransaction(proxyDelegateContractAddress, proxyDelegateContractAddress, data);
+//        PlatonEstimateGas platonEstimateGas = defaultWeb3j.platonEstimateGas(transaction).send();
+//        BigInteger amount = platonEstimateGas.getAmountUsed();
+//        System.out.println(amount);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.stake;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
@@ -42,6 +43,8 @@ public class StakeModifyConverterTest extends AgentTestBase {
     @Mock
     private CollectionEvent collectionEvent;
     @Mock
+    private EpochMessage epochMessage;
+    @Mock
     private StakingMapper stakingMapper;
     @Spy
     private StakeModifyConverter target;
@@ -63,6 +66,8 @@ public class StakeModifyConverterTest extends AgentTestBase {
         Staking staking = new Staking();
         staking.setRewardPer(333);
         when(stakingMapper.selectByPrimaryKey(any())).thenReturn(staking);
+        when(collectionEvent.getEpochMessage()).thenReturn(epochMessage);
+        when(epochMessage.getSettleEpochRound()).thenReturn(BigInteger.TEN);
     }
 
     @Test
