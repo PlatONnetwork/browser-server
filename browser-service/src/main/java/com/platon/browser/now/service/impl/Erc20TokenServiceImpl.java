@@ -75,7 +75,7 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         }).collect(Collectors.toList());
 
         result.init(queryTokenList, totalCount, tokenList.size(),
-            PageHelper.getPageTotal(Long.valueOf(totalCount).intValue(), pageParams.getSize()));
+            PageHelper.getPageTotal((int)totalCount, pageParams.getSize()));
         return result;
     }
 

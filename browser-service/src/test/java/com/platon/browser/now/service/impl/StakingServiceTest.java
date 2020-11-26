@@ -104,6 +104,7 @@ public class StakingServiceTest extends TestMockBase{
         staking.setPreTotalDeleReward(BigDecimal.ONE);
         staking.setHaveDeleReward(BigDecimal.TEN);
         staking.setRewardPer(333);
+        staking.setNextRewardPer(444);
         staking.setIsInit(1);
         staking.setStakingLocked(BigDecimal.ONE);
         staking.setStatDelegateValue(BigDecimal.ONE);

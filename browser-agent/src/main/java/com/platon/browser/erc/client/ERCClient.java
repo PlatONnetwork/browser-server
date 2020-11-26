@@ -279,7 +279,7 @@ public class ERCClient implements ERCInterface {
             List<ExtendEvent.TokenContractResponse> tokenContractResponseList = extendEvent.getContractAddressList(event, transactionReceipt, eventWrapper.getAddressIndex(), indexed);
             if (tokenContractResponseList != null && tokenContractResponseList.size() != 0) {
                 for (int n = 0; n < tokenContractResponseList.size(); n++) {
-                    contractList.add(tokenContractResponseList.get(n).address);
+                    contractList.add(tokenContractResponseList.get(n).getAddress());
                 }
             }
         }

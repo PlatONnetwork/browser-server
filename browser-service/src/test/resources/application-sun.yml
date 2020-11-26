@@ -92,7 +92,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.112.172:8789
+    addresses: 192.168.120.151:6789,192.168.120.151:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)
@@ -126,6 +126,8 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
   chainId: 108
+  #锁仓最小释放金额参数生效版本
+  restrictingMinimumReleaseActiveVersion: 3584
   #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
   eventDefine: {
     "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"

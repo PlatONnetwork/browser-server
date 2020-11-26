@@ -53,11 +53,51 @@ public class ExtendEvent extends Contract {
     }
 
     public static class TokenCreatedResponse {
-        public Log log;
-        public String address;
-        public String name;
-        public String symbol;
-        public BigInteger value;
+        private Log log;
+        private String address;
+        private String name;
+        private String symbol;
+        private BigInteger value;
+
+        public Log getLog() {
+            return log;
+        }
+
+        public void setLog(Log log) {
+            this.log = log;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+
+        public void setSymbol(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public BigInteger getValue() {
+            return value;
+        }
+
+        public void setValue(BigInteger value) {
+            this.value = value;
+        }
     }
 
     /**
@@ -89,8 +129,24 @@ public class ExtendEvent extends Contract {
     }
 
     public static class TokenContractResponse {
-        public Log log;
-        public String address;
+        private Log log;
+        private String address;
+
+        public Log getLog() {
+            return log;
+        }
+
+        public void setLog(Log log) {
+            this.log = log;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
     }
 
     public static Event buildEvent(String eventName, List<EventDefine> eventType) {
@@ -126,8 +182,8 @@ public class ExtendEvent extends Contract {
     }
 
     public static class EventDefine {
-        public String type;
-        public boolean indexed;
+        private String type;
+        private boolean indexed;
 
         public String getType() {
             return type;
@@ -151,8 +207,8 @@ public class ExtendEvent extends Contract {
      */
     public static class EventWrapper {
         private String eventName;
-        public List<EventDefine> eventDefineList;
-        public int addressIndex;
+        private List<EventDefine> eventDefineList;
+        private int addressIndex;
 
         public EventWrapper() {
         }
