@@ -76,11 +76,9 @@ public class RedisImportService {
      */
     public Set<ESTokenTransferRecord> retryRecordSet(Set<Transaction> txSet){
         Set<ESTokenTransferRecord> recordSet = new HashSet<>();
-        if (txSet != null && txSet.size() != 0) {
-            Iterator<Transaction> transactionIterator = txSet.iterator();
-            while (transactionIterator.hasNext()) {
-                Transaction tx = transactionIterator.next();
-                if (null != tx && null != tx.getEsTokenTransferRecords() && tx.getEsTokenTransferRecords().size() != 0) {
+        if (txSet != null && !txSet.isEmpty()) {
+            for (Transaction tx : txSet) {
+                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
                     recordSet.addAll(tx.getEsTokenTransferRecords());
                 }
             }

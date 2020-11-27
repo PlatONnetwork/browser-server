@@ -550,7 +550,7 @@ public class StakingServiceImpl implements StakingService {
         Page<Node> stakingPage = this.customNodeMapper.selectListByExample(nodeExample);
 
 		/** 查询出块节点 */
-        NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
+        //NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
 		int i=(req.getPageNo()-1)*req.getPageSize();
 		for (Node node:stakingPage) {
 			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();

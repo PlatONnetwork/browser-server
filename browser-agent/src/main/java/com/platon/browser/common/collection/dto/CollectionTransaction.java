@@ -93,22 +93,21 @@ public class CollectionTransaction extends Transaction {
             TransactionReceipt transactionReceipt = new TransactionReceipt();
             transactionReceipt.setLogs(receipt.getLogs());
             List<String> contractAddress = ercInterface.getContractFromReceiptByEvents(transactionReceipt);
-            if (null != contractAddress && contractAddress.size() != 0) {
-                for (int i = 0; i < contractAddress.size(); i++) {
+            if (null != contractAddress && !contractAddress.isEmpty()) {
+                for (String address : contractAddress) {
                     ComplementInfo complementInfo = new ComplementInfo();
                     // 如果to地址为空则是普通合约创建
-                    TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, contractAddress.get(i), platOnClient, complementInfo, log);
-                    TransactionUtil.resolveErcContract(this, complementInfo, contractAddress.get(i), ercInterface, addressCache);
-                    addressCache.updateFirst(contractAddress.get(i), complementInfo);
+                    TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, address, platOnClient, complementInfo, log);
+                    TransactionUtil.resolveErcContract(this, complementInfo, address, ercInterface, addressCache);
+                    addressCache.updateFirst(address, complementInfo);
                     // 把合约地址添加至缓存
-                    GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contractAddress.get(i), ContractTypeEnum.getEnum(complementInfo.contractType));
+                    GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.getEnum(complementInfo.contractType));
                 }
             }
 
             if (StringUtils.isBlank(this.getTo())) {
                 // 如果to地址为空则是普通合约创建
-                TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, receipt.getContractAddress(),
-                    platOnClient, ci, log);
+                TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, receipt.getContractAddress(), platOnClient, ci, log);
 
                 // 把回执里的合约地址回填到交易的to字段
                 this.setTo(receipt.getContractAddress());
@@ -132,7 +131,7 @@ public class CollectionTransaction extends Transaction {
                         // 如果是erc20地址则需要查询转账记录
                         // 跨合约调用：需要取回执中的地址判定是否有代币交易
                         List<String> uniAddressList = new ArrayList<>();
-                        receipt.getLogs().stream().forEach(log -> {
+                        receipt.getLogs().forEach(log -> {
                             if (StringUtils.isEmpty(log.getAddress())) {
                                 return;
                             }
@@ -141,11 +140,11 @@ public class CollectionTransaction extends Transaction {
                             }
                         });
                         // 提取产生Event的合约地址，并进行解析
-                        uniAddressList.stream().forEach(addr -> {
+                        uniAddressList.forEach(addr -> {
                             if (addressCache.isEvmErc20ContractAddress(addr)) {
-                                List<ESTokenTransferRecord> erc20Tokens = TransactionUtil.resolveInnerToken(this, ci,
-                                        receipt.getLogs(), ercInterface, addressCache, addr);
-                                if (erc20Tokens != null && erc20Tokens.size() != 0) {
+                                List<ESTokenTransferRecord> erc20Tokens = TransactionUtil
+                                        .resolveInnerToken(this, ci, receipt.getLogs(), ercInterface, addressCache, addr);
+                                if (!erc20Tokens.isEmpty()) {
                                     this.getEsTokenTransferRecords().addAll((erc20Tokens));
                                 }
                             }

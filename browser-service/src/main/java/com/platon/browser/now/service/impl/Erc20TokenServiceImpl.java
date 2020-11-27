@@ -53,7 +53,7 @@ public class Erc20TokenServiceImpl implements Erc20TokenService {
         params.put("offset", pageParams.getOffset());
 
         List<Erc20Token> tokenIdList = this.erc20TokenMapper.listErc20TokenIds(params);
-        if (tokenIdList == null || tokenIdList.size() == 0) {
+        if (tokenIdList == null || tokenIdList.isEmpty()) {
             return result;
         }
         List<Long> tokenIds = tokenIdList.stream().map(Erc20Token::getId).collect(Collectors.toList());
