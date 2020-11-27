@@ -39,7 +39,7 @@ public class ExtendEvent extends Contract {
 
     public List<TokenCreatedResponse> getTransferEvents(final TransactionReceipt transactionReceipt) {
         final List<EventValuesWithLog> valueList = this.extractEventParametersWithLog(TOKEN_CREATED_EVENT, transactionReceipt);
-        final ArrayList<TokenCreatedResponse> responses = new ArrayList<TokenCreatedResponse>(valueList.size());
+        final ArrayList<TokenCreatedResponse> responses = new ArrayList<>(valueList.size());
         for (final EventValuesWithLog eventValues : valueList) {
             final TokenCreatedResponse typedResponse = new TokenCreatedResponse();
             typedResponse.log = eventValues.getLog();
@@ -151,31 +151,37 @@ public class ExtendEvent extends Contract {
 
     public static Event buildEvent(String eventName, List<EventDefine> eventType) {
         List<TypeReference<?>> parameters = new ArrayList<>();
-        if (null == eventType || eventType.size() == 0) {
+        if (null == eventType || eventType.isEmpty()) {
             return new Event(eventName, Arrays.<TypeReference<?>>asList());
         }
-        for (int i = 0; i < eventType.size(); i++) {
-            EventDefine define = eventType.get(i);
+        for (EventDefine define : eventType) {
             if (define.getType().equalsIgnoreCase("string")) {
-                parameters.add(new TypeReference<Utf8String>(define.isIndexed()){});
+                parameters.add(new TypeReference<Utf8String>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("address")) {
-                parameters.add(new TypeReference<Address>(define.isIndexed()){});
+                parameters.add(new TypeReference<Address>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("uint8")) {
-                parameters.add(new TypeReference<Uint8>(define.isIndexed()){});
+                parameters.add(new TypeReference<Uint8>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("uint256")) {
-                parameters.add(new TypeReference<Uint256>(define.isIndexed()){});
+                parameters.add(new TypeReference<Uint256>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("uint128")) {
-                parameters.add(new TypeReference<Uint128>(define.isIndexed()){});
+                parameters.add(new TypeReference<Uint128>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("int8")) {
-                parameters.add(new TypeReference<Int8>(define.isIndexed()){});
+                parameters.add(new TypeReference<Int8>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("int256")) {
-                parameters.add(new TypeReference<Int256>(define.isIndexed()){});
+                parameters.add(new TypeReference<Int256>(define.isIndexed()) {
+                });
             }
         }
         return new Event(eventName, parameters);

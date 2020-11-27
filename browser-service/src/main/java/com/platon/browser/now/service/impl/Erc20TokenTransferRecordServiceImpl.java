@@ -97,7 +97,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         // 2、所有查询直接走ES，不进行DB检索
         RespPage<QueryTokenTransferRecordListResp> result = new RespPage<>();
 
-        List<ESTokenTransferRecord> records = new ArrayList<>();
+        List<ESTokenTransferRecord> records;
         long totalCount = 0;
         long displayTotalCount = 0;
         if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
@@ -265,7 +265,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         params.put("offset", pageParams.getOffset());
         params.put("contract", req.getContract());
         List<Erc20TokenAddressRel> ids = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelIds(params);
-        if (ids == null || ids.size() == 0) {
+        if (ids == null || ids.isEmpty()) {
             return result;
         }
         List<Long> tokenIds = ids.stream().map(Erc20TokenAddressRel::getId).collect(Collectors.toList());
@@ -331,7 +331,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         params.put("offset", pageParams.getOffset());
         params.put("address", req.getAddress());
         List<Erc20TokenAddressRel> ids = this.customErc20TokenAddressRelMapper.listErc20TokenAddressRelIds(params);
-        if (ids == null || ids.size() == 0) {
+        if (ids == null || ids.isEmpty()) {
             return result;
         }
         List<Long> tokenIds = ids.stream().map(Erc20TokenAddressRel::getId).collect(Collectors.toList());

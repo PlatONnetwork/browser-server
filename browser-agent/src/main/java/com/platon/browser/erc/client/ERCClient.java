@@ -181,7 +181,7 @@ public class ERCClient implements ERCInterface {
         transactions.stream().filter(transaction -> transaction.getEsTokenTransferRecords().size() > 0)
             .forEach(transaction -> {
                 List<Erc20Param> erc20Params = new ArrayList<>();
-                transaction.getEsTokenTransferRecords().stream().forEach(esTokenTransferRecord -> {
+                transaction.getEsTokenTransferRecords().forEach(esTokenTransferRecord -> {
                     // 存量的erc20参数，提高访问速度
                     Erc20Token erc20Token = erc20Tokens.get(esTokenTransferRecord.getContract());
 
@@ -263,23 +263,22 @@ public class ERCClient implements ERCInterface {
     @Override
     public List<String> getContractFromReceiptByEvents(TransactionReceipt transactionReceipt) {
         List<ExtendEvent.EventWrapper> eventWrappers = CalculateUtils.buildEvents(blockChainConfig);
-        if (null == eventWrappers || eventWrappers.size() == 0) {
-            return null;
+        if (null == eventWrappers || eventWrappers.isEmpty()) {
+            return Collections.emptyList();
         }
         List<String> contractList = new ArrayList<>();
         ExtendEvent extendEvent = new ExtendEvent("", this.platOnClient.getWeb3jWrapper().getWeb3j(),
                 new ReadonlyTransactionManager(this.platOnClient.getWeb3jWrapper().getWeb3j(), ""),
                 new DefaultGasProvider(),
                 NetworkParms.getChainId());
-        for (int i = 0; i < eventWrappers.size(); i++) {
-            ExtendEvent.EventWrapper eventWrapper = eventWrappers.get(i);
+        for (ExtendEvent.EventWrapper eventWrapper : eventWrappers) {
             Event event = ExtendEvent.buildEvent(eventWrapper.getEventName(), eventWrapper.getEventDefineList());
             // 根据地址位置，判定是否为 indexed
             boolean indexed = eventWrapper.getEventDefineList().get(eventWrapper.getAddressIndex()).isIndexed();
             List<ExtendEvent.TokenContractResponse> tokenContractResponseList = extendEvent.getContractAddressList(event, transactionReceipt, eventWrapper.getAddressIndex(), indexed);
-            if (tokenContractResponseList != null && tokenContractResponseList.size() != 0) {
-                for (int n = 0; n < tokenContractResponseList.size(); n++) {
-                    contractList.add(tokenContractResponseList.get(n).getAddress());
+            if (tokenContractResponseList != null && !tokenContractResponseList.isEmpty()) {
+                for (ExtendEvent.TokenContractResponse tokenContractResponse : tokenContractResponseList) {
+                    contractList.add(tokenContractResponse.getAddress());
                 }
             }
         }

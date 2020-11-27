@@ -39,10 +39,14 @@ public class StakeModifyDecoder {
         String detail = stringResolver((RlpString) rootList.getValues().get(7));
         detail = new String(Numeric.hexStringToByteArray(detail));
 
+        String externalId2 = externalId;
+        if(StringUtils.isBlank(externalId)) externalId2 = null;
+        if("0x".equals(externalId)) externalId2 = "";
+
         return StakeModifyParam.builder()
                 .nodeId(nodeId)
                 .benefitAddress(StringUtils.isBlank(benefitAddress)?null:benefitAddress) // 非必填
-                .externalId("0x".equals(externalId)?"":StringUtils.isBlank(externalId)?null:externalId) // 非必填
+                .externalId(externalId2) // 非必填
                 .nodeName(StringUtils.isBlank(nodeName)?null:nodeName) // 非必填
                 .website(StringUtils.isBlank(website)?null:website) // 非必填
                 .details(StringUtils.isBlank(detail)?null:detail) // 非必填
