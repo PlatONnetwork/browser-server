@@ -1,7 +1,11 @@
 package com.platon.browser.service.redis;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.client.EpochInfo;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.common.service.redis.RedisImportService;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.redis.RedisBlockService;
 import com.platon.browser.service.redis.RedisStatisticService;
 import com.platon.browser.service.redis.RedisTransactionService;
@@ -12,7 +16,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collections;
 
 import static org.mockito.Mockito.*;
@@ -35,11 +43,12 @@ public class RedisImportServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "statisticService", statisticService);
     }
 
+
     /**
      * 根据区块号获取激励池余额
      */
     @Test
-    public void batchImport() throws InterruptedException {
+    public void batchImport() throws InterruptedException, ContractInvokeException, BlankResponseException {
         target.batchImport(Collections.emptySet(),Collections.emptySet(),Collections.emptySet());
         verify(target, times(1)).batchImport(anySet(),anySet(),anySet());
     }

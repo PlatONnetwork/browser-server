@@ -53,7 +53,7 @@ public class CollectionTransaction extends Transaction {
 
     // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存
     // <普通合约地址,合约类型枚举>
-    private final static Map<String, ContractTypeEnum> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP = new HashMap<>();
+    private static final Map<String, ContractTypeEnum> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP = new HashMap<>();
 
     public static Map<String, ContractTypeEnum> getGeneralContractAddressCache() {
         return Collections.unmodifiableMap(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP);

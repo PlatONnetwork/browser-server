@@ -2,6 +2,7 @@ package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -22,7 +23,7 @@ import java.util.Set;
 public class EsTransactionService implements EsService<Transaction>{
     @Autowired
     private TransactionESRepository transactionESRepository;
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<Transaction> transactions) throws IOException {
         if(transactions.isEmpty()) return;
         try {
@@ -32,7 +33,7 @@ public class EsTransactionService implements EsService<Transaction>{
             transactionESRepository.bulkAddOrUpdate(transactionMap);
         }catch (Exception e){
             log.error("",e);
-            throw e;
+            throw new BusinessException(e.getMessage());
         }
     }
 }
