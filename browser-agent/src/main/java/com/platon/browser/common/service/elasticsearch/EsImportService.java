@@ -1,6 +1,7 @@
 package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -50,7 +50,7 @@ public class EsImportService {
         });
     }
 
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions,
                             Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
 
@@ -74,7 +74,7 @@ public class EsImportService {
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         }catch (Exception e){
             log.error("",e);
-            throw e;
+            throw new BusinessException(e.getMessage());
         }
     }
 
@@ -83,11 +83,9 @@ public class EsImportService {
      */
     public Set<ESTokenTransferRecord> retryRecordSet(Set<Transaction> txSet){
         Set<ESTokenTransferRecord> recordSet = new HashSet<>();
-        if (txSet != null && txSet.size() != 0) {
-            Iterator<Transaction> transactionIterator = txSet.iterator();
-            while (transactionIterator.hasNext()) {
-                Transaction tx = transactionIterator.next();
-                if (null != tx && null != tx.getEsTokenTransferRecords() && tx.getEsTokenTransferRecords().size() != 0) {
+        if (txSet != null && !txSet.isEmpty()) {
+            for (Transaction tx : txSet) {
+                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
                     recordSet.addAll(tx.getEsTokenTransferRecords());
                 }
             }

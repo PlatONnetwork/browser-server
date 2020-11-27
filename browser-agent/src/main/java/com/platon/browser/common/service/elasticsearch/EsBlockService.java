@@ -2,12 +2,14 @@ package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.BatchUpdateException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +24,7 @@ import java.util.Set;
 public class EsBlockService implements EsService<Block>{
     @Autowired
     private BlockESRepository blockESRepository;
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<Block> blocks) throws IOException {
         if(blocks.isEmpty()) return;
         try {
@@ -32,7 +34,7 @@ public class EsBlockService implements EsService<Block>{
             blockESRepository.bulkAddOrUpdate(blockMap);
         }catch (Exception e){
             log.error("",e);
-            throw e;
+            throw new BusinessException(e.getMessage());
         }
     }
 }

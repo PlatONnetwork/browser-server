@@ -93,7 +93,7 @@ public class AddressCache {
             case EVM_CONTRACT_CREATE:
             case WASM_CONTRACT_CREATE:
             case ERC20_CONTRACT_CREATE:
-                this.updateContractFromAddress(tx, from);
+                this.updateContractFromAddress(from);
                 this.updateAddress(tx, contractAddress);
                 break;
             default:
@@ -232,7 +232,7 @@ public class AddressCache {
         }
     }
 
-    private void updateContractFromAddress(Transaction tx, String addr) {
+    private void updateContractFromAddress(String addr) {
         if (addr == null)
             return;
         Address address = this.addressMap.get(addr);

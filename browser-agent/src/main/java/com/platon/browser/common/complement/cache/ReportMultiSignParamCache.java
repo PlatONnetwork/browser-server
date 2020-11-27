@@ -25,17 +25,13 @@ public class ReportMultiSignParamCache {
      * @param report
      */
     public void addReport(Report report){
-        List<Report> reportList = cache.get(report.getNodeId());
-        if(reportList==null){
-            reportList = new ArrayList<>();
-            cache.put(report.getNodeId(),reportList);
-        }
+        List<Report> reportList = cache.computeIfAbsent(report.getNodeId(), k -> new ArrayList<>());
         reportList.add(report);
     }
 
     public void init(List<Report> reportList) {
         if(reportList.isEmpty()) return;
-        reportList.forEach(report -> addReport(report));
+        reportList.forEach(this::addReport);
     }
 
     /**
