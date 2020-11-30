@@ -3,24 +3,50 @@
 <mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
 <update id="modify" parameterType="com.platon.browser.complement.dao.param.stake.StakeModify">
 	/*1. staking 更新*/
-	update `staking` set
-		`node_name` = #{nodeName},
-		`external_id` = #{externalId},
-		`benefit_addr` = #{benefitAddr},
-		`web_site` = #{webSite},
-		`details` = #{details},
-		`is_init` =  #{isInit},
-		`reward_per` = #{delegateRewardPer}
+	update `staking`
+	<set>
+		<if test="nodeName != null">
+			`node_name` = #{nodeName},
+		</if>
+		<if test="externalId != null">
+			`external_id` = #{externalId},
+		</if>
+		<if test="benefitAddr != null">
+			`benefit_addr` = #{benefitAddr},
+		</if>
+		<if test="webSite != null">
+			`web_site` = #{webSite},
+		</if>
+		<if test="details != null">
+			`details` = #{details},
+		</if>
+		<if test="isInit != null">
+			`is_init` =  #{isInit},
+		</if>
+	</set>
 	 where `node_id` = #{nodeId} and `staking_block_num` = #{stakingBlockNum};
 	/*2、node 更新*/
-	update `node` set
-	 	`node_name` = #{nodeName},
-	  	`external_id` = #{externalId},
-	    `benefit_addr` = #{benefitAddr},
-		`web_site` = #{webSite},
-		`details` = #{details},
-		`is_init` = #{isInit},
-		`reward_per` = #{delegateRewardPer}
+	update `node`
+	<set>
+		<if test="nodeName != null">
+			`node_name` = #{nodeName},
+		</if>
+		<if test="externalId != null">
+			`external_id` = #{externalId},
+		</if>
+		<if test="benefitAddr != null">
+			`benefit_addr` = #{benefitAddr},
+		</if>
+		<if test="webSite != null">
+			`web_site` = #{webSite},
+		</if>
+		<if test="details != null">
+			`details` = #{details},
+		</if>
+		<if test="isInit != null">
+			`is_init` =  #{isInit},
+		</if>
+	</set>
 	where `node_id` = #{nodeId};
 </update>
 </mapper>

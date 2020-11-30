@@ -22,7 +22,8 @@ public enum ModifiableGovernParamEnum {
 	ZERO_PRODUCE_FREEZE_DURATION("slashing", "zeroProduceFreezeDuration"),//节点零出块惩罚被锁定时间
 	REWARD_PER_MAX_CHANGE_RANGE("staking", "rewardPerMaxChangeRange"),
 	REWARD_PER_CHANGE_INTERVAL("staking", "rewardPerChangeInterval"),
-	INCREASE_ISSUANCE_RATIO("reward", "increaseIssuanceRatio")
+	INCREASE_ISSUANCE_RATIO("reward", "increaseIssuanceRatio"),
+	RESTRICTING_MINIMUM_RELEASE("restricting", "minimumRelease") // 锁仓最小释放金额 v0.14.0版本新增
 	;
 
 	private String module;
