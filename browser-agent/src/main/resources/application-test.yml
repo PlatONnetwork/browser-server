@@ -26,12 +26,12 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_1
-      transactionIndexName: browser_transaction_1
-      delegationIndexName: browser_delegation_1
-      nodeOptIndexName: browser_nodeopt_1
-      delegationRewardIndexName: browser_delegation_reward_1
-      innerTxIndexName: browser_inner_tx_1
+      blockIndexName: browser_block_135
+      transactionIndexName: browser_transaction_135
+      delegationIndexName: browser_delegation_135
+      nodeOptIndexName: browser_nodeopt_135
+      delegationRewardIndexName: browser_delegation_reward_135
+      innerTxIndexName: browser_inner_tx_135
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -76,7 +76,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.16.11:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -112,7 +112,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201018
+  chainId: 201030
 
 task:
    #地址统计任务
