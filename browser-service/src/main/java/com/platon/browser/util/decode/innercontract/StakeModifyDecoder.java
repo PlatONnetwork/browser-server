@@ -30,16 +30,16 @@ public class StakeModifyDecoder {
         BigInteger rewardPer = bigIntegerResolver((RlpString) rootList.getValues().get(3));
         //外部Id externalId
         String externalId = stringResolver((RlpString) rootList.getValues().get(4));
-        externalId = new String(Numeric.hexStringToByteArray(externalId));
+        externalId = externalId==null?null:new String(Numeric.hexStringToByteArray(externalId));
         //被质押节点的名称
         String nodeName = stringResolver((RlpString) rootList.getValues().get(5));
-        nodeName = new String(Numeric.hexStringToByteArray(nodeName));
+        nodeName = nodeName==null?null:new String(Numeric.hexStringToByteArray(nodeName));
         //节点的第三方主页
         String website = stringResolver((RlpString) rootList.getValues().get(6));
-        website = new String(Numeric.hexStringToByteArray(website));
+        website = website==null?null:new String(Numeric.hexStringToByteArray(website));
         //节点的描述
         String detail = stringResolver((RlpString) rootList.getValues().get(7));
-        detail = new String(Numeric.hexStringToByteArray(detail));
+        detail = detail==null?null:new String(Numeric.hexStringToByteArray(detail));
 
         String externalId2 = externalId;
         if(StringUtils.isBlank(externalId)) externalId2 = null;
