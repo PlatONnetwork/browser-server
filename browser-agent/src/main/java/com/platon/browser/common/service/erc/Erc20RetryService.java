@@ -23,6 +23,7 @@ public class Erc20RetryService {
             try {
                 TimeUnit.SECONDS.sleep(5L);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new BusinessException("合约查询线程被中断！");
             }
             throw new BusinessException("合约【"+contractAddress+"】未入库，稍后重试...");

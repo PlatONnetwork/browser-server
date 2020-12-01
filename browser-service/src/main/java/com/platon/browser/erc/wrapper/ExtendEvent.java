@@ -39,7 +39,7 @@ public class ExtendEvent extends Contract {
 
     public List<TokenCreatedResponse> getTransferEvents(final TransactionReceipt transactionReceipt) {
         final List<EventValuesWithLog> valueList = this.extractEventParametersWithLog(TOKEN_CREATED_EVENT, transactionReceipt);
-        final ArrayList<TokenCreatedResponse> responses = new ArrayList<TokenCreatedResponse>(valueList.size());
+        final ArrayList<TokenCreatedResponse> responses = new ArrayList<>(valueList.size());
         for (final EventValuesWithLog eventValues : valueList) {
             final TokenCreatedResponse typedResponse = new TokenCreatedResponse();
             typedResponse.log = eventValues.getLog();
@@ -53,11 +53,51 @@ public class ExtendEvent extends Contract {
     }
 
     public static class TokenCreatedResponse {
-        public Log log;
-        public String address;
-        public String name;
-        public String symbol;
-        public BigInteger value;
+        private Log log;
+        private String address;
+        private String name;
+        private String symbol;
+        private BigInteger value;
+
+        public Log getLog() {
+            return log;
+        }
+
+        public void setLog(Log log) {
+            this.log = log;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+
+        public void setSymbol(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public BigInteger getValue() {
+            return value;
+        }
+
+        public void setValue(BigInteger value) {
+            this.value = value;
+        }
     }
 
     /**
@@ -89,45 +129,67 @@ public class ExtendEvent extends Contract {
     }
 
     public static class TokenContractResponse {
-        public Log log;
-        public String address;
+        private Log log;
+        private String address;
+
+        public Log getLog() {
+            return log;
+        }
+
+        public void setLog(Log log) {
+            this.log = log;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
     }
 
     public static Event buildEvent(String eventName, List<EventDefine> eventType) {
         List<TypeReference<?>> parameters = new ArrayList<>();
-        if (null == eventType || eventType.size() == 0) {
+        if (null == eventType || eventType.isEmpty()) {
             return new Event(eventName, Arrays.<TypeReference<?>>asList());
         }
-        for (int i = 0; i < eventType.size(); i++) {
-            EventDefine define = eventType.get(i);
+        for (EventDefine define : eventType) {
             if (define.getType().equalsIgnoreCase("string")) {
-                parameters.add(new TypeReference<Utf8String>(define.isIndexed()){});
+                parameters.add(new TypeReference<Utf8String>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("address")) {
-                parameters.add(new TypeReference<Address>(define.isIndexed()){});
+                parameters.add(new TypeReference<Address>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("uint8")) {
-                parameters.add(new TypeReference<Uint8>(define.isIndexed()){});
+                parameters.add(new TypeReference<Uint8>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("uint256")) {
-                parameters.add(new TypeReference<Uint256>(define.isIndexed()){});
+                parameters.add(new TypeReference<Uint256>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("uint128")) {
-                parameters.add(new TypeReference<Uint128>(define.isIndexed()){});
+                parameters.add(new TypeReference<Uint128>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("int8")) {
-                parameters.add(new TypeReference<Int8>(define.isIndexed()){});
+                parameters.add(new TypeReference<Int8>(define.isIndexed()) {
+                });
             }
             if (define.getType().equalsIgnoreCase("int256")) {
-                parameters.add(new TypeReference<Int256>(define.isIndexed()){});
+                parameters.add(new TypeReference<Int256>(define.isIndexed()) {
+                });
             }
         }
         return new Event(eventName, parameters);
     }
 
     public static class EventDefine {
-        public String type;
-        public boolean indexed;
+        private String type;
+        private boolean indexed;
 
         public String getType() {
             return type;
@@ -151,8 +213,8 @@ public class ExtendEvent extends Contract {
      */
     public static class EventWrapper {
         private String eventName;
-        public List<EventDefine> eventDefineList;
-        public int addressIndex;
+        private List<EventDefine> eventDefineList;
+        private int addressIndex;
 
         public EventWrapper() {
         }
