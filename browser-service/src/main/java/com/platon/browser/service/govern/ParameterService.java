@@ -54,19 +54,13 @@ public class ParameterService {
             config.setName(gp.getParamItem().getName());
             config.setRangeDesc(gp.getParamItem().getDesc());
             config.setActiveBlock(0L);
-            configList.add(config);
             config.setCreateTime(date);
             config.setUpdateTime(date);
 
-            // Alaya版本特殊处理【锁仓最小释放金额属性】，因为：
-            // 在Alaya版本中，debug_economic接口不会返回minimumRelease参数，因此需要在提案合约中查询出来并设置到BlockChainConfig实例中
-            // 防止后面代码 getValueInBlockChainConfig("minimumRelease") 时取不到参数值报错
+            // 此版本兼容 0.13.2 和 0.14.0 版本底层, 所以对最小锁仓释放金额参数不做处理
             ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
             if(paramEnum == ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE){
-                // 如果参数是锁仓最小释放金额，则把blockChainConfig中的锁仓最小释放金额属性设置为当前查询的值
-                String minimumRelease = gp.getParamValue().getValue();
-                chainConfig.setRestrictingMinimumRelease(new BigDecimal(minimumRelease));
-                // 接下来的代码就可以从blockChainConfig实例中获取此值了
+                continue;
             }
 
             // 浏览器刚启动时在BlockChainConfig中调用debugEconomicConfig接口取得链刚启动时的参数
@@ -75,6 +69,7 @@ public class ParameterService {
             config.setInitValue(initValue);
             config.setStaleValue(initValue);
             config.setValue(initValue);
+            configList.add(config);
             id++;
         }
         configMapper.batchInsert(configList);
@@ -112,9 +107,14 @@ public class ParameterService {
         chainConfig.setZeroProduceCumulativeTime(modifiableParam.getSlashing().getZeroProduceCumulativeTime());
         //零出块锁定结算周期数
         chainConfig.setZeroProduceFreezeDuration(modifiableParam.getSlashing().getZeroProduceFreezeDuration());
+        //奖励比例改变周期
         chainConfig.setRewardPerChangeInterval(modifiableParam.getStaking().getRewardPerChangeInterval());
+        //奖励比例最大变更范围+/-xxx
         chainConfig.setRewardPerMaxChangeRange(modifiableParam.getStaking().getRewardPerMaxChangeRange());
+        //增发比例
         chainConfig.setAddIssueRate(modifiableParam.getReward().getIncreaseIssuanceRatio().divide(new BigDecimal(10000)));
+        //锁仓释放最小金额
+        chainConfig.setRestrictingMinimumRelease(modifiableParam.getRestricting().getMinimumRelease());
     }
 
     /**
@@ -188,6 +188,10 @@ public class ParameterService {
                 break;
             case INCREASE_ISSUANCE_RATIO:
                 staleValue = chainConfig.getAddIssueRate().multiply(new BigDecimal(10000)).setScale(0).toPlainString();
+                break;
+            case RESTRICTING_MINIMUM_RELEASE:
+                //最小锁仓释放金额(LAT)
+                staleValue = chainConfig.getRestrictingMinimumRelease().toString();
                 break;
             default:
                 break;
