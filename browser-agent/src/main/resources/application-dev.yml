@@ -117,6 +117,8 @@ platon:
   eventDefine: {
     "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
   }
+  #锁仓最小释放金额参数生效版本
+  restrictingMinimumReleaseActiveVersion: 3584
 
 task:
    #地址统计任务
