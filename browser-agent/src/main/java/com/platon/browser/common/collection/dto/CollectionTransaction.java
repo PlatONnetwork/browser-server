@@ -180,7 +180,7 @@ public class CollectionTransaction extends Transaction {
         // 交易信息
         this.setGasUsed(receipt.getGasUsed().toString())
             .setCost(this.decimalGasUsed().multiply(this.decimalGasPrice()).toString())
-            .setFailReason(receipt.getFailReason()).setStatus(status).setSeq(this.getNum() * 10000 + this.getIndex())
+            .setFailReason(receipt.getFailReason()).setStatus(status).setSeq(this.getNum() * 100000 + this.getIndex())
             .setInfo(ci.info).setType(ci.type).setToType(ci.toType).setContractAddress(receipt.getContractAddress())
             .setContractType(ci.contractType).setBin(ci.binCode).setMethod(ci.method);
 
