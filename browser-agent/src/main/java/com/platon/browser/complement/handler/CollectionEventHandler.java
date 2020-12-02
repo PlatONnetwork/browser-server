@@ -83,7 +83,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
                 int index = 0;
                 for (ESTokenTransferRecord esTokenTransferRecord : tx.getEsTokenTransferRecords()) {
                     // Token交易序号 = 交易所在块号*10000 + 本区块Token交易列表index
-                    esTokenTransferRecord.setSeq(event.getBlock().getNum()*10000+index);
+                    esTokenTransferRecord.setSeq(event.getBlock().getNum()*100000+index);
                     index++;
                 }
             }
