@@ -94,13 +94,21 @@ public class TransactionParameterService {
         if (event.getBlock().getNum() == 0)
             return tar;
 
+        // 普通交易和虚拟PPOS交易统一设置seq排序序号： 区块号*100000+自增号(allTxCount)
+        int allTxCount = 0;
         for (Transaction tx : transactions) {
+            // 设置普通交易的交易序号
+            tx.setSeq(event.getBlock().getNum()*100000+allTxCount);
             this.addressCache.update(tx);
+            // 自增
+            allTxCount++;
             // 分析真实交易
             this.analyzePPosTx(event, tx, tar);
             // 分析虚拟交易
             List<Transaction> virtualTxes = tx.getVirtualTransactions();
-            virtualTxes.forEach(vt -> {
+            for (Transaction vt : virtualTxes) {
+                // 设置合约调用ppos交易的交易序号
+                vt.setSeq(event.getBlock().getNum()*100000+allTxCount);
                 switch (vt.getTypeEnum()) {
                     // 如果是提案交易，且交易是由普通合约内部调用触发的，则
                     // 所构造的虚拟交易HASH的格式是：<普通合约调用hash>-<合约内部ppos交易索引>
@@ -118,8 +126,9 @@ public class TransactionParameterService {
                         break;
                 }
                 this.analyzePPosTx(event, vt, tar);
-
-            });
+                // 自增
+                allTxCount++;
+            }
         }
 
         Block block = event.getBlock();
