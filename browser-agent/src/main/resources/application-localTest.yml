@@ -73,6 +73,7 @@ logging:
     com.platon.browser.task: error
 #PlatOn相关配置
 platon:
+  redis-namespace: browser:${version}:${profile}
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 10
   # Web3j访问地址
