@@ -71,7 +71,6 @@ logging:
     com.platon.browser.task: error
 #PlatOn相关配置
 platon:
-  redis-namespace: browser:${version}:${profile}
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
@@ -119,6 +118,8 @@ platon:
   eventDefine: {
     "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
   }
+  #Redis命名空间
+  redis-namespace: browser:${version}:${profile}
 
 task:
    #地址统计任务
