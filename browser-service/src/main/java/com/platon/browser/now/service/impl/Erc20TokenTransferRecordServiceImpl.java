@@ -364,6 +364,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
                 .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .fromType(record.getFromType()).toType(record.getToType())
+                .seq(record.getSeq())
                 .build();
         // Processing accuracy calculation.
         if (null != record.getTValue()) {

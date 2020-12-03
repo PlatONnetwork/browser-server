@@ -61,6 +61,8 @@ public class QueryTokenTransferRecordListResp {
     @ApiModelProperty(value = "to类型")
     private Integer toType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
 
+    private Long seq;
+
     public String getType() {
         return this.type;
     }
@@ -192,4 +194,11 @@ public class QueryTokenTransferRecordListResp {
         }
     }
 
+    public Long getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Long seq) {
+        this.seq = seq;
+    }
 }
