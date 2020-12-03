@@ -108,6 +108,8 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 108
+  #Redis命名空间
+  redis-namespace: browser:${version}:${profile}
 
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
 isRecaptcha: false
