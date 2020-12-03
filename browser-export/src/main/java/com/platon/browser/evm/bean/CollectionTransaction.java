@@ -130,7 +130,7 @@ public class CollectionTransaction extends Transaction {
                 .setCost(decimalGasUsed().multiply(decimalGasPrice()).toString())
                 .setFailReason(receipt.getFailReason())
                 .setStatus(status)
-                .setSeq(getNum()*10000+getIndex())
+                .setSeq(getNum()*100000+getIndex())
                 .setInfo(ci.info)
                 .setType(ci.type)
                 .setToType(ci.toType)

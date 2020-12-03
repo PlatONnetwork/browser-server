@@ -119,6 +119,8 @@ platon:
   eventDefine: {
     "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
   }
+  #Redis命名空间
+  redis-namespace: browser:${version}:${profile}
 
 task:
   #地址统计任务

@@ -54,7 +54,7 @@ public class BlockResult {
             String to = HexTool.prefix(DigestUtils.sha1Hex(from));
             tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), to),addressReusedTimes));
             tx.setIndex(i);
-            long seq = tx.getNum()*10000+i;
+            long seq = tx.getNum()*100000+i;
             tx.setSeq(seq);
             i++;
         }
