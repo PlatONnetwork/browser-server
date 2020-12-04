@@ -97,10 +97,12 @@ public class StakingServiceImpl implements StakingService {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
+			// 接受委托 = 实时质押委托总数 - 实时质押总数
 			stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue()
 					.subtract(networkStatRedis.getStakingValue()));
 			//实时除以现有的结算周期人数
 			Integer count= customStakingMapper.selectCountByActive();
+            // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
 			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
 			
 		}

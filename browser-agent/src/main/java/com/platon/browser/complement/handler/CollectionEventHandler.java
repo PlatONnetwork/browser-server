@@ -77,10 +77,10 @@ public class CollectionEventHandler implements ICollectionEventHandler {
         try {
             List<Transaction> transactions = event.getTransactions();
             // 确保交易从小到大的索引顺序
+            int index = 0;
             transactions.sort(Comparator.comparing(Transaction::getIndex));
             for (Transaction tx : transactions) {
                 tx.setId(++this.transactionId);
-                int index = 0;
                 for (ESTokenTransferRecord esTokenTransferRecord : tx.getEsTokenTransferRecords()) {
                     // Token交易序号 = 交易所在块号*100000 + 本区块Token交易列表index
                     esTokenTransferRecord.setSeq(event.getBlock().getNum()*100000+index);
