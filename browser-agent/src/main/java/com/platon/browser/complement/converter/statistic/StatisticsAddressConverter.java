@@ -188,6 +188,8 @@ public class StatisticsAddressConverter {
         // 将增量新增的代币合约录入DB
         List<Erc20Token> params = new ArrayList<>();
         erc20TokenMap.values().forEach(t -> {
+            // token在浏览器默认不显示
+            t.setScanShow(0);
             params.add(t);
         });
 
