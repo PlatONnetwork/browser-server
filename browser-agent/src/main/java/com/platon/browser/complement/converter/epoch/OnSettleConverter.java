@@ -75,8 +75,8 @@ public class OnSettleConverter {
             if(chainVersion.compareTo(restrictingMinimumReleaseActiveVersion)!=0) return;
 
             // 如果不存在minimumRelease则从链上查询指定模块的参数插入
-            String restrictingMinimumRelease=null;
-            String restrictingMinimumReleaseDesc = "";
+            String restrictingMinimumRelease="80000000000000000000";
+            String restrictingMinimumReleaseDesc = "minimum restricting amount to be released in each epoch, range: [80000000000000000000, 100000000000000000000000]";
             List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList(moduleName).send().getData();
             if(governParamList!=null&&!governParamList.isEmpty()){
                 for (GovernParam e : governParamList) {
