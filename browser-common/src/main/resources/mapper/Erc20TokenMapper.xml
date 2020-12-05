@@ -105,7 +105,7 @@
     select
     <include refid="Base_Column_List" />
     from erc20_token
-    where address = #{address,jdbcType=VARCHAR} and scan_show=1
+    where address = #{address,jdbcType=VARCHAR}
   </select>
 
   <select id="listErc20Token" parameterType="java.util.Map" resultMap="BaseResultMap">
