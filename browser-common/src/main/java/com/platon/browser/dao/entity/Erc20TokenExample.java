@@ -496,76 +496,6 @@ public class Erc20TokenExample {
             return (Criteria) this;
         }
 
-        public Criteria andIconIsNull() {
-            addCriterion("icon is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconIsNotNull() {
-            addCriterion("icon is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconEqualTo(String value) {
-            addCriterion("icon =", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconNotEqualTo(String value) {
-            addCriterion("icon <>", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconGreaterThan(String value) {
-            addCriterion("icon >", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconGreaterThanOrEqualTo(String value) {
-            addCriterion("icon >=", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconLessThan(String value) {
-            addCriterion("icon <", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconLessThanOrEqualTo(String value) {
-            addCriterion("icon <=", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconLike(String value) {
-            addCriterion("icon like", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconNotLike(String value) {
-            addCriterion("icon not like", value, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconIn(List<String> values) {
-            addCriterion("icon in", values, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconNotIn(List<String> values) {
-            addCriterion("icon not in", values, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconBetween(String value1, String value2) {
-            addCriterion("icon between", value1, value2, "icon");
-            return (Criteria) this;
-        }
-
-        public Criteria andIconNotBetween(String value1, String value2) {
-            addCriterion("icon not between", value1, value2, "icon");
-            return (Criteria) this;
-        }
-
         public Criteria andCreatorIsNull() {
             addCriterion("creator is null");
             return (Criteria) this;
@@ -706,76 +636,6 @@ public class Erc20TokenExample {
             return (Criteria) this;
         }
 
-        public Criteria andWebSiteIsNull() {
-            addCriterion("web_site is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteIsNotNull() {
-            addCriterion("web_site is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteEqualTo(String value) {
-            addCriterion("web_site =", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteNotEqualTo(String value) {
-            addCriterion("web_site <>", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteGreaterThan(String value) {
-            addCriterion("web_site >", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteGreaterThanOrEqualTo(String value) {
-            addCriterion("web_site >=", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteLessThan(String value) {
-            addCriterion("web_site <", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteLessThanOrEqualTo(String value) {
-            addCriterion("web_site <=", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteLike(String value) {
-            addCriterion("web_site like", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteNotLike(String value) {
-            addCriterion("web_site not like", value, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteIn(List<String> values) {
-            addCriterion("web_site in", values, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteNotIn(List<String> values) {
-            addCriterion("web_site not in", values, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteBetween(String value1, String value2) {
-            addCriterion("web_site between", value1, value2, "webSite");
-            return (Criteria) this;
-        }
-
-        public Criteria andWebSiteNotBetween(String value1, String value2) {
-            addCriterion("web_site not between", value1, value2, "webSite");
-            return (Criteria) this;
-        }
-
         public Criteria andTypeIsNull() {
             addCriterion("`type` is null");
             return (Criteria) this;
@@ -846,6 +706,66 @@ public class Erc20TokenExample {
             return (Criteria) this;
         }
 
+        public Criteria andStatusIsNull() {
+            addCriterion("`status` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusIsNotNull() {
+            addCriterion("`status` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusEqualTo(Integer value) {
+            addCriterion("`status` =", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotEqualTo(Integer value) {
+            addCriterion("`status` <>", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusGreaterThan(Integer value) {
+            addCriterion("`status` >", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("`status` >=", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusLessThan(Integer value) {
+            addCriterion("`status` <", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("`status` <=", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusIn(List<Integer> values) {
+            addCriterion("`status` in", values, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotIn(List<Integer> values) {
+            addCriterion("`status` not in", values, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusBetween(Integer value1, Integer value2) {
+            addCriterion("`status` between", value1, value2, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("`status` not between", value1, value2, "status");
+            return (Criteria) this;
+        }
+
         public Criteria andBlockTimestampIsNull() {
             addCriterion("block_timestamp is null");
             return (Criteria) this;
@@ -906,6 +826,126 @@ public class Erc20TokenExample {
             return (Criteria) this;
         }
 
+        public Criteria andTxCountIsNull() {
+            addCriterion("tx_count is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountIsNotNull() {
+            addCriterion("tx_count is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountEqualTo(Integer value) {
+            addCriterion("tx_count =", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountNotEqualTo(Integer value) {
+            addCriterion("tx_count <>", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountGreaterThan(Integer value) {
+            addCriterion("tx_count >", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountGreaterThanOrEqualTo(Integer value) {
+            addCriterion("tx_count >=", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountLessThan(Integer value) {
+            addCriterion("tx_count <", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountLessThanOrEqualTo(Integer value) {
+            addCriterion("tx_count <=", value, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountIn(List<Integer> values) {
+            addCriterion("tx_count in", values, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountNotIn(List<Integer> values) {
+            addCriterion("tx_count not in", values, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountBetween(Integer value1, Integer value2) {
+            addCriterion("tx_count between", value1, value2, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxCountNotBetween(Integer value1, Integer value2) {
+            addCriterion("tx_count not between", value1, value2, "txCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderIsNull() {
+            addCriterion("holder is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderIsNotNull() {
+            addCriterion("holder is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderEqualTo(Integer value) {
+            addCriterion("holder =", value, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderNotEqualTo(Integer value) {
+            addCriterion("holder <>", value, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderGreaterThan(Integer value) {
+            addCriterion("holder >", value, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderGreaterThanOrEqualTo(Integer value) {
+            addCriterion("holder >=", value, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderLessThan(Integer value) {
+            addCriterion("holder <", value, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderLessThanOrEqualTo(Integer value) {
+            addCriterion("holder <=", value, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderIn(List<Integer> values) {
+            addCriterion("holder in", values, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderNotIn(List<Integer> values) {
+            addCriterion("holder not in", values, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderBetween(Integer value1, Integer value2) {
+            addCriterion("holder between", value1, value2, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andHolderNotBetween(Integer value1, Integer value2) {
+            addCriterion("holder not between", value1, value2, "holder");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
@@ -963,6 +1003,66 @@ public class Erc20TokenExample {
 
         public Criteria andCreateTimeNotBetween(Date value1, Date value2) {
             addCriterion("create_time not between", value1, value2, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowIsNull() {
+            addCriterion("scan_show is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowIsNotNull() {
+            addCriterion("scan_show is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowEqualTo(Integer value) {
+            addCriterion("scan_show =", value, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowNotEqualTo(Integer value) {
+            addCriterion("scan_show <>", value, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowGreaterThan(Integer value) {
+            addCriterion("scan_show >", value, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowGreaterThanOrEqualTo(Integer value) {
+            addCriterion("scan_show >=", value, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowLessThan(Integer value) {
+            addCriterion("scan_show <", value, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowLessThanOrEqualTo(Integer value) {
+            addCriterion("scan_show <=", value, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowIn(List<Integer> values) {
+            addCriterion("scan_show in", values, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowNotIn(List<Integer> values) {
+            addCriterion("scan_show not in", values, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowBetween(Integer value1, Integer value2) {
+            addCriterion("scan_show between", value1, value2, "scanShow");
+            return (Criteria) this;
+        }
+
+        public Criteria andScanShowNotBetween(Integer value1, Integer value2) {
+            addCriterion("scan_show not between", value1, value2, "scanShow");
             return (Criteria) this;
         }
     }
