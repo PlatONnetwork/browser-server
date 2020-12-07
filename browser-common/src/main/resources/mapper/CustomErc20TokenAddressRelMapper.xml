@@ -39,6 +39,10 @@
         where e.address = #{address,jdbcType=VARCHAR}
         order by t.tx_count desc
     </select>
+    <select id="sumContractBalance" resultType="java.math.BigDecimal">
+        /*根据Token合约地址汇总金额*/
+        SELECT SUM(etar.`balance`) FROM `erc20_token_address_rel` etar WHERE etar.`contract` = #{contractAddress}
+    </select>
     <update id="updateAddressData">
         <foreach collection="list" item="item" index="index" separator=";">
             update `erc20_token_address_rel`
