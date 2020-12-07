@@ -238,6 +238,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         example.setOrderByClause(" update_time desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
+
+        // 根据Token合约地址汇总金额
+        BigDecimal totalBalance = customErc20TokenAddressRelMapper.sumContractBalance(req.getContract());
+
         List<QueryTokenHolderListResp> listResps = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
@@ -250,8 +254,20 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
                 queryTokenHolderListResp.setBalance(BigDecimal.ZERO);
             }
             queryTokenHolderListResp.setAddress(erc20TokenAddressRel.getAddress());
-            queryTokenHolderListResp.setPercent(balance.divide(erc20TokenAddressRel.getTotalSupply(), 10, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
+
+            BigDecimal totalSupply = erc20TokenAddressRel.getTotalSupply();
+            if(totalSupply==null||totalSupply.compareTo(BigDecimal.ZERO)<=0){
+                // 如果totalSupply为空或小于等于0，则使用Token合约地址汇总金额做为被除数
+                totalSupply = totalBalance;
+            }
+
+            if(totalSupply==null||totalSupply.compareTo(BigDecimal.ZERO)<=0){
+                // 如果totalSupply经过上一步判空处理后还是为空或小于等于0，则使用百分比设置为100%
+                queryTokenHolderListResp.setPercent("100%");
+            }else{
+                queryTokenHolderListResp.setPercent(balance.divide(totalSupply, 10, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
+            }
             listResps.add(queryTokenHolderListResp);
         });
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
