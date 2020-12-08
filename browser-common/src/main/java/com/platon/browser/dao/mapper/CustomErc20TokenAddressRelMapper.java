@@ -6,6 +6,7 @@ import com.platon.browser.dto.CustomErc20TokenAddressRel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -27,4 +28,6 @@ public interface CustomErc20TokenAddressRelMapper {
     int countByContract(Map params);
 
     int countByAddress(Map params);
+
+    BigDecimal sumBalanceByContract(String contractAddress);
 }
