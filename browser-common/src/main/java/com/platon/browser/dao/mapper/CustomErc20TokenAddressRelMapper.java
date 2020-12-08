@@ -20,5 +20,5 @@ public interface CustomErc20TokenAddressRelMapper {
 
     int updateAddressBalance(@Param("list") List<Erc20TokenAddressRel> list);
 
-    BigDecimal sumContractBalance(String contractAddress);
+    BigDecimal sumBalanceByContract(String contractAddress);
 }
