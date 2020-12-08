@@ -246,9 +246,10 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         erc20TokenAddressRels.forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp resp = new QueryTokenHolderListResp();
             resp.setAddress(erc20TokenAddressRel.getAddress());
-            BigDecimal balance = getAddressBalance(erc20TokenAddressRel);
+            BigDecimal originBalance = getAddressBalance(erc20TokenAddressRel);
+            originBalance = (originBalance==null)?BigDecimal.ZERO:originBalance;
             //金额转换成对应的值
-            balance = (balance==null)?BigDecimal.ZERO:ConvertUtil.convertByFactor(balance, erc20TokenAddressRel.getDecimal());
+            BigDecimal balance = ConvertUtil.convertByFactor(originBalance, erc20TokenAddressRel.getDecimal());
             resp.setBalance(balance);
             //计算总供应量
             BigDecimal totalSupply = erc20TokenAddressRel.getTotalSupply();
@@ -257,7 +258,7 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
             totalSupply = (totalSupply.compareTo(sumBalance)<0)?sumBalance:totalSupply;
             if(totalSupply.compareTo(BigDecimal.ZERO)>0){
                 // 总供应量大于0, 使用实际的余额除以总供应量
-                resp.setPercent(balance.divide(totalSupply, 10, RoundingMode.HALF_UP)
+                resp.setPercent(originBalance.divide(totalSupply, 10, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
             }else{
                 // 总供应量小于等于0，则占比设置为100%
