@@ -252,7 +252,8 @@ public class AddressServiceImpl implements AddressService {
 		// 2、先根据地址汇总【锁仓释放区块号】大于【网络统计表中的最新块号】的【所有锁仓金额】
 		NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
 		Long curBlockNum = networkStat.getCurNumber();
-		BigDecimal restrictBalanceFromDB = customRpPlanMapper.sumAmountByAddressAndBlockNumber(address,curBlockNum);
+		Long settleBlockCount = blockChainConfig.getSettlePeriodBlockCount().longValue();
+		BigDecimal restrictBalanceFromDB = customRpPlanMapper.sumAmountByAddressAndBlockNumber(address,curBlockNum,settleBlockCount);
 		restrictBalanceFromDB = (restrictBalanceFromDB==null)?BigDecimal.ZERO:restrictBalanceFromDB;
 		BigDecimal restrictBalance = restrictBalanceFromDB.subtract(new BigDecimal(pledgeBalance));
 		restrictBalance = (restrictBalance.compareTo(BigDecimal.ZERO)<0)?BigDecimal.ZERO:restrictBalance;

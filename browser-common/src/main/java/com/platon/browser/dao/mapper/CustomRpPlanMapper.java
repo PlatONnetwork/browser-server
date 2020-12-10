@@ -17,5 +17,9 @@ public interface CustomRpPlanMapper {
      * 查询金额总数
      */
     BigDecimal selectSumByAddress ( String address );
-    BigDecimal sumAmountByAddressAndBlockNumber ( @Param("address")String address,@Param("blockNumber") Long blockNumber);
+    BigDecimal sumAmountByAddressAndBlockNumber (
+            @Param("address")String address,
+            @Param("curbBlockNumber") Long curBlockNumber,
+            @Param("settleBlockCount") Long settleBlockCount
+    );
 }

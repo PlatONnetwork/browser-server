@@ -57,6 +57,6 @@
 
   <select id="sumAmountByAddressAndBlockNumber" resultType="java.math.BigDecimal">
     select sum(amount) from rp_plan
-    where address = #{address} and `number` > #{blockNumber}
+    where address = #{address} and (`epoch`*#{settleBlockCount}+`number`) > #{curBlockNumber}
   </select>
 </mapper>
