@@ -75,6 +75,7 @@ public class ConsistencyService {
             erc20TokenAddressRelTxCountUpdateParams,
             networkStatTokenQtyUpdateParam
         );
+        log.info("同步ES中的Token交易数至Mysql数据库成功！");
     }
 
     /**

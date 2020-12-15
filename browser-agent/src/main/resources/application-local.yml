@@ -63,6 +63,7 @@ logging:
     com.platon.browser.collection.queue.handler: error
     com.platon.browser.common: error
     com.platon.browser.complement: error
+    com.platon.browser.complement.dao.mapper: debug
     com.platon.browser.complement.handler: error
     com.platon.browser.complement.converter: error
     com.platon.browser.persistence: error
