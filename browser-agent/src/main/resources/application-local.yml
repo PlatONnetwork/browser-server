@@ -9,9 +9,9 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    url: jdbc:mysql://localhost:3306/browser_0.13.5.0_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: root
   #Redis配置
   redis:
     cluster:
@@ -57,7 +57,8 @@ logging:
     org.springframework: error
     org.springframework.retry: error
     com.platon.browser: error
-    com.platon.browser.bootstrap: error
+    com.platon.browser.bootstrap: debug
+    com.platon.browser.elasticsearch: debug
     com.platon.browser.collection: error
     com.platon.browser.collection.queue.handler: error
     com.platon.browser.common: error
@@ -76,7 +77,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.112.172:6778
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
