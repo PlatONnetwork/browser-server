@@ -62,14 +62,14 @@ public class InnerTxESRepository extends ESRepository {
         log.debug("from角度from!=tto的交易\n{}", JSON.toJSONString(fromSummary,true));
         log.debug("tto角度tto!=from的交易\n{}", JSON.toJSONString(ttoSummary,true));
 
-        // 汇总addressTxCount，用于更新network_stat表的token_qty
+        // 汇总addressTxCount（【from==tto的交易】与任意一个【from!=tto的交易】的汇总），用于更新network_stat表的token_qty
         TokenTxSummary summary = new TokenTxSummary();
         summary.setAddressTxCount(
             equalSummary.getAddressTxCount()
             +fromSummary.getAddressTxCount()
         );
 
-        // 汇总addressTxCountMap，用户更新address表token_qty
+        // 汇总addressTxCountMap（汇总地址from==tto、from!=tto的总数），用于更新address表token_qty
         Map<String,Long> summaryTxCountMap = summary.getAddressTxCountMap();
         Arrays.asList(equalSummary,fromSummary,ttoSummary).forEach(subSummary->{
             subSummary.getAddressTxCountMap().forEach((address,count)->{
@@ -98,7 +98,7 @@ public class InnerTxESRepository extends ESRepository {
             });
         });
 
-        // 汇总contractTxCountMap的tokenTxCount（【from==tto的交易】与任意【from!=tto的交易】的汇总）, 用于更新erc20_token表的tx_count
+        // 汇总contractTxCountMap的tokenTxCount（【from==tto的交易】与任意一个【from!=tto的交易】的汇总）, 用于更新erc20_token表的tx_count
         Arrays.asList(equalSummary,fromSummary).forEach(subSummary->{
             subSummary.getContractTxCountMap().forEach((contract,subTtc)->{
                 TokenTxCount sumTtc = contractTxCountMap.get(contract);
