@@ -57,13 +57,13 @@ logging:
     org.springframework: error
     org.springframework.retry: error
     com.platon.browser: error
-    com.platon.browser.bootstrap: debug
+    com.platon.browser.bootstrap: error
     com.platon.browser.elasticsearch: debug
     com.platon.browser.collection: error
     com.platon.browser.collection.queue.handler: error
     com.platon.browser.common: error
     com.platon.browser.complement: error
-    com.platon.browser.complement.dao.mapper: debug
+    com.platon.browser.complement.dao.mapper: error
     com.platon.browser.complement.handler: error
     com.platon.browser.complement.converter: error
     com.platon.browser.persistence: error

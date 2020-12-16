@@ -24,9 +24,9 @@ public class AlatContractDeploy extends ContractTestBase {
                     gasProvider,
                     chainId,
                     new BigInteger("500000000000000000000000000"),
-                    "aLAT-1"+i,
+                    "aLAT-2"+i,
                     BigInteger.valueOf(16L),
-                    "aLAT-1"+i ,
+                    "aLAT-2"+i ,
                     ownerWallet.getAddress()
             ).send();
             try{

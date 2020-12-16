@@ -61,10 +61,10 @@ public class ConsistencyService {
 
     private void syncTxCount(){
         TokenTxSummary summary = tokenTxESRepository.groupContractTxCount();
-        List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParams = summary.getAddressTokenQtyUpdateParamList();
-        List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.getErc20TokenAddressRelTxCountUpdateParamList();
-        List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.getErc20TokenTxCountUpdateParamList();
-        NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam = summary.getNetworkStatTokenQtyUpdateParam();
+        List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParams = summary.addressTokenQtyUpdateParamList();
+        List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.erc20TokenAddressRelTxCountUpdateParamList();
+        List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.erc20TokenTxCountUpdateParamList();
+        NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam = summary.networkStatTokenQtyUpdateParam();
         syncTokenInfoMapper.syncTokenTxCount(
             addressTokenQtyUpdateParams,
             erc20TokenTxCountUpdateParams,

@@ -1,5 +1,6 @@
 package com.platon.browser.dto.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
@@ -39,7 +40,7 @@ public class TokenTxSummary {
      * 获取address表token_qty字段更新参数列表
      * @return
      */
-    public List<AddressTokenQtyUpdateParam> getAddressTokenQtyUpdateParamList(){
+    public List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParamList(){
         List<AddressTokenQtyUpdateParam> params = new ArrayList<>();
         addressTxCountMap.forEach((address,count)->{
             AddressTokenQtyUpdateParam param = new AddressTokenQtyUpdateParam();
@@ -54,7 +55,7 @@ public class TokenTxSummary {
      * 获取erc20_token_address_rel表tx_count字段更新参数列表
      * @return
      */
-    public List<Erc20TokenAddressRelTxCountUpdateParam> getErc20TokenAddressRelTxCountUpdateParamList(){
+    public List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParamList(){
         List<Erc20TokenAddressRelTxCountUpdateParam> params = new ArrayList<>();
         contractTxCountMap.forEach((contract,ttc)->{
             ttc.getTokenTxCountMap().forEach((address,count)->{
@@ -72,7 +73,8 @@ public class TokenTxSummary {
      * 获取erc20_token表tx_count字段更新参数列表
      * @return
      */
-    public List<Erc20TokenTxCountUpdateParam> getErc20TokenTxCountUpdateParamList(){
+    @JsonIgnore
+    public List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParamList(){
         List<Erc20TokenTxCountUpdateParam> params = new ArrayList<>();
         contractTxCountMap.forEach((contract,ttc)->{
             Erc20TokenTxCountUpdateParam param = new Erc20TokenTxCountUpdateParam();
@@ -87,7 +89,7 @@ public class TokenTxSummary {
      * 获取network_stat表token_qty字段更新参数列表
      * @return
      */
-    public NetworkStatTokenQtyUpdateParam getNetworkStatTokenQtyUpdateParam(){
+    public NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam(){
         NetworkStatTokenQtyUpdateParam param = new NetworkStatTokenQtyUpdateParam();
         param.setTokenQty(addressTxCount.intValue());
         return param;

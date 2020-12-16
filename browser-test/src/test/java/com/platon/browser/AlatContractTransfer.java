@@ -35,7 +35,29 @@ public class AlatContractTransfer extends ContractTestBase {
 
     @Test
     public void transfer() throws Exception {
-//        for (int i=0;i<2;i++) send(ownerWallet,ownerWallet);
+        //*********contract: atp1anqfd4c0j09dy2lqtcapgyvrpa8yf23vhy7p9t **********
+        send(ownerWallet,testWalletA,new BigInteger("1000000000000000000000"));
+        send(ownerWallet,testWalletB,new BigInteger("1000000000000000000000"));
+        send(ownerWallet,testWalletC,new BigInteger("1000000000000000000000"));
+
+        // ownerWallet: atp196278ns22j23awdfj9f2d4vz0pedld8a2fzwwj
+        for (int i=0;i<8;i++) send(ownerWallet,ownerWallet);
+        for (int i=0;i<8;i++) send(ownerWallet,testWalletA);
+        for (int i=0;i<8;i++) send(ownerWallet,testWalletB);
+        // testWalletA: atp1gqsdewmd0w4ct8xwnl6xxlu0yx46p8ssjtys38
+        for (int i=0;i<8;i++) send(testWalletA,testWalletA);
+        for (int i=0;i<8;i++) send(testWalletA,testWalletB);
+        for (int i=0;i<8;i++) send(testWalletA,ownerWallet);
+        // testWalletB: atp1zkrxx6rf358jcvr7nruhyvr9hxpwv9uncjmns0
+        for (int i=0;i<8;i++) send(testWalletB,testWalletB);
+        for (int i=0;i<8;i++) send(testWalletB,testWalletA);
+        // testWalletC: atp1cy2uat0eukfrxv897s5s8lnljfka5ewjj943gf
+        for (int i=0;i<17;i++) send(testWalletC,testWalletC);
+        for (int i=0;i<12;i++) send(testWalletC,testWalletA);
+        for (int i=0;i<12;i++) send(testWalletC,testWalletB);
+
+//         ownerWallet: atp196278ns22j23awdfj9f2d4vz0pedld8a2fzwwj
+//        for (int i=0;i<8;i++) send(ownerWallet,ownerWallet);
 //        for (int i=0;i<4;i++) send(ownerWallet,testWalletA);
 //        for (int i=0;i<6;i++) send(ownerWallet,testWalletB);
 //        for (int i=0;i<8;i++) send(testWalletA,testWalletA);
@@ -46,9 +68,13 @@ public class AlatContractTransfer extends ContractTestBase {
     }
 
     private void send(Credentials from,Credentials to) throws Exception {
+        send(from,to,new BigInteger("100000000000000000"));
+    }
+
+    private void send(Credentials from,Credentials to,BigInteger amount) throws Exception {
         String currContractAddress = getCurrContractAddress();
         AlatContract contract = loadContract(currContractAddress,from);
-        TransactionReceipt transactionReceipt = contract.transfer(to.getAddress(), new BigInteger("1")).send();
+        TransactionReceipt transactionReceipt = contract.transfer(to.getAddress(), amount).send();
         log.info("hash = {}",transactionReceipt.getTransactionHash());
         List<AlatContract.TransferEventResponse> tokenAddress = contract.getTransferEvents(transactionReceipt);
         assertThat(tokenAddress.size(), is(1));

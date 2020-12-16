@@ -39,6 +39,7 @@ public abstract class ContractTestBase {
 	// 测试钱包
 	protected Credentials testWalletA = Credentials.create("0x690a32ceb7eab4131f7be318c1672d3b9b2dadeacba20b99432a7847c1e926e1");
 	protected Credentials testWalletB = Credentials.create("0xf51ca759562e1daf9e5302d121f933a8152915d34fcbc27e542baf256b5e4b74");
+	protected Credentials testWalletC = Credentials.create("0x3a4130e4abb887a296eb38c15bbd83253ab09492a505b10a54b008b7dcc1668");
 
 	@Before
 	public void init() {
@@ -53,12 +54,15 @@ public abstract class ContractTestBase {
 	 * @throws Exception
 	 */
 	protected void charge() throws Exception {
+		BigInteger ownerWalletBalance = web3j.platonGetBalance(ownerWallet.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
+		log.info("ownerWalletBalance:{}",ownerWalletBalance);
+
 		Transfer.sendFunds(
 				web3j,
 				ownerWallet,
 				chainId,
 				testWalletA.getAddress(),
-				BigDecimal.valueOf(100000),
+				BigDecimal.valueOf(10000000),
 				Convert.Unit.ATP
 		).send();
 		BigInteger testWalletABalance = web3j.platonGetBalance(testWalletA.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
@@ -69,11 +73,22 @@ public abstract class ContractTestBase {
 				ownerWallet,
 				chainId,
 				testWalletB.getAddress(),
-				BigDecimal.valueOf(100000),
+				BigDecimal.valueOf(10000000),
 				Convert.Unit.ATP
 		).send();
 		BigInteger testWalletBBalance = web3j.platonGetBalance(testWalletB.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
 		log.info("testWalletBBalance:{}",testWalletBBalance);
+
+		Transfer.sendFunds(
+				web3j,
+				ownerWallet,
+				chainId,
+				testWalletC.getAddress(),
+				BigDecimal.valueOf(10000000),
+				Convert.Unit.ATP
+		).send();
+		BigInteger testWalletCBalance = web3j.platonGetBalance(testWalletC.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
+		log.info("testWalletCBalance:{}",testWalletCBalance);
 	}
 
 	protected AlatContract loadContract(String address, Credentials credentials){
