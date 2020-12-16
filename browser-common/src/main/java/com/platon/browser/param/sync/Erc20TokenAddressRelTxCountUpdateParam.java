@@ -1,4 +1,4 @@
-package com.platon.browser.param.boostrapsync;
+package com.platon.browser.param.sync;
 
 import lombok.Data;
 

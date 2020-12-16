@@ -1,9 +1,9 @@
 package com.platon.browser.dto.elasticsearch;
 
-import com.platon.browser.param.boostrapsync.AddressTokenQtyUpdateParam;
-import com.platon.browser.param.boostrapsync.Erc20TokenAddressRelTxCountUpdateParam;
-import com.platon.browser.param.boostrapsync.Erc20TokenTxCountUpdateParam;
-import com.platon.browser.param.boostrapsync.NetworkStatTokenQtyUpdateParam;
+import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
+import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
+import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
+import com.platon.browser.param.sync.NetworkStatTokenQtyUpdateParam;
 import lombok.Data;
 
 import java.util.ArrayList;

@@ -1,35 +1,31 @@
 package com.platon.browser.bootstrap.service;
 
 
-import com.alibaba.fastjson.JSON;
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.receipt.ReceiptService;
-import com.platon.browser.complement.dao.mapper.SyncTokenTxCountMapper;
+import com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dto.elasticsearch.TokenTxSummary;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.InnerTxESRepository;
-import com.platon.browser.enums.Arc20TxGroupTypeEnum;
-import com.platon.browser.param.boostrapsync.AddressTokenQtyUpdateParam;
-import com.platon.browser.param.boostrapsync.Erc20TokenAddressRelTxCountUpdateParam;
-import com.platon.browser.param.boostrapsync.Erc20TokenTxCountUpdateParam;
-import com.platon.browser.param.boostrapsync.NetworkStatTokenQtyUpdateParam;
+import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
+import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
+import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
+import com.platon.browser.param.sync.NetworkStatTokenQtyUpdateParam;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -55,7 +51,7 @@ public class ConsistencyService {
     private InnerTxESRepository tokenTxESRepository;
 
     @Resource
-    private SyncTokenTxCountMapper syncTokenTxCountMapper;
+    private SyncTokenInfoMapper syncTokenInfoMapper;
 
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
@@ -69,7 +65,7 @@ public class ConsistencyService {
         List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.getErc20TokenAddressRelTxCountUpdateParamList();
         List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.getErc20TokenTxCountUpdateParamList();
         NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam = summary.getNetworkStatTokenQtyUpdateParam();
-        syncTokenTxCountMapper.syncTokenTxCount(
+        syncTokenInfoMapper.syncTokenTxCount(
             addressTokenQtyUpdateParams,
             erc20TokenTxCountUpdateParams,
             erc20TokenAddressRelTxCountUpdateParams,
