@@ -7,10 +7,8 @@ import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.entity.Erc20TokenAddressRelExample;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
-import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
@@ -82,6 +80,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
     private DownFileCommon downFileCommon;
 
     @Autowired
+    private NetworkStatMapper networkStatMapper;
+
+    @Autowired
     private ErcService ercService;
 
     @Override
@@ -138,8 +139,16 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, recordListResp);
+
         result.setTotalCount(queryResultFromES.getTotal());
         result.setDisplayTotalCount(queryResultFromES.getTotal());
+        // 从数据库查询网络表取最新的token交易数
+        List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
+        if(networkStatList!=null&&!networkStatList.isEmpty()){
+            NetworkStat networkStat = networkStatList.get(0);
+            result.setTotalCount(networkStat.getTokenQty());
+            result.setDisplayTotalCount(networkStat.getTokenQty());
+        }
         return result;
     }
 
