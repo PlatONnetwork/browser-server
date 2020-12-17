@@ -23,7 +23,7 @@
 		<if test="isInit != null">
 			`is_init` =  #{isInit},
 		</if>
-		<if test="reward_per != null">
+		<if test="delegateRewardPer != null">
 			`reward_per` =  #{delegateRewardPer},
 		</if>
 	</set>
@@ -49,7 +49,7 @@
 		<if test="isInit != null">
 			`is_init` =  #{isInit},
 		</if>
-		<if test="reward_per != null">
+		<if test="delegateRewardPer != null">
 			`reward_per` =  #{delegateRewardPer},
 		</if>
 	</set>
