@@ -23,6 +23,9 @@
 		<if test="isInit != null">
 			`is_init` =  #{isInit},
 		</if>
+		<if test="reward_per != null">
+			`reward_per` =  #{delegateRewardPer},
+		</if>
 	</set>
 	 where `node_id` = #{nodeId} and `staking_block_num` = #{stakingBlockNum};
 	/*2、node 更新*/
@@ -45,6 +48,9 @@
 		</if>
 		<if test="isInit != null">
 			`is_init` =  #{isInit},
+		</if>
+		<if test="reward_per != null">
+			`reward_per` =  #{delegateRewardPer},
 		</if>
 	</set>
 	where `node_id` = #{nodeId};
