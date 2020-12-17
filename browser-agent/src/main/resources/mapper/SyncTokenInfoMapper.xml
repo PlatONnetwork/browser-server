@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper">
+    <update id="syncTokenTxCount">
+        /*1、更新网络表*/
+        update `network_stat`set `token_qty` = #{networkParam.tokenQty};
+        /*2、更新地址表*/
+        <foreach collection="addressParams" item="item" index="index">
+            update `address` set `token_qty` = #{item.tokenQty} where `address` = #{item.address};
+        </foreach>
+        /*3、更新erc20_token表*/
+        <foreach collection="tokenParams" item="item" index="index">
+            update `erc20_token` set `tx_count` = #{item.txCount} where `address` = #{item.address};
+        </foreach>
+        /*4、更新erc20_token_address_rel表*/
+        <foreach collection="tokenAddressParams" item="item" index="index">
+            update `erc20_token_address_rel` set `tx_count` = #{item.txCount}
+            where `contract` = #{item.contract} and `address` = #{item.address};
+        </foreach>
+    </update>
+
+    <update id="updateTotalSupply">
+        /*1、更新erc20_token表的total_supply字段*/
+        /*2、更新erc20_token_address_rel表的total_supply字段*/
+        <foreach collection="totalSupplyParams" item="item" index="index">
+            update `erc20_token` set `total_supply` = #{item.totalSupply} where `address` = #{item.address};
+            update `erc20_token_address_rel` set `total_supply` = #{item.totalSupply} where `contract` = #{item.address};
+        </foreach>
+    </update>
+</mapper>

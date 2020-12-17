@@ -1,21 +1,31 @@
 package com.platon.browser.bootstrap.service;
 
 
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
 import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.receipt.ReceiptService;
+import com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dto.elasticsearch.TokenTxSummary;
 import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.InnerTxESRepository;
+import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
+import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
+import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
+import com.platon.browser.param.sync.NetworkStatTokenQtyUpdateParam;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -37,17 +47,45 @@ public class ConsistencyService {
     @Autowired
     private BootstrapEventPublisher bootstrapEventPublisher;
 
+    @Resource
+    private InnerTxESRepository tokenTxESRepository;
+
+    @Resource
+    private SyncTokenInfoMapper syncTokenInfoMapper;
+
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
+
+    /**
+     * 同步ARC20相关地址交易数统计数据
+     */
+
+    private void syncTxCount(){
+        TokenTxSummary summary = tokenTxESRepository.groupContractTxCount();
+        List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParams = summary.addressTokenQtyUpdateParamList();
+        List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.erc20TokenAddressRelTxCountUpdateParamList();
+        List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.erc20TokenTxCountUpdateParamList();
+        NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam = summary.networkStatTokenQtyUpdateParam();
+        syncTokenInfoMapper.syncTokenTxCount(
+            addressTokenQtyUpdateParams,
+            erc20TokenTxCountUpdateParams,
+            erc20TokenAddressRelTxCountUpdateParams,
+            networkStatTokenQtyUpdateParam
+        );
+        log.info("同步ES中的Token交易数至Mysql数据库成功！");
+    }
 
     /**
      * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
      * @throws IOException
      */
+    @Transactional(rollbackFor = Exception.class)
     public void post() throws IOException {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if(networkStat==null) {
             return;
         }
+
+        syncTxCount();
 
         // mysql中的最高块号
         long mysqlMaxBlockNum = networkStat.getCurNumber();

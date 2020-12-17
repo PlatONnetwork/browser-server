@@ -41,7 +41,7 @@ public class ErcBalanceUpdateTest extends AgentTestBase {
     private SetOperations setOperations;
 
     @Spy
-    private ErcBalanceUpdateTask target;
+    private ErcTokenUpdateTask target;
 
     @Before
     public void setup() throws Exception {

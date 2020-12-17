@@ -7,10 +7,8 @@ import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.entity.Erc20TokenAddressRelExample;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
-import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.transaction.TokenTransferRecordCacheDto;
@@ -84,6 +82,9 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
     private DownFileCommon downFileCommon;
 
     @Autowired
+    private NetworkStatMapper networkStatMapper;
+
+    @Autowired
     private ErcService ercService;
 
     @Override
@@ -146,15 +147,21 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
         }
 
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
-                .filter(p -> p != null && p.getDecimal() != null)
-                .map(p -> {
-                    return this.toQueryTokenTransferRecordListResp(req.getAddress(), p);
-                }).collect(Collectors.toList());
+            .filter(p -> p != null && p.getDecimal() != null)
+            .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p)).collect(Collectors.toList());
 
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, recordListResp);
+
         result.setTotalCount(totalCount);
         result.setDisplayTotalCount(displayTotalCount);
+        // 从数据库查询网络表取最新的token交易数
+        List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
+        if(networkStatList!=null&&!networkStatList.isEmpty()){
+            NetworkStat networkStat = networkStatList.get(0);
+            result.setTotalCount(networkStat.getTokenQty());
+            result.setDisplayTotalCount(networkStat.getTokenQty());
+        }
         return result;
     }
 
@@ -282,9 +289,6 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
 
         List<QueryTokenHolderListResp> respList = new ArrayList<>();
 
-        // 根据Token合约地址汇总金额
-        BigDecimal totalBalance = customErc20TokenAddressRelMapper.sumBalanceByContract(req.getContract());
-        BigDecimal sumBalance = (totalBalance==null)?BigDecimal.ZERO:totalBalance;
         sortedErc20TokenAddressRelList.forEach(erc20TokenAddressRel -> {
             QueryTokenHolderListResp resp = new QueryTokenHolderListResp();
             resp.setAddress(erc20TokenAddressRel.getAddress());
@@ -296,15 +300,13 @@ public class Erc20TokenTransferRecordServiceImpl implements Erc20TokenTransferRe
             //计算总供应量
             BigDecimal totalSupply = erc20TokenAddressRel.getTotalSupply();
             totalSupply = (totalSupply==null)?BigDecimal.ZERO:totalSupply;
-            // 记录中的总供应量与SQL汇总出来的总量对比，取最大者
-            totalSupply = (totalSupply.compareTo(sumBalance)<0)?sumBalance:totalSupply;
             if(totalSupply.compareTo(BigDecimal.ZERO)>0){
                 // 总供应量大于0, 使用实际的余额除以总供应量
                 resp.setPercent(originBalance.divide(totalSupply, 10, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
             }else{
-                // 总供应量小于等于0，则占比设置为100%
-                resp.setPercent("100%");
+                // 总供应量小于等于0，则占比设置为0%
+                resp.setPercent("0%");
             }
             respList.add(resp);
         });

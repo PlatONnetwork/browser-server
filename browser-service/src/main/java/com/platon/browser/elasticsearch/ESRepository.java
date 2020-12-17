@@ -51,7 +51,7 @@ import java.util.Map;
 public abstract class ESRepository {
 
 	@Resource(name = "restHighLevelClient")
-	private RestHighLevelClient client;
+	protected RestHighLevelClient client;
 
 	@Autowired
 	private SpringUtils springUtils;
