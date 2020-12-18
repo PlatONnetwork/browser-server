@@ -59,25 +59,18 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private AddressMapper addressMapper;
-
     @Autowired
     private RpPlanMapper rpPlanMapper;
-
     @Autowired
     private CustomRpPlanMapper customRpPlanMapper;
-
     @Autowired
     private PlatOnClient platonClient;
-
     @Autowired
     private I18nUtil i18n;
-
     @Autowired
     private BlockChainConfig blockChainConfig;
-    
     @Autowired
 	private BlockESRepository blockESRepository;
-    
     @Autowired
     private SpecialApi specialApi;
     

@@ -7,9 +7,12 @@ import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.receipt.ReceiptService;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dto.elasticsearch.TokenTxSummary;
 import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.InnerTxESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
@@ -20,6 +23,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +49,11 @@ public class ConsistencyServiceTest extends AgentTestBase {
     private BootstrapEventPublisher bootstrapEventPublisher;
     @Mock
     private ShutdownCallback shutdownCallback;
+    @Mock
+    private InnerTxESRepository tokenTxESRepository;
+    @Mock
+    private SyncTokenInfoMapper syncTokenInfoMapper;
+
     @Spy
     private ConsistencyService target;
 
@@ -55,12 +64,18 @@ public class ConsistencyServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target, "blockService", blockService);
         ReflectionTestUtils.setField(target, "receiptService", receiptService);
         ReflectionTestUtils.setField(target, "bootstrapEventPublisher", bootstrapEventPublisher);
+        ReflectionTestUtils.setField(target, "tokenTxESRepository", tokenTxESRepository);
+        ReflectionTestUtils.setField(target, "syncTokenInfoMapper", syncTokenInfoMapper);
         ReflectionTestUtils.setField(target, "shutdownCallback", shutdownCallback);
         when(shutdownCallback.isDone()).thenReturn(true);
     }
 
     @Test
     public void post() throws IOException {
+
+        TokenTxSummary summary = new TokenTxSummary();
+        when(tokenTxESRepository.groupContractTxCount()).thenReturn(summary);
+
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
         target.post();
