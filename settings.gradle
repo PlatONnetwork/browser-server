@@ -12,4 +12,5 @@ include 'browser-service'
 include 'browser-sync'
 include 'browser-press'
 include 'browser-export'
+include 'browser-test'
 
