@@ -1,4 +1,5 @@
 ## v0.13.0.1
+#### 功能变更
 数据库&界面变动：  
 1. 节点表状态字段【status】增加【锁定状态】值：4 ；
 2. 节点表加字段：
@@ -33,3 +34,58 @@
     b. 后续被举报时，走4；  
     
 7. 节点锁定周期结束，则置为候选中，并记录恢复日志，异常=1（正常）, 零出块次数=0
+
+## v0.13.4.1
+#### 功能变更
+1. 令牌表erc20_token添加scan_show字段（0-不显示，1-显示），用于控制令牌是否在浏览器显示；
+2. browser-api模块查询令牌添加scan_show=1过滤，只返回允许显示的令牌；
+
+## v0.14.0.0
+#### 功能变更
+1. 为兼容底层修改节点信息项变为可选，浏览器解码【修改质押输入参数】逻辑做调整；  
+2. 普通交易、通过合约调用PPOS交易、arc20交易排序序号计算规则：交易所在块号*100000+本区块交易列表索引；  
+3. 为兼容最小锁仓释放参数minimumRelease的参数修改提案，对minimumRelease进行入库，但给前端提供的治理参数列表不返回此参数；  
+4. 并入0.13.4.1改动：erc20_token列表添加显示控制字段（0-不显示，1-显示）（默认不显示）；  
+5. 修复token发行量&&token持有者百分比计算问题，计算逻辑修改为如下：  
+    5.1. agent端ErcTokenUpdateTask定时更新【erc20_token_address_rel表】的balance && 定时更新 【erc20_token表、erc20_token_address_rel表】的total_supply，以探测地址余额及Token总发行量的变化； 
+    5.2. api端token详情接口处理：  
+        5.2.1. 发行量：取【erc20_token表】的total_supply；    
+        5.2.2. 持有者列表计算规则：
+        5.2.2.1. 如果【erc20_token_address_rel表】的total_supply大于0，则： 百分比 =(【erc20_token_address_rel表】的balance/【erc20_token_address_rel表】的total_supply) x 100 %
+        5.2.2.2. 如果【erc20_token_address_rel表】的total_supply等于0，则： 百分比 = 0%
+        测试方法：  
+        a、发行量更新验证：修改 数据库 erc20_token_address_rel表中的 totalSupply字段为任意错误值，检查定时任务是否会把值更正回来；  
+        b、百分比验证：参考5.2.2；  
+    6. 地址【可用锁仓余额】修正（对应底层锁仓余额bug）：【可用锁仓余额】 = 【从特殊节点查询的锁仓余额】 - 【锁仓余额中已经用户质押或委托的金额】  
+    测试方法： 在浏览器查询rp_plan表中的地址余额，核对与底层查询出来的余额是否一致;  
+7. arc20 token交易数校正逻辑：  
+    7.1. Agent启动时，在执行业务逻辑前，从ES统计token的交易信息（合约的交易数、在地址的交易数），并更新到数据库的一下表中：  
+        `address`      ---   校正字段：token_qty  
+        `erc20_token`  --- 校正字段： tx_count  
+        `erc20_token_address_rel`  --- 校正字段：tx_count  
+        `network_stat`   -- 校正字段：token_qty  
+
+    7.2. ARC20交易列表的记录总数取network_stat的token_qty字段值，解决ES的10000记录数限制导致的总数错误；  
+
+## v0.15.0.0
+#### 功能变更
+1. 节点委托奖励比例修改, 需要在下一结算周期生效；
+2. 新增锁仓治理参数minimumRelease；
+3. 零出块处罚列表新增预估解锁块高；
+4. 退出节点新增预估解锁块高；
+5. ARC20交易下载条数设置为30000；
+6. 兼容跨连合约交易的解析；
+7. ARC20交易入库至Redis； 
+8. 根据特殊节点返回的调账数据，对锁仓相关金额进行调整；
+
+#### 配置变更
+1. Redis命名空间移到最外层配置文件中配置：
+   ```
+    platon:
+        redis-namespace: browser:${version}:${profile}
+   ```
+
+#### 升级注意事项
+1. 由于0.15.0.0之前的版本ARC20交易没有入库至Redis，在不清理现有数据的场景下，
+   部署0.15.0.0版本前，需要停止browser-agent，并执行browser-sync把ES中的
+   ARC20交易同步至Redis。

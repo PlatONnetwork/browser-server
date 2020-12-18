@@ -1,9 +1,7 @@
 CREATE DATABASE `alaya_browser` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 USE `alaya_browser`;
 
 DROP TABLE IF EXISTS `address`;
-
 CREATE TABLE `address` (
   `address` varchar(42) NOT NULL COMMENT '地址',
   `type` int(11) NOT NULL COMMENT '地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约',
@@ -34,10 +32,7 @@ CREATE TABLE `address` (
   KEY `type` (`type`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `block_node`;
-
 CREATE TABLE `block_node` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -49,10 +44,7 @@ CREATE TABLE `block_node` (
   KEY `staking_consensus_epoch` (`staking_consensus_epoch`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `config`;
-
 CREATE TABLE `config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `module` varchar(64) NOT NULL COMMENT '参数模块名',
@@ -67,10 +59,7 @@ CREATE TABLE `config` (
   PRIMARY KEY (`id`)
 );
 
-
-
 DROP TABLE IF EXISTS `delegation`;
-
 CREATE TABLE `delegation` (
   `delegate_addr` varchar(42) NOT NULL COMMENT '委托交易地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '最新的质押交易块高',
@@ -88,10 +77,7 @@ CREATE TABLE `delegation` (
   KEY `staking_block_num` (`staking_block_num`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `erc20_token`;
-
 CREATE TABLE `erc20_token` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
   `address` varchar(64) DEFAULT NULL COMMENT '合约地址',
@@ -107,16 +93,14 @@ CREATE TABLE `erc20_token` (
   `tx_count` int(11) DEFAULT NULL COMMENT '合约内交易数',
   `holder` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的持有人',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `scan_show` int(11) NOT NULL DEFAULT '0' COMMENT '是否在浏览器中显示: 0-不显示,1-显示',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_address` (`address`),
   KEY `idx_name` (`name`),
   KEY `idx_holder` (`holder`)
 );
 
-
-
 DROP TABLE IF EXISTS `erc20_token_address_rel`;
-
 CREATE TABLE `erc20_token_address_rel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
   `contract` varchar(64) DEFAULT NULL COMMENT '合约地址',
@@ -133,10 +117,7 @@ CREATE TABLE `erc20_token_address_rel` (
   KEY `idx_contract` (`contract`)
 );
 
-
-
 DROP TABLE IF EXISTS `erc20_token_detail`;
-
 CREATE TABLE `erc20_token_detail` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
   `contract` varchar(64) DEFAULT NULL COMMENT '合约地址',
@@ -150,10 +131,7 @@ CREATE TABLE `erc20_token_detail` (
   UNIQUE KEY `uni_contract` (`contract`)
 );
 
-
-
 DROP TABLE IF EXISTS `erc20_token_transfer_record`;
-
 CREATE TABLE `erc20_token_transfer_record` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
   `tx_hash` varchar(128) DEFAULT NULL COMMENT '交易哈希',
@@ -175,32 +153,23 @@ CREATE TABLE `erc20_token_transfer_record` (
   KEY `idx_from_to_contract` (`tx_from`,`transfer_to`)
 );
 
-
-
 DROP TABLE IF EXISTS `gas_estimate`;
-
 CREATE TABLE `gas_estimate` (
   `addr` varchar(42) NOT NULL COMMENT '委托交易地址',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
   `sbn` bigint(20) NOT NULL COMMENT '最新的质押交易块高',
   `epoch` bigint(20) NOT NULL DEFAULT '0' COMMENT '委托未计算周期',
   PRIMARY KEY (`addr`,`node_id`,`sbn`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
+);
 
 DROP TABLE IF EXISTS `gas_estimate_log`;
-
 CREATE TABLE `gas_estimate_log` (
   `seq` bigint(20) NOT NULL COMMENT '序号',
   `json` longtext NOT NULL,
   PRIMARY KEY (`seq`)
 );
 
-
-
 DROP TABLE IF EXISTS `n_opt_bak`;
-
 CREATE TABLE `n_opt_bak` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -217,10 +186,7 @@ CREATE TABLE `n_opt_bak` (
   KEY `block_number` (`b_num`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `network_stat`;
-
 CREATE TABLE `network_stat` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `cur_number` bigint(20) NOT NULL COMMENT '当前块号',
@@ -253,10 +219,7 @@ CREATE TABLE `network_stat` (
   PRIMARY KEY (`id`)
 );
 
-
-
 DROP TABLE IF EXISTS `node`;
-
 CREATE TABLE `node` (
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
   `stat_slash_multi_qty` int(11) NOT NULL DEFAULT '0' COMMENT '多签举报次数',
@@ -278,7 +241,7 @@ CREATE TABLE `node` (
   `external_name` varchar(128) DEFAULT NULL COMMENT '第三方社交软件关联用户名',
   `staking_addr` varchar(42) NOT NULL COMMENT '发起质押的账户地址',
   `benefit_addr` varchar(42) NOT NULL DEFAULT '' COMMENT '收益地址',
-  `annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
+  `annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
   `program_version` int(11) NOT NULL DEFAULT '0' COMMENT '程序版本',
   `big_version` int(11) NOT NULL DEFAULT '0' COMMENT '大程序版本',
   `web_site` varchar(255) NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
@@ -304,8 +267,8 @@ CREATE TABLE `node` (
   `next_reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '下一结算周期委托奖励比例',
   `next_reward_per_mod_epoch` int(11) DEFAULT '0' COMMENT '【下一结算周期委托奖励比例】修改所在结算周期',
   `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '所有质押已领取委托奖励',
-  `pre_dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
-  `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
+  `pre_dele_annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
+  `dele_annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
   `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前质押总的委托奖励',
   `pre_total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '所有历史质押记录总的委托奖励累计字段(在质押退出时会把total_dele_reward累加到此字段)',
   `exception_status` int(11) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因低出块被惩罚(例如在连续两个周期当选验证人，但在第一个周期出块率低),5因双签被惩罚',
@@ -323,10 +286,7 @@ CREATE TABLE `node` (
   KEY `list2` (`big_version`,`total_value`,`staking_block_num`,`staking_tx_index`)
 );
 
-
-
 DROP TABLE IF EXISTS `proposal`;
-
 CREATE TABLE `proposal` (
   `hash` varchar(72) NOT NULL COMMENT '提案交易hash',
   `type` int(11) NOT NULL COMMENT '提案类型:1文本提案,2升级提案,3参数提案,4取消提案',
@@ -360,10 +320,7 @@ CREATE TABLE `proposal` (
   KEY `type` (`type`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `rp_plan`;
-
 CREATE TABLE `rp_plan` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `address` varchar(42) NOT NULL DEFAULT '0' COMMENT '发布锁仓计划地址',
@@ -372,13 +329,11 @@ CREATE TABLE `rp_plan` (
   `number` bigint(20) NOT NULL COMMENT '锁仓计划所在区块',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `number索引` (`number`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `slash`;
-
 CREATE TABLE `slash` (
   `hash` varchar(72) NOT NULL COMMENT '举报交易hash',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -394,10 +349,7 @@ CREATE TABLE `slash` (
   KEY `node_id` (`node_id`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `staking`;
-
 CREATE TABLE `staking` (
   `node_id` varchar(130) NOT NULL COMMENT '质押节点地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '质押区块高度',
@@ -412,7 +364,7 @@ CREATE TABLE `staking` (
   `external_name` varchar(128) DEFAULT NULL COMMENT '第三方社交软件关联用户名',
   `staking_addr` varchar(42) NOT NULL COMMENT '发起质押的账户地址',
   `benefit_addr` varchar(42) NOT NULL DEFAULT '' COMMENT '收益地址',
-  `annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
+  `annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
   `program_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '程序版本',
   `big_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '大程序版本',
   `web_site` varchar(255) NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
@@ -439,9 +391,9 @@ CREATE TABLE `staking` (
   `next_reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '下一结算周期委托奖励比例',
   `next_reward_per_mod_epoch` int(11) DEFAULT '0' COMMENT '【下一结算周期委托奖励比例】修改所在结算周期',
   `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点当前质押已领取委托奖励',
-  `pre_dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
-  `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
-  `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点当前质押总的委托奖励',
+  `pre_dele_annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
+  `dele_annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
+  `total_dele_reward` decimal(65,0) DEFAULT '0' COMMENT '节点当前质押总的委托奖励',
   `exception_status` int(11) NOT NULL DEFAULT '1' COMMENT '1正常,2低出块异常,3被双签,4因低出块被惩罚(例如在连续两个周期当选验证人，但在第一个周期出块率低),5因双签被惩罚',
   `un_stake_freeze_duration` int(11) NOT NULL COMMENT '解质押理论上锁定的结算周期数',
   `un_stake_end_block` bigint(20) DEFAULT NULL COMMENT '解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者',
@@ -452,10 +404,7 @@ CREATE TABLE `staking` (
   KEY `staking_addr` (`staking_addr`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `staking_history`;
-
 CREATE TABLE `staking_history` (
   `node_id` varchar(130) NOT NULL COMMENT '质押节点地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '质押区块高度',
@@ -470,7 +419,7 @@ CREATE TABLE `staking_history` (
   `external_name` varchar(128) DEFAULT NULL COMMENT '第三方社交软件关联用户名',
   `staking_addr` varchar(42) NOT NULL COMMENT '发起质押的账户地址',
   `benefit_addr` varchar(42) NOT NULL DEFAULT '' COMMENT '收益地址',
-  `annualized_rate` double(10,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
+  `annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
   `program_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '程序版本',
   `big_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '大程序版本',
   `web_site` varchar(255) NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
@@ -497,17 +446,14 @@ CREATE TABLE `staking_history` (
   `next_reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '下一结算周期委托奖励比例',
   `next_reward_per_mod_epoch` int(11) DEFAULT '0' COMMENT '【下一结算周期委托奖励比例】修改所在结算周期',
   `have_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已领取委托奖励(初始值等于前一条历史质押记录的【已领取委托奖励】)',
-  `pre_dele_annualized_rate` double(16,2) DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
-  `dele_annualized_rate` double(16,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
+  `pre_dele_annualized_rate` double(64,2) DEFAULT '0.00' COMMENT '前一参与周期预计委托收益率',
+  `dele_annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计委托收益率',
   `total_dele_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '节点总的委托奖励(前一条历史质押记录的【节点总的委托奖励】+ 当前质押实时查询出来的奖励)',
   PRIMARY KEY (`node_id`,`staking_block_num`),
   KEY `staking_addr` (`staking_addr`) USING BTREE
 );
 
-
-
 DROP TABLE IF EXISTS `tx_bak`;
-
 CREATE TABLE `tx_bak` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `hash` varchar(72) NOT NULL COMMENT '交易Hash',
@@ -518,10 +464,7 @@ CREATE TABLE `tx_bak` (
   KEY `id` (`id`)
 );
 
-
-
 DROP TABLE IF EXISTS `vote`;
-
 CREATE TABLE `vote` (
   `hash` varchar(72) NOT NULL COMMENT '投票交易Hash(如果此值带有"-",则表示投票操作是通过普通合约代理执行的,"-"号前面的是合约交易hash)',
   `node_id` varchar(130) NOT NULL COMMENT '投票验证人(节点ID)',
