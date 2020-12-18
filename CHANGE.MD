@@ -86,6 +86,12 @@
    ```
 
 #### 升级注意事项
-1. 由于0.15.0.0之前的版本ARC20交易没有入库至Redis，在不清理现有数据的场景下，
+1. 本次发版涉及的程序包:
+   a. browser-sync  -- 数据同步模块（只需要在browser-agent运行前运行一次）  
+   b. browser-agent -- 数据采集端  
+   c. browser-api   -- 前端接口提供端  
+   
+2. 由于0.15.0.0之前的版本ARC20交易没有入库至Redis，在不清理现有数据的场景下，
    部署0.15.0.0版本前，需要停止browser-agent，并执行browser-sync把ES中的
    ARC20交易同步至Redis。
+   
