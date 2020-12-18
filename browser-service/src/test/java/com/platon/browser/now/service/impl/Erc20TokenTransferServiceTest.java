@@ -4,10 +4,7 @@ import com.github.pagehelper.Page;
 import com.platon.browser.TestMockBase;
 import com.platon.browser.common.DownFileCommon;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
-import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.dto.transaction.TokenTransferRecordCacheDto;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
@@ -59,6 +56,8 @@ public class Erc20TokenTransferServiceTest extends TestMockBase {
 	private DownFileCommon downFileCommon;
 	@Mock
 	private StatisticCacheService statisticCacheService;
+	@Mock
+	private NetworkStatMapper networkStatMapper;
 
 	@Spy
 	private Erc20TokenTransferRecordServiceImpl target;
@@ -73,6 +72,7 @@ public class Erc20TokenTransferServiceTest extends TestMockBase {
 		ReflectionTestUtils.setField(this.target, "erc20TokenAddressRelMapper", this.erc20TokenAddressRelMapper);
 		ReflectionTestUtils.setField(this.target, "customErc20TokenAddressRelMapper", this.customErc20TokenAddressRelMapper);
 		ReflectionTestUtils.setField(this.target, "downFileCommon", this.downFileCommon);
+		ReflectionTestUtils.setField(this.target, "networkStatMapper", networkStatMapper);
 
 	}
 

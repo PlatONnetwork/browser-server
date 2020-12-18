@@ -1,30 +1,15 @@
 package com.platon.browser.now.service.impl;
 
 
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
+import com.alaya.contracts.ppos.RestrictingPlanContract;
+import com.alaya.contracts.ppos.RewardContract;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
+import com.alaya.contracts.ppos.dto.resp.Reward;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.RemoteCall;
 import com.alaya.protocol.core.Request;
 import com.alaya.protocol.core.methods.response.PlatonGetBalance;
-
 import com.github.pagehelper.Page;
 import com.platon.browser.TestMockBase;
 import com.platon.browser.client.PlatOnClient;
@@ -37,43 +22,50 @@ import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
-import com.alaya.contracts.ppos.RestrictingPlanContract;
-import com.alaya.contracts.ppos.RewardContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
-import com.alaya.contracts.ppos.dto.resp.Reward;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class AddressServiceImplTest extends TestMockBase {
-
 	@Mock
     private RpPlanMapper rpPlanMapper;
-
 	@Mock
     private CustomRpPlanMapper customRpPlanMapper;
-
 	@Mock
     private PlatOnClient platonClient;
-
 	@Mock
     private SpecialApi specialApi;
-    
 	@Spy
-    private AddressServiceImpl targe;
+    private AddressServiceImpl target;
 	
 	@SuppressWarnings("unchecked")
 	@Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(targe, "addressMapper", addressMapper);
-        ReflectionTestUtils.setField(targe, "rpPlanMapper", rpPlanMapper);
-        ReflectionTestUtils.setField(targe, "customRpPlanMapper", customRpPlanMapper);
-        ReflectionTestUtils.setField(targe, "platonClient", platonClient);
-        ReflectionTestUtils.setField(targe, "i18n", i18n);
-        ReflectionTestUtils.setField(targe, "blockChainConfig", blockChainConfig);
-        ReflectionTestUtils.setField(targe, "blockESRepository", blockESRepository);
-        ReflectionTestUtils.setField(targe, "specialApi", specialApi);
-        ReflectionTestUtils.setField(targe, "statisticCacheService", statisticCacheService);
+        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
+        ReflectionTestUtils.setField(target, "rpPlanMapper", rpPlanMapper);
+        ReflectionTestUtils.setField(target, "customRpPlanMapper", customRpPlanMapper);
+        ReflectionTestUtils.setField(target, "platonClient", platonClient);
+        ReflectionTestUtils.setField(target, "i18n", i18n);
+        ReflectionTestUtils.setField(target, "blockChainConfig", blockChainConfig);
+        ReflectionTestUtils.setField(target, "blockESRepository", blockESRepository);
+        ReflectionTestUtils.setField(target, "specialApi", specialApi);
+        ReflectionTestUtils.setField(target, "statisticCacheService", statisticCacheService);
         RestrictingPlanContract restrictingPlanContract = mock(RestrictingPlanContract.class);
         when(platonClient.getRestrictingPlanContract()).thenReturn(restrictingPlanContract);
         RestrictingItem restrictingItem = new RestrictingItem();
@@ -133,7 +125,7 @@ public class AddressServiceImplTest extends TestMockBase {
 		CallResponse<List<Reward>> callResponse = mock(CallResponse.class);
 		when(remoteCall.send()).thenReturn(callResponse);
 		when(platonClient.getRewardContract().getDelegateReward(any(),any()).send().getData()).thenReturn(null);
-		targe.getDetails(req);
+		target.getDetails(req);
 		List<Reward> rewards = new ArrayList<Reward>();
 		Reward reward = new Reward();
 		reward.setReward("0x0");
@@ -143,10 +135,22 @@ public class AddressServiceImplTest extends TestMockBase {
 		RpPlan rpPlan = new RpPlan();
 		rpPlans.add(rpPlan);
 		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlans);
-		targe.getDetails(req);
+		target.getDetails(req);
 	}
 	@Test
 	public void rpplanDetail() throws Exception {
+
+		List<RestrictingBalance> restrictingBalances = new ArrayList<RestrictingBalance>();
+		RestrictingBalance restrictingBalance = new RestrictingBalance();
+		restrictingBalance.setAccount("0x1000000000000000000000000000000000000001");
+		restrictingBalance.setFreeBalance("0x10");
+		restrictingBalance.setLockBalance("0x10");
+		restrictingBalance.setPledgeBalance("0x10");
+		restrictingBalances.add(restrictingBalance);
+		when(specialApi.getRestrictingBalance(any(),any())).thenReturn(restrictingBalances);
+		Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
+		when(platonClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
+
 		QueryRPPlanDetailRequest req = new QueryRPPlanDetailRequest();
 		req.setPageNo(0);
 		req.setPageSize(10);
@@ -160,7 +164,7 @@ public class AddressServiceImplTest extends TestMockBase {
 		rpPlansPage.add(rpPlan);
 		when(rpPlanMapper.selectByExample(any())).thenReturn(rpPlansPage);
 		when(customRpPlanMapper.selectSumByAddress(any())).thenReturn(BigDecimal.TEN);
-		assertNotNull(targe.rpplanDetail(req));
+		assertNotNull(target.rpplanDetail(req));
 	}
 	
 }
