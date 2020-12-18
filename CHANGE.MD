@@ -86,7 +86,7 @@
    ```
 
 #### 升级注意事项
-1. 本次发版涉及的程序包:
+1. 本次发版涉及的程序包:  
    a. browser-sync  -- 数据同步模块（只需要在browser-agent运行前运行一次）  
    b. browser-agent -- 数据采集端  
    c. browser-api   -- 前端接口提供端  
