@@ -20,7 +20,14 @@ spring:
   redis:
     database: 0
     key:
-      c
+      #区块列表
+      blocks: ${platon.redis-namespace}:blocks
+      #交易列表
+      transactions: ${platon.redis-namespace}:transactions
+      #统计信息
+      networkStat: ${platon.redis-namespace}:networkStat
+      #代币交易
+      innerTx: ${platon.redis-namespace}:innerTx
     max-item: 500000
 
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
