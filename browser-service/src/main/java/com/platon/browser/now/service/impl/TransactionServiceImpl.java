@@ -412,7 +412,12 @@ public class TransactionServiceImpl implements TransactionService {
                         resp.setDetails(editValidatorParam.getDetails());
                         resp.setNodeName(this.commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
                         resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-                        resp.setDelegationRatio(new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
+
+                        String delegationRatio = null;
+                        if(editValidatorParam.getDelegateRewardPer()!=null){
+                            delegationRatio=new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString();
+                        }
+                        resp.setDelegationRatio(delegationRatio);
                         break;
                     /**
                      * 增加质押

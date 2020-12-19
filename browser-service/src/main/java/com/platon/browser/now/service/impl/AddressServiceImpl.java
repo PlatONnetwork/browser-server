@@ -59,25 +59,18 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private AddressMapper addressMapper;
-
     @Autowired
     private RpPlanMapper rpPlanMapper;
-
     @Autowired
     private CustomRpPlanMapper customRpPlanMapper;
-
     @Autowired
     private PlatOnClient platonClient;
-
     @Autowired
     private I18nUtil i18n;
-
     @Autowired
     private BlockChainConfig blockChainConfig;
-    
     @Autowired
 	private BlockESRepository blockESRepository;
-    
     @Autowired
     private SpecialApi specialApi;
     
@@ -127,18 +120,18 @@ public class AddressServiceImpl implements AddressService {
 	public QueryRPPlanDetailResp rpplanDetail(QueryRPPlanDetailRequest req) {
 		QueryRPPlanDetailResp queryRPPlanDetailResp = new QueryRPPlanDetailResp();
 		try {
-			/**
-			 * 链上实时查询对应的锁仓信息
-			 */
-			RestrictingPlanContract restrictingPlanContract = platonClient.getRestrictingPlanContract();
-			CallResponse<RestrictingItem> baseResponse = restrictingPlanContract.getRestrictingInfo(req.getAddress()).send();
-			if(baseResponse.isStatusOk()) {
+			// 锁仓可用余额查询特殊节点接口
+			List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
+			if(restrictingBalances != null && !restrictingBalances.isEmpty()) {
 				/**
 				 * 可用余额为balance减去质押金额
 				 */
-				BigDecimal restrictBalance = getAvailableRestrictBalance(req.getAddress(),baseResponse.getData().getPledge());
-				queryRPPlanDetailResp.setRestrictingBalance(restrictBalance);
-
+				queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
+			}
+			// 质押金额和待释放金额查询锁仓合约
+			RestrictingPlanContract restrictingPlanContract = platonClient.getRestrictingPlanContract();
+			CallResponse<RestrictingItem> baseResponse = restrictingPlanContract.getRestrictingInfo(req.getAddress()).send();
+			if(baseResponse.isStatusOk()) {
 				queryRPPlanDetailResp.setStakingValue(new BigDecimal(baseResponse.getData().getPledge()));
 				queryRPPlanDetailResp.setUnderReleaseValue(new BigDecimal(baseResponse.getData().getDebt()));
 			}
@@ -208,17 +201,13 @@ public class AddressServiceImpl implements AddressService {
 	}
 	
 	private QueryDetailResp getAddressInfo(QueryDetailRequest req, QueryDetailResp resp) throws Exception {
-
-		// 1、调用特殊节点接口查询地址锁仓余额中用于质押委托的金额
 		List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
 		if(restrictingBalances != null && !restrictingBalances.isEmpty()) {
 			resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
-
-			BigDecimal restrictBalance = getAvailableRestrictBalance(req.getAddress(),restrictingBalances.get(0).getPledgeBalance());
-			resp.setRestrictingBalance(restrictBalance);
+			resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
 		}
 		/** 特殊账户余额直接查询链  */
-		if(resp.getBalance().compareTo(BigDecimal.valueOf(10000000000L)) > 0) {
+		if(resp.getBalance().compareTo(BigDecimal.valueOf(10000000000l)) > 0) {
 			BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
 			resp.setBalance(new BigDecimal(balance));
 		}
@@ -239,23 +228,5 @@ public class AddressServiceImpl implements AddressService {
 		}
 		resp.setDelegateClaim(allRewards);
 		return resp;
-	}
-
-	/**
-	 * 根据地址到锁仓计划表汇总锁仓余额，并减掉锁仓合约中实际查询出来的质押委托金额，得出锁仓可用余额
-	 * @param address 地址
-	 * @param pledgeBalance 锁仓合约查询出来的质押委托金额
-	 * @return
-	 */
-	private BigDecimal getAvailableRestrictBalance(String address,BigInteger pledgeBalance){
-		/*=========锁仓余额查询逻辑 ： 0.13.5 版本修正底层锁仓问题========*/
-		// 2、先根据地址汇总【锁仓释放区块号】大于【网络统计表中的最新块号】的【所有锁仓金额】
-		NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-		Long curBlockNum = networkStat.getCurNumber();
-		BigDecimal restrictBalanceFromDB = customRpPlanMapper.sumAmountByAddressAndBlockNumber(address,curBlockNum);
-		restrictBalanceFromDB = (restrictBalanceFromDB==null)?BigDecimal.ZERO:restrictBalanceFromDB;
-		BigDecimal restrictBalance = restrictBalanceFromDB.subtract(new BigDecimal(pledgeBalance));
-		restrictBalance = (restrictBalance.compareTo(BigDecimal.ZERO)<0)?BigDecimal.ZERO:restrictBalance;
-		return restrictBalance;
 	}
 }

@@ -16,6 +16,7 @@ public class TransactionListResp {
 	private String txHash;    //交易hash
     private String from;      //发送方地址（操作地址）
     private String to;        //接收方地址
+    private Long seq;        //排序号
     private BigDecimal value;          //金额(单位:von)
     private BigDecimal actualTxCost;    //交易费用(单位:von)
     private String txType;             //交易类型 0：转账  1：合约发布  2：合约调用    5：MPC交易
@@ -100,5 +101,12 @@ public class TransactionListResp {
 	public void setTxReceiptStatus(Integer txReceiptStatus) {
 		this.txReceiptStatus = txReceiptStatus;
 	}
-    
+
+	public Long getSeq() {
+		return seq;
+	}
+
+	public void setSeq(Long seq) {
+		this.seq = seq;
+	}
 }

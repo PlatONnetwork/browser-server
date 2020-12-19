@@ -1,15 +1,35 @@
 package com.platon.browser.now.service.impl;
 
 
-import com.alaya.contracts.ppos.RestrictingPlanContract;
-import com.alaya.contracts.ppos.RewardContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
-import com.alaya.contracts.ppos.dto.resp.Reward;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.util.I18nUtil;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.RemoteCall;
 import com.alaya.protocol.core.Request;
 import com.alaya.protocol.core.methods.response.PlatonGetBalance;
+
 import com.github.pagehelper.Page;
 import com.platon.browser.TestMockBase;
 import com.platon.browser.client.PlatOnClient;
@@ -22,23 +42,11 @@ import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import com.alaya.contracts.ppos.RestrictingPlanContract;
+import com.alaya.contracts.ppos.RewardContract;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
+import com.alaya.contracts.ppos.dto.resp.Reward;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)
