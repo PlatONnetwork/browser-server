@@ -1,0 +1,18 @@
+[
+  {
+    "optType":"staking",
+    "nodeId":"0x94795e21b23fa28473fd93d17edfaf24d5a0b9ec0c5dc7626c4e8882d43548d02e11aeaa16191ddf5128cddc6d0bb352f461570049a765c3a19e86d9771b3173",
+    "stakingBlockNum":"10000",
+    "addr":"atp1rjuy0qy2s7lgyv44upevdeg7x407h5zmrhdxps",
+    "lock":"100000",
+    "hes":"200000"
+  },
+  {
+    "optType":"delegate",
+    "nodeId":"0xade53a03334eda53f0bed8f3e1572a7d5faf59f40e464b683e9160946a738b0d72b333b93c07b4b75341de633784b4a2d00aacf78ce082949470046a4875fbee",
+    "stakingBlockNum":"30000",
+    "addr":"atp1xgn3mfwztj4ed8n47v08e6wnqdc2s78u9t9glx",
+    "lock":"120000",
+    "hes":"509999"
+  }
+]

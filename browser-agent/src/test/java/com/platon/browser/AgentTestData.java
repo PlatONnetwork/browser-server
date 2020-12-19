@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.adjustment.bean.AdjustParam;
 import com.platon.browser.bean.BlockBean;
 import com.platon.browser.bean.NodeBean;
 import com.platon.browser.client.ReceiptResult;
@@ -47,7 +48,8 @@ public class AgentTestData {
             "address",
             "proposal",
             "blockChainConfig",
-            "networkstat"
+            "networkstat",
+            "adjust-data"
     };
 
     protected List<CustomNode> nodeList= Collections.emptyList();
@@ -68,6 +70,9 @@ public class AgentTestData {
 
     protected Map<Long,PlatonBlock.Block> rawBlockMap = new HashMap<>();
     protected Map<Long, ReceiptResult> receiptResultMap = new HashMap<>();
+
+    protected List<AdjustParam> stakingAdjustParamList = new ArrayList<>();
+    protected List<AdjustParam> delegateAdjustParamList = new ArrayList<>();
 
     @Before
     public void init(){
@@ -148,6 +153,14 @@ public class AgentTestData {
                         break;
                     case "blockChainConfig":
                         blockChainConfig = JSON.parseObject(content,BlockChainConfig.class);
+                        break;
+                    case "adjust-data":
+                        List<AdjustParam> adjustParamList = JSON.parseArray(content, AdjustParam.class);
+                        adjustParamList.forEach(e->{
+                            if("staking".equals(e.getOptType())) stakingAdjustParamList.add(e);
+                            if("delegate".equals(e.getOptType())) delegateAdjustParamList.add(e);
+                        });
+                        break;
                 }
             } catch (IOException e) {
                 e.printStackTrace();

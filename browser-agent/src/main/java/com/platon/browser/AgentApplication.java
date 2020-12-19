@@ -39,7 +39,11 @@ import java.util.concurrent.CompletableFuture;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@MapperScan(basePackages = {"com.platon.browser.dao.mapper","com.platon.browser.complement.dao.mapper"})
+@MapperScan(basePackages = {
+	"com.platon.browser.dao.mapper",
+	"com.platon.browser.complement.dao.mapper",
+	"com.platon.browser.adjustment.dao"
+})
 public class AgentApplication implements ApplicationRunner {
 	// 区块服务
 	@Autowired
