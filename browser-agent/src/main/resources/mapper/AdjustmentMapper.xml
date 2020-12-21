@@ -4,15 +4,14 @@
     <!--TODO: 质押相关表调账-->
     <update id="adjustStakingData">
         /*
+        adjustParam
         1、node表：
         total_value【有效的质押委托总数(von)】 - stakingShouldNotHaveAmount
         staking_hes【犹豫期的质押金(von)】 - stakingShouldNotHaveAmount （先减犹豫）
         staking_locked【锁定期的质押金(von)】 - stakingShouldNotHaveAmount' （犹豫不够再减锁定）
         staking_reduction【退回中的质押金(von)】 - stakingShouldNotHaveAmount'' （锁定不够再减待提取）
         */
-        <foreach collection="adjustParams" item="item" index="index">
 
-        </foreach>
         /*
         2、staking表：
         staking_hes【犹豫期的质押金(von)】 - stakingShouldNotHaveAmount （先减犹豫）
@@ -21,31 +20,26 @@
 
         金额扣减后，如果 staking_hes+staking_locked 小于 质押门槛, 则节点执行退出逻辑，状态直接置为已退出。
         */
-        <foreach collection="adjustParams" item="item" index="index">
 
-        </foreach>
     </update>
 
     <!--TODO: 委托相关表调账-->
     <update id="adjustDelegateData">
         /*
+        adjustParam
         1、node表：
         total_value【有效的质押委托总数(von)】 - delegationShouldNotHaveAmount
         stat_delegate_value【有效的委托金额(von)】 - delegationShouldNotHaveAmount （先扣有效委托）
         stat_delegate_released【待提取的委托金额(von)】 - delegationShouldNotHaveAmount （有效委托不够扣再扣待提取）
         */
-        <foreach collection="adjustParams" item="item" index="index">
 
-        </foreach>
         /*
         2、staking表：
         stat_delegate_hes【未锁定的委托(von)】 - delegationShouldNotHaveAmount  （先减犹豫）
         stat_delegate_locked【锁定的委托(von)】 - delegationShouldNotHaveAmount' （犹豫不够再减锁定）
         stat_delegate_released【待提取的委托(von)】 - delegationShouldNotHaveAmount'' （锁定不够再减待提取）
         */
-        <foreach collection="adjustParams" item="item" index="index">
 
-        </foreach>
         /*
         3、delegation表：
         delegate_hes【未锁定委托金额(von)】 - delegationShouldNotHaveAmount  （先减犹豫）
@@ -54,8 +48,6 @@
 
         金额扣减后，如果 delegate_hes+delegate_locked+delegate_released = 0, 则委托变为历史。
         */
-        <foreach collection="adjustParams" item="item" index="index">
 
-        </foreach>
     </update>
 </mapper>

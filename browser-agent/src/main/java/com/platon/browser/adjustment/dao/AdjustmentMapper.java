@@ -5,21 +5,17 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Mapper
 public interface AdjustmentMapper {
     /**
      * 质押相关表调账
-     * @param adjustParams
      */
     @Transactional
-    void adjustStakingData(@Param("adjustParams")List<AdjustParam> adjustParams);
+    void adjustStakingData(@Param("adjustParam") AdjustParam adjustParam);
 
     /**
      * 委托相关表调账
-     * @param adjustParams
      */
     @Transactional
-    void adjustDelegateData(@Param("adjustParams")List<AdjustParam> adjustParams);
+    void adjustDelegateData(@Param("adjustParam") AdjustParam adjustParam);
 }

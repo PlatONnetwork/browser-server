@@ -1,54 +1,48 @@
 package com.platon.browser.adjustment.context;
 
-import com.platon.browser.adjustment.bean.AdjustParam;
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Delegation;
 import lombok.Data;
-
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 委托调账上下文
+ * 必须数据：
+ * 1、质押信息
+ * 2、节点信息
+ * 3、委托信息
  */
+@Slf4j
 @Data
 public class DelegateAdjustContext extends AbstractAdjustContext {
     private Delegation delegation;
     /**
      * 校验委托相关金额是否满足调账要求
-     * @param errors
      */
     @Override
-    public void validateAmount(List<String> errors){
-        AdjustParam diff = getAdjustParam();
-        if(delegation==null) errors.add("委托记录缺失:[节点ID="+diff.getNodeId()+",委托人="+diff.getAddr()+",节点质押块号="+diff.getStakingBlockNum()+"]");
+    public void validateAmount(){
+        if(delegation==null) errors.add("【错误】：委托记录缺失:[节点ID="+adjustParam.getNodeId()+",节点质押块号="+adjustParam.getStakingBlockNum()+",委托人="+adjustParam.getAddr()+"]");
+        // 验证金额是否正确前，检查各项必须的数据是否存在
+        if(!errors.isEmpty()) return;
 
-        // TODO: 校验委托相关金额是否满足调账要求
+        if(
+            delegation.getDelegateHes().compareTo(adjustParam.getHes())<0
+            ||delegation.getDelegateLocked().compareTo(adjustParam.getLock())<0
+        ){
+            errors.add(extraContextInfo());
+        }
 
-        /*
-        # 委托调账，对不该有的委托额度 delegationShouldNotHaveAmount，如下表字段需要调整
+        if(delegation.getDelegateHes().compareTo(adjustParam.getHes())<0){
+            errors.add("【错误】：委托记录犹豫期金额【"+delegation.getDelegateHes()+"】小于调账犹豫期金额【"+adjustParam.getHes()+"】！");
+        }
+        if(delegation.getDelegateLocked().compareTo(adjustParam.getLock())<0){
+            errors.add("【错误】：委托记录锁定期金额【"+delegation.getDelegateHes()+"】小于调账锁定期金额【"+adjustParam.getLock()+"】！");
+        }
+    }
 
-        1、node表：
-            total_value【有效的质押委托总数(von)】 - delegationShouldNotHaveAmount
-            stat_delegate_value【有效的委托金额(von)】 - delegationShouldNotHaveAmount （先扣有效委托）
-            stat_delegate_released【待提取的委托金额(von)】 - delegationShouldNotHaveAmount （有效委托不够扣再扣待提取）
-
-        2、staking表：
-            stat_delegate_hes【未锁定的委托(von)】 - delegationShouldNotHaveAmount  （先减犹豫）
-            stat_delegate_locked【锁定的委托(von)】 - delegationShouldNotHaveAmount' （犹豫不够再减锁定）
-            stat_delegate_released【待提取的委托(von)】 - delegationShouldNotHaveAmount'' （锁定不够再减待提取）
-
-        3、delegation表：
-            delegate_hes【未锁定委托金额(von)】 - delegationShouldNotHaveAmount  （先减犹豫）
-            delegate_locked【已锁定委托金额(von)】 - delegationShouldNotHaveAmount'  （犹豫不够再减锁定）
-            delegate_released【待提取的金额(von)】 - delegationShouldNotHaveAmount''  （锁定不够再减待提取）
-
-            金额扣减后，如果 delegate_hes+delegate_locked+delegate_released = 0, 则委托变为历史。
-
-        4、address表：以下字段由现有的AddressUpdateTask任务定时统计相关表更新，因此不用改动此表
-            delegate_value 【委托的金额(von)】
-            delegate_hes【未锁定委托金额(von)】
-            delegate_locked【已锁定委托金额(von)】
-            delegate_released【待提取的金额(von)】
-         */
-
+    @Override
+    String extraContextInfo() {
+        String extra = "委托记录：\n"+JSON.toJSONString(delegation,true);
+        return extra;
     }
 }

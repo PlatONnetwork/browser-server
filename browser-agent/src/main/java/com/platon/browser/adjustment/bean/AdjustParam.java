@@ -2,6 +2,9 @@ package com.platon.browser.adjustment.bean;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  * 质押或委托账户调账条目
  */
@@ -11,6 +14,6 @@ public class AdjustParam {
     private String nodeId;
     private String stakingBlockNum;
     private String addr;
-    private String lock;
-    private String hes;
+    private BigDecimal lock;
+    private BigDecimal hes;
 }

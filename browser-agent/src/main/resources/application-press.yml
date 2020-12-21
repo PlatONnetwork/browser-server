@@ -122,6 +122,8 @@ platon:
   restrictingMinimumReleaseActiveVersion: 3584
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
+  #调账日志输出文件
+  account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
 
 task:
    #地址统计任务

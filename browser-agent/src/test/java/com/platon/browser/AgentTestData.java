@@ -71,8 +71,7 @@ public class AgentTestData {
     protected Map<Long,PlatonBlock.Block> rawBlockMap = new HashMap<>();
     protected Map<Long, ReceiptResult> receiptResultMap = new HashMap<>();
 
-    protected List<AdjustParam> stakingAdjustParamList = new ArrayList<>();
-    protected List<AdjustParam> delegateAdjustParamList = new ArrayList<>();
+    protected List<AdjustParam> adjustParamList = new ArrayList<>();
 
     @Before
     public void init(){
@@ -155,11 +154,7 @@ public class AgentTestData {
                         blockChainConfig = JSON.parseObject(content,BlockChainConfig.class);
                         break;
                     case "adjust-data":
-                        List<AdjustParam> adjustParamList = JSON.parseArray(content, AdjustParam.class);
-                        adjustParamList.forEach(e->{
-                            if("staking".equals(e.getOptType())) stakingAdjustParamList.add(e);
-                            if("delegate".equals(e.getOptType())) delegateAdjustParamList.add(e);
-                        });
+                        adjustParamList = JSON.parseArray(content, AdjustParam.class);
                         break;
                 }
             } catch (IOException e) {

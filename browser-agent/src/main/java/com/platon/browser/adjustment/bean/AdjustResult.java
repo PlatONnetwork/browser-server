@@ -13,17 +13,16 @@ import java.util.Map;
 public class AdjustResult {
     // 是否成功
     private boolean success=true;
-    // 错误信息<调整参数,错误信息>
-    private Map<AdjustParam, List<String>> errors = new HashMap<>();
+    // 错误信息<调整参数,错误信息(字符串)>
+    private Map<AdjustParam, String> errors = new HashMap<>();
 
     /**
      * 校验是否有错误
      */
     public boolean validate(){
-        for (Map.Entry<AdjustParam, List<String>> entry : errors.entrySet()) {
-            AdjustParam k = entry.getKey();
-            List<String> v = entry.getValue();
-            if (!v.isEmpty()) {
+        for (Map.Entry<AdjustParam, String> entry : errors.entrySet()) {
+            String v = entry.getValue();
+            if (v!=null) {
                 success = false;
                 break;
             }
