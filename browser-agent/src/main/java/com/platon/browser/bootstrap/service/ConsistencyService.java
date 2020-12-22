@@ -13,6 +13,7 @@ import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dto.elasticsearch.TokenTxSummary;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.InnerTxESRepository;
+import com.platon.browser.now.service.Erc20TransactionSyncService;
 import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
@@ -52,6 +53,8 @@ public class ConsistencyService {
 
     @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
+    @Resource
+    private Erc20TransactionSyncService erc20TransactionSyncService;
 
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
@@ -85,6 +88,8 @@ public class ConsistencyService {
             return;
         }
 
+        // 把es中的arc20交易同步至Redis
+        erc20TransactionSyncService.sync();
         syncTxCount();
 
         // mysql中的最高块号

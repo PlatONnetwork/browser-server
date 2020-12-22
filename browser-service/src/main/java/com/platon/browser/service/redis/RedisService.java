@@ -87,4 +87,12 @@ public abstract class RedisService<T> {
         }
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
+
+    public Long size(String key){
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(hasKey){
+            return redisTemplate.opsForZSet().size(key);
+        }
+        return 0L;
+    }
 }

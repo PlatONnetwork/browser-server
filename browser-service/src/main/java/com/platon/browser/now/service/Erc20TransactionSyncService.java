@@ -1,4 +1,4 @@
-package com.platon.browser.service;
+package com.platon.browser.now.service;
 
 import com.platon.browser.dto.elasticsearch.ESResult;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
@@ -31,12 +31,20 @@ public class Erc20TransactionSyncService {
     private TokenTransferRecordESRepository esRepository;
     @Autowired
     private RedisTransferTokenRecordService redisService;
-    @Value("${paging.erc20-transaction.page-size}")
+    @Value("${platon.paging.erc20-transaction.page-size}")
     private int pageSize;
-    @Value("${paging.erc20-transaction.page-count}")
+    @Value("${platon.paging.erc20-transaction.page-count}")
     private int pageCount;
+    /**
+     * 交易缓存key
+     */
+    @Value("${spring.redis.key.innerTx}")
+    private String innerTxCacheKey;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void sync(){
+        Long recordSize = redisService.size(innerTxCacheKey);
+        // 如果redis innerTx不为空，则不用同步
+        if(recordSize>0) return;
         ESQueryBuilderConstructor transactionConstructor = new ESQueryBuilderConstructor();
         transactionConstructor.setDesc("seq");
         // 分页查询区块数据
