@@ -6,6 +6,7 @@ import com.platon.browser.adjustment.context.AbstractAdjustContext;
 import com.platon.browser.adjustment.context.DelegateAdjustContext;
 import com.platon.browser.adjustment.context.StakingAdjustContext;
 import com.platon.browser.adjustment.dao.AdjustmentMapper;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -34,8 +35,10 @@ public class AdjustService {
     protected NodeMapper nodeMapper;
     @Resource
     protected AdjustmentMapper adjustmentMapper;
+    @Resource
+    protected BlockChainConfig chainConfig;
 
-    private static Logger log = Logger.getLogger(AdjustService.class.getName());
+    private static final Logger log = Logger.getLogger(AdjustService.class.getName());
     @Value("platon.account.adjust.log.file")
     private String adjustLogFile;
     @PostConstruct
@@ -90,6 +93,7 @@ public class AdjustService {
             }
 
             if(aac!=null){
+                aac.setChainConfig(chainConfig);
                 aac.setAdjustParam(adjustParam);
                 // 根据<质押块高,节点ID>找到对应的质押信息
                 StakingKey stakingKey = new StakingKey();

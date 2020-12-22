@@ -75,5 +75,4 @@ public class GovernParamAdjustService {
             configMapper.insert(config);
         }
     }
-
 }

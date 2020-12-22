@@ -1,53 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.adjustment.dao.AdjustmentMapper">
-    <!--TODO: 质押相关表调账-->
-    <update id="adjustStakingData">
-        /*
-        adjustParam
-        1、node表：
-        total_value【有效的质押委托总数(von)】 - stakingShouldNotHaveAmount
-        staking_hes【犹豫期的质押金(von)】 - stakingShouldNotHaveAmount （先减犹豫）
-        staking_locked【锁定期的质押金(von)】 - stakingShouldNotHaveAmount' （犹豫不够再减锁定）
-        staking_reduction【退回中的质押金(von)】 - stakingShouldNotHaveAmount'' （锁定不够再减待提取）
-        */
+    <!--委托相关表调账-->
+    <update id="adjustDelegateData">
+        update `delegation` set
+            `delegate_hes`=#{adjustParam.delegateHes},
+            `delegate_locked`=#{adjustParam.delegateLocked},
+            `delegate_released`=#{adjustParam.delegateReleased},
+            `is_history`=#{adjustParam.isHistory}
+        where `node_id`=#{adjustParam.nodeId}
+          and `staking_block_num`=#{adjustParam.stakingBlockNum}
+          and `delegate_addr`=#{adjustParam.addr};
 
-        /*
-        2、staking表：
-        staking_hes【犹豫期的质押金(von)】 - stakingShouldNotHaveAmount （先减犹豫）
-        staking_locked【锁定期的质押金(von)】 - stakingShouldNotHaveAmount' （犹豫不够再减锁定）
-        staking_reduction【退回中的质押金(von)】 - stakingShouldNotHaveAmount'' （锁定不够再减待提取）
+        update `node` set
+            `total_value`=#{adjustParam.nodeTotalValue},
+            `stat_delegate_value`=#{adjustParam.nodeStatDelegateValue},
+            `stat_delegate_released`=#{adjustParam.nodeStatDelegateReleased}
+        where `node_id` = #{adjustParam.nodeId};
 
-        金额扣减后，如果 staking_hes+staking_locked 小于 质押门槛, 则节点执行退出逻辑，状态直接置为已退出。
-        */
-
+        update `staking` set
+             `stat_delegate_hes`=#{adjustParam.stakeStatDelegateHes},
+             `stat_delegate_locked`=#{adjustParam.stakeStatDelegateLocked},
+             `stat_delegate_released`=#{adjustParam.stakeStatDelegateReleased}
+        where `node_id` = #{adjustParam.nodeId}
+          and `staking_block_num` = #{adjustParam.stakingBlockNum};
     </update>
 
-    <!--TODO: 委托相关表调账-->
-    <update id="adjustDelegateData">
-        /*
-        adjustParam
-        1、node表：
-        total_value【有效的质押委托总数(von)】 - delegationShouldNotHaveAmount
-        stat_delegate_value【有效的委托金额(von)】 - delegationShouldNotHaveAmount （先扣有效委托）
-        stat_delegate_released【待提取的委托金额(von)】 - delegationShouldNotHaveAmount （有效委托不够扣再扣待提取）
-        */
+    <!--质押相关表调账-->
+    <update id="adjustStakingData">
+        update `node` set
+            `status`=#{adjustParam.status},
+            `isConsensus`=#{adjustParam.isConsensus},
+            `isSettle`=#{adjustParam.isSettle},
+            `staking_hes`=#{adjustParam.stakingHes},
+            `staking_locked`=#{adjustParam.stakingLocked},
+            `staking_reduction`=#{adjustParam.stakingReduction}
+        where `node_id` = #{adjustParam.nodeId};
 
-        /*
-        2、staking表：
-        stat_delegate_hes【未锁定的委托(von)】 - delegationShouldNotHaveAmount  （先减犹豫）
-        stat_delegate_locked【锁定的委托(von)】 - delegationShouldNotHaveAmount' （犹豫不够再减锁定）
-        stat_delegate_released【待提取的委托(von)】 - delegationShouldNotHaveAmount'' （锁定不够再减待提取）
-        */
-
-        /*
-        3、delegation表：
-        delegate_hes【未锁定委托金额(von)】 - delegationShouldNotHaveAmount  （先减犹豫）
-        delegate_locked【已锁定委托金额(von)】 - delegationShouldNotHaveAmount'  （犹豫不够再减锁定）
-        delegate_released【待提取的金额(von)】 - delegationShouldNotHaveAmount''  （锁定不够再减待提取）
-
-        金额扣减后，如果 delegate_hes+delegate_locked+delegate_released = 0, 则委托变为历史。
-        */
-
+        update `staking` set
+             `status`=#{adjustParam.status},
+             `isConsensus`=#{adjustParam.isConsensus},
+             `isSettle`=#{adjustParam.isSettle},
+             `staking_hes`=#{adjustParam.stakingHes},
+             `staking_locked`=#{adjustParam.stakingLocked},
+             `staking_reduction`=#{adjustParam.stakingReduction}
+        where `node_id` = #{adjustParam.nodeId}
+          and `staking_block_num` = #{adjustParam.stakingBlockNum};
     </update>
 </mapper>

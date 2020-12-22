@@ -55,9 +55,9 @@
     5.1. agent端ErcTokenUpdateTask定时更新【erc20_token_address_rel表】的balance && 定时更新 【erc20_token表、erc20_token_address_rel表】的total_supply，以探测地址余额及Token总发行量的变化； 
     5.2. api端token详情接口处理：  
         5.2.1. 发行量：取【erc20_token表】的total_supply；    
-        5.2.2. 持有者列表计算规则：
-        5.2.2.1. 如果【erc20_token_address_rel表】的total_supply大于0，则： 百分比 =(【erc20_token_address_rel表】的balance/【erc20_token_address_rel表】的total_supply) x 100 %
-        5.2.2.2. 如果【erc20_token_address_rel表】的total_supply等于0，则： 百分比 = 0%
+        5.2.2. 持有者列表计算规则：  
+        5.2.2.1. 如果【erc20_token_address_rel表】的total_supply大于0，则： 百分比 =(【erc20_token_address_rel表】的balance/【erc20_token_address_rel表】的total_supply) x 100 %  
+        5.2.2.2. 如果【erc20_token_address_rel表】的total_supply等于0，则： 百分比 = 0%    
         测试方法：  
         a、发行量更新验证：修改 数据库 erc20_token_address_rel表中的 totalSupply字段为任意错误值，检查定时任务是否会把值更正回来；  
         b、百分比验证：参考5.2.2；  
@@ -74,18 +74,22 @@
 
 ## v0.15.0.0
 #### 功能变更
-1. 节点委托奖励比例修改, 需要在下一结算周期生效；
-2. 新增锁仓治理参数minimumRelease；
-3. 零出块处罚列表新增预估解锁块高；
-4. 退出节点新增预估解锁块高；
-5. ARC20交易入库至Redis； 
-6. 根据特殊节点返回的调账数据，对锁仓相关金额进行调整；
+1. 节点委托奖励比例修改, 需要在下一结算周期生效；  
+2. 新增锁仓治理参数minimumRelease；  
+3. 零出块处罚列表新增预估解锁块高；   
+4. 退出节点新增预估解锁块高；    
+5. ARC20交易入库至Redis；   
+6. 根据特殊节点返回的调账数据，对锁仓相关金额进行调整；  
+7. token持有者列表只显示余额大于0（持有数量大于0）的记录；  
 
 #### 配置变更
-1. Redis命名空间移到最外层配置文件中配置：
+1. Redis命名空间移到最外层配置文件中配置 & 新增调账日志存储文件配置：
    ```
     platon:
+        #Redis命名空间
         redis-namespace: browser:${version}:${profile}
+        #调账日志输出文件
+        account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
    ```
 
 #### 升级注意事项
