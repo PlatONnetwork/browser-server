@@ -7,6 +7,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -26,12 +27,12 @@ import static org.mockito.Mockito.when;
 public class RedisStatisticServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
+    @InjectMocks
     @Spy
     private RedisStatisticService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "redisTemplate", redisTemplate);
         ReflectionTestUtils.setField(target, "maxItemCount", 500000);
         ValueOperations vo = mock(ValueOperations.class);
         when(redisTemplate.opsForValue()).thenReturn(vo);

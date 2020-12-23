@@ -21,8 +21,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * @description: 委托业务参数转换器
- * @author: chendongming@juzix.net
+ * @description: 升级提案业务参数转换器
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 17:58:27
  **/
 @Slf4j

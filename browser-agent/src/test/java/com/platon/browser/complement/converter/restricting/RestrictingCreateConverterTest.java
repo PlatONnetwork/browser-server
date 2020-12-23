@@ -9,10 +9,10 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 
 
@@ -26,13 +26,12 @@ public class RestrictingCreateConverterTest extends AgentTestBase {
 
     @Mock
     private RestrictingBusinessMapper restrictingBusinessMapper;
-
+    @InjectMocks
     @Spy
     private RestrictingCreateConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"restrictingBusinessMapper",restrictingBusinessMapper);
     }
 
     @Test

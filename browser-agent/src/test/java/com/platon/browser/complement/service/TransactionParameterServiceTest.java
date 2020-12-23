@@ -22,10 +22,10 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -73,29 +73,12 @@ public class TransactionParameterServiceTest extends AgentTestBase {
     private NetworkStatCache networkStatCache;
     @Mock
     private AddressCache addressCache;
-
+    @InjectMocks
     @Spy
     private TransactionParameterService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "stakeCreateConverter", stakeCreateConverter);
-        ReflectionTestUtils.setField(target, "stakeModifyConverter", stakeModifyConverter);
-        ReflectionTestUtils.setField(target, "stakeIncreaseConverter", stakeIncreaseConverter);
-        ReflectionTestUtils.setField(target, "stakeExitConverter", stakeExitConverter);
-        ReflectionTestUtils.setField(target, "reportConverter", reportConverter);
-        ReflectionTestUtils.setField(target, "delegateCreateConverter", delegateCreateConverter);
-        ReflectionTestUtils.setField(target, "delegateExitConverter", delegateExitConverter);
-        ReflectionTestUtils.setField(target, "proposalTextConverter", proposalTextConverter);
-        ReflectionTestUtils.setField(target, "proposalUpgradeConverter", proposalUpgradeConverter);
-        ReflectionTestUtils.setField(target, "proposalCancelConverter", proposalCancelConverter);
-        ReflectionTestUtils.setField(target, "proposalVoteConverter", proposalVoteConverter);
-        ReflectionTestUtils.setField(target, "proposalVersionConverter", proposalVersionConverter);
-        ReflectionTestUtils.setField(target, "proposalParameterConverter", proposalParameterConverter);
-        ReflectionTestUtils.setField(target, "delegateRewardClaimConverter", delegateRewardClaimConverter);
-        ReflectionTestUtils.setField(target, "restrictingCreateConverter", restrictingCreateConverter);
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        ReflectionTestUtils.setField(target, "addressCache", addressCache);
     }
 
     @Test(expected = Exception.class)

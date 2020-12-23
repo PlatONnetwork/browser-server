@@ -42,28 +42,20 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
         adjustParam.setStakeStatDelegateLocked(staking.getStatDelegateLocked());
         adjustParam.setStakeStatDelegateReleased(staking.getStatDelegateReleased());
         if(
-            staking.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()
-            ||staking.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
+            adjustParam.getStatus()== CustomStaking.StatusEnum.EXITING.getCode()
+            ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
         ){
             // 退出中或已退出的节点，从委托的delegateReleased中减掉hes和lock
-            if(delegation.getDelegateReleased().compareTo(adjustParam.getHes().add(adjustParam.getLock()))<0){
-                errors.add(extraContextInfo());
-                errors.add("【错误】：委托记录待提取的金额【"+delegation.getDelegateReleased()+"】小于调账[犹豫期+锁定期]金额【"+adjustParam.getHes().add(adjustParam.getLock())+"】！");
+            if(adjustParam.getDelegateReleased().compareTo(adjustParam.getHes().add(adjustParam.getLock()))<0){
+                errors.add("【错误】：委托记录[待提取金额【"+adjustParam.getDelegateReleased()+"】]小于调账参数[犹豫期【"+adjustParam.getHes()+"】+锁定期【"+adjustParam.getLock()+"】]金额【"+adjustParam.getHes().add(adjustParam.getLock())+"】！");
             }
         }else{
             // 候选中或已锁定的节点，从委托各自的犹豫期或锁定期金额中扣除
-            if(
-                delegation.getDelegateHes().compareTo(adjustParam.getHes())<0
-                ||delegation.getDelegateLocked().compareTo(adjustParam.getLock())<0
-            ){
-                errors.add(extraContextInfo());
+            if(adjustParam.getDelegateHes().compareTo(adjustParam.getHes())<0){
+                errors.add("【错误】：委托记录[犹豫期金额【"+adjustParam.getDelegateHes()+"】]小于调账参数[犹豫期金额【"+adjustParam.getHes()+"】]！");
             }
-
-            if(delegation.getDelegateHes().compareTo(adjustParam.getHes())<0){
-                errors.add("【错误】：委托记录犹豫期金额【"+delegation.getDelegateHes()+"】小于调账犹豫期金额【"+adjustParam.getHes()+"】！");
-            }
-            if(delegation.getDelegateLocked().compareTo(adjustParam.getLock())<0){
-                errors.add("【错误】：委托记录锁定期金额【"+delegation.getDelegateHes()+"】小于调账锁定期金额【"+adjustParam.getLock()+"】！");
+            if(adjustParam.getDelegateLocked().compareTo(adjustParam.getLock())<0){
+                errors.add("【错误】：委托记录[锁定期金额【"+adjustParam.getDelegateLocked()+"】]小于调账参数[锁定期金额【"+adjustParam.getLock()+"】]！");
             }
         }
     }
@@ -71,8 +63,8 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
     @Override
     void calculateAmountAndStatus() {
         if(
-            staking.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
-            ||staking.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
+            adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
+            ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
         ){
             // 退出中或已退出的节点
             // 1、从委托的delegateReleased中减掉hes和lock
@@ -130,6 +122,7 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
 
     @Override
     String extraContextInfo() {
+        if(delegation==null) return "";
         String extra = "委托记录：\n"+JSON.toJSONString(delegation,true);
         return extra;
     }

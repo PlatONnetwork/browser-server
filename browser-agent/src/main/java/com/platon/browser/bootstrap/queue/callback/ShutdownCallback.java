@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @description: 关闭队列回调
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-07 15:07:57
  **/
 @Slf4j

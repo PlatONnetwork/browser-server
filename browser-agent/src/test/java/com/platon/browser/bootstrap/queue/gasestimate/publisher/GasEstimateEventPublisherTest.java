@@ -2,7 +2,6 @@ package com.platon.browser.bootstrap.queue.gasestimate.publisher;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.collection.dto.EpochMessage;
-import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
 import com.platon.browser.common.queue.gasestimate.handler.IGasEstimateEventHandler;
 import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -10,6 +9,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -25,20 +25,19 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class GasEstimateEventPublisherTest extends AgentTestBase {
     @Mock
     private IGasEstimateEventHandler handler;
-
+    @InjectMocks
     @Spy
     private GasEstimateEventPublisher target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "handler", handler);
         ReflectionTestUtils.setField(target, "ringBufferSize", 1024);
     }
 

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-22 10:18:43
  **/
 public class NodeVersion {

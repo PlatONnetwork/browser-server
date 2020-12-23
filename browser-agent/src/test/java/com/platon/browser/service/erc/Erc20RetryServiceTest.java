@@ -7,10 +7,10 @@ import com.platon.browser.exception.BusinessException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -26,22 +26,21 @@ public class Erc20RetryServiceTest {
 
     @Mock
     private Erc20TokenMapper erc20TokenMapper;
-
+    @InjectMocks
     @Spy
-    private Erc20RetryService targe;
+    private Erc20RetryService target;
 
     @Test
     public void test_getErc20Token() {
-        ReflectionTestUtils.setField(this.targe, "erc20TokenMapper", this.erc20TokenMapper);
         when(this.erc20TokenMapper.selectByAddress(any())).thenReturn(null);
         try {
-            this.targe.getErc20Token("123");
+            this.target.getErc20Token("123");
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BusinessException);
         }
         Erc20Token erc20Token = new Erc20Token();
         when(this.erc20TokenMapper.selectByAddress(any())).thenReturn(erc20Token);
-        Erc20Token erc20Token1 = this.targe.getErc20Token("123");
+        Erc20Token erc20Token1 = this.target.getErc20Token("123");
         Assert.assertNotNull(erc20Token1);
     }
 

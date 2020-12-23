@@ -27,7 +27,7 @@ import java.util.Date;
 
 /**
  * @description: 创建验证人(质押)业务参数转换器
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 17:58:27
  **/
 @Slf4j

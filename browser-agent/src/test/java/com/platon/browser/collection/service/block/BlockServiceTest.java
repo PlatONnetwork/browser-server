@@ -14,11 +14,12 @@ import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net 资金
+ * @author: chendongming@matrixelements.com 资金
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)

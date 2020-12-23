@@ -8,6 +8,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -23,20 +24,19 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ComplementEventPublisherTest extends AgentTestBase {
     @Mock
     private IComplementEventHandler handler;
-
+    @InjectMocks
     @Spy
     private ComplementEventPublisher target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "handler", handler);
         ReflectionTestUtils.setField(target, "ringBufferSize", 1024);
     }
 

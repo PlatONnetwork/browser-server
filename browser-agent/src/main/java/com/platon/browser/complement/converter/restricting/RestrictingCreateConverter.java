@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * @description: 委托业务参数转换器
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 17:58:27
  **/
 @Slf4j

@@ -12,6 +12,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -23,19 +24,20 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlatOnClientMonitorTaskTest extends AgentTestBase {
     @Mock
     private PlatOnClient platOnClient;
+    @InjectMocks
     @Spy
     private PlatOnClientMonitorTask target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
+
     }
 
     @Test

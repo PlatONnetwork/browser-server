@@ -8,20 +8,20 @@ import com.platon.browser.dao.mapper.AddressMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -30,15 +30,12 @@ public class AddressUpdateTaskTest extends AgentTestBase {
     private StatisticBusinessMapper statisticBusinessMapper;
     @Mock
     private AddressMapper addressMapper;
-
+    @InjectMocks
     @Spy
     private AddressUpdateTask target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "statisticBusinessMapper", statisticBusinessMapper);
-        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
-
         when(addressMapper.selectByExample(any())).thenReturn(new ArrayList<>(addressList));
         when(statisticBusinessMapper.getAddressStatisticsFromStaking(any())).thenReturn(Collections.emptyList());
         when(statisticBusinessMapper.getAddressStatisticsFromDelegation(any())).thenReturn(Collections.emptyList());

@@ -8,10 +8,10 @@ import com.platon.browser.dao.mapper.DelegationMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -29,14 +29,12 @@ public class DelegateMigrateTaskTest extends AgentTestBase {
     private DelegationMapper delegationMapper;
     @Mock
     private EsDelegationService esDelegationService;
+    @InjectMocks
     @Spy
     private DelegateMigrateTask target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "delegationMapper", delegationMapper);
-        ReflectionTestUtils.setField(target, "esDelegationService", esDelegationService);
-
         when(delegationMapper.selectByExample(any())).thenReturn(new ArrayList<>(delegationList));
     }
 

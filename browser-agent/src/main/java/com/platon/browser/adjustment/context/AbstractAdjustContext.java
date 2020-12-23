@@ -39,6 +39,7 @@ public abstract class AbstractAdjustContext {
         // 调账目标记录是否都存在
         if(node==null) errors.add("【错误】：节点记录缺失:[节点ID="+ adjustParam.getNodeId()+"]");
         if(staking==null) errors.add("【错误】：质押记录缺失:[节点ID="+ adjustParam.getNodeId()+",节点质押块号="+ adjustParam.getStakingBlockNum()+"]");
+        if (!errors.isEmpty()) return errors;
         // 设置质押相关原始状态和值
         adjustParam.setStatus(staking.getStatus());
         adjustParam.setIsConsensus(staking.getIsConsensus());
@@ -88,13 +89,23 @@ public abstract class AbstractAdjustContext {
      */
     public final String errorInfo(){
         if(errors.isEmpty()) return "";
-        StringBuilder sb = new StringBuilder("============ ")
-                .append(adjustParam.getOptType())
-                .append("调账出错 ============\n")
-                .append(adjustParam.getOptType())
-                .append("调账参数：\n")
-                .append(JSON.toJSONString(adjustParam,true))
-                .append("\n");
+        StringBuilder sb = new StringBuilder("============ ");
+        if(adjustParam!=null){
+            sb.append(adjustParam.getOptType())
+            .append("调账错误 ============\n")
+            .append(adjustParam.getOptType())
+            .append("调账参数：\n")
+            .append(JSON.toJSONString(adjustParam,true)).append("\n");
+        }else{
+            sb.append("调账错误 ============\n");
+        }
+
+        if(node!=null) sb.append("节点记录：\n").append(JSON.toJSONString(node,true)).append("\n");
+        if(staking!=null) sb.append("质押记录：\n").append(JSON.toJSONString(staking,true)).append("\n");
+        String extraContextInfo = extraContextInfo();
+        if(StringUtils.isNotBlank(extraContextInfo)){
+            sb.append(extraContextInfo).append("\n");
+        }
         errors.forEach(e->sb.append(e).append("\n"));
         log.error("{}",sb.toString());
         return sb.toString();

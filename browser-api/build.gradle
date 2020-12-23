@@ -14,21 +14,19 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-//	compile.exclude module: "spring-boot-starter-tomcat"
 }
+
 dependencies {
 	compile project(":browser-service")
 	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//	implementation 'org.springframework.boot:spring-boot-starter-jetty'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	//compile 'io.springfox:springfox-swagger2:2.9.2'
-	//compile 'io.springfox:springfox-swagger-ui:2.9.2'
 	compile 'io.projectreactor.netty:reactor-netty:0.8.10.RELEASE'
 }
 
 
 /*=====================API生成配置 START=======================*/
+def rootDir = projectDir.parent;
 def apiDefDir = file(projectDir.path+"/apidef")
 files(apiDefDir.listFiles(new FilenameFilter() {
     boolean accept(File dir, String name) {
@@ -36,9 +34,13 @@ files(apiDefDir.listFiles(new FilenameFilter() {
     }
 })).each{yml ->
     println yml.name
-    def jsonFile = file(projectDir.path+"/src/main/resources/public/apidoc/json/"+yml.name+".json")
     def json = yamlToJson(yml.text)
+    // sync to browser-api
+    def jsonFile = file(projectDir.path+"/src/main/resources/public/apidoc/json/"+yml.name+".json")
     jsonFile.write(json)
+    // sync to root dir[docs]
+    def rootJsonFile = file(rootDir+"/docs/json/"+yml.name+".json")
+    rootJsonFile.write(json)
 }
 
 static yamlToJson(String yaml) {

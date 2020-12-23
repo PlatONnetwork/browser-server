@@ -1,7 +1,7 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "version" : "0.13.4",
+    "version" : "0.15.0.0",
     "title" : "浏览器接口文档",
     "description" : null
   },

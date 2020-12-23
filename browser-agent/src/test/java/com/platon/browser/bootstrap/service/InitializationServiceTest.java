@@ -21,6 +21,7 @@ import com.alaya.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -72,6 +73,7 @@ public class InitializationServiceTest extends AgentTestBase {
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Mock
     private StakeMiscService stakeMiscService;
+    @InjectMocks
     @Spy
     private InitializationService target;
     @Before
@@ -87,21 +89,6 @@ public class InitializationServiceTest extends AgentTestBase {
         staking.setNodeId(node.getNodeId());
         staking.setNodeName("node-name");
 
-        ReflectionTestUtils.setField(target, "epochRetryService", epochRetryService);
-        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(target, "nodeMapper", nodeMapper);
-        ReflectionTestUtils.setField(target, "stakingMapper", stakingMapper);
-        ReflectionTestUtils.setField(target, "networkStatMapper", networkStatMapper);
-        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
-        ReflectionTestUtils.setField(target, "nodeCache", nodeCache);
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        ReflectionTestUtils.setField(target, "addressCache", addressCache);
-        ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
-        ReflectionTestUtils.setField(target, "proposalCache", proposalCache);
-        ReflectionTestUtils.setField(target, "parameterService", parameterService);
-        ReflectionTestUtils.setField(target, "gasEstimateLogMapper", gasEstimateLogMapper);
-        ReflectionTestUtils.setField(target, "gasEstimateEventPublisher", gasEstimateEventPublisher);
-        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         when(epochRetryService.getPreValidators()).thenReturn(candidateList);
         when(epochRetryService.getPreVerifiers()).thenReturn(candidateList);
         when(epochRetryService.getCandidates()).thenReturn(candidateList);

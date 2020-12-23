@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 /**
  * @description: 可修改的惩罚参数配置
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-25 18:31:37
  **/
 @Builder

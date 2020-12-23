@@ -1,5 +1,10 @@
 package com.platon.browser.common.service.epoch;
 
+import com.alaya.contracts.ppos.NodeContract;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.resp.Node;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
@@ -8,18 +13,13 @@ import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.exception.CandidateException;
 import com.platon.browser.config.BlockChainConfig;
-import com.alaya.contracts.ppos.NodeContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.RemoteCall;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -39,15 +39,12 @@ public class EpochRetryServiceTest extends AgentTestBase {
     @Mock List<Node> curVerifiers;
     @Mock
     private NetworkStatCache networkStatCache;
-    @Spy private EpochRetryService target;
+    @InjectMocks
+    @Spy
+    private EpochRetryService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
-        ReflectionTestUtils.setField(target, "curVerifiers", curVerifiers);
-        ReflectionTestUtils.setField(target, "specialApi", specialApi);
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
         when(chainConfig.getAddIssuePeriodBlockCount()).thenReturn(BigInteger.valueOf(250));
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(10));
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(50));

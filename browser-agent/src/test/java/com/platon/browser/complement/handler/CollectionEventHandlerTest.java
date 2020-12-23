@@ -17,6 +17,7 @@ import com.platon.browser.dao.mapper.TxBakMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -52,7 +53,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
     private CustomTxBakMapper customTxBakMapper;
     @Mock
     private CustomNOptBakMapper customNOptBakMapper;
-
+    @InjectMocks
     @Spy
     private CollectionEventHandler target;
 
@@ -60,15 +61,6 @@ public class CollectionEventHandlerTest extends AgentTestBase {
     public void setup() throws Exception {
         ReflectionTestUtils.setField(target, "txDeleteBatchCount", 100);
         ReflectionTestUtils.setField(target, "optDeleteBatchCount", 100);
-        ReflectionTestUtils.setField(target, "transactionParameterService", transactionParameterService);
-        ReflectionTestUtils.setField(target, "blockParameterService", blockParameterService);
-        ReflectionTestUtils.setField(target, "statisticParameterService", statisticParameterService);
-        ReflectionTestUtils.setField(target, "complementEventPublisher", complementEventPublisher);
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        ReflectionTestUtils.setField(target, "nOptBakMapper", nOptBakMapper);
-        ReflectionTestUtils.setField(target, "txBakMapper", txBakMapper);
-        ReflectionTestUtils.setField(target, "customTxBakMapper", customTxBakMapper);
-        ReflectionTestUtils.setField(target, "customNOptBakMapper", customNOptBakMapper);
         NetworkStat networkStat = mock(NetworkStat.class);
         when(networkStatCache.getNetworkStat()).thenReturn(networkStat);
         when(networkStat.getTxQty()).thenReturn(1000);

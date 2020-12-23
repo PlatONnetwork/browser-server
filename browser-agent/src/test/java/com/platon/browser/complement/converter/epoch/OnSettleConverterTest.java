@@ -12,10 +12,10 @@ import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -38,17 +38,12 @@ public class OnSettleConverterTest extends AgentTestBase {
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Mock
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
-
+    @InjectMocks
     @Spy
     private OnSettleConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
-        ReflectionTestUtils.setField(target,"epochBusinessMapper",epochBusinessMapper);
-        ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
-        ReflectionTestUtils.setField(target,"gasEstimateEventPublisher",gasEstimateEventPublisher);
-        ReflectionTestUtils.setField(target,"customGasEstimateLogMapper",customGasEstimateLogMapper);
         when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(blockChainConfig.getUnStakeRefundSettlePeriodCount());
         when(chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat()).thenReturn(blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat());
         when(chainConfig.getSettlePeriodCountPerIssue()).thenReturn(blockChainConfig.getSettlePeriodCountPerIssue());

@@ -111,9 +111,10 @@ public class AdjustService {
         return validatedContext;
     }
 
-    public void adjust(List<AdjustParam> adjustParams) {
+    public String adjust(List<AdjustParam> adjustParams) {
         // 构造调账上下文并验证调账参数
         ValidatedContext validatedContext = validate(adjustParams);
+        String adjustMsg = "";
         // 委托调账
         for (AbstractAdjustContext context : validatedContext.getDelegateAdjustContextList()) {
             if(StringUtils.isBlank(context.errorInfo())){
@@ -121,12 +122,14 @@ public class AdjustService {
                 adjustmentMapper.adjustDelegateData(context.getAdjustParam());
                 StringBuilder sb = new StringBuilder("============ ")
                         .append(context.getAdjustParam().getOptType())
-                        .append("调账成功,调账上下文： ============\n")
+                        .append("调账成功 ============\n")
                         .append(context.contextInfo());
-                log.info(sb.toString());
+                adjustMsg = sb.toString();
+                log.info(adjustMsg);
             }else{
                 // 调账上下文有错误信息，调账参数打印到错误文件
-                log.warning(context.errorInfo());
+                adjustMsg = context.errorInfo();
+                log.warning(adjustMsg);
             }
         }
         // 质押调账
@@ -136,13 +139,16 @@ public class AdjustService {
                 adjustmentMapper.adjustStakingData(context.getAdjustParam());
                 StringBuilder sb = new StringBuilder("============ ")
                         .append(context.getAdjustParam().getOptType())
-                        .append("调账成功,调账上下文： ============\n")
+                        .append("调账成功 ============\n")
                         .append(context.contextInfo());
-                log.info(sb.toString());
+                adjustMsg=sb.toString();
+                log.info(adjustMsg);
             }else{
                 // 调账上下文有错误信息，调账参数打印到错误文件
-                log.warning(context.errorInfo());
+                adjustMsg=context.errorInfo();
+                log.warning(adjustMsg);
             }
         }
+        return adjustMsg;
     }
 }

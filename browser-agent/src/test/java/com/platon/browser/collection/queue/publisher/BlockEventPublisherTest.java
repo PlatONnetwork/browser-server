@@ -1,9 +1,9 @@
 package com.platon.browser.collection.queue.publisher;
 
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)

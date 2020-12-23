@@ -6,7 +6,7 @@ import com.platon.browser.param.TxParam;
 
 /**
  * @description: 解码后的结果
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 20:38:57
  **/
 public class GeneralContractDecodedResult {

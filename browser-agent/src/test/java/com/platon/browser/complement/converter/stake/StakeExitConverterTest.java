@@ -15,6 +15,7 @@ import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -45,17 +46,12 @@ public class StakeExitConverterTest extends AgentTestBase {
     private BlockChainConfig chainConfig;
     @Mock
     private StakeMiscService stakeMiscService;
+    @InjectMocks
     @Spy
     private StakeExitConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-        ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
-        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
-        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")

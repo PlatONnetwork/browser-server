@@ -1,18 +1,5 @@
 package com.platon.browser.bootstrap.queue.gasestimate.handler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.queue.gasestimate.event.GasEstimateEvent;
 import com.platon.browser.common.queue.gasestimate.handler.GasEstimateEventHandler;
@@ -20,6 +7,19 @@ import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class GasEstimateEventHandlerTest extends AgentTestBase {
@@ -28,13 +28,12 @@ public class GasEstimateEventHandlerTest extends AgentTestBase {
 	private GasEstimateLogMapper gasEstimateLogMapper;
 	@Mock
 	private EpochBusinessMapper epochBusinessMapper;
+	@InjectMocks
 	@Spy
 	private GasEstimateEventHandler target;
 	
 	@Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "gasEstimateLogMapper", gasEstimateLogMapper);
-        ReflectionTestUtils.setField(target, "epochBusinessMapper", epochBusinessMapper);
     }
 	
 	 @Test

@@ -22,6 +22,7 @@ import com.alaya.contracts.ppos.dto.resp.TallyResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -56,20 +57,12 @@ public class OnNewBlockConverterTest  extends AgentTestBase {
     private ParameterService parameterService;
     @Mock
     private PlatOnClient platOnClient;
-
+    @InjectMocks
     @Spy
     private OnNewBlockConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-        ReflectionTestUtils.setField(target,"newBlockMapper",newBlockMapper);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"proposalCache",proposalCache);
-        ReflectionTestUtils.setField(target,"proposalService",proposalService);
-        ReflectionTestUtils.setField(target,"proposalMapper",proposalMapper);
-        ReflectionTestUtils.setField(target,"parameterService",parameterService);
-        ReflectionTestUtils.setField(target,"platOnClient",platOnClient);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")

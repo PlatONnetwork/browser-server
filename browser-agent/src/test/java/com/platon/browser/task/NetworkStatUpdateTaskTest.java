@@ -6,29 +6,28 @@ import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.task.bean.NetworkStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doThrow;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -41,16 +40,12 @@ public class NetworkStatUpdateTaskTest extends AgentTestBase {
     private AccountService accountService;
     @Mock
     private StatisticBusinessMapper statisticBusinessMapper;
+    @InjectMocks
     @Spy
     private NetworkStatUpdateTask target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(target, "accountService", accountService);
-        ReflectionTestUtils.setField(target, "statisticBusinessMapper", statisticBusinessMapper);
-
         NetworkStat networkStat= CollectionNetworkStat.newInstance();
         networkStat.setCurNumber(100L);
         when(networkStatCache.getNetworkStat()).thenReturn(networkStat);

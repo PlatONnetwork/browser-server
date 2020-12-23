@@ -7,6 +7,7 @@ import com.platon.browser.collection.exception.CollectionBlockException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -40,12 +41,12 @@ public class BlockRetryServiceTest extends AgentTestBase {
     private Web3j web3j;
     @Mock
     private Request request;
+    @InjectMocks
     @Spy
     private BlockRetryService target;
 
     @Before
     public void setup() throws IOException {
-        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
         ReflectionTestUtils.setField(target, "latestBlockNumber", BigInteger.TEN);
         when(platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         when(web3jWrapper.getWeb3j()).thenReturn(web3j);

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * @Auther: chendongming@juzix.net
+ * @Auther: chendongming@matrixelements.com
  * @Date: 2019/11/16
  * @Description: 环形缓冲区队列监控任务
  */

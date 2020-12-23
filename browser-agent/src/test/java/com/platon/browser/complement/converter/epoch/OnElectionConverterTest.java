@@ -1,5 +1,6 @@
 package com.platon.browser.complement.converter.epoch;
 
+import com.alaya.protocol.Web3j;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.HistoryLowRateSlash;
 import com.platon.browser.client.PlatOnClient;
@@ -19,11 +20,10 @@ import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.Web3j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -52,19 +52,12 @@ public class OnElectionConverterTest extends AgentTestBase {
     private StakeMiscService stakeMiscService;
     @Mock
     private BlockChainConfig chainConfig;
-
+    @InjectMocks
     @Spy
     private OnElectionConverter target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(this.target, "epochBusinessMapper", this.epochBusinessMapper);
-        ReflectionTestUtils.setField(this.target, "networkStatCache", this.networkStatCache);
-        ReflectionTestUtils.setField(this.target, "specialApi", this.specialApi);
-        ReflectionTestUtils.setField(this.target, "platOnClient", this.platOnClient);
-        ReflectionTestUtils.setField(this.target, "stakingMapper", this.stakingMapper);
-        ReflectionTestUtils.setField(this.target, "chainConfig", this.chainConfig);
-        ReflectionTestUtils.setField(this.target, "stakeMiscService", this.stakeMiscService);
         List<Staking> list = new ArrayList<>();
         for (int i = 0; i < this.stakingList.size(); i++) {
             Staking staking = new Staking();

@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * @description: 领取委托奖励交易输入参数解码器
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2020-01-02 15:28:04
  **/
 class DelegateRewardClaimDecoder {

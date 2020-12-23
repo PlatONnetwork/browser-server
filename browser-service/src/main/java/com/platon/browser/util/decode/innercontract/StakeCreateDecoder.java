@@ -15,7 +15,7 @@ import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.
 
 /**
  * @description: 创建验证人交易输入参数解码器
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 20:13:04
  *
  * return Arrays.<Type>asList(new Uint16(stakingAmountType.getValue()) 1

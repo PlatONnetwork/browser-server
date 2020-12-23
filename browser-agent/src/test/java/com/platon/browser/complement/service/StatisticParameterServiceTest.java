@@ -10,6 +10,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -33,15 +34,12 @@ public class StatisticParameterServiceTest extends AgentTestBase {
     private StatisticsNetworkConverter statisticsNetworkConverter;
     @Mock
     private StatisticsAddressConverter statisticsAddressConverter;
-
+    @InjectMocks
     @Spy
     private StatisticParameterService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "addressCache", addressCache);
-        ReflectionTestUtils.setField(target, "statisticsNetworkConverter", statisticsNetworkConverter);
-        ReflectionTestUtils.setField(target, "statisticsAddressConverter", statisticsAddressConverter);
         when(addressCache.getAll()).thenReturn(new ArrayList<>(addressList));
     }
 

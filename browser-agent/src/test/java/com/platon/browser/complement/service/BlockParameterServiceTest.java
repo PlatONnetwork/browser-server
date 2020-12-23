@@ -12,6 +12,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -40,17 +41,12 @@ public class BlockParameterServiceTest extends AgentTestBase {
     private OnConsensusConverter onConsensusConverter;
     @Mock
     private OnSettleConverter onSettleConverter;
-
+    @InjectMocks
     @Spy
     private BlockParameterService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(target, "onNewBlockConverter", onNewBlockConverter);
-        ReflectionTestUtils.setField(target, "onElectionConverter", onElectionConverter);
-        ReflectionTestUtils.setField(target, "onConsensusConverter", onConsensusConverter);
-        ReflectionTestUtils.setField(target, "onSettleConverter", onSettleConverter);
         when(chainConfig.getElectionBackwardBlockCount()).thenReturn(BigInteger.ONE);
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(40));
         when(onElectionConverter.convert(any(),any())).thenReturn(nodeOptList);

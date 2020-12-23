@@ -1,6 +1,5 @@
 package com.platon.browser.adjustment.context;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomStaking;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -24,26 +23,20 @@ public class StakingAdjustContext extends AbstractAdjustContext {
         // 验证金额是否正确前，检查各项必须的数据是否存在
         if (!errors.isEmpty()) return;
         if(
-            staking.getStakingHes().compareTo(adjustParam.getHes())<0
-            ||staking.getStakingLocked().compareTo(adjustParam.getLock())<0
+            adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
+            ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
         ){
-            errors.add("质押记录：\n"+ JSON.toJSONString(staking,true));
-        }
-        if(
-            staking.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
-            ||staking.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
-        ){
-            // 退出中或已退出的节点，从stakingReduction中减掉hes和lock
-            if(staking.getStakingReduction().compareTo(adjustParam.getHes().add(adjustParam.getLock()))<0){
-                errors.add("【错误】：质押记录退回中金额【"+staking.getStakingReduction()+"】小于调账[犹豫期+锁定期]金额【"+adjustParam.getHes().add(adjustParam.getLock())+"】！");
+            // 退出中或已退出的节点，判断stakingReduction金额是否够扣
+            if(adjustParam.getStakingReduction().compareTo(adjustParam.getHes().add(adjustParam.getLock()))<0){
+                errors.add("【错误】：质押记录[退回中金额【"+adjustParam.getStakingReduction()+"】]小于调账参数[犹豫期【"+adjustParam.getHes()+"】+锁定期【"+adjustParam.getLock()+"】]金额【"+adjustParam.getHes().add(adjustParam.getLock())+"】！");
             }
         }else{
-            // 候选中或已锁定的节点，从各自的犹豫期或锁定期金额中扣除
-            if(staking.getStakingHes().compareTo(adjustParam.getHes())<0){
-                errors.add("【错误】：质押记录犹豫期金额【"+staking.getStakingHes()+"】小于调账犹豫期金额【"+adjustParam.getHes()+"】！");
+            // 候选中或已锁定的节点，判断犹豫期和锁定期金额是否够扣
+            if(adjustParam.getStakingHes().compareTo(adjustParam.getHes())<0){
+                errors.add("【错误】：质押记录[犹豫期金额【"+adjustParam.getStakingHes()+"】]小于调账参数[犹豫期金额【"+adjustParam.getHes()+"】]！");
             }
-            if(staking.getStakingLocked().compareTo(adjustParam.getLock())<0){
-                errors.add("【错误】：质押记录锁定期金额【"+staking.getStakingLocked()+"】小于调账锁定期金额【"+adjustParam.getLock()+"】！");
+            if(adjustParam.getStakingLocked().compareTo(adjustParam.getLock())<0){
+                errors.add("【错误】：质押记录[锁定期金额【"+adjustParam.getStakingLocked()+"】]小于调账参数[锁定期金额【"+adjustParam.getLock()+"】]！");
             }
         }
     }
@@ -51,8 +44,8 @@ public class StakingAdjustContext extends AbstractAdjustContext {
     @Override
     void calculateAmountAndStatus() {
         if(
-            staking.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
-            ||staking.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
+            adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
+            ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
         ){
             // 退出中或已退出的节点，从stakingReduction中减掉hes和lock
             adjustParam.getStakingReduction().subtract(adjustParam.getHes()).subtract(adjustParam.getLock());

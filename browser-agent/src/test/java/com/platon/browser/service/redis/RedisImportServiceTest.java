@@ -7,10 +7,10 @@ import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 
@@ -24,14 +24,12 @@ public class RedisImportServiceTest extends AgentTestBase {
     private RedisTransactionService transactionService;
     @Mock
     private RedisStatisticService statisticService;
+    @InjectMocks
     @Spy
     private RedisImportService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "blockService", blockService);
-        ReflectionTestUtils.setField(target, "transactionService", transactionService);
-        ReflectionTestUtils.setField(target, "statisticService", statisticService);
     }
 
 

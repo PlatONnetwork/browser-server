@@ -1,21 +1,21 @@
 package com.platon.browser.common.service.proposal;
 
+import com.alaya.contracts.ppos.ProposalContract;
+import com.alaya.contracts.ppos.dto.CallResponse;
+import com.alaya.contracts.ppos.dto.resp.TallyResult;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
-import com.alaya.contracts.ppos.ProposalContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.TallyResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.RemoteCall;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,7 +28,7 @@ public class ProposalServiceTest extends AgentTestBase {
     private PlatOnClient client;
     @Mock
     private SpecialApi sca;
-
+    @InjectMocks
     @Spy
     private ProposalService target;
 
@@ -37,8 +37,6 @@ public class ProposalServiceTest extends AgentTestBase {
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "client", client);
-        ReflectionTestUtils.setField(target, "sca", sca);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(client.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);

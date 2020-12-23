@@ -15,10 +15,10 @@ import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -42,15 +42,12 @@ public class ProposalInfoTaskTest extends AgentTestBase {
     private ProposalService proposalService;
 //    @Mock
 //    private PlatOnClient platOnClient;
+    @InjectMocks
     @Spy
     private ProposalInfoTask target;
 
     @Before
     public void setup() throws IOException {
-        ReflectionTestUtils.setField(target, "networkStatCache", networkStatCache);
-        ReflectionTestUtils.setField(target, "proposalMapper", proposalMapper);
-        ReflectionTestUtils.setField(target, "customProposalMapper", customProposalMapper);
-        ReflectionTestUtils.setField(target, "proposalService", proposalService);
 //        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
 //        Web3jWrapper ww = mock(Web3jWrapper.class);
 //        when(platOnClient.getWeb3jWrapper()).thenReturn(ww);

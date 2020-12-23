@@ -10,7 +10,7 @@ import static com.platon.browser.util.decode.innercontract.InnerContractDecoder.
 
 /**
  * @description: 参数提案交易输入参数解码器
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-25 10:13:04
  **/
 class ProposalParameterDecoder {

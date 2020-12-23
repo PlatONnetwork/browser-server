@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * @description: 领取委托奖励业务参数转换器
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2020-01-02 14:40:10
  **/
 @Slf4j

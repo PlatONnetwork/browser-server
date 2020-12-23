@@ -15,6 +15,7 @@ import com.platon.browser.service.redis.RedisErc20TokenService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,7 +35,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StatisticsAddressConverterTest extends AgentTestBase {
 
-
     @Mock
     private AddressCache addressCache;
     @Mock
@@ -53,25 +53,14 @@ public class StatisticsAddressConverterTest extends AgentTestBase {
     private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
     @Mock
     private RedisErc20TokenService dbHelperCache;
-
+    @InjectMocks
     @Spy
     private StatisticsAddressConverter target;
 
-
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(this.target, "dbHelperCache", this.dbHelperCache);
-        ReflectionTestUtils.setField(this.target, "addressCache", this.addressCache);
-        ReflectionTestUtils.setField(this.target, "statisticBusinessMapper", this.statisticBusinessMapper);
-        ReflectionTestUtils.setField(this.target, "addressMapper", this.addressMapper);
-        ReflectionTestUtils.setField(this.target, "erc20TokenMapper", this.erc20TokenMapper);
-        ReflectionTestUtils.setField(this.target, "customErc20TokenMapper", this.customErc20TokenMapper);
-        ReflectionTestUtils.setField(this.target, "redisTemplate", this.redisTemplate);
-        ReflectionTestUtils.setField(this.target, "customErc20TokenAddressRelMapper", this.customErc20TokenAddressRelMapper);
-        ReflectionTestUtils.setField(this.target, "erc20TokenAddressRelMapper", this.erc20TokenAddressRelMapper);
         when(this.addressCache.getAll()).thenReturn(new ArrayList<>(this.addressList));
         when(this.addressMapper.selectByExampleWithBLOBs(any())).thenReturn(new ArrayList<>(this.addressList));
-
     }
 
     @Test

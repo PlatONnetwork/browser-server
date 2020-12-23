@@ -11,10 +11,10 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @description: 增持质押转换器测试类
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 17:58:27
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -37,15 +37,12 @@ public class StakeIncreaseConverterTest extends AgentTestBase  {
     private CollectionEvent collectionEvent;
     @Mock
     private NetworkStatCache networkStatCache;
-
+    @InjectMocks
     @Spy
     private StakeIncreaseConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")

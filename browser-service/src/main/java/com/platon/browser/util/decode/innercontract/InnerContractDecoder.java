@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * @description: 交易输入解码器基类
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 20:14:38
  **/
 public interface InnerContractDecoder {

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-21 16:18:55
  **/
 public class TxInputUtilTest {

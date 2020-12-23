@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -46,15 +47,12 @@ public class StakeModifyConverterTest extends AgentTestBase {
     private EpochMessage epochMessage;
     @Mock
     private StakingMapper stakingMapper;
+    @InjectMocks
     @Spy
     private StakeModifyConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-        ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
                 .nodeName("zrj-node1")

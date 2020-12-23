@@ -2,7 +2,7 @@ package com.platon.browser.bootstrap.bean;
 
 /**
  * @description: 初始化结果
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-06 10:28:48
  **/
 

@@ -9,6 +9,7 @@ import com.platon.browser.erc.ErcService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -39,15 +40,12 @@ public class ErcBalanceUpdateTest extends AgentTestBase {
     private ErcService ercService;
     @Mock
     private SetOperations setOperations;
-
+    @InjectMocks
     @Spy
     private ErcTokenUpdateTask target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(this.target, "redisTemplate", this.redisTemplate);
-        ReflectionTestUtils.setField(this.target, "customErc20TokenAddressRelMapper", this.customErc20TokenAddressRelMapper);
-        ReflectionTestUtils.setField(this.target, "ercService", this.ercService);
         ReflectionTestUtils.setField(this.target, "batchSize", 10);
 
         Set<String> data = new HashSet<>();

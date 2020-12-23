@@ -7,10 +7,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
@@ -28,16 +28,13 @@ public class EsImportServiceTest extends AgentTestBase {
     private EsDelegateRewardService delegateRewardService;
     @Mock
     private EsTokenTransferRecordService esTokenTransferRecordService;
+    @InjectMocks
     @Spy
     private EsImportService target;
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(this.target, "blockService", this.blockService);
-        ReflectionTestUtils.setField(this.target, "transactionService", this.transactionService);
-        ReflectionTestUtils.setField(this.target, "nodeOptService", this.nodeOptService);
-        ReflectionTestUtils.setField(this.target, "delegateRewardService", this.delegateRewardService);
-        ReflectionTestUtils.setField(this.target, "esTokenTransferRecordService", this.esTokenTransferRecordService);
+
     }
 
     /**

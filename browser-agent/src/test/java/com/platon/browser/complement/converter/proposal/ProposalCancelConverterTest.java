@@ -13,10 +13,10 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @description: 委托参数转换器测试类
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 17:58:27
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -39,18 +39,12 @@ public class ProposalCancelConverterTest extends AgentTestBase {
 	private BlockChainConfig chainConfig;
 	@Mock
 	private NodeCache nodeCache;
-
-
-
+	@InjectMocks
 	@Spy
 	private ProposalCancelConverter target;
 
 	@Before
 	public void setup()throws Exception{
-		ReflectionTestUtils.setField(target,"proposalBusinessMapper",proposalBusinessMapper);
-		ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-		ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-		ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
 		NodeItem nodeItem = NodeItem.builder()
 				.nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
 				.nodeName("integration-node1")

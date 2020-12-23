@@ -8,10 +8,10 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -28,14 +28,12 @@ public class VersionUpdateTaskTest extends AgentTestBase {
     private StakingMapper stakingMapper;
     @Mock
     private CustomStakingHistoryMapper customStakingHistoryMapper;
-
+    @InjectMocks
     @Spy
     private StakingMigrateTask target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "stakingMapper", stakingMapper);
-        ReflectionTestUtils.setField(target, "customStakingHistoryMapper", customStakingHistoryMapper);
         when(stakingMapper.selectByExample(any())).thenReturn(new ArrayList<>(stakingList));
     }
 

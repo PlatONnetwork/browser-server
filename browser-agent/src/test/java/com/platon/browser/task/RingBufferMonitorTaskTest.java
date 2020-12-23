@@ -6,6 +6,7 @@ import com.platon.browser.common.utils.AppStatusUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -14,11 +15,12 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @description:
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class RingBufferMonitorTaskTest extends AgentTestBase {
+    @InjectMocks
     @Spy
     private RingBufferMonitorTask target;
 

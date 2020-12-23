@@ -13,10 +13,10 @@ import com.platon.browser.service.misc.StakeMiscService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 
@@ -43,16 +43,12 @@ public class StakeCreateConverterTest extends AgentTestBase {
     private ParameterService parameterService;
     @Mock
     private StakeMiscService stakeMiscService;
+    @InjectMocks
     @Spy
     private StakeCreateConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"stakeBusinessMapper",stakeBusinessMapper);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-        ReflectionTestUtils.setField(target,"parameterService",parameterService);
-        ReflectionTestUtils.setField(target,"stakeMiscService",stakeMiscService);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0xbfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf")
                 .nodeName("zrj-node1")

@@ -1,7 +1,6 @@
 package com.platon.browser.service.redis;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.service.redis.RedisService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

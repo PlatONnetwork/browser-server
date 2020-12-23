@@ -18,6 +18,7 @@ import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -54,19 +55,13 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     private AddressCache addressCache;
     @Mock
     private ERCInterface ercInterface;
+    @InjectMocks
     @Spy
     private BootstrapEventHandler target;
     private ReceiptResult receiptResult;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "esImportService", esImportService);
-        ReflectionTestUtils.setField(target, "redisImportService", redisImportService);
-        ReflectionTestUtils.setField(target, "txBakMapper", txBakMapper);
-        ReflectionTestUtils.setField(target, "nOptBakMapper", nOptBakMapper);
-        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
-        ReflectionTestUtils.setField(target, "addressCache", addressCache);
-        ReflectionTestUtils.setField(target, "ercInterface", ercInterface);
         receiptResult = receiptResultList.get(0);
     }
 

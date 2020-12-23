@@ -6,6 +6,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -23,12 +24,12 @@ import static org.mockito.Mockito.*;
 public class RedisTransactionServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
+    @InjectMocks
     @Spy
     private RedisTransactionService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "redisTemplate", redisTemplate);
         ReflectionTestUtils.setField(target, "maxItemCount", 500000);
         ValueOperations vo = mock(ValueOperations.class);
         when(redisTemplate.opsForValue()).thenReturn(vo);

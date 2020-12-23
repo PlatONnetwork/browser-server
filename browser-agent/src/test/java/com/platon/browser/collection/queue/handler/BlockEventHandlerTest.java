@@ -1,5 +1,6 @@
 package com.platon.browser.collection.queue.handler;
 
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
@@ -14,11 +15,10 @@ import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
- * @author: chendongming@juzix.net
+ * @author: chendongming@matrixelements.com
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -43,7 +43,8 @@ public class BlockEventHandlerTest extends AgentTestBase {
     private AddressCache addressCache;
     @Mock
     private ERCInterface ercInterface;
-    
+
+    @InjectMocks
     @Spy
     private BlockEventHandler target;
 
@@ -51,10 +52,6 @@ public class BlockEventHandlerTest extends AgentTestBase {
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "collectionEventPublisher", collectionEventPublisher);
-        ReflectionTestUtils.setField(target, "platOnClient", platOnClient);
-        ReflectionTestUtils.setField(target, "addressCache", addressCache);
-        ReflectionTestUtils.setField(target, "ercInterface", ercInterface);
         receiptResult = receiptResultList.get(0);
     }
 

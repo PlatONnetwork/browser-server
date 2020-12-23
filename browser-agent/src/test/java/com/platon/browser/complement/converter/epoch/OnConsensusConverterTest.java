@@ -16,11 +16,11 @@ import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -47,19 +47,12 @@ public class OnConsensusConverterTest extends AgentTestBase {
     private NetworkStatCache networkStatCache;
     @Mock
     private ProposalParameterService proposalParameterService;
-	
+	@InjectMocks
     @Spy
     private OnConsensusConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
-        ReflectionTestUtils.setField(target,"epochBusinessMapper",epochBusinessMapper);
-        ReflectionTestUtils.setField(target,"reportMultiSignParamCache",reportMultiSignParamCache);
-        ReflectionTestUtils.setField(target,"slashBusinessMapper",slashBusinessMapper);
-        ReflectionTestUtils.setField(target,"stakingMapper",stakingMapper);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"proposalParameterService",proposalParameterService);
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(blockChainConfig.getConsensusPeriodBlockCount());
         List<String> nodeIdList = new ArrayList<>();
         nodeList.forEach(n->nodeIdList.add(n.getNodeId()));

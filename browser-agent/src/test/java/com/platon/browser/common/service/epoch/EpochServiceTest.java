@@ -2,14 +2,13 @@ package com.platon.browser.common.service.epoch;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.exception.BlockNumberException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -24,12 +23,12 @@ public class EpochServiceTest extends AgentTestBase {
 
     @Mock private BlockChainConfig chainConfig;
     @Mock EpochRetryService epochRetryService;
+    @InjectMocks
     @Spy private EpochService target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(target, "epochRetryService", epochRetryService);
+
     }
 
     /**

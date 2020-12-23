@@ -13,10 +13,10 @@ import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,18 +37,13 @@ public class StatisticsNetworkConverterTest extends AgentTestBase {
     private BlockChainConfig chainConfig;
     @Mock
     private StatisticBusinessMapper statisticBusinessMapper;
-    
-	
+    @InjectMocks
     @Spy
     private StatisticsNetworkConverter target;
 
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
-        ReflectionTestUtils.setField(target,"statisticBusinessMapper",statisticBusinessMapper);
         NetworkStat networkStat = new NetworkStat();
         networkStat.setNodeOptSeq(1L);
         NodeItem nodeItem = NodeItem.builder()

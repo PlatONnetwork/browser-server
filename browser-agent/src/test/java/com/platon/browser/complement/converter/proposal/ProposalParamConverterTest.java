@@ -15,6 +15,7 @@ import com.platon.browser.service.govern.ParameterService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -45,21 +46,13 @@ public class ProposalParamConverterTest extends AgentTestBase {
     private ParameterService parameterService;
     @Mock
     private NodeCache nodeCache;
-
+    @InjectMocks
     @Spy
     private ProposalParameterConverter target;
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"chainConfig",chainConfig);
-        ReflectionTestUtils.setField(target,"proposalBusinessMapper",proposalBusinessMapper);
-        ReflectionTestUtils.setField(target,"networkStatCache",networkStatCache);
-        ReflectionTestUtils.setField(target,"proposalCache",proposalCache);
-        ReflectionTestUtils.setField(target,"parameterService",parameterService);
-        ReflectionTestUtils.setField(target,"nodeCache",nodeCache);
-
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("600");
-
         when(chainConfig.getProposalUrlTemplate()).thenReturn(blockChainConfig.getProposalUrlTemplate());
         when(chainConfig.getProposalPipNumTemplate()).thenReturn(blockChainConfig.getProposalPipNumTemplate());
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
@@ -69,7 +62,6 @@ public class ProposalParamConverterTest extends AgentTestBase {
                 .stakingBlockNum(new BigInteger("88602"))
                 .build();
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
-
     }
 
     @Test
