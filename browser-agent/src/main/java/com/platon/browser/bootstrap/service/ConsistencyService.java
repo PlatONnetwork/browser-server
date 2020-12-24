@@ -2,12 +2,12 @@ package com.platon.browser.bootstrap.service;
 
 
 import com.alaya.protocol.core.methods.response.PlatonBlock;
-import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
-import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
+import com.platon.browser.bootstrap.BootstrapEventPublisher;
+import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.receipt.ReceiptService;
-import com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.receipt.ReceiptService;
+import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dto.elasticsearch.TokenTxSummary;
@@ -20,7 +20,6 @@ import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
 import com.platon.browser.param.sync.NetworkStatTokenQtyUpdateParam;
 import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,15 +36,15 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Service
 public class ConsistencyService {
-    @Autowired
+    @Resource
     private NetworkStatMapper networkStatMapper;
-    @Autowired
+    @Resource
     private BlockESRepository blockESRepository;
-    @Autowired
+    @Resource
     private BlockService blockService;
-    @Autowired
+    @Resource
     private ReceiptService receiptService;
-    @Autowired
+    @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
 
     @Resource

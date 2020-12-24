@@ -1,36 +1,29 @@
 package com.platon.browser;
 
+import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.service.ConsistencyService;
 import com.platon.browser.bootstrap.service.InitializationService;
 import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
-import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.receipt.ReceiptService;
-import com.platon.browser.common.collection.dto.EpochMessage;
-import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
-import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
-import com.platon.browser.common.queue.gasestimate.handler.GasEstimateEventHandler;
-import com.platon.browser.common.queue.gasestimate.handler.IGasEstimateEventHandler;
-import com.platon.browser.common.service.epoch.EpochService;
-import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.complement.handler.CollectionEventHandler;
-import com.platon.browser.persistence.handler.ComplementEventHandler;
+import com.platon.browser.enums.AppStatus;
+import com.platon.browser.publisher.BlockEventPublisher;
+import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.epoch.EpochService;
+import com.platon.browser.service.receipt.ReceiptService;
+import com.platon.browser.utils.AppStatusUtil;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
 
+import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -41,41 +34,28 @@ import java.util.concurrent.CompletableFuture;
 @EnableEncryptableProperties
 @MapperScan(basePackages = {
 	"com.platon.browser.dao.mapper",
-	"com.platon.browser.complement.dao.mapper",
+	"com.platon.browser.dao.mapper",
 	"com.platon.browser.adjustment.dao"
 })
 public class AgentApplication implements ApplicationRunner {
 	// 区块服务
-	@Autowired
+	@Resource
 	private BlockService blockService;
 	// 交易服务
-	@Autowired
+	@Resource
 	private ReceiptService receiptService;
 	// 区块事件发布服务
-	@Autowired
+	@Resource
 	private BlockEventPublisher blockEventPublisher;
 	// 周期服务
-	@Autowired
+	@Resource
 	private EpochService epochService;
 	// 启动一致性检查服务
-    @Autowired
+    @Resource
     private ConsistencyService consistencyService;
     // 启动初始化服务
-    @Autowired
+    @Resource
 	private InitializationService initializationService;
-	// 整合各模块事件处理器
-	@Bean
-	public ICollectionEventHandler collectionEventHandler(){
-		return new CollectionEventHandler();
-	}
-	@Bean
-	public IComplementEventHandler complementEventHandler(){
-		return new ComplementEventHandler();
-	}
-	@Bean
-	public IGasEstimateEventHandler gasEstimateEventHandler(){
-		return new GasEstimateEventHandler();
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(AgentApplication.class, args);

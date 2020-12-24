@@ -1,9 +1,9 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.ProposalParticipantStat;
-import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.service.proposal.ProposalService;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.service.proposal.ProposalService;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
@@ -20,8 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,17 +32,17 @@ import java.util.List;
 @Slf4j
 @Component
 public class ProposalInfoTask {
-    @Autowired
+    @Resource
     private NetworkStatCache networkStatCache;
-    @Autowired
+    @Resource
     private ProposalMapper proposalMapper;
-    @Autowired
+    @Resource
     private CustomProposalMapper customProposalMapper;
-    @Autowired
+    @Resource
     private ProposalService proposalService;
-    @Autowired
+    @Resource
 	private NetworkStatMapper networkStatMapper;
-    @Autowired
+    @Resource
 	private BlockChainConfig blockChainConfig;
 
     /**

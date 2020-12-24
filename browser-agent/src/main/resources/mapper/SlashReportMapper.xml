@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.complement.dao.mapper.SlashBusinessMapper">
+<mapper namespace="com.platon.browser.dao.mapper.SlashBusinessMapper">
 	<update id="setException">
 		/*把节点设置为双签异常*/
 		/*2、更新质押*/
@@ -19,7 +19,7 @@
 		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
 		and `exception_status` = 3;
 	</select>
-	<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.slash.Report">
+	<update id="slashNode" parameterType="com.platon.browser.dao.param.ppos.Report">
 	/*1、更新委托*/
 	update `delegation` set
 		`delegate_released` = `delegate_released` + `delegate_hes` + `delegate_locked`,
@@ -85,7 +85,7 @@
 
 </update>
 
-	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.complement.dao.param.slash.Report">
+	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.dao.param.ppos.Report">
 		/*2、更新节点*/
 		update `node` set
 			  `un_stake_freeze_duration` = #{unStakeFreezeDuration},

@@ -1,9 +1,9 @@
 package com.platon.browser.task;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.common.service.elasticsearch.EsDelegationService;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.enums.AppStatus;
+import com.platon.browser.service.elasticsearch.EsDelegationService;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import org.junit.Before;
 import org.junit.Test;

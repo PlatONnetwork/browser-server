@@ -1,8 +1,8 @@
 package com.platon.browser.task;
 
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.task.bean.AddressStatistics;
-import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,9 +44,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AddressUpdateTask {
 	
-	@Autowired
+	@Resource
 	private StatisticBusinessMapper statisticBusinessMapper;
-	@Autowired
+	@Resource
 	private AddressMapper addressMapper;
     @Value("${task.address-batch-size}")
     private int batchSize;

@@ -1,17 +1,17 @@
 package com.platon.browser.task;
 
-import com.platon.browser.common.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
 import com.platon.browser.dao.mapper.CustomStakingHistoryMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.utils.AppStatusUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,10 +25,9 @@ import java.util.Set;
 @Slf4j
 public class StakingMigrateTask {
 
-    @Autowired
+    @Resource
     private StakingMapper stakingMapper;
-
-    @Autowired
+    @Resource
     private CustomStakingHistoryMapper customStakingHistoryMapper;
 
     @Scheduled(cron = "0/30  * * * * ?")

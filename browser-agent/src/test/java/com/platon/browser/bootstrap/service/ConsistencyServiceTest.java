@@ -1,12 +1,12 @@
 package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bootstrap.queue.callback.ShutdownCallback;
-import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
-import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.receipt.ReceiptService;
-import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.bootstrap.ShutdownCallback;
+import com.platon.browser.bootstrap.BootstrapEventPublisher;
+import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.receipt.ReceiptService;
+import com.platon.browser.bean.CollectionNetworkStat;
+import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dto.elasticsearch.TokenTxSummary;

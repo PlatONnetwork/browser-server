@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.complement.dao.mapper.DelegateBusinessMapper">
-<update id="create" parameterType="com.platon.browser.complement.dao.param.delegate.DelegateCreate">
+<mapper namespace="com.platon.browser.dao.mapper.DelegateBusinessMapper">
+<update id="create" parameterType="com.platon.browser.dao.param.ppos.DelegateCreate">
     /*1、更新节点*/
     update `node`set
         `total_value` = `total_value` + #{amount},

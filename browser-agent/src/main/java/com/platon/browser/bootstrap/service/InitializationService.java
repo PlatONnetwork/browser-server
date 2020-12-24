@@ -1,44 +1,39 @@
 package com.platon.browser.bootstrap.service;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.common.complement.cache.AddressCache;
-import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.ProposalCache;
-import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
-import com.platon.browser.common.complement.dto.PeriodValueElement;
-import com.platon.browser.common.queue.gasestimate.publisher.GasEstimateEventPublisher;
-import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.bean.CollectionNetworkStat;
+import com.platon.browser.publisher.GasEstimateEventPublisher;
+import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.cache.NodeCache;
+import com.platon.browser.cache.ProposalCache;
+import com.platon.browser.bean.AnnualizedRateInfo;
+import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.DelegationRewardESRepository;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.*;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
 import com.platon.browser.utils.EpochUtil;
-import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * @description: 启动初始化服务
@@ -49,45 +44,45 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class InitializationService {
     private static final InitializationResult initialResult = new InitializationResult();
-    @Autowired
+    @Resource
     private EpochRetryService epochRetryService;
-    @Autowired
+    @Resource
     private BlockChainConfig chainConfig;
-    @Autowired
+    @Resource
     private NodeMapper nodeMapper;
-    @Autowired
+    @Resource
     private StakingMapper stakingMapper;
-    @Autowired
+    @Resource
     private NetworkStatMapper networkStatMapper;
-    @Autowired
+    @Resource
     private AddressMapper addressMapper;
-    @Autowired
+    @Resource
     private NodeCache nodeCache;
-    @Autowired
+    @Resource
     private NetworkStatCache networkStatCache;
-    @Autowired
+    @Resource
     private AddressCache addressCache;
-    @Autowired
+    @Resource
     private ParameterService parameterService;
-    @Autowired
+    @Resource
     private ProposalMapper proposalMapper;
-    @Autowired
+    @Resource
     private ProposalCache proposalCache;
-    @Autowired
+    @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
-    @Autowired
+    @Resource
     private GasEstimateEventPublisher gasEstimateEventPublisher;
-    @Autowired
+    @Resource
     private StakeMiscService stakeMiscService;
-    @Autowired
+    @Resource
     private BlockESRepository blockESRepository;
-    @Autowired
+    @Resource
     private TransactionESRepository transactionESRepository;
-    @Autowired
+    @Resource
     private DelegationRewardESRepository delegationRewardESRepository;
-    @Autowired
+    @Resource
     private TokenTransferRecordESRepository transferRecordESRepository;
-    @Autowired
+    @Resource
     private NodeOptESRepository nodeOptESRepository;
 
     @Transactional

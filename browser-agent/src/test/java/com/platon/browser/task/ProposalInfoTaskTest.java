@@ -2,11 +2,11 @@ package com.platon.browser.task;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.ProposalParticipantStat;
-import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.common.service.proposal.ProposalService;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.bean.CollectionNetworkStat;
+import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.enums.AppStatus;
+import com.platon.browser.service.proposal.ProposalService;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;

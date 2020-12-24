@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.client.NodeVersion;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 
@@ -32,15 +33,15 @@ import java.util.*;
 @Slf4j
 public class NodeUpdateTask {
 	
-    @Autowired
+    @Resource
     private BlockChainConfig chainConfig;
-    @Autowired
+    @Resource
     private NodeMapper nodeMapper;
-    @Autowired
+    @Resource
     private StakeBusinessMapper stakeBusinessMapper;
-	@Autowired
+	@Resource
 	private PlatOnClient platOnClient;
-    @Autowired
+    @Resource
 	private SpecialApi specialApi;
 	
     @Scheduled(cron = "0/5  * * * * ?")

@@ -1,10 +1,10 @@
 package com.platon.browser.task;
 
-import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.service.account.AccountService;
-import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.common.utils.CalculateUtils;
-import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.service.account.AccountService;
+import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.utils.CalculateUtils;
+import com.platon.browser.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeExample;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -30,15 +31,15 @@ import java.math.RoundingMode;
 @Slf4j
 public class NetworkStatUpdateTask {
 	
-	@Autowired
+	@Resource
 	private NetworkStatCache networkStatCache;
-    @Autowired
+    @Resource
     private BlockChainConfig chainConfig;
-	@Autowired
+	@Resource
 	private AccountService accountService;
-	@Autowired
+	@Resource
 	private StatisticBusinessMapper statisticBusinessMapper;
-	@Autowired
+	@Resource
 	private NodeMapper nodeMapper;
 	
     @Scheduled(cron = "0/1  * * * * ?")

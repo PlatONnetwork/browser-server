@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.common.service.elasticsearch.EsDelegationService;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.service.elasticsearch.EsDelegationService;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +26,9 @@ import java.util.Set;
 @Slf4j
 public class DelegateMigrateTask {
 
-    @Autowired
+    @Resource
     private DelegationMapper delegationMapper;
-    @Autowired
+    @Resource
     private EsDelegationService esDelegationService;
 
     @Transactional

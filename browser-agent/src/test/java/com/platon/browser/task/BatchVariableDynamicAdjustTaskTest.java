@@ -2,9 +2,9 @@ package com.platon.browser.task;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.persistence.queue.handler.PersistenceEventHandler;
+import com.platon.browser.enums.AppStatus;
+import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.handler.PersistenceEventHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

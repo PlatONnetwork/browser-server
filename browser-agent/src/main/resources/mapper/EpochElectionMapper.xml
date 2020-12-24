@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.complement.dao.mapper.EpochBusinessMapper">
+<mapper namespace="com.platon.browser.dao.mapper.EpochBusinessMapper">
 	<select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
 		/*查询低出块率质押节点*/
 		select  `node_id` as nodeId,
@@ -28,7 +28,7 @@
 		and `exception_status` = 2
 		and `status` = 1;
 	</select>
-	<update id="slashNode" parameterType="com.platon.browser.complement.dao.param.epoch.Election">
+	<update id="slashNode" parameterType="com.platon.browser.dao.param.epoch.Election">
 		/*处理低出块率被锁定的节点*/
 		<foreach collection="lockedNodeList" item="item">
 			/*1、更新质押*/

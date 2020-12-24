@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
-<update id="lockedExit" parameterType="com.platon.browser.complement.dao.param.stake.StakeExit">
+<mapper namespace="com.platon.browser.dao.mapper.StakeBusinessMapper">
+<update id="lockedExit" parameterType="com.platon.browser.dao.param.ppos.StakeExit">
 /*节点质押金处于锁定状态，进行解质押*/
 /*1、更新委托*/
 	update `delegation` set
@@ -46,7 +46,7 @@
 	and `staking_block_num` = #{stakingBlockNum};
 </update>
 
-<update id="unlockExit" parameterType="com.platon.browser.complement.dao.param.stake.StakeExit">
+<update id="unlockExit" parameterType="com.platon.browser.dao.param.ppos.StakeExit">
 /*节点质押金处于犹豫期状态，进行解质押*/
 /*1、更新委托*/
 	update `delegation` set

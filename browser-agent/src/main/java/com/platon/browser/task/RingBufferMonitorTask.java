@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.common.queue.AbstractPublisher;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.publisher.AbstractPublisher;
+import com.platon.browser.utils.AppStatusUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

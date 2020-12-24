@@ -1,13 +1,15 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.persistence.queue.handler.PersistenceEventHandler;
+import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.handler.PersistenceEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @Auther: chendongming@matrixelements.com
@@ -18,9 +20,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class BatchVariableDynamicAdjustTask {
 
-    @Autowired
+    @Resource
     private PlatOnClient platOnClient;
-    @Autowired
+    @Resource
     private PersistenceEventHandler persistenceEventHandler;
 
     @Value("${task.dynamic-adjust.threshold}")

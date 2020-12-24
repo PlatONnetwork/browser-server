@@ -2,7 +2,7 @@ package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.collection.dto.CollectionNetworkStat;
+import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Before;
 import org.junit.Test;

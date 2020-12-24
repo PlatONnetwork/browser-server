@@ -2,8 +2,8 @@ package com.platon.browser.task;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.common.BrowserConst;
-import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.enums.AppStatus;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.erc.ErcService;
 import org.junit.Before;

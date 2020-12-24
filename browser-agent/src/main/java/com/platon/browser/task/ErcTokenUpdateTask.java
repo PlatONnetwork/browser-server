@@ -1,14 +1,14 @@
 package com.platon.browser.task;
 
 import com.platon.browser.common.BrowserConst;
-import com.platon.browser.common.utils.AppStatusUtil;
-import com.platon.browser.complement.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.erc.ErcService;
-import com.platon.browser.erc.client.ERCClient;
+import com.platon.browser.service.erc20.Erc20ServiceImpl;
 import com.platon.browser.param.sync.TotalSupplyUpdateParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,18 +36,18 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class ErcTokenUpdateTask {
 
-    @Autowired
+    @Resource
     protected RedisTemplate<String, String> redisTemplate;
-    @Autowired
+    @Resource
     private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
-    @Autowired
+    @Resource
     private Erc20TokenMapper erc20TokenMapper;
-    @Autowired
+    @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
-    @Autowired
+    @Resource
     protected ErcService ercService;
-    @Autowired
-    private ERCClient ercClient;
+    @Resource
+    private Erc20ServiceImpl erc20ServiceImpl;
 
     @Value("${task.erc20-batch-size:4}")
     private int batchSize;
@@ -95,7 +96,7 @@ public class ErcTokenUpdateTask {
                 tokens.forEach(token->{
                     EXECUTOR.submit(() -> {
                         //查询总供应量
-                        BigInteger totalSupply = ercClient.getTotalSupply(token.getAddress());
+                        BigInteger totalSupply = erc20ServiceImpl.getTotalSupply(token.getAddress());
                         totalSupply = totalSupply==null?BigInteger.ZERO:totalSupply;
                         TotalSupplyUpdateParam tsp = new TotalSupplyUpdateParam();
                         tsp.setAddress(token.getAddress());

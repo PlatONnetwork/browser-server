@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.common.utils.AppStatusUtil;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,9 +28,9 @@ import java.util.List;
 @Slf4j
 @Component
 public class ProposalDetailTask {
-    @Autowired
+    @Resource
     private CustomProposalMapper customProposalMapper;
-    @Autowired
+    @Resource
     private ProposalMapper proposalMapper;
 
     /**

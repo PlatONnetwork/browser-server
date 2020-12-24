@@ -2,12 +2,10 @@ package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.adjustment.bean.AdjustParam;
-import com.platon.browser.bean.BlockBean;
-import com.platon.browser.bean.NodeBean;
 import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
+import com.platon.browser.bean.CollectionBlock;
+import com.platon.browser.bean.CollectionTransaction;
+import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.*;
