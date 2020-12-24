@@ -78,10 +78,10 @@
 2. 新增锁仓治理参数minimumRelease；  
 3. 零出块处罚列表新增预估解锁块高；   
 4. 退出节点新增预估解锁块高；    
-5. ARC20交易入库至Redis；   
-6. 根据特殊节点返回的调账数据，对锁仓相关金额进行调整；  
-7. token持有者列表只显示余额大于0（持有数量大于0）的记录；  
-8. 错误码中英描述修改；
+5. agent启动时，检测Redis中是否存在ARC20交易，如果没有，则从ES同步ARC20交易至Redis；
+6. token持有者列表只显示余额大于0（持有数量大于0）的记录；  
+7. 错误码中英描述修改，与底层一致： http://192.168.9.66/Juzix-Platon-Doc/Dark/blob/develop/03-系统设计/01-架构设计/PlatON底层/内置合约错误码对照表.xlsx；
+8. 根据特殊节点返回的调账数据，对锁仓相关金额进行调整；
 
 #### 配置变更
 1. Redis命名空间移到最外层配置文件中配置 & 新增调账日志存储文件配置：
@@ -91,15 +91,11 @@
         redis-namespace: browser:${version}:${profile}
         #调账日志输出文件
         account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
+        #同步时的索引查询分页参数配置
+        paging:
+            erc20-transaction:
+                pageSize: 2000
+                pageCount: 250
    ```
 
-#### 升级注意事项
-1. 本次发版涉及的程序包:  
-   a. browser-sync  -- 数据同步模块（只需要在browser-agent运行前运行一次）  
-   b. browser-agent -- 数据采集端  
-   c. browser-api   -- 前端接口提供端  
-   
-2. 由于0.15.0.0之前的版本ARC20交易没有入库至Redis，在不清理现有数据的场景下，
-   部署0.15.0.0版本前，需要停止browser-agent，并执行browser-sync把ES中的
-   ARC20交易同步至Redis。
    
