@@ -108,6 +108,11 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 201018
+  #同步时的索引查询分页参数配置
+  paging:
+    erc20-transaction:
+      pageSize: 2000
+      pageCount: 250
 
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
 isRecaptcha: false
