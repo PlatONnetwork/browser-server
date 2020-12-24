@@ -123,6 +123,8 @@ platon:
   redis-namespace: browser:${version}:${profile}
   #调账日志输出文件
   account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
+  #ES中的ARC20交易同步至redis，每页大小
+  paging.erc20-transaction.page-size: 1000
 
 task:
    #地址统计任务
