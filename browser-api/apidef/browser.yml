@@ -14,6 +14,7 @@ paths:
   #首页接口
   /home/queryNavigation:
     post:
+      operationId: queryNavigation
       tags:
         - 首页接口
       summary: 搜索导航
@@ -45,6 +46,7 @@ paths:
             $ref: '#/definitions/QueryNavigationResult'
   /home/blockStatistic:
     post:
+      operationId: blockStatistic
       tags:
         - 首页接口
       summary: 出块趋势（websocket）
@@ -63,6 +65,7 @@ paths:
             $ref: '#/definitions/BlockTrendPushResult'
   /home/chainStatistic:
     post:
+      operationId: chainStatistic
       tags:
         - 首页接口
       summary: 基础数据（websocket）
@@ -81,6 +84,7 @@ paths:
             $ref: '#/definitions/ChainPushResult'
   /home/stakingList:
     post:
+      operationId: stakingList
       tags:
         - 首页接口
       summary: 验证人列表（websocket）
@@ -102,6 +106,7 @@ paths:
   #地址相关接口
   /address/details:
     post:
+      operationId: details
       tags:
         - 地址接口
       summary: 查询地址详情
@@ -121,6 +126,7 @@ paths:
             $ref: '#/definitions/AddressDetailResult'
   /address/rpplanDetail:
     post:
+      operationId: rpplanDetail
       tags:
         - 地址接口
       summary: 地址锁仓详情
@@ -143,6 +149,7 @@ paths:
   #区块相关接口
   /block/blockList:
     post:
+      operationId: blockList
       tags:
         - 区块接口
       summary: 区块列表
@@ -163,6 +170,7 @@ paths:
             $ref: '#/definitions/BlockListResult'
   /block/blockListByNodeId:
     post:
+      operationId: blockListByNodeId
       tags:
         - 区块接口
       summary: 节点的区块列表
@@ -183,6 +191,7 @@ paths:
             $ref: '#/definitions/BlockListResult'
   /block/blockListByNodeIdDownload:
     get:
+      operationId: blockListByNodeIdDownload
       tags:
         - 区块接口
       summary: 导出节点的区块列表
@@ -221,6 +230,7 @@ paths:
           description: 返回二进制文件流
   /block/blockDetails:
     post:
+      operationId: blockDetails
       tags:
         - 区块接口
       summary: 区块详情
@@ -241,6 +251,7 @@ paths:
             $ref: '#/definitions/BlockDetailResult'
   /block/blockDetailNavigate:
     post:
+      operationId: blockDetailNavigate
       tags:
         - 区块接口
       summary: 区块详情前后跳转浏览
@@ -262,6 +273,7 @@ paths:
   #合约相关接口
   /token/tokenDetail:
     post:
+      operationId: tokenDetail
       tags:
         - 合约接口
       summary: 查询令牌详情
@@ -282,6 +294,7 @@ paths:
             $ref: '#/definitions/TokenDetailResult'
   /token/tokenList:
     post:
+      operationId: tokenList
       tags:
         - 合约接口
       summary: 合约列表
@@ -302,6 +315,7 @@ paths:
             $ref: '#/definitions/TokenListResult'
   /token/tokenTransferList:
     post:
+      operationId: tokenTransferList
       tags:
         - 合约接口
       summary: 合约内部交易列表
@@ -325,6 +339,7 @@ paths:
             $ref: '#/definitions/TokenTransferListResult'
   /token/exportTokenTransferList:
     get:
+      operationId: exportTokenTransferList
       tags:
         - 合约接口
       summary: 导出合约内部交易列表
@@ -371,6 +386,7 @@ paths:
           description: 返回二进制数据流
   /token/tokenHolderList:
     post:
+      operationId: tokenHolderList
       tags:
         - 合约接口
       summary: ERC20合约持有人信息列表
@@ -391,6 +407,7 @@ paths:
             $ref: '#/definitions/TokenHolderListResult'
   /token/exportTokenHolderList:
     get:
+      operationId: exportTokenHolderList
       tags:
         - 合约接口
       summary: 导出ERC20合约持有人信息列表
@@ -427,6 +444,7 @@ paths:
           description: 返回二进制数据
   /token/holderTokenList:
     post:
+      operationId: holderTokenList
       tags:
         - 合约接口
       summary: 持有人持有token信息列表
@@ -449,6 +467,7 @@ paths:
             $ref: '#/definitions/HolderTokenListResult'
   /token/exportHolderTokenList:
     get:
+      operationId: exportHolderTokenList
       tags:
         - 合约接口
       summary: 导出持有人对应token列表
@@ -485,6 +504,7 @@ paths:
           description: 返回二进制数据
   /extra/queryConfig:
     post:
+      operationId: queryConfig
       tags:
         - 配置参数接口
       summary: 查询配置详情
@@ -500,6 +520,7 @@ paths:
   #提案相关接口
   /proposal/proposalList:
     post:
+      operationId: proposalList
       tags:
         - 提案接口
       summary: 提案列表
@@ -520,6 +541,7 @@ paths:
             $ref: '#/definitions/ProposalListResult'
   /proposal/proposalDetails:
     post:
+      operationId: proposalDetails
       tags:
         - 提案接口
       summary: 提案详情
@@ -540,6 +562,7 @@ paths:
             $ref: '#/definitions/ProposalDetailResult'
   /proposal/voteList:
     post:
+      operationId: voteList
       tags:
         - 提案接口
       summary: 投票列表
@@ -561,6 +584,7 @@ paths:
   #质押验证人相关接口
   /staking/statistic:
     post:
+      operationId: statistic
       tags:
         - 验证人接口
       summary: 汇总数据（websocket）
@@ -579,6 +603,7 @@ paths:
             $ref: '#/definitions/StakingStatisticResult'
   /staking/aliveStakingList:
     post:
+      operationId: aliveStakingList
       tags:
         - 验证人接口
       summary: 实时验证人列表
@@ -601,6 +626,7 @@ paths:
             $ref: '#/definitions/AliveStakingListResult'
   /staking/historyStakingList:
     post:
+      operationId: historyStakingList
       tags:
         - 验证人接口
       summary: 历史验证人列表
@@ -623,6 +649,7 @@ paths:
             $ref: '#/definitions/HistoryStakingListResult'
   /staking/lockedStakingList:
     post:
+      operationId: lockedStakingList
       tags:
         - 验证人接口
       summary: 已锁定验证人列表
@@ -645,6 +672,7 @@ paths:
             $ref: '#/definitions/LockedStakingListResult'
   /staking/stakingDetails:
     post:
+      operationId: stakingDetails
       tags:
         - 验证人接口
       summary: 验证人详情
@@ -667,6 +695,7 @@ paths:
             $ref: '#/definitions/StakingDetailResult'
   /staking/stakingOptRecordList:
     post:
+      operationId: stakingOptRecordList
       tags:
         - 验证人接口
       summary: 节点操作记录
@@ -689,6 +718,7 @@ paths:
             $ref: '#/definitions/StakingOptRecordListResult'
   /staking/delegationListByStaking:
     post:
+      operationId: delegationListByStaking
       tags:
         - 验证人接口
       summary: 验证人的委托列表
@@ -712,6 +742,7 @@ paths:
             $ref: '#/definitions/DelegationListByStakingListResult'
   /staking/delegationListByAddress:
     post:
+      operationId: delegationListByAddress
       tags:
         - 验证人接口
       summary: 地址相关的委托列表
@@ -736,6 +767,7 @@ paths:
   #交易相关接口
   /transaction/transactionList:
     post:
+      operationId: transactionList
       tags:
         - 交易接口
       summary: 交易列表
@@ -758,6 +790,7 @@ paths:
             $ref: '#/definitions/TransactionListResult'
   /transaction/transactionListByBlock:
     post:
+      operationId: transactionListByBlock
       tags:
         - 交易接口
       summary: 区块的交易列表
@@ -780,6 +813,7 @@ paths:
             $ref: '#/definitions/TransactionListResult'
   /transaction/transactionListByAddress:
     post:
+      operationId: transactionListByAddress
       tags:
         - 交易接口
       summary: 地址的交易列表
@@ -802,6 +836,7 @@ paths:
             $ref: '#/definitions/TransactionListResult'
   /transaction/addressTransactionDownload:
     get:
+      operationId: addressTransactionDownload
       tags:
         - 交易接口
       summary: 导出地址交易列表
@@ -842,6 +877,7 @@ paths:
           description: 返回二进制数据流
   /transaction/transactionDetails:
     post:
+      operationId: transactionDetails
       tags:
         - 交易接口
       summary: 交易详情
@@ -876,6 +912,7 @@ paths:
             $ref: '#/definitions/TransactionDetailsResult'
   /transaction/queryClaimByAddress:
     post:
+      operationId: queryClaimByAddress
       tags:
         - 交易接口
       summary: 地址的领取奖励列表
@@ -898,6 +935,7 @@ paths:
             $ref: '#/definitions/QueryClaimByAddressListResult'
   /transaction/queryClaimByStaking:
     post:
+      operationId: queryClaimByStaking
       tags:
         - 交易接口
       summary: 节点相关的领取奖励列表
