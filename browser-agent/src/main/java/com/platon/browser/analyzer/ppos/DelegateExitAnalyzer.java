@@ -9,7 +9,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dao.param.BusinessParam;
 import com.platon.browser.dao.param.ppos.DelegateExit;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;

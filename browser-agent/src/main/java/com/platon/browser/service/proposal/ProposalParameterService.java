@@ -8,8 +8,8 @@ import com.platon.browser.dao.entity.VoteExample;
 import com.platon.browser.dao.entity.VoteExample.Criteria;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomVote.OptionEnum;
+import com.platon.browser.bean.CustomProposal;
+import com.platon.browser.bean.CustomVote.OptionEnum;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

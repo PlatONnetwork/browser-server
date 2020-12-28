@@ -1,13 +1,12 @@
 package com.platon.browser.service.block;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.analyzer.epoch.OnConsensusAnalyzer;
 import com.platon.browser.analyzer.epoch.OnElectionAnalyzer;
 import com.platon.browser.analyzer.epoch.OnNewBlockAnalyzer;
 import com.platon.browser.analyzer.epoch.OnSettleAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.CollectionBlockException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -20,7 +19,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockServiceTest extends AgentTestBase {
+public class BlockServiceTest extends TestBase {
     @Mock
     private BlockRetryService retryService;
     @Mock

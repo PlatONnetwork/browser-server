@@ -2,7 +2,7 @@ package com.platon.browser.dao.mapper;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
-import com.platon.browser.dto.CustomErc20TokenAddressRel;
+import com.platon.browser.bean.CustomErc20TokenAddressRel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

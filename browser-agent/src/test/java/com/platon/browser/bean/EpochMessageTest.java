@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.epoch.EpochService;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
  * @Description: 年化率信息bean单元测试
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EpochMessageTest extends AgentTestBase {
+public class EpochMessageTest extends TestBase {
 
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException {

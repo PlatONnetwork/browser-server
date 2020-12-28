@@ -1,6 +1,6 @@
 package com.platon.browser.dao.param.epoch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ElectionTest extends AgentTestBase {
+public class ElectionTest extends TestBase {
 
     @Test
     public void test(){

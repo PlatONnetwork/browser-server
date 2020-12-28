@@ -1,6 +1,6 @@
 package com.platon.browser.service.transaction;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.analyzer.ppos.*;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionServiceTest extends AgentTestBase {
+public class TransactionServiceTest extends TestBase {
     @Mock
     private StakeCreateAnalyzer stakeCreateAnalyzer;
     @Mock

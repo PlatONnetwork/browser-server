@@ -1,7 +1,7 @@
 package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisBlockServiceTest extends AgentTestBase {
+public class RedisBlockServiceTest extends TestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @InjectMocks

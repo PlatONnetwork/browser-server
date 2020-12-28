@@ -10,7 +10,7 @@ import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.service.erc20.Erc20Service;
+import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -75,7 +75,7 @@ public class CollectionTransaction extends Transaction {
     }
 
     CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient,
-        AddressCache addressCache, SpecialApi specialApi, Erc20Service erc20Service)
+        AddressCache addressCache, SpecialApi specialApi, Erc20ResolveService erc20ResolveService)
         throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         // 使用地址缓存初始化普通合约缓存信息
         this.initGeneralContractCache(addressCache);
@@ -92,13 +92,13 @@ public class CollectionTransaction extends Transaction {
             // 检测是否包指定代币的创建事件
             TransactionReceipt transactionReceipt = new TransactionReceipt();
             transactionReceipt.setLogs(receipt.getLogs());
-            List<String> contractAddress = erc20Service.getContractFromReceiptByEvents(transactionReceipt);
+            List<String> contractAddress = erc20ResolveService.getContractAddressFromEvents(transactionReceipt);
             if (null != contractAddress && !contractAddress.isEmpty()) {
                 for (String address : contractAddress) {
                     ComplementInfo complementInfo = new ComplementInfo();
                     // 如果to地址为空则是普通合约创建
                     TransactionUtil.resolveGeneralContractCreateTxComplementInfo(this, address, platOnClient, complementInfo, log);
-                    TransactionUtil.resolveErcContract(this, complementInfo, address, erc20Service, addressCache);
+                    TransactionUtil.resolveErcContract(this, complementInfo, address, erc20ResolveService, addressCache);
                     addressCache.updateFirst(address, complementInfo);
                     // 把合约地址添加至缓存
                     GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.getEnum(complementInfo.contractType));
@@ -111,7 +111,7 @@ public class CollectionTransaction extends Transaction {
 
                 // 把回执里的合约地址回填到交易的to字段
                 this.setTo(receipt.getContractAddress());
-                TransactionUtil.resolveErcContract(this, ci, receipt.getContractAddress(), erc20Service, addressCache);
+                TransactionUtil.resolveErcContract(this, ci, receipt.getContractAddress(), erc20ResolveService, addressCache);
                 addressCache.updateFirst(receipt.getContractAddress(), ci);
                 // 把合约地址添加至缓存
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(this.getTo(), ContractTypeEnum.getEnum(ci.contractType));
@@ -143,7 +143,7 @@ public class CollectionTransaction extends Transaction {
                         uniAddressList.forEach(addr -> {
                             if (addressCache.isEvmErc20ContractAddress(addr)) {
                                 List<ESTokenTransferRecord> erc20Tokens = TransactionUtil
-                                        .resolveInnerToken(this, ci, receipt.getLogs(), erc20Service, addressCache, addr);
+                                        .resolveInnerToken(this, ci, receipt.getLogs(), erc20ResolveService, addressCache, addr);
                                 if (!erc20Tokens.isEmpty()) {
                                     this.getEsTokenTransferRecords().addAll((erc20Tokens));
                                 }

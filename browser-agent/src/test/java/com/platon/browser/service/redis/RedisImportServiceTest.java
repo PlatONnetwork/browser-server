@@ -1,6 +1,6 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import org.junit.Before;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisImportServiceTest extends AgentTestBase {
+public class RedisImportServiceTest extends TestBase {
     @Mock
     private RedisBlockService blockService;
     @Mock

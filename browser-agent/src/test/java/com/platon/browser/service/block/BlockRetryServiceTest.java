@@ -1,6 +1,6 @@
 package com.platon.browser.service.block;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.exception.CollectionBlockException;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockRetryServiceTest extends AgentTestBase {
+public class BlockRetryServiceTest extends TestBase {
     @Mock
     private PlatOnClient platOnClient;
     @Mock

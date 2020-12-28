@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.StakeIncreaseAnalyzer;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-04 17:58:27
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakeIncreaseConverterTest extends AgentTestBase  {
+public class StakeIncreaseConverterTest extends TestBase {
 
     @Mock
     private StakeBusinessMapper stakeBusinessMapper;

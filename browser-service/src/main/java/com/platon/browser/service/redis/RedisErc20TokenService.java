@@ -1,6 +1,6 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.config.RedisFactory;
+import com.platon.browser.config.redis.RedisFactory;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

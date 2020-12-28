@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.mapper.StakeBusinessMapper;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NodeUpdateTaskTest extends AgentTestBase {
+public class NodeUpdateTaskTest extends TestBase {
     @Mock
     private BlockChainConfig chainConfig;
     @Mock

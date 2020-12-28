@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.StakeExitAnalyzer;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.when;
  * @Description: 退出验证人(退出质押)转化器测试类
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakeExitConverterTest extends AgentTestBase {
+public class StakeExitConverterTest extends TestBase {
 
     @Mock
     private StakeBusinessMapper stakeBusinessMapper;

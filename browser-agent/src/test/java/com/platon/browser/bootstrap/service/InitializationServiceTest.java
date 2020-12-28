@@ -1,7 +1,7 @@
 package com.platon.browser.bootstrap.service;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.cache.AddressCache;
@@ -14,7 +14,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
 import com.alaya.contracts.ppos.dto.resp.Node;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class InitializationServiceTest extends AgentTestBase {
+public class InitializationServiceTest extends TestBase {
     @Mock
     private EpochRetryService epochRetryService;
     @Mock

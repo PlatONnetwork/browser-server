@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.ReportMultiSignParamCache;
@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class OnConsensusAnalyzerTest extends AgentTestBase {
+public class OnConsensusAnalyzerTest extends TestBase {
 	
     @Mock
     private BlockChainConfig chainConfig;

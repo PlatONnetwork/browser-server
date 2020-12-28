@@ -1,11 +1,11 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.dao.param.ppos.DelegateExit;
 import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
-import com.platon.browser.dto.ERCData;
+import com.platon.browser.service.erc20.ERCData;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -24,7 +24,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AddressCacheTest extends AgentTestBase {
+public class AddressCacheTest extends TestBase {
 
     @Spy
     private AddressCache addressCache;

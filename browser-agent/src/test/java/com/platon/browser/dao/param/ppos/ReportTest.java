@@ -1,7 +1,6 @@
 package com.platon.browser.dao.param.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.dao.param.ppos.Report;
+import com.platon.browser.TestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -13,7 +12,7 @@ import java.util.Date;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ReportTest extends AgentTestBase {
+public class ReportTest extends TestBase {
 
     @Test
     public void test(){

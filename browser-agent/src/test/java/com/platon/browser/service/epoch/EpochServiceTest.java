@@ -1,6 +1,6 @@
 package com.platon.browser.service.epoch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EpochServiceTest extends AgentTestBase {
+public class EpochServiceTest extends TestBase {
 
     @Mock private BlockChainConfig chainConfig;
     @Mock EpochRetryService epochRetryService;

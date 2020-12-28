@@ -1,7 +1,7 @@
-package com.platon.browser.dao.mapper;//package com.platon.browser.dao.mapper.mapper_old;
+package com.platon.browser.dao.mapper;
 
-import com.platon.browser.dto.CustomVote;
-import com.platon.browser.dto.CustomVoteProposal;
+import com.platon.browser.bean.CustomVote;
+import com.platon.browser.bean.CustomVoteProposal;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

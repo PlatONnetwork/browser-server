@@ -1,6 +1,6 @@
 package com.platon.browser.adjustment.service;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.adjustment.bean.AdjustParam;
 import com.platon.browser.adjustment.dao.AdjustmentMapper;
 import com.platon.browser.dao.entity.Delegation;
@@ -9,7 +9,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  **/
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AdjustServiceTest extends AgentTestBase {
+public class AdjustServiceTest extends TestBase {
     @Mock
     private DelegationMapper delegationMapper;
     @Mock

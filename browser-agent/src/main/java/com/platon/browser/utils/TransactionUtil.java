@@ -11,31 +11,32 @@ import com.alaya.rlp.solidity.RlpString;
 import com.alaya.rlp.solidity.RlpType;
 import com.alaya.utils.Numeric;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.*;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.dto.CustomErc20Token;
-import com.platon.browser.dto.ERCData;
-import com.platon.browser.dto.TransferEvent;
+import com.platon.browser.client.*;
+import com.platon.browser.bean.CustomErc20Token;
+import com.platon.browser.service.erc20.ERCData;
+import com.platon.browser.service.erc20.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.service.erc20.Erc20Service;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
-import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
-import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
-import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
-import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
+import com.platon.browser.service.erc20.Erc20ResolveService;
+import com.platon.browser.service.erc20.Erc20Service;
+import com.platon.browser.decoder.general.GeneralContractDecodeUtil;
+import com.platon.browser.decoder.general.GeneralContractDecodedResult;
+import com.platon.browser.decoder.ppos.InnerContractDecodeUtil;
+import com.platon.browser.decoder.ppos.InnerContractDecodedResult;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
@@ -357,11 +358,10 @@ public class TransactionUtil {
      * @param tx
      * @param ci
      * @param contractAddress
-     * @param erc20Service
      */
     public static void resolveErcContract(CollectionTransaction tx, ComplementInfo ci, String contractAddress,
-                                          Erc20Service erc20Service, AddressCache addressCache) {
-        ERCData ercData = erc20Service.getErcData(contractAddress);
+                                          Erc20ResolveService erc20ResolveService, AddressCache addressCache) {
+        ERCData ercData = erc20ResolveService.getErcData(contractAddress);
         if (ercData != null && ci.getContractType() == ContractTypeEnum.EVM.getCode()) {
             ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
@@ -376,7 +376,6 @@ public class TransactionUtil {
      * @param tx
      * @param ci
      * @param logs
-     * @param erc20Service
      * @param addressCache
      * @return
      */

@@ -1,7 +1,6 @@
 package com.platon.browser.dao.param.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.dao.param.ppos.DelegateExit;
+import com.platon.browser.TestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -12,7 +11,7 @@ import java.math.BigInteger;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class DelegateExitTest extends AgentTestBase {
+public class DelegateExitTest extends TestBase {
     @Test
     public void test(){
         DelegateExit target = DelegateExit.builder()

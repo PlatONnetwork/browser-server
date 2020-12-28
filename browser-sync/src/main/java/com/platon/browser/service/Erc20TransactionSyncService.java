@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dto.elasticsearch.ESResult;
+import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;

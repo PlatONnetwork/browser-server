@@ -1,13 +1,12 @@
 package com.platon.browser.service.proposal;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.service.proposal.ProposalParameterService;
+import com.platon.browser.bean.CustomProposal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalParameterServiceTest extends AgentTestBase {
+public class ProposalParameterServiceTest extends TestBase {
     @Mock
     private ProposalMapper proposalMapper;
     @Mock

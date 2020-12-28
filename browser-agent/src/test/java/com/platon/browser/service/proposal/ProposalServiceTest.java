@@ -5,7 +5,7 @@ import com.alaya.contracts.ppos.dto.CallResponse;
 import com.alaya.contracts.ppos.dto.resp.TallyResult;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.RemoteCall;
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalServiceTest extends AgentTestBase {
+public class ProposalServiceTest extends TestBase {
 
     @Mock
     private PlatOnClient client;

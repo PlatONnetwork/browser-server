@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
@@ -38,7 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class OnNewBlockAnalyzerTest extends AgentTestBase {
+public class OnNewBlockAnalyzerTest extends TestBase {
 	
     @Mock
     private NodeCache nodeCache;

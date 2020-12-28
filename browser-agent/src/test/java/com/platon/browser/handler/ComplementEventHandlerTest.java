@@ -1,6 +1,6 @@
 package com.platon.browser.handler;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.ComplementEvent;
 import com.platon.browser.publisher.PersistenceEventPublisher;
 import org.junit.Before;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ComplementEventHandlerTest extends AgentTestBase {
+public class ComplementEventHandlerTest extends TestBase {
     @Mock
     private PersistenceEventPublisher persistenceEventPublisher;
     @InjectMocks

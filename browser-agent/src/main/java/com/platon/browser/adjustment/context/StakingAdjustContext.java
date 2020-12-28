@@ -1,6 +1,6 @@
 package com.platon.browser.adjustment.context;
 
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

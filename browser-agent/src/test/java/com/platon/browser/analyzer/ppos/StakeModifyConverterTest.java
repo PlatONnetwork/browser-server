@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.StakeModifyAnalyzer;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.when;
  **/
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakeModifyConverterTest extends AgentTestBase {
+public class StakeModifyConverterTest extends TestBase {
 	
     @Mock
     private StakeBusinessMapper stakeBusinessMapper;

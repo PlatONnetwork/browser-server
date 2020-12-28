@@ -1,0 +1,35 @@
+[
+  {
+    "contract": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "address": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "balance": 1000000000,
+    "name": "My Token",
+    "symbol": "MT",
+    "decimal": 2,
+    "tx_count": 10,
+    "total_supply": 100000000000,
+    "update_time": "2019-11-13 19:01:25"
+  },
+  {
+    "contract": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "address": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "balance": 1000000000,
+    "name": "My Token",
+    "symbol": "MT",
+    "decimal": 2,
+    "tx_count": 10,
+    "total_supply": 100000000000,
+    "update_time": "2019-11-13 19:01:25"
+  },
+  {
+    "contract": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "address": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+    "balance": 1000000000,
+    "name": "My Token",
+    "symbol": "MT",
+    "decimal": 2,
+    "tx_count": 10,
+    "total_supply": 100000000000,
+    "update_time": "2019-11-13 19:01:25"
+  }
+]

@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.utils.AppStatusUtil;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BatchVariableDynamicAdjustTaskTest extends AgentTestBase {
+public class BatchVariableDynamicAdjustTaskTest extends TestBase {
     @Mock
     private PlatOnClient platOnClient;
     @Mock

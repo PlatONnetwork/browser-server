@@ -1,6 +1,6 @@
 package com.platon.browser.service.statistic;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.bean.CollectionEvent;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StatisticServiceTest extends AgentTestBase {
+public class StatisticServiceTest extends TestBase {
     @Mock
     private AddressCache addressCache;
     @Mock

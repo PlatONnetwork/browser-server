@@ -1,0 +1,41 @@
+[ 
+{ 
+"delegate_addr":"lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
+"staking_block_num":75,
+"node_id":"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
+"delegate_hes":0,
+"delegate_locked":65000000000000000000000,
+"delegate_released":0,
+"is_history":2,
+"sequence":890000,
+"cur_delegation_block_num":89,
+"create_time":"2019-11-13 19:00:08",
+"update_time":"2019-11-13 19:00:09"
+},
+{ 
+"delegate_addr":"lax10np85x9huvu8rt85ekpws7wr4vjx9j4fty2f2l",
+"staking_block_num":4717,
+"node_id":"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208",
+"delegate_hes":0,
+"delegate_locked":1000123456789000000000,
+"delegate_released":0,
+"is_history":2,
+"sequence":131310000,
+"cur_delegation_block_num":13131,
+"create_time":"2019-11-13 19:01:31",
+"update_time":"2019-11-13 19:01:32"
+},
+{
+"delegate_addr":"lax14m6uq3m39k05utyxj6ercu72xnzrrvrq4ttlxz",
+"staking_block_num":88602,
+"node_id":"0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050",
+"delegate_hes":11000000000000000000,
+"delegate_locked":1000123456789000000000,
+"delegate_released":0,
+"is_history":2,
+"sequence":131310000,
+"cur_delegation_block_num":109423,
+"create_time":"2019-11-13 19:01:31",
+"update_time":"2019-11-13 19:01:32"
+}
+]

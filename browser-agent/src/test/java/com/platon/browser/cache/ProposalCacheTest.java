@@ -1,6 +1,6 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalCacheTest extends AgentTestBase {
+public class ProposalCacheTest extends TestBase {
 
     @Spy
     private ProposalCache proposalCache;

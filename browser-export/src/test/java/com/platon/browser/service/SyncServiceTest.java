@@ -1,6 +1,6 @@
 //package com.platon.browser.service;
 //
-//import com.platon.browser.dto.elasticsearch.ESResult;
+//import com.platon.browser.elasticsearch.bean.ESResult;
 //import com.platon.browser.elasticsearch.BlockESRepository;
 //import com.platon.browser.elasticsearch.TransactionESRepository;
 //import com.platon.browser.elasticsearch.dto.Block;

@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Assert;
@@ -17,7 +17,7 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsImportServiceTest extends AgentTestBase {
+public class EsImportServiceTest extends TestBase {
     @Mock
     private EsBlockService blockService;
     @Mock

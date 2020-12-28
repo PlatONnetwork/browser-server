@@ -1,7 +1,7 @@
-package com.platon.browser.dao.mapper;//package com.platon.browser.dao.mapper.mapper_old;
+package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.RpPlan;
-import com.platon.browser.dto.CustomRpPlan;
+import com.platon.browser.bean.CustomRpPlan;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

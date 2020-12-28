@@ -7,14 +7,14 @@ import com.alaya.protocol.core.methods.response.PlatonGetCode;
 import com.alaya.rlp.solidity.RlpEncoder;
 import com.alaya.rlp.solidity.RlpList;
 import com.alaya.rlp.solidity.RlpString;
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.*;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.dto.ERCData;
-import com.platon.browser.dto.TransferEvent;
+import com.platon.browser.client.*;
+import com.platon.browser.service.erc20.ERCData;
+import com.platon.browser.service.erc20.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -22,7 +22,7 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.erc20.Erc20Service;
+import com.platon.browser.service.erc20.Erc20ResolveService;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionUtilsTest extends AgentTestBase {
+public class TransactionUtilsTest extends TestBase {
 
     @Mock
     protected PlatOnClient platOnClient;
@@ -183,7 +183,7 @@ public class TransactionUtilsTest extends AgentTestBase {
         ComplementInfo ci = new ComplementInfo();
         ci.setContractType(ContractTypeEnum.EVM.getCode());
         CollectionTransaction collectionTransaction = CollectionTransaction.newInstance();
-        Erc20Service erc20Service = mock(Erc20Service.class);
+        Erc20ResolveService erc20Service = mock(Erc20ResolveService.class);
         ERCData ercData = new ERCData();
         when(erc20Service.getErcData(any())).thenReturn(ercData);
         TransactionUtil.resolveErcContract(collectionTransaction, ci, "123",

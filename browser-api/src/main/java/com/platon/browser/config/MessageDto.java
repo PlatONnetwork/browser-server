@@ -1,7 +1,6 @@
 package com.platon.browser.config;
 
-import com.platon.browser.common.BrowserConst;
-import com.platon.browser.req.PageReq;
+import com.platon.browser.reqest.PageReq;
 import org.apache.commons.lang3.StringUtils;
 /**
  * 获取message的dto

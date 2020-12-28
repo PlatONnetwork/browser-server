@@ -2,7 +2,7 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.req.PageReq;
+import com.platon.browser.reqest.PageReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -9,10 +9,9 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.CustomNode;
+import com.platon.browser.bean.CustomNode;
 import com.platon.browser.task.bean.NetworkStatistics;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

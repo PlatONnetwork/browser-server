@@ -1,10 +1,10 @@
 package com.platon.browser.adjustment.context;
 
-import com.platon.browser.AgentTestData;
+import com.platon.browser.TestData;
 import com.platon.browser.adjustment.bean.AdjustParam;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class StakingAdjustContextTest extends AgentTestData {
+public class StakingAdjustContextTest extends TestData {
     private StakingAdjustContext target;
     private AdjustParam adjustParam;
     private Node node;

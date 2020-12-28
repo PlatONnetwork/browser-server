@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.statistic;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StatisticsAddressAnalyzerTest extends AgentTestBase {
+public class StatisticsAddressAnalyzerTest extends TestBase {
 
     @Mock
     private AddressCache addressCache;

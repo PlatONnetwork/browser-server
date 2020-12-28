@@ -1,6 +1,6 @@
 package com.platon.browser.handler;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.GasEstimateEvent;
 import com.platon.browser.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class GasEstimateEventHandlerTest extends AgentTestBase {
+public class GasEstimateEventHandlerTest extends TestBase {
 
 	@Mock
 	private GasEstimateLogMapper gasEstimateLogMapper;

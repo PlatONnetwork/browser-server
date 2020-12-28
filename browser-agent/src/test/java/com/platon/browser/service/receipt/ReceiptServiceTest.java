@@ -1,8 +1,6 @@
 package com.platon.browser.service.receipt;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.service.receipt.ReceiptRetryService;
-import com.platon.browser.service.receipt.ReceiptService;
+import com.platon.browser.TestBase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +18,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ReceiptServiceTest extends AgentTestBase {
+public class ReceiptServiceTest extends TestBase {
     @Mock
     private ReceiptRetryService retryService;
     @Spy

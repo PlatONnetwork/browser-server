@@ -7,7 +7,7 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.dao.param.ppos.ProposalUpgrade;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalUpgradeParam;

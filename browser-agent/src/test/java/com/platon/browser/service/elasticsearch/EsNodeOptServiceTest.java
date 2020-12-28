@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.junit.Before;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsNodeOptServiceTest extends AgentTestBase {
+public class EsNodeOptServiceTest extends TestBase {
     @Mock
     private NodeOptESRepository nodeOptESRepository;
     @Spy

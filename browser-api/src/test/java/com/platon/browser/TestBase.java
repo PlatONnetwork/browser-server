@@ -1,12 +1,19 @@
 package com.platon.browser;
 
+import com.platon.browser.client.AccuVerifiersCount;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.platon.browser.client.PlatOnClient;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@SpringBootTest(classes= BrowserApiApplication.class, value = "spring.profiles.active=dev")
+import static org.junit.Assert.assertNotNull;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
 
 //    @Autowired
@@ -42,4 +49,10 @@ public class TestBase extends TestData {
 //        example.createCriteria().andTxTypeEqualTo(TransactionTypeEnum.VOTING_PROPOSAL.code);
 //        return null;
 //    }
+
+    @Test
+    public void testAccuVerifiersCount() {
+        AccuVerifiersCount accuVerifiersCount = new AccuVerifiersCount();
+        assertNotNull(accuVerifiersCount);
+    }
 }

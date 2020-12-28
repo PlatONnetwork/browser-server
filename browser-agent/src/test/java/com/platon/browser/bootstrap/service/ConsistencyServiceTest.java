@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap.service;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.service.block.BlockService;
@@ -9,10 +9,10 @@ import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dto.elasticsearch.TokenTxSummary;
+import com.platon.browser.elasticsearch.bean.TokenTxSummary;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.InnerTxESRepository;
-import com.platon.browser.now.service.Erc20TransactionSyncService;
+import com.platon.browser.service.erc20.Erc20TransactionSyncService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ConsistencyServiceTest extends AgentTestBase {
+public class ConsistencyServiceTest extends TestBase {
     @Mock
     private NetworkStatMapper networkStatMapper;
     @Mock

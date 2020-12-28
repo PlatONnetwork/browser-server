@@ -9,13 +9,12 @@ import com.platon.browser.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.keybase.KeyBaseUserInfo;
+import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
 import com.platon.browser.util.KeyBaseAnalysis;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

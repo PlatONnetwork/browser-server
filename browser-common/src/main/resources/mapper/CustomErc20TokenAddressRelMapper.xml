@@ -12,7 +12,7 @@
         <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <resultMap id="CustomBaseResultMap" type="com.platon.browser.dto.CustomErc20TokenAddressRel">
+    <resultMap id="CustomBaseResultMap" type="com.platon.browser.bean.CustomErc20TokenAddressRel">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="contract" jdbcType="VARCHAR" property="contract"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>

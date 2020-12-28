@@ -9,7 +9,7 @@ import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.ppos.StakeExit;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;

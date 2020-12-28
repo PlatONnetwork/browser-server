@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class TestData {
-	public static final String testDataDir = TestData.class.getClassLoader().getResource("./").getPath()+"../../../testdata/";
-	private static String prefix = "data/",suffix=".json",encode="UTF8";
+    public static final String testDataDir = TestData.class.getClassLoader().getResource("./").getPath()+"../../../../../testdata/";
+    private static String suffix=".json",encode="UTF8";
     private static String[] dataFile = {
             "transaction",
             "blockChainConfig",
@@ -47,10 +47,8 @@ public class TestData {
     public void init() {
         Arrays.asList(dataFile).forEach(fileName -> {
             try {
-                URL url = TestData.class.getClassLoader().getResource(prefix + fileName + suffix);
-                String path = url.getPath();
-                String content = FileUtils.readFileToString(new File(path), encode);
-
+                File data = new File(testDataDir + fileName + suffix);
+                String content = FileUtils.readFileToString(data, encode);
                 switch (fileName) {
                     case "transaction":
                         this.transactionList = JSON.parseArray(content, Transaction.class);

@@ -1,7 +1,7 @@
 package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.dao.entity.NetworkStat;
 import org.junit.Before;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisStatisticServiceTest extends AgentTestBase {
+public class RedisStatisticServiceTest extends TestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @InjectMocks

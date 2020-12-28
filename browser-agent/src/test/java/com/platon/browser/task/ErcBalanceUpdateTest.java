@@ -1,11 +1,11 @@
 package com.platon.browser.task;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.common.BrowserConst;
+import com.platon.browser.TestBase;
+import com.platon.browser.config.BrowserConst;
 import com.platon.browser.enums.AppStatus;
+import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
-import com.platon.browser.erc.ErcService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,18 +31,18 @@ import static org.mockito.Mockito.when;
  * @create: 2020/10/16
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ErcBalanceUpdateTest extends AgentTestBase {
+public class ErcBalanceUpdateTest extends TestBase {
     @Mock
     protected RedisTemplate<String, String> redisTemplate;
     @Mock
     private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
     @Mock
-    private ErcService ercService;
+    private Erc20ResolveService erc20ResolveService;
     @Mock
     private SetOperations setOperations;
     @InjectMocks
     @Spy
-    private ErcTokenUpdateTask target;
+    private Erc20TokenUpdateTask target;
 
     @Before
     public void setup() throws Exception {
@@ -53,7 +53,7 @@ public class ErcBalanceUpdateTest extends AgentTestBase {
 
         when(this.redisTemplate.opsForSet()).thenReturn(this.setOperations);
         when(this.setOperations.members(BrowserConst.ERC_BALANCE_KEY)).thenReturn(data);
-        when(this.ercService.getBalance(any(), any())).thenReturn(BigInteger.TEN);
+        when(this.erc20ResolveService.getBalance(any(), any())).thenReturn(BigInteger.TEN);
     }
 
     @Test

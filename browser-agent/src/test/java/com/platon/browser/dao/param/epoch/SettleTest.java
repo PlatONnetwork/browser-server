@@ -1,6 +1,6 @@
 package com.platon.browser.dao.param.epoch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
  * @Description: 结算周期切换参数入库
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class SettleTest extends AgentTestBase {
+public class SettleTest extends TestBase {
 
     @Test
     public void test(){

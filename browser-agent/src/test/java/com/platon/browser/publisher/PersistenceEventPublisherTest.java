@@ -1,6 +1,6 @@
 package com.platon.browser.publisher;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.handler.PersistenceEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class PersistenceEventPublisherTest extends AgentTestBase {
+public class PersistenceEventPublisherTest extends TestBase {
     @Mock
     private PersistenceEventHandler handler;
     @InjectMocks

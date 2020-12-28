@@ -18,10 +18,10 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
-import com.platon.browser.util.decode.generalcontract.GeneralContractDecodeUtil;
-import com.platon.browser.util.decode.generalcontract.GeneralContractDecodedResult;
-import com.platon.browser.util.decode.innercontract.InnerContractDecodeUtil;
-import com.platon.browser.util.decode.innercontract.InnerContractDecodedResult;
+import com.platon.browser.decoder.general.GeneralContractDecodeUtil;
+import com.platon.browser.decoder.general.GeneralContractDecodedResult;
+import com.platon.browser.decoder.ppos.InnerContractDecodeUtil;
+import com.platon.browser.decoder.ppos.InnerContractDecodedResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

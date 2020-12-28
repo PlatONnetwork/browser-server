@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.ProposalTextAnalyzer;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -30,7 +29,7 @@ import static org.mockito.Mockito.when;
  * @Description: 文本提案参数转换测试类
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalTextConverterTest extends AgentTestBase {
+public class ProposalTextConverterTest extends TestBase {
     @Mock
     private BlockChainConfig chainConfig;
     @Mock

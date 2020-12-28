@@ -1,8 +1,8 @@
 package com.platon.browser.util;
 
-import com.platon.browser.dto.keybase.Basics;
-import com.platon.browser.dto.keybase.KeyBaseUserInfo;
-import com.platon.browser.dto.keybase.Them;
+import com.platon.browser.bean.keybase.Basics;
+import com.platon.browser.bean.keybase.KeyBaseUserInfo;
+import com.platon.browser.bean.keybase.Them;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomRpPlanMapper">
 
-  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomRpPlan" extends="com.platon.browser.dao.mapper.RpPlanMapper.BaseResultMap"/>
+  <resultMap id="BaseResultMap" type="com.platon.browser.bean.CustomRpPlan" extends="com.platon.browser.dao.mapper.RpPlanMapper.BaseResultMap"/>
 
   <!--查询所有节点-->
   <select id="selectAll" resultMap="BaseResultMap">

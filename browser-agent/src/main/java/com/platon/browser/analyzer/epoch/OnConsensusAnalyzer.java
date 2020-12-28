@@ -12,7 +12,7 @@ import com.platon.browser.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Consensus;
 import com.platon.browser.dao.param.ppos.Report;
-import com.platon.browser.dto.CustomStaking.StatusEnum;
+import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.service.proposal.ProposalParameterService;

@@ -8,7 +8,7 @@ import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.service.erc20.Erc20Service;
+import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
@@ -37,7 +37,7 @@ public class CollectionBlock extends Block {
     }
 
     public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult,
-        PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi, Erc20Service erc20Service)
+        PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi, Erc20ResolveService erc20ResolveService)
         throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         String nodeId;
         if (block.getNumber().longValue() == 0) {
@@ -67,7 +67,7 @@ public class CollectionBlock extends Block {
                 Transaction rawTransaction = to.get();
                 CollectionTransaction transaction = CollectionTransaction.newInstance().updateWithBlock(this)
                     .updateWithRawTransaction(rawTransaction).updateWithBlockAndReceipt(this,
-                        receiptMap.get(rawTransaction.getHash()), platOnClient, addressCache, specialApi, erc20Service);
+                        receiptMap.get(rawTransaction.getHash()), platOnClient, addressCache, specialApi, erc20ResolveService);
                 this.transactions.add(transaction);
                 this.setTokenQty(this.getTokenQty() + transaction.getEsTokenTransferRecords().size());
             }

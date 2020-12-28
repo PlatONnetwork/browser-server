@@ -130,11 +130,6 @@ platon:
   chainId: 201018
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
-  #同步时的索引查询分页参数配置
-  paging:
-    erc20-transaction:
-      pageSize: 2000
-      pageCount: 250
 
 brokenHost: 192.168.16.173
 brokenPort: 61613

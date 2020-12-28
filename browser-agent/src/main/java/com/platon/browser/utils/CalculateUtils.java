@@ -1,9 +1,9 @@
 package com.platon.browser.utils;
 
-import com.platon.browser.common.BrowserConst;
 import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.erc.wrapper.ExtendEvent;
+import com.platon.browser.config.BrowserConst;
+import com.platon.browser.service.erc20.ExtendEvent;
 import lombok.extern.slf4j.Slf4j;
 import com.alaya.utils.Convert;
 

@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.ReportAnalyzer;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NodeCache;
@@ -12,7 +11,7 @@ import com.platon.browser.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.misc.StakeMiscService;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.when;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ReportConverterTest extends AgentTestBase {
+public class ReportConverterTest extends TestBase {
 
     @Mock
     private BlockChainConfig chainConfig;

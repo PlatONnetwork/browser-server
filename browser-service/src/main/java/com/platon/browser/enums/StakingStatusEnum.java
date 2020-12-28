@@ -1,6 +1,6 @@
 package com.platon.browser.enums;
 
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 
 /**
  *  返回前端验证人状态枚举

@@ -1,9 +1,9 @@
-package com.platon.browser.dao.mapper;//package com.platon.browser.dao.mapper.mapper_old;
+package com.platon.browser.dao.mapper;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.dto.CustomDelegation;
-import com.platon.browser.dto.DelegationAddress;
-import com.platon.browser.dto.DelegationStaking;
+import com.platon.browser.bean.CustomDelegation;
+import com.platon.browser.bean.DelegationAddress;
+import com.platon.browser.bean.DelegationStaking;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

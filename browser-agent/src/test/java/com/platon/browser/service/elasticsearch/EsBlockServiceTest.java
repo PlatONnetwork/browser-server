@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsBlockServiceTest extends AgentTestBase {
+public class EsBlockServiceTest extends TestBase {
     @Mock
     private BlockESRepository blockESRepository;
     @Spy

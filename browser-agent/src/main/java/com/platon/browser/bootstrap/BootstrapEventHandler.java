@@ -21,7 +21,7 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.erc20.Erc20Service;
+import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     @Resource
     private SpecialApi specialApi;
     @Resource
-    private Erc20Service erc20Service;
+    private Erc20ResolveService erc20ResolveService;
 
     private Set<Block> blocks = new HashSet<>();
     private Set<Transaction> transactions = new HashSet<>();
@@ -75,8 +75,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,
-                receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.erc20Service);
-            this.erc20Service.initContractData(block.getTransactions(), this.addressCache);
+                receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.erc20ResolveService);
+            this.erc20ResolveService.initContractAddressCache(block.getTransactions(), this.addressCache);
 
             this.clear();
             this.blocks.add(block);

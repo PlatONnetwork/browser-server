@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ComplementNodeOptTest extends AgentTestBase {
+public class ComplementNodeOptTest extends TestBase {
 
     @Test
     public void Test() throws InvocationTargetException, IllegalAccessException {

@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.DelegateExitAnalyzer;
+import com.platon.browser.TestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
@@ -14,7 +13,7 @@ import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.CustomDelegation;
+import com.platon.browser.bean.CustomDelegation;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class DelegateExitAnalyzerTest extends AgentTestBase {
+public class DelegateExitAnalyzerTest extends TestBase {
 
     @Mock
     private DelegateBusinessMapper delegateBusinessMapper;

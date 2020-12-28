@@ -6,14 +6,14 @@ import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.erc20.Erc20TransactionSyncService;
 import com.platon.browser.service.receipt.ReceiptService;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dto.elasticsearch.TokenTxSummary;
+import com.platon.browser.elasticsearch.bean.TokenTxSummary;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.InnerTxESRepository;
-import com.platon.browser.now.service.Erc20TransactionSyncService;
 import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
@@ -46,15 +46,12 @@ public class ConsistencyService {
     private ReceiptService receiptService;
     @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
-
     @Resource
     private InnerTxESRepository tokenTxESRepository;
-
     @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
     @Resource
     private Erc20TransactionSyncService erc20TransactionSyncService;
-
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
     /**

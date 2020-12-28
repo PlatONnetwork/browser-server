@@ -1,8 +1,8 @@
 package com.platon.browser.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dto.elasticsearch.ESResult;
-import com.platon.browser.dto.elasticsearch.ESSortDto;
+import com.platon.browser.elasticsearch.bean.ESResult;
+import com.platon.browser.elasticsearch.bean.ESSortDto;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.util.SpringUtils;
 import lombok.extern.slf4j.Slf4j;

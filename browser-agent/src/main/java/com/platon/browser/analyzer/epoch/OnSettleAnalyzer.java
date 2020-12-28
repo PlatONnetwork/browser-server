@@ -17,7 +17,7 @@ import com.platon.browser.dao.mapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Settle;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;

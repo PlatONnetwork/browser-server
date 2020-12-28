@@ -1,14 +1,14 @@
 package com.platon.browser.handler;
 
 import com.alaya.protocol.core.methods.response.PlatonBlock;
-import com.platon.browser.AgentTestBase;
+import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.bean.BlockEvent;
 import com.platon.browser.publisher.CollectionEventPublisher;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.service.erc20.Erc20Service;
+import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockEventHandlerTest extends AgentTestBase {
+public class BlockEventHandlerTest extends TestBase {
     @Mock
     private CollectionEventPublisher collectionEventPublisher;
     @Mock
@@ -42,7 +42,7 @@ public class BlockEventHandlerTest extends AgentTestBase {
     @Mock
     private AddressCache addressCache;
     @Mock
-    private Erc20Service erc20Service;
+    private Erc20ResolveService erc20ResolveService;
 
     @InjectMocks
     @Spy
