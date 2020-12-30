@@ -37,10 +37,10 @@ files(apiDefDir.listFiles(new FilenameFilter() {
     def json = yamlToJson(yml.text)
     // sync to browser-api
     def jsonFile = file(projectDir.path+"/src/main/resources/public/apidoc/apidef/"+yml.name+".json")
-    jsonFile.write(json)
+    jsonFile.write(json,"utf-8")
     // sync to root dir[docs]
     def rootJsonFile = file(rootDir+"/docs/apidef/"+yml.name+".json")
-    rootJsonFile.write(json)
+    rootJsonFile.write(json,"utf-8")
 }
 
 static yamlToJson(String yaml) {
