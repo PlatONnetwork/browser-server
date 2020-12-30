@@ -16,7 +16,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
-import com.platon.browser.reqest.home.QueryNavigationRequest;
+import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.*;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;

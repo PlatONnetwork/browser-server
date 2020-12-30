@@ -5,7 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.entity.VoteExample;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.reqest.proposal.VoteListRequest;
+import com.platon.browser.request.proposal.VoteListRequest;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.proposal.VoteListResp;
 import org.apache.commons.lang3.StringUtils;

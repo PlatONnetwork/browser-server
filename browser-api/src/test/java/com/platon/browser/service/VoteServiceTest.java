@@ -2,7 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.reqest.proposal.VoteListRequest;
+import com.platon.browser.request.proposal.VoteListRequest;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.proposal.VoteListResp;
 import org.junit.Test;

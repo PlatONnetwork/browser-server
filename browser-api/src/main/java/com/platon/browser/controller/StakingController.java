@@ -4,7 +4,7 @@ import com.platon.browser.config.BrowserConst;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
-import com.platon.browser.reqest.staking.*;
+import com.platon.browser.request.staking.*;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.*;

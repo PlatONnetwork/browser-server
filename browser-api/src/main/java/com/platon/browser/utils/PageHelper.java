@@ -1,7 +1,7 @@
 package com.platon.browser.utils;
 
 
-import com.platon.browser.reqest.PageReq;
+import com.platon.browser.request.PageReq;
 
 import java.util.Map;
 

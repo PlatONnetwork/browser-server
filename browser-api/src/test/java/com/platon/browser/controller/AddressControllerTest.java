@@ -2,7 +2,7 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.reqest.address.QueryRPPlanDetailRequest;
+import com.platon.browser.request.address.QueryRPPlanDetailRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -17,8 +17,8 @@ import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.reqest.address.QueryDetailRequest;
-import com.platon.browser.reqest.address.QueryRPPlanDetailRequest;
+import com.platon.browser.request.address.QueryDetailRequest;
+import com.platon.browser.request.address.QueryRPPlanDetailRequest;
 import com.platon.browser.response.address.DetailsRPPlanResp;
 import com.platon.browser.response.address.QueryDetailResp;
 import com.platon.browser.response.address.QueryRPPlanDetailResp;
@@ -33,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alaya.protocol.core.DefaultBlockParameterName;
 

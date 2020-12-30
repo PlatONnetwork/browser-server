@@ -2,7 +2,7 @@ package com.platon.browser.service;
 
 
 import com.platon.browser.TestMockBase;
-import com.platon.browser.reqest.home.QueryNavigationRequest;
+import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.BlockStatisticNewResp;
 import com.platon.browser.response.home.ChainStatisticNewResp;
 import com.platon.browser.response.home.QueryNavigationResp;

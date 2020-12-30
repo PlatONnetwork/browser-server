@@ -7,6 +7,8 @@ server:
     context-path: /browser-server
 #Spring应用配置
 spring:
+  resources:
+    static-locations: E:/Java/browser-server/docs/
   profiles.active: test
   application.name: browser-api
   session.timeout: 1800  #以秒为单位
@@ -15,7 +17,7 @@ spring:
   #数据源配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   #Redis集群配置
   redis:
     database: 0

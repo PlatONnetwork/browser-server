@@ -2,9 +2,9 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.reqest.token.QueryHolderTokenListReq;
-import com.platon.browser.reqest.token.QueryTokenHolderListReq;
-import com.platon.browser.reqest.token.QueryTokenTransferRecordListReq;
+import com.platon.browser.request.token.QueryHolderTokenListReq;
+import com.platon.browser.request.token.QueryTokenHolderListReq;
+import com.platon.browser.request.token.QueryTokenTransferRecordListReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
