@@ -68,7 +68,7 @@
     <!-- 查询ID列表 -->
     <select id="listErc20TokenAddressRelIds" parameterType="java.util.Map" resultMap="BaseResultMap">
         select id from erc20_token_address_rel
-        where 1=1
+        where balance>0
         <if test="contract != null">
             and contract=#{contract}
         </if>
@@ -80,19 +80,19 @@
 
     <select id="countByContract" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(*) total from erc20_token_address_rel
-        where contract=#{contract}
+        where balance>0 and contract=#{contract}
     </select>
 
     <select id="countByAddress" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(*) total from erc20_token_address_rel
-        where address=#{address}
+        where balance>0 and address=#{address}
     </select>
 
     <!-- 根据ID查询 -->
     <select id="listErc20TokenAddressRelByIds" resultMap="BaseResultMap">
         select
         e.id,e.contract,e.address,e.name,e.symbol,e.decimal, e.tx_count, e.balance
-        from erc20_token_address_rel e where e.id in
+        from erc20_token_address_rel e where e.balance>0 and e.id in
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
