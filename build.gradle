@@ -88,8 +88,8 @@ subprojects {
         def tpl = file(projectDir.path+"/conftpl/application.yml")
         if(tpl.exists()){
             def txt = tpl.text.replace('_VERSION_',"$projectVersion").replace('_DESCRIPTION_',desc)
-            file("${mainRes}application.yml").write(txt)
-            file("${testRes}application.yml").write(txt)
+            file("${mainRes}application.yml").write(txt,"utf-8")
+            file("${testRes}application.yml").write(txt,"utf-8")
         }
 
         tpl = file("${tplPath}application-dev.yml")
@@ -107,8 +107,8 @@ subprojects {
                     .replace('_ES_PORT_',"$esPort")
                     .replace('_ES_USER_',"$esUser")
                     .replace('_ES_PWD_',"$esPwd")
-            file("${mainRes}application-dev.yml").write(txt)
-            file("${testRes}application-dev.yml").write(txt)
+            file("${mainRes}application-dev.yml").write(txt,"utf-8")
+            file("${testRes}application-dev.yml").write(txt,"utf-8")
         }
     }
 
