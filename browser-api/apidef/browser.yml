@@ -2131,7 +2131,6 @@ definitions:
         description: 成功（0），失败则有相关失败码
         type: integer
       data:
-        type: object
         $ref: '#/definitions/StakingStatisticDetail'
 
   AliveStakingListParam:

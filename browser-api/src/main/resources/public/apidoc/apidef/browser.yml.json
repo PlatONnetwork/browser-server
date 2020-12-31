@@ -2623,7 +2623,6 @@
           "type" : "integer"
         },
         "data" : {
-          "type" : "object",
           "$ref" : "#/definitions/StakingStatisticDetail"
         }
       }
