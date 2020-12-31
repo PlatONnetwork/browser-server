@@ -277,8 +277,14 @@ public class Erc20TokenTransferRecordService {
             BigDecimal totalSupply = ConvertUtil.convertByFactor(originTotalSupply, erc20TokenAddressRel.getDecimal());
             if(totalSupply.compareTo(BigDecimal.ZERO)>0){
                 // 总供应量大于0, 使用实际的余额除以总供应量
-                resp.setPercent(balance.divide(totalSupply, erc20TokenAddressRel.getDecimal(), RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100)).setScale(erc20TokenAddressRel.getDecimal(), RoundingMode.HALF_UP).toPlainString() + "%");
+                resp.setPercent(
+                    balance
+                    .divide(totalSupply, erc20TokenAddressRel.getDecimal(), RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(erc20TokenAddressRel.getDecimal(), RoundingMode.HALF_UP)
+                    .stripTrailingZeros()
+                    .toPlainString() + "%"
+                );
             }else{
                 // 总供应量小于等于0，则占比设置为0%
                 resp.setPercent("0.0000%");
