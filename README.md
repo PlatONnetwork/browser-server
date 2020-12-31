@@ -3,6 +3,7 @@
 
 ## 软件架构
 
+- [架构文档](docs/arch_doc/overall_structure.md)
 - [接口文档](https://platonnetwork.github.io/browser-server/)
 
 ## 使用技术
