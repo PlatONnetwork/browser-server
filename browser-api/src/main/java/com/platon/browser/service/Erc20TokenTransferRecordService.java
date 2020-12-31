@@ -240,16 +240,6 @@ public class Erc20TokenTransferRecordService {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
         RespPage<QueryTokenHolderListResp> result = new RespPage<>();
-        /**
-         * 倒序查询持有人列表
-         */
-        /*Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
-        Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
-        criteria.andContractEqualTo(req.getContract());
-        example.setOrderByClause(" update_time desc");
-        PageHelper.startPage(req.getPageNo(), req.getPageSize());
-        Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);*/
-
         com.platon.browser.utils.PageHelper.PageParams pageParams = com.platon.browser.utils.PageHelper.buildPageParams(req);
         Map params = new HashMap<>();
         params.put("size", pageParams.getSize());
@@ -282,15 +272,16 @@ public class Erc20TokenTransferRecordService {
             BigDecimal balance = ConvertUtil.convertByFactor(originBalance, erc20TokenAddressRel.getDecimal());
             resp.setBalance(balance);
             //计算总供应量
-            BigDecimal totalSupply = erc20TokenAddressRel.getTotalSupply();
-            totalSupply = (totalSupply==null)?BigDecimal.ZERO:totalSupply;
+            BigDecimal originTotalSupply = erc20TokenAddressRel.getTotalSupply();
+            originTotalSupply = (originTotalSupply==null)?BigDecimal.ZERO:originTotalSupply;
+            BigDecimal totalSupply = ConvertUtil.convertByFactor(originTotalSupply, erc20TokenAddressRel.getDecimal());
             if(totalSupply.compareTo(BigDecimal.ZERO)>0){
                 // 总供应量大于0, 使用实际的余额除以总供应量
-                resp.setPercent(originBalance.divide(totalSupply, 10, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
+                resp.setPercent(balance.divide(totalSupply, erc20TokenAddressRel.getDecimal(), RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100)).setScale(erc20TokenAddressRel.getDecimal(), RoundingMode.HALF_UP).toPlainString() + "%");
             }else{
                 // 总供应量小于等于0，则占比设置为0%
-                resp.setPercent("0%");
+                resp.setPercent("0.0000%");
             }
             respList.add(resp);
         });

@@ -10,6 +10,7 @@
         <result column="symbol" jdbcType="VARCHAR" property="symbol"/>
         <result column="decimal" jdbcType="INTEGER" property="decimal"/>
         <result column="tx_count" jdbcType="INTEGER" property="txCount"/>
+        <result column="total_supply" jdbcType="DECIMAL" property="totalSupply"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <resultMap id="CustomBaseResultMap" type="com.platon.browser.bean.CustomErc20TokenAddressRel">
@@ -91,7 +92,7 @@
     <!-- 根据ID查询 -->
     <select id="listErc20TokenAddressRelByIds" resultMap="BaseResultMap">
         select
-        e.id,e.contract,e.address,e.name,e.symbol,e.decimal, e.tx_count, e.balance
+        e.id,e.contract,e.address,e.name,e.symbol,e.decimal, e.tx_count, e.balance, e.total_supply, e.update_time
         from erc20_token_address_rel e where e.balance>0 and e.id in
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
