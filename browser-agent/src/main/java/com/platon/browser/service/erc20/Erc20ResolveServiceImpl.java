@@ -14,7 +14,7 @@ import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.Erc20Param;
 import com.platon.browser.utils.CalculateUtils;
-import com.platon.browser.utils.NetworkParms;
+import com.platon.browser.utils.NetworkParams;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
-public class Erc20ResolveServiceImpl extends Erc20ServiceImpl implements Erc20ResolveService {
+public class Erc20ResolveServiceImpl extends Erc20ServiceImpl {
 
     @Resource
     private PlatOnClient platOnClient;
@@ -41,7 +41,6 @@ public class Erc20ResolveServiceImpl extends Erc20ServiceImpl implements Erc20Re
     @Resource
     private BlockChainConfig blockChainConfig;
 
-    @Override
     public void initContractAddressCache(List<Transaction> transactions, AddressCache addressCache) {
         Map<String, Erc20Token> erc20Tokens = new ConcurrentHashMap<>();
         transactions.stream().filter(transaction -> transaction.getEsTokenTransferRecords().size() > 0)
@@ -126,7 +125,6 @@ public class Erc20ResolveServiceImpl extends Erc20ServiceImpl implements Erc20Re
             });
     }
 
-    @Override
     public List<String> getContractAddressFromEvents(TransactionReceipt transactionReceipt) {
         List<ExtendEvent.EventWrapper> eventWrappers = CalculateUtils.buildEvents(blockChainConfig);
         if (null == eventWrappers || eventWrappers.isEmpty()) {
@@ -136,7 +134,7 @@ public class Erc20ResolveServiceImpl extends Erc20ServiceImpl implements Erc20Re
         ExtendEvent extendEvent = new ExtendEvent("", this.platOnClient.getWeb3jWrapper().getWeb3j(),
                 new ReadonlyTransactionManager(this.platOnClient.getWeb3jWrapper().getWeb3j(), ""),
                 new DefaultGasProvider(),
-                NetworkParms.getChainId());
+                NetworkParams.getChainId());
         for (ExtendEvent.EventWrapper eventWrapper : eventWrappers) {
             Event event = ExtendEvent.buildEvent(eventWrapper.getEventName(), eventWrapper.getEventDefineList());
             // 根据地址位置，判定是否为 indexed

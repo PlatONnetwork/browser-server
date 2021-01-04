@@ -1,6 +1,6 @@
-package com.platon.browser.adjustment.bean;
+package com.platon.browser.v015.bean;
 
-import com.platon.browser.adjustment.context.AbstractAdjustContext;
+import com.platon.browser.v015.context.AbstractAdjustContext;
 import lombok.Data;
 
 import java.util.ArrayList;

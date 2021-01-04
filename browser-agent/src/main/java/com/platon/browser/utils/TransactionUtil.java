@@ -18,6 +18,8 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.*;
 import com.platon.browser.bean.CustomErc20Token;
 import com.platon.browser.service.erc20.ERCData;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
+import com.platon.browser.service.erc20.Erc20ServiceImpl;
 import com.platon.browser.service.erc20.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
@@ -31,8 +33,6 @@ import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
-import com.platon.browser.service.erc20.Erc20ResolveService;
-import com.platon.browser.service.erc20.Erc20Service;
 import com.platon.browser.decoder.general.GeneralContractDecodeUtil;
 import com.platon.browser.decoder.general.GeneralContractDecodedResult;
 import com.platon.browser.decoder.ppos.InnerContractDecodeUtil;
@@ -360,7 +360,7 @@ public class TransactionUtil {
      * @param contractAddress
      */
     public static void resolveErcContract(CollectionTransaction tx, ComplementInfo ci, String contractAddress,
-                                          Erc20ResolveService erc20ResolveService, AddressCache addressCache) {
+                                          Erc20ResolveServiceImpl erc20ResolveService, AddressCache addressCache) {
         ERCData ercData = erc20ResolveService.getErcData(contractAddress);
         if (ercData != null && ci.getContractType() == ContractTypeEnum.EVM.getCode()) {
             ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
@@ -380,7 +380,7 @@ public class TransactionUtil {
      * @return
      */
     public static List<ESTokenTransferRecord> resolveInnerToken(CollectionTransaction tx, ComplementInfo ci,
-                                                                List<Log> logs, Erc20Service erc20Service, AddressCache addressCache, String contractAddress) {
+                                                                List<Log> logs, Erc20ServiceImpl erc20Service, AddressCache addressCache, String contractAddress) {
         TransactionReceipt transactionReceipt = new TransactionReceipt();
         transactionReceipt.setLogs(logs);
         transactionReceipt.setContractAddress(contractAddress);

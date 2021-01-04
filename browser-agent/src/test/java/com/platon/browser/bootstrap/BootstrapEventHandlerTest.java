@@ -5,11 +5,11 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.service.elasticsearch.EsImportService;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -51,7 +51,7 @@ public class BootstrapEventHandlerTest extends TestBase {
     @Mock
     private AddressCache addressCache;
     @Mock
-    private Erc20ResolveService erc20ResolveService;
+    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
     @InjectMocks
     @Spy
     private BootstrapEventHandler target;

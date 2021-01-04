@@ -7,7 +7,7 @@ import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.param.sync.TotalSupplyUpdateParam;
-import com.platon.browser.service.erc20.Erc20ResolveService;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.AppStatusUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,7 @@ public class Erc20TokenUpdateTask {
     @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
     @Resource
-    protected Erc20ResolveService erc20ResolveService;
+    protected Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
     @Value("${task.erc20-batch-size:4}")
     private int batchSize;
@@ -64,7 +64,7 @@ public class Erc20TokenUpdateTask {
                     String[] ds = d.split(BrowserConst.ERC_SPILT);
                     EXECUTOR.submit(() -> {
                         //查询余额并回填
-                        BigInteger balance = erc20ResolveService.getBalance(ds[0], ds[1]);
+                        BigInteger balance = erc20ResolveServiceImpl.getBalance(ds[0], ds[1]);
                         //更新成功则删除对应的数据
                         Erc20TokenAddressRel erc20TokenAddressRel = Erc20TokenAddressRel.builder().contract(ds[0])
                                 .address(ds[1]).balance(new BigDecimal(balance)).build();
@@ -92,7 +92,7 @@ public class Erc20TokenUpdateTask {
                 tokens.forEach(token->{
                     EXECUTOR.submit(() -> {
                         //查询总供应量
-                        BigInteger totalSupply = erc20ResolveService.getTotalSupply(token.getAddress());
+                        BigInteger totalSupply = erc20ResolveServiceImpl.getTotalSupply(token.getAddress());
                         totalSupply = totalSupply==null?BigInteger.ZERO:totalSupply;
                         TotalSupplyUpdateParam tsp = new TotalSupplyUpdateParam();
                         tsp.setAddress(token.getAddress());

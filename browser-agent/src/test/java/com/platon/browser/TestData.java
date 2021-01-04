@@ -3,7 +3,7 @@ package com.platon.browser;
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.adjustment.bean.AdjustParam;
+import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementNodeOpt;

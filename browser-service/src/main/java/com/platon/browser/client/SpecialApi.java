@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.v015.bean.AdjustParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +73,10 @@ public class SpecialApi {
      * 查询合约调用PPOS信息
      */
     public static final int GET_PPOS_INFO_FUNC_TYPE = 1111;
+    /**
+     * 查询质押委托调账信息
+     */
+    public static final int GET_STAKING_DELEGATE_ADJUST_DATA_FUNC_TYPE = 1112;
 
     private static final String BLANK_RES = "结果为空!";
 
@@ -105,12 +110,10 @@ public class SpecialApi {
                     return data;
                 }
                 String decodedValue = new String(Numeric.hexStringToByteArray(value));
-
                 BaseContract.CallRet callRet = JSONUtil.parseObject(decodedValue, BaseContract.CallRet.class);
                 if (callRet == null) {
                     throw new ContractCallException("Unable to convert response: " + decodedValue);
                 }
-
                 CallResponse<String> callResponse = new CallResponse<>();
                 if (callRet.isStatusOk()) {
                     callResponse.setCode(callRet.getCode());
@@ -119,7 +122,6 @@ public class SpecialApi {
                     callResponse.setCode(callRet.getCode());
                     callResponse.setErrMsg(callRet.getRet().toString());
                 }
-
                 return callResponse;
             }).send();
         } catch (Exception e) {
@@ -331,7 +333,6 @@ public class SpecialApi {
         return request.send();
     }
 
-
     /**
      * 根据区块号获取合约调用PPOS信息
      * @param blockNumber
@@ -353,6 +354,31 @@ public class SpecialApi {
         }else{
             String msg = JSON.toJSONString(br,true);
             throw new ContractInvokeException(String.format("【查询PPOS调用信息出错】函数类型:%s,区块号:%s,返回数据:%s",GET_PPOS_INFO_FUNC_TYPE,blockNumber.toString(),msg));
+        }
+    }
+
+    /**
+     * 根据区块号获取质押委托调账信息
+     * @param blockNumber
+     * @return
+     * @throws Exception
+     */
+    public List<AdjustParam> getStakingDelegateAdjustDataList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
+        final Function function = new Function(GET_STAKING_DELEGATE_ADJUST_DATA_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
+        CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
+        if(br==null||br.getData()==null){
+            return Collections.EMPTY_LIST;
+        }
+        if(br.isStatusOk()){
+            String data = br.getData();
+            if(data==null){
+                throw new BlankResponseException(BLANK_RES);
+            }
+            data = data.replace("delete","delegate");
+            return JSON.parseArray(data, AdjustParam.class);
+        }else{
+            String msg = JSON.toJSONString(br,true);
+            throw new ContractInvokeException(String.format("【查询质押委托调账信息出错】函数类型:%s,区块号:%s,返回数据:%s",GET_STAKING_DELEGATE_ADJUST_DATA_FUNC_TYPE,blockNumber.toString(),msg));
         }
     }
 }

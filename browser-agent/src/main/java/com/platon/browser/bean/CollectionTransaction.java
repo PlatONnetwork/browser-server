@@ -5,12 +5,12 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.TransactionUtil;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -75,7 +75,7 @@ public class CollectionTransaction extends Transaction {
     }
 
     CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block, Receipt receipt, PlatOnClient platOnClient,
-        AddressCache addressCache, SpecialApi specialApi, Erc20ResolveService erc20ResolveService)
+        AddressCache addressCache, SpecialApi specialApi, Erc20ResolveServiceImpl erc20ResolveService)
         throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         // 使用地址缓存初始化普通合约缓存信息
         this.initGeneralContractCache(addressCache);

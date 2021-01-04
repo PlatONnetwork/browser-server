@@ -4,7 +4,7 @@ import com.alaya.crypto.Credentials;
 import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.alaya.tx.exceptions.ContractCallException;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.utils.NetworkParms;
+import com.platon.browser.utils.NetworkParams;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class Erc20ServiceImpl implements Erc20Service {
+public class Erc20ServiceImpl {
 
     @Resource
     private PlatOnClient platOnClient;
@@ -33,11 +33,10 @@ public class Erc20ServiceImpl implements Erc20Service {
         }
         Erc20Contract erc20Contract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
             Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
-            NetworkParms.getChainId());
+            NetworkParams.getChainId());
         return erc20Contract;
     }
 
-    @Override
     public BigInteger getBalance(String contractAddress, String account) {
         Erc20Contract erc20Contract = this.init(contractAddress);
         BigInteger balance = BigInteger.ZERO;
@@ -51,7 +50,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return balance;
     }
 
-    @Override
     public String getName(String contractAddress) {
         Erc20Contract erc20Contract = this.init(contractAddress);
         String name = "";
@@ -65,7 +63,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return name;
     }
 
-    @Override
     public String getSymbol(String contractAddress) {
         Erc20Contract erc20Contract = this.init(contractAddress);
         String symbol = "";
@@ -79,7 +76,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return symbol;
     }
 
-    @Override
     public BigInteger getDecimals(String contractAddress) {
         Erc20Contract erc20Contract = this.init(contractAddress);
         BigInteger decimal = null;
@@ -93,7 +89,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return decimal;
     }
 
-    @Override
     public BigInteger getTotalSupply(String contractAddress) {
         Erc20Contract erc20Contract = this.init(contractAddress);
         BigInteger totalSupply = null;
@@ -107,7 +102,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return totalSupply;
     }
 
-    @Override
     public ERCData getErcData(String contractAddress) {
         String name = this.getName(contractAddress);
         if (StringUtils.isBlank(name)) {
@@ -127,7 +121,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return ercData;
     }
 
-    @Override
     public List<TransferEvent> getTransferEvents(TransactionReceipt transactionReceipt) {
         Erc20Contract erc20Contract = this.init(transactionReceipt.getContractAddress());
         List<TransferEvent> transferEvents = new ArrayList<>();
@@ -148,7 +141,6 @@ public class Erc20ServiceImpl implements Erc20Service {
         return transferEvents;
     }
 
-    @Override
     public List<TransferEvent> getApprovalEvents(TransactionReceipt transactionReceipt) {
         Erc20Contract erc20Contract = this.init(transactionReceipt.getContractAddress());
         List<TransferEvent> transferEvents = null;

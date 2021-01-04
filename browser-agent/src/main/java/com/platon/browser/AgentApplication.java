@@ -33,9 +33,9 @@ import java.util.concurrent.CompletableFuture;
 @SpringBootApplication
 @EnableEncryptableProperties
 @MapperScan(basePackages = {
+	"com.platon.browser",
 	"com.platon.browser.dao.mapper",
-	"com.platon.browser.dao.mapper",
-	"com.platon.browser.adjustment.dao"
+	"com.platon.browser.v015.dao"
 })
 public class AgentApplication implements ApplicationRunner {
 	// 区块服务

@@ -14,6 +14,7 @@ import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.*;
 import com.platon.browser.service.erc20.ERCData;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.erc20.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -22,7 +23,6 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.erc20.Erc20ResolveService;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -183,7 +183,7 @@ public class TransactionUtilsTest extends TestBase {
         ComplementInfo ci = new ComplementInfo();
         ci.setContractType(ContractTypeEnum.EVM.getCode());
         CollectionTransaction collectionTransaction = CollectionTransaction.newInstance();
-        Erc20ResolveService erc20Service = mock(Erc20ResolveService.class);
+        Erc20ResolveServiceImpl erc20Service = mock(Erc20ResolveServiceImpl.class);
         ERCData ercData = new ERCData();
         when(erc20Service.getErcData(any())).thenReturn(ercData);
         TransactionUtil.resolveErcContract(collectionTransaction, ci, "123",

@@ -1,9 +1,8 @@
-package com.platon.browser.adjustment.bean;
+package com.platon.browser.v015.bean;
 
 import lombok.Data;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

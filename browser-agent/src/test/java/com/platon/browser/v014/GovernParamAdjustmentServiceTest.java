@@ -1,4 +1,4 @@
-package com.platon.browser.adjustment.service;
+package com.platon.browser.v014;
 
 import com.alaya.contracts.ppos.ProposalContract;
 import com.alaya.contracts.ppos.dto.CallResponse;
@@ -11,6 +11,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.v014.service.GovernParamAdjustService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class GovernParamAdjustServiceTest extends TestBase {
+public class GovernParamAdjustmentServiceTest extends TestBase {
     @Mock
     private ConfigMapper configMapper;
     @Mock

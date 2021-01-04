@@ -1,4 +1,4 @@
-package com.platon.browser.adjustment.bean;
+package com.platon.browser.v015.bean;
 
 import lombok.Data;
 

@@ -1,11 +1,11 @@
-package com.platon.browser.adjustment.service;
+package com.platon.browser.v015.service;
 
-import com.platon.browser.adjustment.bean.AdjustParam;
-import com.platon.browser.adjustment.bean.ValidatedContext;
-import com.platon.browser.adjustment.context.AbstractAdjustContext;
-import com.platon.browser.adjustment.context.DelegateAdjustContext;
-import com.platon.browser.adjustment.context.StakingAdjustContext;
-import com.platon.browser.adjustment.dao.AdjustmentMapper;
+import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.v015.bean.ValidatedContext;
+import com.platon.browser.v015.context.AbstractAdjustContext;
+import com.platon.browser.v015.context.DelegateAdjustContext;
+import com.platon.browser.v015.context.StakingAdjustContext;
+import com.platon.browser.v015.dao.AdjustmentMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.DelegationMapper;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 @Service
-public class AdjustService {
+public class AdjustmentService {
     @Resource
     protected DelegationMapper delegationMapper;
     @Resource
@@ -38,7 +38,7 @@ public class AdjustService {
     @Resource
     protected BlockChainConfig chainConfig;
 
-    private static final Logger log = Logger.getLogger(AdjustService.class.getName());
+    private static final Logger log = Logger.getLogger(AdjustmentService.class.getName());
     @Value("platon.account.adjust.log.file")
     private String adjustLogFile;
     @PostConstruct

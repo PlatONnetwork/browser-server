@@ -3,7 +3,7 @@ package com.platon.browser.task;
 import com.platon.browser.TestBase;
 import com.platon.browser.config.BrowserConst;
 import com.platon.browser.enums.AppStatus;
-import com.platon.browser.service.erc20.Erc20ResolveService;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class ErcBalanceUpdateTest extends TestBase {
     @Mock
     private CustomErc20TokenAddressRelMapper customErc20TokenAddressRelMapper;
     @Mock
-    private Erc20ResolveService erc20ResolveService;
+    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
     @Mock
     private SetOperations setOperations;
     @InjectMocks
@@ -53,7 +53,7 @@ public class ErcBalanceUpdateTest extends TestBase {
 
         when(this.redisTemplate.opsForSet()).thenReturn(this.setOperations);
         when(this.setOperations.members(BrowserConst.ERC_BALANCE_KEY)).thenReturn(data);
-        when(this.erc20ResolveService.getBalance(any(), any())).thenReturn(BigInteger.TEN);
+        when(this.erc20ResolveServiceImpl.getBalance(any(), any())).thenReturn(BigInteger.TEN);
     }
 
     @Test

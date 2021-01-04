@@ -21,7 +21,7 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.erc20.Erc20ResolveService;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     @Resource
     private SpecialApi specialApi;
     @Resource
-    private Erc20ResolveService erc20ResolveService;
+    private Erc20ResolveServiceImpl erc20ResolveService;
 
     private Set<Block> blocks = new HashSet<>();
     private Set<Transaction> transactions = new HashSet<>();

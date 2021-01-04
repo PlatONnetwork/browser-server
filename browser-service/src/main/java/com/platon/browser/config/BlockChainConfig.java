@@ -38,7 +38,7 @@ import java.util.*;
  */
 
 @Slf4j
-@DependsOn("networkParms")
+@DependsOn("networkParams")
 @Configuration
 @ConfigurationProperties(prefix="platon")
 public class BlockChainConfig {

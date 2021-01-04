@@ -1,8 +1,7 @@
-package com.platon.browser.adjustment.context;
+package com.platon.browser.v015.context;
 
 import com.platon.browser.TestData;
-import com.platon.browser.adjustment.bean.AdjustParam;
-import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.bean.CustomStaking;
@@ -13,18 +12,17 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class DelegateAdjustContextTest extends TestData {
-    private DelegateAdjustContext target;
+public class StakingAdjustContextTest extends TestData {
+    private StakingAdjustContext target;
     private AdjustParam adjustParam;
     private Node node;
     private Staking staking;
-    private Delegation delegation;
 
     @Before
     public void setup(){
-        target = new DelegateAdjustContext();
+        target = new StakingAdjustContext();
         for (AdjustParam param : adjustParamList) {
-            if ("delegate".equals(param.getOptType())) {
+            if ("staking".equals(param.getOptType())) {
                 adjustParam = param;
                 break;
             }
@@ -33,7 +31,6 @@ public class DelegateAdjustContextTest extends TestData {
         staking = stakingList.get(0);
         // 默认是候选中状态
         staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
-        delegation = delegationList.get(0);
     }
 
     @Test
@@ -60,8 +57,8 @@ public class DelegateAdjustContextTest extends TestData {
         List<String> errors = target.validate();
         Assert.assertEquals(2,errors.size());
         String errorInfo = target.errorInfo();
-        Assert.assertTrue(errorInfo.contains("【错误】：节点记录缺失"));
         Assert.assertTrue(errorInfo.contains("【错误】：质押记录缺失"));
+        Assert.assertTrue(errorInfo.contains("【错误】：节点记录缺失"));
     }
 
     @Test
@@ -86,171 +83,149 @@ public class DelegateAdjustContextTest extends TestData {
         Assert.assertTrue(errorInfo.contains("【错误】：节点记录缺失"));
     }
 
-    @Test
-    public void delegateNullTest() {
-        target.setChainConfig(blockChainConfig);
-        target.setAdjustParam(adjustParam);
-        target.setNode(node);
-        target.setStaking(staking);
-        List<String> errors = target.validate();
-        Assert.assertEquals(1,errors.size());
-        String errorInfo = target.errorInfo();
-        Assert.assertTrue(errorInfo.contains("【错误】：委托记录缺失"));
-    }
-
     // ********************节点状态是候选中或锁定中********************
     @Test
-    public void delegateHesEqualTest() {
+    public void stakingHesEqualTest() {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.ONE);
-        delegation.setDelegateHes(BigDecimal.TEN);
-        delegation.setDelegateLocked(BigDecimal.TEN);
+        staking.setStakingHes(BigDecimal.TEN);
+        staking.setStakingLocked(BigDecimal.TEN);
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(0,errors.size());
     }
 
     @Test
-    public void delegateLockedEqualTest() {
+    public void stakingLockedEqualTest() {
         adjustParam.setHes(BigDecimal.ONE);
         adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateHes(BigDecimal.TEN);
-        delegation.setDelegateLocked(BigDecimal.TEN);
+        staking.setStakingHes(BigDecimal.TEN);
+        staking.setStakingLocked(BigDecimal.TEN);
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(0,errors.size());
     }
 
     @Test
-    public void delegateHesNotEnoughTest() {
+    public void stakingHesNotEnoughTest() {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateHes(BigDecimal.ONE);
-        delegation.setDelegateLocked(BigDecimal.valueOf(100));
+        staking.setStakingHes(BigDecimal.ONE);
+        staking.setStakingLocked(BigDecimal.valueOf(100));
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(1,errors.size());
         String errorInfo = target.errorInfo();
-        Assert.assertTrue(errorInfo.contains("【错误】：委托记录[犹豫期金额"));
+        Assert.assertTrue(errorInfo.contains("【错误】：质押记录[犹豫期金额"));
     }
 
     @Test
-    public void delegateLockedNotEnoughTest() {
+    public void stakingLockedNotEnoughTest() {
         adjustParam.setHes(BigDecimal.TEN);
-        adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateHes(BigDecimal.valueOf(100));
-        delegation.setDelegateLocked(BigDecimal.ONE);
+        adjustParam.setLock(BigDecimal.valueOf(200));
+        staking.setStakingHes(BigDecimal.valueOf(100));
+        staking.setStakingLocked(BigDecimal.TEN);
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(1,errors.size());
         String errorInfo = target.errorInfo();
-        Assert.assertTrue(errorInfo.contains("【错误】：委托记录[锁定期金额"));
+        Assert.assertTrue(errorInfo.contains("【错误】：质押记录[锁定期金额"));
     }
 
     @Test
-    public void delegateBothNotEnoughTest() {
+    public void stakingBothNotEnoughTest() {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateHes(BigDecimal.ONE);
-        delegation.setDelegateLocked(BigDecimal.ONE);
+        staking.setStakingHes(BigDecimal.ONE);
+        staking.setStakingLocked(BigDecimal.ONE);
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(2,errors.size());
         String errorInfo = target.errorInfo();
-        Assert.assertTrue(errorInfo.contains("【错误】：委托记录[犹豫期金额"));
-        Assert.assertTrue(errorInfo.contains("【错误】：委托记录[锁定期金额"));
+        Assert.assertTrue(errorInfo.contains("【错误】：质押记录[犹豫期金额"));
+        Assert.assertTrue(errorInfo.contains("【错误】：质押记录[锁定期金额"));
     }
 
     @Test
-    public void delegateBothEnoughTest() {
+    public void stakingBothEnoughTest() {
         adjustParam.setHes(BigDecimal.ONE);
         adjustParam.setLock(BigDecimal.ONE);
-        delegation.setDelegateHes(BigDecimal.TEN);
-        delegation.setDelegateLocked(BigDecimal.TEN);
+        staking.setStakingHes(BigDecimal.TEN);
+        staking.setStakingLocked(BigDecimal.TEN);
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(0,errors.size());
     }
-
 
     // ********************节点状态是退出中或已退出********************
     @Test
-    public void delegateReleasedEqualTest() {
+    public void stakingReductionEqualTest() {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateReleased(BigDecimal.valueOf(20));
+        staking.setStakingReduction(BigDecimal.valueOf(20));
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(0,errors.size());
     }
 
     @Test
-    public void delegateReleasedNotEqualTest() {
+    public void stakingReductionNotEqualTest() {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateReleased(BigDecimal.valueOf(50));
+        staking.setStakingReduction(BigDecimal.valueOf(50));
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(0,errors.size());
     }
 
     @Test
-    public void delegateReleasedNotEnoughTest() {
+    public void stakingReductionNotEnoughTest() {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
-        delegation.setDelegateReleased(BigDecimal.valueOf(15));
+        staking.setStakingReduction(BigDecimal.valueOf(15));
 
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
         target.setStaking(staking);
-        target.setDelegation(delegation);
         List<String> errors = target.validate();
         Assert.assertEquals(1,errors.size());
         String errorInfo = target.errorInfo();
-        Assert.assertTrue(errorInfo.contains("委托记录[待提取金额"));
+        Assert.assertTrue(errorInfo.contains("【错误】：质押记录[退回中金额"));
     }
 }

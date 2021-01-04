@@ -1,6 +1,6 @@
-package com.platon.browser.adjustment.dao;
+package com.platon.browser.v015.dao;
 
-import com.platon.browser.adjustment.bean.AdjustParam;
+import com.platon.browser.v015.bean.AdjustParam;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;

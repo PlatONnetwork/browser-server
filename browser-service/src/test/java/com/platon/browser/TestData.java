@@ -1,11 +1,14 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.CustomDelegation;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.v015.bean.AdjustParam;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 
@@ -25,23 +28,29 @@ public class TestData {
             "blockChainConfig",
             "networkstat",
             "address",
+            "staking",
+            "delegation",
             "node",
             "block",
             "erc20Token",
             "erc20TokenDetail",
             "erc20TokenAddressRel",
-            "erc20TokenTransfer"
+            "erc20TokenTransfer",
+            "adjust-data"
     };
     protected List<Transaction> transactionList = Collections.emptyList();
     protected BlockChainConfig blockChainConfig = new BlockChainConfig();
     protected List<NetworkStat> networkStatList = new ArrayList<>();
     protected List<Address> addressList = Collections.emptyList();
+    protected List<CustomStaking> stakingList= Collections.emptyList();
+    protected List<CustomDelegation> delegationList= Collections.emptyList();
     protected List<Node> nodeList = new ArrayList<>();
     protected List<Block> blockList = Collections.emptyList();
     protected List<Erc20Token> erc20Tokens = Collections.emptyList();
     protected List<Erc20TokenDetailWithBLOBs> erc20TokenDetails = Collections.emptyList();
     protected List<ESTokenTransferRecord> esTokenTransferRecords = Collections.emptyList();
     protected List<Erc20TokenAddressRel> erc20TokenAddressRels = Collections.emptyList();
+    protected List<AdjustParam> adjustParamList = new ArrayList<>();
 
     @Before
     public void init() {
@@ -62,6 +71,12 @@ public class TestData {
                     case "address":
                         this.addressList = JSON.parseArray(content, Address.class);
                         break;
+                    case "staking":
+                        stakingList = JSON.parseArray(content, CustomStaking.class);
+                        break;
+                    case "delegation":
+                        delegationList = JSON.parseArray(content, CustomDelegation.class);
+                        break;
                     case "node":
                         this.nodeList = JSON.parseArray(content, Node.class);
                         break;
@@ -79,6 +94,9 @@ public class TestData {
                         break;
                     case "erc20TokenTransfer":
                         this.esTokenTransferRecords = JSON.parseArray(content, ESTokenTransferRecord.class);
+                        break;
+                    case "adjust-data":
+                        adjustParamList = JSON.parseArray(content, AdjustParam.class);
                         break;
                 }
             } catch (IOException e) {

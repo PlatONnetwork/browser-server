@@ -1,13 +1,18 @@
-package com.platon.browser.adjustment.service;
+package com.platon.browser.v015;
 
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.http.HttpService;
 import com.platon.browser.TestBase;
+import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.v015.dao.AdjustmentMapper;
 import com.platon.browser.v015.service.AdjustmentService;
@@ -24,6 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +41,7 @@ import static org.mockito.Mockito.when;
  **/
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AdjustServiceTest extends TestBase {
+public class AdjustmentServiceTest2 extends TestBase {
     @Mock
     private DelegationMapper delegationMapper;
     @Mock
@@ -57,8 +63,12 @@ public class AdjustServiceTest extends TestBase {
     private List<AdjustParam> delegateAdjustParamList = new ArrayList<>();
     private List<AdjustParam> stakingAdjustParamList = new ArrayList<>();
 
+    private SpecialApi specialApi = new SpecialApi();
+    private Web3j web3j = Web3j.build(new HttpService("http://192.168.21.49:6789"));
+    private Long chainId = 201018L;
+
     @Before
-    public void setup(){
+    public void setup() throws ContractInvokeException, BlankResponseException {
         ReflectionTestUtils.setField(target,"adjustLogFile", adjustLogFile);
         ReflectionTestUtils.setField(target,"chainConfig", blockChainConfig);
         ReflectionTestUtils.invokeMethod(target,"init");
@@ -72,6 +82,7 @@ public class AdjustServiceTest extends TestBase {
         delegation.setDelegateLocked(BigDecimal.ONE);
         delegation.setDelegateReleased(BigDecimal.valueOf(2));
 
+        adjustParamList = specialApi.getStakingDelegateAdjustDataList(web3j, BigInteger.valueOf(9641));
         adjustParamList.forEach(param->{
             if("staking".equals(param.getOptType())){
                 stakingAdjustParamList.add(param);
@@ -88,72 +99,10 @@ public class AdjustServiceTest extends TestBase {
 
     private void adjustDelegate(){
         String adjustMsg = target.adjust(adjustParamList);
-        Assert.assertFalse(adjustMsg.contains("错误"));
-
-        //调整委托
-        delegation.setDelegateHes(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(delegateAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：委托记录[犹豫期金额"));
-
-        delegation.setDelegateHes(BigDecimal.ONE);
-        delegation.setDelegateLocked(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(delegateAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：委托记录[锁定期金额"));
-
-        delegation.setDelegateHes(BigDecimal.valueOf(0.5));
-        delegation.setDelegateLocked(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(delegateAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：委托记录[犹豫期金额"));
-        Assert.assertTrue(adjustMsg.contains("【错误】：委托记录[锁定期金额"));
-
-        delegation.setDelegateHes(BigDecimal.TEN);
-        delegation.setDelegateLocked(BigDecimal.TEN);
-        adjustMsg = target.adjust(delegateAdjustParamList);
-        Assert.assertFalse(adjustMsg.contains("错误"));
-
-        //调账质押
-        staking.setStakingHes(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(stakingAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：质押记录[犹豫期金额"));
-
-        staking.setStakingHes(BigDecimal.ONE);
-        staking.setStakingLocked(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(stakingAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：质押记录[锁定期金额"));
-
-        staking.setStakingHes(BigDecimal.valueOf(0.5));
-        staking.setStakingLocked(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(stakingAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：质押记录[犹豫期金额"));
-        Assert.assertTrue(adjustMsg.contains("【错误】：质押记录[锁定期金额"));
-
-        staking.setStakingHes(BigDecimal.TEN);
-        staking.setStakingLocked(BigDecimal.TEN);
-        adjustMsg = target.adjust(stakingAdjustParamList);
-        Assert.assertFalse(adjustMsg.contains("错误"));
     }
 
     private void adjustStaking(){
         String adjustMsg = target.adjust(adjustParamList);
-        Assert.assertFalse(adjustMsg.contains("错误"));
-
-        //调整委托
-        delegation.setDelegateReleased(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(delegateAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：委托记录[待提取金额"));
-
-        delegation.setDelegateReleased(BigDecimal.TEN);
-        adjustMsg = target.adjust(delegateAdjustParamList);
-        Assert.assertFalse(adjustMsg.contains("错误"));
-
-        //调账质押
-        staking.setStakingReduction(BigDecimal.valueOf(0.5));
-        adjustMsg = target.adjust(stakingAdjustParamList);
-        Assert.assertTrue(adjustMsg.contains("【错误】：质押记录[退回中金额"));
-
-        staking.setStakingReduction(BigDecimal.TEN);
-        adjustMsg = target.adjust(stakingAdjustParamList);
-        Assert.assertFalse(adjustMsg.contains("错误"));
     }
 
     @Test

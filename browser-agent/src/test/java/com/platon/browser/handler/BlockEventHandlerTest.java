@@ -8,10 +8,10 @@ import com.platon.browser.bean.BlockEvent;
 import com.platon.browser.publisher.CollectionEventPublisher;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +42,7 @@ public class BlockEventHandlerTest extends TestBase {
     @Mock
     private AddressCache addressCache;
     @Mock
-    private Erc20ResolveService erc20ResolveService;
+    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
     @InjectMocks
     @Spy

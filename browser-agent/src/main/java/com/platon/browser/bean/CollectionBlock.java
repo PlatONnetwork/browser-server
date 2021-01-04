@@ -8,11 +8,11 @@ import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.service.erc20.Erc20ResolveService;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class CollectionBlock extends Block {
     }
 
     public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block, ReceiptResult receiptResult,
-        PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi, Erc20ResolveService erc20ResolveService)
+        PlatOnClient platOnClient, AddressCache addressCache, SpecialApi specialApi, Erc20ResolveServiceImpl erc20ResolveService)
         throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         String nodeId;
         if (block.getNumber().longValue() == 0) {

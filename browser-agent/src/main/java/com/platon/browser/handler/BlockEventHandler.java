@@ -12,7 +12,7 @@ import com.platon.browser.publisher.CollectionEventPublisher;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.erc20.Erc20ResolveService;
+import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
     @Resource
     private SpecialApi specialApi;
     @Resource
-    private Erc20ResolveService erc20ResolveService;
+    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "BlockEventHandler")
@@ -53,8 +53,8 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,
-                receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.erc20ResolveService);
-            this.erc20ResolveService.initContractAddressCache(block.getTransactions(), this.addressCache);
+                receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.erc20ResolveServiceImpl);
+            this.erc20ResolveServiceImpl.initContractAddressCache(block.getTransactions(), this.addressCache);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
 
             this.collectionEventPublisher.publish(block, block.getTransactions(), event.getEpochMessage());
