@@ -5,7 +5,7 @@
     "title" : "浏览器接口文档",
     "description" : null
   },
-  "host" : "localhost:9061",
+  "host" : "https://scan.alaya.network/",
   "basePath" : "/browser-server",
   "schemes" : [ "http" ],
   "paths" : {

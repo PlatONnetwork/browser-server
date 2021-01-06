@@ -49,8 +49,8 @@ public class StakingDelegateBalanceAdjustmentServiceTest2 extends TestBase {
     private NodeMapper nodeMapper;
     @Mock
     private StakingDelegateBalanceAdjustmentMapper stakingDelegateBalanceAdjustmentMapper;
-
-    private String adjustLogFile = System.getProperty("user.dir")+ File.separator+"adjust.log";
+    @Mock
+    private V015Config v015Config;
 
     @Spy
     @InjectMocks
@@ -68,7 +68,7 @@ public class StakingDelegateBalanceAdjustmentServiceTest2 extends TestBase {
 
     @Before
     public void setup() throws ContractInvokeException, BlankResponseException {
-        ReflectionTestUtils.setField(target,"adjustLogFile", adjustLogFile);
+        when(v015Config.getAdjustLogFilePath()).thenReturn(System.getProperty("user.dir")+ File.separator+"adjust.log");
         ReflectionTestUtils.setField(target,"chainConfig", blockChainConfig);
         ReflectionTestUtils.invokeMethod(target,"init");
         node = nodeList.get(0);

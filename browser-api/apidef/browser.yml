@@ -3,7 +3,7 @@ info:
   version: 0.15.0.0
   title: 浏览器接口文档
   description:
-host: localhost:9061
+host: https://scan.alaya.network/
 basePath: /browser-server
 
 schemes:
