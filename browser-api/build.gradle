@@ -1,10 +1,3 @@
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-buildscript {
-    dependencies {
-        classpath 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.1'
-    }
-}
 plugins {
 	id 'org.springframework.boot' version "$springbootVersion"
 }
@@ -23,31 +16,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	compile 'io.projectreactor.netty:reactor-netty:0.8.10.RELEASE'
 }
-
-
-/*=====================API生成配置 START=======================*/
-def rootDir = projectDir.parent;
-def apiDefDir = file(projectDir.path+"/apidef")
-files(apiDefDir.listFiles(new FilenameFilter() {
-    boolean accept(File dir, String name) {
-        return name.endsWith(".yml")
-    }
-})).each{yml ->
-    println yml.name
-    def json = yamlToJson(yml.text)
-    // sync to root dir[docs]
-    def rootJsonFile = file(rootDir+"/docs/apidef/"+yml.name+".json")
-    rootJsonFile.write(json,"utf-8")
-}
-
-static yamlToJson(String yaml) {
-    ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
-    Object obj = yamlReader.readValue(yaml, Object.class);
-    ObjectMapper jsonWriter = new ObjectMapper();
-    return jsonWriter.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
-}
-/*=====================API生成配置 END=======================*/
-
 
 //判断 build命令是否指定属性 profile。
 //例如 gradle buildTar -xtest -Pprofile=online
@@ -154,3 +122,9 @@ sonarqube {
     }
 }
 
+// 拷贝接口文档至类路径
+task copyApiToClasspath(type: Copy) {
+    file('build/resources/main/docs').mkdirs()
+    from "${project.parent.projectDir}/docs"
+    into 'build/resources/main/docs'
+}
