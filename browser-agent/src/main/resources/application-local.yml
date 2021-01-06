@@ -58,7 +58,7 @@ logging:
     org.springframework.retry: error
     com.platon.browser: error
     com.platon.browser.bootstrap: error
-    com.platon.browser.elasticsearch: debug
+    com.platon.browser.elasticsearch: error
     com.platon.browser.collection: error
     com.platon.browser.collection.queue.handler: error
     com.platon.browser.common: error
@@ -78,7 +78,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.112.172:6778
+    addresses: 192.168.21.109:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -124,12 +124,16 @@ platon:
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
   #调账日志输出文件
-  account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
+  account.adjust.log.file: E:\Java\browser-server\browser-agent\build\adjust.log
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
       pageSize: 2000
       pageCount: 250
+  #调账生效版本
+  adjustmentActiveVersion: 3840
+  #调账提案ID
+  adjustmentPipId: '1609410836.4141252'
 
 task:
    #地址统计任务

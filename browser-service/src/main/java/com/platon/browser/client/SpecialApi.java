@@ -22,6 +22,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.NodeTool;
 import com.platon.browser.v015.bean.AdjustParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -375,7 +377,9 @@ public class SpecialApi {
                 throw new BlankResponseException(BLANK_RES);
             }
             data = data.replace("delete","delegate");
-            return JSON.parseArray(data, AdjustParam.class);
+            List<AdjustParam> adjustParams = JSON.parseArray(data, AdjustParam.class);
+            adjustParams.forEach(param->param.setNodeId(HexTool.prefix(param.getNodeId())));
+            return adjustParams;
         }else{
             String msg = JSON.toJSONString(br,true);
             throw new ContractInvokeException(String.format("【查询质押委托调账信息出错】函数类型:%s,区块号:%s,返回数据:%s",GET_STAKING_DELEGATE_ADJUST_DATA_FUNC_TYPE,blockNumber.toString(),msg));

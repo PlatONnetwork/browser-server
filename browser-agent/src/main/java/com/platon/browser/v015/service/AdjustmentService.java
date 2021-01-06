@@ -39,7 +39,7 @@ public class AdjustmentService {
     protected BlockChainConfig chainConfig;
 
     private static final Logger log = Logger.getLogger(AdjustmentService.class.getName());
-    @Value("platon.account.adjust.log.file")
+    @Value("${platon.account.adjust.log.file}")
     private String adjustLogFile;
     @PostConstruct
     private void init(){

@@ -198,6 +198,11 @@ public class BlockChainConfig {
     // 代币定义事件
     private Map<String, String> eventDefine;
 
+    // 调账生效版本
+    private BigInteger adjustmentActiveVersion;
+    // 调账提案ID
+    private String adjustmentPipId;
+
     @PostConstruct
     public void init() throws ConfigLoadingException {
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
@@ -794,5 +799,22 @@ public class BlockChainConfig {
 
     public void setRestrictingMinimumRelease(BigDecimal restrictingMinimumRelease) {
         this.restrictingMinimumRelease = restrictingMinimumRelease;
+    }
+
+
+    public BigInteger getAdjustmentActiveVersion() {
+        return adjustmentActiveVersion;
+    }
+
+    public String getAdjustmentPipId() {
+        return adjustmentPipId;
+    }
+
+    public void setAdjustmentActiveVersion(BigInteger version) {
+        adjustmentActiveVersion = version;
+    }
+
+    public void setAdjustmentPipId(String pipid) {
+        adjustmentPipId = pipid;
     }
 }
