@@ -1,6 +1,8 @@
-package com.platon.browser.adjustment.service;
+package com.platon.browser.v015.service;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.v015.V015Config;
+import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
@@ -8,9 +10,7 @@ import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.bean.CustomStaking;
-import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.v015.dao.StakingDelegateBalanceAdjustmentMapper;
-import com.platon.browser.v015.service.StakingDelegateBalanceAdjustmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  **/
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AdjustServiceTest extends TestBase {
+public class StakingDelegateBalanceAdjustmentServiceTest extends TestBase {
     @Mock
     private DelegationMapper delegationMapper;
     @Mock
@@ -43,9 +43,9 @@ public class AdjustServiceTest extends TestBase {
     @Mock
     private NodeMapper nodeMapper;
     @Mock
-    private StakingDelegateBalanceAdjustmentMapper stakingDelegateBalanceAdjustmentMapper;
-
-    private String adjustLogFile = System.getProperty("user.dir")+ File.separator+"adjust.log";
+    private StakingDelegateBalanceAdjustmentMapper adjustmentMapper;
+    @Mock
+    private V015Config v015Config;
 
     @Spy
     @InjectMocks
@@ -59,7 +59,7 @@ public class AdjustServiceTest extends TestBase {
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target,"adjustLogFile", adjustLogFile);
+        when(v015Config.getAdjustLogFilePath()).thenReturn(System.getProperty("user.dir")+ File.separator+"adjust.log");
         ReflectionTestUtils.setField(target,"chainConfig", blockChainConfig);
         ReflectionTestUtils.invokeMethod(target,"init");
         node = nodeList.get(0);
@@ -71,6 +71,7 @@ public class AdjustServiceTest extends TestBase {
         delegation.setDelegateHes(BigDecimal.ONE);
         delegation.setDelegateLocked(BigDecimal.ONE);
         delegation.setDelegateReleased(BigDecimal.valueOf(2));
+
 
         adjustParamList.forEach(param->{
             if("staking".equals(param.getOptType())){

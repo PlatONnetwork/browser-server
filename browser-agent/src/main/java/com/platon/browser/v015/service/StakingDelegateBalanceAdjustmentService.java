@@ -1,18 +1,18 @@
 package com.platon.browser.v015.service;
 
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.v015.V015Config;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.v015.bean.ValidatedContext;
 import com.platon.browser.v015.context.AbstractAdjustContext;
 import com.platon.browser.v015.context.DelegateAdjustContext;
 import com.platon.browser.v015.context.StakingAdjustContext;
-import com.platon.browser.v015.dao.AdjustmentMapper;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.DelegationMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.v015.dao.StakingDelegateBalanceAdjustmentMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 @Service
-public class AdjustmentService {
+public class StakingDelegateBalanceAdjustmentService {
     @Resource
     protected DelegationMapper delegationMapper;
     @Resource
@@ -34,23 +34,23 @@ public class AdjustmentService {
     @Resource
     protected NodeMapper nodeMapper;
     @Resource
-    protected AdjustmentMapper adjustmentMapper;
+    protected StakingDelegateBalanceAdjustmentMapper stakingDelegateBalanceAdjustmentMapper;
     @Resource
     protected BlockChainConfig chainConfig;
+    @Resource
+    protected V015Config v015Config;
 
-    private static final Logger log = Logger.getLogger(AdjustmentService.class.getName());
-    @Value("${platon.account.adjust.log.file}")
-    private String adjustLogFile;
+    private static final Logger log = Logger.getLogger(StakingDelegateBalanceAdjustmentService.class.getName());
     @PostConstruct
     private void init(){
-        File logFile = new File(adjustLogFile);
+        File logFile = new File(v015Config.getAdjustLogFilePath());
         if(logFile.exists()) {
             boolean deleted = logFile.delete();
             if(!deleted) log.warning("删除日志文件失败！");
         }
         try {
             log.setLevel(Level.INFO);
-            FileHandler fileHandler = new FileHandler(adjustLogFile);
+            FileHandler fileHandler = new FileHandler(v015Config.getAdjustLogFilePath());
             fileHandler.setLevel(Level.INFO);
             SimpleFormatter formatter = new SimpleFormatter();
             fileHandler.setFormatter(formatter);
@@ -119,7 +119,7 @@ public class AdjustmentService {
         for (AbstractAdjustContext context : validatedContext.getDelegateAdjustContextList()) {
             if(StringUtils.isBlank(context.errorInfo())){
                 // 调账上下文没有错误信息，则执行调账操作
-                adjustmentMapper.adjustDelegateData(context.getAdjustParam());
+                stakingDelegateBalanceAdjustmentMapper.adjustDelegateData(context.getAdjustParam());
                 StringBuilder sb = new StringBuilder("============ ")
                         .append(context.getAdjustParam().getOptType())
                         .append("调账成功 ============\n")
@@ -136,7 +136,7 @@ public class AdjustmentService {
         for (AbstractAdjustContext context : validatedContext.getStakingAdjustContextList()) {
             if(StringUtils.isBlank(context.errorInfo())){
                 // 调账上下文没有错误信息，则执行调账操作
-                adjustmentMapper.adjustStakingData(context.getAdjustParam());
+                stakingDelegateBalanceAdjustmentMapper.adjustStakingData(context.getAdjustParam());
                 StringBuilder sb = new StringBuilder("============ ")
                         .append(context.getAdjustParam().getOptType())
                         .append("调账成功 ============\n")

@@ -1,4 +1,4 @@
-package com.platon.browser.v014;
+package com.platon.browser.v015.service;
 
 import com.alaya.contracts.ppos.ProposalContract;
 import com.alaya.contracts.ppos.dto.CallResponse;
@@ -11,14 +11,13 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
-import com.platon.browser.v014.service.GovernParamAdjustService;
+import com.platon.browser.v015.V015Config;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -33,21 +32,20 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class GovernParamAdjustmentServiceTest extends TestBase {
+public class GovernParamStakingDelegateBalanceAdjustmentServiceTest extends TestBase {
     @Mock
     private ConfigMapper configMapper;
     @Mock
     private PlatOnClient platOnClient;
+    @Mock
+    private V015Config v015Config;
 
     @Spy
     @InjectMocks
-    private GovernParamAdjustService target;
+    private RestrictingMinimumReleaseParamService target;
 
     @Test
     public void test() throws Exception {
-
-        ReflectionTestUtils.setField(target,"restrictingMinimumReleaseActiveVersion",BigInteger.TEN);
-
         Block block = blockList.get(0);
 
         ProposalContract proposalContract = mock(ProposalContract.class);
@@ -58,6 +56,7 @@ public class GovernParamAdjustmentServiceTest extends TestBase {
         when(proposalContract.getActiveVersion()).thenReturn(remoteCall0);
         when(remoteCall0.send()).thenReturn(callResponse0);
         when(callResponse0.getData()).thenReturn(BigInteger.TEN);
+        when(v015Config.getRestrictingMinimumReleaseActiveVersion()).thenReturn(BigInteger.TEN);
 
         RemoteCall remoteCall1 = mock(RemoteCall.class);
         CallResponse callResponse1 = mock(CallResponse.class);

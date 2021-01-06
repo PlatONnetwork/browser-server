@@ -14,10 +14,9 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.v015.bean.AdjustParam;
-import com.platon.browser.v015.dao.AdjustmentMapper;
-import com.platon.browser.v015.service.AdjustmentService;
+import com.platon.browser.v015.dao.StakingDelegateBalanceAdjustmentMapper;
+import com.platon.browser.v015.service.StakingDelegateBalanceAdjustmentService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.when;
  **/
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AdjustmentServiceTest2 extends TestBase {
+public class StakingDelegateBalanceAdjustmentServiceTest2 extends TestBase {
     @Mock
     private DelegationMapper delegationMapper;
     @Mock
@@ -49,13 +48,13 @@ public class AdjustmentServiceTest2 extends TestBase {
     @Mock
     private NodeMapper nodeMapper;
     @Mock
-    private AdjustmentMapper adjustmentMapper;
+    private StakingDelegateBalanceAdjustmentMapper stakingDelegateBalanceAdjustmentMapper;
 
     private String adjustLogFile = System.getProperty("user.dir")+ File.separator+"adjust.log";
 
     @Spy
     @InjectMocks
-    private AdjustmentService target;
+    private StakingDelegateBalanceAdjustmentService target;
 
     private Node node;
     private Staking staking;

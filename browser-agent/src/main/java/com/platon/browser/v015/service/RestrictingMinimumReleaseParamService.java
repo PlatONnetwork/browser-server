@@ -1,4 +1,4 @@
-package com.platon.browser.v014.service;
+package com.platon.browser.v015.service;
 
 import com.alaya.contracts.ppos.dto.resp.GovernParam;
 import com.platon.browser.client.PlatOnClient;
@@ -7,6 +7,7 @@ import com.platon.browser.dao.entity.ConfigExample;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.v015.V015Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +20,12 @@ import java.util.List;
  * 治理参数调整（添加、中途调整）服务
  */
 @Service
-public class GovernParamAdjustService {
+public class RestrictingMinimumReleaseParamService {
 
     // alaya版本特殊处理版本升级，在结算周期调用proposalContract的getActiveVersion()方法，看返回值是否与本字段值一致，
     // 如果一致，则把检测数据库中是否存在锁仓最小释放金额配置，如果不存在则插入此数据
-    @Value("${platon.restrictingMinimumReleaseActiveVersion}")
-    private BigInteger restrictingMinimumReleaseActiveVersion;
+    @Resource
+    private V015Config v015Config;
     @Resource
     private ConfigMapper configMapper;
     @Resource
@@ -38,9 +39,9 @@ public class GovernParamAdjustService {
         List<Config> configs = configMapper.selectByExample(example);
 
         if(configs.isEmpty()){
-            // 检查链上生效版本是否与配置文件中指定的一致，如果一致则插入锁仓最小释放金额参数
+            // 检查链上生效版本大于等于配置文件中指定的版本，则插入锁仓最小释放金额参数
             BigInteger chainVersion = platOnClient.getProposalContract().getActiveVersion().send().getData();
-            if(chainVersion.compareTo(restrictingMinimumReleaseActiveVersion)!=0) return;
+            if(chainVersion.compareTo(v015Config.getRestrictingMinimumReleaseActiveVersion())>=0) return;
 
             // 如果不存在minimumRelease则从链上查询指定模块的参数插入
             String restrictingMinimumRelease="80000000000000000000";
