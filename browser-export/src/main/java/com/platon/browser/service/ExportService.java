@@ -796,7 +796,7 @@ public class ExportService {
 		return blockNumer;
 	}
 	
-	public boolean checkDatabaseNumer() {
+	public boolean checkDatabaseNumber() {
 		List<NetworkStat> networkStat = networkStatMapper.selectByExample(null);
 		if(BigInteger.valueOf(networkStat.get(0).getCurNumber()).compareTo(dbblock) <= 0) {
 			return true;

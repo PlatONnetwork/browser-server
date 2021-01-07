@@ -133,7 +133,8 @@ v015:
   #调账生效版本
   adjustmentActiveVersion: 3840
   #调账提案ID
-  adjustmentPipId: '1609410836.4141252'
+  adjustmentPipId: '1609934366.2214465'
+
   #调账日志输出文件
   adjustLogFilePath: E:\Java\browser-server\browser-agent\build\adjust.log
 

@@ -1,10 +1,13 @@
 package com.platon.browser.v015.context;
 
 import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.utils.EpochUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * 质押调账上下文
@@ -42,13 +45,17 @@ public class StakingAdjustContext extends AbstractAdjustContext {
     }
 
     @Override
-    void calculateAmountAndStatus() {
+    void calculateAmountAndStatus() throws BlockNumberException {
         if(
             adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
             ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
         ){
             // 退出中或已退出的节点，从stakingReduction中减掉hes和lock
-            adjustParam.getStakingReduction().subtract(adjustParam.getHes()).subtract(adjustParam.getLock());
+            adjustParam.setStakingReduction(
+                adjustParam.getStakingReduction()
+                .subtract(adjustParam.getHes())
+                .subtract(adjustParam.getLock())
+            );
         }else{
             // 候选中或已锁定的节点，从各自的犹豫期或锁定期金额中扣除
             adjustParam.setStakingHes(adjustParam.getStakingHes().subtract(adjustParam.getHes()));
@@ -60,13 +67,26 @@ public class StakingAdjustContext extends AbstractAdjustContext {
                 .subtract(adjustParam.getLock())
             );
         }
-        // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为已退出
+        // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为退出中，且锁定周期设置为1，解锁块号设为本周期最后一个块号
         BigDecimal stakingHes = adjustParam.getStakingHes();
         BigDecimal stakingLocked = adjustParam.getStakingLocked();
         if(stakingHes.add(stakingLocked).compareTo(chainConfig.getStakeThreshold())<0){
-            adjustParam.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+            adjustParam.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
             adjustParam.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
             adjustParam.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
+            // 把锁定期金额移至退回中字段
+            adjustParam.setStakingReduction(adjustParam.getStakingReduction().add(stakingLocked));
+            // 把犹豫期和锁定期金额置0
+            adjustParam.setStakingHes(BigDecimal.ZERO);
+            adjustParam.setStakingLocked(BigDecimal.ZERO);
+            // 设置退出时所在结算周期
+            BigInteger epoch = EpochUtil.getEpoch(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
+            adjustParam.setStakingReductionEpoch(epoch.intValue());
+            // 锁定周期设置为1
+            adjustParam.setUnStakeFreezeDuration(1);
+            //解锁块号设为本周期最后一个块号
+            BigInteger unStakeEndBlock = EpochUtil.getCurEpochLastBlockNumber(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
+            adjustParam.setUnStakeEndBlock(unStakeEndBlock.intValue());
         }
     }
 

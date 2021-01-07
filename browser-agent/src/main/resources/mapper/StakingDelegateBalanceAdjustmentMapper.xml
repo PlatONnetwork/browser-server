@@ -30,20 +30,26 @@
     <update id="adjustStakingData">
         update `node` set
             `status`=#{adjustParam.status},
-            `isConsensus`=#{adjustParam.isConsensus},
-            `isSettle`=#{adjustParam.isSettle},
+            `is_consensus`=#{adjustParam.isConsensus},
+            `is_settle`=#{adjustParam.isSettle},
             `staking_hes`=#{adjustParam.stakingHes},
             `staking_locked`=#{adjustParam.stakingLocked},
-            `staking_reduction`=#{adjustParam.stakingReduction}
+            `staking_reduction`=#{adjustParam.stakingReduction},
+            `staking_reduction_epoch`=#{adjustParam.stakingReductionEpoch},
+            `un_stake_freeze_duration`=#{adjustParam.unStakeFreezeDuration},
+            `un_stake_end_block`=#{adjustParam.unStakeEndBlock}
         where `node_id` = #{adjustParam.nodeId};
 
         update `staking` set
              `status`=#{adjustParam.status},
-             `isConsensus`=#{adjustParam.isConsensus},
-             `isSettle`=#{adjustParam.isSettle},
+             `is_consensus`=#{adjustParam.isConsensus},
+             `is_settle`=#{adjustParam.isSettle},
              `staking_hes`=#{adjustParam.stakingHes},
              `staking_locked`=#{adjustParam.stakingLocked},
-             `staking_reduction`=#{adjustParam.stakingReduction}
+             `staking_reduction`=#{adjustParam.stakingReduction},
+             `staking_reduction_epoch`=#{adjustParam.stakingReductionEpoch},
+             `un_stake_freeze_duration`=#{adjustParam.unStakeFreezeDuration},
+             `un_stake_end_block`=#{adjustParam.unStakeEndBlock}
         where `node_id` = #{adjustParam.nodeId}
           and `staking_block_num` = #{adjustParam.stakingBlockNum};
     </update>

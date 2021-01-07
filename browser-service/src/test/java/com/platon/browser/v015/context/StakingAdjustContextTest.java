@@ -1,6 +1,7 @@
 package com.platon.browser.v015.context;
 
 import com.platon.browser.TestData;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
@@ -34,7 +35,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void blockChainConfigNullTest() {
+    public void blockChainConfigNullTest() throws BlockNumberException {
         List<String> errors = target.validate();
         Assert.assertEquals(1, errors.size());
         String errorInfo = target.errorInfo();
@@ -42,7 +43,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void adjustParamNullTest() {
+    public void adjustParamNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         List<String> errors = target.validate();
         Assert.assertEquals(1,errors.size());
@@ -51,7 +52,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void nodeStakingNullTest() {
+    public void nodeStakingNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         List<String> errors = target.validate();
@@ -62,7 +63,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingNullTest() {
+    public void stakingNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
@@ -73,7 +74,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void nodeNullTest() {
+    public void nodeNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setStaking(staking);
@@ -85,7 +86,7 @@ public class StakingAdjustContextTest extends TestData {
 
     // ********************节点状态是候选中或锁定中********************
     @Test
-    public void stakingHesEqualTest() {
+    public void stakingHesEqualTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.ONE);
         staking.setStakingHes(BigDecimal.TEN);
@@ -100,7 +101,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingLockedEqualTest() {
+    public void stakingLockedEqualTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.ONE);
         adjustParam.setLock(BigDecimal.TEN);
         staking.setStakingHes(BigDecimal.TEN);
@@ -115,7 +116,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingHesNotEnoughTest() {
+    public void stakingHesNotEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         staking.setStakingHes(BigDecimal.ONE);
@@ -132,7 +133,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingLockedNotEnoughTest() {
+    public void stakingLockedNotEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.valueOf(200));
         staking.setStakingHes(BigDecimal.valueOf(100));
@@ -149,7 +150,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingBothNotEnoughTest() {
+    public void stakingBothNotEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         staking.setStakingHes(BigDecimal.ONE);
@@ -167,7 +168,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingBothEnoughTest() {
+    public void stakingBothEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.ONE);
         adjustParam.setLock(BigDecimal.ONE);
         staking.setStakingHes(BigDecimal.TEN);
@@ -183,7 +184,7 @@ public class StakingAdjustContextTest extends TestData {
 
     // ********************节点状态是退出中或已退出********************
     @Test
-    public void stakingReductionEqualTest() {
+    public void stakingReductionEqualTest() throws BlockNumberException {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
@@ -198,7 +199,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingReductionNotEqualTest() {
+    public void stakingReductionNotEqualTest() throws BlockNumberException {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
@@ -213,7 +214,7 @@ public class StakingAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingReductionNotEnoughTest() {
+    public void stakingReductionNotEnoughTest() throws BlockNumberException {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);

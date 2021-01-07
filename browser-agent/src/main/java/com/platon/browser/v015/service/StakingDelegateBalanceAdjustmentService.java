@@ -1,6 +1,7 @@
 package com.platon.browser.v015.service;
 
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.V015Config;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.DelegationMapper;
@@ -65,7 +66,7 @@ public class StakingDelegateBalanceAdjustmentService {
      * @param adjustParams
      * @return
      */
-    public ValidatedContext validate(List<AdjustParam> adjustParams){
+    public ValidatedContext validate(List<AdjustParam> adjustParams) throws BlockNumberException {
         ValidatedContext validatedContext = new ValidatedContext();
         if(adjustParams.isEmpty()) return validatedContext;
         // 针对每笔委托调账数据获取完整的【调账上下文数据】
@@ -111,7 +112,7 @@ public class StakingDelegateBalanceAdjustmentService {
         return validatedContext;
     }
 
-    public String adjust(List<AdjustParam> adjustParams) {
+    public String adjust(List<AdjustParam> adjustParams) throws BlockNumberException {
         // 构造调账上下文并验证调账参数
         ValidatedContext validatedContext = validate(adjustParams);
         String adjustMsg = "";

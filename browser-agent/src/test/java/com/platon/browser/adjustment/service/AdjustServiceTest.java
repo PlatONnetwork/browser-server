@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.v015.dao.StakingDelegateBalanceAdjustmentMapper;
 import com.platon.browser.v015.service.StakingDelegateBalanceAdjustmentService;
@@ -86,7 +87,7 @@ public class AdjustServiceTest extends TestBase {
         when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegation);
     }
 
-    private void adjustDelegate(){
+    private void adjustDelegate() throws BlockNumberException {
         String adjustMsg = target.adjust(adjustParamList);
         Assert.assertFalse(adjustMsg.contains("错误"));
 
@@ -133,7 +134,7 @@ public class AdjustServiceTest extends TestBase {
         Assert.assertFalse(adjustMsg.contains("错误"));
     }
 
-    private void adjustStaking(){
+    private void adjustStaking() throws BlockNumberException {
         String adjustMsg = target.adjust(adjustParamList);
         Assert.assertFalse(adjustMsg.contains("错误"));
 

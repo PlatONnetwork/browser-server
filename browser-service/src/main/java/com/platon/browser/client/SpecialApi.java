@@ -19,6 +19,7 @@ import com.alaya.tx.exceptions.ContractCallException;
 import com.alaya.utils.JSONUtil;
 import com.alaya.utils.Numeric;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -28,6 +29,7 @@ import com.platon.browser.v015.bean.AdjustParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -378,7 +380,10 @@ public class SpecialApi {
             }
             data = data.replace("delete","delegate");
             List<AdjustParam> adjustParams = JSON.parseArray(data, AdjustParam.class);
-            adjustParams.forEach(param->param.setNodeId(HexTool.prefix(param.getNodeId())));
+            adjustParams.forEach(param->{
+                param.setNodeId(HexTool.prefix(param.getNodeId()));
+                param.setCurrBlockNum(blockNumber);
+            });
             return adjustParams;
         }else{
             String msg = JSON.toJSONString(br,true);

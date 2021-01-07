@@ -128,3 +128,4 @@ task copyApiToClasspath(type: Copy) {
     from "${project.parent.projectDir}/docs"
     into 'build/resources/main/docs'
 }
+

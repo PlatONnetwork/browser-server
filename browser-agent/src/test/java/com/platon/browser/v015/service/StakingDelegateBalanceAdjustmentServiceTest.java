@@ -1,6 +1,7 @@
 package com.platon.browser.v015.service;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.V015Config;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.dao.entity.Delegation;
@@ -87,7 +88,7 @@ public class StakingDelegateBalanceAdjustmentServiceTest extends TestBase {
         when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegation);
     }
 
-    private void adjustDelegate(){
+    private void adjustDelegate() throws BlockNumberException {
         String adjustMsg = target.adjust(adjustParamList);
         Assert.assertFalse(adjustMsg.contains("错误"));
 
@@ -134,7 +135,7 @@ public class StakingDelegateBalanceAdjustmentServiceTest extends TestBase {
         Assert.assertFalse(adjustMsg.contains("错误"));
     }
 
-    private void adjustStaking(){
+    private void adjustStaking() throws BlockNumberException {
         String adjustMsg = target.adjust(adjustParamList);
         Assert.assertFalse(adjustMsg.contains("错误"));
 

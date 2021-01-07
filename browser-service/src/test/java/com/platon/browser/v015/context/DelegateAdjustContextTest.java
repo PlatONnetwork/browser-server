@@ -1,6 +1,7 @@
 package com.platon.browser.v015.context;
 
 import com.platon.browser.TestData;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
@@ -37,7 +38,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void blockChainConfigNullTest() {
+    public void blockChainConfigNullTest() throws BlockNumberException {
         List<String> errors = target.validate();
         Assert.assertEquals(1, errors.size());
         String errorInfo = target.errorInfo();
@@ -45,7 +46,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void adjustParamNullTest() {
+    public void adjustParamNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         List<String> errors = target.validate();
         Assert.assertEquals(1,errors.size());
@@ -54,7 +55,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void nodeStakingNullTest() {
+    public void nodeStakingNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         List<String> errors = target.validate();
@@ -65,7 +66,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void stakingNullTest() {
+    public void stakingNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
@@ -76,7 +77,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void nodeNullTest() {
+    public void nodeNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setStaking(staking);
@@ -87,7 +88,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateNullTest() {
+    public void delegateNullTest() throws BlockNumberException {
         target.setChainConfig(blockChainConfig);
         target.setAdjustParam(adjustParam);
         target.setNode(node);
@@ -100,7 +101,7 @@ public class DelegateAdjustContextTest extends TestData {
 
     // ********************节点状态是候选中或锁定中********************
     @Test
-    public void delegateHesEqualTest() {
+    public void delegateHesEqualTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.ONE);
         delegation.setDelegateHes(BigDecimal.TEN);
@@ -116,7 +117,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateLockedEqualTest() {
+    public void delegateLockedEqualTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.ONE);
         adjustParam.setLock(BigDecimal.TEN);
         delegation.setDelegateHes(BigDecimal.TEN);
@@ -132,7 +133,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateHesNotEnoughTest() {
+    public void delegateHesNotEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         delegation.setDelegateHes(BigDecimal.ONE);
@@ -150,7 +151,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateLockedNotEnoughTest() {
+    public void delegateLockedNotEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         delegation.setDelegateHes(BigDecimal.valueOf(100));
@@ -168,7 +169,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateBothNotEnoughTest() {
+    public void delegateBothNotEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         delegation.setDelegateHes(BigDecimal.ONE);
@@ -187,7 +188,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateBothEnoughTest() {
+    public void delegateBothEnoughTest() throws BlockNumberException {
         adjustParam.setHes(BigDecimal.ONE);
         adjustParam.setLock(BigDecimal.ONE);
         delegation.setDelegateHes(BigDecimal.TEN);
@@ -205,7 +206,7 @@ public class DelegateAdjustContextTest extends TestData {
 
     // ********************节点状态是退出中或已退出********************
     @Test
-    public void delegateReleasedEqualTest() {
+    public void delegateReleasedEqualTest() throws BlockNumberException {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
@@ -221,7 +222,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateReleasedNotEqualTest() {
+    public void delegateReleasedNotEqualTest() throws BlockNumberException {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
@@ -237,7 +238,7 @@ public class DelegateAdjustContextTest extends TestData {
     }
 
     @Test
-    public void delegateReleasedNotEnoughTest() {
+    public void delegateReleasedNotEnoughTest() throws BlockNumberException {
         staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);

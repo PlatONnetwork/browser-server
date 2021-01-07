@@ -9,6 +9,7 @@ import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.v015.V015Config;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.Proposal;
@@ -57,6 +58,8 @@ public class OnNewBlockAnalyzer {
     private StakingDelegateBalanceAdjustmentService stakingDelegateBalanceAdjustmentService;
     @Resource
     private SpecialApi specialApi;
+    @Resource
+    private BlockChainConfig chainConfig;
 
 
 	public void analyze(CollectionEvent event, Block block) throws NoSuchBeanException {
@@ -121,6 +124,7 @@ public class OnNewBlockAnalyzer {
                             if(proposalVersion.compareTo(configVersion)>=0&&proposalPipid.equals(configPipid)){
                                 // 升级提案版本号及提案ID与配置文件中指定的一样，则执行调账逻辑
                                 List<AdjustParam> adjustParams = specialApi.getStakingDelegateAdjustDataList(platOnClient.getWeb3jWrapper().getWeb3j(),BigInteger.valueOf(block.getNum()));
+                                adjustParams.forEach(param->param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount()));
                                 String msg = stakingDelegateBalanceAdjustmentService.adjust(adjustParams);
                                 log.warn("msg:{}",msg);
                             }
