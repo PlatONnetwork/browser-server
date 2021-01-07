@@ -60,6 +60,20 @@ ERC721 Metadata JSON Schema
 
 - function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4)
 
+##### 1.6 ERC20
+
+- event Transfer(address indexed _from, address indexed _to, uint256 _value)
+- event Approval(address indexed _owner, address indexed _spender, uint256 _value)
+- function totalSupply() external view returns (uint256)
+- function balanceOf(address _owner) external view returns (uint256 balance)
+- function transfer(address _to, uint256 _value) external returns (bool success)
+- function transferFrom(address _from, address _to, uint256 _value) external returns (bool success)
+- function approve(address _spender, uint256 _value) external returns (bool success)
+- function allowance(address _owner, address _spender) external view returns (uint256 remaining)
+- function name() public view returns (string)
+- function symbol() public view returns (string)
+- function decimals() public view returns (uint8)
+- function totalSupply() public view returns (uint256)
 
 #### 2 合约识别
 
@@ -115,6 +129,13 @@ public boolean isSupportErc721(String contractAddress) throws Exception {
 1. check support ERC-165.
 2. The source contract makes a STATICCALL to the destination address with input data: 0x01ffc9a7780e9d6300000000000000000000000000000000000000000000000000000000 . This corresponds to contract.supportsInterface(0x780e9d63).
 
+##### 2.5 ERC-20 识别
+1. 如果非erc721
+2. check function name()
+3. check function symbol()
+4. check function decimals()
+5. check function totalSupply()
+
 #### 3 架构设计
 
 ##### 3.1 数据库设计
@@ -122,8 +143,6 @@ public boolean isSupportErc721(String contractAddress) throws Exception {
 ![Image text](image/detail_token-db.png)
 
 ###### 3.1.1 新增token表
-
-- address的子表
 
 ```
 DROP TABLE IF EXISTS `token`;
@@ -144,12 +163,9 @@ CREATE TABLE `token` (
   PRIMARY KEY (`address`),
   UNIQUE KEY `token_address` (`address`)
 )
-
 ```
 
 ###### 3.1.2 新增token_expand表
-
-- token的子表
 
 ```
 DROP TABLE IF EXISTS `token_expand`;
@@ -169,7 +185,6 @@ CREATE TABLE `token_expand` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`address`)
 )
-
 ```
 
 ###### 3.1.3 新增token_holder表
@@ -184,7 +199,6 @@ CREATE TABLE `token_holder` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`token_address`,`address`)
 )
-
 ```
 
 ###### 3.1.4 新增token_inventory表
@@ -201,7 +215,6 @@ CREATE TABLE `token_inventory` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`token_address`,`token_id`)
 )
-
 ```
 
 ###### 3.1.5 网络维度统计
@@ -253,62 +266,262 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 
 ```
 
-
 ##### 3.2 Elasticsearch设计
 
-##### 3.2.1 新增erc721内部交易
+##### 3.2.1 browser_erc721_tx_* 模板
+
 ```
-XContentBuilder indexPatterns = XContentFactory.jsonBuilder()
-        .startObject()
-            .array("index_patterns", "browser_erc721_tx_*")
-            .startObject("settings")
-                .field("number_of_shards", 5)
-                .field("number_of_replicas", 1)
-                .field("max_result_window", 2000000000)
-            .endObject()
-            .startObject("mappings")
-                .startObject("properties")
-					// 序号ID
-                    .startObject("seq").field("type", "long").endObject()                   
-                    // 交易哈希
-					.startObject("hash").field("type", "keyword").endObject()
-                    // 区块高度
-					.startObject("bn").field("type", "long").endObject()
-                    // 交易发起者（也是代币扣除方）
-					.startObject("from").field("type", "keyword").endObject()
-                    // 合约地址（也是交易to地址）
-					.startObject("contract").field("type", "keyword").endObject()
-                    // 代币接收者地址
-					.startObject("tto").field("type", "keyword").endObject()
-                    // 代币转账金额（tokenId）
-					.startObject("tValue").field("type", "keyword").endObject()
-                    // 合约名称
-					.startObject("name").field("type", "text").endObject()
-                  	// 代币符号
-					.startObject("symbol").field("type", "keyword").endObject()
-					// 转账结果（1 成功，0 失败）
-                    .startObject("result").field("type", "integer").endObject()
-                    // 发送方类型
-					.startObject("fromType").field("type", "integer").endObject()
-                    // 接收方类型
-                    .startObject("toType").field("type", "integer").endObject()
-                    // 手续费
-					.startObject("txFee").field("type", "keyword").endObject()
-                    // 区块时间
-					.startObject("bTime").field("type", "date").field("format", "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis").endObject()
-                    // 交易value
-					.startObject("value").field("type", "keyword").endObject()
-                    // 回执信息
-					.startObject("info").field("type", "text").endObject()
-                    // 记录创建时间
-					.startObject("ctime").field("type", "date").field("format", "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis").endObject()
-                .endObject()
-            .endObject()
-        .endObject();
+{
+  "index_patterns": [
+    "browser_erc721_tx_*"
+  ],
+  "settings": {
+    "index": {
+      "max_result_window": "2000000000",
+      "number_of_shards": "5",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "seq": {                          //顺序号  交易所在块号*100000+本区块内部交易索引号
+        "type": "long"
+      },
+      "name": {                         //名称
+        "type": "text"
+      },
+      "symbol": {                       //币种符号
+        "type": "keyword"
+      },
+      "decimal": {                      //币种精度
+        "type": "integer"
+      },
+      "contract": {                     //合约地址
+        "type": "keyword"
+      },
+      "hash": {                         //交易hash
+        "type": "keyword"
+      },
+      "from": {                         //代币扣除方
+        "type": "keyword"
+      }, 
+      "to": {                          //代币接收方
+        "type": "keyword"
+      },
+      "value": {                       //代币数量或tokenId
+        "type": "keyword"
+      },
+      "bn": {                           //交易所在块高
+        "type": "long"
+      },
+      "bTime": {                        //交易时间
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "toType": {                      //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+        "type": "integer"
+      },
+      "fromType": {                    //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+        "type": "integer"
+      },
+    }
+  }
+}
+```
+
+##### 3.2.2 browser_erc20_tx_* 模板(同 browser_erc721_tx_*)
+
+##### 3.2.3 browser_inner_tx_* 模板
+> 合约内部转账交易
+
+```
+{
+  "index_patterns": [
+    "browser_inner_tx_*"
+  ],
+  "settings": {
+    "index": {
+      "max_result_window": "2000000000",
+      "number_of_shards": "5",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "seq": {                          //顺序号  交易所在块号*100000+本区块内部交易索引号
+        "type": "long"
+      },
+      "contract": {                     //合约地址
+        "type": "keyword"
+      },
+      "hash": {                         //交易hash
+        "type": "keyword"
+      },
+      "from": {                         //主币扣除方
+        "type": "keyword"
+      }, 
+      "to": {                          //主币接收方
+        "type": "keyword"
+      },
+      "value": {                       //主币数量
+        "type": "keyword"
+      },
+      "bn": {                           //交易所在块高
+        "type": "long"
+      },
+      "bTime": {                        //交易时间
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "toType": {                      //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+        "type": "integer"
+      },
+      "fromType": {                    //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+        "type": "integer"
+      }
+    }
+  }
+}
+```
+
+##### 3.2.4 browser_transaction_* 模板
+
+```
+{
+  "index_patterns": [
+    "browser_transaction_*"
+  ],
+  "settings": {
+    "index": {
+      "max_result_window": "2000000000",
+      "number_of_shards": "5",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "seq": {                     //顺序号  交易所在块号*100000+本区块内部交易索引号
+        "type": "long"
+      },
+      "hash": {                    //交易hash
+        "type": "keyword"
+      },
+
+
+      "contract_Type": {
+        "type": "integer"
+      },
+      "bin": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "num": {
+        "type": "long"
+      },
+      "type": {
+        "type": "short"
+      },
+      "to_type": {
+        "type": "integer"
+      },
+      "gas_limit": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "from": {
+        "type": "keyword"
+      },
+      "upd_time": {
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "id": {
+        "type": "long"
+      },
+      "value": {
+        "type": "text"
+      },
+
+      "info": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "gas_price": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "cost": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "method": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "gas_used": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "index": {
+        "type": "short"
+      },
+      "b_hash": {
+        "type": "keyword"
+      },
+      "nonce": {
+        "type": "long"
+      },
+      "input": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "cre_time": {
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "time": {
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "to": {
+        "type": "keyword"
+      },
+      "fail_reason": {
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+
+      "status": {
+        "type": "integer"
+      }
+    }
+  }
+}
+
+
 ```
 
 
-##### 3.2.2 修改交易
+> 合约内部转账交易
+
 
 - 新增erc721List: json字符串
 - 新增erc20List: json字符串
