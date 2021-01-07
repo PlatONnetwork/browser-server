@@ -278,7 +278,8 @@ paths:
         - token合约接口
       summary: 令牌列表
       description: 实现逻辑：|
-        查询mysql中token表，示的合约状态为 1（可见）
+        查询mysql中数据<br/>
+        查询可展示的token列表,是否允许展示需要关联token_expand表中is_show_in_scan字段<br/>
       produces:
         - application/json
       parameters:
@@ -302,7 +303,8 @@ paths:
         查询ES中索引数据<br/>
         如果传入合约地址，则返回当前合约内的所有转账记录<br/>
         如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
-        如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）<br/>
+        如果同时存在，则返回地址在当前合约内的转账记录<br/>
+        如果合约地址和用户地址，则返回所有转账记录<br/>
       produces:
         - application/json
       parameters:
@@ -322,11 +324,7 @@ paths:
       tags:
         - token合约接口
       summary: 导出ERC20合约内部交易列表
-      description: 实现逻辑：|
-        查询ES中索引数据<br/>
-        如果传入合约地址，则返回当前合约内的所有转账记录<br/>
-        如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
-        如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）<br/>
+      description: 实现逻辑同/token/20tokenTransferList
       produces:
         - application/json
       parameters:
@@ -1558,6 +1556,9 @@ definitions:
       type:
         description: 合约类型 erc20 erc721(必填)
         type: string
+        enum:
+          - erc20
+          - erc721
       pageNo:
         description: 页数(必填)
         type: integer
@@ -1586,23 +1587,14 @@ definitions:
       icon:
         description: 合约图标（base64编码）
         type: string
-      creator:
-        description: 合约创建者地址
-        type: string
-      txHash:
-        description: 创建合约的交易哈希
-        type: string
       webSite:
         description: 合约对应官方站点
         type: string
-      blockTimestamp:
-        description: 合约创建时间（时间戳）
-        type: integer
+      details:
+        description: 合约描述
+        type: string
       holder:
         description: 持有人数
-        type: integer
-      createTime:
-        description: 合约入库时间（时间戳）
         type: integer
   TokenListResult:
     type: object
@@ -1612,6 +1604,15 @@ definitions:
         type: string
       code:
         description: 成功（0），失败则有相关失败码
+        type: integer
+      totalCount:
+        description: 总记录数
+        type: integer
+      totalPages:
+        description: 总记页数
+        type: integer
+      displayTotalCount:
+        description: 显示可展示记录数
         type: integer
       data:
         type: array
