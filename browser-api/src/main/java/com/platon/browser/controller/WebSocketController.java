@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @RestController
 @ServerEndpoint("/websocket/{message}")
-@CrossOrigin
+@CrossOrigin(originPatterns = "*",allowCredentials="true",allowedHeaders = "*",methods = {})
 public class WebSocketController {
 	
 	private static Logger logger = LoggerFactory.getLogger(WebSocketController.class);
