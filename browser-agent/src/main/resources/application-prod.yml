@@ -52,7 +52,6 @@ disruptor:
       batch-size: 10
 #日志配置
 logging:
-  file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
     org.springframework: error
@@ -69,6 +68,8 @@ logging:
     com.platon.browser.persistence.handler: error
     com.platon.browser.persistence.queue.handler: error
     com.platon.browser.task: error
+  file:
+    name: ./logs/${spring.application.name}-${version}-${profile}.log
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数
