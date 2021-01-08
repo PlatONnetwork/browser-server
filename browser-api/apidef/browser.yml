@@ -1148,7 +1148,7 @@ definitions:
     description: 地址详情对象
     properties:
       type:
-        description: 地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM  5:EVM-Token
+        description: 地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         type: string
       balance:
         description: 余额(单位:LAT)
@@ -3077,12 +3077,7 @@ definitions:
         type: string
         enum:
           - 0-转账
-          - 1-合约发布(合约创建)
-          - 2-合约调用(合约执行)
-          - 3-合约销毁(合约销毁)
-          - 5-MPC交易
-          - 6-erc20合约创建
-          - 7-erc20合约执行
+          - 8-合约交易
           - 1000-发起质押 (创建验证人)
           - 1001-修改质押信息(修改验证人)
           - 1002-增持质押(增持自由质押)
@@ -3234,14 +3229,7 @@ definitions:
         type: string
         enum:
           - 0-转账
-          - 1-合约发布(合约创建)
-          - 2-合约调用(合约执行)
-          - 3-合约销毁(合约销毁)
-          - 5-MPC交易
-          - 6-erc20合约创建
-          - 7-erc20合约执行
-          - 8-erc721合约创建
-          - 9-erc721合约执行
+          - 8-合约交易
           - 1000-发起质押 (创建验证人)
           - 1001-修改质押信息(修改验证人)
           - 1002-增持质押(增持自由质押)
@@ -3284,7 +3272,7 @@ definitions:
         enum:
           - 1-合约地址
           - 2-钱包地址
-          - 3-erc合约地址
+          - 3-token地址
       contractType:
         description: 合约类型  0-系统合约，1-evm合约 2-wasm合约 3-evm-token
         type: integer

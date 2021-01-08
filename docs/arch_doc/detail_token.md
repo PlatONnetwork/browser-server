@@ -373,10 +373,10 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
         "type": "date"
       },
-      "toType": {                      //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+      "toType": {                      //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
         "type": "integer"
       },
-      "fromType": {                    //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+      "fromType": {                    //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
         "type": "integer"
       }
     }
@@ -400,158 +400,345 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
   },
   "mappings": {
     "properties": {
+      "type": {                   //交易类型 (定义见下文)
+        "type": "short"
+      },  
       "seq": {                     //顺序号  交易所在块号*100000+本区块内部交易索引号
         "type": "long"
       },
+      "bHash": {                   //区块hash
+        "type": "keyword"
+      },
+      "num": {                     //区块高度
+        "type": "long"
+      },
+      "index": {                   //交易所在区块index
+        "type": "short"
+      },  
       "hash": {                    //交易hash
         "type": "keyword"
       },
-
-
-      "contract_Type": {
-        "type": "integer"
-      },
-      "bin": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "num": {
-        "type": "long"
-      },
-      "type": {
-        "type": "short"
-      },
-      "to_type": {
-        "type": "integer"
-      },
-      "gas_limit": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "from": {
+      "from": {                    //交易发送地址
         "type": "keyword"
       },
-      "upd_time": {
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
-        "type": "date"
+      "to": {                      //交易接收地址
+        "type": "keyword"
       },
-      "id": {
+      "fromType": {                //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
+        "type": "integer"
+      },
+      "toType": {                 //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
+        "type": "integer"
+      },
+      "nonce": {                   //交易nonce
         "type": "long"
+      },  
+      "gasLimit": {               //gasLimit
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },      
+      "gasPrice": {               //gasPrice
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
       },
-      "value": {
+      "gasUsed": {               //gasUsed
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "cost": {                   //手续费 gasPrice * gasUsed
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "value": {                  //金额
         "type": "text"
       },
-
-      "info": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "gas_price": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "cost": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "method": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "gas_used": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "index": {
-        "type": "short"
-      },
-      "b_hash": {
-        "type": "keyword"
-      },
-      "nonce": {
-        "type": "long"
-      },
-      "input": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-      "cre_time": {
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
-        "type": "date"
-      },
-      "time": {
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
-        "type": "date"
-      },
-      "to": {
-        "type": "keyword"
-      },
-      "fail_reason": {
-        "norms": false,
-        "index": false,
-        "type": "text",
-        "doc_values": false
-      },
-
-      "status": {
+      "status": {                 //交易状态 1-成功  2-失败
         "type": "integer"
+      }
+      "time": {                   //链上交易时间
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "input": {                  //交易input
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "info": {                   //ppos相关交易解析后json字符串定义(定义见下文)
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "erc721List": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc721_tx_* 模板）
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },      
+      "erc20List": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc20_tx_* 模板）
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },   
+      "innerTxList": {          //合约中内部交易定义，json数组。（对象定义参考 browser_inner_tx_* 模板）
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },  
+      "pposList": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },   
+      "failReason": {            //交易失败原因
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },      
+      "creTime": {               //本地创建时间
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      },
+      "updTime": {               //本地更新时间
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
       }
     }
   }
 }
 
+```
+
+##### type及info定义
+
+###### type=0:转账
+
+###### type=8:合约交易
+- 可包含 erc721List
+- 可包含 erc20List
+- 可包含 innerTxList
+- 可包含 pposList
+
+###### type=1000:发起质押(创建验证人)
+
+```
+{
+    "type":0,                   //表示使用账户自由金额还是账户的锁仓金额做质押，0: 自由金额； 1: 锁仓金额，2: 混合模式
+    "benefitAddress":"",        //用于接受出块奖励和质押奖励的收益账户
+    "nodeId":"",                //被质押的节点Id(也叫候选人的节点Id)
+    "externalId":"",            //外部Id(有长度限制，给第三方拉取节点描述的Id)
+    "nodeName":"",              //被质押节点的名称(有长度限制，表示该节点的名称)
+    "website":"",               //节点的第三方主页(有长度限制，表示该节点的主页)
+    "details":"",               //节点的描述(有长度限制，表示该节点的描述)
+    "amount":"",                //质押的von
+    "programVersion":"",        //程序的真实版本，治理rpc获取
+    "rewardPer":""              //委托所得到的奖励分成比例
+}
 
 ```
 
-
-> 合约内部转账交易
-
-
-- 新增erc721List: json字符串
-- 新增erc20List: json字符串
-- 新增pposList: json字符串
+###### type=1001: 修改质押信息(编辑验证人)
 
 ```
-[
-      {
-        "bTime": 1609992716356,
-        "bn": 1856319,
-        "contract": "atp1z54wl969sm3yzvwcnvey4epvruql8gn9z9c56k",
-        "ctime": 1609992718825,
-        "decimal": 16,
-        "from": "atp1cy2uat0eukfrxv897s5s8lnljfka5ewjj943gf",
-        "fromType": 1,
-        "hash": "0xa120ab3ca192f6d1db504012d909da8dbae725f36b861def0dbde7d346111c3e",
-        "info": "0x00000000000000000000000000000000000000000000000001aa535d3d0c0000",
-        "name": "aLAT",
-        "result": 1,
-        "seq": 185631900000,
-        "symbol": "aLAT",
-        "tValue": "120000000000000000",
-        "toType": 1,
-        "tto": "atp1sc4tk9kdtctqrd53sln5ud0yhxjexrjx3vnslh",
-        "txFee": "711700000000000",
-        "value": "0"
-      }
-]
+{
+    "benefitAddress":"",    //用于接受出块奖励和质押奖励的收益账户
+    "nodeId":"",            //被质押的节点Id(也叫候选人的节点Id)
+    "externalId":"",        //外部Id(有长度限制，给第三方拉取节点描述的Id)
+    "nodeName":"",          //被质押节点的名称(有长度限制，表示该节点的名称)
+    "website":"",           //节点的第三方主页(有长度限制，表示该节点的主页)
+    "details":"",           //节点的描述(有长度限制，表示该节点的描述)
+    "rewardPer":""          //委托所得到的奖励分成比例
+}
 
 ```
+
+###### type=1002: 增持质押(增加自有质押)
+
+```
+{
+    "type":0,               //表示使用账户自由金额还是账户的锁仓金额做质押，0: 自由金额； 1: 锁仓金额，2: 混合模式
+    "nodeId":"",            //被质押的节点Id(也叫候选人的节点Id)
+    "amount":"",            //质押的von
+    "nodeName":"",          //<需要冗余>被质押节点的名称(有长度限制，表示该节点的名称)
+    “stakingBlockNum”:""    //<需要冗余> 质押交易快高
+}
+
+```
+
+###### type=1003: 撤销质押(退出验证人)
+
+```
+{
+    "nodeId":"",              //被质押的节点Id(也叫候选人的节点Id)
+    "nodeName":"",            //<需要冗余>被质押节点的名称(有长度限制，表示该节点的名称)
+    "stakingBlockNum":"",     //<需要冗余> 质押交易快高
+    "amount":""               //<需要冗余> 质押的von
+}
+
+```
+
+###### type=1004: 发起委托(委托)
+
+```
+{
+    "type":0,                //表示使用账户自由金额还是账户的锁仓金额做质押，0: 自由金额； 1: 锁仓金额
+    "nodeId":"",             //被质押的节点Id(也叫候选人的节点Id)
+    "amount":"",             //委托的金额(按照最小单位算，1LAT = 10**18 von)
+    "nodeName":"",           //<需要冗余>被质押节点的名称(有长度限制，表示该节点的名称)
+    “stakingBlockNum”:""     //<需要冗余> 质押交易快高
+}
+
+```
+
+###### type=1005: 减持/撤销委托(赎回委托)
+
+```
+{
+    "stakingBlockNum":111,      //代表着某个node的某次质押的唯一标示
+    "nodeId":"",                //被质押的节点Id(也叫候选人的节点Id)
+    "amount":"",                //减持委托的金额(按照最小单位算，1LAT = 10**18 von)
+    "nodeName":"",              //<需要冗余>被质押节点的名称(有长度限制，表示该节点的名称)
+    "realAmount":"",            //<需要冗余>真正减持的金额
+    "delegateIncome":""         //委托的收益
+}
+
+```
+
+###### type=2000: 提交文本提案(创建提案)
+
+```
+{
+    "verifier":111,             //提交提案的验证人
+    "pIDID":"",                 //PIPID
+    "nodeName":""               //<需要冗余>提交提案的验证人名称(有长度限制，表示该节点的名称)
+}
+
+```
+
+###### type=2001: 提交升级提案(创建提案)
+
+```
+{
+    "verifier":111,          //提交提案的验证人
+    "pIDID":"",              //pIDID
+    "newVersion":111,        //升级版本
+    "endVotingRounds":11,    //投票共识轮数量
+    "nodeName":""            //<需要冗余>提交提案的验证人名称(有长度限制，表示该节点的名称)
+}
+
+```
+
+###### type=2002: 提交参数提案(创建提案)
+```
+{
+    "verifier":111,          //提交提案的验证人
+    "pIDID":"",              //pIDID
+    "nodeName":""            //<需要冗余>提交提案的验证人名称(有长度限制，表示该节点的名称)
+    "module":"",             //参数模块
+    "name":"",               //参数名称
+    "newValue":""            //参数新值
+}
+
+```
+
+###### type=2003: 给提案投票(提案投票)
+```
+{
+    "verifier":111,          //投票的验证人
+    "nodeName":""            //<需要冗余>投票的验证人的名称(有长度限制，表示该节点的名称)
+    "proposalID":"",         //提案ID
+    "option":"",             //投票选项 0x01：支持  0x02：反对 0x03：弃权 
+    "programVersion":"",     //节点代码版本，
+    "versionSign":"",        //代码版本签名
+    "pIDID":"",              //<需要冗余>提案的pIDID
+    "proposalType":""        //<需要冗余>提案类型 1:文本提案 2:升级提案 4:取消提案
+}
+
+```
+
+###### type=2004: 版本声明
+
+```
+{
+    "activeNode":111,        //声明的节点，只能是验证人/候选人
+    "nodeName":"",           //<需要冗余>被质押节点的名称(有长度限制，表示该节点的名称)
+    "version":111,           //声明的版本
+    "versionSign":''         //声明的版本签名
+}
+
+```
+
+###### type=2005: 提交取消提案
+
+```
+{
+    "verifier":111,                 //提交提案的验证人
+    "pIDID":"",                     //pIDID
+    "endVotingRounds":111,          //投票共识轮数量
+    "tobeCanceledProposalID":"",    //待取消的升级提案ID
+    "nodeName":""                   //<需要冗余>提交提案的验证人名称(有长度限制，表示该节点的名称)
+}
+
+```
+
+###### type=3000: 举报多签(举报验证人)
+
+```
+{
+    "data":"{jsonObj}",              //证据的json值，格式为RPC接口Evidences的返回值
+    "type":"",                       //双签类型:1: prepareBlock 2: prepareVote 3: viewChange
+    "verify":"",                     //举报的节点id
+    "nodeName":"",                   //<需要冗余>被质押节点的名称(有长度限制，表示该节点的名称)
+    "stakingBlockNum":""             //<需要冗余> 质押交易快高
+    "reward":""                      //惩罚奖励 
+}
+
+```
+
+###### type=4000: 创建锁仓计划(创建锁仓)
+
+```
+{
+    "account":""            //锁仓释放到账账户
+    "plan":[
+        {
+         "epoch":11,        //表示结算周期的倍数。与每个结算周期出块数的乘积表示在目标区块高度上释放锁定的资金。Epoch * 每周期的区块数至少要大于最高不可逆区块高度
+         "amount":111       //表示目标区块上待释放的金额
+        }
+    ]
+}
+
+```
+
+###### type=5000: 领取奖励
+```
+{
+    "rewardItem":[
+        {
+            "nodeId":"",             //节点ID
+            "stakingBlockNum":"",    //节点的质押块高
+            "reward":"",             //领取到的收益
+            "nodeName":""            //<需要冗余>投票的验证人的名称(有长度限制，表示该节点的名称)
+        }
+    ]
+}
+
+```
+
 
 ##### 3.3 特殊节点设计
 - 修改批量修改交易回执接口。 交易hash -> 合约地址列表
