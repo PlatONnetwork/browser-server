@@ -3267,15 +3267,23 @@ definitions:
         description: 下一交易HASH
         type: string
       toType:
-        description: 此字段表示的是to字段存储的账户类型, 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
+        description: 此字段表示的是to字段存储的账户类型, 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情.
         type: string
         enum:
-          - 1-合约地址
-          - 2-钱包地址
-          - 3-token地址
+          - 1-账号
+          - 2-内置合约
+          - 3-EVM合约
+          - 4-WASM合约
+          - 5-EVM-Token
+          - 6-WASM-Token
       contractType:
-        description: 合约类型  0-系统合约，1-evm合约 2-wasm合约 3-evm-token
+        description: 合约类型
         type: integer
+        enum:
+          - 3-EVM合约
+          - 4-WASM合约
+          - 5-EVM-Token
+          - 6-WASM-Token
       contractName:
         description: 合约名称
         type: string

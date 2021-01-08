@@ -318,10 +318,10 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
         "type": "date"
       },
-      "toType": {                      //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+      "toType": {                      //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
-      "fromType": {                    //地址类型 1-普通地址  2-内置合约地址  3-合约地址   4-token地址
+      "fromType": {                    //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
     }
@@ -373,10 +373,10 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
         "type": "date"
       },
-      "toType": {                      //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
+      "toType": {                      //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
-      "fromType": {                    //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
+      "fromType": {                    //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       }
     }
@@ -424,10 +424,10 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       "to": {                      //交易接收地址
         "type": "keyword"
       },
-      "fromType": {                //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
+      "fromType": {                //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
-      "toType": {                 //地址类型 1-普通地址  2-内置合约地址  10-合约地址   11-token地址
+      "toType": {                 //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
       "nonce": {                   //交易nonce
@@ -741,5 +741,4 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 
 
 ##### 3.3 特殊节点设计
-- 修改批量修改交易回执接口。 交易hash -> 合约地址列表
-
+1. 批量交易回执接口 交易hash -> 合约地址列表
