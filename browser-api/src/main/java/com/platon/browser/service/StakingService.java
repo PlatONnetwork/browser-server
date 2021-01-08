@@ -310,23 +310,21 @@ public class StakingService {
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 			}
+			resp.setDelegateValue(stakingNode.getStatDelegateValue());
+			resp.setTotalValue(stakingNode.getTotalValue());
 			/**
 			 * 如果判断为true则表示为查历史数据
 			 * 没有值则标识查询活跃账户
 			 */
 			if(stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()) {
+				// 候选中的节点设置有效委托地址数
 				resp.setDelegateQty(stakingNode.getStatValidAddrs());
-				/** 候选中则返回单条委托的总金额 **/
-				resp.setDelegateValue(stakingNode.getStatDelegateValue());
 				/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
 				BigDecimal stakingValue = stakingNode.getStakingHes().add(stakingNode.getStakingLocked());
 				resp.setStakingValue(stakingValue);
-				/** 质押总数=有效的质押+委托 */
-				BigDecimal totalValue = stakingValue.add(stakingNode.getStatDelegateValue());
-				resp.setTotalValue(totalValue);
 			} else {
+				// 其它状态节点设置待提取委托地址数
 				resp.setDelegateQty(stakingNode.getStatInvalidAddrs());
-				resp.setDelegateValue(stakingNode.getStatDelegateValue());
 				/**
 				 * 如果在结算中则直接设置为0
 				 */
@@ -339,10 +337,7 @@ public class StakingService {
                     } else {
                         resp.setStakingValue(stakingNode.getStakingReduction());
                     }
-					BigDecimal totalValue = resp.getStakingValue().add(resp.getDelegateValue());
-					resp.setTotalValue(totalValue);
 				}
-				
 				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
 			}
 		}

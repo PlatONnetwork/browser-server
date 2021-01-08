@@ -29,6 +29,7 @@
     <!--质押相关表调账-->
     <update id="adjustStakingData">
         update `node` set
+            `total_value`=#{adjustParam.nodeTotalValue},
             `status`=#{adjustParam.status},
             `is_consensus`=#{adjustParam.isConsensus},
             `is_settle`=#{adjustParam.isSettle},
