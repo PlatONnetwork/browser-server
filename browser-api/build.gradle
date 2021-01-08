@@ -78,6 +78,31 @@ task copyJasypt(type: Copy) {
 task deleteLib(type: Delete) {
     delete 'build/lib'
 }
+
+// 拷贝接口文档至类路径
+task copyDocsToClasspath(type: Copy) {
+    file('build/resources/main/public').mkdirs()
+    from "${project.parent.projectDir}/docs"
+    into 'build/resources/main/public'
+}
+task copyDocsToDistribute(type: Copy) {
+    file('build/package/browser-api/public').mkdirs()
+    from "${project.parent.projectDir}/docs"
+    into 'build/package/browser-api/public'
+}
+
+// 拷贝网站配置文件至类路径
+task copyWebsiteConfToClasspath(type: Copy){
+    file('build/resources/main/public').mkdirs()
+    from "webconfig"
+    into 'build/resources/main/public'
+}
+task copyWebsiteConfToDistribute(type: Copy){
+    file('build/package/browser-api/public').mkdirs()
+    from "webconfig"
+    into 'build/package/browser-api/public'
+}
+
 //把上述的task串联起来
 task prepareFile(dependsOn: [
         'createDirs',
@@ -87,7 +112,8 @@ task prepareFile(dependsOn: [
         'copyDep',
         'copyJasypt',
         'deleteLib',
-        'copyWebsiteConfToDistribute'
+        'copyWebsiteConfToDistribute',
+        'copyDocsToDistribute'
 ]){}
 //指定打包的tar包的名字，以及文件来源目录
 distributions {
@@ -122,24 +148,3 @@ sonarqube {
                 "**/RecaptchaDto.java,**/RewardJob.java"
     }
 }
-
-// 拷贝接口文档至类路径
-task copyApiToClasspath(type: Copy) {
-    file('build/resources/main/public').mkdirs()
-    from "${project.parent.projectDir}/docs"
-    into 'build/resources/main/public'
-}
-
-// 拷贝网站配置文件至类路径
-task copyWebsiteConfToClasspath(type: Copy){
-    file('build/resources/main/public').mkdirs()
-    from "webconfig"
-    into 'build/resources/main/public'
-}
-// 拷贝网站配置文件至类路径
-task copyWebsiteConfToDistribute(type: Copy){
-    file('build/package/browser-api/public').mkdirs()
-    from "webconfig"
-    into 'build/package/browser-api/public'
-}
-

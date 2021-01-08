@@ -768,8 +768,8 @@ public class ExportService {
 		Method method;
 		Object value;
 		try {
-			method = node.getClass().getMethod(getter, new Class[] {});
-			value = method.invoke(node, new Node[] {});
+			method = node.getClass().getMethod(getter);
+			value = method.invoke(node);
 			return value;
 		} catch (Exception e) {
 			e.printStackTrace();
