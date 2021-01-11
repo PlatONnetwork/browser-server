@@ -1,6 +1,6 @@
 package com.platon.browser.service.proposal;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalParameterServiceTest extends TestBase {
+public class ProposalParameterServiceTest extends AgentTestBase {
     @Mock
     private ProposalMapper proposalMapper;
     @Mock

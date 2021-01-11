@@ -1,6 +1,6 @@
 package com.platon.browser.dao.param.ppos;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakeModifyTest extends TestBase {
+public class StakeModifyTest extends AgentTestBase {
 
     @Test
     public void test(){

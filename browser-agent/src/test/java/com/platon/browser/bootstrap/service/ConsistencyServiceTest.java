@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap.service;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.service.block.BlockService;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ConsistencyServiceTest extends TestBase {
+public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private NetworkStatMapper networkStatMapper;
     @Mock

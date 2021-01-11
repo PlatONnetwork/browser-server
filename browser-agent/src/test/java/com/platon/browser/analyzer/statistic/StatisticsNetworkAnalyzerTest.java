@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.statistic;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StatisticsNetworkAnalyzerTest extends TestBase {
+public class StatisticsNetworkAnalyzerTest extends AgentTestBase {
 	
 	@Mock
 	private NetworkStatCache networkStatCache;

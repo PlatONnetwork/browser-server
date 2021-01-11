@@ -59,10 +59,10 @@ public class Erc20ServiceTest {
 
         List<Erc20Contract.TransferEventResponse> transferEventResponses = new ArrayList<>();
         Erc20Contract.TransferEventResponse transferEventResponse = new Erc20Contract.TransferEventResponse();
-        transferEventResponse.from = "";
-        transferEventResponse.log = new Log();
-        transferEventResponse.to = "";
-        transferEventResponse.value = BigInteger.TEN;
+        transferEventResponse.setFrom("");
+        transferEventResponse.setLog(new Log());
+        transferEventResponse.setTo("");
+        transferEventResponse.setValue(BigInteger.TEN);
         transferEventResponses.add(transferEventResponse);
         when(erc20Contract.getTransferEvents(any())).thenReturn(transferEventResponses);
         when(erc20Contract.getTransferEvents(any())).thenReturn(transferEventResponses);
@@ -70,10 +70,10 @@ public class Erc20ServiceTest {
 
         List<Erc20Contract.ApprovalEventResponse> approvalEventResponses = new ArrayList<>();
         Erc20Contract.ApprovalEventResponse approvalEventResponse = new Erc20Contract.ApprovalEventResponse();
-        approvalEventResponse.log = new Log();
-        approvalEventResponse.value = BigInteger.TEN;
-        approvalEventResponse.owner = "";
-        approvalEventResponse.spender = "";
+        approvalEventResponse.setLog(new Log());
+        approvalEventResponse.setValue(BigInteger.TEN);
+        approvalEventResponse.setOwner("");
+        approvalEventResponse.setSpender("");
         approvalEventResponses.add(approvalEventResponse);
         when(erc20Contract.getApprovalEvents(any())).thenReturn(approvalEventResponses);
     }

@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.AgentTestData;
 import com.platon.browser.client.ProposalParticipantStat;
 import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.cache.NetworkStatCache;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalInfoTaskTest extends TestBase {
+public class ProposalInfoTaskTest extends AgentTestData {
     @Mock
     private NetworkStatCache networkStatCache;
     @Mock

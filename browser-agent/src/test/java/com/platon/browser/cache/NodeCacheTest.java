@@ -1,6 +1,6 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.NodeItem;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NodeCacheTest extends TestBase {
+public class NodeCacheTest extends AgentTestBase {
 
     @Spy
     private NodeCache nodeCache;

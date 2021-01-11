@@ -1,6 +1,6 @@
 package com.platon.browser.dao.param.epoch;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
  * @Description: 新区块更新入参
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NewBlockTest extends TestBase {
+public class NewBlockTest extends AgentTestBase {
 
     @Test
     public void test(){

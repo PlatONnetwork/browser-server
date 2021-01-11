@@ -1,6 +1,6 @@
 package com.platon.browser.v015.service;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.V015Config;
 import com.platon.browser.v015.bean.AdjustParam;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
  **/
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakingDelegateBalanceAdjustmentServiceTest extends TestBase {
+public class StakingDelegateBalanceAdjustmentServiceTest extends AgentTestBase {
     @Mock
     private DelegationMapper delegationMapper;
     @Mock

@@ -1,7 +1,7 @@
 package com.platon.browser.bootstrap;
 
 import com.lmax.disruptor.dsl.Disruptor;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.ReceiptResult;
 import org.junit.Before;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BootstrapEventPublisherTest extends TestBase {
+public class BootstrapEventPublisherTest extends AgentTestBase {
     @Spy
     private BootstrapEventPublisher target;
 

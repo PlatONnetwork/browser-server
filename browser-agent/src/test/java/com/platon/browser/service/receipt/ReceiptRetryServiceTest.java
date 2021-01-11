@@ -1,6 +1,6 @@
 package com.platon.browser.service.receipt;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.exception.NetworkException;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ReceiptRetryServiceTest extends TestBase {
+public class ReceiptRetryServiceTest extends AgentTestBase {
     @Mock
     private PlatOnClient platOnClient;
     @Mock

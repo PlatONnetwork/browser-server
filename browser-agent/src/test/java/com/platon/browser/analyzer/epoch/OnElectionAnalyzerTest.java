@@ -1,7 +1,7 @@
 package com.platon.browser.analyzer.epoch;
 
 import com.alaya.protocol.Web3j;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.HistoryLowRateSlash;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class OnElectionAnalyzerTest extends TestBase {
+public class OnElectionAnalyzerTest extends AgentTestBase {
 
     @Mock
     private EpochBusinessMapper epochBusinessMapper;

@@ -1,6 +1,6 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TpsCalcCacheTest extends TestBase {
+public class TpsCalcCacheTest extends AgentTestBase {
 
     @Spy
     private TpsCalcCache tpsCalcCache;

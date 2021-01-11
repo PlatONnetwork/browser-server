@@ -1,6 +1,6 @@
 package com.platon.browser.dao.param.ppos;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
  * @Description: 创建委托 入库参数
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class DelegateCreateTest extends TestBase {
+public class DelegateCreateTest extends AgentTestBase {
 
     @Test
     public void test(){

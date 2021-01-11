@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
  * @Description: 创建验证人(质押)转化器测试类
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakeCreateConverterTest extends TestBase {
+public class StakeCreateConverterTest extends AgentTestBase {
 
     @Mock
     private StakeBusinessMapper stakeBusinessMapper;

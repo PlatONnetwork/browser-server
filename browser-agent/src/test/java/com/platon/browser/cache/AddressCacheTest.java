@@ -1,6 +1,6 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.dao.param.ppos.DelegateExit;
 import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
@@ -24,7 +24,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AddressCacheTest extends TestBase {
+public class AddressCacheTest extends AgentTestBase {
 
     @Spy
     private AddressCache addressCache;

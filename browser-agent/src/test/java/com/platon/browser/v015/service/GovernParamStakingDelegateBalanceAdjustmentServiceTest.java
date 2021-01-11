@@ -6,7 +6,7 @@ import com.alaya.contracts.ppos.dto.resp.GovernParam;
 import com.alaya.contracts.ppos.dto.resp.ParamItem;
 import com.alaya.contracts.ppos.dto.resp.ParamValue;
 import com.alaya.protocol.core.RemoteCall;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class GovernParamStakingDelegateBalanceAdjustmentServiceTest extends TestBase {
+public class GovernParamStakingDelegateBalanceAdjustmentServiceTest extends AgentTestBase {
     @Mock
     private ConfigMapper configMapper;
     @Mock

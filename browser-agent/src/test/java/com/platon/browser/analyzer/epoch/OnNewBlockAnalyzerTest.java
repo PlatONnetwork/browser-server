@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
@@ -19,6 +19,7 @@ import com.alaya.contracts.ppos.dto.resp.GovernParam;
 import com.alaya.contracts.ppos.dto.resp.ParamItem;
 import com.alaya.contracts.ppos.dto.resp.ParamValue;
 import com.alaya.contracts.ppos.dto.resp.TallyResult;
+import com.platon.browser.v015.V015Config;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class OnNewBlockAnalyzerTest extends TestBase {
+public class OnNewBlockAnalyzerTest extends AgentTestBase {
 	
     @Mock
     private NodeCache nodeCache;
@@ -56,6 +57,8 @@ public class OnNewBlockAnalyzerTest extends TestBase {
     private ParameterService parameterService;
     @Mock
     private PlatOnClient platOnClient;
+    @Mock
+    private V015Config v015Config;
     @InjectMocks
     @Spy
     private OnNewBlockAnalyzer target;
@@ -67,6 +70,9 @@ public class OnNewBlockAnalyzerTest extends TestBase {
                 .nodeName("integration-node1")
                 .stakingBlockNum(new BigInteger("88602"))
                 .build();
+
+        when(v015Config.getAdjustmentActiveVersion()).thenReturn(BigInteger.TEN);
+        when(v015Config.getAdjustmentPipId()).thenReturn("10");
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         Set<String> proposalSet = new HashSet<>();
         Proposal proposal = proposalList.get(0);

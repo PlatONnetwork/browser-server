@@ -1,6 +1,6 @@
 package com.platon.browser.handler;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.TxAnalyseResult;
 import com.platon.browser.cache.NetworkStatCache;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class CollectionEventHandlerTest extends TestBase {
+public class CollectionEventHandlerTest extends AgentTestBase {
     @Mock
     private TransactionService transactionService;
     @Mock

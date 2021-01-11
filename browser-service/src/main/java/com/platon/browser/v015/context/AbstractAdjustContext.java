@@ -42,7 +42,7 @@ public abstract class AbstractAdjustContext {
         // 调账目标记录是否都存在
         if(node==null) errors.add("【错误】：节点记录缺失:[节点ID="+ adjustParam.getNodeId()+"]");
         if(staking==null) errors.add("【错误】：质押记录缺失:[节点ID="+ adjustParam.getNodeId()+",节点质押块号="+ adjustParam.getStakingBlockNum()+"]");
-        if (!errors.isEmpty()) return errors;
+        if(node==null||staking==null) return errors;
         // 设置质押相关原始状态和值
         adjustParam.setStatus(staking.getStatus());
         adjustParam.setIsConsensus(staking.getIsConsensus());

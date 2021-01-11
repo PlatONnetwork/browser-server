@@ -1,6 +1,6 @@
 package com.platon.browser.service.account;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.exception.BusinessException;
@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AccountServiceTest extends TestBase {
+public class AccountServiceTest extends AgentTestBase {
     @Mock
     private PlatOnClient platOnClient;
     @Spy

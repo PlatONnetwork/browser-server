@@ -57,7 +57,7 @@ public class StakingDelegateBalanceAdjustmentService {
             fileHandler.setFormatter(formatter);
             log.addHandler(fileHandler);
         } catch (SecurityException | IOException e) {
-            e.printStackTrace();
+            log.warning(e.getMessage());
         }
     }
 
