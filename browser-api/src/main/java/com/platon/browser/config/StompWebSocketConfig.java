@@ -16,7 +16,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  */
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    /**
+     * 注册stomp的端点,暴露节点用于连接。
+     */
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/platon-websocket")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+    }
 
 	/**
      * 	配置消息代理
@@ -32,14 +41,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //        对于这个url来说 加上后缀之后走代理。发送时需要制定用户名:convertAndSendToUser或者sendtouser注解.
     }
 
-    /**
-     * 注册stomp的端点,暴露节点用于连接。
-     */
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/platon-websocket").setAllowedOrigins("*").withSockJS();
-        
-    }
+
     
     /**设置客户端线程组*/
     @Override
