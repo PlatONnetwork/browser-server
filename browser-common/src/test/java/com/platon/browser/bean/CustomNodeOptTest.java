@@ -1,10 +1,9 @@
-//package com.platon.browser.dto;
+//package com.platon.browser.bean;
 //
 //import static org.junit.Assert.assertNotNull;
 //
 //import org.junit.Test;
 //
-//import com.platon.browser.dto.CustomNodeOpt.TypeEnum;
 //
 //public class CustomNodeOptTest {
 //
