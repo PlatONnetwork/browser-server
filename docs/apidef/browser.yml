@@ -11,6 +11,19 @@ schemes:
 
 #定义接口路径
 paths:
+  /config.json:
+    get:
+      operationId: websiteConfig
+      tags:
+        - 网站配置
+      summary: 网站配置
+      description: |
+        网站配置
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: <a href="config.json">config.json</a>
   #首页接口
   /home/queryNavigation:
     post:

@@ -9,6 +9,20 @@
   "basePath" : "/browser-server",
   "schemes" : [ "http" ],
   "paths" : {
+    "/config.json" : {
+      "get" : {
+        "operationId" : "websiteConfig",
+        "tags" : [ "网站配置" ],
+        "summary" : "网站配置",
+        "description" : "网站配置\n",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "<a href=\"config.json\">config.json</a>"
+          }
+        }
+      }
+    },
     "/home/queryNavigation" : {
       "post" : {
         "operationId" : "queryNavigation",
