@@ -13,6 +13,7 @@ import com.alaya.protocol.core.methods.response.Log;
 import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.alaya.tx.Contract;
 import com.alaya.tx.gas.GasProvider;
+import lombok.Data;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -619,77 +620,63 @@ public class Erc20Contract extends Contract {
         return this.executeRemoteCallSingleValueReturn(function, String.class);
     }
 
+    @Data
     public static class IssueEventResponse {
-        public Log log;
-
-        public BigInteger amount;
+        private Log log;
+        private BigInteger amount;
     }
-
+    @Data
     public static class RedeemEventResponse {
-        public Log log;
-
-        public BigInteger amount;
+        private Log log;
+        private BigInteger amount;
     }
-
+    @Data
     public static class DeprecateEventResponse {
-        public Log log;
-
-        public String newAddress;
+        private Log log;
+        private String newAddress;
     }
-
+    @Data
     public static class ParamsEventResponse {
-        public Log log;
-
-        public BigInteger feeBasisPoints;
-
-        public BigInteger maxFee;
+        private Log log;
+        private BigInteger feeBasisPoints;
+        private BigInteger maxFee;
     }
-
+    @Data
     public static class DestroyedBlackFundsEventResponse {
-        public Log log;
-
-        public String _blackListedUser;
-
-        public BigInteger _balance;
+        private Log log;
+        private String _blackListedUser;
+        private BigInteger _balance;
     }
-
+    @Data
     public static class AddedBlackListEventResponse {
-        public Log log;
-
-        public String _user;
+        private Log log;
+        private String _user;
     }
-
+    @Data
     public static class RemovedBlackListEventResponse {
-        public Log log;
-
-        public String _user;
+        private Log log;
+        private String _user;
     }
-
+    @Data
     public static class ApprovalEventResponse {
-        public Log log;
-
-        public String owner;
-
-        public String spender;
-
-        public BigInteger value;
+        private Log log;
+        private String owner;
+        private String spender;
+        private BigInteger value;
     }
-
+    @Data
     public static class TransferEventResponse {
-        public Log log;
-
-        public String from;
-
-        public String to;
-
-        public BigInteger value;
+        private Log log;
+        private String from;
+        private String to;
+        private BigInteger value;
     }
-
+    @Data
     public static class PauseEventResponse {
-        public Log log;
+        private Log log;
     }
-
+    @Data
     public static class UnpauseEventResponse {
-        public Log log;
+        private Log log;
     }
 }

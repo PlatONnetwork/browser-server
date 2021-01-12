@@ -1,6 +1,7 @@
 package com.platon.browser.task.bean;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.AgentTestData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertTrue;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NetworkStatisticsTest extends TestBase {
+public class NetworkStatisticsTest extends AgentTestData {
 
     @Test
     public void test(){

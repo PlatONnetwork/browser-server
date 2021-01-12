@@ -3,13 +3,17 @@ package com.platon.browser.v015.bean;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * 质押或委托账户调账条目
  */
 @Data
 public class AdjustParam {
-
+    // 调整时刻的区块号
+    private BigInteger currBlockNum;
+    // 结算周期区块数
+    private BigInteger settleBlockCount;
     /*特殊节点返回的调账参数*/
     private String optType;
     private String nodeId;
@@ -40,4 +44,7 @@ public class AdjustParam {
     private BigDecimal stakingLocked; // 锁定期的质押金
     private BigDecimal stakingReduction; // 退回中的质押金
 
+    private int stakingReductionEpoch; // 退回结算周期标识
+    private int unStakeFreezeDuration; // 解质押理论上锁定的结算周期数
+    private int unStakeEndBlock; // 解质押冻结的最后一个区块
 }

@@ -51,7 +51,6 @@ disruptor:
       batch-size: 10
 #日志配置
 logging:
-  file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
     org.springframework: error
@@ -68,6 +67,8 @@ logging:
     com.platon.browser.persistence.handler: error
     com.platon.browser.persistence.queue.handler: error
     com.platon.browser.task: error
+  file:
+    name: ./logs/${spring.application.name}-${version}-${profile}.log
 #PlatOn相关配置
 platon:
   # 交易输入参数并行解码线程数
@@ -117,17 +118,23 @@ platon:
   eventDefine: {
     "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
   }
-  #锁仓最小释放金额参数生效版本
-  restrictingMinimumReleaseActiveVersion: 3584
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
-  #调账日志输出文件
-  account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
       pageSize: 2000
       pageCount: 250
+# v0.15.0.0版本新增功能涉及的配置
+v015:
+  #锁仓最小释放金额参数生效版本
+  restrictingMinimumReleaseActiveVersion: 3584
+  #调账生效版本
+  adjustmentActiveVersion: 3840
+  #调账提案ID
+  adjustmentPipId: '1609410836.4141252'
+  #调账日志输出文件
+  adjustLogFilePath: E:\Java\browser-server\browser-agent\build\adjust.log
 
 task:
    #地址统计任务

@@ -1,7 +1,7 @@
 package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import java.util.Set;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisTransactionServiceTest extends TestBase {
+public class RedisTransactionServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @InjectMocks

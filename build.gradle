@@ -1,6 +1,7 @@
 group = 'com.platon.browser'
 version = "${projectVersion}"
-
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 buildscript {
   repositories {
     maven {url "https://plugins.gradle.org/m2/"}
@@ -8,8 +9,30 @@ buildscript {
   }
   dependencies {
     classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
+    classpath 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.1'
   }
 }
+
+/*=====================API生成配置 START=======================*/
+def apiDefDir = file(projectDir.path+"/docs/apidef")
+files(apiDefDir.listFiles(new FilenameFilter() {
+    boolean accept(File dir, String name) {
+        return name.endsWith(".yml")
+    }
+})).each{yml ->
+    println yml.name
+    def json = yamlToJson(yml.text)
+    def jsonFile = file(apiDefDir.path+"/"+yml.name+".json")
+    jsonFile.write(json,"utf-8")
+}
+
+static yamlToJson(String yaml) {
+    ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
+    Object obj = yamlReader.readValue(yaml, Object.class);
+    ObjectMapper jsonWriter = new ObjectMapper();
+    return jsonWriter.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+}
+/*=====================API生成配置 END=======================*/
 
 apply plugin: "org.sonarqube"
 
@@ -51,7 +74,6 @@ subprojects {
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "commons-io:commons-io:$commonIoVersion"
         compile "redis.clients:jedis:$jedisVersion"
-        compile "org.yaml:snakeyaml:1.23"
         testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-api-easymock', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'

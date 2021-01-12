@@ -1,6 +1,6 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisServiceTest extends TestBase {
+public class RedisServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @Spy

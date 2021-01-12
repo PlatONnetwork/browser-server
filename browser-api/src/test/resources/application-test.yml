@@ -11,11 +11,9 @@ server.port: 9061
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
-    username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
-    password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     #下面为连接池的补充设置，应用到上面所有数据源中
     #初始化大小，最小，最大
     initialSize: 5
@@ -73,16 +71,15 @@ redisCluster:
 server:
   tomcat:
     max-connections: 20000
-    min-spare-threads: 800
-    max-threads: 2000
-  connection-timeout: 5000
+    threads:
+      min-spare: 800
+      max: 2000
 zuul:
   FormBodyWrapperFilter:
     pre:
       disable: true
 #日志配置
 logging:
-  file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
     org.springframework: debug
@@ -91,6 +88,8 @@ logging:
     com.platon.browser.task: debug
     com.platon.browser.client: debug
     com.platon.browser.dao: debug
+  file:
+    name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
 platon:
   # 交易输入参数并行解码线程数
@@ -133,20 +132,18 @@ platon:
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
-  chainId: 108
-  #锁仓最小释放金额参数生效版本
-  restrictingMinimumReleaseActiveVersion: 3584
-  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
-  eventDefine: {
-    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
-  }
+  #链id
+  chainId: 201018
+  #Redis命名空间
+  redis-namespace: browser:${version}:${profile}
 
-brokenHost: 192.168.16.173
-brokenPort: 61613
-system.username: admin
-system.password: admin
-client.username: guest
-client.password: guest
+recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
+isRecaptcha: false
+limit:
+  num: 10
+output:
+  file:
+    url: D:/
 
 
 task:

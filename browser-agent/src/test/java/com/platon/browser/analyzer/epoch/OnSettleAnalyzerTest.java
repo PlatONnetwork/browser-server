@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class OnSettleAnalyzerTest extends TestBase {
+public class OnSettleAnalyzerTest extends AgentTestBase {
 	
     @Mock
     private BlockChainConfig chainConfig;

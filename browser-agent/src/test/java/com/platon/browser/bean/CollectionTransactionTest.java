@@ -1,10 +1,10 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.Receipt;
-import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.client.SpecialApi;
+import com.alaya.protocol.Web3j;
+import com.alaya.protocol.core.Request;
+import com.alaya.protocol.core.methods.response.PlatonGetCode;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.client.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
@@ -15,6 +15,7 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,6 +34,9 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @Auther: dongqile
@@ -40,7 +44,7 @@ import static org.junit.Assert.assertTrue;
  * @Description: 年化率信息bean单元测试
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class CollectionTransactionTest extends TestBase {
+public class CollectionTransactionTest extends AgentTestBase {
 
     @Mock
     protected PlatOnClient client;
@@ -50,6 +54,19 @@ public class CollectionTransactionTest extends TestBase {
     protected SpecialApi specialApi;
     @Mock
     protected Erc20ResolveServiceImpl erc20ResolveServiceImpl;
+
+    @Before
+    public void setup() throws IOException {
+        Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
+        when(client.getWeb3jWrapper()).thenReturn(web3jWrapper);
+        Web3j web3j = mock(Web3j.class);
+        when(web3jWrapper.getWeb3j()).thenReturn(web3j);
+        Request request = mock(Request.class);
+        when(web3j.platonGetCode(any(),any())).thenReturn(request);
+        PlatonGetCode platonGetCode = mock(PlatonGetCode.class);
+        when(request.send()).thenReturn(platonGetCode);
+        when(platonGetCode.getCode()).thenReturn("code");
+    }
 
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {

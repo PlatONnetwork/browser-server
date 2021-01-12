@@ -3,27 +3,33 @@ package com.platon.browser.analyzer.epoch;
 import com.alaya.contracts.ppos.dto.resp.GovernParam;
 import com.alaya.contracts.ppos.dto.resp.TallyResult;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialApi;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.v015.V015Config;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.NewBlockMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.param.epoch.NewBlock;
-import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.proposal.ProposalService;
+import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.v015.service.StakingDelegateBalanceAdjustmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 @Slf4j
@@ -46,6 +52,15 @@ public class OnNewBlockAnalyzer {
     private ParameterService parameterService;
     @Resource
     private PlatOnClient platOnClient;
+    @Resource
+    private V015Config v015Config;
+    @Resource
+    private StakingDelegateBalanceAdjustmentService stakingDelegateBalanceAdjustmentService;
+    @Resource
+    private SpecialApi specialApi;
+    @Resource
+    private BlockChainConfig chainConfig;
+
 
 	public void analyze(CollectionEvent event, Block block) throws NoSuchBeanException {
 
@@ -101,6 +116,18 @@ public class OnNewBlockAnalyzer {
                                 config.setValue(gp.getParamValue().getValue());
                                 configList.add(config);
                             });
+
+                            BigInteger proposalVersion = new BigInteger(proposal.getNewVersion());
+                            String proposalPipid = proposal.getPipId();
+                            BigInteger configVersion = v015Config.getAdjustmentActiveVersion();
+                            String configPipid = v015Config.getAdjustmentPipId();
+                            if(proposalVersion.compareTo(configVersion)>=0&&proposalPipid.equals(configPipid)){
+                                // 升级提案版本号及提案ID与配置文件中指定的一样，则执行调账逻辑
+                                List<AdjustParam> adjustParams = specialApi.getStakingDelegateAdjustDataList(platOnClient.getWeb3jWrapper().getWeb3j(),BigInteger.valueOf(block.getNum()));
+                                adjustParams.forEach(param->param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount()));
+                                String msg = stakingDelegateBalanceAdjustmentService.adjust(adjustParams);
+                                log.warn("msg:{}",msg);
+                            }
                         }
                     }
                 } catch (Exception e) {

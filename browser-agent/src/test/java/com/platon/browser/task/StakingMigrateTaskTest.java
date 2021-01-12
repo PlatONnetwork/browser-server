@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.AgentTestData;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.mapper.CustomStakingHistoryMapper;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakingMigrateTaskTest extends TestBase {
+public class StakingMigrateTaskTest extends AgentTestData {
     @Mock
     private StakingMapper stakingMapper;
     @Mock

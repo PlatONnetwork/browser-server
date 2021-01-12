@@ -11,10 +11,10 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NetworkStatCacheTest extends TestBase {
+public class NetworkStatCacheTest extends AgentTestBase {
 
     @Mock
     private TpsCalcCache tpsCalcCache;

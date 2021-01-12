@@ -1,6 +1,7 @@
 package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.ApiTestBase;
 import com.platon.browser.BrowserApiApplication;
 import com.platon.browser.request.PageReq;
 import org.junit.Before;
@@ -26,9 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class TransactionControllerTest {
+public class TransactionControllerTest  extends ApiTestBase  {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;

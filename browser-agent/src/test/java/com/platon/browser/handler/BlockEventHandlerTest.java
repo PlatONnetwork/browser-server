@@ -1,7 +1,7 @@
 package com.platon.browser.handler;
 
 import com.alaya.protocol.core.methods.response.PlatonBlock;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.bean.BlockEvent;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockEventHandlerTest extends TestBase {
+public class BlockEventHandlerTest extends AgentTestBase {
     @Mock
     private CollectionEventPublisher collectionEventPublisher;
     @Mock

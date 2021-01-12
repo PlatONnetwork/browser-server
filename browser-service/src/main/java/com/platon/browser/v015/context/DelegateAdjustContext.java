@@ -25,9 +25,11 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
      */
     @Override
     void validateAmount(){
-        if(delegation==null) errors.add("【错误】：委托记录缺失:[节点ID="+adjustParam.getNodeId()+",节点质押块号="+adjustParam.getStakingBlockNum()+",委托人="+adjustParam.getAddr()+"]");
-        // 验证金额是否正确前，检查各项必须的数据是否存在
-        if(!errors.isEmpty()) return;
+        if(delegation==null) {
+            errors.add("【错误】：委托记录缺失:[节点ID="+adjustParam.getNodeId()+",节点质押块号="+adjustParam.getStakingBlockNum()+",委托人="+adjustParam.getAddr()+"]");
+            return;
+        }
+
         // 设置委托原始状态
         adjustParam.setIsHistory(delegation.getIsHistory());
         // 设置委托原始金额

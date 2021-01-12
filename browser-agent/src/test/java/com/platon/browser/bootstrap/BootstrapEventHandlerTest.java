@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.cache.AddressCache;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BootstrapEventHandlerTest extends TestBase {
+public class BootstrapEventHandlerTest extends AgentTestBase {
     @Mock
     private EsImportService esImportService;
     @Mock

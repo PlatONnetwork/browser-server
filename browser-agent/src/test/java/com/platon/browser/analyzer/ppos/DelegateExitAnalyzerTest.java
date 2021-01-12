@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class DelegateExitAnalyzerTest extends TestBase {
+public class DelegateExitAnalyzerTest extends AgentTestBase {
 
     @Mock
     private DelegateBusinessMapper delegateBusinessMapper;

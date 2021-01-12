@@ -5,7 +5,7 @@ import com.alaya.contracts.ppos.dto.CallResponse;
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.RemoteCall;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EpochRetryServiceTest extends TestBase {
+public class EpochRetryServiceTest extends AgentTestBase {
 
     @Mock private BlockChainConfig chainConfig;
     @Mock PlatOnClient platOnClient;

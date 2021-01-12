@@ -1,6 +1,6 @@
 package com.platon.browser.service.block;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.analyzer.epoch.OnConsensusAnalyzer;
 import com.platon.browser.analyzer.epoch.OnElectionAnalyzer;
 import com.platon.browser.analyzer.epoch.OnNewBlockAnalyzer;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockServiceTest extends TestBase {
+public class BlockServiceTest extends AgentTestBase {
     @Mock
     private BlockRetryService retryService;
     @Mock

@@ -7,7 +7,8 @@ import com.alaya.protocol.core.methods.response.PlatonGetCode;
 import com.alaya.rlp.solidity.RlpEncoder;
 import com.alaya.rlp.solidity.RlpList;
 import com.alaya.rlp.solidity.RlpString;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.AgentTestData;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
@@ -25,6 +26,7 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -42,13 +44,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionUtilsTest extends TestBase {
+public class TransactionUtilsTest extends AgentTestData {
 
     @Mock
     protected PlatOnClient platOnClient;
 
     @Mock
     protected AddressCache addressCache;
+
 
     @Test
     public void test() throws BeanCreateOrUpdateException {
@@ -91,11 +94,7 @@ public class TransactionUtilsTest extends TestBase {
         ComplementInfo ci = new ComplementInfo();
         CollectionTransaction collectionTransaction = CollectionTransaction.newInstance();
 
-        try {
-            TransactionUtil.resolveGeneralContractCreateTxComplementInfo(collectionTransaction, "", this.platOnClient, ci, logger);
-        } catch (BeanCreateOrUpdateException e) {
 
-        }
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(this.platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);

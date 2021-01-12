@@ -2,7 +2,7 @@ package com.platon.browser.analyzer.epoch;
 
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.v014.service.GovernParamAdjustService;
+import com.platon.browser.v015.service.RestrictingMinimumReleaseParamService;
 import com.platon.browser.bean.AnnualizedRateInfo;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
@@ -52,7 +52,7 @@ public class OnSettleAnalyzer {
     @Resource
     private NetworkStatCache networkStatCache;
     @Resource
-    private GovernParamAdjustService governParamAdjustService;
+    private RestrictingMinimumReleaseParamService restrictingMinimumReleaseParamService;
 
     public List<NodeOpt> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
@@ -193,7 +193,7 @@ public class OnSettleAnalyzer {
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
         try {
-            governParamAdjustService.checkRestrictingMinimumReleaseParam(block);
+            restrictingMinimumReleaseParamService.checkRestrictingMinimumReleaseParam(block);
         } catch (Exception e) {
             log.error("检查链上生效版本出错：",e);
         }

@@ -24,6 +24,11 @@ dependencies {
 sonarqube {
     properties {
         property "sonar.exclusions", "**/KeyBaseAnalysis.java," +
+                "src/main/java/**/bean/**," +
+                "src/main/java/**/enums/**," +
+                "src/main/java/**/config/**," +
+                "src/main/java/**/util/**," +
+                "src/main/java/**/erc20/**," +
                 "**/SpecialApi.java,**/JedisNoResultCall.java," +
                 "**/JdkSerializer.java,**/JedisClusterManager.java," +
                 "**/JedisHelper.java,**/SerializerUtils.java,**/*Application.java," +
@@ -35,6 +40,7 @@ sonarqube {
                 "**/BrowserCache.java,**/JedisNoResultCall.java,**/CommonMethod.java," +
                 "**/NullStringJsonSerializer.java,**/AccuVerifiersCount.java,**/BlockListResp.java," +
                 "**/AliveStakingListResp.java,**/QueryDetailResp.java,**/res/token/*.java,**/converter/*.java," +
-                "**/ERC20Client.java"
+                "**/ERC20Client.java,**/ESQueryBuilderConstructor.java,**/ESSimpleExpression.java,"
+                "**/InnerTxESRepository.java,**/ESRepository.java"
     }
 }

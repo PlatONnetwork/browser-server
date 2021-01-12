@@ -1,6 +1,7 @@
 package com.platon.browser.v015.context;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @Slf4j()
 @Data
 public abstract class AbstractAdjustContext {
+    protected BigInteger blockNumber;
     protected AdjustParam adjustParam;
     protected Staking staking;
     protected Node node;
@@ -27,7 +30,7 @@ public abstract class AbstractAdjustContext {
      * 检查上下文是否有错：需要的数据是否都有
      * @return
      */
-    public final List<String> validate(){
+    public final List<String> validate() throws BlockNumberException {
         if(chainConfig==null){
             errors.add("【错误】：BlockChainConfig缺失！");
             return errors;
@@ -39,7 +42,7 @@ public abstract class AbstractAdjustContext {
         // 调账目标记录是否都存在
         if(node==null) errors.add("【错误】：节点记录缺失:[节点ID="+ adjustParam.getNodeId()+"]");
         if(staking==null) errors.add("【错误】：质押记录缺失:[节点ID="+ adjustParam.getNodeId()+",节点质押块号="+ adjustParam.getStakingBlockNum()+"]");
-        if (!errors.isEmpty()) return errors;
+        if(node==null||staking==null) return errors;
         // 设置质押相关原始状态和值
         adjustParam.setStatus(staking.getStatus());
         adjustParam.setIsConsensus(staking.getIsConsensus());
@@ -47,6 +50,7 @@ public abstract class AbstractAdjustContext {
         adjustParam.setStakingHes(staking.getStakingHes());
         adjustParam.setStakingLocked(staking.getStakingLocked());
         adjustParam.setStakingReduction(staking.getStakingReduction());
+        adjustParam.setStakingReductionEpoch(staking.getStakingReductionEpoch());
         // 设置节点相关统计字段原始状态和值
         adjustParam.setNodeTotalValue(node.getTotalValue());
         adjustParam.setNodeStatDelegateValue(node.getStatDelegateValue());
@@ -122,7 +126,7 @@ public abstract class AbstractAdjustContext {
      * 1、如果当前是委托调整上下文，更新委托调整参数的isHistory字段
      * 2、如果当前是质押调整上下文，更新质押调整参数的status、isConsensus、isSettle字段
      */
-    abstract void calculateAmountAndStatus();
+    abstract void calculateAmountAndStatus() throws BlockNumberException;
 
     /**
      * attention: invoke this method after validate()

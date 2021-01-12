@@ -6,15 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 
 @Service
 public class RedisErc20TokenService extends RedisService<Long> {
 
-    @Autowired
+    @Resource
     private RedisFactory redisFactory;
 
-    @Autowired
+    @Resource
     private Erc20TokenMapper erc20TokenMapper;
 
     @Value("${spring.redis.key.innerTx}")
@@ -45,8 +46,9 @@ public class RedisErc20TokenService extends RedisService<Long> {
         String value = redisFactory.createRedisCommands().get(getCacheKey());
         if (null == value || value.equals("")) {
             int count = erc20TokenMapper.totalErc20Token(new HashMap());
-            redisFactory.createRedisCommands().set(getCacheKey(), count + "");
+            value = String.valueOf(count);
+            redisFactory.createRedisCommands().set(getCacheKey(), value);
         }
-        return Long.valueOf(redisFactory.createRedisCommands().get(getCacheKey()));
+        return Long.parseLong(value);
     }
 }

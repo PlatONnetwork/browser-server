@@ -1,7 +1,7 @@
 package com.platon.browser.bootstrap.service;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.cache.AddressCache;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class InitializationServiceTest extends TestBase {
+public class InitializationServiceTest extends AgentTestBase {
     @Mock
     private EpochRetryService epochRetryService;
     @Mock

@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.AgentTestData;
 import com.platon.browser.config.BrowserConst;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.when;
  * @create: 2020/10/16
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ErcBalanceUpdateTest extends TestBase {
+public class ErcBalanceUpdateTest extends AgentTestData {
     @Mock
     protected RedisTemplate<String, String> redisTemplate;
     @Mock

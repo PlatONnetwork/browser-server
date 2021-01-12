@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.AgentTestData;
 import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.enums.AppStatus;
@@ -22,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static com.platon.browser.AgentTestBase.subsidies;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -31,7 +33,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NetworkStatUpdateTaskTest extends TestBase {
+public class NetworkStatUpdateTaskTest extends AgentTestData {
     @Mock
     private NetworkStatCache networkStatCache;
     @Mock

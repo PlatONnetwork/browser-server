@@ -49,5 +49,7 @@
 "keyBase":"https://keybase.io/",
 "keyBaseApi":"_/api/1.0/user/autocomplete.json?q=",
 "defaultStakingLockedAmount": "1500000",
-"defaultStakingList":[]
+"defaultStakingList":[],
+  "paramProposalSupportRate": 80,
+  "paramProposalVoteRate": 80
 }

@@ -1,5 +1,6 @@
 package com.platon.browser.controller;
 
+import com.platon.browser.ApiTestBase;
 import com.platon.browser.BrowserApiApplication;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,9 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class StakingControllerTest {
+public class StakingControllerTest  extends ApiTestBase  {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;

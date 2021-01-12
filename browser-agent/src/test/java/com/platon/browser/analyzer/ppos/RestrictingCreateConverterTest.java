@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.dao.mapper.RestrictingBusinessMapper;
@@ -22,7 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @Description: 创建锁仓计划转换器测试类
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RestrictingCreateConverterTest extends TestBase {
+public class RestrictingCreateConverterTest extends AgentTestBase {
 
     @Mock
     private RestrictingBusinessMapper restrictingBusinessMapper;

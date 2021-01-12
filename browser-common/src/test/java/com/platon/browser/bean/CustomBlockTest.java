@@ -1,4 +1,3 @@
-//package com.platon.browser.dto;
 //
 //import static org.junit.Assert.assertNotNull;
 //import static org.junit.Assert.assertTrue;

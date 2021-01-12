@@ -1,6 +1,6 @@
 package com.platon.browser.publisher;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.handler.GasEstimateEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class GasEstimateEventPublisherTest extends TestBase {
+public class GasEstimateEventPublisherTest extends AgentTestBase {
     @Mock
     private GasEstimateEventHandler handler;
     @InjectMocks

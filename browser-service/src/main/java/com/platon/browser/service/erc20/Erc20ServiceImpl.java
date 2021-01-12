@@ -129,10 +129,10 @@ public class Erc20ServiceImpl {
                     erc20Contract.getTransferEvents(transactionReceipt);
             transferEventResponses.forEach(transferEventRespon -> {
                 TransferEvent transferEvent = new TransferEvent();
-                transferEvent.setFrom(transferEventRespon.from);
-                transferEvent.setTo(transferEventRespon.to);
-                transferEvent.setValue(transferEventRespon.value);
-                transferEvent.setLog(transferEventRespon.log);
+                transferEvent.setFrom(transferEventRespon.getFrom());
+                transferEvent.setTo(transferEventRespon.getTo());
+                transferEvent.setValue(transferEventRespon.getValue());
+                transferEvent.setLog(transferEventRespon.getLog());
                 transferEvents.add(transferEvent);
             });
         } catch (Exception e) {

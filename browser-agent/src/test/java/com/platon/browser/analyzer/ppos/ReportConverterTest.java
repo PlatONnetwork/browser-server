@@ -1,6 +1,6 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.TestBase;
+import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NodeCache;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ReportConverterTest extends TestBase {
+public class ReportConverterTest extends AgentTestBase {
 
     @Mock
     private BlockChainConfig chainConfig;
