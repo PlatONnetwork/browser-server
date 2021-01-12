@@ -208,6 +208,7 @@ DROP TABLE IF EXISTS `token_inventory`;
 CREATE TABLE `token_inventory` (
   `token_address` varchar(64) NOT NULL COMMENT '合约地址',
   `token_id` bigint(80) NOT NULL COMMENT 'token id',
+  `owner` varchar(64) NOT NULL COMMENT 'token id 对应持有者地址',
   `name` varchar(256) COMMENT 'Identifies the asset to which this NFT represents',
   `description` varchar(256) COMMENT 'Describes the asset to which this NFT represents',
   `image` varchar(256) COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
@@ -526,13 +527,15 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 ##### type及info定义
 
 ###### type=0:转账
-
-###### type=8:合约交易
-- 可包含 erc721List
-- 可包含 erc20List
-- 可包含 innerTxList
-- 可包含 pposList
-
+###### type=1:EVM合约发布(合约创建)
+###### type=2:合约调用(合约执行)
+###### type=3:WASM合约发布(合约创建)
+###### type=4:其他
+###### type=5:MPC交易
+###### type=6:ERC20合约发布(合约创建)
+###### type=7:ERC20合约调用(合约执行)
+###### type=8:ERC721合约发布(合约创建)
+###### type=9:ERC721合约调用(合约执行)
 ###### type=1000:发起质押(创建验证人)
 
 ```
