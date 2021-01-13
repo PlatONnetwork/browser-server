@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 public class EsBlockService extends EsService<Block>{
 
     @Autowired
-    private BlockESRepository blockESRepository;
+    private BlockEsRepository blockESRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<Block> stage) throws IOException, InterruptedException {
         Set<Block> data = stage.getData();

@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.NodeOptEsRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 @Service
 public class EsNodeOptService extends EsService<NodeOpt>{
     @Autowired
-    private NodeOptESRepository nodeOptESRepository;
+    private NodeOptEsRepository nodeOptESRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<NodeOpt> stage) throws IOException, InterruptedException {
         Set<NodeOpt> data = stage.getData();

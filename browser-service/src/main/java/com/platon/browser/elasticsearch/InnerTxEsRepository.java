@@ -21,7 +21,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
 import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -38,18 +37,11 @@ import java.util.Map;
 */
 @Slf4j
 @Repository
-public class InnerTxESRepository extends ESRepository {
-    @Value("${spring.elasticsearch.high-level-client.innerTxIndexName}")
-    private String indexName;
-
+public class InnerTxEsRepository extends EsRepository {
     @Override
     public String getIndexName() {
-        return indexName;
+        return config.getInnerTxIndexName();
     }
-    
-    public void setIndexName(String indexName) {
-		this.indexName = indexName;
-	}
 
     public TokenTxSummary groupContractTxCount(){
         String equalCondition = "doc['from'].value == doc['tto'].value";
@@ -156,7 +148,7 @@ public class InnerTxESRepository extends ESRepository {
             outAggs.subAggregation(inAggs);
 
             searchSourceBuilder.aggregation(outAggs);
-            SearchRequest searchRequest = new SearchRequest(indexName).source(searchSourceBuilder);
+            SearchRequest searchRequest = new SearchRequest(config.getInnerTxIndexName()).source(searchSourceBuilder);
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
             //分组在es中是分桶
             ParsedStringTerms contractTerms = response.getAggregations().get(Arc20TxGroupTypeEnum.CONTRACT.getTerms());

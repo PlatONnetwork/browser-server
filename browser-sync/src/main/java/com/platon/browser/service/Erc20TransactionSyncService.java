@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisTransferTokenRecordService;
@@ -28,7 +28,7 @@ public class Erc20TransactionSyncService {
     @Setter
     private static volatile boolean done =false;
     @Autowired
-    private TokenTransferRecordESRepository esRepository;
+    private TokenTransferRecordEsRepository esRepository;
     @Autowired
     private RedisTransferTokenRecordService redisService;
     @Value("${paging.erc20-transaction.page-size}")

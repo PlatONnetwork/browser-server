@@ -11,9 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -28,12 +25,12 @@ import static org.mockito.Mockito.when;
  * @Version 1.0
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TokenTransferRecordESRepositoryTest {
+public class TokenTransferRecordEsRepositoryTest {
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private TokenTransferRecordESRepository target;
+    private TokenTransferRecordEsRepository target;
 
     @Before
     public void setup()throws Exception{

@@ -4,7 +4,7 @@ import com.alaya.utils.Convert;
 import com.github.pagehelper.Page;
 import com.platon.browser.config.BrowserConst;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -59,7 +59,7 @@ public class BlockService {
 	@Resource
 	private StatisticCacheService statisticCacheService;
 	@Resource
-	private BlockESRepository blockESRepository;
+	private BlockEsRepository blockESRepository;
 	@Resource
 	private I18nUtil i18n;
 	@Resource

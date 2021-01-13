@@ -75,15 +75,15 @@ public class InitializationService {
     @Resource
     private StakeMiscService stakeMiscService;
     @Resource
-    private BlockESRepository blockESRepository;
+    private BlockEsRepository blockESRepository;
     @Resource
-    private TransactionESRepository transactionESRepository;
+    private TransactionEsRepository transactionESRepository;
     @Resource
-    private DelegationRewardESRepository delegationRewardESRepository;
+    private DelegationRewardEsRepository delegationRewardESRepository;
     @Resource
-    private TokenTransferRecordESRepository transferRecordESRepository;
+    private TokenTransferRecordEsRepository transferRecordESRepository;
     @Resource
-    private NodeOptESRepository nodeOptESRepository;
+    private NodeOptEsRepository nodeOptESRepository;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {

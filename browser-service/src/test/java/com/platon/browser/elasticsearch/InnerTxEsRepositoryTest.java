@@ -30,12 +30,12 @@ import static org.mockito.Mockito.when;
  * @create: 2020/10/16
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class InnerTxESRepositoryTest {
+public class InnerTxEsRepositoryTest {
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private InnerTxESRepository target;
+    private InnerTxEsRepository target;
 
 
     @Before

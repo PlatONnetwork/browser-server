@@ -17,9 +17,9 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.elasticsearch.DelegationRewardESRepository;
-import com.platon.browser.elasticsearch.InnerTxESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
+import com.platon.browser.elasticsearch.InnerTxEsRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
@@ -74,11 +74,11 @@ public class TransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
     @Resource
-    private TransactionESRepository transactionESRepository;
+    private TransactionEsRepository transactionESRepository;
     @Resource
-    private DelegationRewardESRepository delegationRewardESRepository;
+    private DelegationRewardEsRepository delegationRewardESRepository;
     @Resource
-    private InnerTxESRepository innerTxESRepository;
+    private InnerTxEsRepository innerTxESRepository;
     @Resource
     private I18nUtil i18n;
     @Resource

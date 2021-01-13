@@ -15,7 +15,7 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.cache.TransactionCacheDto;
-import com.platon.browser.elasticsearch.DelegationRewardESRepository;
+import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.Erc20Param;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 public class TransactionServiceTest extends ApiTestMockBase {
 
 	@Mock
-	private DelegationRewardESRepository delegationRewardESRepository;
+	private DelegationRewardEsRepository delegationRewardESRepository;
 	@Mock
 	private StakingMapper stakingMapper;
 	@Mock

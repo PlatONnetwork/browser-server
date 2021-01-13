@@ -13,7 +13,7 @@ import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
@@ -68,7 +68,7 @@ public class AddressService {
     @Resource
     private BlockChainConfig blockChainConfig;
     @Resource
-	private BlockESRepository blockESRepository;
+	private BlockEsRepository blockESRepository;
     @Resource
     private SpecialApi specialApi;
     

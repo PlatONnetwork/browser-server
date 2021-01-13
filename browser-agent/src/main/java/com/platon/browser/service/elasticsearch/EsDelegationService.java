@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.elasticsearch.DelegationEsRepository;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 public class EsDelegationService implements EsService<Delegation> {
     @Resource
-    private DelegationESRepository delegationESRepository;
+    private DelegationEsRepository delegationESRepository;
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<Delegation> delegations) throws IOException {
         if(delegations.isEmpty()) return;

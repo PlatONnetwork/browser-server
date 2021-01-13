@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class Erc20TransactionSyncServiceTest {
     @Mock
-    private TokenTransferRecordESRepository esRepository;
+    private TokenTransferRecordEsRepository esRepository;
     @Mock
     private RedisTransferTokenRecordService redisService;
     @Spy

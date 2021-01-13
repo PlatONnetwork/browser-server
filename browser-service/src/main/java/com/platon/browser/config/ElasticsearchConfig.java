@@ -9,6 +9,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,21 +23,24 @@ import java.util.List;
  * @Date: 2019/10/25 15:12
  * @Description: ES配置
  */
-@Configuration
 @Data
+@Configuration
+@ConfigurationProperties(prefix="spring.elasticsearch.high-level-client")
 public class ElasticsearchConfig {
-    @Value("${spring.elasticsearch.high-level-client.hosts}")
-    private List<String> addresses; // 集群地址，多个用,隔开
-    @Value("${spring.elasticsearch.high-level-client.port}")
+    private List<String> hosts; // 集群地址，多个用,隔开
     private int port; // 使用的端口号
-    @Value("${spring.elasticsearch.high-level-client.schema}")
     private String schema; // 使用的协议
-    @Value("${spring.elasticsearch.high-level-client.username}")
     private String username; // 用户名
-    @Value("${spring.elasticsearch.high-level-client.password}")
     private String password; // 密码
-   
 
+    private String blockIndexName; // 区块索引名称
+    private String transactionIndexName; // 交易索引名称
+    private String delegationIndexName; // 委托索引名称
+    private String nodeOptIndexName; // 节点操作日志索引名称
+    private String delegationRewardIndexName; // 委托奖励索引名称
+    private String innerTxIndexName; // erc20交易索引名称
+    private String erc20TxIndexName; // erc20交易索引名称(new)
+    private String erc721TxIndexName; // erc721交易索引名称
 
     private int connectTimeOut = 10000; // 连接超时时间
     private int socketTimeOut = 30000; // 连接超时时间
@@ -48,11 +52,10 @@ public class ElasticsearchConfig {
     @Bean(name = "restHighLevelClient")
     public RestHighLevelClient client() {
     	CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(username, password));
-        List<HttpHost> hosts = new ArrayList<>();
-        addresses.forEach(address->hosts.add(new HttpHost(address,port,schema)));
-        RestClientBuilder builder = RestClient.builder(hosts.toArray(new HttpHost[0]));
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+        List<HttpHost> hostList = new ArrayList<>();
+        hosts.forEach(host->hostList.add(new HttpHost(host,port,schema)));
+        RestClientBuilder builder = RestClient.builder(hostList.toArray(new HttpHost[0]));
         // 异步httpclient连接延时配置
         builder.setRequestConfigCallback(requestConfigBuilder -> {
             requestConfigBuilder.setConnectTimeout(connectTimeOut);

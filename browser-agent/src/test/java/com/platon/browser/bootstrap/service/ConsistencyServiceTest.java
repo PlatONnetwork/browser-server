@@ -10,8 +10,8 @@ import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.bean.TokenTxSummary;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.InnerTxESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.InnerTxEsRepository;
 import com.platon.browser.service.erc20.Erc20TransactionSyncService;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private NetworkStatMapper networkStatMapper;
     @Mock
-    private BlockESRepository blockESRepository;
+    private BlockEsRepository blockESRepository;
     @Mock
     private BlockService blockService;
     @Mock
@@ -46,7 +46,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private ShutdownCallback shutdownCallback;
     @Mock
-    private InnerTxESRepository tokenTxESRepository;
+    private InnerTxEsRepository tokenTxESRepository;
     @Mock
     private SyncTokenInfoMapper syncTokenInfoMapper;
     @Mock

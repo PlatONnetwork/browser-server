@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.doThrow;
 public class EsTokenTransferRecordServiceTest {
 
     @Mock
-    private TokenTransferRecordESRepository tokenTransferRecordESRepository;
+    private TokenTransferRecordEsRepository tokenTransferRecordESRepository;
 
     @Spy
     private EsTokenTransferRecordService target;

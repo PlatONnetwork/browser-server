@@ -12,8 +12,8 @@ import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.bean.TokenTxSummary;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.InnerTxESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.InnerTxEsRepository;
 import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
@@ -39,7 +39,7 @@ public class ConsistencyService {
     @Resource
     private NetworkStatMapper networkStatMapper;
     @Resource
-    private BlockESRepository blockESRepository;
+    private BlockEsRepository blockESRepository;
     @Resource
     private BlockService blockService;
     @Resource
@@ -47,7 +47,7 @@ public class ConsistencyService {
     @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
     @Resource
-    private InnerTxESRepository tokenTxESRepository;
+    private InnerTxEsRepository tokenTxESRepository;
     @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
     @Resource

@@ -1,6 +1,5 @@
 package com.platon.browser.elasticsearch;
 
-import com.platon.browser.elasticsearch.TransactionESRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -30,13 +29,13 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionESRepositoryTest {
+public class TransactionEsRepositoryTest {
 
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private TransactionESRepository target;
+    private TransactionEsRepository target;
 
     @Before
     public void setup()throws Exception{

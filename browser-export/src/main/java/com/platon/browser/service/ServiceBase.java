@@ -9,7 +9,7 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.univocity.parsers.csv.CsvWriter;
@@ -29,7 +29,7 @@ import java.util.Set;
 @Slf4j
 public abstract class ServiceBase {
     @Autowired
-    protected TransactionESRepository transactionESRepository;
+    protected TransactionEsRepository transactionESRepository;
     @Autowired
     private PlatOnClient platonClient;
     @Autowired

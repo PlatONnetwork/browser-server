@@ -2,7 +2,7 @@ package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.elasticsearch.DelegationEsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.doThrow;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsDelegationServiceTest extends AgentTestBase {
     @Mock
-    private DelegationESRepository delegationESRepository;
+    private DelegationEsRepository delegationESRepository;
     @Spy
     private EsDelegationService target;
 

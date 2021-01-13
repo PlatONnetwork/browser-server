@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class TransactionSyncServiceTest {
     @Mock
-    private TransactionESRepository esRepository;
+    private TransactionEsRepository esRepository;
     @Mock
     private RedisTransactionService redisService;
     @Spy

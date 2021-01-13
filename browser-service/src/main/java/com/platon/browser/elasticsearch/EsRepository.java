@@ -1,6 +1,7 @@
 package com.platon.browser.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.ElasticsearchConfig;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.bean.ESSortDto;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -33,7 +34,6 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -48,12 +48,12 @@ import java.util.Map;
  * @Description: elasticsearch通用操作
  */
 @Slf4j
-public abstract class ESRepository {
-
+public abstract class EsRepository {
 	@Resource(name = "restHighLevelClient")
 	protected RestHighLevelClient client;
-
-	@Autowired
+	@Resource
+	protected ElasticsearchConfig config;
+	@Resource
 	private SpringUtils springUtils;
 
 	public abstract String getIndexName();

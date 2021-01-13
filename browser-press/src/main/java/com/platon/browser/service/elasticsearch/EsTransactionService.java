@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 @Service
 public class EsTransactionService extends EsService<Transaction>{
     @Autowired
-    private TransactionESRepository transactionESRepository;
+    private TransactionEsRepository transactionESRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<Transaction> stage) throws IOException, InterruptedException {
         Set<Transaction> data = stage.getData();

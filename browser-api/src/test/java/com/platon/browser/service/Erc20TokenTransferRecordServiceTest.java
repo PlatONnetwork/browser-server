@@ -9,7 +9,7 @@ import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
@@ -43,7 +43,7 @@ public class Erc20TokenTransferRecordServiceTest extends ApiTestMockBase {
 	@Mock
 	private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
 	@Mock
-	private TokenTransferRecordESRepository esTokenTransferRecordRepository;
+	private TokenTransferRecordEsRepository esTokenTransferRecordRepository;
 	@Mock
 	private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
 	@Mock

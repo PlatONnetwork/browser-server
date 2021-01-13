@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
+import com.platon.browser.elasticsearch.DelegationEsRepository;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 @Service
 public class EsDelegationService extends EsService<Delegation> {
     @Autowired
-    private DelegationESRepository delegationESRepository;
+    private DelegationEsRepository delegationESRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<Delegation> stage) throws IOException, InterruptedException {
         Set<Delegation> data = stage.getData();

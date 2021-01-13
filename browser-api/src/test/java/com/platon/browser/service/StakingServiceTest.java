@@ -11,7 +11,7 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.NodeOptEsRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.request.staking.*;
@@ -48,7 +48,7 @@ public class StakingServiceTest extends ApiTestMockBase {
     @Mock
     private CustomNodeMapper customNodeMapper;
     @Mock
-    private NodeOptESRepository nodeOptESRepository;
+    private NodeOptEsRepository nodeOptESRepository;
     @Mock
     private PlatOnClient platonClient;
     @Spy

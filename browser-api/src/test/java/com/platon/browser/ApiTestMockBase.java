@@ -18,8 +18,8 @@ import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.StatisticCacheService;
@@ -28,9 +28,9 @@ import com.platon.browser.util.I18nUtil;
 public class ApiTestMockBase extends ApiTestData {
 
 	@Mock
-	protected BlockESRepository blockESRepository;
+	protected BlockEsRepository blockESRepository;
 	@Mock
-	protected TransactionESRepository transactionESRepository;
+	protected TransactionEsRepository transactionESRepository;
 	@Mock
 	protected NodeMapper nodeMapper;
 	@Mock

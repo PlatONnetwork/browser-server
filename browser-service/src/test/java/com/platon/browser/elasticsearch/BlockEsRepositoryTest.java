@@ -1,6 +1,5 @@
 package com.platon.browser.elasticsearch;
 
-import com.platon.browser.elasticsearch.BlockESRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -30,12 +29,12 @@ import static org.mockito.Mockito.when;
  * @Description: elasticsearch通用操作测试类
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockESRepositoryTest {
+public class BlockEsRepositoryTest {
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private BlockESRepository target;
+    private BlockEsRepository target;
 
 
 

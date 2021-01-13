@@ -5,7 +5,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.redis.RedisFactory;
 import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.NodeOptEsRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -39,7 +39,7 @@ import java.util.List;
 public class RewardExportTask {
 
     @Resource
-    private NodeOptESRepository nodeOptESRepository;
+    private NodeOptEsRepository nodeOptESRepository;
     @Resource
     private PlatOnClient platOnClient;
     @Resource

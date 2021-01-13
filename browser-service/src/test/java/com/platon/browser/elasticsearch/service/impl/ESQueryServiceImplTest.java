@@ -18,11 +18,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.DelegationESRepository;
-import com.platon.browser.elasticsearch.DelegationRewardESRepository;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.DelegationEsRepository;
+import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
+import com.platon.browser.elasticsearch.NodeOptEsRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 
 import static org.mockito.Mockito.*;
@@ -31,19 +31,19 @@ import static org.mockito.Mockito.*;
 public class ESQueryServiceImplTest {
 
 	@Spy
-	private BlockESRepository blockESRepository;
+	private BlockEsRepository blockESRepository;
 	
 	@Spy
-	private TransactionESRepository transactionESRepository;
+	private TransactionEsRepository transactionESRepository;
 	
 	@Spy
-	private DelegationESRepository delegationESRepository;
+	private DelegationEsRepository delegationESRepository;
 	
 	@Spy
-	private NodeOptESRepository nodeOptESRepository;
+	private NodeOptEsRepository nodeOptESRepository;
 	
 	@Spy
-	private DelegationRewardESRepository delegationRewardESRepository;
+	private DelegationRewardEsRepository delegationRewardESRepository;
 	
 	@Mock
 	private RestHighLevelClient client;

@@ -14,7 +14,7 @@ import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -60,7 +60,7 @@ public class Erc20TokenTransferRecordService {
     @Resource
     private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
     @Resource
-    private TokenTransferRecordESRepository esTokenTransferRecordRepository;
+    private TokenTransferRecordEsRepository esTokenTransferRecordRepository;
     @Resource
     private I18nUtil i18n;
     @Resource

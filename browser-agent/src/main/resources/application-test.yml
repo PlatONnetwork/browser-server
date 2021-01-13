@@ -26,12 +26,14 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_test
-      transactionIndexName: browser_transaction_test
-      delegationIndexName: browser_delegation_test
-      nodeOptIndexName: browser_nodeopt_test
-      delegationRewardIndexName: browser_delegation_reward_test
-      innerTxIndexName: browser_inner_tx_test
+      blockIndexName: browser_block_${profile}
+      transactionIndexName: browser_transaction_${profile}
+      delegationIndexName: browser_delegation_${profile}
+      nodeOptIndexName: browser_nodeopt_${profile}
+      delegationRewardIndexName: browser_delegation_reward_${profile}
+      innerTxIndexName: browser_inner_tx_${profile}
+      erc20TxIndexName: browser_erc20_tx_${profile}
+      erc721TxIndexName: browser_erc721_tx_${profile}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:

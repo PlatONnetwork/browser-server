@@ -47,7 +47,7 @@ public class EsImportServiceTest extends AgentTestBase {
     }
 
     @Test
-    public void retryRecordSet() {
+    public void getOldErc20TxList() {
         Set<Transaction> transactions = new HashSet<>();
         Transaction transaction = new Transaction();
         List<ESTokenTransferRecord> esTokenTransferRecordList = new ArrayList<>();
@@ -55,7 +55,7 @@ public class EsImportServiceTest extends AgentTestBase {
         esTokenTransferRecordList.add(esTokenTransferRecord);
         transaction.setEsTokenTransferRecords(esTokenTransferRecordList);
         transactions.add(transaction);
-        this.target.retryRecordSet(transactions);
+        target.getOldErc20TxList(transactions);
         Assert.assertTrue(true);
     }
 }

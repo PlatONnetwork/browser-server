@@ -12,7 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -83,7 +83,7 @@ public class ExportService {
     private BlockChainConfig blockChainConfig;
 
 	@Autowired
-	private TransactionESRepository transactionESRepository;
+	private TransactionEsRepository transactionESRepository;
 	@Autowired
 	private AddressMapper addressMapper;
 	@Autowired

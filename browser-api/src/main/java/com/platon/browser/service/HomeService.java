@@ -9,8 +9,8 @@ import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.TransactionEsRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -43,9 +43,9 @@ import java.util.List;
 public class HomeService {
 
 	@Resource
-	private BlockESRepository blockESRepository;
+	private BlockEsRepository blockESRepository;
 	@Resource
-	private TransactionESRepository transactionESRepository;
+	private TransactionEsRepository transactionESRepository;
 	@Resource
 	private StatisticCacheService statisticCacheService;
 	@Resource

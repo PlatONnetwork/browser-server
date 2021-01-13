@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
+import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
 import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
 public class EsTokenTransferRecordService extends EsService<ESTokenTransferRecord> {
 
     @Autowired
-    private TokenTransferRecordESRepository tokenTransferRecordESRepository;
+    private TokenTransferRecordEsRepository tokenTransferRecordESRepository;
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<ESTokenTransferRecord> stage) throws IOException, InterruptedException {

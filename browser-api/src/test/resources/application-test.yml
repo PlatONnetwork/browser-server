@@ -1,6 +1,6 @@
 # ***************************测试配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: test
+profile: testsonar
 # 密码加密配置
 jasypt:
   encryptor:
@@ -46,12 +46,14 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_testsonar
-      transactionIndexName: browser_transaction_testsonar
-      delegationIndexName: browser_delegation_testsonar
-      nodeOptIndexName: browser_nodeopt_testsonar
-      delegationRewardIndexName: browser_delegation_reward_testsonar
-      innerTxIndexName: browser_inner_tx_testsonar
+      blockIndexName: browser_block_${profile}
+      transactionIndexName: browser_transaction_${profile}
+      delegationIndexName: browser_delegation_${profile}
+      nodeOptIndexName: browser_nodeopt_${profile}
+      delegationRewardIndexName: browser_delegation_reward_${profile}
+      innerTxIndexName: browser_inner_tx_${profile}
+      erc20TxIndexName: browser_erc20_tx_${profile}
+      erc721TxIndexName: browser_erc721_tx_${profile}
 #redis配置
 redisCluster:
   configKey: DEFAULT

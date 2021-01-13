@@ -4,25 +4,23 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 /**
- * 针对处理合约内部转账记录的ES处理器
+ * ERC20交易记录ES操作类
  */
 @Repository
 @Slf4j
-public class TokenTransferRecordESRepository extends ESRepository {
-
-    @Value("${spring.elasticsearch.high-level-client.innerTxIndexName}")
-    private String indexName;
-
+public class Erc20TxEsRepository extends EsRepository {
+    @Override
+    public String getIndexName() {
+        return config.getErc20TxIndexName();
+    }
     @Getter
-    public String defaultIndexTemplateName = "browser_inner_tx_template";
-
+    public String defaultIndexTemplateName = "browser_erc20_tx_template";
     @PostConstruct
     public void init() {
         try {
@@ -34,15 +32,10 @@ public class TokenTransferRecordESRepository extends ESRepository {
         }
     }
 
-    @Override
-    public String getIndexName() {
-        return this.indexName;
-    }
-
     public XContentBuilder defaultIndexTemplate() throws IOException {
         XContentBuilder indexPatterns = XContentFactory.jsonBuilder()
                 .startObject()
-                    .array("index_patterns", "browser_inner_tx_*")
+                    .array("index_patterns", "browser_erc20_tx_*")
                     .startObject("settings")
                         .field("number_of_shards", 5)
                         .field("number_of_replicas", 1)
@@ -57,11 +50,8 @@ public class TokenTransferRecordESRepository extends ESRepository {
                             .startObject("contract").field("type", "keyword").endObject()
                             .startObject("tto").field("type", "keyword").endObject()
                             .startObject("tValue").field("type", "keyword").endObject()
-                            .startObject("decimal").field("type", "integer").endObject()
                             .startObject("name").field("type", "text").endObject()
                             .startObject("symbol").field("type", "keyword").endObject()
-                            .startObject("sign").field("type", "keyword").endObject()
-                            .startObject("result").field("type", "integer").endObject()
                             .startObject("fromType").field("type", "integer").endObject()
                             .startObject("toType").field("type", "integer").endObject()
                             .startObject("txFee").field("type", "keyword").endObject()
@@ -74,9 +64,4 @@ public class TokenTransferRecordESRepository extends ESRepository {
                 .endObject();
         return indexPatterns;
     }
-
-    public void setIndexName(String indexName) {
-		this.indexName = indexName;
-	}
-
 }
