@@ -8,9 +8,9 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.BrowserConst;
 import com.platon.browser.config.DownFileCommon;
-import com.platon.browser.config.redis.RedisFactory;
+import com.platon.browser.config.redis.JedisClient;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Staking;
@@ -28,8 +28,8 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
@@ -44,8 +44,7 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.staking.QueryClaimByStakingResp;
 import com.platon.browser.response.transaction.*;
-import com.platon.browser.util.*;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -92,7 +91,7 @@ public class TransactionService {
     @Resource
     private CommonService commonService;
     @Resource
-    private RedisFactory redisFactory;
+    private JedisClient jedisClient;
     @Resource
     private DownFileCommon downFileCommon;
     private static final String ERROR_TIPS = "获取区块错误。";
@@ -249,9 +248,9 @@ public class TransactionService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))
             };
             rows.add(row);
         });
@@ -391,7 +390,7 @@ public class TransactionService {
                         resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
                         resp.setTxAmount(createValidatorParam.getAmount());
                         resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-                        resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
+                        resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString());
                         break;
                     /**
                      * 编辑验证人
@@ -408,7 +407,7 @@ public class TransactionService {
 
                         String delegationRatio = null;
                         if(editValidatorParam.getDelegateRewardPer()!=null){
-                            delegationRatio=new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(BrowserConst.PERCENTAGE).toString();
+                            delegationRatio=new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString();
                         }
                         resp.setDelegationRatio(delegationRatio);
                         break;
@@ -555,7 +554,7 @@ public class TransactionService {
                         if (proposal != null) {
                             resp.setPipNum(proposal.getPipNum());
                             resp.setProposalTitle(
-                                BrowserConst.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
+                                Browser.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
                             resp.setProposalUrl(proposal.getUrl());
                             resp.setProposalOption(String.valueOf(proposal.getType()));
                         }
@@ -733,7 +732,7 @@ public class TransactionService {
             resp.setNodeId(proposal.getNodeId());
             resp.setNodeName(proposal.getNodeName());
             resp.setPipNum(proposal.getPipNum());
-            resp.setProposalTitle(BrowserConst.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
+            resp.setProposalTitle(Browser.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
             resp.setProposalStatus(proposal.getStatus());
             resp.setProposalOption(String.valueOf(proposal.getType()));
             resp.setProposalNewVersion(proposal.getNewVersion());
@@ -768,7 +767,7 @@ public class TransactionService {
             /**
              * 检查redis是否已经存储
              */
-            String userName = this.redisFactory.createRedisCommands().get(externalId);
+            String userName = jedisClient.get(externalId);
             if (StringUtils.isNotBlank(userName)) {
                 defaultBaseUrl += userName;
                 return defaultBaseUrl;
@@ -786,7 +785,7 @@ public class TransactionService {
                 /**
                  * 设置redis
                  */
-                this.redisFactory.createRedisCommands().set(externalId, userName);
+                jedisClient.set(externalId, userName);
                 defaultBaseUrl += userName;
             }
             return defaultBaseUrl;

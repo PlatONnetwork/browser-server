@@ -16,8 +16,8 @@ import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
 import com.platon.browser.request.token.QueryTokenHolderListReq;
@@ -27,10 +27,10 @@ import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.token.QueryHolderTokenListResp;
 import com.platon.browser.response.token.QueryTokenHolderListResp;
 import com.platon.browser.response.token.QueryTokenTransferRecordListResp;
-import com.platon.browser.util.ConvertUtil;
-import com.platon.browser.util.DateUtil;
-import com.platon.browser.util.I18nUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.ConvertUtil;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.HexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -199,8 +199,8 @@ public class OldErc20TxService {
                         DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone),
                         esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTto(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()),
-                        HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal()).toString()),
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()),
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal()).toString()),
                         esTokenTransferRecord.getSymbol()
                 };
                 rows.add(row);
@@ -209,7 +209,7 @@ public class OldErc20TxService {
                         DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone),
                         esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTto(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexTool.append(ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getTValue()), esTokenTransferRecord.getDecimal()).toString()),
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getTValue()), esTokenTransferRecord.getDecimal()).toString()),
                         esTokenTransferRecord.getSymbol()
                 };
                 rows.add(row);
@@ -367,7 +367,7 @@ public class OldErc20TxService {
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
-            Object[] row = {erc20TokenAddressRel.getAddress(), HexTool.append(ConvertUtil.convertByFactor(balance,
+            Object[] row = {erc20TokenAddressRel.getAddress(), HexUtil.append(ConvertUtil.convertByFactor(balance,
                     erc20TokenAddressRel.getDecimal()).toString()),
                     balance.divide(erc20TokenAddressRel.getTotalSupply())
                             .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
@@ -394,7 +394,7 @@ public class OldErc20TxService {
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
             BigDecimal balance = this.getAddressBalance(erc20TokenAddressRel);
             Object[] row = {erc20TokenAddressRel.getName(), erc20TokenAddressRel.getSymbol(),
-                    HexTool.append(ConvertUtil.convertByFactor(balance, erc20TokenAddressRel.getDecimal()).toString()),
+                    HexUtil.append(ConvertUtil.convertByFactor(balance, erc20TokenAddressRel.getDecimal()).toString()),
                     erc20TokenAddressRel.getDecimal(), erc20TokenAddressRel.getTxCount(), erc20TokenAddressRel.getContract()
             };
             rows.add(row);

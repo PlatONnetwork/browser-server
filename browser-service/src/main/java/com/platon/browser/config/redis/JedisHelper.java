@@ -1,14 +1,16 @@
 package com.platon.browser.config.redis;
 
+import com.platon.browser.config.RedisClusterConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.ShardedJedis;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -22,14 +24,11 @@ import java.util.Set;
  *  @data 2019年11月13日
  */
 @Slf4j
+@Component
 public class JedisHelper {
-
-	private Logger logger = LoggerFactory.getLogger(JedisHelper.class);
-
+	@Resource
+	private RedisClusterConfig redisClusterConfig;
 	private static Map<String, JedisCluster> redisMaps = new HashMap<>();
-
-	private JedisHelper() {
-	}
 
 	/**
 	 * 获取和设置redis类
@@ -39,28 +38,20 @@ public class JedisHelper {
 	 */
 	public JedisCluster getJedisClusterByKey(String configKey) {
 		JedisCluster jedisCluster = null;
+		if(StringUtils.isBlank(redisClusterConfig.getMasterIPs())) return jedisCluster;
 		JedisConfig jedisConfig = new JedisConfig();
-		jedisConfig.setConnectionTimeout(Integer
-				.parseInt(RedisConfig.getRedisClusterConnectionTimeout()));
-		jedisConfig.setSoTimeout(Integer
-				.parseInt(RedisConfig.getRedisClusterSoTimeout()));
-		jedisConfig.setMaxRedirections(Integer
-				.parseInt(RedisConfig.getRedisClusterMaxRedirections()));
+		jedisConfig.setConnectionTimeout(redisClusterConfig.getConnectionTimeout());
+		jedisConfig.setSoTimeout(redisClusterConfig.getSoTimeout());
+		jedisConfig.setMaxRedirections(redisClusterConfig.getMaxRedirections());
 		GenericObjectPoolConfig<Jedis> poolConfig = new GenericObjectPoolConfig<>();
-		poolConfig.setMaxTotal(Integer
-				.parseInt(RedisConfig.getRedisClusterMaxTotal()));
-		poolConfig
-				.setMaxIdle(Integer.parseInt(RedisConfig.getRedisClusterMaxIdle()));
-		poolConfig
-				.setMinIdle(Integer.parseInt(RedisConfig.getRedisClusterMinIdle()));
-		poolConfig.setTestOnBorrow(Boolean
-				.parseBoolean(RedisConfig.getRedisClusterTestOnBorrow()));
-		poolConfig.setTestOnReturn(Boolean
-				.parseBoolean(RedisConfig.getRedisClusterTestOnReturn()));
-		poolConfig.setTestWhileIdle(Boolean
-				.parseBoolean(RedisConfig.getRedisClusterTestWhileIdle()));
+		poolConfig.setMaxTotal(redisClusterConfig.getMaxTotal());
+		poolConfig.setMaxIdle(redisClusterConfig.getMaxIdle());
+		poolConfig.setMinIdle(redisClusterConfig.getMinIdle());
+		poolConfig.setTestOnBorrow(redisClusterConfig.isTestOnBorrow());
+		poolConfig.setTestOnReturn(redisClusterConfig.isTestOnReturn());
+		poolConfig.setTestWhileIdle(redisClusterConfig.isTestWhileIdle());
 		Set<HostAndPort> jedisClusterNodes = new HashSet<>();
-		String[] ips = RedisConfig.getRedisClusterMasterIPs().split(",");
+		String[] ips = redisClusterConfig.getMasterIPs().split(",");
 		for(String ip: ips){
 			String[] arr = ip.split(":");
 			HostAndPort hostAndPort = new HostAndPort(arr[0], Integer.parseInt(arr[1]));
@@ -81,7 +72,7 @@ public class JedisHelper {
 
 		JedisCluster jedisCluster;
 		if (jedisConfig.getJedisClusterNodes().isEmpty()) {
-			logger.error("Redis [masterIPs] 参数未配置！");
+			log.error("Redis [masterIPs] 参数未配置！");
 			return null;
 		}
 		try {
@@ -89,10 +80,10 @@ public class JedisHelper {
 					jedisConfig.getConnectionTimeout(),
 					jedisConfig.getSoTimeout(),
 					jedisConfig.getMaxRedirections(),
-					RedisConfig.getRedisClusterPassword(),
+					redisClusterConfig.getPassword(),
 					jedisConfig.getPoolConfig());
 		} catch (Exception e) {
-			logger.error("Redis 创建Redis连接池失败 ，请检查相关配置项！", e);
+			log.error("Redis 创建Redis连接池失败 ，请检查相关配置项！", e);
 			return null;
 		}
 		return jedisCluster;
@@ -130,22 +121,7 @@ public class JedisHelper {
 				shardedJedis.close();
 			}
 		} catch (Exception e) {
-			logger.error("Redis ShardedJedis返回资源池完成!!!", e);
+			log.error("Redis ShardedJedis返回资源池完成!!!", e);
 		}
 	}
-
-	private static class RedisUtilHolder {
-		private static JedisHelper instance = new JedisHelper();
-	}
-
-	/**
-	 * 当getInstance方法第一次被调用的时候，它第一次读取
-	 * RedisUtilHolder.instance，导致RedisUtilHolder类得到初始化；而这个类在装载并被初始化的时候，会初始化它的静
-	 * 态域，从而创建RedisUtil的实例，由于是静态的域，因此只会在虚拟机装载类的时候初始化一次，并由虚拟机来保证它的线程安全性。
-	 * 这个模式的优势在于，getInstance方法并没有被同步，并且只是执行一个域的访问，因此延迟初始化并没有增加任何访问成本。
-	 */
-	public static JedisHelper getInstance() {
-		return RedisUtilHolder.instance;
-	}
-
 }

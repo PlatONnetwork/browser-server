@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
@@ -16,7 +16,7 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
 import com.platon.browser.service.BlockService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +50,7 @@ public class BlockController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> blockService.blockList(req));
+        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> blockService.blockList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
@@ -60,7 +60,7 @@ public class BlockController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> blockService.blockListByNodeId(req));
+        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> blockService.blockListByNodeId(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;  
 	}
@@ -92,7 +92,7 @@ public class BlockController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
             BlockDetailResp blockDetailResp = blockService.blockDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
         });
@@ -105,7 +105,7 @@ public class BlockController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
             BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
         });

@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.service.ProposalService;
 import com.platon.browser.service.VoteService;
@@ -43,7 +43,7 @@ public class ProposalController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<ProposalListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<ProposalListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> proposalService.list(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -54,7 +54,7 @@ public class ProposalController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> proposalService.get(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -65,7 +65,7 @@ public class ProposalController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> voteService.queryByProposal(req));
+		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> voteService.queryByProposal(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
 	}

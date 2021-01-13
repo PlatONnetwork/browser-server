@@ -1,8 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
-import com.platon.browser.client.ProposalParticipantStat;
+import com.platon.browser.bean.ProposalParticipantStat;
 import com.platon.browser.bean.CollectionNetworkStat;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.enums.AppStatus;

@@ -10,7 +10,7 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.token.QueryTokenDetailResp;
 import com.platon.browser.response.token.QueryTokenListResp;
 import com.platon.browser.service.redis.RedisErc20TokenService;
-import com.platon.browser.util.ConvertUtil;
+import com.platon.browser.utils.ConvertUtil;
 import com.platon.browser.utils.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

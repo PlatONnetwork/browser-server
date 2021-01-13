@@ -4,7 +4,7 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.handler.BlockEventHandler;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.BlockEvent;

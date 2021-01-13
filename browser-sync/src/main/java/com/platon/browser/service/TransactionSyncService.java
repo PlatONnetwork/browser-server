@@ -3,7 +3,7 @@ package com.platon.browser.service;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.Getter;
 import lombok.Setter;

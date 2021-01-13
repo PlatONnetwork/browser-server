@@ -2,7 +2,7 @@ package com.platon.browser.analyzer.epoch;
 
 import com.alaya.protocol.Web3j;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.HistoryLowRateSlash;
+import com.platon.browser.bean.HistoryLowRateSlash;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
@@ -16,7 +16,7 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +49,7 @@ public class OnElectionAnalyzerTest extends AgentTestBase {
     @Mock
     private StakingMapper stakingMapper;
     @Mock
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
     @Mock
     private BlockChainConfig chainConfig;
     @InjectMocks
@@ -94,10 +94,10 @@ public class OnElectionAnalyzerTest extends AgentTestBase {
         when(this.chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
         when(this.chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);
         when(this.chainConfig.getStakeThreshold()).thenReturn(BigDecimal.TEN);
-        when(this.stakeMiscService.getUnStakeEndBlock(anyString(), any(BigInteger.class), anyBoolean()))
+        when(this.stakeEpochService.getUnStakeEndBlock(anyString(), any(BigInteger.class), anyBoolean()))
             .thenReturn(BigInteger.TEN);
-        when(this.stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
-        when(this.stakeMiscService.getZeroProduceFreeDuration()).thenReturn(BigInteger.TEN);
+        when(this.stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(this.stakeEpochService.getZeroProduceFreeDuration()).thenReturn(BigInteger.TEN);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(this.platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);

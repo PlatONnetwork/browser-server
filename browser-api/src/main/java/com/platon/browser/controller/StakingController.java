@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -9,7 +9,7 @@ import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.*;
 import com.platon.browser.service.StakingService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +41,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<BaseResp<StakingStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<BaseResp<StakingStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> {
 					StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
 					return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS),
@@ -56,7 +56,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.aliveStakingList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -65,7 +65,7 @@ public class StakingController {
 	@PostMapping(value = "staking/historyStakingList")
 	public WebAsyncTask<RespPage<HistoryStakingListResp>> historyStakingList(@Valid @RequestBody HistoryStakingListReq req) {
 		// 5s钟没返回，则认为超时
-		WebAsyncTask<RespPage<HistoryStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<HistoryStakingListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.historyStakingList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -76,7 +76,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.stakingDetails(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -87,7 +87,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.stakingOptRecordList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -98,7 +98,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.delegationListByStaking(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -109,7 +109,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-		WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.delegationListByAddress(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;
@@ -120,7 +120,7 @@ public class StakingController {
 		/**
 		 * 异步调用，超时则进入timeout
 		 */
-		WebAsyncTask<RespPage<LockedStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
+		WebAsyncTask<RespPage<LockedStakingListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT,
 				() -> stakingService.lockedStakingList(req));
 		CommonMethod.onTimeOut(webAsyncTask);
 		return webAsyncTask;

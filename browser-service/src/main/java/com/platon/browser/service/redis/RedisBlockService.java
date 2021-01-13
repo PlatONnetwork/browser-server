@@ -2,7 +2,6 @@ package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.elasticsearch.dto.Block;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +16,9 @@ import java.util.Set;
  */
 @Service
 public class RedisBlockService extends AbstractRedisService<Block> {
-
-    /** 区块缓存key */
-    @Value("${spring.redis.key.blocks}")
-    private String blocksCacheKey;
     @Override
     public String getCacheKey() {
-        return blocksCacheKey;
+        return redisKeyConfig.getBlocks();
     }
 
     @Override

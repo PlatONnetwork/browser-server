@@ -5,6 +5,7 @@ import com.alaya.protocol.core.Request;
 import com.alaya.protocol.core.Response;
 import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.ReceiptResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

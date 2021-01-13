@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.EsErc20TxRepository;
-import com.platon.browser.elasticsearch.dto.EsErcTx;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
@@ -20,17 +20,17 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class EsErc20TxService implements EsService<EsErcTx> {
+public class EsErc20TxService implements EsService<ErcTx> {
 
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
 
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
-    public void save(Set<EsErcTx> recordSet) {
+    public void save(Set<ErcTx> recordSet) {
         try {
             if (recordSet.isEmpty()) return;
             // key: _doc id
-            Map<String, EsErcTx> txMap = new HashMap<>();
+            Map<String, ErcTx> txMap = new HashMap<>();
             recordSet.forEach(t-> txMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTto(), t.getSeq()), t));
             esErc20TxRepository.bulkAddOrUpdate(txMap);
         }catch (Exception e){

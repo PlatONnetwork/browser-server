@@ -3,8 +3,6 @@ package com.platon.browser.bean;
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.alaya.protocol.core.methods.response.Transaction;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.Receipt;
-import com.platon.browser.client.ReceiptResult;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -13,8 +11,8 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
-import com.platon.browser.utils.HexTool;
-import com.platon.browser.utils.NodeTool;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.NodeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -43,9 +41,9 @@ public class CollectionBlock extends Block {
         if (block.getNumber().longValue() == 0) {
             nodeId = "000000000000000000000000000000000";
         } else {
-            nodeId = NodeTool.getPublicKey(block);
+            nodeId = NodeUtil.getPublicKey(block);
         }
-        nodeId = HexTool.prefix(nodeId);
+        nodeId = HexUtil.prefix(nodeId);
         this.setNum(block.getNumber().longValue()).setHash(block.getHash()).setPHash(block.getParentHash())
             .setSize(block.getSize().intValue()).setTime(new Date(block.getTimestamp().longValue()))
             .setExtra(block.getExtraData()).setMiner(block.getMiner()).setNodeId(nodeId)

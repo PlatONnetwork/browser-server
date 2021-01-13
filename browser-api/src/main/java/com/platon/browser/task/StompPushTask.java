@@ -21,7 +21,7 @@ import com.platon.browser.response.staking.AliveStakingListResp;
 import com.platon.browser.response.staking.StakingStatisticNewResp;
 import com.platon.browser.service.*;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

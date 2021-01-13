@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
@@ -14,7 +14,7 @@ import com.platon.browser.response.token.QueryHolderTokenListResp;
 import com.platon.browser.response.token.QueryTokenHolderListResp;
 import com.platon.browser.response.token.QueryTokenTransferRecordListResp;
 import com.platon.browser.service.OldErc20TxService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.WebAsyncTask;
@@ -44,7 +44,7 @@ public class Erc20TokenTransferRecordController {
 
     @PostMapping(value = "token/tokenTransferList")
     public WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> tokenTransferList(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
-        WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
+        WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () ->
                 this.oldErc20TxService.queryTokenRecordList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;
@@ -76,7 +76,7 @@ public class Erc20TokenTransferRecordController {
 
     @PostMapping(value = "token/tokenHolderList")
     public WebAsyncTask<RespPage<QueryTokenHolderListResp>> tokenHolderList(@Valid @RequestBody QueryTokenHolderListReq req) {
-        WebAsyncTask<RespPage<QueryTokenHolderListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
+        WebAsyncTask<RespPage<QueryTokenHolderListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () ->
                 this.oldErc20TxService.tokenHolderList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;
@@ -106,7 +106,7 @@ public class Erc20TokenTransferRecordController {
 
     @PostMapping(value = "token/holderTokenList")
     public WebAsyncTask<RespPage<QueryHolderTokenListResp>> holderTokenList(@Valid @RequestBody QueryHolderTokenListReq req) {
-        WebAsyncTask<RespPage<QueryHolderTokenListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
+        WebAsyncTask<RespPage<QueryHolderTokenListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () ->
                 this.oldErc20TxService.holderTokenList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;

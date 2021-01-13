@@ -1,10 +1,11 @@
 package com.platon.browser.service.erc20;
 
-import com.platon.browser.elasticsearch.bean.ESResult;
+import com.platon.browser.config.RedisKeyConfig;
 import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.service.redis.RedisErc20TxService;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.redis.OldRedisErc20TxService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,9 @@ import java.util.List;
 @Service
 public class Erc20TransactionSyncService {
 
+    @Resource
+    private RedisKeyConfig redisKeyConfig;
+
     /**
      * 同步ERC20交易
      * 把ES中的ERC20交易同步到Redis中
@@ -30,19 +34,15 @@ public class Erc20TransactionSyncService {
     @Resource
     private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Resource
-    private RedisErc20TxService redisService;
+    private OldRedisErc20TxService redisService;
     @Value("${platon.paging.erc20-transaction.page-size}")
     private int pageSize;
     @Value("${platon.paging.erc20-transaction.page-count}")
     private int pageCount;
-    /**
-     * 交易缓存key
-     */
-    @Value("${spring.redis.key.innerTx}")
-    private String innerTxCacheKey;
+
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void sync(){
-        Long recordSize = redisService.size(innerTxCacheKey);
+        Long recordSize = redisService.size(redisKeyConfig.getInnerTx());
         // 如果redis innerTx不为空，则不用同步
         if(recordSize>0) return;
         ESQueryBuilderConstructor transactionConstructor = new ESQueryBuilderConstructor();

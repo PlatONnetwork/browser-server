@@ -10,7 +10,7 @@ import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.bean.ProposalMarkDownDto;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.MarkDownParserUtil;
+import com.platon.browser.utils.MarkDownParserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

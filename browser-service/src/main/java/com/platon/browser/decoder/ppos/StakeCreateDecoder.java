@@ -1,10 +1,10 @@
 package com.platon.browser.decoder.ppos;
 
-import com.platon.browser.param.StakeCreateParam;
-import com.platon.browser.param.TxParam;
 import com.alaya.rlp.solidity.RlpList;
 import com.alaya.rlp.solidity.RlpString;
 import com.alaya.utils.Numeric;
+import com.platon.browser.param.StakeCreateParam;
+import com.platon.browser.param.TxParam;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,34 +28,34 @@ import java.math.BigInteger;
  *         , new BytesType(Numeric.hexStringToByteArray(blsPubKey)) 12
  *         , new BytesType(Numeric.hexStringToByteArray(blsProof)) 13
  **/
-class StakeCreateDecoder {
+public class StakeCreateDecoder extends AbstractPPOSDecoder {
     private StakeCreateDecoder(){}
-    static TxParam decode(RlpList rootList) {
+    public static TxParam decode(RlpList rootList) {
         // 发起质押
         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
-        BigInteger type =  InnerContractDecoder.bigIntegerResolver((RlpString) rootList.getValues().get(1));
+        BigInteger type =  bigIntegerResolver((RlpString) rootList.getValues().get(1));
         //用于接受出块奖励和质押奖励的收益账户benefitAddress
-        String address = InnerContractDecoder.addressResolver((RlpString) rootList.getValues().get(2));
+        String address = addressResolver((RlpString) rootList.getValues().get(2));
         //被质押的节点的NodeId
-        String nodeId = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(3));
+        String nodeId = stringResolver((RlpString) rootList.getValues().get(3));
         //外部Id externalId
-        String externalId = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(4));
+        String externalId = stringResolver((RlpString) rootList.getValues().get(4));
         externalId = new String(Numeric.hexStringToByteArray(externalId));
         //被质押节点的名称 nodeName
-        String nodeName = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(5));
+        String nodeName = stringResolver((RlpString) rootList.getValues().get(5));
         nodeName = new String(Numeric.hexStringToByteArray(nodeName));
         //节点的第三方主页 website
-        String website = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(6));
+        String website = stringResolver((RlpString) rootList.getValues().get(6));
         website = new String(Numeric.hexStringToByteArray(website));
         //节点的描述 details
-        String details = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(7));
+        String details = stringResolver((RlpString) rootList.getValues().get(7));
         details = new String(Numeric.hexStringToByteArray(details));
         //质押的von amount programVersion
-        BigInteger amount =  InnerContractDecoder.bigIntegerResolver((RlpString) rootList.getValues().get(8));
+        BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(8));
         //程序的真实版本，治理rpc获取
-        BigInteger rewardPer =  InnerContractDecoder.bigIntegerResolver((RlpString) rootList.getValues().get(9));
+        BigInteger rewardPer =  bigIntegerResolver((RlpString) rootList.getValues().get(9));
         //程序的真实版本，治理rpc获取
-        BigInteger version =  InnerContractDecoder.bigIntegerResolver((RlpString) rootList.getValues().get(10));
+        BigInteger version =  bigIntegerResolver((RlpString) rootList.getValues().get(10));
 
         return StakeCreateParam.builder()
                 .type(type.intValue())

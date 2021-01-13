@@ -2,16 +2,16 @@ package com.platon.browser.service.govern;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.govern.ModifiableParam;
+import com.platon.browser.bean.govern.ModifiableParam;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.alaya.contracts.ppos.dto.resp.GovernParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -26,14 +26,13 @@ import java.util.List;
 @Service
 @Transactional
 public class ParameterService {
-
-    @Autowired
+    @Resource
     private ConfigMapper configMapper;
-    @Autowired
+    @Resource
     private PlatOnClient platOnClient;
-    @Autowired
+    @Resource
     private BlockChainConfig chainConfig;
-    @Autowired
+    @Resource
     private CustomConfigMapper customConfigMapper;
 
     /**

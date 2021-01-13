@@ -1,17 +1,17 @@
 package com.platon.browser.service.epoch;
 
 import com.platon.browser.bean.ConfigChange;
-import com.platon.browser.client.EpochInfo;
+import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import com.alaya.contracts.ppos.dto.CallResponse;
 import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
@@ -103,7 +103,7 @@ public class EpochRetryService {
 
             // 前一周期的验证人
             List <Node> preNodes = specialApi.getHistoryValidatorList(web3j, preEpochLastBlockNumber);
-            preNodes.forEach(n -> n.setNodeId(HexTool.prefix(n.getNodeId())));
+            preNodes.forEach(n -> n.setNodeId(HexUtil.prefix(n.getNodeId())));
             preValidators.clear();
             preValidators.addAll(preNodes);
 
@@ -119,7 +119,7 @@ public class EpochRetryService {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestValidators();
             }
-            curNodes.forEach(n -> n.setNodeId(HexTool.prefix(n.getNodeId())));
+            curNodes.forEach(n -> n.setNodeId(HexUtil.prefix(n.getNodeId())));
             curValidators.clear();
             curValidators.addAll(curNodes);
 
@@ -152,7 +152,7 @@ public class EpochRetryService {
 
             // 前一周期的验证人
             List <Node> preNodes = specialApi.getHistoryVerifierList(web3j, preEpochLastBlockNumber);
-            preNodes.forEach(n -> n.setNodeId(HexTool.prefix(n.getNodeId())));
+            preNodes.forEach(n -> n.setNodeId(HexUtil.prefix(n.getNodeId())));
             preVerifiers.clear();
             preVerifiers.addAll(preNodes);
 
@@ -168,7 +168,7 @@ public class EpochRetryService {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestVerifiers();
             }
-            curNodes.forEach(n -> n.setNodeId(HexTool.prefix(n.getNodeId())));
+            curNodes.forEach(n -> n.setNodeId(HexUtil.prefix(n.getNodeId())));
             curVerifiers.clear();
             curVerifiers.addAll(curNodes);
 
@@ -223,7 +223,7 @@ public class EpochRetryService {
             if (!br.isStatusOk()) throw new CandidateException(br.getErrMsg());
             List <Node> candidates = br.getData();
             if (candidates == null) throw new CandidateException("实时候选节点列表为空!");
-            candidates.forEach(v -> v.setNodeId(HexTool.prefix(v.getNodeId())));
+            candidates.forEach(v -> v.setNodeId(HexUtil.prefix(v.getNodeId())));
             return candidates;
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
@@ -248,7 +248,7 @@ public class EpochRetryService {
                  */
                 if(chainConfig.getIssueEpochRound() != null && chainConfig.getIssueEpochRound().compareTo(configChange.getIssueEpoch()) != 0) {
                 	NetworkStat networkStat = networkStatCache.getNetworkStat();
-                	summary.setIssueRates(networkStat.getIssueRates()+ BrowserConst.HTTP_SPILT + chainConfig.getAddIssueRate().toPlainString());
+                	summary.setIssueRates(networkStat.getIssueRates()+ Browser.HTTP_SPILT + chainConfig.getAddIssueRate().toPlainString());
                 }
                 // 更新增发周期轮数
                 chainConfig.setIssueEpochRound(configChange.getIssueEpoch());

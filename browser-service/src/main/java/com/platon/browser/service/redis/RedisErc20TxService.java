@@ -1,8 +1,8 @@
 package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.stereotype.Service;
 
@@ -10,24 +10,17 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 代币交易缓存数据
+ * ERC20代币交易缓存数据
  */
 @Service
-public class RedisErc20TxService extends AbstractRedisService<OldErcTx> {
-
-    /**
-     * 交易缓存key
-     */
-    @Value("${spring.redis.key.innerTx}")
-    private String innerTxCacheKey;
-
+public class RedisErc20TxService extends AbstractRedisService<ErcTx> {
     @Override
     public String getCacheKey() {
-        return innerTxCacheKey;
+        return redisKeyConfig.getErc20Tx();
     }
 
     @Override
-    public void updateMinMaxScore(Set<OldErcTx> data) {
+    public void updateMinMaxScore(Set<ErcTx> data) {
         minMax.reset();
         data.forEach(item -> {
             Long score = item.getSeq();
@@ -42,11 +35,11 @@ public class RedisErc20TxService extends AbstractRedisService<OldErcTx> {
     }
 
     @Override
-    public void updateStageSet(Set<OldErcTx> data) {
+    public void updateStageSet(Set<ErcTx> data) {
         data.forEach(item -> {
             // 在缓存中不存在的才放入缓存
             if (!existScore.contains(item.getSeq()))
-                stageSet.add(new DefaultTypedTuple<String>(JSON.toJSONString(item), item.getSeq().doubleValue()));
+                stageSet.add(new DefaultTypedTuple<>(JSON.toJSONString(item), item.getSeq().doubleValue()));
         });
     }
 }

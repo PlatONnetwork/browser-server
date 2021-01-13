@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 
 /**
  * 交易详情请求对象
@@ -25,7 +25,7 @@ public class TransactionDetailsReq{
 
 	public void setTxHash(String txHash) {
 		if(StringUtils.isBlank(txHash)) return;
-		this.txHash = HexTool.prefix(txHash.toLowerCase());
+		this.txHash = HexUtil.prefix(txHash.toLowerCase());
 	}
     
 }

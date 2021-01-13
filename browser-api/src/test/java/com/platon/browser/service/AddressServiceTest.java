@@ -28,7 +28,7 @@ import com.alaya.protocol.core.methods.response.PlatonGetBalance;
 import com.github.pagehelper.Page;
 import com.platon.browser.ApiTestMockBase;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.dao.entity.Address;

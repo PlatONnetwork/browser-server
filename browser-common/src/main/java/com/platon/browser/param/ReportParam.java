@@ -3,7 +3,7 @@ package com.platon.browser.param;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.param.evidence.PrepareEvidence;
 import com.platon.browser.param.evidence.VoteEvidence;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,7 +42,7 @@ public class ReportParam extends TxParam{
      */
     private String verify;
     public void setVerify(String verify){
-        this.verify= HexTool.prefix(verify);
+        this.verify= HexUtil.prefix(verify);
     }
 
     /**

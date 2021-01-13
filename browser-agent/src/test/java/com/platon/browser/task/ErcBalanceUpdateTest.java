@@ -1,8 +1,7 @@
 package com.platon.browser.task;
 
-import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.AppStatusUtil;
@@ -53,7 +52,7 @@ public class ErcBalanceUpdateTest extends AgentTestData {
         data.add("lax1jzcc0xqvkglwmr3txeaf2c9jxp6pzmse3gxk9n#lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e");
 
         when(this.redisTemplate.opsForSet()).thenReturn(this.setOperations);
-        when(this.setOperations.members(BrowserConst.ERC_BALANCE_KEY)).thenReturn(data);
+        when(this.setOperations.members(Browser.ERC_BALANCE_KEY)).thenReturn(data);
         when(this.erc20ResolveServiceImpl.getBalance(any(), any())).thenReturn(BigInteger.TEN);
     }
 

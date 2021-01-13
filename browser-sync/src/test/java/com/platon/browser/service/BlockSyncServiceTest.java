@@ -4,7 +4,7 @@ import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisBlockService;
 import org.junit.Before;
 import org.junit.Test;

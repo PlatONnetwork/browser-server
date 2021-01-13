@@ -1,7 +1,6 @@
 package com.platon.browser.service.redis;
 
 import com.platon.browser.dao.entity.NetworkStat;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,11 +8,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RedisStatisticService extends AbstractRedisService<NetworkStat> {
-    /** 统计缓存信息key */
-    @Value("${spring.redis.key.networkStat}")
-    private String networkStatCacheKey;
     @Override
     public String getCacheKey() {
-        return networkStatCacheKey;
+        return redisKeyConfig.getNetworkStat();
     }
 }

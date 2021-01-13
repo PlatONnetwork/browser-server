@@ -3,7 +3,7 @@ package com.platon.browser.service;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisBlockService;
 import lombok.Getter;
 import lombok.Setter;

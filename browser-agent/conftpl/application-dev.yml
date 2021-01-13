@@ -14,10 +14,26 @@ spring:
     password: _DB_PASS_
   #Redis配置
   redis:
+    password: _REDIS_PWD_
+    database: 0
+    key:
+      #最多存储多少条数据
+      max-item: 500000
+      #区块列表
+      blocks: ${platon.redis-namespace}:blocks
+      #交易列表
+      transactions: ${platon.redis-namespace}:transactions
+      #统计信息
+      networkStat: ${platon.redis-namespace}:networkStat
+      #代币交易
+      innerTx: ${platon.redis-namespace}:innerTx
+      #erc20交易
+      erc20Tx: ${platon.redis-namespace}:erc20Tx
+      #erc721交易
+      erc721Tx: ${platon.redis-namespace}:erc721Tx
     cluster:
       max-redirects: 3
       nodes: _REDIS_IPS_
-    password: _REDIS_PWD_
   #ES配置
   elasticsearch:
     high-level-client:

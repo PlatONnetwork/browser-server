@@ -1,10 +1,9 @@
 package com.platon.browser.param;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigInteger;
@@ -31,7 +30,7 @@ public class StakeModifyParam extends TxParam{
      */
     private String nodeId;
     public void setNodeId(String nodeId){
-        this.nodeId= HexTool.prefix(nodeId);
+        this.nodeId= HexUtil.prefix(nodeId);
     }
 
     /**

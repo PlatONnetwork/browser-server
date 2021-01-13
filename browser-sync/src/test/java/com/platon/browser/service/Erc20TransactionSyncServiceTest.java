@@ -4,8 +4,8 @@ import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.service.redis.RedisErc20TxService;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.redis.OldRedisErc20TxService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +26,7 @@ public class Erc20TransactionSyncServiceTest {
     @Mock
     private OldEsErc20TxRepository esRepository;
     @Mock
-    private RedisErc20TxService redisService;
+    private OldRedisErc20TxService redisService;
     @Spy
     private Erc20TransactionSyncService target;
 

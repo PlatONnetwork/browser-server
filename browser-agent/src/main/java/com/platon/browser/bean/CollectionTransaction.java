@@ -2,7 +2,6 @@ package com.platon.browser.bean;
 
 import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.Receipt;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
@@ -202,7 +201,7 @@ public class CollectionTransaction extends Transaction {
                 block.setDQty(block.getDQty() + 1);
                 break;
             case DELEGATE_EXIT:// 撤销委托
-                if (status == Receipt.getSuccess()) {
+                if (status == Receipt.SUCCESS) {
                     // 成功的领取交易才解析info回填
                     // 设置委托奖励提取额
                     DelegateExitParam param = this.getTxParam(DelegateExitParam.class);
@@ -215,7 +214,7 @@ public class CollectionTransaction extends Transaction {
             case CLAIM_REWARDS: // 领取委托奖励
                 DelegateRewardClaimParam param =
                     DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
-                if (status == Receipt.getSuccess()) {
+                if (status == Receipt.SUCCESS) {
                     // 成功的领取交易才解析info回填
                     param = this.getTxParam(DelegateRewardClaimParam.class);
                 }

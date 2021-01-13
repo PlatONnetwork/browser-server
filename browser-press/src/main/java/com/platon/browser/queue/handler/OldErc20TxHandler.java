@@ -3,7 +3,7 @@ package com.platon.browser.queue.handler;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.queue.event.ESTokenTransferRecordEvent;
 import com.platon.browser.service.elasticsearch.OldErc20TxService;
-import com.platon.browser.service.redis.RedisErc20TxService;
+import com.platon.browser.service.redis.OldRedisErc20TxService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class OldErc20TxHandler extends AbstractHandler<ESTokenTransferRecordEven
     private OldErc20TxService oldErc20TxService;
 
     @Autowired
-    private RedisErc20TxService redisErc20TxService;
+    private OldRedisErc20TxService oldRedisErc20TxService;
 
     @Setter
     @Getter
@@ -49,7 +49,7 @@ public class OldErc20TxHandler extends AbstractHandler<ESTokenTransferRecordEven
                 return;
             }
             oldErc20TxService.save(stage);
-            redisErc20TxService.save(cache, false);
+            oldRedisErc20TxService.save(cache, false);
             long endTime = System.currentTimeMillis();
             printTps("Token交易", cache.size(), startTime, endTime);
             cache.clear();

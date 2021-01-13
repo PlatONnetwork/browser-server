@@ -11,12 +11,10 @@ import com.alaya.rlp.solidity.RlpString;
 import com.alaya.rlp.solidity.RlpType;
 import com.alaya.utils.Numeric;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.bean.ComplementInfo;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.PPosInvokeContractInputCache;
 import com.platon.browser.client.*;
-import com.platon.browser.bean.CustomErc20Token;
 import com.platon.browser.service.erc20.ERCData;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.erc20.Erc20ServiceImpl;
@@ -33,10 +31,10 @@ import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
-import com.platon.browser.decoder.general.GeneralContractDecodeUtil;
-import com.platon.browser.decoder.general.GeneralContractDecodedResult;
-import com.platon.browser.decoder.ppos.InnerContractDecodeUtil;
-import com.platon.browser.decoder.ppos.InnerContractDecodedResult;
+import com.platon.browser.decoder.TxInputDecodeUtil;
+import com.platon.browser.decoder.TxInputDecodeResult;
+import com.platon.browser.decoder.PPOSTxDecodeUtil;
+import com.platon.browser.decoder.PPOSTxDecodeResult;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
@@ -69,8 +67,8 @@ public class TransactionUtil {
         List<TransData> trans = invokeContractInput.getTransDatas();
         for (int i = 0; i < trans.size(); i++) {
             TransData tran = trans.get(i);
-            InnerContractDecodedResult result =
-                InnerContractDecodeUtil.decode(tran.getInput(), Collections.emptyList());
+            PPOSTxDecodeResult result =
+                PPOSTxDecodeUtil.decode(tran.getInput(), Collections.emptyList());
             if (result.getTypeEnum() == null) {
                 continue;
             }
@@ -88,7 +86,7 @@ public class TransactionUtil {
             tx.setSeq((long)i);
             transactionList.add(tx);
 
-            if (Integer.valueOf(tran.getCode()) > 0) {
+            if (Integer.parseInt(tran.getCode()) > 0) {
                 // 虚拟交易失败,交易状态码设置为失败
                 tx.setStatus(Transaction.StatusEnum.FAILURE.getCode());
             }
@@ -204,7 +202,7 @@ public class TransactionUtil {
                     DelegateRewardClaimParam delegateRewardClaimParam =
                         DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
                     List<Log> logs = Arrays.asList(log);
-                    InnerContractDecodedResult result = InnerContractDecodeUtil.decode(vt.getInput(), logs);
+                    PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(vt.getInput(), logs);
                     TxParam param = result.getParam();
                     if (param != null) {
                         delegateRewardClaimParam = (DelegateRewardClaimParam)param;
@@ -228,10 +226,10 @@ public class TransactionUtil {
      */
     public static void resolveInnerContractInvokeTxComplementInfo(CollectionTransaction tx, List<Log> logs,
         ComplementInfo ci) throws BeanCreateOrUpdateException {
-        InnerContractDecodedResult decodedResult;
+        PPOSTxDecodeResult decodedResult;
         try {
             // 解析交易的输入及交易回执log信息
-            decodedResult = InnerContractDecodeUtil.decode(tx.getInput(), logs);
+            decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logs);
             ci.setType(decodedResult.getTypeEnum().getCode());
             ci.setInfo(decodedResult.getParam().toJSONString());
             ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
@@ -277,7 +275,7 @@ public class TransactionUtil {
         ci.setInfo("");
         ci.setBinCode(getContractBinCode(tx, platOnClient, contractAddress, logger));
         // 解码合约创建交易前缀，用于区分EVM||WASM
-        GeneralContractDecodedResult decodedResult = GeneralContractDecodeUtil.decode(tx.getInput());
+        TxInputDecodeResult decodedResult = TxInputDecodeUtil.decode(tx.getInput());
         ci.setType(decodedResult.getTypeEnum().getCode());
         ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());
         ci.setContractType(ContractTypeEnum.UNKNOWN.getCode());

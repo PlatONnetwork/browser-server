@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -13,7 +13,7 @@ import com.platon.browser.response.home.StakingListNewResp;
 import com.platon.browser.service.HomeService;
 import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.BaseResp;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +43,7 @@ public class HomeController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<QueryNavigationResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<QueryNavigationResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
              try{
                  QueryNavigationResp queryNavigationResp = homeService.queryNavigation(req);
                  return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),queryNavigationResp);
@@ -61,7 +61,7 @@ public class HomeController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<BlockStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<BlockStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
             BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp);
         });
@@ -75,7 +75,7 @@ public class HomeController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<ChainStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<ChainStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
             ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp);
         });
@@ -89,7 +89,7 @@ public class HomeController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<StakingListNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<StakingListNewResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
             StakingListNewResp stakingListNewResp = homeService.stakingListNew();
             /**
              * 第一次返回都设为true

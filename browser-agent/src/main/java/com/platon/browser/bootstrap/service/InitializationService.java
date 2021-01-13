@@ -23,7 +23,7 @@ import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +73,7 @@ public class InitializationService {
     @Resource
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Resource
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
     @Resource
     private EsBlockRepository ESBlockRepository;
     @Resource
@@ -256,9 +256,9 @@ public class InitializationService {
             BigInteger curSettleEpochRound =
                 EpochUtil.getEpoch(BigInteger.ONE, this.chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
             // 更新解质押到账需要经过的结算周期数
-            BigInteger unStakeFreezeDuration = this.stakeMiscService.getUnStakeFreeDuration();
+            BigInteger unStakeFreezeDuration = this.stakeEpochService.getUnStakeFreeDuration();
             // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-            BigInteger unStakeEndBlock = this.stakeMiscService.getUnStakeEndBlock("", curSettleEpochRound, false);
+            BigInteger unStakeEndBlock = this.stakeEpochService.getUnStakeEndBlock("", curSettleEpochRound, false);
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
             staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
             staking.setLowRateSlashCount(0);

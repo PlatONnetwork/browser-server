@@ -2,14 +2,14 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.redis.RedisFactory;
+import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
 import com.platon.browser.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilders;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class RewardExportTask {
     @Resource
     private PlatOnClient platOnClient;
     @Resource
-    private RedisFactory redisFactory;
+    private JedisClient jedisClient;
     @Resource
     private BlockChainConfig chainConfig;
     @Resource
@@ -65,11 +65,11 @@ public class RewardExportTask {
     @Scheduled(cron = "0/5 * * * * ?")
     public void exportRewardNode() {
         try {
-            String v = this.redisFactory.createRedisCommands().setnx(REWARD_KEY, REWARD_KEY, 30000l);
+            String v = jedisClient.setnx(REWARD_KEY, REWARD_KEY, 30000l);
             if (!"OK".equals(v)) {
                 return;
             }
-            String consensus = this.redisFactory.createRedisCommands().get(ROUND_KEY);
+            String consensus = jedisClient.get(ROUND_KEY);
             int conL = 0;
             if (StringUtils.isNotBlank(consensus)) {
                 conL = Integer.valueOf(consensus);
@@ -112,12 +112,12 @@ public class RewardExportTask {
                 });
                 String[] headers = new String[] {"nodeId", "nodeName"};
                 this.buildFile(startNum + "_" + endNum + "_reward.csv", rs, headers);
-                this.redisFactory.createRedisCommands().set(ROUND_KEY, String.valueOf(conL + this.limitNum));
+                jedisClient.set(ROUND_KEY, String.valueOf(conL + this.limitNum));
             }
         } catch (Exception e) {
             log.error("exportRewardNode fail", e);
         } finally {
-            this.redisFactory.createRedisCommands().del(REWARD_KEY);
+            jedisClient.del(REWARD_KEY);
         }
 
     }

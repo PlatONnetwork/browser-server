@@ -14,11 +14,11 @@ import com.platon.browser.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.*;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -117,10 +117,10 @@ public class HomeService {
 //			}
 			if (keyword.length() == 128) {
 				/* 判断为节点Id */
-				Node node = nodeMapper.selectByPrimaryKey(HexTool.prefix(keyword.toLowerCase()));
+				Node node = nodeMapper.selectByPrimaryKey(HexUtil.prefix(keyword.toLowerCase()));
 				if(node != null) {
 					result.setType(STAKING_TYPE);
-					queryNavigationStructResp.setNodeId(HexTool.prefix(node.getNodeId()));
+					queryNavigationStructResp.setNodeId(HexUtil.prefix(node.getNodeId()));
 				}
 			}
 			if (keyword.startsWith("atp")||keyword.startsWith("atx")) {

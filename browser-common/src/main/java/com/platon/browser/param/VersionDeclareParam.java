@@ -1,10 +1,9 @@
 package com.platon.browser.param;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -24,7 +23,7 @@ public class VersionDeclareParam extends TxParam{
      */
     private String activeNode;
     public void setActiveNode(String activeNode){
-        this.activeNode= HexTool.prefix(activeNode);
+        this.activeNode= HexUtil.prefix(activeNode);
     }
 
     /**

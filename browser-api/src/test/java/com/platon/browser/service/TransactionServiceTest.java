@@ -2,8 +2,10 @@ package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestMockBase;
+import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.DownFileCommon;
-import com.platon.browser.config.redis.RedisFactory;
+import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Slash;
@@ -11,29 +13,26 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.bean.CustomStaking;
-import com.platon.browser.response.account.AccountDownload;
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.elasticsearch.EsDelegationRewardRepository;
+import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.Erc20Param;
-import com.platon.browser.config.redis.RedisCommands;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.request.newtransaction.TransactionDetailsReq;
 import com.platon.browser.request.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.request.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.request.staking.QueryClaimByStakingReq;
 import com.platon.browser.response.RespPage;
+import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.transaction.TransactionListResp;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -59,28 +58,17 @@ public class TransactionServiceTest extends ApiTestMockBase {
 	@Mock
 	private ProposalMapper proposalMapper;
 	@Mock
-	private RedisFactory redisFactory;
+	private JedisClient jedisClient;
 	@Mock
 	private DownFileCommon downFileCommon;
 
+	@InjectMocks
 	@Spy
 	private TransactionService target;
 
 	@Before
 	public void setup() {
-		ReflectionTestUtils.setField(this.target, "transactionESRepository", this.ESTransactionRepository);
-		ReflectionTestUtils.setField(this.target, "delegationRewardESRepository", this.ESDelegationRewardRepository);
-		ReflectionTestUtils.setField(this.target, "i18n", this.i18n);
-		ReflectionTestUtils.setField(this.target, "stakingMapper", this.stakingMapper);
-		ReflectionTestUtils.setField(this.target, "proposalMapper", this.proposalMapper);
-		ReflectionTestUtils.setField(this.target, "statisticCacheService", this.statisticCacheService);
-		ReflectionTestUtils.setField(this.target, "blockChainConfig", this.blockChainConfig);
-		ReflectionTestUtils.setField(this.target, "commonService", this.commonService);
-		ReflectionTestUtils.setField(this.target, "redisFactory", this.redisFactory);
-		ReflectionTestUtils.setField(this.target, "downFileCommon", this.downFileCommon);
-		RedisCommands redisCommands = mock(RedisCommands.class);
-		when(this.redisFactory.createRedisCommands()).thenReturn(redisCommands);
-		when(redisCommands.get(anyString())).thenReturn("test");
+		when(jedisClient.get(anyString())).thenReturn("test");
 		when(this.commonService.getNodeName(any(), any())).thenReturn("test-name");
 	}
 

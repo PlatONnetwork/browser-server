@@ -2,8 +2,8 @@ package com.platon.browser.bean;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.utils.HexTool;
-import com.platon.browser.utils.VerUtil;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.ChainVersionUtil;
 import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +78,7 @@ public class CustomStaking extends Staking {
         // 质押区块高度
         if(verifier.getStakingBlockNum()!=null) this.setStakingBlockNum(verifier.getStakingBlockNum().longValue());
         // 质押节点地址
-        this.setNodeId(HexTool.prefix(verifier.getNodeId()));
+        this.setNodeId(HexUtil.prefix(verifier.getNodeId()));
         // 发起质押交易的索引
         if(verifier.getStakingTxIndex()!=null) this.setStakingTxIndex(verifier.getStakingTxIndex().intValue());
         // 发起质押的账户地址
@@ -97,7 +97,7 @@ public class CustomStaking extends Staking {
 
         // 程序版本号
         BigInteger programVersion=verifier.getProgramVersion();
-        BigInteger bigVersion = VerUtil.transferBigVersion(programVersion);
+        BigInteger bigVersion = ChainVersionUtil.toBigVersion(programVersion);
         this.setProgramVersion(programVersion.toString());
         this.setBigVersion(bigVersion.toString());
     }
@@ -114,7 +114,7 @@ public class CustomStaking extends Staking {
         String programVersion=candidate.getProgramVersion().toString();
         if(StringUtils.isNotBlank(programVersion)){
             setProgramVersion(programVersion);
-            BigInteger bigVersion = VerUtil.transferBigVersion(candidate.getProgramVersion());
+            BigInteger bigVersion = ChainVersionUtil.toBigVersion(candidate.getProgramVersion());
             setBigVersion(bigVersion.toString());
         }
         // 设置外部ID

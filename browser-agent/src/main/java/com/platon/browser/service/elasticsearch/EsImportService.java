@@ -59,8 +59,8 @@ public class EsImportService {
                             Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
 
         Set<OldErcTx> oldErc20TxList = getOldErc20TxList(transactions);
-        Set<EsErcTx> erc20TxList = getErc20TxList(transactions);
-        Set<EsErcTx> erc721TxList = getErc721TxList(transactions);
+        Set<ErcTx> erc20TxList = getErc20TxList(transactions);
+        Set<ErcTx> erc721TxList = getErc721TxList(transactions);
         if (log.isDebugEnabled()) {
             log.debug("ES batch import: {}(blocks({}), transactions({}), nodeOpts({}), delegationRewards({}), oldErc20TxList({}), erc20TxList({}), erc721TxList({}))",
                     Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size(),
@@ -104,13 +104,13 @@ public class EsImportService {
     /**
      * 取erc20交易列表
      */
-    public Set<EsErcTx> getErc20TxList(Set<Transaction> transactions){
-        Set<EsErcTx> result = new HashSet<>();
+    public Set<ErcTx> getErc20TxList(Set<Transaction> transactions){
+        Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
                 if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
                     tx.getOldErcTxes().forEach(e->{
-                        EsErcTx ercTx = new EsErcTx();
+                        ErcTx ercTx = new ErcTx();
                         BeanUtils.copyProperties(e,ercTx);
                         result.add(ercTx);
                     });
@@ -123,9 +123,9 @@ public class EsImportService {
     /**
      * 取erc721交易列表
      */
-    public Set<EsErcTx> getErc721TxList(Set<Transaction> transactions){
+    public Set<ErcTx> getErc721TxList(Set<Transaction> transactions){
         // TODO: 取出erc721交易
-        Set<EsErcTx> result = new HashSet<>();
+        Set<ErcTx> result = new HashSet<>();
 //        if (transactions != null && !transactions.isEmpty()) {
 //            for (Transaction tx : transactions) {
 //                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {

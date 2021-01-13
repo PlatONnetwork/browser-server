@@ -11,10 +11,10 @@ import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.util.DateUtil;
-import com.platon.browser.service.misc.StakeMiscService;
-import com.platon.browser.utils.HexTool;
-import com.platon.browser.utils.VerUtil;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.service.ppos.StakeEpochService;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.ChainVersionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
     @Resource
 	private ParameterService parameterService;
     @Resource
-	private StakeMiscService stakeMiscService;
+	private StakeEpochService stakeEpochService;
 
     @Override
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
@@ -50,7 +50,7 @@ public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
 		long startTime = System.currentTimeMillis();
 
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
-        BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
+        BigInteger bigVersion = ChainVersionUtil.toBigVersion(txParam.getProgramVersion());
         BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
 
         String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
@@ -59,9 +59,9 @@ public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
 		}
         Date txTime = DateUtil.covertTime(tx.getTime());
 		// 更新解质押到账需要经过的结算周期数
-		BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+		BigInteger  unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
 		// 理论上的退出区块号
-		BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(txParam.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
+		BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
         		.stakingHes(txParam.getAmount())
@@ -86,7 +86,7 @@ public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
 
         stakeBusinessMapper.create(businessParam);
         
-        updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
+        updateNodeCache(HexUtil.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
         
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());

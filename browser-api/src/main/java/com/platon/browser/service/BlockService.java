@@ -2,13 +2,13 @@ package com.platon.browser.service;
 
 import com.alaya.utils.Convert;
 import com.github.pagehelper.Page;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.request.PageReq;
@@ -19,10 +19,10 @@ import com.platon.browser.request.newblock.BlockListByNodeIdReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
-import com.platon.browser.util.DateUtil;
-import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.I18nUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.utils.EnergonUtil;
+import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.HexUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -77,7 +77,7 @@ public class BlockService {
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Long bNumber = networkStatRedis.getCurNumber();
 		/** 小于50万条查询redis */
-		if (req.getPageNo() * req.getPageSize() < BrowserConst.MAX_NUM) {
+		if (req.getPageNo() * req.getPageSize() < Browser.MAX_NUM) {
 			/**
 			 * 当页号等于1，重新获取数据，与首页保持一致
 			 */
@@ -232,8 +232,8 @@ public class BlockService {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
                     block.getTxQty(),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN))),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN)))
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN))),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN)))
             };
             rows.add(row);
         });

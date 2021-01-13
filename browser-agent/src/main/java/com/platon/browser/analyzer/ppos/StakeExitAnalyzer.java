@@ -15,7 +15,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
     @Resource
     private BlockChainConfig chainConfig;
     @Resource
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
 	
     @Override
     public NodeOpt analyze(CollectionEvent event, Transaction tx) throws BlockNumberException {
@@ -81,9 +81,9 @@ public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
         long startTime = System.currentTimeMillis();
 
         // 更新解质押到账需要经过的结算周期数
-        BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+        BigInteger  unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
         // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-        BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(txParam.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
+        BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getNodeId(),event.getEpochMessage().getSettleEpochRound(),true);
         // 撤销质押
         StakeExit businessParam= StakeExit.builder()
         		.nodeId(txParam.getNodeId())

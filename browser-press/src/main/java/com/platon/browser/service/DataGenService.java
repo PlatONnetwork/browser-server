@@ -9,7 +9,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -41,9 +41,9 @@ public class DataGenService {
     private NodeMapper nodeMapper;
 
     static {
-        PROPOSAL_HASH.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
-        NODE_IDS.add(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
-        ADDRESS.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
+        PROPOSAL_HASH.add(HexUtil.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
+        NODE_IDS.add(HexUtil.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
+        ADDRESS.add(HexUtil.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
     }
 
     static class Status{
@@ -243,7 +243,7 @@ public class DataGenService {
     public StakeResult getStakeResult(Transaction tx) throws BlockNumberException {
         Node node = JSON.parseObject(nodeStr,Node.class);
         node.setStakingBlockNum(tx.getNum());
-        node.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
+        node.setNodeId(HexUtil.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
         node.setNodeIcon(node.getNodeId().substring(0,6));
         node.setNodeName(node.getNodeId().substring(7,10));
 

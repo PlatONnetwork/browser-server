@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -10,7 +10,7 @@ import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.address.QueryDetailResp;
 import com.platon.browser.response.address.QueryRPPlanDetailResp;
 import com.platon.browser.service.AddressService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +40,7 @@ public class AddressController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<QueryDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
+        WebAsyncTask<BaseResp<QueryDetailResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () -> {
             QueryDetailResp queryDetailResp = addressService.getDetails(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), queryDetailResp);
         });
@@ -53,7 +53,7 @@ public class AddressController {
 		/**
 		 * 异步调用，超时则进入timeout  
 		 */
-        WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<QueryRPPlanDetailResp>>() {  
+        WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, new Callable<BaseResp<QueryRPPlanDetailResp>>() {
             @Override  
             public BaseResp<QueryRPPlanDetailResp> call() throws Exception {  
             	QueryRPPlanDetailResp dueryRPPlanDetailResp = addressService.rpplanDetail(req);

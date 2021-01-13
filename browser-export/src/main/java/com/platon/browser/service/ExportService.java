@@ -14,13 +14,13 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.param.*;
-import com.platon.browser.util.DateUtil;
-import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.utils.EnergonUtil;
+import com.platon.browser.utils.HexUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.Getter;
@@ -382,7 +382,7 @@ public class ExportService {
 							allRewards = allRewards.add(new BigDecimal(reward.getReward()));
 						}
 					}
-					row[1] = HexTool.append(EnergonUtil
+					row[1] = HexUtil.append(EnergonUtil
 							.format(Convert.fromVon(allRewards, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 					rows.add(row);
 				}
@@ -505,15 +505,15 @@ public class ExportService {
 					Object[] row = { tx.getHash(), tx.getNum(), DateUtil.timeZoneTransfer(tx.getTime(), "0", "+8"),
 							Transaction.TypeEnum.getEnum(tx.getType()).getDesc(), tx.getFrom(), tx.getTo(),
 							/** 数值von转换成lat，并保留十八位精确度 */
-							HexTool.append(EnergonUtil.format(
+							HexUtil.append(EnergonUtil.format(
 									Convert.fromVon(tx.getValue(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN),
 									18)),
-							HexTool.append(EnergonUtil.format(
+							HexUtil.append(EnergonUtil.format(
 									Convert.fromVon(tx.getCost(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN),
 									18)),
-							HexTool.append(EnergonUtil.format(
+							HexUtil.append(EnergonUtil.format(
 									Convert.fromVon(txAmount, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
-							HexTool.append(EnergonUtil.format(
+							HexUtil.append(EnergonUtil.format(
 									Convert.fromVon(reward, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
 							tx.getInfo(), };
 					csvRows.add(row);
@@ -557,14 +557,14 @@ public class ExportService {
 					Object value = this.getFieldValueByName((String)rowHead[i], node);
 					if("shares,released,releasedHes,restrictingPlan,restrictingPlanHes,delegateEpoch,delegateTotal,delegateTotalHes,delegateRewardTotal"
 							.contains((String)rowHead[i]) && value != null) {
-						value = HexTool.append(EnergonUtil
+						value = HexUtil.append(EnergonUtil
 								.format(Convert.fromVon(new BigDecimal((BigInteger)value), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 					}
 					row[i] = value;
 				}
 				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(node.getBenifitAddress(), DefaultBlockParameter.valueOf(eblock))
 					.send();
-				row[24] = HexTool.append(EnergonUtil
+				row[24] = HexUtil.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 				row[25] = eblock;
 				rows.add(row);
@@ -589,7 +589,7 @@ public class ExportService {
 			row[2] = ContractDescEnum.getMap().get(address).getContractName();
 			PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(eblock))
 					.send();
-			row[3] = HexTool.append(EnergonUtil
+			row[3] = HexUtil.append(EnergonUtil
 					.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 			rows.add(row);
 		}
@@ -626,14 +626,14 @@ public class ExportService {
 					Object value = this.getFieldValueByName((String)rowHead[i], node);
 					if("shares,released,releasedHes,restrictingPlan,restrictingPlanHes,delegateEpoch,delegateTotal,delegateTotalHes,delegateRewardTotal"
 							.contains((String)rowHead[i]) && value != null) {
-						value = HexTool.append(EnergonUtil
+						value = HexUtil.append(EnergonUtil
 								.format(Convert.fromVon(new BigDecimal((BigInteger)value), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 					}
 					row[i] = value;
 				}
 				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(node.getBenifitAddress(), DefaultBlockParameter.valueOf(eblock))
 					.send();
-				row[24] = HexTool.append(EnergonUtil
+				row[24] = HexUtil.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 				row[25] = eblock;
 				rows.add(row);
@@ -658,7 +658,7 @@ public class ExportService {
 			row[2] = ContractDescEnum.getMap().get(address).getContractName();
 			PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(eblock))
 					.send();
-			row[3] = HexTool.append(EnergonUtil
+			row[3] = HexUtil.append(EnergonUtil
 					.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 			rows.add(row);
 		}
@@ -692,7 +692,7 @@ public class ExportService {
 				row[2] = ContractDescEnum.getMap().get(address).getContractName();
 				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(balanceBlock))
 						.send();
-				row[3] = HexTool.append(EnergonUtil
+				row[3] = HexUtil.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 				rows.add(row);
 			}
@@ -749,7 +749,7 @@ public class ExportService {
 			row[1] = address;
 			PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address, DefaultBlockParameter.valueOf(balanceBlock))
 					.send();
-			row[2] = HexTool.append(EnergonUtil
+			row[2] = HexUtil.append(EnergonUtil
 					.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18));
 			rows.add(row);
 		}
@@ -825,11 +825,11 @@ public class ExportService {
 				break;
 			for(Node node: data) {
 				rows.add(new Object[] { node.getNodeId() ,node.getNodeName() 
-						,HexTool.append(EnergonUtil
+						, HexUtil.append(EnergonUtil
 								.format(Convert.fromVon(node.getStatBlockRewardValue(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))
-						, HexTool.append(EnergonUtil
+						, HexUtil.append(EnergonUtil
 								.format(Convert.fromVon(node.getStatStakingRewardValue(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))
-						, HexTool.append(EnergonUtil
+						, HexUtil.append(EnergonUtil
 										.format(Convert.fromVon(node.getStatFeeRewardValue(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))});
 			}
 			log.info("【exportNodeInfo()】第{}页,{}条记录", pageNo, rows.size());
@@ -856,7 +856,7 @@ public class ExportService {
 			for(Address address: data) {
 				PlatonGetBalance balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(address.getAddress(), DefaultBlockParameter.valueOf(eblock))
 						.send();
-				rows.add(new Object[] { address.getAddress() ,HexTool.append(EnergonUtil
+				rows.add(new Object[] { address.getAddress() , HexUtil.append(EnergonUtil
 						.format(Convert.fromVon(new BigDecimal(balance.getBalance()), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))});
 			}
 			log.info("【exportAddressBalance()】第{}页,{}条记录", pageNo, rows.size());

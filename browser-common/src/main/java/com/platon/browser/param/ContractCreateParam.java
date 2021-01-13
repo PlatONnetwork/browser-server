@@ -1,13 +1,9 @@
 package com.platon.browser.param;
 
-import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * User: dongqile

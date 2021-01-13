@@ -3,7 +3,7 @@ package com.platon.browser.handler;
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.cache.AddressCache;

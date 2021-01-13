@@ -1,15 +1,16 @@
 package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.RedisKeyConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,10 +21,10 @@ import java.util.Set;
  */
 @Slf4j
 public abstract class AbstractRedisService<T> {
-    @Autowired
+    @Resource
+    protected RedisKeyConfig redisKeyConfig;
+    @Resource
     protected RedisTemplate<String,String> redisTemplate;
-    @Value("${spring.redis.max-item}")
-    protected long maxItemCount;
     MinMaxScore minMax= MinMaxScore.builder().build();
     // 待入库元组列表
     Set<ZSetOperations.TypedTuple<String>> stageSet = new HashSet<>();
@@ -64,7 +65,10 @@ public abstract class AbstractRedisService<T> {
         long startTime = System.currentTimeMillis();
 
         if(serialOverride) {
-            data.forEach(item -> redisTemplate.opsForValue().set(getCacheKey(), JSON.toJSONString(item)));
+            data.forEach(item -> {
+                String json = JSON.toJSONString(item);
+                redisTemplate.opsForValue().set(getCacheKey(), json);
+            });
         }else{
             // 取出缓存中的记录总数
             Long cacheItemCount = redisTemplate.opsForZSet().size(getCacheKey());
@@ -80,9 +84,9 @@ public abstract class AbstractRedisService<T> {
             updateStageSet(data);
             // 执行入库操作
             if(!stageSet.isEmpty()) redisTemplate.opsForZSet().add(getCacheKey(), stageSet);
-            if(cacheItemCount!=null&&cacheItemCount>maxItemCount){
+            if(cacheItemCount!=null&&cacheItemCount>redisKeyConfig.getMaxItem()){
                 // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (cacheItemCount-maxItemCount)个
-                redisTemplate.opsForZSet().removeRange(getCacheKey(),0,cacheItemCount-maxItemCount);
+                redisTemplate.opsForZSet().removeRange(getCacheKey(),0,cacheItemCount-redisKeyConfig.getMaxItem());
             }
         }
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);

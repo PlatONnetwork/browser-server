@@ -1,14 +1,13 @@
 package com.platon.browser.service.proposal;
 
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.ProposalParticipantStat;
+import com.platon.browser.bean.ProposalParticipantStat;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.alaya.contracts.ppos.dto.CallResponse;
 import com.alaya.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

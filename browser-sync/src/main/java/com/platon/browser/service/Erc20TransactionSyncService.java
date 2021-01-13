@@ -3,8 +3,8 @@ package com.platon.browser.service;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.service.redis.RedisErc20TxService;
+import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.redis.OldRedisErc20TxService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class Erc20TransactionSyncService {
     @Autowired
     private OldEsErc20TxRepository esRepository;
     @Autowired
-    private RedisErc20TxService redisService;
+    private OldRedisErc20TxService redisService;
     @Value("${paging.erc20-transaction.page-size}")
     private int pageSize;
     @Value("${paging.erc20-transaction.page-count}")

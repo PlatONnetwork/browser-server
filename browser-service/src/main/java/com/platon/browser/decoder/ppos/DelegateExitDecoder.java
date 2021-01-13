@@ -1,11 +1,10 @@
 package com.platon.browser.decoder.ppos;
 
-import com.platon.browser.param.DelegateExitParam;
-import com.platon.browser.param.TxParam;
-
-import org.apache.commons.lang3.StringUtils;
 import com.alaya.rlp.solidity.RlpList;
 import com.alaya.rlp.solidity.RlpString;
+import com.platon.browser.param.DelegateExitParam;
+import com.platon.browser.param.TxParam;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -15,17 +14,17 @@ import java.math.BigInteger;
  * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 20:13:04
  **/
-class DelegateExitDecoder {
+public class DelegateExitDecoder extends AbstractPPOSDecoder{
     private DelegateExitDecoder(){}
-    static TxParam decode(RlpList rootList) {
+    public static TxParam decode(RlpList rootList) {
         // 减持/撤销委托
         //代表着某个node的某次质押的唯一标示
-        String blockNumber = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(1));
+        String blockNumber = stringResolver((RlpString) rootList.getValues().get(1));
         blockNumber=blockNumber.replace("0x","");
         //被质押的节点的NodeId
-        String nodeId = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(2));
+        String nodeId = stringResolver((RlpString) rootList.getValues().get(2));
         //减持委托的金额(按照最小单位算，1LAT = 10**18 von)
-        BigInteger amount =  InnerContractDecoder.bigIntegerResolver((RlpString) rootList.getValues().get(3));
+        BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
         BigInteger bl = BigInteger.ZERO;
         if(StringUtils.isNotBlank(blockNumber)) {
