@@ -13,7 +13,7 @@ import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
-import com.platon.browser.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;

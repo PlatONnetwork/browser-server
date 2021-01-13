@@ -1,4 +1,4 @@
-package com.platon.browser.elasticsearch.query;
+package com.platon.browser.service.elasticsearch.query;
 
 import org.elasticsearch.index.query.QueryBuilder;
 

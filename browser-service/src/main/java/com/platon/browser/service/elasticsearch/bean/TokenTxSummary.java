@@ -1,4 +1,4 @@
-package com.platon.browser.elasticsearch.bean;
+package com.platon.browser.service.elasticsearch.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;

@@ -1,10 +1,7 @@
-package com.platon.browser.elasticsearch.query;
+package com.platon.browser.service.elasticsearch.query;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-
-import com.platon.browser.elasticsearch.query.ESCriterion;
-import com.platon.browser.elasticsearch.query.ESCriterion.Operator;
 
 import java.util.Collection;
 
@@ -23,13 +20,13 @@ public class ESSimpleExpression {
     private Object from;
     private Object to;
 
-    protected  ESSimpleExpression(String fieldName, Object value, Operator operator) {
+    protected  ESSimpleExpression(String fieldName, Object value, ESCriterion.Operator operator) {
         this.fieldName = fieldName;
         this.value = value;
         this.operator = operator;
     }
 
-    protected  ESSimpleExpression(String value, Operator operator) {
+    protected  ESSimpleExpression(String value, ESCriterion.Operator operator) {
         this.value = value;
         this.operator = operator;
     }
@@ -37,14 +34,14 @@ public class ESSimpleExpression {
     protected ESSimpleExpression(String fieldName, Collection<Object> values) {
         this.fieldName = fieldName;
         this.values = values;
-        this.operator = Operator.TERMS;
+        this.operator = ESCriterion.Operator.TERMS;
     }
 
     protected ESSimpleExpression(String fieldName, Object from, Object to) {
         this.fieldName = fieldName;
         this.from = from;
         this.to = to;
-        this.operator = Operator.RANGE;
+        this.operator = ESCriterion.Operator.RANGE;
     }
 
     public QueryBuilder toBuilder() {

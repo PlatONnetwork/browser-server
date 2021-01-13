@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.EsErc20TxRepository;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;

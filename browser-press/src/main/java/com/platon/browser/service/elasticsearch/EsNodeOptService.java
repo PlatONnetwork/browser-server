@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;

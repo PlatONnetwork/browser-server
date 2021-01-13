@@ -1,9 +1,9 @@
 package com.platon.browser.service;
 
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
-import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.OldRedisErc20TxService;
 import lombok.Getter;
 import lombok.Setter;

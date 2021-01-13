@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.EsDelegationRewardRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;

@@ -1,8 +1,8 @@
-package com.platon.browser.elasticsearch;
+package com.platon.browser.service.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.elasticsearch.bean.TokenTxCount;
-import com.platon.browser.elasticsearch.bean.TokenTxSummary;
+import com.platon.browser.service.elasticsearch.bean.TokenTxCount;
+import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
 import com.platon.browser.enums.Arc20TxGroupTypeEnum;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

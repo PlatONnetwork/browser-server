@@ -1,10 +1,10 @@
 package com.platon.browser.service;
 
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.EsTransactionRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisTransactionService;
 import org.junit.Before;
 import org.junit.Test;

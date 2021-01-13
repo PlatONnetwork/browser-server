@@ -1,5 +1,7 @@
 package com.platon.browser.elasticsearch.query;
 
+import com.platon.browser.service.elasticsearch.query.ESCriterion;
+import com.platon.browser.service.elasticsearch.query.ESSimpleExpression;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.junit.Before;
 import org.junit.Test;

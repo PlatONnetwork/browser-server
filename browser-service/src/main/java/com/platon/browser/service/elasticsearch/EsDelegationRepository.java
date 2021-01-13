@@ -1,4 +1,4 @@
-package com.platon.browser.elasticsearch;
+package com.platon.browser.service.elasticsearch;
 
 import org.springframework.stereotype.Repository;
 

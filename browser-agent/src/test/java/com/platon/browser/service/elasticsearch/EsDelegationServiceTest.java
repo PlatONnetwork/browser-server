@@ -2,7 +2,6 @@ package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.EsDelegationRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

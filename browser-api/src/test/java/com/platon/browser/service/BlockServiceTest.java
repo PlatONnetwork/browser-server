@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.ApiTestMockBase;
-import com.platon.browser.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.request.newblock.BlockDetailNavigateReq;

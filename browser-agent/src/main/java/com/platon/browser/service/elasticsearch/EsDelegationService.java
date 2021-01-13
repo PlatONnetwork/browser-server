@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.EsDelegationRepository;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;

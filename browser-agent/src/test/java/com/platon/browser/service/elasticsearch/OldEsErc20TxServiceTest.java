@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
 import org.junit.Before;
 import org.junit.Test;
