@@ -2,9 +2,8 @@ package com.platon.browser.controller;
 
 import com.platon.browser.config.BrowserCache;
 import com.platon.browser.config.MessageDto;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,12 +24,11 @@ import java.util.concurrent.locks.ReentrantLock;
  *	@author zhangrj
  *  @data 2019年12月19日
  */
+@Slf4j
 @RestController
 @ServerEndpoint("/websocket/{message}")
 @CrossOrigin
 public class WebSocketController {
-	
-	private static Logger logger = LoggerFactory.getLogger(WebSocketController.class);
 	private String userno = "";
 	private Lock lock = new ReentrantLock();
 
@@ -62,7 +60,7 @@ public class WebSocketController {
 		}
 		userno = messageDto.getUserNo();
 		BrowserCache.addOnlineCount();// 在线数加1
-		logger.debug("有新连接加入！当前在线人数为:{}",BrowserCache.getOnlineCount());
+		log.debug("有新连接加入！当前在线人数为:{}",BrowserCache.getOnlineCount());
 	}
 
 	/**
@@ -82,7 +80,7 @@ public class WebSocketController {
 			BrowserCache.getWebSocketSet().remove(userno); // 从set中删除
 		}
 		BrowserCache.subOnlineCount(); // 在线数减1
-		logger.debug("有一连接关闭！当前在线人数为:{}",BrowserCache.getOnlineCount());
+		log.debug("有一连接关闭！当前在线人数为:{}",BrowserCache.getOnlineCount());
 	}
 
 	/**
@@ -91,7 +89,7 @@ public class WebSocketController {
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		logger.debug("来自客户端的消息:{}",message);
+		log.debug("来自客户端的消息:{}",message);
 	}
 
 	/**
@@ -100,7 +98,7 @@ public class WebSocketController {
 
 	@OnError
 	public void onError(Session session, Throwable error) {
-		logger.error(" error", error);
+		log.error(" error", error);
 		if (StringUtils.isNotBlank(userno)) {
 			/**
 			 * 循环去除对应的用户
@@ -112,8 +110,7 @@ public class WebSocketController {
 			}
 			BrowserCache.getWebSocketSet().remove(userno); // 从set中删除
 			BrowserCache.subOnlineCount(); // 在线数减1
-			logger.debug("有一连接关闭！当前在线人数为:{}",BrowserCache.getOnlineCount());
+			log.debug("有一连接关闭！当前在线人数为:{}",BrowserCache.getOnlineCount());
 		}
 	}
-
 }

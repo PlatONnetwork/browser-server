@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.constant.Browser;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
@@ -17,7 +16,7 @@ import com.platon.browser.service.OldErc20TxService;
 import com.platon.browser.utils.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.WebAsyncTask;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -42,15 +41,12 @@ public class Erc20TokenTransferRecordController {
     @Resource
     private I18nUtil i18n;
 
-    @PostMapping(value = "token/tokenTransferList")
-    public WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> tokenTransferList(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
-        WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () ->
-                this.oldErc20TxService.queryTokenRecordList(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("token/tokenTransferList")
+    public Mono<RespPage<QueryTokenTransferRecordListResp>> tokenTransferList(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
+        return Mono.just(oldErc20TxService.queryTokenRecordList(req));
     }
 
-    @GetMapping(value = "token/exportTokenTransferList")
+    @GetMapping("token/exportTokenTransferList")
     public void exportTokenTransferList(
             @RequestParam(value = "address",required = false) String address,
             @RequestParam(value = "contract",required = false) String contract,
@@ -64,25 +60,22 @@ public class Erc20TokenTransferRecordController {
             /**
              * 鉴权
              */
-            this.commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = this.oldErc20TxService.exportTokenTransferList(address, contract, date, local, timeZone, token, response);
-            this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
+            commonMethod.recaptchaAuth(token);
+            AccountDownload accountDownload = oldErc20TxService.exportTokenTransferList(address, contract, date, local, timeZone, token, response);
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error("download error", e);
+            log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
 
-    @PostMapping(value = "token/tokenHolderList")
-    public WebAsyncTask<RespPage<QueryTokenHolderListResp>> tokenHolderList(@Valid @RequestBody QueryTokenHolderListReq req) {
-        WebAsyncTask<RespPage<QueryTokenHolderListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () ->
-                this.oldErc20TxService.tokenHolderList(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("token/tokenHolderList")
+    public Mono<RespPage<QueryTokenHolderListResp>> tokenHolderList(@Valid @RequestBody QueryTokenHolderListReq req) {
+        return Mono.just(oldErc20TxService.tokenHolderList(req));
     }
 
-    @GetMapping(value = "token/exportTokenHolderList")
+    @GetMapping("token/exportTokenHolderList")
     public void exportTokenHolderList(
             @RequestParam(value = "contract",required = true) String contract,
             @RequestParam(value = "local",required = true) String local,
@@ -94,25 +87,22 @@ public class Erc20TokenTransferRecordController {
             /**
              * 鉴权
              */
-            this.commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = this.oldErc20TxService.exportTokenHolderList(contract, local, timeZone, token, response);
-            this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
+            commonMethod.recaptchaAuth(token);
+            AccountDownload accountDownload = oldErc20TxService.exportTokenHolderList(contract, local, timeZone, token, response);
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error(e.getMessage());
-            throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
+            log.error(e.getMessage());
+            throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
 
-    @PostMapping(value = "token/holderTokenList")
-    public WebAsyncTask<RespPage<QueryHolderTokenListResp>> holderTokenList(@Valid @RequestBody QueryHolderTokenListReq req) {
-        WebAsyncTask<RespPage<QueryHolderTokenListResp>> webAsyncTask = new WebAsyncTask<>(Browser.WEB_TIME_OUT, () ->
-                this.oldErc20TxService.holderTokenList(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("token/holderTokenList")
+    public Mono<RespPage<QueryHolderTokenListResp>> holderTokenList(@Valid @RequestBody QueryHolderTokenListReq req) {
+        return Mono.just(oldErc20TxService.holderTokenList(req));
     }
 
-    @GetMapping(value = "token/exportHolderTokenList")
+    @GetMapping("token/exportHolderTokenList")
     public void exportHolderTokenList(
             @RequestParam(value = "address",required = true) String address,
             @RequestParam(value = "local",required = true) String local,
@@ -124,13 +114,13 @@ public class Erc20TokenTransferRecordController {
             /**
              * 鉴权
              */
-            this.commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = this.oldErc20TxService.exportHolderTokenList(address, local, timeZone, token, response);
-            this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
+            commonMethod.recaptchaAuth(token);
+            AccountDownload accountDownload = oldErc20TxService.exportHolderTokenList(address, local, timeZone, token, response);
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error("download error", e);
-            throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
+            log.error("download error", e);
+            throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
 }
