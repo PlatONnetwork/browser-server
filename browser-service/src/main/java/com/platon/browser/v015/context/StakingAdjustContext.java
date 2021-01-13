@@ -67,6 +67,12 @@ public class StakingAdjustContext extends AbstractAdjustContext {
                 .subtract(adjustParam.getLock())
             );
         }
+        int unStakeFreezeDuration = 1;
+        if(adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()) {
+            // 如果節點本身已經處於退出中，則保留原來的凍結周期數
+            unStakeFreezeDuration = adjustParam.getUnStakeFreezeDuration();
+        }
+        adjustParam.setUnStakeFreezeDuration(unStakeFreezeDuration);
         // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为退出中，且锁定周期设置为1，解锁块号设为本周期最后一个块号
         BigDecimal stakingHes = adjustParam.getStakingHes();
         BigDecimal stakingLocked = adjustParam.getStakingLocked();
@@ -82,8 +88,6 @@ public class StakingAdjustContext extends AbstractAdjustContext {
             // 设置退出时所在结算周期
             BigInteger epoch = EpochUtil.getEpoch(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
             adjustParam.setStakingReductionEpoch(epoch.intValue());
-            // 锁定周期设置为1
-            adjustParam.setUnStakeFreezeDuration(1);
             //解锁块号设为本周期最后一个块号
             BigInteger unStakeEndBlock = EpochUtil.getCurEpochLastBlockNumber(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
             adjustParam.setUnStakeEndBlock(unStakeEndBlock.intValue());
