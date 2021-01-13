@@ -34,7 +34,7 @@ public class StatisticCacheService extends CacheBase {
 	}
 
 	public NetworkStat getNetworkStatCache() {
-		String value = jedisClient.get(redisKeyConfig.getNetworkStat());
+		String value = redisTemplate.opsForValue().get(redisKeyConfig.getNetworkStat());
 		/* 获取对象转换成统计对象 */
 		NetworkStat networkStat = JSON.parseObject(value, NetworkStat.class);
 		if(networkStat == null) {

@@ -1,4 +1,4 @@
-package com.platon.browser.elasticsearch.bean;
+package com.platon.browser.service.elasticsearch.bean;
 
 import com.platon.browser.service.elasticsearch.bean.ESSortDto;
 import org.elasticsearch.search.sort.SortOrder;

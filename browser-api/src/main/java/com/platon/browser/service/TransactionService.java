@@ -9,7 +9,6 @@ import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.DownFileCommon;
-import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
@@ -51,6 +50,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -91,7 +91,7 @@ public class TransactionService {
     @Resource
     private CommonService commonService;
     @Resource
-    private JedisClient jedisClient;
+    private RedisTemplate<String,String> redisTemplate;
     @Resource
     private DownFileCommon downFileCommon;
     private static final String ERROR_TIPS = "获取区块错误。";
@@ -767,7 +767,7 @@ public class TransactionService {
             /**
              * 检查redis是否已经存储
              */
-            String userName = jedisClient.get(externalId);
+            String userName = redisTemplate.opsForValue().get(externalId);
             if (StringUtils.isNotBlank(userName)) {
                 defaultBaseUrl += userName;
                 return defaultBaseUrl;
@@ -785,7 +785,7 @@ public class TransactionService {
                 /**
                  * 设置redis
                  */
-                jedisClient.set(externalId, userName);
+                redisTemplate.opsForValue().set(externalId, userName);
                 defaultBaseUrl += userName;
             }
             return defaultBaseUrl;

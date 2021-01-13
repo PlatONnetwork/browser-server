@@ -1,7 +1,5 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.config.RedisKeyConfig;
-import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +8,6 @@ import java.util.HashMap;
 
 @Service
 public class RedisErc20TokenService extends AbstractRedisService<Long> {
-    @Resource
-    private JedisClient jedisClient;
-
     @Resource
     private Erc20TokenMapper erc20TokenMapper;
 
@@ -38,11 +33,11 @@ public class RedisErc20TokenService extends AbstractRedisService<Long> {
     }
 
     public long getTokenCount() {
-        String value = jedisClient.get(getCacheKey());
+        String value = redisTemplate.opsForValue().get(getCacheKey());
         if (null == value || value.equals("")) {
             int count = erc20TokenMapper.totalErc20Token(new HashMap());
             value = String.valueOf(count);
-            jedisClient.set(getCacheKey(), value);
+            redisTemplate.opsForValue().set(getCacheKey(),value);
         }
         return Long.parseLong(value);
     }

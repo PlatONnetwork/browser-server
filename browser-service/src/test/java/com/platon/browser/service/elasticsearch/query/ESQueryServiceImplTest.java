@@ -1,9 +1,7 @@
-package com.platon.browser.elasticsearch.query;
+package com.platon.browser.service.elasticsearch.query;
 
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.service.elasticsearch.*;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.IndicesClient;

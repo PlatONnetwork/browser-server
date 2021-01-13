@@ -1,6 +1,5 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.config.redis.RedisCommands;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,12 +15,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisTransferRecordServiceTest {
+public class OldRedisErc20TxServiceTest {
 	@Mock
 	private RedisTemplate<String,String> redisTemplate;
 	@Spy
@@ -35,13 +33,11 @@ public class RedisTransferRecordServiceTest {
 		when(redisTemplate.opsForZSet()).thenReturn(operations);
 		when(redisTemplate.hasKey(any())).thenReturn(true);
 		when(operations.size(any())).thenReturn(30L);
-		//when(operations.rangeByScore(any(),any(),any())).thenReturn(Collections.EMPTY_SET);
-		RedisCommands commands = mock(RedisCommands.class);
-		when(commands.get(anyString())).thenReturn("90");
 
 		ValueOperations<String,String> valueOperations = mock(ValueOperations.class);
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 		when(redisTemplate.hasKey(any())).thenReturn(true);
+		when(valueOperations.get(any())).thenReturn("90");
 	}
 
 	@Test

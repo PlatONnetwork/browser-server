@@ -1,4 +1,4 @@
-package com.platon.browser.elasticsearch;
+package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
 import org.elasticsearch.client.IndicesClient;

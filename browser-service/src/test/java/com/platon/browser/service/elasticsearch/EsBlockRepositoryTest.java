@@ -1,6 +1,6 @@
-package com.platon.browser.elasticsearch;
+package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.service.elasticsearch.EsTransactionRepository;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -23,20 +23,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+
 /**
  * @Auther: dongqile
- * @Date: 2019/12/5
- * @Description:
+ * @Date: 2019/12/4
+ * @Description: elasticsearch通用操作测试类
  */
-
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsTransactionRepositoryTest {
-
+public class EsBlockRepositoryTest {
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private EsTransactionRepository target;
+    private EsBlockRepository target;
+
+
+
 
     @Before
     public void setup()throws Exception{
@@ -51,7 +53,7 @@ public class EsTransactionRepositoryTest {
     @Test
     public void createIndexTest()throws Exception{
         Map <String,String> map = new HashMap <>();
-        map.put("123","123");
+        map.put("","");
         target.createIndex(map);
     }
 
@@ -103,5 +105,6 @@ public class EsTransactionRepositoryTest {
         map.put("Test","aaaa");
         target.bulkAddOrUpdate(map);
     }
+
 
 }

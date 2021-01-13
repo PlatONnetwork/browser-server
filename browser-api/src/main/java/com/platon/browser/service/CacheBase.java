@@ -1,7 +1,6 @@
 package com.platon.browser.service;
 
 import com.platon.browser.config.RedisKeyConfig;
-import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.utils.I18nUtil;
@@ -25,7 +24,7 @@ public class CacheBase {
     @Resource
     protected RedisKeyConfig redisKeyConfig;
     @Resource
-    protected JedisClient jedisClient;
+    protected RedisTemplate<String,String> redisTemplate;
     @Resource
     protected I18nUtil i18n;
 
@@ -50,7 +49,8 @@ public class CacheBase {
         RespPage<T> page = new RespPage<>();
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         CachePageInfo<T> cpi = new CachePageInfo<>();
-        long pagingTotalCount = jedisClient.zsize(cacheKey);
+        Long pagingTotalCount = redisTemplate.opsForZSet().size(cacheKey);
+        if(pagingTotalCount==null) pagingTotalCount=0L;
         if(pagingTotalCount>redisKeyConfig.getMaxItem()){
             // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
             pagingTotalCount = redisKeyConfig.getMaxItem();
@@ -72,7 +72,8 @@ public class CacheBase {
         }
         long start = (pageNum-1L)*pageSize;
         long end = (pageNum*pageSize)-1L;
-        cpi.data = jedisClient.zrevrange(cacheKey, start, end);
+        cpi.data = redisTemplate.opsForZSet().reverseRange(cacheKey,start,end);
+//        cpi.data = jedisClient.zrevrange(cacheKey, start, end);
         cpi.page = page;
         return cpi;
     }
@@ -99,7 +100,8 @@ public class CacheBase {
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
 
         CachePageInfo<T> cpi = new CachePageInfo<>();
-        cpi.data = jedisClient.zrevrange(cacheKey, start, end);
+//        cpi.data = jedisClient.zrevrange(cacheKey, start, end);
+        cpi.data = redisTemplate.opsForZSet().reverseRange(cacheKey,start,end);
         cpi.page = page;
         return cpi;
     }

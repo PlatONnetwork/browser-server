@@ -10,21 +10,20 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix="spring.redis.jedis-cluster")
 public class RedisClusterConfig {
-	private String configKey="DEFAULT";
-	private int connectionTimeout;
-	private int soTimeout;
-	private int maxRedirections;
-	private int maxTotal;
-	private int maxIdle;
-	private int minIdle;
-	private int maxWaitMillis;
-	private boolean testOnBorrow;
-	private boolean testOnReturn;
-	private boolean testWhileIdle;
-	private String masterIPs="";
-	private String password="";
+//	private String configKey="DEFAULT";
+//	private int connectionTimeout;
+//	private int soTimeout;
+//	private int maxRedirections;
+//	private int maxTotal;
+//	private int maxIdle;
+//	private int minIdle;
+//	private int maxWaitMillis;
+//	private boolean testOnBorrow;
+//	private boolean testOnReturn;
+//	private boolean testWhileIdle;
+//	private String masterIPs="";
+//	private String password="";
 
 	@Bean
 	public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {

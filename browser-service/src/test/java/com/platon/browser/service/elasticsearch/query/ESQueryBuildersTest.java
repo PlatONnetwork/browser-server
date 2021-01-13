@@ -1,6 +1,5 @@
-package com.platon.browser.elasticsearch.query;
+package com.platon.browser.service.elasticsearch.query;
 
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

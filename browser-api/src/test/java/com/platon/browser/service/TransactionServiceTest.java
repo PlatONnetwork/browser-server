@@ -5,7 +5,6 @@ import com.platon.browser.ApiTestMockBase;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.DownFileCommon;
-import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Slash;
@@ -13,8 +12,6 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.service.elasticsearch.EsDelegationRewardRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.Erc20Param;
@@ -26,6 +23,8 @@ import com.platon.browser.request.staking.QueryClaimByStakingReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.transaction.TransactionListResp;
+import com.platon.browser.service.elasticsearch.EsDelegationRewardRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +32,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -58,7 +59,7 @@ public class TransactionServiceTest extends ApiTestMockBase {
 	@Mock
 	private ProposalMapper proposalMapper;
 	@Mock
-	private JedisClient jedisClient;
+	private RedisTemplate<String,String> redisTemplate;
 	@Mock
 	private DownFileCommon downFileCommon;
 
@@ -68,7 +69,9 @@ public class TransactionServiceTest extends ApiTestMockBase {
 
 	@Before
 	public void setup() {
-		when(jedisClient.get(anyString())).thenReturn("test");
+		ValueOperations valueOperations = mock(ValueOperations.class);
+		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+		when(valueOperations.get(any())).thenReturn("test");
 		when(this.commonService.getNodeName(any(), any())).thenReturn("test-name");
 	}
 

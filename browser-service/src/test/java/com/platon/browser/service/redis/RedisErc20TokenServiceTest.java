@@ -1,6 +1,5 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.config.redis.JedisClient;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +21,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class RedisErc20TokenServiceTest {
 	@Mock
-	private JedisClient jedisClient;
-	@Mock
 	private Erc20TokenMapper erc20TokenMapper;
 	@Mock
 	private RedisTemplate<String,String> redisTemplate;
@@ -40,12 +37,11 @@ public class RedisErc20TokenServiceTest {
 		when(redisTemplate.opsForZSet()).thenReturn(operations);
 		when(redisTemplate.hasKey(any())).thenReturn(true);
 		when(operations.size(any())).thenReturn(30L);
-		//when(operations.rangeByScore(any(),any(),any())).thenReturn(Collections.EMPTY_SET);
-		when(jedisClient.get(anyString())).thenReturn("90");
 
 		ValueOperations<String,String> valueOperations = mock(ValueOperations.class);
 		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 		when(redisTemplate.hasKey(any())).thenReturn(true);
+		when(valueOperations.get(any())).thenReturn("9");
 	}
 
 	@Test

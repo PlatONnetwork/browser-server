@@ -1,6 +1,6 @@
-package com.platon.browser.elasticsearch;
+package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.service.elasticsearch.EsDelegationRepository;
+import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -29,13 +29,14 @@ import static org.mockito.Mockito.when;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsDelegationRepositoryTest {
+public class EsNodeOptRepositoryTest {
+
 
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private EsDelegationRepository target;
+    private EsNodeOptRepository target;
 
     @Before
     public void setup()throws Exception{
