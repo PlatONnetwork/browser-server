@@ -325,6 +325,15 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       "fromType": {                    //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
+      "remark": {                      //交易备注信息， aton使用
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "txFee": {                       //交易手续费    
+        "type": "keyword"
+      }
     }
   }
 }
@@ -379,6 +388,9 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       },
       "fromType": {                    //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
+      },
+      "txFee": {                       //交易手续费    
+        "type": "keyword"
       }
     }
   }
@@ -517,6 +529,12 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       "updTime": {               //本地更新时间
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
         "type": "date"
+      },
+      "remark": {                //交易备注信息， aton使用
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
       }
     }
   }
