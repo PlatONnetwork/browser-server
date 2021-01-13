@@ -1,19 +1,18 @@
 package com.platon.browser.service;
 
 import com.platon.browser.ApiTestBase;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.cache.TransactionCacheDto;
-
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
-
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 
-public class StatisticCacheServiceApiTest extends ApiTestBase {
+import static org.junit.Assert.assertNotNull;
+
+
+public class StatisticCacheServiceTest extends ApiTestBase {
 
 	@Autowired
 	private StatisticCacheService statisticCacheService;

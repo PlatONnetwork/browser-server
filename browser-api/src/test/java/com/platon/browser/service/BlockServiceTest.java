@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockServiceApiTest extends ApiTestMockBase {
+public class BlockServiceTest extends ApiTestMockBase {
 
 	@Spy
     private BlockService target;

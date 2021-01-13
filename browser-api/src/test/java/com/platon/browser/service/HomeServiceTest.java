@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class HomeServiceApiTest extends ApiTestMockBase {
+public class HomeServiceTest extends ApiTestMockBase {
     @Spy
     private HomeService target;
     @Spy

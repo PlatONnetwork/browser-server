@@ -39,7 +39,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class Erc20TokenTransferRecordServiceApiTest extends ApiTestMockBase {
+public class Erc20TokenTransferRecordServiceTest extends ApiTestMockBase {
 	@Mock
 	private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
 	@Mock

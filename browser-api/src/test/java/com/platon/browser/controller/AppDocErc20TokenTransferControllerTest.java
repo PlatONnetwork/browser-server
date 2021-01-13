@@ -89,7 +89,7 @@ public class AppDocErc20TokenTransferControllerTest  extends ApiTestBase {
                     result.getResponse().setCharacterEncoding("UTF-8");
                     MockHttpServletResponse contentRespon = result.getResponse();
                     InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
-                    FileOutputStream fos = new FileOutputStream(new File("ccc.csv"));
+                    FileOutputStream fos = new FileOutputStream(new File("build/ccc.csv"));
                     byte[] byteBuf = new byte[1024];
                     while (in.read(byteBuf) != -1) {
                         fos.write(byteBuf);
@@ -112,7 +112,7 @@ public class AppDocErc20TokenTransferControllerTest  extends ApiTestBase {
                     result.getResponse().setCharacterEncoding("UTF-8");
                     MockHttpServletResponse contentRespon = result.getResponse();
                     InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
-                    FileOutputStream fos = new FileOutputStream(new File("ddd.csv"));
+                    FileOutputStream fos = new FileOutputStream(new File("build/ddd.csv"));
                     byte[] byteBuf = new byte[1024];
                     while (in.read(byteBuf) != -1) {
                         fos.write(byteBuf);
@@ -134,7 +134,7 @@ public class AppDocErc20TokenTransferControllerTest  extends ApiTestBase {
                     result.getResponse().setCharacterEncoding("UTF-8");
                     MockHttpServletResponse contentRespon = result.getResponse();
                     InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
-                    FileOutputStream fos = new FileOutputStream(new File("eee.csv"));
+                    FileOutputStream fos = new FileOutputStream(new File("build/eee.csv"));
                     byte[] byteBuf = new byte[1024];
                     while (in.read(byteBuf) != -1) {
                         fos.write(byteBuf);

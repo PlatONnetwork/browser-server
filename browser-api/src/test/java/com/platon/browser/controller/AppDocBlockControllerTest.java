@@ -73,7 +73,7 @@ public class AppDocBlockControllerTest extends ApiTestBase {
 				result.getResponse().setCharacterEncoding("UTF-8");
 				MockHttpServletResponse contentRespon = result.getResponse();
 				InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
-				FileOutputStream fos = new FileOutputStream(new File("aaa.csv"));
+				FileOutputStream fos = new FileOutputStream(new File("build/aaa.csv"));
 				byte[] byteBuf = new byte[1024];
 				while(in.read(byteBuf)!=-1) {
 					fos.write(byteBuf);

@@ -48,7 +48,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionServiceApiTest extends ApiTestMockBase {
+public class TransactionServiceTest extends ApiTestMockBase {
 
 	@Mock
 	private DelegationRewardESRepository delegationRewardESRepository;

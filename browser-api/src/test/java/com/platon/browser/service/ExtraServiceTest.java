@@ -22,7 +22,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ExtraServiceApiTest extends ApiTestMockBase {
+public class ExtraServiceTest extends ApiTestMockBase {
 	@Mock
 	private ConfigMapper configMapper;
     @Spy

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class Erc20TokenDetailServiceApiTest extends ApiTestMockBase {
+public class Erc20TokenDetailServiceTest extends ApiTestMockBase {
 
 	@Mock
 	private Erc20TokenDetailMapper erc20TokenDetailMapper;

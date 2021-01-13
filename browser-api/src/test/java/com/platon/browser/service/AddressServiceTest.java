@@ -45,7 +45,7 @@ import com.alaya.contracts.ppos.dto.resp.Reward;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class AddressServiceApiTest extends ApiTestMockBase {
+public class AddressServiceTest extends ApiTestMockBase {
 	@Mock
     private RpPlanMapper rpPlanMapper;
 	@Mock

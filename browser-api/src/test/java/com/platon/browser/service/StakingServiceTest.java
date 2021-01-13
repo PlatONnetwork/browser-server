@@ -3,16 +3,16 @@ package com.platon.browser.service;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.ApiTestMockBase;
+import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.bean.DelegationAddress;
+import com.platon.browser.bean.DelegationStaking;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.bean.CustomStaking;
-import com.platon.browser.bean.DelegationAddress;
-import com.platon.browser.bean.DelegationStaking;
-import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.request.staking.*;
 import com.platon.browser.response.RespPage;
@@ -40,7 +40,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StakingServiceApiTest extends ApiTestMockBase {
+public class StakingServiceTest extends ApiTestMockBase {
     @Mock
     private CustomStakingMapper customStakingMapper;
     @Mock

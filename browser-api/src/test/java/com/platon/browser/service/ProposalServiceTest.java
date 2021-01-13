@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProposalServiceApiTest extends ApiTestMockBase {
+public class ProposalServiceTest extends ApiTestMockBase {
     @Mock
     private ProposalMapper proposalMapper;
     @Spy
