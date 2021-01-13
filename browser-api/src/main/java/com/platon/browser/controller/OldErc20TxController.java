@@ -30,7 +30,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-public class Erc20TokenTransferRecordController {
+public class OldErc20TxController {
 
     @Resource
     private OldErc20TxService oldErc20TxService;
