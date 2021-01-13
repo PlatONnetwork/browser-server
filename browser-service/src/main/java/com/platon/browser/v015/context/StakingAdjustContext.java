@@ -87,6 +87,8 @@ public class StakingAdjustContext extends AbstractAdjustContext {
             //解锁块号设为本周期最后一个块号
             BigInteger unStakeEndBlock = EpochUtil.getCurEpochLastBlockNumber(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
             adjustParam.setUnStakeEndBlock(unStakeEndBlock.intValue());
+            //設置退出時間
+            adjustParam.setLeaveTime(adjustParam.getBlockTime());
         }
     }
 

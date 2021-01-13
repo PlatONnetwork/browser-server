@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * 质押或委托账户调账条目
@@ -14,6 +15,8 @@ public class AdjustParam {
     private BigInteger currBlockNum;
     // 结算周期区块数
     private BigInteger settleBlockCount;
+    // 區塊時間
+    private Date blockTime;
     /*特殊节点返回的调账参数*/
     private String optType;
     private String nodeId;
@@ -47,4 +50,5 @@ public class AdjustParam {
     private int stakingReductionEpoch; // 退回结算周期标识
     private int unStakeFreezeDuration; // 解质押理论上锁定的结算周期数
     private int unStakeEndBlock; // 解质押冻结的最后一个区块
+    private Date leaveTime; // 退出時間
 }
