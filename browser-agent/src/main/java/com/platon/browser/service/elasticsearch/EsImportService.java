@@ -32,7 +32,7 @@ public class EsImportService {
     @Resource
     private EsDelegateRewardService esDelegateRewardService;
     @Resource
-    private EsTokenTransferRecordService esTokenTransferRecordService;
+    private OldEsErc20TxService oldEsErc20TxService;
     @Resource
     private EsErc20TxService esErc20TxService;
     @Resource
@@ -58,7 +58,7 @@ public class EsImportService {
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions,
                             Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
 
-        Set<ESTokenTransferRecord> oldErc20TxList = getOldErc20TxList(transactions);
+        Set<OldErcTx> oldErc20TxList = getOldErc20TxList(transactions);
         Set<EsErcTx> erc20TxList = getErc20TxList(transactions);
         Set<EsErcTx> erc721TxList = getErc721TxList(transactions);
         if (log.isDebugEnabled()) {
@@ -74,7 +74,7 @@ public class EsImportService {
             submit(esTransactionService, transactions, latch);
             submit(esNodeOptService, nodeOpts, latch);
             submit(esDelegateRewardService, delegationRewards, latch);
-            submit(esTokenTransferRecordService, oldErc20TxList, latch);
+            submit(oldEsErc20TxService, oldErc20TxList, latch);
             submit(esErc20TxService, erc20TxList, latch);
             submit(esErc721TxService, erc721TxList, latch);
             latch.await();
@@ -89,12 +89,12 @@ public class EsImportService {
     /**
      * 取Token交易列表
      */
-    public Set<ESTokenTransferRecord> getOldErc20TxList(Set<Transaction> txSet){
-        Set<ESTokenTransferRecord> recordSet = new HashSet<>();
+    public Set<OldErcTx> getOldErc20TxList(Set<Transaction> txSet){
+        Set<OldErcTx> recordSet = new HashSet<>();
         if (txSet != null && !txSet.isEmpty()) {
             for (Transaction tx : txSet) {
-                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
-                    recordSet.addAll(tx.getEsTokenTransferRecords());
+                if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
+                    recordSet.addAll(tx.getOldErcTxes());
                 }
             }
         }
@@ -108,8 +108,8 @@ public class EsImportService {
         Set<EsErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
-                    tx.getEsTokenTransferRecords().forEach(e->{
+                if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
+                    tx.getOldErcTxes().forEach(e->{
                         EsErcTx ercTx = new EsErcTx();
                         BeanUtils.copyProperties(e,ercTx);
                         result.add(ercTx);

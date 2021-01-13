@@ -75,15 +75,19 @@ public class InitializationService {
     @Resource
     private StakeMiscService stakeMiscService;
     @Resource
-    private BlockEsRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
     @Resource
-    private TransactionEsRepository transactionESRepository;
+    private EsTransactionRepository ESTransactionRepository;
     @Resource
-    private DelegationRewardEsRepository delegationRewardESRepository;
+    private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Resource
-    private TokenTransferRecordEsRepository transferRecordESRepository;
+    private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Resource
-    private NodeOptEsRepository nodeOptESRepository;
+    private EsNodeOptRepository ESNodeOptRepository;
+    @Resource
+    private EsErc20TxRepository esErc20TxRepository;
+    @Resource
+    private EsErc721TxRepository esErc721TxRepository;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
@@ -285,11 +289,13 @@ public class InitializationService {
 
     private void initEs() {
     	try {
-    		blockESRepository.initIndex();
-        	transactionESRepository.initIndex();
-        	delegationRewardESRepository.initIndex();
-        	transferRecordESRepository.initIndex();
-        	nodeOptESRepository.initIndex();
+    		ESBlockRepository.initIndex();
+        	ESTransactionRepository.initIndex();
+        	ESDelegationRewardRepository.initIndex();
+        	ESNodeOptRepository.initIndex();
+            oldEsErc20TxRepository.initIndex();
+        	esErc20TxRepository.initIndex();
+        	esErc721TxRepository.init();
 		} catch (Exception e) {
 			log.error("init es error",e);
 		}

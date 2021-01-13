@@ -18,11 +18,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.platon.browser.elasticsearch.BlockEsRepository;
-import com.platon.browser.elasticsearch.DelegationEsRepository;
-import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
-import com.platon.browser.elasticsearch.NodeOptEsRepository;
-import com.platon.browser.elasticsearch.TransactionEsRepository;
+import com.platon.browser.elasticsearch.EsBlockRepository;
+import com.platon.browser.elasticsearch.EsDelegationRepository;
+import com.platon.browser.elasticsearch.EsDelegationRewardRepository;
+import com.platon.browser.elasticsearch.EsNodeOptRepository;
+import com.platon.browser.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 
 import static org.mockito.Mockito.*;
@@ -31,19 +31,19 @@ import static org.mockito.Mockito.*;
 public class ESQueryServiceImplTest {
 
 	@Spy
-	private BlockEsRepository blockESRepository;
+	private EsBlockRepository ESBlockRepository;
 	
 	@Spy
-	private TransactionEsRepository transactionESRepository;
+	private EsTransactionRepository ESTransactionRepository;
 	
 	@Spy
-	private DelegationEsRepository delegationESRepository;
+	private EsDelegationRepository ESDelegationRepository;
 	
 	@Spy
-	private NodeOptEsRepository nodeOptESRepository;
+	private EsNodeOptRepository ESNodeOptRepository;
 	
 	@Spy
-	private DelegationRewardEsRepository delegationRewardESRepository;
+	private EsDelegationRewardRepository ESDelegationRewardRepository;
 	
 	@Mock
 	private RestHighLevelClient client;
@@ -51,22 +51,22 @@ public class ESQueryServiceImplTest {
 	
 	@Before
 	public void setup() {
-		ReflectionTestUtils.setField(blockESRepository,"client",client);
-		ReflectionTestUtils.setField(transactionESRepository,"client",client);
-		ReflectionTestUtils.setField(delegationESRepository,"client",client);
-		ReflectionTestUtils.setField(nodeOptESRepository,"client",client);
-		ReflectionTestUtils.setField(delegationRewardESRepository,"client",client);
+		ReflectionTestUtils.setField(ESBlockRepository,"client",client);
+		ReflectionTestUtils.setField(ESTransactionRepository,"client",client);
+		ReflectionTestUtils.setField(ESDelegationRepository,"client",client);
+		ReflectionTestUtils.setField(ESNodeOptRepository,"client",client);
+		ReflectionTestUtils.setField(ESDelegationRewardRepository,"client",client);
 	}
 	
 	@Test
 	public void testBlockES() throws IOException {
-		blockESRepository.setIndexName("browser_block_1");
+
 		IndicesClient indicesClient = mock(IndicesClient.class);
 		GetIndexRequest request = new GetIndexRequest("browser_block_1");
 		when(client.indices()).thenReturn(indicesClient);
 		when(indicesClient.exists(request, RequestOptions.DEFAULT)).thenReturn(false);
-		if(!blockESRepository.existsIndex()) {
-			blockESRepository.createIndex(null);
+		if(!ESBlockRepository.existsIndex()) {
+			ESBlockRepository.createIndex(null);
 		}
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.setDesc("num");
@@ -85,63 +85,59 @@ public class ESQueryServiceImplTest {
 		SearchHit[] s = new SearchHit[] {};
 		when(searchHits.getHits()).thenReturn(s);
 		try {
-			blockESRepository.search(constructor, Block.class, -1, 100);
+			ESBlockRepository.search(constructor, Block.class, -1, 100);
 		} catch (IOException e) {
 			
 		}
-		blockESRepository.deleteIndex();
+		ESBlockRepository.deleteIndex();
 	}
 	
 	@Test
 	public void testTransactionES() throws IOException {
-		transactionESRepository.setIndexName("browser_transaction_1");
 		IndicesClient indicesClient = mock(IndicesClient.class);
 		GetIndexRequest request = new GetIndexRequest("browser_transaction_1");
 		when(client.indices()).thenReturn(indicesClient);
 		when(indicesClient.exists(request, RequestOptions.DEFAULT)).thenReturn(false);
-		if(!transactionESRepository.existsIndex()) {
-			transactionESRepository.createIndex(null);
+		if(!ESTransactionRepository.existsIndex()) {
+			ESTransactionRepository.createIndex(null);
 		}
-		transactionESRepository.deleteIndex();
+		ESTransactionRepository.deleteIndex();
 	}
 	
 	@Test
 	public void testDelegationES() throws IOException {
-		delegationESRepository.setIndexName("browser_delegation_1");
 		IndicesClient indicesClient = mock(IndicesClient.class);
 		GetIndexRequest request = new GetIndexRequest("browser_delegation_1");
 		when(client.indices()).thenReturn(indicesClient);
 		when(indicesClient.exists(request, RequestOptions.DEFAULT)).thenReturn(false);
-		if(!delegationESRepository.existsIndex()) {
-			delegationESRepository.createIndex(null);
+		if(!ESDelegationRepository.existsIndex()) {
+			ESDelegationRepository.createIndex(null);
 		}
-		delegationESRepository.deleteIndex();
+		ESDelegationRepository.deleteIndex();
 	}
 	
 	@Test
 	public void testNodeOptES() throws IOException {
-		nodeOptESRepository.setIndexName("browser_nodeOpt_1");
 		IndicesClient indicesClient = mock(IndicesClient.class);
 		GetIndexRequest request = new GetIndexRequest("browser_nodeOpt_1");
 		when(client.indices()).thenReturn(indicesClient);
 		when(indicesClient.exists(request, RequestOptions.DEFAULT)).thenReturn(false);
-		if(!nodeOptESRepository.existsIndex()) {
-			nodeOptESRepository.createIndex(null);
+		if(!ESNodeOptRepository.existsIndex()) {
+			ESNodeOptRepository.createIndex(null);
 		}
-		nodeOptESRepository.deleteIndex();
+		ESNodeOptRepository.deleteIndex();
 	}
 	
 	@Test
 	public void testDelegationRewardES() throws IOException {
-		delegationRewardESRepository.setIndexName("browser_delegationReward_1");
 		IndicesClient indicesClient = mock(IndicesClient.class);
 		GetIndexRequest request = new GetIndexRequest("browser_delegationReward_1");
 		when(client.indices()).thenReturn(indicesClient);
 		when(indicesClient.exists(request, RequestOptions.DEFAULT)).thenReturn(false);
-		if(!delegationRewardESRepository.existsIndex()) {
-			delegationRewardESRepository.createIndex(null);
+		if(!ESDelegationRewardRepository.existsIndex()) {
+			ESDelegationRewardRepository.createIndex(null);
 		}
-		delegationRewardESRepository.deleteIndex();
+		ESDelegationRewardRepository.deleteIndex();
 	}
 	
 }

@@ -1,6 +1,6 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.response.RespPage;
 
 import java.util.ArrayList;
@@ -13,19 +13,19 @@ public class TokenTransferRecordCacheDto {
 		this.transferRecordList = new ArrayList<>();
 	}
 
-	public TokenTransferRecordCacheDto(List<ESTokenTransferRecord> transferRecordList, RespPage page) {
+	public TokenTransferRecordCacheDto(List<OldErcTx> transferRecordList, RespPage page) {
 		this.transferRecordList = transferRecordList;
 		this.page = page;
 	}
-	private List<ESTokenTransferRecord> transferRecordList;
+	private List<OldErcTx> transferRecordList;
 	
 	private RespPage page;
 
-	public List<ESTokenTransferRecord> getTransferRecordList() {
+	public List<OldErcTx> getTransferRecordList() {
 		return transferRecordList;
 	}
 
-	public void setTransferRecordList(List<ESTokenTransferRecord> transferRecordList) {
+	public void setTransferRecordList(List<OldErcTx> transferRecordList) {
 		this.transferRecordList = transferRecordList;
 	}
 

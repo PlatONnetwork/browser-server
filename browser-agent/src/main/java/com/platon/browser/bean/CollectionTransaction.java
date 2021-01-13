@@ -7,7 +7,7 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.TransactionUtil;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -142,10 +142,10 @@ public class CollectionTransaction extends Transaction {
                         // 提取产生Event的合约地址，并进行解析
                         uniAddressList.forEach(addr -> {
                             if (addressCache.isEvmErc20ContractAddress(addr)) {
-                                List<ESTokenTransferRecord> erc20Tokens = TransactionUtil
+                                List<OldErcTx> erc20Tokens = TransactionUtil
                                         .resolveInnerToken(this, ci, receipt.getLogs(), erc20ResolveService, addressCache, addr);
                                 if (!erc20Tokens.isEmpty()) {
-                                    this.getEsTokenTransferRecords().addAll((erc20Tokens));
+                                    this.getOldErcTxes().addAll((erc20Tokens));
                                 }
                             }
                         });

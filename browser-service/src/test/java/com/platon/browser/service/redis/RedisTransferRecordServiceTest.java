@@ -26,7 +26,7 @@ public class RedisTransferRecordServiceTest {
 	private RedisTemplate<String,String> redisTemplate;
 	@Spy
 	@InjectMocks
-	private RedisTransferTokenRecordService target;
+	private RedisErc20TxService target;
 
 	@Before
 	public void setup(){

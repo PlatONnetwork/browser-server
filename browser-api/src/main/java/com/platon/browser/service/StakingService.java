@@ -18,7 +18,7 @@ import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.NodeOptEsRepository;
+import com.platon.browser.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -70,7 +70,7 @@ public class StakingService {
 	@Resource
 	private NodeMapper nodeMapper;
 	@Resource
-	private NodeOptEsRepository nodeOptESRepository;
+	private EsNodeOptRepository ESNodeOptRepository;
 	@Resource
 	private I18nUtil i18n;
 	@Resource
@@ -351,7 +351,7 @@ public class StakingService {
 		ESResult<NodeOpt> items = new ESResult<>();
 		constructor.setDesc("id");
 		try {
-			items = nodeOptESRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
+			items = ESNodeOptRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
 		} catch (Exception e) {
 			logger.error("获取节点操作错误。", e);
 			return respPage;

@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,22 +17,22 @@ import java.util.concurrent.CountDownLatch;
 
 @Slf4j
 @Service
-public class EsTokenTransferRecordService extends EsService<ESTokenTransferRecord> {
+public class OldErc20TxService extends EsService<OldErcTx> {
 
     @Autowired
-    private TokenTransferRecordEsRepository tokenTransferRecordESRepository;
+    private OldEsErc20TxRepository OldEsErc20TxRepository;
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void save(StageCache<ESTokenTransferRecord> stage) throws IOException, InterruptedException {
+    public void save(StageCache<OldErcTx> stage) throws IOException, InterruptedException {
         try {
-            Set<ESTokenTransferRecord> data = stage.getData();
+            Set<OldErcTx> data = stage.getData();
             if (data.isEmpty()) {
                 return;
             }
             int size = data.size() / POOL_SIZE;
-            Set<Map<String, ESTokenTransferRecord>> groups = new HashSet<>();
-            Map<String, ESTokenTransferRecord> group = new HashMap<>();
-            for (ESTokenTransferRecord record : data) {
+            Set<Map<String, OldErcTx>> groups = new HashSet<>();
+            Map<String, OldErcTx> group = new HashMap<>();
+            for (OldErcTx record : data) {
                 group.put(record.getHash(), record);
                 if (group.size() >= size) {
                     groups.add(group);
@@ -41,9 +41,9 @@ public class EsTokenTransferRecordService extends EsService<ESTokenTransferRecor
             }
             if (group.size() > 0) groups.add(group);
             CountDownLatch latch = new CountDownLatch(groups.size());
-            for (Map<String, ESTokenTransferRecord> g : groups) {
+            for (Map<String, OldErcTx> g : groups) {
                 try {
-                    tokenTransferRecordESRepository.bulkAddOrUpdate(g);
+                    OldEsErc20TxRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

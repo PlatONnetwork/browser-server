@@ -40,7 +40,7 @@ public class BlockServiceTest extends ApiTestMockBase {
 		ReflectionTestUtils.setField(target,"i18n",i18n);
 		ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
 		ReflectionTestUtils.setField(target,"commonService",commonService);
-		ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
+		ReflectionTestUtils.setField(target,"blockESRepository", ESBlockRepository);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class BlockServiceTest extends ApiTestMockBase {
         blockList.add(block1);
         blockEs.setRsData(blockList);
         blockEs.setTotal(2l);
-        when(blockESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
+        when(ESBlockRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
         target.blockList(pageReq);
         assertTrue(pages.getData().size()>=0);
 	}
@@ -123,7 +123,7 @@ public class BlockServiceTest extends ApiTestMockBase {
         blockList.add(block1);
         blockEs.setRsData(blockList);
         blockEs.setTotal(2l);
-        when(blockESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
+        when(ESBlockRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
 		RespPage<BlockListResp> pages = target.blockListByNodeId(req);
 		
 		assertNotNull(pages);
@@ -151,7 +151,7 @@ public class BlockServiceTest extends ApiTestMockBase {
         blockList.add(block1);
         blockEs.setRsData(blockList);
         blockEs.setTotal(2l);
-        when(blockESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
+        when(ESBlockRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
         
         when(i18n.i(any(), any(), any())).thenReturn("test");
         BlockDownload blpBlockDownload = target.blockListByNodeIdDownload("0x", new Date().getTime(), "en_US", "+8");

@@ -13,11 +13,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisServiceTest extends AgentTestBase {
+public class AbstractRedisServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @Spy
-    private RedisService target;
+    private AbstractRedisService target;
 
     @Before
     public void setup(){

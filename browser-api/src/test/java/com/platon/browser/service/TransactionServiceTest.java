@@ -15,7 +15,7 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.cache.TransactionCacheDto;
-import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
+import com.platon.browser.elasticsearch.EsDelegationRewardRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.Erc20Param;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 public class TransactionServiceTest extends ApiTestMockBase {
 
 	@Mock
-	private DelegationRewardEsRepository delegationRewardESRepository;
+	private EsDelegationRewardRepository ESDelegationRewardRepository;
 	@Mock
 	private StakingMapper stakingMapper;
 	@Mock
@@ -68,8 +68,8 @@ public class TransactionServiceTest extends ApiTestMockBase {
 
 	@Before
 	public void setup() {
-		ReflectionTestUtils.setField(this.target, "transactionESRepository", this.transactionESRepository);
-		ReflectionTestUtils.setField(this.target, "delegationRewardESRepository", this.delegationRewardESRepository);
+		ReflectionTestUtils.setField(this.target, "transactionESRepository", this.ESTransactionRepository);
+		ReflectionTestUtils.setField(this.target, "delegationRewardESRepository", this.ESDelegationRewardRepository);
 		ReflectionTestUtils.setField(this.target, "i18n", this.i18n);
 		ReflectionTestUtils.setField(this.target, "stakingMapper", this.stakingMapper);
 		ReflectionTestUtils.setField(this.target, "proposalMapper", this.proposalMapper);
@@ -102,13 +102,13 @@ public class TransactionServiceTest extends ApiTestMockBase {
 		transaction.setGasPrice("3333");
 		transaction.setValue("4333");
 		transaction.setStatus(Transaction.StatusEnum.FAILURE.getCode());
-		when(this.transactionESRepository.get(any(), any())).thenReturn(transaction);
+		when(this.ESTransactionRepository.get(any(), any())).thenReturn(transaction);
 		ESResult<Object> first = new ESResult<>();
 		List<Object> transactionList = new ArrayList<>();
 		transactionList.add(transaction);
 		first.setRsData(transactionList);
 		first.setTotal(33L);
-		when(this.transactionESRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(first);
+		when(this.ESTransactionRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(first);
 
 		transaction.setType(Transaction.TypeEnum.STAKE_CREATE.getCode());
 		transaction.setInfo("{\"benefitAddress\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\",\"details\":\"Node of CDM\",\"externalId\":\"5FD68B690010632B\",\"nodeId\":\"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7\",\"nodeName\":\"cdm-004\",\"programVersion\":2048,\"website\":\"WWW.CCC.COM\",\"DelegateRewardPer\":3}");
@@ -224,7 +224,7 @@ public class TransactionServiceTest extends ApiTestMockBase {
 		lists.add(delegationReward);
 		delegationRewards.setRsData(lists);
 		delegationRewards.setTotal(1l);
-		when(this.delegationRewardESRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(delegationRewards);
+		when(this.ESDelegationRewardRepository.search(any(), any(), anyInt(), anyInt())).thenReturn(delegationRewards);
 		this.target.queryClaimByAddress(req);
 		QueryClaimByStakingReq queryClaimByStakingReq = new QueryClaimByStakingReq();
 		queryClaimByStakingReq.setNodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050");

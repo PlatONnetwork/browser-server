@@ -10,7 +10,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
@@ -61,7 +61,7 @@ public class ProposalService {
     @Resource
     private BlockChainConfig blockChainConfig;
     @Resource
-    private BlockEsRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
 
     public RespPage<ProposalListResp> list(PageReq req) {
         RespPage<ProposalListResp> respPage = new RespPage<>();
@@ -193,7 +193,7 @@ public class ProposalService {
         if(diff.compareTo(BigDecimal.ZERO) > 0) {
         	/** 结束时间预估：（生效区块-当前区块）*出块间隔 + 区块现有时间 */
     		try {
-    			block = blockESRepository.get(proposalDetailsResp.getCurBlock(), Block.class);
+    			block = ESBlockRepository.get(proposalDetailsResp.getCurBlock(), Block.class);
                 BigDecimal endTime = diff.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(block.getTime().getTime()));
                 proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
     		} catch (IOException e) {
@@ -201,7 +201,7 @@ public class ProposalService {
     		}
         } else {
     		try {
-    			block = blockESRepository.get(proposalDetailsResp.getEndVotingBlock(), Block.class);
+    			block = ESBlockRepository.get(proposalDetailsResp.getEndVotingBlock(), Block.class);
                 proposalDetailsResp.setEndVotingBlockTime(block.getTime().getTime());
     		} catch (IOException e) {
     			logger.error("获取区块错误。", e);

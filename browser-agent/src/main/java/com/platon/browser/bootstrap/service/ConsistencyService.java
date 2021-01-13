@@ -5,6 +5,7 @@ import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.erc20.Erc20TransactionSyncService;
 import com.platon.browser.service.receipt.ReceiptService;
@@ -12,8 +13,7 @@ import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.bean.TokenTxSummary;
-import com.platon.browser.elasticsearch.BlockEsRepository;
-import com.platon.browser.elasticsearch.InnerTxEsRepository;
+import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
 import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
@@ -39,7 +39,7 @@ public class ConsistencyService {
     @Resource
     private NetworkStatMapper networkStatMapper;
     @Resource
-    private BlockEsRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
     @Resource
     private BlockService blockService;
     @Resource
@@ -47,7 +47,7 @@ public class ConsistencyService {
     @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
     @Resource
-    private InnerTxEsRepository tokenTxESRepository;
+    private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
     @Resource
@@ -59,7 +59,7 @@ public class ConsistencyService {
      */
 
     private void syncTxCount(){
-        TokenTxSummary summary = tokenTxESRepository.groupContractTxCount();
+        TokenTxSummary summary = oldEsErc20TxRepository.groupContractTxCount();
         List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParams = summary.addressTokenQtyUpdateParamList();
         List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.erc20TokenAddressRelTxCountUpdateParamList();
         List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.erc20TokenTxCountUpdateParamList();
@@ -98,7 +98,7 @@ public class ConsistencyService {
         long esMaxBlockNum = mysqlMaxBlockNum;
         boolean exist =false;
         while (!exist){
-            exist = blockESRepository.exists(String.valueOf(esMaxBlockNum));
+            exist = ESBlockRepository.exists(String.valueOf(esMaxBlockNum));
             if(!exist) {
                 esMaxBlockNum--;
                 // 小于等于0时需要退出

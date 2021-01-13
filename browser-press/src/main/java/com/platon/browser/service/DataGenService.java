@@ -374,8 +374,8 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public ESTokenTransferRecord getESTokenTransferRecord(Transaction tx){
-        ESTokenTransferRecord transferRecord = JSON.parseObject(esTokenTransferRecordStr, ESTokenTransferRecord.class);
+    public OldErcTx getESTokenTransferRecord(Transaction tx){
+        OldErcTx transferRecord = JSON.parseObject(esTokenTransferRecordStr, OldErcTx.class);
         transferRecord.setSeq(tx.getSeq());
         transferRecord.setBTime(tx.getTime());
         transferRecord.setBn(tx.getNum());

@@ -38,7 +38,7 @@ public class ProposalServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target,"proposalMapper",proposalMapper);
         ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
-        ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
+        ReflectionTestUtils.setField(target,"blockESRepository", ESBlockRepository);
     }
     
     @Test

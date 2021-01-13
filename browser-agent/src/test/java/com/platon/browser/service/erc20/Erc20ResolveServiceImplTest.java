@@ -5,10 +5,8 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.dao.entity.Erc20Token;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import jnr.ffi.annotations.In;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -69,18 +66,18 @@ public class Erc20ResolveServiceImplTest {
         String to = "lax196278ns22j23awdfj9f2d4vz0pedld8au6xel1";
         List<Transaction> transactions = new ArrayList<>();
         Transaction transaction = new Transaction();
-        List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
-        ESTokenTransferRecord esTokenTransferRecord = ESTokenTransferRecord.builder().tValue("1")
+        List<OldErcTx> oldErcTxes = new ArrayList<>();
+        OldErcTx oldErcTx = OldErcTx.builder().tValue("1")
                 .tto(from).from(from).bn(1l).bTime(new Date()).contract(contractAddress).ctime(new Date()).hash("")
                 .info("").result(0).value("").decimal(0).fromType(0).name("").seq(1l).sign("").symbol("")
                 .build();
-        ESTokenTransferRecord esTokenTransferRecord2 = ESTokenTransferRecord.builder().tValue("1")
+        OldErcTx oldErcTx2 = OldErcTx.builder().tValue("1")
                 .tto(to).from(from).bn(1l).bTime(new Date()).contract(contractAddress).ctime(new Date()).hash("")
                 .info("").result(0).value("").decimal(0).fromType(0).name("").seq(1l).sign("").symbol("")
                 .build();
-        esTokenTransferRecords.add(esTokenTransferRecord);
-        esTokenTransferRecords.add(esTokenTransferRecord2);
-        transaction.setEsTokenTransferRecords(esTokenTransferRecords);
+        oldErcTxes.add(oldErcTx);
+        oldErcTxes.add(oldErcTx2);
+        transaction.setOldErcTxes(oldErcTxes);
         AddressCache addressCache = new AddressCache();
         Erc20Token erc20Token = Erc20Token.builder().address(contractAddress).blockTimestamp(new Date())
                 .createTime(new Date()).creator("").decimal(0).holder(0).totalSupply(BigDecimal.ZERO).name("")

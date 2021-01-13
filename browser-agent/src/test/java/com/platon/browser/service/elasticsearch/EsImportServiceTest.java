@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,7 +27,7 @@ public class EsImportServiceTest extends AgentTestBase {
     @Mock
     private EsDelegateRewardService delegateRewardService;
     @Mock
-    private EsTokenTransferRecordService esTokenTransferRecordService;
+    private OldEsErc20TxService oldEsErc20TxService;
     @InjectMocks
     @Spy
     private EsImportService target;
@@ -50,10 +50,10 @@ public class EsImportServiceTest extends AgentTestBase {
     public void getOldErc20TxList() {
         Set<Transaction> transactions = new HashSet<>();
         Transaction transaction = new Transaction();
-        List<ESTokenTransferRecord> esTokenTransferRecordList = new ArrayList<>();
-        ESTokenTransferRecord esTokenTransferRecord = new ESTokenTransferRecord();
-        esTokenTransferRecordList.add(esTokenTransferRecord);
-        transaction.setEsTokenTransferRecords(esTokenTransferRecordList);
+        List<OldErcTx> oldErcTxList = new ArrayList<>();
+        OldErcTx oldErcTx = new OldErcTx();
+        oldErcTxList.add(oldErcTx);
+        transaction.setOldErcTxes(oldErcTxList);
         transactions.add(transaction);
         target.getOldErc20TxList(transactions);
         Assert.assertTrue(true);

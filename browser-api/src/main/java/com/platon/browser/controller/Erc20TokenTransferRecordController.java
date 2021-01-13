@@ -13,7 +13,7 @@ import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.token.QueryHolderTokenListResp;
 import com.platon.browser.response.token.QueryTokenHolderListResp;
 import com.platon.browser.response.token.QueryTokenTransferRecordListResp;
-import com.platon.browser.service.Erc20TokenTransferRecordService;
+import com.platon.browser.service.OldErc20TxService;
 import com.platon.browser.util.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +34,7 @@ import javax.validation.Valid;
 public class Erc20TokenTransferRecordController {
 
     @Resource
-    private Erc20TokenTransferRecordService erc20TokenTransferRecordService;
+    private OldErc20TxService oldErc20TxService;
     @Resource
     private DownFileCommon downFileCommon;
     @Resource
@@ -45,7 +45,7 @@ public class Erc20TokenTransferRecordController {
     @PostMapping(value = "token/tokenTransferList")
     public WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> tokenTransferList(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
         WebAsyncTask<RespPage<QueryTokenTransferRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
-                this.erc20TokenTransferRecordService.queryTokenRecordList(req));
+                this.oldErc20TxService.queryTokenRecordList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;
     }
@@ -65,7 +65,7 @@ public class Erc20TokenTransferRecordController {
              * 鉴权
              */
             this.commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = this.erc20TokenTransferRecordService.exportTokenTransferList(address, contract, date, local, timeZone, token, response);
+            AccountDownload accountDownload = this.oldErc20TxService.exportTokenTransferList(address, contract, date, local, timeZone, token, response);
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class Erc20TokenTransferRecordController {
     @PostMapping(value = "token/tokenHolderList")
     public WebAsyncTask<RespPage<QueryTokenHolderListResp>> tokenHolderList(@Valid @RequestBody QueryTokenHolderListReq req) {
         WebAsyncTask<RespPage<QueryTokenHolderListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
-                this.erc20TokenTransferRecordService.tokenHolderList(req));
+                this.oldErc20TxService.tokenHolderList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;
     }
@@ -95,7 +95,7 @@ public class Erc20TokenTransferRecordController {
              * 鉴权
              */
             this.commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = this.erc20TokenTransferRecordService.exportTokenHolderList(contract, local, timeZone, token, response);
+            AccountDownload accountDownload = this.oldErc20TxService.exportTokenHolderList(contract, local, timeZone, token, response);
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class Erc20TokenTransferRecordController {
     @PostMapping(value = "token/holderTokenList")
     public WebAsyncTask<RespPage<QueryHolderTokenListResp>> holderTokenList(@Valid @RequestBody QueryHolderTokenListReq req) {
         WebAsyncTask<RespPage<QueryHolderTokenListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () ->
-                this.erc20TokenTransferRecordService.holderTokenList(req));
+                this.oldErc20TxService.holderTokenList(req));
         CommonMethod.onTimeOut(webAsyncTask);
         return webAsyncTask;
     }
@@ -125,7 +125,7 @@ public class Erc20TokenTransferRecordController {
              * 鉴权
              */
             this.commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = this.erc20TokenTransferRecordService.exportHolderTokenList(address, local, timeZone, token, response);
+            AccountDownload accountDownload = this.oldErc20TxService.exportHolderTokenList(address, local, timeZone, token, response);
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {

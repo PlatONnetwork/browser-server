@@ -14,13 +14,13 @@ import java.io.IOException;
  */
 @Repository
 @Slf4j
-public class Erc20TxEsRepository extends EsRepository {
+public class EsErc721TxRepository extends AbstractEsRepository {
     @Override
     public String getIndexName() {
-        return config.getErc20TxIndexName();
+        return config.getErc721TxIndexName();
     }
     @Getter
-    public String defaultIndexTemplateName = "browser_erc20_tx_template";
+    public String defaultIndexTemplateName = "browser_erc721_tx_template";
     @PostConstruct
     public void init() {
         try {
@@ -31,11 +31,11 @@ public class Erc20TxEsRepository extends EsRepository {
             throw new RuntimeException(e);
         }
     }
-
+    
     public XContentBuilder defaultIndexTemplate() throws IOException {
         XContentBuilder indexPatterns = XContentFactory.jsonBuilder()
                 .startObject()
-                    .array("index_patterns", "browser_erc20_tx_*")
+                    .array("index_patterns", "browser_erc721_tx_*")
                     .startObject("settings")
                         .field("number_of_shards", 5)
                         .field("number_of_replicas", 1)

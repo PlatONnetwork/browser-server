@@ -9,8 +9,8 @@ import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.BlockEsRepository;
-import com.platon.browser.elasticsearch.TransactionEsRepository;
+import com.platon.browser.elasticsearch.EsBlockRepository;
+import com.platon.browser.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -43,9 +43,9 @@ import java.util.List;
 public class HomeService {
 
 	@Resource
-	private BlockEsRepository blockESRepository;
+	private EsBlockRepository ESBlockRepository;
 	@Resource
-	private TransactionEsRepository transactionESRepository;
+	private EsTransactionRepository ESTransactionRepository;
 	@Resource
 	private StatisticCacheService statisticCacheService;
 	@Resource
@@ -101,7 +101,7 @@ public class HomeService {
 			/* 存在区块信息则返回区块号 */
 			Block block = null;
 			try {
-				block = blockESRepository.get(String.valueOf(number), Block.class);
+				block = ESBlockRepository.get(String.valueOf(number), Block.class);
 			} catch (IOException e) {
 				log.error(BLOCK_ERR_TIPS, e);
 			}
@@ -152,7 +152,7 @@ public class HomeService {
 					keyword = keyword.toLowerCase();
 					Transaction items = null;
 					try {
-						items = transactionESRepository.get(keyword, Transaction.class);
+						items = ESTransactionRepository.get(keyword, Transaction.class);
 					} catch (IOException e) {
 						log.error(BLOCK_ERR_TIPS, e);
 					}
@@ -166,7 +166,7 @@ public class HomeService {
 						blockConstructor.must(new ESQueryBuilders().term("hash", keyword));
 						ESResult<Block> blockList = new ESResult<>();
 						try {
-							blockList = blockESRepository.search(blockConstructor, Block.class, 1, 1);
+							blockList = ESBlockRepository.search(blockConstructor, Block.class, 1, 1);
 						} catch (IOException e) {
 							log.error(BLOCK_ERR_TIPS, e);
 						}

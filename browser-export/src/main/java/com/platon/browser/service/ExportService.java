@@ -12,7 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TransactionEsRepository;
+import com.platon.browser.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -83,7 +83,7 @@ public class ExportService {
     private BlockChainConfig blockChainConfig;
 
 	@Autowired
-	private TransactionEsRepository transactionESRepository;
+	private EsTransactionRepository ESTransactionRepository;
 	@Autowired
 	private AddressMapper addressMapper;
 	@Autowired
@@ -137,7 +137,7 @@ public class ExportService {
 		ESResult<Transaction> esResult = null;
 		for (int pageNo = 0; pageNo * this.transactionPageSize <= this.maxCount; pageNo++) {
 			try {
-				esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
+				esResult = ESTransactionRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
 			} catch (Exception e) {
 				if (e.getMessage().contains("all shards failed")) {
 					break;
@@ -427,7 +427,7 @@ public class ExportService {
 		ESResult<Transaction> esResult = null;
 		for (int pageNo = 0; pageNo <= Integer.MAX_VALUE; pageNo++) {
 			try {
-				esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
+				esResult = ESTransactionRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
 			} catch (Exception e) {
 				if (e.getMessage().contains("all shards failed")) {
 					break;

@@ -5,7 +5,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.redis.RedisFactory;
 import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
-import com.platon.browser.elasticsearch.NodeOptEsRepository;
+import com.platon.browser.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -39,7 +39,7 @@ import java.util.List;
 public class RewardExportTask {
 
     @Resource
-    private NodeOptEsRepository nodeOptESRepository;
+    private EsNodeOptRepository ESNodeOptRepository;
     @Resource
     private PlatOnClient platOnClient;
     @Resource
@@ -88,7 +88,7 @@ public class RewardExportTask {
                 types.add(NodeOpt.TypeEnum.MULTI_SIGN.getCode());
                 types.add(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode());
                 constructor.must(new ESQueryBuilders().terms("type", types));
-                ESResult<NodeOpt> nodeOpts = this.nodeOptESRepository.search(constructor, NodeOpt.class, 1, 30000);
+                ESResult<NodeOpt> nodeOpts = this.ESNodeOptRepository.search(constructor, NodeOpt.class, 1, 30000);
                 List<BlockNode> blockNodes = this.customBlockNodeMapper.selectNodeByDis(conL, conL + this.limitNum);
                 List<Object[]> rs = new ArrayList<>();
                 /**

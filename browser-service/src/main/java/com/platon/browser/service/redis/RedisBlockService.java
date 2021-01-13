@@ -16,7 +16,7 @@ import java.util.Set;
  * @Description:
  */
 @Service
-public class RedisBlockService extends RedisService<Block> {
+public class RedisBlockService extends AbstractRedisService<Block> {
 
     /** 区块缓存key */
     @Value("${spring.redis.key.blocks}")

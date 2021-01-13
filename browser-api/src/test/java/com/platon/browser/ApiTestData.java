@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -83,7 +83,7 @@ public class ApiTestData {
     protected List<Block> blockList = Collections.emptyList();
     protected List<Erc20Token> erc20Tokens = Collections.emptyList();
     protected List<Erc20TokenDetailWithBLOBs> erc20TokenDetails = Collections.emptyList();
-    protected List<ESTokenTransferRecord> esTokenTransferRecords = Collections.emptyList();
+    protected List<OldErcTx> oldErcTxes = Collections.emptyList();
     protected List<Erc20TokenAddressRel> erc20TokenAddressRels = Collections.emptyList();
 
     @Before
@@ -121,7 +121,7 @@ public class ApiTestData {
                         this.erc20TokenAddressRels = JSON.parseArray(content, Erc20TokenAddressRel.class);
                         break;
                     case "erc20TokenTransfer":
-                        this.esTokenTransferRecords = JSON.parseArray(content, ESTokenTransferRecord.class);
+                        this.oldErcTxes = JSON.parseArray(content, OldErcTx.class);
                         break;
                 }
             } catch (IOException e) {

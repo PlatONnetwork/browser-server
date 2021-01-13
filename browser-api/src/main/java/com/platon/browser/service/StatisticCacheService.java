@@ -6,7 +6,7 @@ import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.redis.RedisFactory;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,13 +100,13 @@ public class StatisticCacheService extends CacheBase {
 
 	public TokenTransferRecordCacheDto getTokenTransferRecordCache(Integer pageNum, Integer pageSize) {
 		/* 分页根据key来获取交易数据  */
-		CachePageInfo<Class<ESTokenTransferRecord>> cpi = this.getCachePageInfo(innerTxCacheKey, pageNum, pageSize, i18n, maxItemNum, redisFactory);
-		List<ESTokenTransferRecord> esTokenTransferRecordList = new LinkedList<>();
+		CachePageInfo<Class<OldErcTx>> cpi = this.getCachePageInfo(innerTxCacheKey, pageNum, pageSize, i18n, maxItemNum, redisFactory);
+		List<OldErcTx> oldErcTxList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/* 获取数据转换成对象 */
-			ESTokenTransferRecord tokenTransferRedis = JSON.parseObject(str, ESTokenTransferRecord.class);
-			esTokenTransferRecordList.add(tokenTransferRedis);
+			OldErcTx tokenTransferRedis = JSON.parseObject(str, OldErcTx.class);
+			oldErcTxList.add(tokenTransferRedis);
 		});
-		return new TokenTransferRecordCacheDto(esTokenTransferRecordList, cpi.page);
+		return new TokenTransferRecordCacheDto(oldErcTxList, cpi.page);
 	}
 }

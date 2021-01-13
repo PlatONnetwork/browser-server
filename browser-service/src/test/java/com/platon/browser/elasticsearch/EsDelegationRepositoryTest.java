@@ -28,14 +28,13 @@ import static org.mockito.Mockito.when;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class NodeOptEsRepositoryTest {
-
+public class EsDelegationRepositoryTest {
 
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private NodeOptEsRepository target;
+    private EsDelegationRepository target;
 
     @Before
     public void setup()throws Exception{

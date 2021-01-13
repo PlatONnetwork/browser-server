@@ -17,9 +17,9 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
-import com.platon.browser.elasticsearch.InnerTxEsRepository;
-import com.platon.browser.elasticsearch.TransactionEsRepository;
+import com.platon.browser.elasticsearch.EsDelegationRewardRepository;
+import com.platon.browser.elasticsearch.EsTransactionRepository;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
@@ -74,11 +74,11 @@ public class TransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
     @Resource
-    private TransactionEsRepository transactionESRepository;
+    private EsTransactionRepository ESTransactionRepository;
     @Resource
-    private DelegationRewardEsRepository delegationRewardESRepository;
+    private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Resource
-    private InnerTxEsRepository innerTxESRepository;
+    private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Resource
     private I18nUtil i18n;
     @Resource
@@ -127,7 +127,7 @@ public class TransactionService {
         /** 根据区块号和类型分页查询交易信息 */
         try {
             items =
-                this.transactionESRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
+                this.ESTransactionRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return result;
@@ -156,7 +156,7 @@ public class TransactionService {
             "cost", "failReason"});
         try {
             items =
-                this.transactionESRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
+                this.ESTransactionRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return result;
@@ -225,7 +225,7 @@ public class TransactionService {
         constructor
             .setResult(new String[] {"hash", "time", "status", "from", "to", "value", "num", "type", "toType", "cost"});
         try {
-            items = this.transactionESRepository.search(constructor, Transaction.class, 1, 30000);
+            items = this.ESTransactionRepository.search(constructor, Transaction.class, 1, 30000);
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return accountDownload;
@@ -272,7 +272,7 @@ public class TransactionService {
         /** 根据hash查询具体的交易数据 */
         Transaction transaction = null;
         try {
-            transaction = this.transactionESRepository.get(req.getTxHash(), Transaction.class);
+            transaction = this.ESTransactionRepository.get(req.getTxHash(), Transaction.class);
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return resp;
@@ -346,7 +346,7 @@ public class TransactionService {
                 constructor.setResult(new String[] {"hash"});
                 ESResult<Transaction> first = new ESResult<>();
                 try {
-                    first = this.transactionESRepository.search(constructor, Transaction.class, 1, 1);
+                    first = this.ESTransactionRepository.search(constructor, Transaction.class, 1, 1);
                 } catch (Exception e) {
                     this.logger.error("获取交易错误。", e);
                     return resp;
@@ -365,7 +365,7 @@ public class TransactionService {
             constructor.setResult(new String[] {"hash"});
             ESResult<Transaction> last = new ESResult<>();
             try {
-                last = this.transactionESRepository.search(constructor, Transaction.class, 1, 1);
+                last = this.ESTransactionRepository.search(constructor, Transaction.class, 1, 1);
             } catch (Exception e) {
                 this.logger.error("获取交易错误。", e);
                 return resp;
@@ -802,7 +802,7 @@ public class TransactionService {
         constructor.setDesc("time");
         ESResult<DelegationReward> delegationRewards = null;
         try {
-            delegationRewards = this.delegationRewardESRepository.search(constructor, DelegationReward.class,
+            delegationRewards = this.ESDelegationRewardRepository.search(constructor, DelegationReward.class,
                 req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
@@ -869,7 +869,7 @@ public class TransactionService {
         constructor.setDesc("time");
         ESResult<DelegationReward> delegationRewards = null;
         try {
-            delegationRewards = this.delegationRewardESRepository.search(constructor, DelegationReward.class,
+            delegationRewards = this.ESDelegationRewardRepository.search(constructor, DelegationReward.class,
                 req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);

@@ -46,7 +46,7 @@ public class Transaction {
 
     // 虚拟erc20交易，
     @JsonIgnore
-    private List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
+    private List<OldErcTx> oldErcTxes = new ArrayList<>();
 
     /******** 把字符串类数值转换为大浮点数的便捷方法 ********/
     public BigDecimal decimalGasLimit() {

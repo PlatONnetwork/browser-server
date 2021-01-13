@@ -22,22 +22,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 /**
  * @Auther: dongqile
- * @Date: 2019/12/4
- * @Description: elasticsearch通用操作测试类
+ * @Date: 2019/12/5
+ * @Description:
  */
+
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BlockEsRepositoryTest {
+public class EsTransactionRepositoryTest {
+
     @Mock
     private RestHighLevelClient client;
 
     @Spy
-    private BlockEsRepository target;
-
-
-
+    private EsTransactionRepository target;
 
     @Before
     public void setup()throws Exception{
@@ -52,7 +50,7 @@ public class BlockEsRepositoryTest {
     @Test
     public void createIndexTest()throws Exception{
         Map <String,String> map = new HashMap <>();
-        map.put("","");
+        map.put("123","123");
         target.createIndex(map);
     }
 
@@ -104,6 +102,5 @@ public class BlockEsRepositoryTest {
         map.put("Test","aaaa");
         target.bulkAddOrUpdate(map);
     }
-
 
 }

@@ -14,8 +14,8 @@ import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
@@ -55,12 +55,12 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class Erc20TokenTransferRecordService {
+public class OldErc20TxService {
 
     @Resource
     private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
     @Resource
-    private TokenTransferRecordEsRepository esTokenTransferRecordRepository;
+    private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Resource
     private I18nUtil i18n;
     @Resource
@@ -84,7 +84,7 @@ public class Erc20TokenTransferRecordService {
         // 2、所有查询直接走ES，不进行DB检索
         RespPage<QueryTokenTransferRecordListResp> result = new RespPage<>();
 
-        List<ESTokenTransferRecord> records;
+        List<OldErcTx> records;
         long totalCount = 0;
         long displayTotalCount = 0;
         if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
@@ -96,7 +96,7 @@ public class Erc20TokenTransferRecordService {
         } else {
             // construct of params
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-            ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
+            ESResult<OldErcTx> queryResultFromES = new ESResult<>();
 
             // condition: txHash/contract/txFrom/transferTo
             if (StringUtils.isNotEmpty(req.getContract())) {
@@ -116,7 +116,7 @@ public class Erc20TokenTransferRecordService {
             constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
                     "tto", "tValue", "decimal", "name", "symbol", "result", "bTime", "fromType", "toType"});
             try {
-                queryResultFromES = this.esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class,
+                queryResultFromES = oldEsErc20TxRepository.search(constructor, OldErcTx.class,
                         req.getPageNo(), req.getPageSize());
                 totalCount = queryResultFromES.getTotal();
                 displayTotalCount = queryResultFromES.getTotal();
@@ -151,7 +151,7 @@ public class Erc20TokenTransferRecordService {
         return result;
     }
 
-    public List<ESTokenTransferRecord> queryFromCache(QueryTokenTransferRecordListReq req){
+    public List<OldErcTx> queryFromCache(QueryTokenTransferRecordListReq req){
         TokenTransferRecordCacheDto tokenTransferRecordCacheDto = this.statisticCacheService.getTokenTransferRecordCache(req.getPageNo(), req.getPageSize());
         return tokenTransferRecordCacheDto.getTransferRecordList();
     }
@@ -171,7 +171,7 @@ public class Erc20TokenTransferRecordService {
         // construct of params
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().range("bTime", new Date(date).getTime(), currentServerTime.getTime()));
-        ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
+        ESResult<OldErcTx> queryResultFromES = new ESResult<>();
         // condition: txHash/contract/txFrom/transferTo
         if (StringUtils.isNotBlank(contract)) constructor.must(new ESQueryBuilders().term("contract", contract));
         if (StringUtils.isNotBlank(address)) constructor.buildMust(new BoolQueryBuilder()
@@ -183,7 +183,7 @@ public class Erc20TokenTransferRecordService {
         constructor.setResult(new String[]{"seq", "hash", "bn", "from", "contract",
                 "tto", "tValue", "decimal", "name", "symbol", "result", "bTime", "fromType", "toType"});
         try {
-            queryResultFromES = this.esTokenTransferRecordRepository.search(constructor, ESTokenTransferRecord.class,
+            queryResultFromES = oldEsErc20TxRepository.search(constructor, OldErcTx.class,
                     1, 30000);
         } catch (Exception e) {
             log.error("检索代币交易列表失败", e);
@@ -410,7 +410,7 @@ public class Erc20TokenTransferRecordService {
         return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
-    public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ESTokenTransferRecord record) {
+    public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, OldErcTx record) {
         QueryTokenTransferRecordListResp resp = QueryTokenTransferRecordListResp.builder()
                 .seq(record.getSeq())
                 .txHash(record.getHash()).blockNumber(record.getBn())

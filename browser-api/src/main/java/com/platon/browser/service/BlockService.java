@@ -4,7 +4,7 @@ import com.alaya.utils.Convert;
 import com.github.pagehelper.Page;
 import com.platon.browser.config.BrowserConst;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
@@ -59,7 +59,7 @@ public class BlockService {
 	@Resource
 	private StatisticCacheService statisticCacheService;
 	@Resource
-	private BlockEsRepository blockESRepository;
+	private EsBlockRepository ESBlockRepository;
 	@Resource
 	private I18nUtil i18n;
 	@Resource
@@ -109,7 +109,7 @@ public class BlockService {
 					"nodeName", "nodeId", "gasUsed", "txGasLimit", "size"});
 			try {
 				lock.lock();
-				blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
+				blocks = ESBlockRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 			} catch (IOException e) {
 				logger.error(ERROR_TIPS, e);
 			} finally {
@@ -172,7 +172,7 @@ public class BlockService {
 		constructor.setResult(new String[] { "num", "time", "txQty", "reward"});
 		ESResult<Block> blocks = new ESResult<>();
 		try {
-			blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
+			blocks = ESBlockRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
 			return respPage;
@@ -220,7 +220,7 @@ public class BlockService {
 				"txFee"});
 		ESResult<Block> blockList = new ESResult<>();
 		try {
-			blockList = blockESRepository.search(constructor, Block.class, 1, 30000);
+			blockList = ESBlockRepository.search(constructor, Block.class, 1, 30000);
 		} catch (Exception e) {
 			logger.error(ERROR_TIPS, e);
 			return blockDownload;
@@ -285,7 +285,7 @@ public class BlockService {
 		
 		Block block = null;
 		try {
-			block = blockESRepository.get(String.valueOf(blockNumber), Block.class);
+			block = ESBlockRepository.get(String.valueOf(blockNumber), Block.class);
 		} catch (IOException e) {
 			logger.error(ERROR_TIPS, e);
 		}

@@ -13,7 +13,7 @@ import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
-import com.platon.browser.elasticsearch.BlockEsRepository;
+import com.platon.browser.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
@@ -68,7 +68,7 @@ public class AddressService {
     @Resource
     private BlockChainConfig blockChainConfig;
     @Resource
-	private BlockEsRepository blockESRepository;
+	private EsBlockRepository ESBlockRepository;
     @Resource
     private SpecialApi specialApi;
     
@@ -165,7 +165,7 @@ public class AddressService {
 			/** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
 			Block block = null;
 			try {
-				block = blockESRepository.get(String.valueOf(rPlan.getNumber()), Block.class);
+				block = ESBlockRepository.get(String.valueOf(rPlan.getNumber()), Block.class);
 			} catch (IOException e) {
 				logger.error("获取区块错误。", e);
 			}

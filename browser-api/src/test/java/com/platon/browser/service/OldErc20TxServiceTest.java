@@ -9,9 +9,9 @@ import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenAddressRelMapper;
 import com.platon.browser.dao.mapper.Erc20TokenTransferRecordMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
 import com.platon.browser.request.token.QueryTokenHolderListReq;
 import com.platon.browser.request.token.QueryTokenTransferRecordListReq;
@@ -39,11 +39,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class Erc20TokenTransferRecordServiceTest extends ApiTestMockBase {
+public class OldErc20TxServiceTest extends ApiTestMockBase {
 	@Mock
 	private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
 	@Mock
-	private TokenTransferRecordEsRepository esTokenTransferRecordRepository;
+	private OldEsErc20TxRepository esTokenTransferRecordRepository;
 	@Mock
 	private Erc20TokenAddressRelMapper erc20TokenAddressRelMapper;
 	@Mock
@@ -54,7 +54,7 @@ public class Erc20TokenTransferRecordServiceTest extends ApiTestMockBase {
 	private NetworkStatMapper networkStatMapper;
 	@InjectMocks
 	@Spy
-	private Erc20TokenTransferRecordService target;
+	private OldErc20TxService target;
 
 	@Before
 	public void setup() {
@@ -68,12 +68,12 @@ public class Erc20TokenTransferRecordServiceTest extends ApiTestMockBase {
 		req.setPageNo(1);
 		req.setPageSize(10);
 
-		ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
+		ESResult<OldErcTx> queryResultFromES = new ESResult<>();
 		List<Object> o = new ArrayList<>();
-		this.esTokenTransferRecords.forEach(esTokenTransferRecord -> {
+		this.oldErcTxes.forEach(esTokenTransferRecord -> {
 			o.add(esTokenTransferRecord);
 		});
-		queryResultFromES.setRsData(this.esTokenTransferRecords);
+		queryResultFromES.setRsData(this.oldErcTxes);
 		queryResultFromES.setTotal(3l);
 		doReturn(queryResultFromES).when(this.esTokenTransferRecordRepository).search(any(), any(), anyInt(), anyInt());
 		TokenTransferRecordCacheDto trrcd = new TokenTransferRecordCacheDto();
@@ -150,7 +150,7 @@ public class Erc20TokenTransferRecordServiceTest extends ApiTestMockBase {
 	public void test_exportTokenTransferList() throws IOException {
 		ESResult<Object> queryResultFromES = new ESResult<>();
 		List<Object> o = new ArrayList<>();
-		this.esTokenTransferRecords.forEach(esTokenTransferRecord -> {
+		this.oldErcTxes.forEach(esTokenTransferRecord -> {
 			o.add(esTokenTransferRecord);
 		});
 		queryResultFromES.setTotal(3l);

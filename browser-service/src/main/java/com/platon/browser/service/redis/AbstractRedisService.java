@@ -19,7 +19,7 @@ import java.util.Set;
  * @Description: Redis服务
  */
 @Slf4j
-public abstract class RedisService<T> {
+public abstract class AbstractRedisService<T> {
     @Autowired
     protected RedisTemplate<String,String> redisTemplate;
     @Value("${spring.redis.max-item}")

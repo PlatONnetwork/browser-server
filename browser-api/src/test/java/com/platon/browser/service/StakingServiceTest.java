@@ -11,7 +11,7 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.elasticsearch.NodeOptEsRepository;
+import com.platon.browser.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.request.staking.*;
@@ -48,7 +48,7 @@ public class StakingServiceTest extends ApiTestMockBase {
     @Mock
     private CustomNodeMapper customNodeMapper;
     @Mock
-    private NodeOptEsRepository nodeOptESRepository;
+    private EsNodeOptRepository ESNodeOptRepository;
     @Mock
     private PlatOnClient platonClient;
     @Spy
@@ -60,7 +60,7 @@ public class StakingServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(this.target,"customStakingMapper", this.customStakingMapper);
         ReflectionTestUtils.setField(this.target,"customDelegationMapper", this.customDelegationMapper);
         ReflectionTestUtils.setField(this.target,"nodeMapper", this.nodeMapper);
-        ReflectionTestUtils.setField(this.target,"nodeOptESRepository", this.nodeOptESRepository);
+        ReflectionTestUtils.setField(this.target,"nodeOptESRepository", this.ESNodeOptRepository);
         ReflectionTestUtils.setField(this.target,"i18n", this.i18n);
         ReflectionTestUtils.setField(this.target,"blockChainConfig", this.blockChainConfig);
         ReflectionTestUtils.setField(this.target,"platonClient", this.platonClient);
@@ -135,7 +135,7 @@ public class StakingServiceTest extends ApiTestMockBase {
         nodeOpt.setTime(new Date());
         nodeOpt.setDesc("test|4|3|4|5");
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.PROPOSALS.getCode()));
-        when(this.nodeOptESRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(items);
+        when(this.ESNodeOptRepository.search(any(),any(),anyInt(),anyInt())).thenReturn(items);
         this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         nodeOpt.setType(Integer.parseInt(NodeOpt.TypeEnum.VOTE.getCode()));

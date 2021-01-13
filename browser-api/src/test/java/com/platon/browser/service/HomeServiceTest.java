@@ -30,8 +30,8 @@ public class HomeServiceTest extends ApiTestMockBase {
     @Before
 	public void setup() {
         ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
-        ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
-        ReflectionTestUtils.setField(target,"transactionESRepository",transactionESRepository);
+        ReflectionTestUtils.setField(target,"blockESRepository", ESBlockRepository);
+        ReflectionTestUtils.setField(target,"transactionESRepository", ESTransactionRepository);
         ReflectionTestUtils.setField(target,"nodeMapper",nodeMapper);
         ReflectionTestUtils.setField(target,"addressMapper",addressMapper);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
@@ -72,7 +72,7 @@ public class HomeServiceTest extends ApiTestMockBase {
 		req.setParameter("0x9bf480e19c921c93cfc30e2e1d5d67b02b65b89f1f68a675e782ec46478fe228");
 		list = target.queryNavigation(req);
 		
-		when(transactionESRepository.get(any(),any())).thenReturn(null);
+		when(ESTransactionRepository.get(any(),any())).thenReturn(null);
 		req.setParameter("0x9bf480e19c921c93cfc30e2e1d5d67b02b65b89f1f68a675e782ec46478fe228");
 		list = target.queryNavigation(req);
 		assertNotNull(list);

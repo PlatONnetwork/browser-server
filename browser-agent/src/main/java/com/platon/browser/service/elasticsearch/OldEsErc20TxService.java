@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
@@ -20,19 +20,19 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class EsTokenTransferRecordService implements EsService<ESTokenTransferRecord> {
+public class OldEsErc20TxService implements EsService<OldErcTx> {
 
     @Resource
-    private TokenTransferRecordEsRepository tokenTransferRecordESRepository;
+    private OldEsErc20TxRepository OldEsErc20TxRepository;
 
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
-    public void save(Set<ESTokenTransferRecord> recordSet) {
+    public void save(Set<OldErcTx> recordSet) {
         try {
             if (recordSet.isEmpty()) return;
             // key: _doc id
-            Map<String, ESTokenTransferRecord> txMap = new HashMap<>();
+            Map<String, OldErcTx> txMap = new HashMap<>();
             recordSet.forEach(t-> txMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTto(), t.getSeq()), t));
-            tokenTransferRecordESRepository.bulkAddOrUpdate(txMap);
+            OldEsErc20TxRepository.bulkAddOrUpdate(txMap);
         }catch (Exception e){
             log.error("Batch save data of ESTokenTransferRecord exception", e);
             throw new BusinessException(e.getMessage());

@@ -5,7 +5,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.GracefullyShutdownException;
@@ -524,7 +524,7 @@ public class PressApplication implements ApplicationRunner {
      */
     private void makeTokenTransferRecord(BlockResult blockResult) {
         if (currentTokenTransferCount < tokenTransferMaxCount) {
-            List<ESTokenTransferRecord> transferRecordList = new ArrayList<>();
+            List<OldErcTx> transferRecordList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
                 if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
                     transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));

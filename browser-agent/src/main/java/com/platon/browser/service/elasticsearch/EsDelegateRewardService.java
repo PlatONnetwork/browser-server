@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.DelegationRewardEsRepository;
+import com.platon.browser.elasticsearch.EsDelegationRewardRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 public class EsDelegateRewardService implements EsService<DelegationReward>{
     @Resource
-    private DelegationRewardEsRepository delegationRewardESRepository;
+    private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<DelegationReward> data) throws IOException {
         if(data.isEmpty()) return;
@@ -30,7 +30,7 @@ public class EsDelegateRewardService implements EsService<DelegationReward>{
             Map<String,DelegationReward> map = new HashMap<>();
             // 使用(<hash>)作ES的docId
             data.forEach(e->map.put(e.getHash(),e));
-            delegationRewardESRepository.bulkAddOrUpdate(map);
+            ESDelegationRewardRepository.bulkAddOrUpdate(map);
         }catch (Exception e){
             log.error("",e);
             throw new BusinessException(e.getMessage());

@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class ESTokenTransferRecord {
+public class OldErcTx {
     private Long seq;                   // 序号ID
     private String hash;                // 交易哈希
     private Long bn;                    // 区块高度

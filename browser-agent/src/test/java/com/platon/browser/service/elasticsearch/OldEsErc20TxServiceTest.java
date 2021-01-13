@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TokenTransferRecordEsRepository;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,33 +24,33 @@ import static org.mockito.Mockito.doThrow;
  * @Version 1.0
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsTokenTransferRecordServiceTest {
+public class OldEsErc20TxServiceTest {
 
     @Mock
-    private TokenTransferRecordEsRepository tokenTransferRecordESRepository;
+    private OldEsErc20TxRepository OldEsErc20TxRepository;
 
     @Spy
-    private EsTokenTransferRecordService target;
+    private OldEsErc20TxService target;
 
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(this.target, "tokenTransferRecordESRepository", this.tokenTransferRecordESRepository);
+        ReflectionTestUtils.setField(this.target, "tokenTransferRecordESRepository", this.OldEsErc20TxRepository);
     }
 
     @Test(expected = Exception.class)
     public void save() throws IOException {
         this.target.save(Collections.emptySet());
-        Set<ESTokenTransferRecord> data = new HashSet<>();
-        ESTokenTransferRecord esTokenTransferRecord = new ESTokenTransferRecord();
-        esTokenTransferRecord.setContract("123");
-        esTokenTransferRecord.setHash("123");
-        esTokenTransferRecord.setFrom("123");
-        esTokenTransferRecord.setTto("123");
-        esTokenTransferRecord.setSeq(1l);
-        data.add(esTokenTransferRecord);
+        Set<OldErcTx> data = new HashSet<>();
+        OldErcTx oldErcTx = new OldErcTx();
+        oldErcTx.setContract("123");
+        oldErcTx.setHash("123");
+        oldErcTx.setFrom("123");
+        oldErcTx.setTto("123");
+        oldErcTx.setSeq(1l);
+        data.add(oldErcTx);
         this.target.save(data);
 
-        doThrow(new RuntimeException("")).when(this.tokenTransferRecordESRepository).bulkAddOrUpdate(anyMap());
+        doThrow(new RuntimeException("")).when(this.OldEsErc20TxRepository).bulkAddOrUpdate(anyMap());
         this.target.save(data);
         /*Set<ESTokenTransferRecord> records = new HashSet<>();
         records.add(ESTokenTransferRecord.builder().seq(1l).hash("11txhash-01").bn(1l).bTime(new Date())

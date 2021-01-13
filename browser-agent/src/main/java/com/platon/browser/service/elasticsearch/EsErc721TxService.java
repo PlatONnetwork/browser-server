@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.Erc721TxEsRepository;
+import com.platon.browser.elasticsearch.EsErc721TxRepository;
 import com.platon.browser.elasticsearch.dto.EsErcTx;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.Set;
 public class EsErc721TxService implements EsService<EsErcTx> {
 
     @Resource
-    private Erc721TxEsRepository erc721TxEsRepository;
+    private EsErc721TxRepository esErc721TxRepository;
 
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<EsErcTx> recordSet) {
@@ -32,7 +32,7 @@ public class EsErc721TxService implements EsService<EsErcTx> {
             // key: _doc id
             Map<String, EsErcTx> txMap = new HashMap<>();
             recordSet.forEach(t-> txMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTto(), t.getSeq()), t));
-            erc721TxEsRepository.bulkAddOrUpdate(txMap);
+            esErc721TxRepository.bulkAddOrUpdate(txMap);
         }catch (Exception e){
             log.error("Batch save data of ESTokenTransferRecord exception", e);
             throw new BusinessException(e.getMessage());

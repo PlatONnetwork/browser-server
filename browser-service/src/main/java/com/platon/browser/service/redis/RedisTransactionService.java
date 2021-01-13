@@ -13,7 +13,7 @@ import java.util.Set;
  * 交易缓存数据处理逻辑\
  */
 @Service
-public class RedisTransactionService extends RedisService<Transaction>{
+public class RedisTransactionService extends AbstractRedisService<Transaction> {
     /** 交易缓存key */
     @Value("${spring.redis.key.transactions}")
     private String transactionsCacheKey;

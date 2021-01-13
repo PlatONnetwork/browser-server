@@ -22,7 +22,7 @@ import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.erc20.Erc20ServiceImpl;
 import com.platon.browser.service.erc20.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -379,32 +379,32 @@ public class TransactionUtil {
      * @param addressCache
      * @return
      */
-    public static List<ESTokenTransferRecord> resolveInnerToken(CollectionTransaction tx, ComplementInfo ci,
-                                                                List<Log> logs, Erc20ServiceImpl erc20Service, AddressCache addressCache, String contractAddress) {
+    public static List<OldErcTx> resolveInnerToken(CollectionTransaction tx, ComplementInfo ci,
+                                                   List<Log> logs, Erc20ServiceImpl erc20Service, AddressCache addressCache, String contractAddress) {
         TransactionReceipt transactionReceipt = new TransactionReceipt();
         transactionReceipt.setLogs(logs);
         transactionReceipt.setContractAddress(contractAddress);
         List<TransferEvent> transferEvents = erc20Service.getTransferEvents(transactionReceipt);
-        List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
+        List<OldErcTx> oldErcTxes = new ArrayList<>();
         if(transferEvents == null || transferEvents.size() == 0){
-            return esTokenTransferRecords;
+            return oldErcTxes;
         }
         AtomicInteger i = new AtomicInteger();
         transferEvents.forEach(transferEvent -> {
             // 仅添加与指定的合约地址相同的记录
             if (transferEvent.getLog().getAddress().equalsIgnoreCase(contractAddress)) {
                 // 转换参数进行设置内部交易
-                ESTokenTransferRecord esTokenTransferRecord =
-                        ESTokenTransferRecord.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
+                OldErcTx oldErcTx =
+                        OldErcTx.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
                                 .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
                                 .contract(contractAddress).result(1).bTime(tx.getTime()).value(tx.getValue())
                                 .info(transferEvent.getLog().getData()).ctime(new Date()).build();
-                esTokenTransferRecord.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
-                esTokenTransferRecord.setToType(addressCache.getTypeData(transferEvent.getTo()));
+                oldErcTx.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
+                oldErcTx.setToType(addressCache.getTypeData(transferEvent.getTo()));
                 i.getAndIncrement();
-                esTokenTransferRecords.add(esTokenTransferRecord);
+                oldErcTxes.add(oldErcTx);
             }
         });
-        return esTokenTransferRecords;
+        return oldErcTxes;
     }
 }

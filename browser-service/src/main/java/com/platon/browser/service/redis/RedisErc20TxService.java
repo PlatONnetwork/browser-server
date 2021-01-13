@@ -1,7 +1,7 @@
 package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.Set;
  * 代币交易缓存数据
  */
 @Service
-public class RedisTransferTokenRecordService extends RedisService<ESTokenTransferRecord> {
+public class RedisErc20TxService extends AbstractRedisService<OldErcTx> {
 
     /**
      * 交易缓存key
@@ -27,7 +27,7 @@ public class RedisTransferTokenRecordService extends RedisService<ESTokenTransfe
     }
 
     @Override
-    public void updateMinMaxScore(Set<ESTokenTransferRecord> data) {
+    public void updateMinMaxScore(Set<OldErcTx> data) {
         minMax.reset();
         data.forEach(item -> {
             Long score = item.getSeq();
@@ -38,11 +38,11 @@ public class RedisTransferTokenRecordService extends RedisService<ESTokenTransfe
 
     @Override
     public void updateExistScore(Set<String> exist) {
-        Objects.requireNonNull(exist).forEach(item -> existScore.add(JSON.parseObject(item, ESTokenTransferRecord.class).getSeq()));
+        Objects.requireNonNull(exist).forEach(item -> existScore.add(JSON.parseObject(item, OldErcTx.class).getSeq()));
     }
 
     @Override
-    public void updateStageSet(Set<ESTokenTransferRecord> data) {
+    public void updateStageSet(Set<OldErcTx> data) {
         data.forEach(item -> {
             // 在缓存中不存在的才放入缓存
             if (!existScore.contains(item.getSeq()))
