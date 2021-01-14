@@ -1,5 +1,5 @@
 index_patterns:
-  - "*_erc721_tx"
+  - "*_erc20_tx"
 settings:
   index:
     max_result_window: '2000000000'
