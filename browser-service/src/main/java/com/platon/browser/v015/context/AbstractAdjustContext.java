@@ -61,6 +61,7 @@ public abstract class AbstractAdjustContext {
         adjustParam.setStakeStatDelegateReleased(staking.getStatDelegateReleased());
         adjustParam.setUnStakeFreezeDuration(staking.getUnStakeFreezeDuration());
         adjustParam.setLeaveTime(staking.getLeaveTime());
+        adjustParam.setUnStakeEndBlock(staking.getUnStakeEndBlock());
 
         // 检查各项金额是否都足够扣减
         validateAmount();

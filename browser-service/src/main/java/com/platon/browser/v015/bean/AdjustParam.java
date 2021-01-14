@@ -49,6 +49,6 @@ public class AdjustParam {
 
     private int stakingReductionEpoch; // 退回结算周期标识
     private int unStakeFreezeDuration; // 解质押理论上锁定的结算周期数
-    private int unStakeEndBlock; // 解质押冻结的最后一个区块
+    private Long unStakeEndBlock; // 解质押冻结的最后一个区块
     private Date leaveTime; // 退出時間
 }
