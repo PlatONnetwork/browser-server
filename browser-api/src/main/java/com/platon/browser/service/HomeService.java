@@ -123,11 +123,11 @@ public class HomeService {
 					queryNavigationStructResp.setNodeId(HexUtil.prefix(node.getNodeId()));
 				}
 			}
-			if (keyword.startsWith("atp")||keyword.startsWith("atx")) {
+			if (keyword.startsWith(blockChainConfig.getAddressPrefix())) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */
 					Address address = addressMapper.selectByPrimaryKey(keyword);
-					if(address != null && address.getType().intValue() != 1) {
+					if(address != null && address.getType() != 1) {
 						result.setType(CONTACT_TYPE);
 					} else {
 						result.setType(ADDRESS_TYPE);

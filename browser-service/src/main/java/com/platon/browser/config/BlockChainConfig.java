@@ -198,6 +198,9 @@ public class BlockChainConfig {
     // 代币定义事件
     private Map<String, String> eventDefine;
 
+    // 地址前缀
+    private String addressPrefix;
+
     @PostConstruct
     public void init() throws ConfigLoadingException {
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
@@ -794,5 +797,13 @@ public class BlockChainConfig {
 
     public void setRestrictingMinimumRelease(BigDecimal restrictingMinimumRelease) {
         this.restrictingMinimumRelease = restrictingMinimumRelease;
+    }
+
+    public String getAddressPrefix() {
+        return addressPrefix;
+    }
+
+    public void setAddressPrefix(String addressPrefix) {
+        this.addressPrefix = addressPrefix;
     }
 }
