@@ -7,37 +7,37 @@ settings:
     number_of_replicas: '1'
 mappings:
   properties:
-    symbol:
-      type: keyword
-    toType:
-      type: integer
-    bTime:
-      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
-      type: date
-    tValue:
-      type: keyword
-    contract:
-      type: keyword
-    bn:
+    seq:
       type: long
-    tto:
-      type: keyword
-    fromType:
-      type: integer
     name:
       type: text
-    txFee:
+    symbol:
       type: keyword
-    ctime:
-      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
-      type: date
+    decimal:
+      type: integer
+    contract:
+      type: keyword
+    hash:
+      type: keyword
     from:
+      type: keyword
+    to:
       type: keyword
     value:
       type: keyword
-    seq:
+    bn:
       type: long
-    hash:
-      type: keyword
-    info:
+    bTime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    toType:
+      type: integer
+    fromType:
+      type: integer
+    remark:
+      norms: false
+      index: false
       type: text
+      doc_values: false
+    txFee:
+      type: keyword
