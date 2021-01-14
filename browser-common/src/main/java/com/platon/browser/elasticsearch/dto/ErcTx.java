@@ -19,19 +19,18 @@ import java.util.Date;
 @Accessors(chain = true)
 public class ErcTx {
     private Long seq;                   // 序号ID
-    private String hash;                // 交易哈希
-    private Long bn;                    // 区块高度
-    private String from;                // 交易发起者（也是代币扣除方）
-    private String contract;            // 合约地址（也是交易to地址）
-    private String tto;                 // 代币接收者地址
-    private String tValue;
     private String name;                // 合约名称
     private String symbol;
-    private Integer fromType; // 发送方类型
-    private Integer toType; // 接收方类型
-    private String txFee;  // 手续费
+    private Integer decimal;            // 精度
+    private String contract;            // 合约地址（也是交易to地址）
+    private String hash;                // 交易哈希
+    private String from;                // 交易发起者（也是代币扣除方）
+    private String to;
+    private String value;
+    private Long bn;                    // 区块高度
     private Date bTime;                 // 区块时间
-    private String value;               // 交易value
-    private String info;
-    private Date ctime;                 // 记录创建时间（以录入ES时间为主）
+    private Integer toType; // 接收方类型
+    private Integer fromType; // 发送方类型// 交易value
+    private String remark;             // 记录创建时间（以录入ES时间为主）
+    private String txFee;  // 手续费
 }

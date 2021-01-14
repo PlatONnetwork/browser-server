@@ -1,3 +1,4 @@
+
 group = 'com.platon.browser'
 version = "${projectVersion}"
 import com.fasterxml.jackson.databind.ObjectMapper

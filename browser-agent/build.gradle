@@ -151,14 +151,7 @@ test {
     exclude '/**/StakingDelegateBalanceAdjustmentServiceTest2.class'
 }
 
-remotes {
-    webServer {
-        host="$deployServerHost"
-        user="$deployServerUser"
-        port=Integer.parseInt("$deployServerPort")
-        password="$deployServerPassword"
-    }
-}
+
 // 包名
 def packageName = "${rootProject.name}-${version}"
 def deployDir = "$deployRootDir/${projectVersion}/agent"

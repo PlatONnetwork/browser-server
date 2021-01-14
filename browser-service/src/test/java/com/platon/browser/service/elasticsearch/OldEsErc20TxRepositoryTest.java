@@ -47,20 +47,6 @@ public class OldEsErc20TxRepositoryTest {
     }
 
     @Test
-    public void testTemplateExists() {
-        try {
-            String templateName = target.getIndexName()+"_tpl";
-            boolean exists = target.existsTemplate(templateName);
-            String templateJson = EsIndexTemplateUtil.getJson("erc20_tx.yml");
-            target.putIndexTemplate(templateName, templateJson);
-            boolean after = target.existsTemplate(templateName);
-            System.out.println("..");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void createIndexTest() throws Exception {
         Map<String, String> map = new HashMap<>();
         map.put("", "");

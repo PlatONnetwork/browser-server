@@ -45,24 +45,24 @@ public class OldEsErc20TxRepository extends AbstractEsRepository {
     }
 
     public TokenTxSummary groupContractTxCount(){
-        String equalCondition = "doc['from'].value == doc['tto'].value";
+        String equalCondition = "doc['from'].value == doc['to'].value";
         TokenTxSummary equalSummary = groupContractTxCount(Arc20TxGroupTypeEnum.FROM,equalCondition);
-        String notEqualCondition = "doc['from'].value != doc['tto'].value";
+        String notEqualCondition = "doc['from'].value != doc['to'].value";
         TokenTxSummary fromSummary = groupContractTxCount(Arc20TxGroupTypeEnum.FROM,notEqualCondition);
-        TokenTxSummary ttoSummary = groupContractTxCount(Arc20TxGroupTypeEnum.TTO,notEqualCondition);
+        TokenTxSummary ttoSummary = groupContractTxCount(Arc20TxGroupTypeEnum.TO,notEqualCondition);
 
-        log.debug("from==tto的交易\n{}", JSON.toJSONString(equalSummary,true));
-        log.debug("from角度from!=tto的交易\n{}", JSON.toJSONString(fromSummary,true));
-        log.debug("tto角度tto!=from的交易\n{}", JSON.toJSONString(ttoSummary,true));
+        log.debug("from==to的交易\n{}", JSON.toJSONString(equalSummary,true));
+        log.debug("from角度from!=to的交易\n{}", JSON.toJSONString(fromSummary,true));
+        log.debug("to角度to!=from的交易\n{}", JSON.toJSONString(ttoSummary,true));
 
-        // 汇总addressTxCount（【from==tto的交易】与任意一个【from!=tto的交易】的汇总），用于更新network_stat表的token_qty
+        // 汇总addressTxCount（【from==to的交易】与任意一个【from!=to的交易】的汇总），用于更新network_stat表的token_qty
         TokenTxSummary summary = new TokenTxSummary();
         summary.setAddressTxCount(
                 equalSummary.getAddressTxCount()
                         +fromSummary.getAddressTxCount()
         );
 
-        // 汇总addressTxCountMap（汇总地址from==tto、from!=tto的总数），用于更新address表token_qty
+        // 汇总addressTxCountMap（汇总地址from==to、from!=to的总数），用于更新address表token_qty
         Map<String,Long> summaryTxCountMap = summary.getAddressTxCountMap();
         Arrays.asList(equalSummary,fromSummary,ttoSummary).forEach(subSummary->{
             subSummary.getAddressTxCountMap().forEach((address,count)->{
@@ -91,7 +91,7 @@ public class OldEsErc20TxRepository extends AbstractEsRepository {
             });
         });
 
-        // 汇总contractTxCountMap的tokenTxCount（【from==tto的交易】与任意一个【from!=tto的交易】的汇总）, 用于更新erc20_token表的tx_count
+        // 汇总contractTxCountMap的tokenTxCount（【from==to的交易】与任意一个【from!=to的交易】的汇总）, 用于更新erc20_token表的tx_count
         Arrays.asList(equalSummary,fromSummary).forEach(subSummary->{
             subSummary.getContractTxCountMap().forEach((contract,subTtc)->{
                 TokenTxCount sumTtc = contractTxCountMap.get(contract);
