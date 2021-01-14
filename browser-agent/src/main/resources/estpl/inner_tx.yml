@@ -1,0 +1,49 @@
+index_patterns:
+  - "*_inner_tx"
+settings:
+  index:
+    max_result_window: '2000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    symbol:
+      type: keyword
+    bTime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    toType:
+      type: integer
+    tValue:
+      type: keyword
+    contract:
+      type: keyword
+    sign:
+      type: keyword
+    bn:
+      type: long
+    tto:
+      type: keyword
+    result:
+      type: integer
+    fromType:
+      type: integer
+    name:
+      type: text
+    txFee:
+      type: keyword
+    ctime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    from:
+      type: keyword
+    decimal:
+      type: integer
+    value:
+      type: keyword
+    seq:
+      type: long
+    hash:
+      type: keyword
+    info:
+      type: text

@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -50,9 +49,11 @@ public class OldEsErc20TxRepositoryTest {
     @Test
     public void testTemplateExists() {
         try {
-            boolean exists = target.existsTemplate(target.getDefaultIndexTemplateName());
-            target.putIndexTemplate(target.getDefaultIndexTemplateName(), target.defaultIndexTemplate());
-            boolean after = target.existsTemplate(target.getDefaultIndexTemplateName());
+            String templateName = target.getIndexName()+"_tpl";
+            boolean exists = target.existsTemplate(templateName);
+            String templateJson = EsIndexTemplateUtil.getJson("erc20_tx.yml");
+            target.putIndexTemplate(templateName, templateJson);
+            boolean after = target.existsTemplate(templateName);
             System.out.println("..");
         } catch (IOException e) {
             e.printStackTrace();

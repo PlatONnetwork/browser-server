@@ -8,7 +8,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.stereotype.Component;
 
-import com.platon.browser.config.ElasticsearchConfig;
+import com.platon.browser.config.EsClusterConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringUtils implements BeanPostProcessor  {
 	
 	@Autowired
-	private ElasticsearchConfig elasticsearchConfig;
+	private EsClusterConfig esClusterConfig;
 	
 	@Autowired
     private DefaultListableBeanFactory defaultListableBeanFactory;
@@ -30,8 +30,8 @@ public class SpringUtils implements BeanPostProcessor  {
             //移除bean的定义和实例
             defaultListableBeanFactory.removeBeanDefinition(targetName);
         }
-		ElasticsearchConfig es = new ElasticsearchConfig();
-		BeanUtils.copyProperties(elasticsearchConfig, es);
+		EsClusterConfig es = new EsClusterConfig();
+		BeanUtils.copyProperties(esClusterConfig, es);
 		RestHighLevelClient restHighLevelClient = es.client();
 		log.error(restHighLevelClient.toString());
 		//注册新的bean定义和实例

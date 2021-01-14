@@ -13,4 +13,8 @@ public class EsBlockRepository extends AbstractEsRepository {
     public String getIndexName() {
         return config.getBlockIndexName();
     }
+    @Override
+    public String getTemplateFileName() {
+        return "block";
+    }
 }

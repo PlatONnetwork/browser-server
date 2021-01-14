@@ -13,4 +13,8 @@ public class EsDelegationRepository extends AbstractEsRepository {
     public String getIndexName() {
         return config.getDelegationIndexName();
     }
+    @Override
+    public String getTemplateFileName() {
+        return "delegate";
+    }
 }

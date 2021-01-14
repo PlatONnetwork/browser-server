@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ElasticsearchConfigTest {
+public class EsClusterConfigTest {
     @Value("${spring.elasticsearch.high-level-client.hosts}")
     private List<String> addresses; // 集群地址，多个用,隔开
     @Value("${spring.elasticsearch.high-level-client.port}")
@@ -24,7 +24,7 @@ public class ElasticsearchConfigTest {
     private String schema; // 使用的协议
 
     @Spy
-    private ElasticsearchConfig target;
+    private EsClusterConfig target;
 
     @Before
     public void setup(){

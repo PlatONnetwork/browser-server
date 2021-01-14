@@ -1,7 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.ElasticsearchConfig;
+import com.platon.browser.config.EsIndexConfig;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.bean.ESSortDto;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
@@ -27,14 +27,15 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.*;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortOrder;
+import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,30 +50,59 @@ import java.util.Map;
  */
 @Slf4j
 public abstract class AbstractEsRepository {
+	private final static String CLASSPATH_ES_TPL_DIR = "/estpl/";
+	private final static String TPL_FILE_SUFFIX=".yml";
+	private static final String CONSUME_TIME_TIPS="处理耗时:{} ms";
 	@Resource(name = "restHighLevelClient")
 	protected RestHighLevelClient client;
 	@Resource
-	protected ElasticsearchConfig config;
+	protected EsIndexConfig config;
 	@Resource
 	private SpringUtils springUtils;
-
 	public abstract String getIndexName();
-
-	private static final String CONSUME_TIME_TIPS="处理耗时:{} ms";
+	public abstract String getTemplateFileName();
+	private String getTplJson(){
+		String tplName = getTemplateFileName()+TPL_FILE_SUFFIX;
+		log.info("template file:{}",tplName);
+		try{
+			Yaml yaml = new Yaml();
+			Object result= yaml.load(AbstractEsRepository.class.getResourceAsStream(CLASSPATH_ES_TPL_DIR+tplName));
+			String json = JSON.toJSONString(result,true);
+			log.info("template json:{}",json);
+			return json;
+		}catch (Exception e){
+			log.error("解析文件{}出错：{}",tplName,e.getMessage());
+			throw e;
+		}
+	}
+	@PostConstruct
+	public void init() {
+		try {
+			String templateName = getIndexName()+"_tpl";
+			String templateJson = getTplJson();
+			putIndexTemplate(templateName, templateJson);
+		} catch (IOException e) {
+			log.error("Automatic detection of internal transaction index template failed.", e);
+			throw new RuntimeException(e);
+		}
+	}
 
 	/**
 	 * 索引模板发布
 	 */
-	public void putIndexTemplate(String indexTemplateName, XContentBuilder builder) throws IOException {
+	public void putIndexTemplate(String indexTemplateName, String templateJson) throws IOException {
 		if (existsTemplate(indexTemplateName)) {
 			log.warn("{" + indexTemplateName + "} index template already exist.");
 			return;
 		}
+		if(StringUtils.isBlank(templateJson)){
+			log.warn("template content empty.");
+			return;
+		}
 		long startTime = System.currentTimeMillis();
 		PutIndexTemplateRequest request = new PutIndexTemplateRequest(indexTemplateName);
-		if (builder != null) {
-			request.source(builder);
-		}
+		request.source(templateJson,XContentType.JSON);
+
 		AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
 		if (log.isDebugEnabled()) {
 			log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);

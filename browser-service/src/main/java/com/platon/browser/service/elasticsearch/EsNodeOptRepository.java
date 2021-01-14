@@ -13,4 +13,8 @@ public class EsNodeOptRepository extends AbstractEsRepository {
     public String getIndexName() {
         return config.getNodeOptIndexName();
     }
+    @Override
+    public String getTemplateFileName() {
+        return "nodeopt";
+    }
 }

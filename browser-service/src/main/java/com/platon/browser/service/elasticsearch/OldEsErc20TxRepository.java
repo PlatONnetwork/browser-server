@@ -1,17 +1,14 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.enums.Arc20TxGroupTypeEnum;
 import com.platon.browser.service.elasticsearch.bean.TokenTxCount;
 import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
-import com.platon.browser.enums.Arc20TxGroupTypeEnum;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.ScriptQueryBuilder;
@@ -26,7 +23,6 @@ import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilde
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,61 +35,14 @@ import java.util.Map;
 @Repository
 @Slf4j
 public class OldEsErc20TxRepository extends AbstractEsRepository {
-    @Getter
-    public String defaultIndexTemplateName = "browser_inner_tx_template";
-
-    @PostConstruct
-    public void init() {
-        try {
-            // Self-test index template.
-            this.putIndexTemplate(this.defaultIndexTemplateName, this.defaultIndexTemplate());
-        } catch (IOException e) {
-            log.error("Automatic detection of internal transaction index template failed.", e);
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public String getIndexName() {
         return config.getInnerTxIndexName();
     }
-
-    public XContentBuilder defaultIndexTemplate() throws IOException {
-        XContentBuilder indexPatterns = XContentFactory.jsonBuilder()
-                .startObject()
-                    .array("index_patterns", "browser_inner_tx_*")
-                    .startObject("settings")
-                        .field("number_of_shards", 5)
-                        .field("number_of_replicas", 1)
-                        .field("max_result_window", 2000000000)
-                    .endObject()
-                    .startObject("mappings")
-                        .startObject("properties")
-                            .startObject("seq").field("type", "long").endObject()
-                            .startObject("hash").field("type", "keyword").endObject()
-                            .startObject("bn").field("type", "long").endObject()
-                            .startObject("from").field("type", "keyword").endObject()
-                            .startObject("contract").field("type", "keyword").endObject()
-                            .startObject("tto").field("type", "keyword").endObject()
-                            .startObject("tValue").field("type", "keyword").endObject()
-                            .startObject("decimal").field("type", "integer").endObject()
-                            .startObject("name").field("type", "text").endObject()
-                            .startObject("symbol").field("type", "keyword").endObject()
-                            .startObject("sign").field("type", "keyword").endObject()
-                            .startObject("result").field("type", "integer").endObject()
-                            .startObject("fromType").field("type", "integer").endObject()
-                            .startObject("toType").field("type", "integer").endObject()
-                            .startObject("txFee").field("type", "keyword").endObject()
-                            .startObject("bTime").field("type", "date").field("format", "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis").endObject()
-                            .startObject("value").field("type", "keyword").endObject()
-                            .startObject("info").field("type", "text").endObject()
-                            .startObject("ctime").field("type", "date").field("format", "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis").endObject()
-                        .endObject()
-                    .endObject()
-                .endObject();
-        return indexPatterns;
+    @Override
+    public String getTemplateFileName() {
+        return "inner_tx";
     }
-
 
     public TokenTxSummary groupContractTxCount(){
         String equalCondition = "doc['from'].value == doc['tto'].value";

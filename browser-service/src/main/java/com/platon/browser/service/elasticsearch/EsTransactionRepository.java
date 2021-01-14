@@ -13,4 +13,8 @@ public class EsTransactionRepository extends AbstractEsRepository {
     public String getIndexName() {
         return config.getTransactionIndexName();
     }
+    @Override
+    public String getTemplateFileName() {
+        return "transaction";
+    }
 }

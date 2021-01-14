@@ -39,7 +39,7 @@ public class AgentTestData {
             "transaction",
             "receipts",
             "staking",
-            "delegation",
+            "delegate.yml",
             "verifier",
             "validator",
             "candidate",
@@ -126,7 +126,7 @@ public class AgentTestData {
                     case "staking":
                         stakingList = JSON.parseArray(content, CustomStaking.class);
                         break;
-                    case "delegation":
+                    case "delegate.yml":
                         delegationList = JSON.parseArray(content, CustomDelegation.class);
                         break;
                     case "verifier":

@@ -1,6 +1,6 @@
 package com.platon.browser.utils;
 
-import com.platon.browser.config.ElasticsearchConfig;
+import com.platon.browser.config.EsClusterConfig;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,12 +28,12 @@ public class SpringUtilsTest {
     @PrepareForTest({SpringUtils.class, SpringUtilsTest.class})
     public void test_resetSpring() throws Exception {
         SpringUtils targe = PowerMockito.spy(new SpringUtils());
-        ElasticsearchConfig elasticsearchConfig = mock(ElasticsearchConfig.class);
+        EsClusterConfig esClusterConfig = mock(EsClusterConfig.class);
         DefaultListableBeanFactory defaultListableBeanFactory = mock(DefaultListableBeanFactory.class);
-        ReflectionTestUtils.setField(targe, "elasticsearchConfig", elasticsearchConfig);
+        ReflectionTestUtils.setField(targe, "elasticsearchConfig", esClusterConfig);
         ReflectionTestUtils.setField(targe, "defaultListableBeanFactory", defaultListableBeanFactory);
-        ElasticsearchConfig es = mock(ElasticsearchConfig.class);
-        PowerMockito.whenNew(ElasticsearchConfig.class)
+        EsClusterConfig es = mock(EsClusterConfig.class);
+        PowerMockito.whenNew(EsClusterConfig.class)
                 .withNoArguments()
                 .thenReturn(es);
         RestHighLevelClient restHighLevelClient = mock(RestHighLevelClient.class);

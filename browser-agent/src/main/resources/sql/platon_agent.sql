@@ -53,7 +53,7 @@ CREATE TABLE `config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for delegation
+-- Table structure for delegate.yml
 -- ----------------------------
 DROP TABLE IF EXISTS `delegation`;
 CREATE TABLE `delegation` (

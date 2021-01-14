@@ -1,0 +1,43 @@
+index_patterns:
+  - "*_erc721_tx"
+settings:
+  index:
+    max_result_window: '2000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    symbol:
+      type: keyword
+    toType:
+      type: integer
+    bTime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    tValue:
+      type: keyword
+    contract:
+      type: keyword
+    bn:
+      type: long
+    tto:
+      type: keyword
+    fromType:
+      type: integer
+    name:
+      type: text
+    txFee:
+      type: keyword
+    ctime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    from:
+      type: keyword
+    value:
+      type: keyword
+    seq:
+      type: long
+    hash:
+      type: keyword
+    info:
+      type: text
