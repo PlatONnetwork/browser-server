@@ -68,20 +68,19 @@ public class StakingAdjustContext extends AbstractAdjustContext {
                 .subtract(adjustParam.getLock())
             );
         }
-        int unStakeFreezeDuration = 1;
-        Date leaveTime = adjustParam.getLeaveTime();
-        if(adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()) {
-            // 如果節點本身已經處於退出中，則保留原來的凍結周期數和退出时间
-            unStakeFreezeDuration = adjustParam.getUnStakeFreezeDuration();
-            leaveTime = adjustParam.getBlockTime();
-        }
-        //設置退出時間
-        adjustParam.setLeaveTime(leaveTime);
-        adjustParam.setUnStakeFreezeDuration(unStakeFreezeDuration);
         // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为退出中，且锁定周期设置为1，解锁块号设为本周期最后一个块号
         BigDecimal stakingHes = adjustParam.getStakingHes();
         BigDecimal stakingLocked = adjustParam.getStakingLocked();
         if(stakingHes.add(stakingLocked).compareTo(chainConfig.getStakeThreshold())<0){
+            if(
+                adjustParam.getStatus()!=CustomStaking.StatusEnum.EXITING.getCode()
+                &&adjustParam.getStatus()!=CustomStaking.StatusEnum.EXITED.getCode()
+            ){
+                // 节点是候选中或已锁定，则覆蓋退出时间为当前区块时间和冻结周期数为1
+                adjustParam.setLeaveTime(adjustParam.getBlockTime());
+                adjustParam.setUnStakeFreezeDuration(1);
+            }
+
             adjustParam.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
             adjustParam.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
             adjustParam.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
