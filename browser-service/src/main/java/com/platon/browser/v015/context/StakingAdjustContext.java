@@ -67,34 +67,29 @@ public class StakingAdjustContext extends AbstractAdjustContext {
                 .subtract(adjustParam.getHes())
                 .subtract(adjustParam.getLock())
             );
-        }
-        // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为退出中，且锁定周期设置为1，解锁块号设为本周期最后一个块号
-        BigDecimal stakingHes = adjustParam.getStakingHes();
-        BigDecimal stakingLocked = adjustParam.getStakingLocked();
-        if(stakingHes.add(stakingLocked).compareTo(chainConfig.getStakeThreshold())<0){
-            if(
-                adjustParam.getStatus()!=CustomStaking.StatusEnum.EXITING.getCode()
-                &&adjustParam.getStatus()!=CustomStaking.StatusEnum.EXITED.getCode()
-            ){
-                // 节点是候选中或已锁定，则覆蓋退出时间为当前区块时间和冻结周期数为1
+
+            // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为退出中，且锁定周期设置为1，解锁块号设为本周期最后一个块号
+            BigDecimal stakingHes = adjustParam.getStakingHes();
+            BigDecimal stakingLocked = adjustParam.getStakingLocked();
+            if(stakingHes.add(stakingLocked).compareTo(chainConfig.getStakeThreshold())<0){
+                adjustParam.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
+                adjustParam.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
+                adjustParam.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
+                // 把锁定期金额移至退回中字段
+                adjustParam.setStakingReduction(adjustParam.getStakingReduction().add(stakingLocked));
+                // 把犹豫期和锁定期金额置0
+                adjustParam.setStakingHes(BigDecimal.ZERO);
+                adjustParam.setStakingLocked(BigDecimal.ZERO);
+                // 设置退出时所在结算周期
+                BigInteger epoch = EpochUtil.getEpoch(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
+                adjustParam.setStakingReductionEpoch(epoch.intValue());
+                //解锁块号设为本周期最后一个块号
+                BigInteger unStakeEndBlock = EpochUtil.getCurEpochLastBlockNumber(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
+                adjustParam.setUnStakeEndBlock(unStakeEndBlock.intValue());
+                // 设置退出时间为当前区块时间和冻结周期数为1
                 adjustParam.setLeaveTime(adjustParam.getBlockTime());
                 adjustParam.setUnStakeFreezeDuration(1);
             }
-
-            adjustParam.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
-            adjustParam.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
-            adjustParam.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
-            // 把锁定期金额移至退回中字段
-            adjustParam.setStakingReduction(adjustParam.getStakingReduction().add(stakingLocked));
-            // 把犹豫期和锁定期金额置0
-            adjustParam.setStakingHes(BigDecimal.ZERO);
-            adjustParam.setStakingLocked(BigDecimal.ZERO);
-            // 设置退出时所在结算周期
-            BigInteger epoch = EpochUtil.getEpoch(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
-            adjustParam.setStakingReductionEpoch(epoch.intValue());
-            //解锁块号设为本周期最后一个块号
-            BigInteger unStakeEndBlock = EpochUtil.getCurEpochLastBlockNumber(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
-            adjustParam.setUnStakeEndBlock(unStakeEndBlock.intValue());
         }
     }
 
