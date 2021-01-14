@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * 质押调账上下文
@@ -68,10 +69,14 @@ public class StakingAdjustContext extends AbstractAdjustContext {
             );
         }
         int unStakeFreezeDuration = 1;
+        Date leaveTime = adjustParam.getLeaveTime();
         if(adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()) {
-            // 如果節點本身已經處於退出中，則保留原來的凍結周期數
+            // 如果節點本身已經處於退出中，則保留原來的凍結周期數和退出时间
             unStakeFreezeDuration = adjustParam.getUnStakeFreezeDuration();
+            leaveTime = adjustParam.getBlockTime();
         }
+        //設置退出時間
+        adjustParam.setLeaveTime(leaveTime);
         adjustParam.setUnStakeFreezeDuration(unStakeFreezeDuration);
         // 质押相关金额扣除金额后，如果(stakingHes+stakingLocked)<质押门槛，则节点状态置为退出中，且锁定周期设置为1，解锁块号设为本周期最后一个块号
         BigDecimal stakingHes = adjustParam.getStakingHes();
@@ -91,8 +96,6 @@ public class StakingAdjustContext extends AbstractAdjustContext {
             //解锁块号设为本周期最后一个块号
             BigInteger unStakeEndBlock = EpochUtil.getCurEpochLastBlockNumber(adjustParam.getCurrBlockNum(),adjustParam.getSettleBlockCount());
             adjustParam.setUnStakeEndBlock(unStakeEndBlock.intValue());
-            //設置退出時間
-            adjustParam.setLeaveTime(adjustParam.getBlockTime());
         }
     }
 
