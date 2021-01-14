@@ -71,8 +71,8 @@ public abstract class AbstractEsRepository {
 			log.info("template json:{}",json);
 			return json;
 		}catch (Exception e){
-			log.error("解析文件{}出错：{}",tplName,e.getMessage());
-			throw e;
+			log.warn("解析文件{}出错：{}",tplName,e.getMessage());
+			return "";
 		}
 	}
 	@PostConstruct
