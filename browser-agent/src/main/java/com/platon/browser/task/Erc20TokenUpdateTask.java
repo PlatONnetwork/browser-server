@@ -45,8 +45,6 @@ public class Erc20TokenUpdateTask {
     @Resource
     protected Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
-    @Value("${task.erc20-batch-size:4}")
-    private int batchSize;
     private ExecutorService EXECUTOR = Executors.newFixedThreadPool(30);
 
     @Scheduled(cron = "0/5  * * * * ?")

@@ -1,6 +1,5 @@
 package com.platon.browser.task;
 
-import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.AppStatus;
@@ -25,14 +24,14 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 17:13:04
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BatchVariableDynamicAdjustTaskTest extends AgentTestData {
+public class BatchSizeAdjustTaskTest extends AgentTestData {
     @Mock
     private PlatOnClient platOnClient;
     @Mock
     private PersistenceEventHandler persistenceEventHandler;
     @InjectMocks
     @Spy
-    private BatchVariableDynamicAdjustTask target;
+    private BatchSizeAdjustTask target;
 
     @Before
     public void setup() throws Exception {

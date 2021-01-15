@@ -1,11 +1,11 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.config.DisruptorConfig;
+import com.platon.browser.config.TaskConfig;
 import com.platon.browser.handler.PersistenceEventHandler;
+import com.platon.browser.utils.AppStatusUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,19 +18,16 @@ import javax.annotation.Resource;
  */
 @Component
 @Slf4j
-public class BatchVariableDynamicAdjustTask {
+public class BatchSizeAdjustTask {
 
     @Resource
     private PlatOnClient platOnClient;
     @Resource
     private PersistenceEventHandler persistenceEventHandler;
-
-    @Value("${task.dynamic-adjust.threshold}")
-    private int threshold;
-    @Value("${task.dynamic-adjust.cache-batch-max-size}")
-    private int maxBatchSize;
-    @Value("${task.dynamic-adjust.cache-batch-min-size}")
-    private int minBatchSize;
+    @Resource
+    private DisruptorConfig disruptorConfig;
+    @Resource
+    private TaskConfig taskConfig;
 
     @Scheduled(cron = "0/30 * * * * ?")
     public void cron () {
@@ -42,12 +39,12 @@ public class BatchVariableDynamicAdjustTask {
         try {
             long chainBlockNumber = platOnClient.getLatestBlockNumber().longValue();
             long appBlockNumber = persistenceEventHandler.getMaxBlockNumber();
-            if(chainBlockNumber-appBlockNumber<threshold) {
-                log.info("-----------------------------------------已追上链,调整批量大小为{}-----------------------------------------",minBatchSize);
-                persistenceEventHandler.setBatchSize(minBatchSize);
+            if(chainBlockNumber-appBlockNumber<taskConfig.getGapForAdjust()) {
+                log.info("---------------已追上链,调整批量大小为{}---------------",taskConfig.getEsRedisCatchupBatchSize());
+                disruptorConfig.setPersistenceBatchSize(taskConfig.getEsRedisCatchupBatchSize());
             }else{
-                log.info("-----------------------------------------未追上链,调整批量大小为{}-----------------------------------------",maxBatchSize);
-                persistenceEventHandler.setBatchSize(maxBatchSize);
+                log.info("---------------未追上链,调整批量大小为{}---------------",taskConfig.getEsRedisNotCatchupBatchSize());
+                disruptorConfig.setPersistenceBatchSize(taskConfig.getEsRedisNotCatchupBatchSize());
             }
         } catch (Exception e) {
             log.error("批次处理相关变量动态调整出错:",e);

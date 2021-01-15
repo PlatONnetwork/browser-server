@@ -12,10 +12,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ScheduleConfigTest {
+public class TaskConfigTest {
 
     @Spy
-    private ScheduleConfig target;
+    private TaskConfig target;
 
     @Test
     public void test() throws IOException {
