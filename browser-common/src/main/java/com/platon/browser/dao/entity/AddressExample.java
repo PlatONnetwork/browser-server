@@ -1595,6 +1595,126 @@ public class AddressExample {
             addCriterion("have_reward not between", value1, value2, "haveReward");
             return (Criteria) this;
         }
+
+        public Criteria andErc721TxQtyIsNull() {
+            addCriterion("erc721_tx_qty is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyIsNotNull() {
+            addCriterion("erc721_tx_qty is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyEqualTo(Integer value) {
+            addCriterion("erc721_tx_qty =", value, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyNotEqualTo(Integer value) {
+            addCriterion("erc721_tx_qty <>", value, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyGreaterThan(Integer value) {
+            addCriterion("erc721_tx_qty >", value, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("erc721_tx_qty >=", value, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyLessThan(Integer value) {
+            addCriterion("erc721_tx_qty <", value, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyLessThanOrEqualTo(Integer value) {
+            addCriterion("erc721_tx_qty <=", value, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyIn(List<Integer> values) {
+            addCriterion("erc721_tx_qty in", values, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyNotIn(List<Integer> values) {
+            addCriterion("erc721_tx_qty not in", values, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyBetween(Integer value1, Integer value2) {
+            addCriterion("erc721_tx_qty between", value1, value2, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc721TxQtyNotBetween(Integer value1, Integer value2) {
+            addCriterion("erc721_tx_qty not between", value1, value2, "erc721TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyIsNull() {
+            addCriterion("erc20_tx_qty is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyIsNotNull() {
+            addCriterion("erc20_tx_qty is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyEqualTo(Integer value) {
+            addCriterion("erc20_tx_qty =", value, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyNotEqualTo(Integer value) {
+            addCriterion("erc20_tx_qty <>", value, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyGreaterThan(Integer value) {
+            addCriterion("erc20_tx_qty >", value, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("erc20_tx_qty >=", value, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyLessThan(Integer value) {
+            addCriterion("erc20_tx_qty <", value, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyLessThanOrEqualTo(Integer value) {
+            addCriterion("erc20_tx_qty <=", value, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyIn(List<Integer> values) {
+            addCriterion("erc20_tx_qty in", values, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyNotIn(List<Integer> values) {
+            addCriterion("erc20_tx_qty not in", values, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyBetween(Integer value1, Integer value2) {
+            addCriterion("erc20_tx_qty between", value1, value2, "erc20TxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andErc20TxQtyNotBetween(Integer value1, Integer value2) {
+            addCriterion("erc20_tx_qty not between", value1, value2, "erc20TxQty");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
