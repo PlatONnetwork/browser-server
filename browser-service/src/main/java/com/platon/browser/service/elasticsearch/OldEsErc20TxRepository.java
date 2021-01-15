@@ -37,11 +37,11 @@ import java.util.Map;
 public class OldEsErc20TxRepository extends AbstractEsRepository {
     @Override
     public String getIndexName() {
-        return config.getInnerTxIndexName();
+        return config.getErc20TxIndexName();
     }
     @Override
     public String getTemplateFileName() {
-        return "inner_tx";
+        return "erc20_list";
     }
 
     public TokenTxSummary groupContractTxCount(){
@@ -149,7 +149,7 @@ public class OldEsErc20TxRepository extends AbstractEsRepository {
             outAggs.subAggregation(inAggs);
 
             searchSourceBuilder.aggregation(outAggs);
-            SearchRequest searchRequest = new SearchRequest(config.getInnerTxIndexName()).source(searchSourceBuilder);
+            SearchRequest searchRequest = new SearchRequest(config.getErc20TxIndexName()).source(searchSourceBuilder);
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
             //分组在es中是分桶
             ParsedStringTerms contractTerms = response.getAggregations().get(Arc20TxGroupTypeEnum.CONTRACT.getTerms());

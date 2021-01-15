@@ -48,6 +48,17 @@ public class Transaction {
     @JsonIgnore
     private List<OldErcTx> oldErcTxes = new ArrayList<>();
 
+    @JsonIgnore
+    private List<ErcTx> erc721TxList = new ArrayList<>();
+    @JsonIgnore
+    private List<ErcTx> erc20TxList = new ArrayList<>();
+    // 内部主幣转账交易
+    @JsonIgnore
+    private List<Transaction> transferTxList = new ArrayList<>();
+    //
+    @JsonIgnore
+    private List<Transaction> pposTxList = new ArrayList<>();
+
     /******** 把字符串类数值转换为大浮点数的便捷方法 ********/
     public BigDecimal decimalGasLimit() {
         return new BigDecimal(this.getGasLimit());

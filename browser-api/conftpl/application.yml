@@ -41,7 +41,7 @@ spring:
       delegationIndexName: ${platon.es-namespace}_delegation
       nodeOptIndexName: ${platon.es-namespace}_nodeopt
       delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
-      innerTxIndexName: ${platon.es-namespace}_inner_tx
+      transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
 

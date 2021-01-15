@@ -2,7 +2,7 @@ package com.platon.browser.analyzer.epoch;
 
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.v015.service.RestrictingMinimumReleaseParamService;
+import com.platon.browser.v0150.service.RestrictingMinimumReleaseParamService;
 import com.platon.browser.bean.AnnualizedRateInfo;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;

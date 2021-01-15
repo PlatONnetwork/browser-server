@@ -19,7 +19,7 @@ spring:
       #统计信息
       networkStat: ${platon.redis-namespace}:networkStat
       #代币交易
-      innerTx: ${platon.redis-namespace}:innerTx
+      transferTx: ${platon.redis-namespace}:transferTx
       #erc20交易
       erc20Tx: ${platon.redis-namespace}:erc20Tx
       #erc721交易
@@ -32,7 +32,7 @@ spring:
       delegationIndexName: ${platon.es-namespace}_delegation
       nodeOptIndexName: ${platon.es-namespace}_nodeopt
       delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
-      innerTxIndexName: ${platon.es-namespace}_inner_tx
+      transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）

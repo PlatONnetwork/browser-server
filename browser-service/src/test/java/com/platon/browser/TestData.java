@@ -8,7 +8,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.v0150.bean.AdjustParam;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 

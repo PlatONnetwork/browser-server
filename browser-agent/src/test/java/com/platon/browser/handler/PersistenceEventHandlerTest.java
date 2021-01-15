@@ -40,29 +40,4 @@ public class PersistenceEventHandlerTest extends AgentTestBase {
 
     }
 
-    @Test(expected = Exception.class)
-    public void test() throws Exception {
-        PersistenceEvent event = new PersistenceEvent();
-        event.setBlock(blockList.get(0));
-        event.setTransactions(new ArrayList<>(transactionList));
-        event.setNodeOpts(nodeOptList);
-        target.setBatchSize(100);
-        target.onEvent(event,33,false);
-        target.setBatchSize(1);
-        target.onEvent(event,33,false);
-
-        target.setBatchSize(1);
-        transactionList.clear();
-        nodeOptList.clear();
-        target.onEvent(event,33,false);
-
-        target.getMaxBlockNumber();
-        target.getBatchSize();
-        verify(target, times(3)).onEvent(any(),anyLong(),anyBoolean());
-
-
-
-        doThrow(new RuntimeException("")).when(esImportService).batchImport(any(),anySet(),anySet(),anySet());
-        target.onEvent(event,33,false);
-    }
 }

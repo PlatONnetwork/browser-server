@@ -104,6 +104,7 @@ public class TransactionAnalyzer {
 
                     // 把回执里的合约地址回填到交易的to字段
                     result.setTo(receipt.getContractAddress());
+                    // 解析ERC合约信息
                     TransactionUtil.resolveErcContract(result, ci, receipt.getContractAddress(), erc20ResolveServiceImpl, addressCache);
                     addressCache.updateFirst(receipt.getContractAddress(), ci);
                     // 把合约地址添加至缓存
@@ -112,8 +113,7 @@ public class TransactionAnalyzer {
                     if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.containsKey(result.getTo()) && inputWithoutPrefix.length() >= 8) {
                         // 如果是普通合约调用（EVM||WASM）
                         ContractTypeEnum contractTypeEnum = GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(result.getTo());
-                        TransactionUtil.resolveGeneralContractInvokeTxComplementInfo(result, platOnClient, ci,
-                                contractTypeEnum, log);
+                        TransactionUtil.resolveGeneralContractInvokeTxComplementInfo(result, platOnClient, ci,contractTypeEnum, log);
                         result.setStatus(receipt.getStatus()); // 普通合约调用的交易是否成功只看回执的status,不用看log中的状态
                         if (result.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                             // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表

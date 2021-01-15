@@ -76,7 +76,7 @@ mappings:
       index: false
       type: text
       doc_values: false
-    innerTxList:
+    transferList:
       norms: false
       index: false
       type: text

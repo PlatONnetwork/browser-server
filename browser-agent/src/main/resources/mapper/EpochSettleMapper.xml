@@ -55,9 +55,7 @@
             `pre_total_dele_reward` = `pre_total_dele_reward`+`total_dele_reward`
             where `node_id` =  #{nodeId};
         </foreach>
-        update `node` set
-        `total_dele_reward`=0
-        where `status` = 3;
+        update `node` set `total_dele_reward`=0 where `status` = 3;
         /*当修改委托奖励比例所在结算周期小于当前结算周期时，统一把reward_per替换为next_reward_per的值*/
         update node set reward_per=next_reward_per where next_reward_per_mod_epoch <![CDATA[ < ]]> #{settingEpoch};
         update staking set reward_per=next_reward_per where next_reward_per_mod_epoch <![CDATA[ < ]]> #{settingEpoch};

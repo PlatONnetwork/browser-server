@@ -341,13 +341,13 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 
 ##### 3.2.2 browser_erc20_tx_* 模板(同 browser_erc721_tx_*)
 
-##### 3.2.3 browser_inner_tx_* 模板
+##### 3.2.3 browser_transfer_tx_* 模板
 > 合约内部转账交易
 
 ```
 {
   "index_patterns": [
-    "browser_inner_tx_*"
+    "browser_transfer_tx_*"
   ],
   "settings": {
     "index": {
@@ -492,25 +492,25 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
         "type": "text",
         "doc_values": false
       },
-      "erc721List": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc721_tx_* 模板）
+      "erc721TxList": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc721_tx_* 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },      
-      "erc20List": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc20_tx_* 模板）
+      "erc20TxList": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc20_tx_* 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },   
-      "innerTxList": {          //合约中内部交易定义，json数组。（对象定义参考 browser_inner_tx_* 模板）
+      "transferTxList": {          //合约中内部交易定义，json数组。（对象定义参考 browser_inner_tx_* 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },  
-      "pposList": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
+      "pposTxList": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
         "norms": false,
         "index": false,
         "type": "text",

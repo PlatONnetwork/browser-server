@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: local
+profile: '01510'
 # 密码加密配置
 jasypt:
   encryptor:
@@ -125,7 +125,7 @@ platon:
       pageSize: 2000
       pageCount: 250
 # v0.15.0.0版本新增功能涉及的配置
-v015:
+v0150:
   #锁仓最小释放金额参数生效版本
   restrictingMinimumReleaseActiveVersion: 3584
   #调账生效版本

@@ -24,7 +24,7 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.utils.HexUtil;
-import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.v0150.bean.AdjustParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

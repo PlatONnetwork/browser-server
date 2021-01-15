@@ -82,7 +82,6 @@
 			`total_value` = 0,
 			`staking_locked` = 0,
 			`staking_hes` = 0,
-			`pre_total_dele_reward` = `pre_total_dele_reward`+`total_dele_reward`,/*前一次质押的总累计值*/
 			`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,/*待提取委托，要用户主动领取*/
 			`stat_delegate_value` = 0,
 			`stat_valid_addrs` = 0,

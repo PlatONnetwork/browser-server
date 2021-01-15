@@ -18,7 +18,7 @@ public class EsIndexConfig {
     private String delegationIndexName; // 委托索引名称
     private String nodeOptIndexName; // 节点操作日志索引名称
     private String delegationRewardIndexName; // 委托奖励索引名称
-    private String innerTxIndexName; // erc20交易索引名称
-    private String erc20TxIndexName; // erc20交易索引名称(new)
-    private String erc721TxIndexName; // erc721交易索引名称
+    private String transferTxIndexName; // 主交易内部轉賬交易索引名称
+    private String erc20TxIndexName; // 主交易内部erc20交易索引名称(new)
+    private String erc721TxIndexName; // 主交易内部erc721交易索引名称
 }

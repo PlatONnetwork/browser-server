@@ -26,11 +26,11 @@ public class ErcTx {
     private String hash;                // 交易哈希
     private String from;                // 交易发起者（也是代币扣除方）
     private String to;
-    private String value;
+    private String value;               // 交易value
     private Long bn;                    // 区块高度
     private Date bTime;                 // 区块时间
-    private Integer toType; // 接收方类型
-    private Integer fromType; // 发送方类型// 交易value
-    private String remark;             // 记录创建时间（以录入ES时间为主）
-    private String txFee;  // 手续费
+    private Integer toType;             // 接收方类型
+    private Integer fromType;           // 发送方类型
+    private String remark;
+    private String txFee;               // 手续费
 }
