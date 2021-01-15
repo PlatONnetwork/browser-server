@@ -86,7 +86,7 @@ public class Erc20ResolveServiceImplTest {
         addressCache.createDefaultErc20(contractAddress);
         transactions.add(transaction);
         when(this.erc20RetryService.getErc20Token(any())).thenReturn(erc20Token);
-        this.target.initContractAddressCache(transactions, addressCache);
+        this.target.initContractAddressCache(transactions);
         Assert.assertTrue(true);
     }
 

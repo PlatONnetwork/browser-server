@@ -1,6 +1,7 @@
 package com.platon.browser.analyzer.statistic;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
@@ -74,9 +75,9 @@ public class StatisticsAddressAnalyzerTest extends AgentTestBase {
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
         collectionEvent.setTransactions(new ArrayList<>(this.transactionList));
-        CollectionTransaction.setGeneralContractAddressCache(this.addressList.get(0).getAddress(), ContractTypeEnum.EVM);
-        CollectionTransaction.setGeneralContractAddressCache(this.addressList.get(1).getAddress(), ContractTypeEnum.WASM);
-        CollectionTransaction.setGeneralContractAddressCache(this.addressList.get(2).getAddress(), ContractTypeEnum.ERC20_EVM);
+        TransactionAnalyzer.setGeneralContractAddressCache(this.addressList.get(0).getAddress(), ContractTypeEnum.EVM);
+        TransactionAnalyzer.setGeneralContractAddressCache(this.addressList.get(1).getAddress(), ContractTypeEnum.WASM);
+        TransactionAnalyzer.setGeneralContractAddressCache(this.addressList.get(2).getAddress(), ContractTypeEnum.ERC20_EVM);
         this.transactionList.get(0).setBin("0x");
         this.target.analyze(collectionEvent, block, epochMessage);
     }

@@ -40,8 +40,10 @@ public class Erc20ResolveServiceImpl extends Erc20ServiceImpl {
     private Erc20RetryService erc20RetryService;
     @Resource
     private BlockChainConfig blockChainConfig;
+    @Resource
+    private AddressCache addressCache;
 
-    public void initContractAddressCache(List<Transaction> transactions, AddressCache addressCache) {
+    public void initContractAddressCache(List<Transaction> transactions) {
         Map<String, Erc20Token> erc20Tokens = new ConcurrentHashMap<>();
         transactions.stream().filter(transaction -> transaction.getOldErcTxes().size() > 0)
             .forEach(transaction -> {

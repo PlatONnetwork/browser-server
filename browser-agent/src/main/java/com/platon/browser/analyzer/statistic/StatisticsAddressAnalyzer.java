@@ -1,7 +1,8 @@
 package com.platon.browser.analyzer.statistic;
 
+import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.CollectionTransaction;
+import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.constant.Browser;
@@ -9,7 +10,6 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dao.param.statistic.AddressStatChange;
 import com.platon.browser.dao.param.statistic.AddressStatItem;
-import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.service.redis.RedisErc20TokenService;
@@ -61,8 +61,7 @@ public class StatisticsAddressAnalyzer {
                 .contractCreatehash(cache.getContractCreatehash()).contractDestroyHash(cache.getContractDestroyHash())
                 .contractBin(cache.getContractBin()).haveReward(cache.getHaveReward()).build();
             // 检查当前地址是否是普通合约地址
-            ContractTypeEnum contractTypeEnum =
-                CollectionTransaction.getGeneralContractAddressCache().get(cache.getAddress());
+            ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(cache.getAddress());
             if (contractTypeEnum != null) {
                 switch (contractTypeEnum) {
                     case WASM:
