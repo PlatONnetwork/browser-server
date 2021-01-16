@@ -7,6 +7,7 @@ import com.alaya.protocol.core.methods.request.Transaction;
 import com.alaya.protocol.core.methods.response.PlatonCall;
 import com.alaya.tx.exceptions.ContractCallException;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.erc20.Erc20Contract;
 import com.platon.browser.utils.NetworkParams;
 import com.platon.browser.v0151.bean.Erc20ContractId;
@@ -15,7 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 /**
  * Erc探测服务
@@ -26,13 +31,25 @@ public class ErcDetectService {
     @Resource
     private PlatOnClient platOnClient;
     // 检测输入数据
-    private String detectInputData(String contractAddress,String inputData) throws Exception {
-        Transaction transaction = Transaction.createEthCallTransaction(Credentials.create(Keys.createEcKeyPair()).getAddress(), contractAddress,inputData);
-        PlatonCall platonCall = platOnClient.getWeb3jWrapper().getWeb3j().platonCall(transaction, DefaultBlockParameterName.LATEST).send();
+    private String detectInputData(String contractAddress,String inputData) {
+        Transaction transaction = null;
+        try {
+            transaction = Transaction.createEthCallTransaction(Credentials.create(Keys.createEcKeyPair()).getAddress(), contractAddress,inputData);
+        } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
+            log.error("",e);
+            throw new BusinessException(e.getMessage());
+        }
+        PlatonCall platonCall = null;
+        try {
+            platonCall = platOnClient.getWeb3jWrapper().getWeb3j().platonCall(transaction, DefaultBlockParameterName.LATEST).send();
+        } catch (IOException e) {
+            log.error("",e);
+            throw new BusinessException(e.getMessage());
+        }
         return platonCall.getResult();
     }
     // 是否支持Erc165标准
-    public boolean isSupportErc165(String contractAddress) throws Exception {
+    public boolean isSupportErc165(String contractAddress) {
         String result = detectInputData(contractAddress,"0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000");
         if(!"0x0000000000000000000000000000000000000000000000000000000000000001".equals(result)){
             return false;
@@ -40,20 +57,20 @@ public class ErcDetectService {
         result = detectInputData(contractAddress,"0x01ffc9a7ffffffff00000000000000000000000000000000000000000000000000000000");
         return "0x0000000000000000000000000000000000000000000000000000000000000000".equals(result);
     }
-    public boolean isSupportErc721Metadata(String contractAddress) throws Exception {
+    public boolean isSupportErc721Metadata(String contractAddress) {
         // 支持erc721，则必定要支持erc165
         if(!isSupportErc165(contractAddress)) return false;
         String result = detectInputData(contractAddress,"0x01ffc9a75b5e139f00000000000000000000000000000000000000000000000000000000");
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
-    public boolean isSupportErc721Enumerable(String contractAddress) throws Exception {
+    public boolean isSupportErc721Enumerable(String contractAddress) {
         // 支持erc721，则必定要支持erc165
         if(!isSupportErc165(contractAddress)) return false;
         String result = detectInputData(contractAddress,"0x01ffc9a7780e9d6300000000000000000000000000000000000000000000000000000000");
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
     // 是否Erc721合约
-    public boolean isSupportErc721(String contractAddress) throws Exception {
+    public boolean isSupportErc721(String contractAddress){
         // 支持erc721，则必定要支持erc165
         if(!isSupportErc165(contractAddress)) return false;
         String result = detectInputData(contractAddress,"0x01ffc9a780ac58cd00000000000000000000000000000000000000000000000000000000");

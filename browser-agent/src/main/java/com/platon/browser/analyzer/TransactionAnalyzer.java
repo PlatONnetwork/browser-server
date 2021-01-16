@@ -70,7 +70,7 @@ public class TransactionAnalyzer {
         }
     }
 
-    public CollectionTransaction analyze(CollectionBlock collectionBlock, Transaction rawTransaction, Receipt receipt) throws Exception {
+    public CollectionTransaction analyze(CollectionBlock collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         CollectionTransaction result = CollectionTransaction.newInstance()
                 .updateWithBlock(collectionBlock)
                 .updateWithRawTransaction(rawTransaction);

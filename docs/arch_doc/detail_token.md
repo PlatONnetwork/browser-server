@@ -172,8 +172,8 @@ DROP TABLE IF EXISTS `token_expand`;
 CREATE TABLE `token_expand` (
   `address` varchar(64) NOT NULL COMMENT '合约地址',
   `icon` text COMMENT '合约图标',
-  `web_site` varchar(256) COMMENT '合约地址',
-  `details` varchar(256) COMMENT '合约官网',
+  `web_site` varchar(256) COMMENT '合约官网',
+  `details` varchar(256) COMMENT '合约详情',
   `is_show_in_aton` tinyint(1) DEFAULT '0' COMMENT 'aton中是否显示，0-隐藏 1-展示',
   `is_show_in_scan` tinyint(1) DEFAULT '0' COMMENT 'scan中是否显示，0-隐藏 1-展示',
   `is_can_transfer` tinyint(1) DEFAULT '0' COMMENT '是否可转账 0-不可转账 1-可转账',

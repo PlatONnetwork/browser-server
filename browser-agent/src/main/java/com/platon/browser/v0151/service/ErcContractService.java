@@ -1,5 +1,6 @@
 package com.platon.browser.v0151.service;
 
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0151.analyzer.Erc20TxAnalyzer;
 import com.platon.browser.v0151.analyzer.Erc721TxAnalyzer;
 import com.platon.browser.v0151.bean.Erc20ContractId;
@@ -31,8 +32,14 @@ public class ErcContractService {
      * @param contractAddress
      * @throws Exception
      */
-    private ErcToken updateErcCache(String contractAddress) throws Exception {
-        boolean isErc721 = ercDetectService.isSupportErc721(contractAddress);
+    private ErcToken updateErcCache(String contractAddress) {
+        boolean isErc721 = false;
+        try {
+            isErc721 = ercDetectService.isSupportErc721(contractAddress);
+        } catch (Exception e) {
+            log.error("",e);
+            throw new BusinessException(e.getMessage());
+        }
         ErcToken token = new ErcToken();
         token.setTypeEnum(ErcTypeEnum.UNKNOWN);
         token.setAddress(contractAddress);
@@ -74,7 +81,7 @@ public class ErcContractService {
         return token;
     }
 
-    public void analyze(String contractAddress) throws Exception {
+    public void analyze(String contractAddress) {
         // 先更新缓存
         ErcToken token = updateErcCache(contractAddress);
         // 根据ERC类型调用各自的分析器
