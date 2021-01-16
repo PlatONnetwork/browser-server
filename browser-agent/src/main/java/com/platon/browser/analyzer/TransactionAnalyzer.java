@@ -19,6 +19,8 @@ import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.TransactionUtil;
+import com.platon.browser.v0151.service.ErcContractService;
+import com.platon.browser.v0151.service.ErcDetectService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -42,6 +44,8 @@ public class TransactionAnalyzer {
     private SpecialApi specialApi;
     @Resource
     private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
+    @Resource
+    private ErcContractService ercContractService;
     
     // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存
     // <普通合约地址,合约类型枚举>
@@ -66,7 +70,7 @@ public class TransactionAnalyzer {
         }
     }
 
-    public CollectionTransaction analyze(CollectionBlock collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
+    public CollectionTransaction analyze(CollectionBlock collectionBlock, Transaction rawTransaction, Receipt receipt) throws Exception {
         CollectionTransaction result = CollectionTransaction.newInstance()
                 .updateWithBlock(collectionBlock)
                 .updateWithRawTransaction(rawTransaction);
@@ -102,8 +106,11 @@ public class TransactionAnalyzer {
                     // 如果to地址为空则是普通合约创建
                     TransactionUtil.resolveGeneralContractCreateTxComplementInfo(result, receipt.getContractAddress(), platOnClient, ci, log);
 
+
                     // 把回执里的合约地址回填到交易的to字段
                     result.setTo(receipt.getContractAddress());
+                    // 检测当前合约是否是erc相关合约
+                    ercContractService.analyze(receipt.getContractAddress());
                     // 解析ERC合约信息
                     TransactionUtil.resolveErcContract(result, ci, receipt.getContractAddress(), erc20ResolveServiceImpl, addressCache);
                     addressCache.updateFirst(receipt.getContractAddress(), ci);

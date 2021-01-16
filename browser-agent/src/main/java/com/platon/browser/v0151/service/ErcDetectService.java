@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 /**
  * Erc探测服务
@@ -59,9 +60,15 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
+    // 获取Erc20合约标识
+    public Erc20ContractId getErc20ContractId(String contractAddress){
+        Erc20ContractId contractId = detectErc20ContractId(contractAddress);
+        return contractId;
+    }
+
     // 是否Erc20合约
     public boolean isSupportErc20(String contractAddress){
-        Erc20ContractId contractId = detectErc20ContractId(contractAddress);
+        Erc20ContractId contractId = getErc20ContractId(contractAddress);
         return contractId.isSupportErc20();
     }
 
@@ -84,12 +91,12 @@ public class ErcDetectService {
                 log.error(" erc get symbol error", e);
             }
             try {
-                contractId.setDecimal(erc20Contract.decimals().send());
+                contractId.setDecimal(erc20Contract.decimals().send().intValue());
             } catch (Exception e) {
                 log.error(" erc get decimal error", e);
             }
             try {
-                contractId.setTotalSupply(erc20Contract.totalSupply().send());
+                contractId.setTotalSupply(new BigDecimal(erc20Contract.totalSupply().send()));
             } catch (Exception e) {
                 log.error(" erc get totalSupply error", e);
             }
