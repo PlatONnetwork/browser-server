@@ -60,19 +60,13 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
-    // 获取Erc20合约标识
-    public Erc20ContractId getErc20ContractId(String contractAddress){
-        Erc20ContractId contractId = detectErc20ContractId(contractAddress);
-        return contractId;
-    }
-
     // 是否Erc20合约
     public boolean isSupportErc20(String contractAddress){
-        Erc20ContractId contractId = getErc20ContractId(contractAddress);
+        Erc20ContractId contractId = detectErc20ContractId(contractAddress);
         return contractId.isSupportErc20();
     }
 
-    // 检测Erc20标识信息
+    // 检测Erc20合约标识
     public Erc20ContractId detectErc20ContractId(String contractAddress){
         Erc20ContractId contractId = new Erc20ContractId();
         if (StringUtils.isBlank(contractAddress)) throw new RuntimeException("contractAddress can not be null!");

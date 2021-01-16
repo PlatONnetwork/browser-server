@@ -53,7 +53,7 @@ public class ErcContractService {
             ercCache.getErc721AddressCache().add(contractAddress);
         } else {
             //
-            Erc20ContractId contractId = ercDetectService.getErc20ContractId(contractAddress);
+            Erc20ContractId contractId = ercDetectService.detectErc20ContractId(contractAddress);
             if(contractId.isSupportErc20()){
                 // 解析ERC20相关信息
                 token.setTypeEnum(ErcTypeEnum.ERC20);
