@@ -310,8 +310,11 @@ public class StakingService {
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 			}
+			// 有效的委托金额
 			resp.setDelegateValue(stakingNode.getStatDelegateValue());
+			// 有效的质押委托总数
 			resp.setTotalValue(stakingNode.getTotalValue());
+
 			/**
 			 * 如果判断为true则表示为查历史数据
 			 * 没有值则标识查询活跃账户
@@ -338,7 +341,8 @@ public class StakingService {
                         resp.setStakingValue(stakingNode.getStakingReduction());
                     }
 				}
-				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
+				// 待提取的委托金额(von)
+				resp.setStatDelegateReduction(stakingNode.getStatDelegateReleased());
 			}
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
