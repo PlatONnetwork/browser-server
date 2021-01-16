@@ -1,5 +1,5 @@
-
 CREATE DATABASE IF NOT EXISTS `alaya_browser` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE `alaya_browser`;
 
 /*Table structure for table `address` */
@@ -7,7 +7,7 @@ USE `alaya_browser`;
 DROP TABLE IF EXISTS `address`;
 
 CREATE TABLE `address` (
-  `address` varchar(42) NOT NULL COMMENT '地址',
+  `address` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '地址',
   `type` int(11) NOT NULL COMMENT '地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约',
   `balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
   `restricting_balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
@@ -24,14 +24,16 @@ CREATE TABLE `address` (
   `delegate_hes` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '未锁定委托(von)',
   `delegate_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已锁定委托(von)',
   `delegate_released` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '待赎回委托金额(von,需要用户主动发起赎回交易)',
-  `contract_name` varchar(125) NOT NULL DEFAULT '' COMMENT '合约名称',
-  `contract_create` varchar(125) NOT NULL DEFAULT '' COMMENT '合约创建者地址',
-  `contract_createHash` varchar(72) NOT NULL DEFAULT '0' COMMENT '创建合约的交易Hash',
-  `contract_destroy_hash` varchar(72) DEFAULT '' COMMENT '销毁合约的交易Hash',
-  `contract_bin` longtext COMMENT '合约bincode数据(通过web3j查询出来的合约代码)',
+  `contract_name` varchar(125) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '合约名称',
+  `contract_create` varchar(125) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '合约创建者地址',
+  `contract_createHash` varchar(72) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '创建合约的交易Hash',
+  `contract_destroy_hash` varchar(72) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '销毁合约的交易Hash',
+  `contract_bin` longtext COLLATE utf8mb4_unicode_ci COMMENT '合约bincode数据(通过web3j查询出来的合约代码)',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `have_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已领取委托奖励',
+  `erc721_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数',
+  `erc20_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
   PRIMARY KEY (`address`),
   KEY `type` (`type`) USING BTREE
 );
@@ -42,8 +44,8 @@ DROP TABLE IF EXISTS `block_node`;
 
 CREATE TABLE `block_node` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `node_id` varchar(130) NOT NULL COMMENT '节点id',
-  `node_name` varchar(64) NOT NULL DEFAULT '' COMMENT '节点名称(质押节点名称)',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '节点id',
+  `node_name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '节点名称(质押节点名称)',
   `staking_consensus_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '共识周期标识',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -57,12 +59,12 @@ DROP TABLE IF EXISTS `config`;
 
 CREATE TABLE `config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `module` varchar(64) NOT NULL COMMENT '参数模块名',
-  `name` varchar(128) NOT NULL COMMENT '参数名',
-  `init_value` varchar(255) NOT NULL COMMENT '系统初始值',
-  `stale_value` varchar(255) NOT NULL COMMENT '旧值',
-  `value` varchar(255) NOT NULL COMMENT '新值',
-  `range_desc` varchar(255) NOT NULL COMMENT '参数取值范围描述',
+  `module` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数模块名',
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数名',
+  `init_value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '系统初始值',
+  `stale_value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '旧值',
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '新值',
+  `range_desc` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数取值范围描述',
   `active_block` bigint(20) NOT NULL COMMENT '生效块高',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -74,9 +76,9 @@ CREATE TABLE `config` (
 DROP TABLE IF EXISTS `delegation`;
 
 CREATE TABLE `delegation` (
-  `delegate_addr` varchar(42) NOT NULL COMMENT '委托交易地址',
+  `delegate_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '委托交易地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '最新的质押交易块高',
-  `node_id` varchar(130) NOT NULL COMMENT '节点id',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '节点id',
   `delegate_hes` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '未锁定委托金额(von)',
   `delegate_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已锁定委托金额(von)',
   `delegate_released` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '待提取的金额(von)',
@@ -96,14 +98,14 @@ DROP TABLE IF EXISTS `erc20_token`;
 
 CREATE TABLE `erc20_token` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-  `address` varchar(64) DEFAULT NULL COMMENT '合约地址',
-  `name` varchar(32) DEFAULT NULL COMMENT '合约名称',
-  `symbol` varchar(32) DEFAULT NULL COMMENT '合约符号',
+  `address` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约地址',
+  `name` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约名称',
+  `symbol` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约符号',
   `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
   `total_supply` decimal(64,0) DEFAULT NULL COMMENT '供应总量',
-  `creator` varchar(64) DEFAULT NULL COMMENT '合约创建者',
-  `tx_hash` varchar(128) DEFAULT NULL COMMENT '合约创建所在交易哈希',
-  `type` char(1) DEFAULT NULL COMMENT '合约类型 E，evm的代币合约，W，wasm的代币合约',
+  `creator` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约创建者',
+  `tx_hash` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约创建所在交易哈希',
+  `type` char(1) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约类型 E，evm的代币合约，W，wasm的代币合约',
   `status` int(11) DEFAULT '0' COMMENT '合约状态 1 可见，0 隐藏',
   `block_timestamp` datetime DEFAULT NULL COMMENT '上链时间',
   `tx_count` int(11) DEFAULT NULL COMMENT '合约内交易数',
@@ -122,11 +124,11 @@ DROP TABLE IF EXISTS `erc20_token_address_rel`;
 
 CREATE TABLE `erc20_token_address_rel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-  `contract` varchar(64) DEFAULT NULL COMMENT '合约地址',
-  `address` varchar(64) DEFAULT NULL COMMENT '用户地址',
+  `contract` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约地址',
+  `address` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '用户地址',
   `balance` decimal(64,0) DEFAULT NULL COMMENT '地址代币余额',
-  `name` varchar(32) DEFAULT NULL COMMENT '合约名称',
-  `symbol` varchar(32) DEFAULT NULL COMMENT '合约符号',
+  `name` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约名称',
+  `symbol` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约符号',
   `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
   `tx_count` int(11) NOT NULL DEFAULT '0' COMMENT '地址token交易数',
   `total_supply` decimal(64,0) NOT NULL DEFAULT '0' COMMENT 'token 总发行量',
@@ -142,12 +144,12 @@ DROP TABLE IF EXISTS `erc20_token_detail`;
 
 CREATE TABLE `erc20_token_detail` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-  `contract` varchar(64) DEFAULT NULL COMMENT '合约地址',
-  `icon` text COMMENT '合约图标',
-  `web_site` varchar(32) DEFAULT NULL COMMENT '官网地址',
-  `abi` text COMMENT '合约的ABI',
-  `bin_code` text COMMENT '合约bincode',
-  `source_code` text COMMENT '合约源码',
+  `contract` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约地址',
+  `icon` text COLLATE utf8mb4_unicode_ci COMMENT '合约图标',
+  `web_site` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '官网地址',
+  `abi` text COLLATE utf8mb4_unicode_ci COMMENT '合约的ABI',
+  `bin_code` text COLLATE utf8mb4_unicode_ci COMMENT '合约bincode',
+  `source_code` text COLLATE utf8mb4_unicode_ci COMMENT '合约源码',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni_contract` (`contract`)
@@ -159,16 +161,16 @@ DROP TABLE IF EXISTS `erc20_token_transfer_record`;
 
 CREATE TABLE `erc20_token_transfer_record` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-  `tx_hash` varchar(128) DEFAULT NULL COMMENT '交易哈希',
+  `tx_hash` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '交易哈希',
   `block_number` bigint(20) DEFAULT NULL COMMENT '区块高度',
-  `tx_from` varchar(64) DEFAULT NULL COMMENT '交易发起者from',
-  `contract` varchar(64) DEFAULT NULL COMMENT 'Token合约地址',
-  `transfer_to` varchar(64) DEFAULT NULL COMMENT '代币接收者',
+  `tx_from` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '交易发起者from',
+  `contract` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Token合约地址',
+  `transfer_to` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '代币接收者',
   `transfer_value` decimal(64,0) DEFAULT NULL COMMENT '转账金额',
   `decimal` int(11) DEFAULT NULL COMMENT '代币精度',
-  `name` varchar(32) DEFAULT NULL COMMENT '代币名称',
-  `symbol` varchar(32) DEFAULT NULL COMMENT '代币符号',
-  `method_sign` varchar(32) DEFAULT NULL COMMENT '函数方法签名',
+  `name` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '代币名称',
+  `symbol` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '代币符号',
+  `method_sign` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '函数方法签名',
   `result` int(11) DEFAULT '1' COMMENT '转账结果 1成功，0失败',
   `block_timestamp` datetime DEFAULT NULL COMMENT '转账时间',
   `value` decimal(64,0) DEFAULT NULL COMMENT '交易value金额',
@@ -196,7 +198,7 @@ DROP TABLE IF EXISTS `gas_estimate_log`;
 
 CREATE TABLE `gas_estimate_log` (
   `seq` bigint(20) NOT NULL COMMENT '序号',
-  `json` longtext NOT NULL,
+  `json` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`seq`)
 );
 
@@ -206,12 +208,12 @@ DROP TABLE IF EXISTS `n_opt_bak`;
 
 CREATE TABLE `n_opt_bak` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `node_id` varchar(130) NOT NULL COMMENT '节点id',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '节点id',
   `type` int(11) NOT NULL COMMENT '操作类型:1创建,2修改,3退出,4提案,5投票,6双签,7出块率低,11解除锁定',
-  `tx_hash` varchar(72) DEFAULT NULL COMMENT '交易hash',
+  `tx_hash` varchar(72) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '交易hash',
   `b_num` bigint(20) DEFAULT NULL COMMENT '交易所在区块号',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '时间',
-  `desc` varchar(2500) DEFAULT NULL COMMENT '操作描述',
+  `desc` varchar(2500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '操作描述',
   `cre_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `upd_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
@@ -227,9 +229,9 @@ DROP TABLE IF EXISTS `network_stat`;
 CREATE TABLE `network_stat` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `cur_number` bigint(20) NOT NULL COMMENT '当前块号',
-  `cur_block_hash` varchar(66) NOT NULL DEFAULT '' COMMENT '当前区块Hash',
-  `node_id` varchar(130) NOT NULL COMMENT '节点ID',
-  `node_name` varchar(256) NOT NULL,
+  `cur_block_hash` varchar(66) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '当前区块Hash',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '节点ID',
+  `node_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT '交易总数',
   `cur_tps` int(11) NOT NULL DEFAULT '0' COMMENT '当前交易TPS',
   `max_tps` int(11) NOT NULL DEFAULT '0' COMMENT '最大交易TPS',
@@ -248,11 +250,13 @@ CREATE TABLE `network_stat` (
   `add_issue_end` bigint(20) NOT NULL COMMENT '当前增发周期的结束块号',
   `next_settle` bigint(20) NOT NULL COMMENT '离下个结算周期的剩余块数',
   `node_opt_seq` bigint(20) NOT NULL COMMENT '节点操作记录最新序号',
-  `issue_rates` text COMMENT '增发比例',
+  `issue_rates` text COLLATE utf8mb4_unicode_ci COMMENT '增发比例',
   `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `avg_pack_time` bigint(20) NOT NULL DEFAULT '0' COMMENT '平均区块打包时间',
+  `erc721_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数',
+  `erc20_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
   PRIMARY KEY (`id`)
 );
 
@@ -261,7 +265,7 @@ CREATE TABLE `network_stat` (
 DROP TABLE IF EXISTS `node`;
 
 CREATE TABLE `node` (
-  `node_id` varchar(130) NOT NULL COMMENT '节点id',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '节点id',
   `stat_slash_multi_qty` int(11) NOT NULL DEFAULT '0' COMMENT '多签举报次数',
   `stat_slash_low_qty` int(11) NOT NULL DEFAULT '0' COMMENT '出块率低举报次数',
   `stat_block_qty` bigint(20) NOT NULL DEFAULT '0' COMMENT '节点处块数统计',
@@ -275,17 +279,17 @@ CREATE TABLE `node` (
   `staking_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁定期的质押金(von)',
   `staking_reduction` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '退回中的质押金(von)',
   `staking_reduction_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '结算周期标识',
-  `node_name` varchar(256) NOT NULL,
-  `node_icon` varchar(255) DEFAULT '' COMMENT '节点头像(关联external_id,第三方软件获取)',
-  `external_id` varchar(255) NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
-  `external_name` varchar(128) DEFAULT NULL COMMENT '第三方社交软件关联用户名',
-  `staking_addr` varchar(42) NOT NULL COMMENT '发起质押的账户地址',
-  `benefit_addr` varchar(42) NOT NULL DEFAULT '' COMMENT '收益地址',
+  `node_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `node_icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '节点头像(关联external_id,第三方软件获取)',
+  `external_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
+  `external_name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '第三方社交软件关联用户名',
+  `staking_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '发起质押的账户地址',
+  `benefit_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '收益地址',
   `annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
   `program_version` int(11) NOT NULL DEFAULT '0' COMMENT '程序版本',
   `big_version` int(11) NOT NULL DEFAULT '0' COMMENT '大程序版本',
-  `web_site` varchar(255) NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
-  `details` varchar(256) NOT NULL,
+  `web_site` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
+  `details` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `join_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
   `leave_time` timestamp NULL DEFAULT NULL COMMENT '离开时间',
   `status` int(11) NOT NULL DEFAULT '1' COMMENT '节点状态:1候选中,2退出中,3已退出,4已锁定',
@@ -300,7 +304,7 @@ CREATE TABLE `node` (
   `stat_staking_reward_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '质押奖励统计(激励池)(von)',
   `stat_fee_reward_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '出块奖励统计(手续费)(von)',
   `predict_staking_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前结算周期预计可获得的质押奖励',
-  `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
+  `annualized_rate_info` longtext COLLATE utf8mb4_unicode_ci COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
@@ -331,12 +335,12 @@ CREATE TABLE `node` (
 DROP TABLE IF EXISTS `proposal`;
 
 CREATE TABLE `proposal` (
-  `hash` varchar(72) NOT NULL COMMENT '提案交易hash',
+  `hash` varchar(72) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '提案交易hash',
   `type` int(11) NOT NULL COMMENT '提案类型:1文本提案,2升级提案,3参数提案,4取消提案',
-  `node_id` varchar(130) NOT NULL COMMENT '提交提案验证人(节点ID)',
-  `node_name` varchar(256) NOT NULL,
-  `url` varchar(255) NOT NULL COMMENT '提案URL',
-  `new_version` varchar(64) DEFAULT NULL COMMENT '新提案版本',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '提交提案验证人(节点ID)',
+  `node_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '提案URL',
+  `new_version` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '新提案版本',
   `end_voting_block` bigint(20) NOT NULL COMMENT '提案结束区块',
   `active_block` bigint(20) DEFAULT NULL COMMENT '提案生效区块',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提案时间',
@@ -345,20 +349,20 @@ CREATE TABLE `proposal` (
   `abstentions` bigint(20) NOT NULL DEFAULT '0' COMMENT '弃权票',
   `accu_verifiers` bigint(20) NOT NULL DEFAULT '0' COMMENT '在整个投票期内有投票资格的验证人总数',
   `status` int(11) NOT NULL DEFAULT '1' COMMENT '提案状态:1投票中,2通过,3失败,4预升级,5生效,6被取消',
-  `pip_num` varchar(128) NOT NULL COMMENT 'pip编号(需要组装 PIP-编号)',
-  `pip_id` varchar(128) NOT NULL COMMENT '提案id',
-  `topic` varchar(255) DEFAULT NULL COMMENT '提案主题',
-  `description` varchar(255) DEFAULT NULL COMMENT '提案描述',
-  `canceled_pip_id` varchar(255) DEFAULT NULL COMMENT '被取消提案id',
-  `canceled_topic` varchar(255) DEFAULT NULL COMMENT '被取消的提案的主题',
+  `pip_num` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'pip编号(需要组装 PIP-编号)',
+  `pip_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '提案id',
+  `topic` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '提案主题',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '提案描述',
+  `canceled_pip_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '被取消提案id',
+  `canceled_topic` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '被取消的提案的主题',
   `block_number` bigint(20) NOT NULL COMMENT '议案交易所在区块',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `completion_flag` int(11) NOT NULL DEFAULT '2' COMMENT '提案相关数据是否补充完成标识:1是,2否',
-  `module` varchar(64) DEFAULT NULL COMMENT '参数模块(参数提案专有属性)',
-  `name` varchar(128) DEFAULT NULL COMMENT '参数名称(参数提案专有属性)',
-  `stale_value` varchar(255) DEFAULT NULL COMMENT '原参数值',
-  `new_value` varchar(255) DEFAULT NULL COMMENT '参数值(参数提案专有属性)',
+  `module` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '参数模块(参数提案专有属性)',
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '参数名称(参数提案专有属性)',
+  `stale_value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '原参数值',
+  `new_value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '参数值(参数提案专有属性)',
   PRIMARY KEY (`hash`),
   KEY `type` (`type`) USING BTREE
 );
@@ -369,7 +373,7 @@ DROP TABLE IF EXISTS `rp_plan`;
 
 CREATE TABLE `rp_plan` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `address` varchar(42) NOT NULL DEFAULT '0' COMMENT '发布锁仓计划地址',
+  `address` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '发布锁仓计划地址',
   `epoch` decimal(25,0) NOT NULL COMMENT '锁仓计划周期',
   `amount` decimal(65,0) NOT NULL COMMENT '区块上待释放的金额(von)',
   `number` bigint(20) NOT NULL COMMENT '锁仓计划所在区块',
@@ -384,13 +388,13 @@ CREATE TABLE `rp_plan` (
 DROP TABLE IF EXISTS `slash`;
 
 CREATE TABLE `slash` (
-  `hash` varchar(72) NOT NULL COMMENT '举报交易hash',
-  `node_id` varchar(130) NOT NULL COMMENT '节点id',
-  `slash_rate` varchar(64) NOT NULL COMMENT '扣除比例',
+  `hash` varchar(72) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '举报交易hash',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '节点id',
+  `slash_rate` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '扣除比例',
   `slash_value` decimal(65,0) NOT NULL COMMENT '惩罚的金额',
   `reward` decimal(65,0) NOT NULL COMMENT '举报成功的奖励',
-  `benefit_addr` varchar(42) NOT NULL COMMENT '收取举报奖励地址',
-  `data` text NOT NULL COMMENT '举报证据',
+  `benefit_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '收取举报奖励地址',
+  `data` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '举报证据',
   `is_quit` int(11) NOT NULL DEFAULT '1' COMMENT '是否退出:1是,2否',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -403,24 +407,24 @@ CREATE TABLE `slash` (
 DROP TABLE IF EXISTS `staking`;
 
 CREATE TABLE `staking` (
-  `node_id` varchar(130) NOT NULL COMMENT '质押节点地址',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '质押节点地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '质押区块高度',
   `staking_tx_index` int(11) NOT NULL COMMENT '发起质押交易的索引',
   `staking_hes` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '犹豫期的质押金(von)',
   `staking_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁定期的质押金(von)',
   `staking_reduction` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '退回中的质押金(von)',
   `staking_reduction_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '撤销质押时的结算周期轮数',
-  `node_name` varchar(256) NOT NULL,
-  `node_icon` varchar(255) DEFAULT '' COMMENT '节点头像(关联external_id，第三方软件获取)',
-  `external_id` varchar(255) NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
-  `external_name` varchar(128) DEFAULT NULL COMMENT '第三方社交软件关联用户名',
-  `staking_addr` varchar(42) NOT NULL COMMENT '发起质押的账户地址',
-  `benefit_addr` varchar(42) NOT NULL DEFAULT '' COMMENT '收益地址',
+  `node_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `node_icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '节点头像(关联external_id，第三方软件获取)',
+  `external_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
+  `external_name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '第三方社交软件关联用户名',
+  `staking_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '发起质押的账户地址',
+  `benefit_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '收益地址',
   `annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
-  `program_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '程序版本',
-  `big_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '大程序版本',
-  `web_site` varchar(255) NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
-  `details` varchar(256) NOT NULL,
+  `program_version` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '程序版本',
+  `big_version` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '大程序版本',
+  `web_site` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
+  `details` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `join_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
   `leave_time` timestamp NULL DEFAULT NULL COMMENT '离开时间',
   `status` int(11) NOT NULL DEFAULT '1' COMMENT '节点状态:1候选中,2退出中,3已退出,4已锁定',
@@ -436,7 +440,7 @@ CREATE TABLE `staking` (
   `fee_reward_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '出块奖励统计(手续费)(von)',
   `cur_cons_block_qty` bigint(20) NOT NULL DEFAULT '0' COMMENT '当前共识周期出块数',
   `pre_cons_block_qty` bigint(20) NOT NULL DEFAULT '0' COMMENT '上个共识周期出块数',
-  `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
+  `annualized_rate_info` longtext COLLATE utf8mb4_unicode_ci COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `reward_per` int(11) NOT NULL COMMENT '委托奖励比例',
@@ -461,24 +465,24 @@ CREATE TABLE `staking` (
 DROP TABLE IF EXISTS `staking_history`;
 
 CREATE TABLE `staking_history` (
-  `node_id` varchar(130) NOT NULL COMMENT '质押节点地址',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '质押节点地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '质押区块高度',
   `staking_tx_index` int(11) NOT NULL COMMENT '发起质押交易的索引',
   `staking_hes` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '犹豫期的质押金(von)',
   `staking_locked` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁定期的质押金(von)',
   `staking_reduction` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '退回中的质押金(von)',
   `staking_reduction_epoch` int(11) NOT NULL DEFAULT '0' COMMENT '结算周期标识',
-  `node_name` varchar(256) NOT NULL,
-  `node_icon` varchar(255) DEFAULT '' COMMENT '节点头像(关联external_id，第三方软件获取)',
-  `external_id` varchar(255) NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
-  `external_name` varchar(128) DEFAULT NULL COMMENT '第三方社交软件关联用户名',
-  `staking_addr` varchar(42) NOT NULL COMMENT '发起质押的账户地址',
-  `benefit_addr` varchar(42) NOT NULL DEFAULT '' COMMENT '收益地址',
+  `node_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `node_icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '节点头像(关联external_id，第三方软件获取)',
+  `external_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '第三方社交软件关联id',
+  `external_name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '第三方社交软件关联用户名',
+  `staking_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '发起质押的账户地址',
+  `benefit_addr` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '收益地址',
   `annualized_rate` double(64,2) NOT NULL DEFAULT '0.00' COMMENT '预计年化率',
-  `program_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '程序版本',
-  `big_version` varchar(10) NOT NULL DEFAULT '0' COMMENT '大程序版本',
-  `web_site` varchar(255) NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
-  `details` varchar(256) NOT NULL,
+  `program_version` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '程序版本',
+  `big_version` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '大程序版本',
+  `web_site` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '节点的第三方主页',
+  `details` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `join_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
   `leave_time` timestamp NULL DEFAULT NULL COMMENT '离开时间',
   `status` int(11) NOT NULL DEFAULT '1' COMMENT '节点状态:1候选中,2退出中,3已退出,4已锁定',
@@ -494,7 +498,7 @@ CREATE TABLE `staking_history` (
   `predict_staking_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '当前结算周期预计可获得的质押奖励',
   `cur_cons_block_qty` bigint(20) NOT NULL DEFAULT '0' COMMENT '当前共识周期出块数',
   `pre_cons_block_qty` bigint(20) NOT NULL DEFAULT '0' COMMENT '上个共识周期出块数',
-  `annualized_rate_info` longtext COMMENT '最近几个结算周期收益和质押信息',
+  `annualized_rate_info` longtext COLLATE utf8mb4_unicode_ci COMMENT '最近几个结算周期收益和质押信息',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `reward_per` int(11) NOT NULL DEFAULT '0' COMMENT '委托奖励比例',
@@ -513,10 +517,10 @@ CREATE TABLE `staking_history` (
 DROP TABLE IF EXISTS `token`;
 
 CREATE TABLE `token` (
-  `address` varchar(64) NOT NULL COMMENT '合约地址',
-  `type` varchar(64) NOT NULL COMMENT '合约类型 erc20 erc721',
-  `name` varchar(64) DEFAULT NULL COMMENT '合约名称',
-  `symbol` varchar(64) DEFAULT NULL COMMENT '合约符号',
+  `address` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '合约地址',
+  `type` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '合约类型 erc20 erc721',
+  `name` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约名称',
+  `symbol` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约符号',
   `total_supply` decimal(64,0) DEFAULT NULL COMMENT '供应总量',
   `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
   `is_support_erc165` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否支持erc165接口： 0-不支持 1-支持',
@@ -537,18 +541,18 @@ CREATE TABLE `token` (
 DROP TABLE IF EXISTS `token_expand`;
 
 CREATE TABLE `token_expand` (
-  `address` varchar(64) NOT NULL COMMENT '合约地址',
-  `icon` text COMMENT '合约图标',
-  `web_site` varchar(256) DEFAULT NULL COMMENT '合约地址',
-  `details` varchar(256) DEFAULT NULL COMMENT '合约官网',
+  `address` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '合约地址',
+  `icon` text COLLATE utf8mb4_unicode_ci COMMENT '合约图标',
+  `web_site` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约地址',
+  `details` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '合约官网',
   `is_show_in_aton` tinyint(1) DEFAULT '0' COMMENT 'aton中是否显示，0-隐藏 1-展示',
   `is_show_in_scan` tinyint(1) DEFAULT '0' COMMENT 'scan中是否显示，0-隐藏 1-展示',
   `is_can_transfer` tinyint(1) DEFAULT '0' COMMENT '是否可转账 0-不可转账 1-可转账',
   `create_id` bigint(20) NOT NULL COMMENT '创建者',
-  `create_name` varchar(50) NOT NULL COMMENT '创建者名称',
+  `create_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '创建者名称',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_id` bigint(20) NOT NULL COMMENT '更新者',
-  `update_name` varchar(50) NOT NULL COMMENT '更新者名称',
+  `update_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '更新者名称',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`address`)
 );
@@ -558,8 +562,8 @@ CREATE TABLE `token_expand` (
 DROP TABLE IF EXISTS `token_holder`;
 
 CREATE TABLE `token_holder` (
-  `token_address` varchar(64) NOT NULL COMMENT '合约地址',
-  `address` varchar(64) NOT NULL COMMENT '用户地址',
+  `token_address` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '合约地址',
+  `address` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户地址',
   `balance` decimal(64,0) DEFAULT NULL COMMENT '地址代币余额, ERC20为金额，ERC721为tokenId数',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -572,12 +576,12 @@ CREATE TABLE `token_holder` (
 DROP TABLE IF EXISTS `token_inventory`;
 
 CREATE TABLE `token_inventory` (
-  `token_address` varchar(64) NOT NULL COMMENT '合约地址',
+  `token_address` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '合约地址',
   `token_id` bigint(80) NOT NULL COMMENT 'token id',
-  `owner` varchar(64) NOT NULL COMMENT 'token id 对应持有者地址',
-  `name` varchar(256) DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
-  `description` varchar(256) DEFAULT NULL COMMENT 'Describes the asset to which this NFT represents',
-  `image` varchar(256) DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
+  `owner` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'token id 对应持有者地址',
+  `name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
+  `description` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Describes the asset to which this NFT represents',
+  `image` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的交易数',
@@ -590,9 +594,9 @@ DROP TABLE IF EXISTS `tx_bak`;
 
 CREATE TABLE `tx_bak` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `hash` varchar(72) NOT NULL COMMENT '交易Hash',
+  `hash` varchar(72) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '交易Hash',
   `num` bigint(20) NOT NULL COMMENT '区块号',
-  `info` text COMMENT '交易信息',
+  `info` text COLLATE utf8mb4_unicode_ci COMMENT '交易信息',
   PRIMARY KEY (`id`),
   KEY `block_number` (`num`) USING BTREE,
   KEY `id` (`id`)
@@ -603,18 +607,14 @@ CREATE TABLE `tx_bak` (
 DROP TABLE IF EXISTS `vote`;
 
 CREATE TABLE `vote` (
-  `hash` varchar(72) NOT NULL COMMENT '投票交易Hash(如果此值带有"-",则表示投票操作是通过普通合约代理执行的,"-"号前面的是合约交易hash)',
-  `node_id` varchar(130) NOT NULL COMMENT '投票验证人(节点ID)',
-  `node_name` varchar(128) NOT NULL COMMENT '投票验证人名称',
+  `hash` varchar(72) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '投票交易Hash(如果此值带有"-",则表示投票操作是通过普通合约代理执行的,"-"号前面的是合约交易hash)',
+  `node_id` varchar(130) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '投票验证人(节点ID)',
+  `node_name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '投票验证人名称',
   `option` int(11) NOT NULL COMMENT '投票选项:1支持,2反对,3弃权',
-  `proposal_hash` varchar(72) NOT NULL COMMENT '提案交易Hash',
+  `proposal_hash` varchar(72) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '提案交易Hash',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提案时间',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`hash`),
   KEY `verifier` (`node_id`) USING BTREE
 );
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
