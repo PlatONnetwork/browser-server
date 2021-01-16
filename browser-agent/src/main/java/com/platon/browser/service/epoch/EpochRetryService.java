@@ -27,6 +27,7 @@ import java.math.RoundingMode;
 import java.util.*;
 
 /**
+ * 此类非线程安全
  * 奖励计算服务
  * 1、根据区块号计算周期切换相关值：
  * 名称/含义                                                                   变量名称
@@ -42,7 +43,7 @@ import java.util.*;
 @Slf4j
 @Service
 public class EpochRetryService {
-    private Queue<ConfigChange> epochChanges = new LinkedList<>();
+    private final Queue<ConfigChange> epochChanges = new LinkedList<>();
 
     @Resource
     private BlockChainConfig chainConfig;
@@ -50,24 +51,31 @@ public class EpochRetryService {
     private PlatOnClient platOnClient;
     @Resource
     private SpecialApi specialApi;
+    // 注意：以下所有属性在其所属周期内都是不变的，只有在各自周期变更时才更新各自的值
+    // ******* 增发周期相关属性 START *******
     @Getter
     private BigDecimal blockReward = BigDecimal.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
     @Getter
     private BigDecimal settleStakeReward = BigDecimal.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
+    // ******* 增发周期相关属性 END *******
+    // ******* 共识周期相关属性 START *******
+    @Getter
+    private final List <Node> preValidators = new ArrayList <>(); // 前一共识周期验证人列表
+    @Getter
+    private final List <Node> curValidators = new ArrayList <>(); // 当前共识周期验证人列表
+    @Getter
+    private Long expectBlockCount = 0L; // 当前期望出块数
+    // ******* 共识周期相关属性 END *******
+    // ******* 结算周期相关属性 START *******
+    @Getter
+    private final List <Node> preVerifiers = new ArrayList <>(); // 前一结算周期验证人列表
+    @Getter
+    private final List <Node> curVerifiers = new ArrayList <>(); // 当前结算周期验证人列表
     @Getter
     private BigDecimal stakeReward = BigDecimal.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
     @Getter
     private BigDecimal preStakeReward = BigDecimal.ZERO; // 前一结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
-    @Getter
-    private List <Node> preValidators = new ArrayList <>(); // 前一共识周期验证人列表
-    @Getter
-    private List <Node> curValidators = new ArrayList <>(); // 当前共识周期验证人列表
-    @Getter
-    private List <Node> preVerifiers = new ArrayList <>(); // 前一结算周期验证人列表
-    @Getter
-    private List <Node> curVerifiers = new ArrayList <>(); // 当前结算周期验证人列表
-    @Getter
-    private Long expectBlockCount = 0L; // 当前期望出块数
+    // ******* 结算周期相关属性 END *******
 
     @Resource
     private NetworkStatCache networkStatCache;
@@ -85,7 +93,9 @@ public class EpochRetryService {
 
     /**
      * 共识周期变更
-     *
+     * 1、更新当前周期验证人
+     * 2、更新前一周期验证人
+     * 3、更新验证人期望出块数
      * @param currentBlockNumber 共识周期内的任意块
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
@@ -134,7 +144,10 @@ public class EpochRetryService {
 
     /**
      * 结算周期变更
-     *
+     *  1、更新当前周期验证人
+     *  2、更新前一周期验证人
+     *  3、更新当前周期区块奖励
+     *  4、更新当前周期质押奖励
      * @param currentBlockNumber 结算周期内的任意块
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
@@ -172,8 +185,6 @@ public class EpochRetryService {
             curVerifiers.clear();
             curVerifiers.addAll(curNodes);
 
-
-
             // 上一结算周期最后一个块号
             BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getSettlePeriodBlockCount());
             // 从特殊接口获取
@@ -182,6 +193,10 @@ public class EpochRetryService {
             blockReward=epochInfo.getPackageReward();
             // 当前增发周期内每个结算周期的质押奖励
             settleStakeReward = epochInfo.getStakingReward();
+            // 前一结算周期质押奖励轮换
+            preStakeReward = stakeReward;
+            // 计算当前结算周期内每个验证人的质押奖励
+            stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()), 10, RoundingMode.FLOOR);
 
             ConfigChange configChange = new ConfigChange();
             configChange.setAvgPackTime(epochInfo.getAvgPackTime());
@@ -191,13 +206,6 @@ public class EpochRetryService {
             configChange.setYearEndNum(epochInfo.getYearEndNum());
             configChange.setRemainEpoch(epochInfo.getRemainEpoch());
             configChange.setSettleStakeReward(epochInfo.getStakingReward());
-
-
-            // 前一结算周期质押奖励轮换
-            preStakeReward = stakeReward;
-            // 计算当前结算周期内每个验证人的质押奖励
-            stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()), 10, RoundingMode.FLOOR);
-
             configChange.setStakeReward(stakeReward);
             epochChanges.offer(configChange);
 
@@ -207,7 +215,6 @@ public class EpochRetryService {
             throw new BusinessException(e.getMessage());
         }
     }
-
 
     /**
      * 获取实时候选人列表
