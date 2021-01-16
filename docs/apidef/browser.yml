@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 0.15.1.0
-  title: 浏览器接口文档
+  title: 浏览器API文档
   description:
 host: localhost:9061
 basePath: /browser-server
