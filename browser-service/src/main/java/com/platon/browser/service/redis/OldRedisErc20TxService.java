@@ -15,7 +15,7 @@ import java.util.Set;
 public class OldRedisErc20TxService extends AbstractRedisService<OldErcTx> {
     @Override
     public String getCacheKey() {
-        return redisKeyConfig.getInnerTx();
+        return redisKeyConfig.getErc20Tx();
     }
 
     @Override

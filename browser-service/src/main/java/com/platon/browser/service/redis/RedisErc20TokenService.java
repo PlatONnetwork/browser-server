@@ -15,7 +15,7 @@ public class RedisErc20TokenService extends AbstractRedisService<Long> {
 
     @Override
     public String getCacheKey() {
-        return redisKeyConfig.getInnerTx() + suffixKey;
+        return redisKeyConfig.getErc20Tx() + suffixKey;
     }
 
     private boolean isInit = false;

@@ -69,7 +69,7 @@ public class StatisticCacheService extends CacheBase {
 
 	public TokenTransferRecordCacheDto getTokenTransferRecordCache(Integer pageNum, Integer pageSize) {
 		/* 分页根据key来获取交易数据  */
-		CachePageInfo<Class<OldErcTx>> cpi = this.getCachePageInfo(redisKeyConfig.getInnerTx(), pageNum, pageSize);
+		CachePageInfo<Class<OldErcTx>> cpi = this.getCachePageInfo(redisKeyConfig.getErc20Tx(), pageNum, pageSize);
 		List<OldErcTx> oldErcTxList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/* 获取数据转换成对象 */

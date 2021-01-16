@@ -1,33 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.alibaba.fastjson.JSON;
-import com.platon.browser.enums.Arc20TxGroupTypeEnum;
-import com.platon.browser.service.elasticsearch.bean.TokenTxCount;
-import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.ScriptQueryBuilder;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
-import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Repository;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 针对处理合约内部转账记录的ES处理器
@@ -44,7 +18,7 @@ public class OldEsErc20TxRepository extends AbstractEsRepository {
         return "erc20_list";
     }
 
-    public TokenTxSummary groupContractTxCount(){
+    /*public TokenTxSummary groupContractTxCount(){
         String equalCondition = "doc['from'].value == doc['to'].value";
         TokenTxSummary equalSummary = groupContractTxCount(Arc20TxGroupTypeEnum.FROM,equalCondition);
         String notEqualCondition = "doc['from'].value != doc['to'].value";
@@ -107,10 +81,10 @@ public class OldEsErc20TxRepository extends AbstractEsRepository {
         return summary;
     }
 
-    /**
+    *//**
      * 根据groupType分组统计token合约交易数
      * @return
-     */
+     *//*
     public TokenTxSummary groupContractTxCount(Arc20TxGroupTypeEnum groupType,String scriptCondition){
         TokenTxSummary tts = new TokenTxSummary();
         try {
@@ -177,5 +151,5 @@ public class OldEsErc20TxRepository extends AbstractEsRepository {
         }
         tts.calculate();
         return tts;
-    }
+    }*/
 }

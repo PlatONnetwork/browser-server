@@ -269,12 +269,12 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 
 ##### 3.2 Elasticsearch设计
 
-##### 3.2.1 browser_erc721_tx_* 模板
+##### 3.2.1 *_erc721_tx 模板
 
 ```
 {
   "index_patterns": [
-    "browser_erc721_tx_*"
+    "*_erc721_tx"
   ],
   "settings": {
     "index": {
@@ -339,15 +339,15 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 }
 ```
 
-##### 3.2.2 browser_erc20_tx_* 模板(同 browser_erc721_tx_*)
+##### 3.2.2 *_erc20_tx 模板(同 *_erc721_tx)
 
-##### 3.2.3 browser_transfer_tx_* 模板
+##### 3.2.3 *_transfer_tx 模板
 > 合约内部转账交易
 
 ```
 {
   "index_patterns": [
-    "browser_transfer_tx_*"
+    "*_transfer_tx"
   ],
   "settings": {
     "index": {
@@ -397,12 +397,12 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 }
 ```
 
-##### 3.2.4 browser_transaction_* 模板
+##### 3.2.4 *_transaction 模板
 
 ```
 {
   "index_patterns": [
-    "browser_transaction_*"
+    "*_transaction"
   ],
   "settings": {
     "index": {
@@ -492,25 +492,25 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
         "type": "text",
         "doc_values": false
       },
-      "erc721TxList": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc721_tx_* 模板）
+      "erc721TxInfo": {             //合约中erc721内部交易定义，json数组。（对象定义参考  *_erc721_tx 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },      
-      "erc20TxList": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc20_tx_* 模板）
+      "erc20TxInfo": {             //合约中erc721内部交易定义，json数组。（对象定义参考  *_erc20_tx 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },   
-      "transferTxList": {          //合约中内部交易定义，json数组。（对象定义参考 browser_inner_tx_* 模板）
+      "transferTxInfo": {          //合约中内部交易定义，json数组。（对象定义参考 *_transfer_tx 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },  
-      "pposTxList": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
+      "pposTxInfo": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
         "norms": false,
         "index": false,
         "type": "text",

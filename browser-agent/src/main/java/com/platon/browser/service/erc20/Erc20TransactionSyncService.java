@@ -42,7 +42,7 @@ public class Erc20TransactionSyncService {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void sync(){
-        Long recordSize = redisService.size(redisKeyConfig.getInnerTx());
+        Long recordSize = redisService.size(redisKeyConfig.getErc20Tx());
         // 如果redis innerTx不为空，则不用同步
         if(recordSize>0) return;
         ESQueryBuilderConstructor transactionConstructor = new ESQueryBuilderConstructor();

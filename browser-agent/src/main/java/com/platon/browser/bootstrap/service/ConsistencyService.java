@@ -57,6 +57,7 @@ public class ConsistencyService {
     /**
      * 同步ARC20相关地址交易数统计数据
      */
+/*
 
     private void syncTxCount(){
         TokenTxSummary summary = oldEsErc20TxRepository.groupContractTxCount();
@@ -72,6 +73,7 @@ public class ConsistencyService {
         );
         log.info("同步ES中的Token交易数至Mysql数据库成功！");
     }
+*/
 
     /**
      * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
@@ -86,7 +88,7 @@ public class ConsistencyService {
 
         // 把es中的arc20交易同步至Redis
         erc20TransactionSyncService.sync();
-        syncTxCount();
+        //syncTxCount();
 
         // mysql中的最高块号
         long mysqlMaxBlockNum = networkStat.getCurNumber();

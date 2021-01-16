@@ -88,6 +88,8 @@ public class InitializationService {
     private EsErc20TxRepository esErc20TxRepository;
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
+    @Resource
+    private EsTransferTxRepository esTransferTxRepository;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
@@ -114,6 +116,8 @@ public class InitializationService {
             networkStat.setCurNumber(-1L);
             networkStat.setAvgPackTime(0L);
             networkStat.setIssueRates(chainConfig.getAddIssueRate().toPlainString());
+            networkStat.setErc20TxQty(0);
+            networkStat.setErc721TxQty(0);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(-1L);
             // 删除节点表和质押表、地址表数据
@@ -294,8 +298,9 @@ public class InitializationService {
         	ESDelegationRewardRepository.initIndex();
         	ESNodeOptRepository.initIndex();
             oldEsErc20TxRepository.initIndex();
+        	esTransferTxRepository.initIndex();
         	esErc20TxRepository.initIndex();
-        	esErc721TxRepository.init();
+        	esErc721TxRepository.initIndex();
 		} catch (Exception e) {
 			log.error("init es error",e);
 		}

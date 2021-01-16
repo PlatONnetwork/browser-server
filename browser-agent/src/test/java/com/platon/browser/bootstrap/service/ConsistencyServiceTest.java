@@ -65,7 +65,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     public void post() throws IOException {
 
         TokenTxSummary summary = new TokenTxSummary();
-        when(oldEsErc20TxRepository.groupContractTxCount()).thenReturn(summary);
+        //when(oldEsErc20TxRepository.groupContractTxCount()).thenReturn(summary);
 
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
