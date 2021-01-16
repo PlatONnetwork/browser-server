@@ -3,11 +3,11 @@ package com.platon.browser;
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.v0150.bean.AdjustParam;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.bean.*;
@@ -39,7 +39,7 @@ public class AgentTestData {
             "transaction",
             "receipts",
             "staking",
-            "delegation",
+            "delegate.yml",
             "verifier",
             "validator",
             "candidate",
@@ -126,7 +126,7 @@ public class AgentTestData {
                     case "staking":
                         stakingList = JSON.parseArray(content, CustomStaking.class);
                         break;
-                    case "delegation":
+                    case "delegate.yml":
                         delegationList = JSON.parseArray(content, CustomDelegation.class);
                         break;
                     case "verifier":

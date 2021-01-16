@@ -1,31 +1,21 @@
 package com.platon.browser.service.redis;
 
-import com.platon.browser.config.redis.RedisFactory;
 import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 
 @Service
-public class RedisErc20TokenService extends RedisService<Long> {
-
-    @Resource
-    private RedisFactory redisFactory;
-
+public class RedisErc20TokenService extends AbstractRedisService<Long> {
     @Resource
     private Erc20TokenMapper erc20TokenMapper;
-
-    @Value("${spring.redis.key.innerTx}")
-    private String prefixKey;
 
     private String suffixKey = ":token:count";
 
     @Override
     public String getCacheKey() {
-        return prefixKey + suffixKey;
+        return redisKeyConfig.getErc20Tx() + suffixKey;
     }
 
     private boolean isInit = false;
@@ -43,11 +33,11 @@ public class RedisErc20TokenService extends RedisService<Long> {
     }
 
     public long getTokenCount() {
-        String value = redisFactory.createRedisCommands().get(getCacheKey());
+        String value = redisTemplate.opsForValue().get(getCacheKey());
         if (null == value || value.equals("")) {
             int count = erc20TokenMapper.totalErc20Token(new HashMap());
             value = String.valueOf(count);
-            redisFactory.createRedisCommands().set(getCacheKey(), value);
+            redisTemplate.opsForValue().set(getCacheKey(),value);
         }
         return Long.parseLong(value);
     }

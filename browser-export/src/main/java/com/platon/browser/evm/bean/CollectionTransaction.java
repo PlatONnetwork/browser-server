@@ -9,8 +9,8 @@ import com.alaya.rlp.solidity.RlpList;
 import com.alaya.rlp.solidity.RlpString;
 import com.alaya.rlp.solidity.RlpType;
 import com.alaya.utils.Numeric;
+import com.platon.browser.bean.Receipt;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -18,10 +18,10 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
-import com.platon.browser.decoder.general.GeneralContractDecodeUtil;
-import com.platon.browser.decoder.general.GeneralContractDecodedResult;
-import com.platon.browser.decoder.ppos.InnerContractDecodeUtil;
-import com.platon.browser.decoder.ppos.InnerContractDecodedResult;
+import com.platon.browser.decoder.TxInputDecodeUtil;
+import com.platon.browser.decoder.TxInputDecodeResult;
+import com.platon.browser.decoder.PPOSTxDecodeUtil;
+import com.platon.browser.decoder.PPOSTxDecodeResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -157,7 +157,7 @@ public class CollectionTransaction extends Transaction {
                 block.setDQty(block.getDQty()+1);
                 break;
             case DELEGATE_EXIT:// 撤销委托
-                if(status==Receipt.getSuccess()){
+                if(status==Receipt.SUCCESS){
                     // 成功的领取交易才解析info回填
                     // 设置委托奖励提取额
                     DelegateExitParam param = getTxParam(DelegateExitParam.class);
@@ -171,7 +171,7 @@ public class CollectionTransaction extends Transaction {
                 DelegateRewardClaimParam param = DelegateRewardClaimParam.builder()
                         .rewardList(new ArrayList<>())
                         .build();
-                if(status==Receipt.getSuccess()){
+                if(status==Receipt.SUCCESS){
                     // 成功的领取交易才解析info回填
                     param = getTxParam(DelegateRewardClaimParam.class);
                 }
@@ -218,10 +218,10 @@ public class CollectionTransaction extends Transaction {
      * 内置合约调用交易,解析补充信息
      */
     private void resolveInnerContractInvokeTxComplementInfo(List<Log> logs,ComplementInfo ci) throws BeanCreateOrUpdateException {
-        InnerContractDecodedResult decodedResult;
+        PPOSTxDecodeResult decodedResult;
         try {
             // 解析交易的输入及交易回执log信息
-            decodedResult = InnerContractDecodeUtil.decode(getInput(),logs);
+            decodedResult = PPOSTxDecodeUtil.decode(getInput(),logs);
             ci.type = decodedResult.getTypeEnum().getCode();
             ci.info = decodedResult.getParam().toJSONString();
             ci.toType = ToTypeEnum.INNER_CONTRACT.getCode();
@@ -256,7 +256,7 @@ public class CollectionTransaction extends Transaction {
     private void resolveGeneralContractCreateTxComplementInfo(String contractAddress,ComplementInfo ci) throws BeanCreateOrUpdateException {
         ci.info="";
         //解码合约创建交易前缀，用于区分EVM||WASM
-        GeneralContractDecodedResult decodedResult = GeneralContractDecodeUtil.decode(getInput());
+        TxInputDecodeResult decodedResult = TxInputDecodeUtil.decode(getInput());
         ci.type = decodedResult.getTypeEnum().getCode();
         ci.toType=ToTypeEnum.ACCOUNT.getCode();
         ci.contractType = ContractTypeEnum.UNKNOWN.getCode();

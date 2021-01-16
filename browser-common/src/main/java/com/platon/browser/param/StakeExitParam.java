@@ -1,6 +1,6 @@
 package com.platon.browser.param;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class StakeExitParam extends TxParam{
      */
     private String nodeId;
     public void setNodeId(String nodeId){
-        this.nodeId= HexTool.prefix(nodeId);
+        this.nodeId= HexUtil.prefix(nodeId);
     }
 
     /**

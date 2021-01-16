@@ -9,16 +9,16 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
 
-import static com.platon.browser.decoder.ppos.InnerContractDecoder.*;
+import static com.platon.browser.decoder.ppos.AbstractPPOSDecoder.*;
 
 /**
  * @description: 创建验证人交易输入参数解码器
  * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 20:13:04
  */
-public class StakeModifyDecoder {
+public class StakeModifyDecoder extends AbstractPPOSDecoder {
     private StakeModifyDecoder(){}
-    static TxParam decode(RlpList rootList) {
+    public static TxParam decode(RlpList rootList) {
         // 修改质押信息
         //用于接受出块奖励和质押奖励的收益账户
         String benefitAddress = addressResolver((RlpString) rootList.getValues().get(1));

@@ -10,7 +10,7 @@ import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
@@ -18,11 +18,11 @@ import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
-import com.platon.browser.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
@@ -30,8 +30,8 @@ import com.platon.browser.request.staking.*;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.*;
-import com.platon.browser.util.I18nUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.HexUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class StakingService {
 	@Resource
 	private NodeMapper nodeMapper;
 	@Resource
-	private NodeOptESRepository nodeOptESRepository;
+	private EsNodeOptRepository ESNodeOptRepository;
 	@Resource
 	private I18nUtil i18n;
 	@Resource
@@ -273,8 +273,8 @@ public class StakingService {
 			resp.setDenefitAddr(stakingNode.getBenefitAddr());
 			resp.setStakingIcon(stakingNode.getNodeIcon());
 			resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
-			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
-			resp.setNextRewardPer(new BigDecimal(stakingNode.getNextRewardPer()).divide(BrowserConst.PERCENTAGE).toString());
+			resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(Browser.PERCENTAGE).toString());
+			resp.setNextRewardPer(new BigDecimal(stakingNode.getNextRewardPer()).divide(Browser.PERCENTAGE).toString());
 			resp.setTotalDeleReward(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()));
 			/**
 			 * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
@@ -294,10 +294,10 @@ public class StakingService {
 				/**
 				 * 如果地址不是http开头就补齐
 				 */
-				if (stakingNode.getWebSite().startsWith(BrowserConst.HTTP) || stakingNode.getWebSite().startsWith(BrowserConst.HTTPS)) {
+				if (stakingNode.getWebSite().startsWith(Browser.HTTP) || stakingNode.getWebSite().startsWith(Browser.HTTPS)) {
 					webSite = stakingNode.getWebSite();
 				} else {
-					webSite = BrowserConst.HTTP + stakingNode.getWebSite();
+					webSite = Browser.HTTP + stakingNode.getWebSite();
 				}
 			}
 			resp.setWebsite(webSite);
@@ -310,8 +310,11 @@ public class StakingService {
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 			}
+			// 有效的委托金额
 			resp.setDelegateValue(stakingNode.getStatDelegateValue());
+			// 有效的质押委托总数
 			resp.setTotalValue(stakingNode.getTotalValue());
+
 			/**
 			 * 如果判断为true则表示为查历史数据
 			 * 没有值则标识查询活跃账户
@@ -338,7 +341,8 @@ public class StakingService {
                         resp.setStakingValue(stakingNode.getStakingReduction());
                     }
 				}
-				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
+				// 待提取的委托金额(von)
+				resp.setStatDelegateReduction(stakingNode.getStatDelegateReleased());
 			}
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
@@ -351,7 +355,7 @@ public class StakingService {
 		ESResult<NodeOpt> items = new ESResult<>();
 		constructor.setDesc("id");
 		try {
-			items = nodeOptESRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
+			items = ESNodeOptRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
 		} catch (Exception e) {
 			logger.error("获取节点操作错误。", e);
 			return respPage;
@@ -365,7 +369,7 @@ public class StakingService {
 			stakingOptRecordListResp.setTimestamp(nodeOpt.getTime().getTime());
 			stakingOptRecordListResp.setBlockNumber(nodeOpt.getBNum());
 			if(StringUtils.isNotBlank(nodeOpt.getDesc())) {
-				String[] desces = nodeOpt.getDesc().split(BrowserConst.OPT_SPILT);
+				String[] desces = nodeOpt.getDesc().split(Browser.OPT_SPILT);
 				/** 根据不同类型组合返回 */
 				switch (NodeOpt.TypeEnum.getEnum(String.valueOf(nodeOpt.getType()))) {
 					/**
@@ -373,14 +377,14 @@ public class StakingService {
 					 */
 					case MODIFY:
 						if(desces.length > 1) {
-							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(BrowserConst.PERCENTAGE).toString());
-							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(BrowserConst.PERCENTAGE).toString());
+							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(Browser.PERCENTAGE).toString());
+							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(Browser.PERCENTAGE).toString());
 						}
 						break;
 					/** 提案类型 */
 					case PROPOSALS:
-						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(BrowserConst.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
+						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1])?"":desces[1]);
 						stakingOptRecordListResp.setProposalType(desces[2]);
 						if(desces.length > 3) {
 							stakingOptRecordListResp.setVersion(desces[3]);
@@ -388,8 +392,8 @@ public class StakingService {
 						break;
 					/** 投票类型 */
 					case VOTE:
-						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(BrowserConst.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
+						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1])?"":desces[1]);
 						stakingOptRecordListResp.setOption(desces[2]);
 						stakingOptRecordListResp.setProposalType(desces[3]);
 						if(desces.length > 4) {
@@ -411,8 +415,8 @@ public class StakingService {
 						 * 参数提案
 						 */
 					case PARAMETER:
-						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(BrowserConst.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
+						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1])?"":desces[1]);
 						stakingOptRecordListResp.setProposalType(desces[2]);
 						stakingOptRecordListResp.setType("4");
 						break;
@@ -498,7 +502,7 @@ public class StakingService {
 					/**
 					 * 匹配成功之后设置金额
 					 */
-					if(delegationAddress.getNodeId().equals(HexTool.prefix(reward.getNodeId()))) {
+					if(delegationAddress.getNodeId().equals(HexUtil.prefix(reward.getNodeId()))) {
 						byAddressResp.setDelegateClaim(new BigDecimal(reward.getReward()));
 					}
 				}

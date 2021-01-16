@@ -1,10 +1,8 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +21,7 @@ import java.util.Set;
 @Service
 public class EsTransactionService implements EsService<Transaction>{
     @Resource
-    private TransactionESRepository transactionESRepository;
+    private EsTransactionRepository ESTransactionRepository;
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<Transaction> transactions) throws IOException {
         if(transactions.isEmpty()) return;
@@ -31,7 +29,7 @@ public class EsTransactionService implements EsService<Transaction>{
             Map<String,Transaction> transactionMap = new HashMap<>();
             // 使用交易Hash作ES的docId
             transactions.forEach(t->transactionMap.put(t.getHash(),t));
-            transactionESRepository.bulkAddOrUpdate(transactionMap);
+            ESTransactionRepository.bulkAddOrUpdate(transactionMap);
         }catch (Exception e){
             log.error("",e);
             throw new BusinessException(e.getMessage());

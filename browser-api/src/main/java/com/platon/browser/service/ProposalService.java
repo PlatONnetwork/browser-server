@@ -5,12 +5,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
@@ -21,9 +21,9 @@ import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.proposal.ProposalDetailsResp;
 import com.platon.browser.response.proposal.ProposalListResp;
-import com.platon.browser.util.ConvertUtil;
-import com.platon.browser.util.I18nUtil;
-import com.platon.browser.utils.VerUtil;
+import com.platon.browser.utils.ConvertUtil;
+import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.ChainVersionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class ProposalService {
     @Resource
     private BlockChainConfig blockChainConfig;
     @Resource
-    private BlockESRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
 
     public RespPage<ProposalListResp> list(PageReq req) {
         RespPage<ProposalListResp> respPage = new RespPage<>();
@@ -82,7 +82,7 @@ public class ProposalService {
             	 */
             	ProposalListResp proposalListResp = new ProposalListResp();
                 BeanUtils.copyProperties(proposal, proposalListResp);
-                proposalListResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
+                proposalListResp.setTopic(Browser.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
                 proposalListResp.setProposalHash(proposal.getHash());
                 proposalListResp.setEndVotingBlock(String.valueOf(proposal.getEndVotingBlock()));
                 proposalListResp.setType(String.valueOf(proposal.getType()));
@@ -110,12 +110,12 @@ public class ProposalService {
         }
         ProposalDetailsResp proposalDetailsResp = new ProposalDetailsResp();
         BeanUtils.copyProperties(proposal, proposalDetailsResp);
-        proposalDetailsResp.setTopic(BrowserConst.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
+        proposalDetailsResp.setTopic(Browser.INQUIRY.equals(proposal.getTopic())?"":proposal.getTopic());
         proposalDetailsResp.setProposalHash(req.getProposalHash());
         proposalDetailsResp.setNodeId(proposal.getNodeId());
         proposalDetailsResp.setNodeName(proposal.getNodeName());
-        proposalDetailsResp.setDescription(BrowserConst.INQUIRY.equals(proposal.getDescription())?"":proposal.getDescription());
-        proposalDetailsResp.setCanceledTopic(BrowserConst.INQUIRY.equals(proposal.getCanceledTopic())?"":proposal.getCanceledTopic());
+        proposalDetailsResp.setDescription(Browser.INQUIRY.equals(proposal.getDescription())?"":proposal.getDescription());
+        proposalDetailsResp.setCanceledTopic(Browser.INQUIRY.equals(proposal.getCanceledTopic())?"":proposal.getCanceledTopic());
         proposalDetailsResp.setEndVotingBlock(String.valueOf(proposal.getEndVotingBlock()));
         proposalDetailsResp.setAccuVerifiers(String.valueOf(proposal.getAccuVerifiers()));
         proposalDetailsResp.setAbstentions(proposal.getAbstentions().intValue());
@@ -150,7 +150,7 @@ public class ProposalService {
 				/**
 				 * 如果参数是需要转换lat的，则进一步转换
 				 */
-				if(BrowserConst.EXTRA_LAT_PARAM.contains(proposal.getName())) {
+				if(Browser.EXTRA_LAT_PARAM.contains(proposal.getName())) {
 					currentValue = Convert.fromVon(currentValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
 					newValue = Convert.fromVon(newValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
 				} 
@@ -176,7 +176,7 @@ public class ProposalService {
 		        if(StringUtils.isBlank(proposalDetailsResp.getCanceledTopic())) {
 		        	Proposal cancelProposal = proposalMapper.selectByPrimaryKey(proposal.getCanceledPipId());
 		        	if (cancelProposal != null && CustomProposal.TypeEnum.getEnum(cancelProposal.getType()) == CustomProposal.TypeEnum.UPGRADE) {
-                            proposalDetailsResp.setCanceledTopic("版本升级-V" + VerUtil.toVersion(new BigInteger(cancelProposal.getNewVersion())));
+                            proposalDetailsResp.setCanceledTopic("版本升级-V" + ChainVersionUtil.toStringVersion(new BigInteger(cancelProposal.getNewVersion())));
 		        	}
 		        }
 				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelSupportRate().toString());
@@ -193,7 +193,7 @@ public class ProposalService {
         if(diff.compareTo(BigDecimal.ZERO) > 0) {
         	/** 结束时间预估：（生效区块-当前区块）*出块间隔 + 区块现有时间 */
     		try {
-    			block = blockESRepository.get(proposalDetailsResp.getCurBlock(), Block.class);
+    			block = ESBlockRepository.get(proposalDetailsResp.getCurBlock(), Block.class);
                 BigDecimal endTime = diff.multiply(new BigDecimal(networkStat.getAvgPackTime())).add(new BigDecimal(block.getTime().getTime()));
                 proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
     		} catch (IOException e) {
@@ -201,7 +201,7 @@ public class ProposalService {
     		}
         } else {
     		try {
-    			block = blockESRepository.get(proposalDetailsResp.getEndVotingBlock(), Block.class);
+    			block = ESBlockRepository.get(proposalDetailsResp.getEndVotingBlock(), Block.class);
                 proposalDetailsResp.setEndVotingBlockTime(block.getTime().getTime());
     		} catch (IOException e) {
     			logger.error("获取区块错误。", e);

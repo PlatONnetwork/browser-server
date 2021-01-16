@@ -1,19 +1,32 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: 1
+profile: dev
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-# 服务器端口号
-server.port: 9061
+#性能配置
+server:
+  port: 9061
+  tomcat:
+    max-connections: 20000
+    threads:
+      max: 2000
+      min-spare: 800
 #Spring框架内部配置
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/_DB_NAME_?useUnicode=true
+    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/_DB_NAME_?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: _DB_USER_
     password: _DB_PASS_
+  #Redis配置
+  redis:
+    password: _REDIS_PWD_
+    database: 0
+    cluster:
+      max-redirects: 3
+      nodes: _REDIS_IPS_
   #ES配置
   elasticsearch:
     high-level-client:
@@ -22,38 +35,6 @@ spring:
       schema: http
       username: _ES_USER_
       password: _ES_PWD_
-      blockIndexName: browser_block_${profile}
-      transactionIndexName: browser_transaction_${profile}
-      delegationIndexName: browser_delegation_${profile}
-      nodeOptIndexName: browser_nodeopt_${profile}
-      delegationRewardIndexName: browser_delegation_reward_${profile}
-      innerTxIndexName: browser_inner_tx_${profile}
-#redis配置
-redisCluster:
-  configKey: DEFAULT
-  connectionTimeout: 4000
-  soTimeout: 5000
-  maxRedirections: 3000
-  maxTotal: 10
-  maxIdle: 5
-  minIdle: 2
-  maxWaitMillis: 2000
-  testOnBorrow: false
-  testOnReturn: false
-  testWhileIdle: true
-  masterIPs: _REDIS_IPS_
-  password: _REDIS_PWD_
-#性能配置
-server:
-  tomcat:
-    max-connections: 20000
-    threads:
-      max: 2000
-      min-spare: 800
-zuul:
-  FormBodyWrapperFilter:
-    pre:
-     disable: true
 #日志配置
 logging:
   #日志级别
@@ -69,6 +50,8 @@ logging:
 #初始化链相关的配置
 #初始化链相关的配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: atp
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
@@ -113,6 +96,8 @@ platon:
   chainId: 201018
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
+  #Es索引命名空间
+  es-namespace: browser_${version}_${profile}
 
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
 isRecaptcha: false

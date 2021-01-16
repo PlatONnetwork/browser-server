@@ -6,7 +6,7 @@ import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.EpochInfo;
+import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;

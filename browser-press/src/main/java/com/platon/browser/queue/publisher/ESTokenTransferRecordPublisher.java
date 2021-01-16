@@ -2,10 +2,10 @@ package com.platon.browser.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.queue.event.ESTokenTransferRecordEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
-import com.platon.browser.queue.handler.ESTokenTransferRecordHandler;
+import com.platon.browser.queue.handler.OldErc20TxHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +17,8 @@ import java.util.List;
 @Component
 public class ESTokenTransferRecordPublisher extends AbstractPublisher {
 
-    private static final EventTranslatorOneArg<ESTokenTransferRecordEvent, List<ESTokenTransferRecord>> TRANSLATOR =
-            (event, sequence, msg) -> event.setEsTokenTransferRecordList(msg);
+    private static final EventTranslatorOneArg<ESTokenTransferRecordEvent, List<OldErcTx>> TRANSLATOR =
+            (event, sequence, msg) -> event.setOldErcTxList(msg);
 
     @Override
     EventTranslatorOneArg getTranslator() {
@@ -26,7 +26,7 @@ public class ESTokenTransferRecordPublisher extends AbstractPublisher {
     }
 
     @Autowired
-    private ESTokenTransferRecordHandler handler;
+    private OldErc20TxHandler handler;
 
     @Override
     public AbstractHandler getHandler() {

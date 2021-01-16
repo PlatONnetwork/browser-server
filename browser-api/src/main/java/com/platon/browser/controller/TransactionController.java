@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
@@ -19,11 +18,10 @@ import com.platon.browser.response.transaction.QueryClaimByAddressResp;
 import com.platon.browser.response.transaction.TransactionDetailsResp;
 import com.platon.browser.response.transaction.TransactionListResp;
 import com.platon.browser.service.TransactionService;
-import com.platon.browser.util.I18nUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.platon.browser.utils.I18nUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.WebAsyncTask;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -37,10 +35,9 @@ import javax.validation.Valid;
  * @author zhangrj
  * @data 2019年8月31日
  */
+@Slf4j
 @RestController
 public class TransactionController {
-
-    private final Logger logger = LoggerFactory.getLogger(TransactionController.class);
     @Resource
     private I18nUtil i18n;
     @Resource
@@ -50,40 +47,22 @@ public class TransactionController {
     @Resource
     private CommonMethod commonMethod;
 
-    @PostMapping(value = "transaction/transactionList")
-    public WebAsyncTask<RespPage<TransactionListResp>> transactionList(@Valid @RequestBody PageReq req) {
-        /**
-         * 异步调用，超时则进入timeout
-         */
-        WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask =
-            new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> this.transactionService.getTransactionList(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("transaction/transactionList")
+    public Mono<RespPage<TransactionListResp>> transactionList(@Valid @RequestBody PageReq req) {
+        return Mono.just(transactionService.getTransactionList(req));
     }
 
-    @PostMapping(value = "transaction/transactionListByBlock")
-    public WebAsyncTask<RespPage<TransactionListResp>> transactionListByBlock(@Valid @RequestBody TransactionListByBlockRequest req) {
-        /**
-         * 异步调用，超时则进入timeout
-         */
-        WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask =
-            new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> this.transactionService.getTransactionListByBlock(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("transaction/transactionListByBlock")
+    public Mono<RespPage<TransactionListResp>> transactionListByBlock(@Valid @RequestBody TransactionListByBlockRequest req) {
+        return Mono.just(transactionService.getTransactionListByBlock(req));
     }
 
-    @PostMapping(value = "transaction/transactionListByAddress")
-    public WebAsyncTask<RespPage<TransactionListResp>> transactionListByAddress(@Valid @RequestBody TransactionListByAddressRequest req) {
-        /**
-         * 异步调用，超时则进入timeout
-         */
-        WebAsyncTask<RespPage<TransactionListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-            () -> this.transactionService.getTransactionListByAddress(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("transaction/transactionListByAddress")
+    public Mono<RespPage<TransactionListResp>> transactionListByAddress(@Valid @RequestBody TransactionListByAddressRequest req) {
+        return Mono.just(transactionService.getTransactionListByAddress(req));
     }
 
-    @GetMapping(value = "transaction/addressTransactionDownload")
+    @GetMapping("transaction/addressTransactionDownload")
     public void addressTransactionDownload(
             @RequestParam(value = "address",required = false) String address,
             @RequestParam(value = "date", required = true) Long date,
@@ -101,50 +80,31 @@ public class TransactionController {
          */
         address = address.toLowerCase();
         AccountDownload accountDownload =
-            this.transactionService.transactionListByAddressDownload(address, date, local, timeZone);
+            transactionService.transactionListByAddressDownload(address, date, local, timeZone);
         try {
-            this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                 accountDownload.getData());
         } catch (Exception e) {
-            this.logger.error(e.getMessage());
-            throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
+            log.error(e.getMessage());
+            throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
 
-    @PostMapping(value = "transaction/transactionDetails")
-    public WebAsyncTask<BaseResp<TransactionDetailsResp>> transactionDetails(@Valid @RequestBody TransactionDetailsReq req) {
-        /**
-         * 异步调用，超时则进入timeout
-         */
-        WebAsyncTask<BaseResp<TransactionDetailsResp>> webAsyncTask =
-            new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-                TransactionDetailsResp transactionDetailsResp = this.transactionService.transactionDetails(req);
-                return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS),
-                    transactionDetailsResp);
-            });
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("transaction/transactionDetails")
+    public Mono<BaseResp<TransactionDetailsResp>> transactionDetails(@Valid @RequestBody TransactionDetailsReq req) {
+        return Mono.create(sink -> {
+            TransactionDetailsResp resp = transactionService.transactionDetails(req);
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp));
+        });
     }
 
-    @PostMapping(value = "transaction/queryClaimByAddress")
-    public WebAsyncTask<RespPage<QueryClaimByAddressResp>> queryClaimByAddress(@Valid @RequestBody TransactionListByAddressRequest req) {
-        /**
-         * 异步调用，超时则进入timeout
-         */
-        WebAsyncTask<RespPage<QueryClaimByAddressResp>> webAsyncTask =
-            new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> this.transactionService.queryClaimByAddress(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("transaction/queryClaimByAddress")
+    public Mono<RespPage<QueryClaimByAddressResp>> queryClaimByAddress(@Valid @RequestBody TransactionListByAddressRequest req) {
+        return Mono.just(transactionService.queryClaimByAddress(req));
     }
 
-    @PostMapping(value = "transaction/queryClaimByStaking")
-    public WebAsyncTask<RespPage<QueryClaimByStakingResp>> queryClaimByStaking(@Valid @RequestBody QueryClaimByStakingReq req) {
-        /**
-         * 异步调用，超时则进入timeout
-         */
-        WebAsyncTask<RespPage<QueryClaimByStakingResp>> webAsyncTask =
-            new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> this.transactionService.queryClaimByStaking(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("transaction/queryClaimByStaking")
+    public Mono<RespPage<QueryClaimByStakingResp>> queryClaimByStaking(@Valid @RequestBody QueryClaimByStakingReq req) {
+        return Mono.just(transactionService.queryClaimByStaking(req));
     }
 }

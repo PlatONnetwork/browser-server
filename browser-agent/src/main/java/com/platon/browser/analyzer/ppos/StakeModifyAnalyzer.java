@@ -13,7 +13,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeModifyParam;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +74,7 @@ public class StakeModifyAnalyzer extends PPOSAnalyzer<NodeOpt> {
 
         stakeBusinessMapper.modify(businessParam);
         // 更新节点缓存
-        updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
+        updateNodeCache(HexUtil.prefix(txParam.getNodeId()),txParam.getNodeName());
 
         
         String desc = "";

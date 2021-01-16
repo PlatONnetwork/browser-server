@@ -5,7 +5,7 @@ import com.alaya.parameters.NetworkParameters;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -41,17 +41,17 @@ public class BlockResult {
     public void buildAssociation(BigInteger blockNumber, String nodeId,long nodeOptId,int addressReusedTimes){
         block.setNum(blockNumber.longValue());
         block.setNodeId(nodeId);
-        String blockHash = HexTool.prefix(DigestUtils.sha256Hex(block.toString()));
+        String blockHash = HexUtil.prefix(DigestUtils.sha256Hex(block.toString()));
         block.setHash(blockHash);
         int i = 0;
         for (Transaction tx : transactionList) {
             tx.setBHash(blockHash);
             tx.setNum(blockNumber.longValue());
-            String txHash = HexTool.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
+            String txHash = HexUtil.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
             tx.setHash(txHash);
-            String from = HexTool.prefix(DigestUtils.sha1Hex(txHash));
+            String from = HexUtil.prefix(DigestUtils.sha1Hex(txHash));
             tx.setFrom(FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), from),addressReusedTimes));
-            String to = HexTool.prefix(DigestUtils.sha1Hex(from));
+            String to = HexUtil.prefix(DigestUtils.sha1Hex(from));
             tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), to),addressReusedTimes));
             tx.setIndex(i);
             long seq = tx.getNum()*100000+i;

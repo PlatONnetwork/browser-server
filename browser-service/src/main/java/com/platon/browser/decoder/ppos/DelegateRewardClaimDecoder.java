@@ -3,7 +3,7 @@ package com.platon.browser.decoder.ppos;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
 import com.platon.browser.param.claim.Reward;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import com.alaya.protocol.core.methods.response.Log;
 import com.alaya.rlp.solidity.RlpDecoder;
 import com.alaya.rlp.solidity.RlpList;
@@ -21,10 +21,9 @@ import java.util.List;
  * @author: chendongming@matrixelements.com
  * @create: 2020-01-02 15:28:04
  **/
-class DelegateRewardClaimDecoder {
+public class DelegateRewardClaimDecoder extends AbstractPPOSDecoder {
     private DelegateRewardClaimDecoder(){}
-
-    static TxParam decode(RlpList rootList,List<Log> logs) {
+    public static TxParam decode(RlpList rootList,List<Log> logs) {
 
         String logData = logs.get(0).getData();
         RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
@@ -50,7 +49,7 @@ class DelegateRewardClaimDecoder {
                     BigInteger amount = ((RlpString)rlpL.getValues().get(2)).asPositiveBigInteger();
 
                     Reward reward = Reward.builder()
-                            .nodeId(HexTool.prefix(nodeId))
+                            .nodeId(HexUtil.prefix(nodeId))
                             .stakingNum(stakingNum)
                             .reward(new BigDecimal(amount))
                             .build();

@@ -5,9 +5,9 @@ import com.alaya.contracts.ppos.dto.resp.ParamItem;
 import com.alaya.contracts.ppos.dto.resp.ParamValue;
 import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
 import com.alaya.utils.Convert;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,8 +43,7 @@ import java.util.*;
 @Configuration
 @ConfigurationProperties(prefix="platon")
 public class BlockChainConfig {
-
-    @Autowired
+    @Resource
     private ConfigMapper configMapper;
     
     static {
@@ -197,6 +197,9 @@ public class BlockChainConfig {
 
     // 代币定义事件
     private Map<String, String> eventDefine;
+
+    // 地址前缀
+    private String addressPrefix;
 
     @PostConstruct
     public void init() throws ConfigLoadingException {
@@ -794,5 +797,13 @@ public class BlockChainConfig {
 
     public void setRestrictingMinimumRelease(BigDecimal restrictingMinimumRelease) {
         this.restrictingMinimumRelease = restrictingMinimumRelease;
+    }
+
+    public String getAddressPrefix() {
+        return addressPrefix;
+    }
+
+    public void setAddressPrefix(String addressPrefix) {
+        this.addressPrefix = addressPrefix;
     }
 }

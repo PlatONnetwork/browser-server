@@ -2,7 +2,7 @@ package com.platon.browser.bootstrap;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;

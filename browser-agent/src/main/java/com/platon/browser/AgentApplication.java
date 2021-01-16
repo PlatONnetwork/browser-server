@@ -5,7 +5,7 @@ import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.service.ConsistencyService;
 import com.platon.browser.bootstrap.service.InitializationService;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.publisher.BlockEventPublisher;
 import com.platon.browser.service.block.BlockService;
@@ -35,7 +35,8 @@ import java.util.concurrent.CompletableFuture;
 @MapperScan(basePackages = {
 	"com.platon.browser",
 	"com.platon.browser.dao.mapper",
-	"com.platon.browser.v015.dao"
+	"com.platon.browser.v0150.dao",
+	"com.platon.browser.v0151.dao"
 })
 public class AgentApplication implements ApplicationRunner {
 	// 区块服务

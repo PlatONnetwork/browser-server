@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 @Service
 public class EsTransactionService extends EsService<Transaction>{
     @Autowired
-    private TransactionESRepository transactionESRepository;
+    private EsTransactionRepository ESTransactionRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<Transaction> stage) throws IOException, InterruptedException {
         Set<Transaction> data = stage.getData();
@@ -46,7 +45,7 @@ public class EsTransactionService extends EsService<Transaction>{
             CountDownLatch latch = new CountDownLatch(groups.size());
             for (Map<String, Transaction> g : groups) {
                 try {
-                    transactionESRepository.bulkAddOrUpdate(g);
+                    ESTransactionRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

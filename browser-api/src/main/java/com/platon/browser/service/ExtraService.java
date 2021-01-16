@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.alaya.utils.Convert;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.response.extra.ConfigDetail;
@@ -94,7 +94,7 @@ public class ExtraService {
 			/**
 			 * lat转换单位
 			 */
-			if(BrowserConst.EXTRA_LAT_PARAM.contains(config.getName())) {
+			if(Browser.EXTRA_LAT_PARAM.contains(config.getName())) {
 				if(StringUtils.isNotBlank(res2)) {
 					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
@@ -114,7 +114,7 @@ public class ExtraService {
 			/**
 			 * 百分比转换
 			 */
-			if(BrowserConst.EXTRA_PECENT_PARAM.contains(config.getName())) {
+			if(Browser.EXTRA_PECENT_PARAM.contains(config.getName())) {
 				configDetail.setValue(new BigDecimal(config.getValue()).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				configDetail.setInitValue(new BigDecimal(config.getInitValue()).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 			}

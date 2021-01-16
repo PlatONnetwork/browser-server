@@ -1,9 +1,9 @@
 package com.platon.browser.bean;
 
 
+import com.alaya.contracts.ppos.dto.resp.Node;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.epoch.EpochService;
-import com.alaya.contracts.ppos.dto.resp.Node;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +32,7 @@ public class EpochMessage {
     private List<Node> curValidatorList=new ArrayList<>(); // 当前共识周期验证人列表
     private List<Node> preVerifierList=new ArrayList<>(); // 前一结算周期验证人列表
     private List<Node> curVerifierList=new ArrayList<>(); // 当前结算周期验证人列表
+    private Long expectBlockCount = 0L; // 当前期望出块数
 
     private EpochMessage(){}
     public static EpochMessage newInstance(){

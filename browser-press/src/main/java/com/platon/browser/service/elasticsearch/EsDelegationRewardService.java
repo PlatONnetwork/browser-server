@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ import java.util.concurrent.CountDownLatch;
 public class EsDelegationRewardService extends EsService<DelegationReward>{
 
     @Autowired
-    private DelegationRewardESRepository delegationRewardESRepository;
+    private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<DelegationReward> stage) throws IOException, InterruptedException {
         Set<DelegationReward> data = stage.getData();
@@ -44,7 +43,7 @@ public class EsDelegationRewardService extends EsService<DelegationReward>{
             CountDownLatch latch = new CountDownLatch(groups.size());
             for (Map<String, DelegationReward> g : groups) {
                 try {
-                	delegationRewardESRepository.bulkAddOrUpdate(g);
+                	ESDelegationRewardRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

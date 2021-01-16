@@ -3,6 +3,7 @@ package com.platon.browser.service.elasticsearch;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +32,13 @@ public class EsImportService {
     @Resource
     private EsDelegateRewardService esDelegateRewardService;
     @Resource
-    private EsTokenTransferRecordService esTokenTransferRecordService;
+    private OldEsErc20TxService oldEsErc20TxService;
+    @Resource
+    private EsErc20TxService esErc20TxService;
+    @Resource
+    private EsErc721TxService esErc721TxService;
 
-    private static final int SERVICE_COUNT = 5;
+    private static final int SERVICE_COUNT = 7;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
@@ -53,11 +58,13 @@ public class EsImportService {
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions,
                             Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
 
-        Set<ESTokenTransferRecord> recordSet = retryRecordSet(transactions);
+        Set<OldErcTx> oldErc20TxList = getOldErc20TxList(transactions);
+        Set<ErcTx> erc20TxList = getErc20TxList(transactions);
+        Set<ErcTx> erc721TxList = getErc721TxList(transactions);
         if (log.isDebugEnabled()) {
-            log.debug("ES batch import: {}(blocks({}), transactions({}), nodeOpts({}), delegationRewards({}), tokenTransfer({}))",
+            log.debug("ES batch import: {}(blocks({}), transactions({}), nodeOpts({}), delegationRewards({}), oldErc20TxList({}), erc20TxList({}), erc721TxList({}))",
                     Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size(),
-                    nodeOpts.size(), delegationRewards.size(), recordSet.size());
+                    nodeOpts.size(), delegationRewards.size(), oldErc20TxList.size(), erc20TxList.size(), erc721TxList.size());
         }
         try{
             long startTime = System.currentTimeMillis();
@@ -67,7 +74,9 @@ public class EsImportService {
             submit(esTransactionService, transactions, latch);
             submit(esNodeOptService, nodeOpts, latch);
             submit(esDelegateRewardService, delegationRewards, latch);
-            submit(esTokenTransferRecordService, recordSet, latch);
+            submit(oldEsErc20TxService, oldErc20TxList, latch);
+            submit(esErc20TxService, erc20TxList, latch);
+            submit(esErc721TxService, erc721TxList, latch);
             latch.await();
 
             log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
@@ -78,17 +87,56 @@ public class EsImportService {
     }
 
     /**
-     * retry transfer record from transactions.
+     * 取Token交易列表
      */
-    public Set<ESTokenTransferRecord> retryRecordSet(Set<Transaction> txSet){
-        Set<ESTokenTransferRecord> recordSet = new HashSet<>();
+    public Set<OldErcTx> getOldErc20TxList(Set<Transaction> txSet){
+        Set<OldErcTx> recordSet = new HashSet<>();
         if (txSet != null && !txSet.isEmpty()) {
             for (Transaction tx : txSet) {
-                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
-                    recordSet.addAll(tx.getEsTokenTransferRecords());
+                if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
+                    recordSet.addAll(tx.getOldErcTxes());
                 }
             }
         }
         return recordSet;
+    }
+
+    /**
+     * 取erc20交易列表
+     */
+    public Set<ErcTx> getErc20TxList(Set<Transaction> transactions){
+        Set<ErcTx> result = new HashSet<>();
+        if (transactions != null && !transactions.isEmpty()) {
+            for (Transaction tx : transactions) {
+                if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
+                    tx.getOldErcTxes().forEach(e->{
+                        ErcTx ercTx = new ErcTx();
+                        BeanUtils.copyProperties(e,ercTx);
+                        result.add(ercTx);
+                    });
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 取erc721交易列表
+     */
+    public Set<ErcTx> getErc721TxList(Set<Transaction> transactions){
+        // TODO: 取出erc721交易
+        Set<ErcTx> result = new HashSet<>();
+//        if (transactions != null && !transactions.isEmpty()) {
+//            for (Transaction tx : transactions) {
+//                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
+//                    tx.getEsTokenTransferRecords().forEach(e->{
+//                        EsErcTx ercTx = new EsErcTx();
+//                        BeanUtils.copyProperties(e,ercTx);
+//                        result.add(ercTx);
+//                    });
+//                }
+//            }
+//        }
+        return result;
     }
 }

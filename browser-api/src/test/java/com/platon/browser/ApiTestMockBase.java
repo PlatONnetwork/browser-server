@@ -17,20 +17,20 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.StatisticCacheService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
 
 public class ApiTestMockBase extends ApiTestData {
 
 	@Mock
-	protected BlockESRepository blockESRepository;
+	protected EsBlockRepository ESBlockRepository;
 	@Mock
-	protected TransactionESRepository transactionESRepository;
+	protected EsTransactionRepository ESTransactionRepository;
 	@Mock
 	protected NodeMapper nodeMapper;
 	@Mock
@@ -76,9 +76,9 @@ public class ApiTestMockBase extends ApiTestData {
 		}
         transEs.setRsData(transactionListTemp);
         transEs.setTotal(2l);
-        when(transactionESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(transEs);
+        when(ESTransactionRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(transEs);
         
-		when(transactionESRepository.get(any(),any())).thenReturn(transactionList.get(0));
+		when(ESTransactionRepository.get(any(),any())).thenReturn(transactionList.get(0));
 	}
 
 	private void initNode() {
@@ -91,7 +91,7 @@ public class ApiTestMockBase extends ApiTestData {
 		block.setReward("10");
 		block.setTime(new Date());
 		block.setNum(10l);
-		when(blockESRepository.get(any(),any())).thenReturn(block);
+		when(ESBlockRepository.get(any(),any())).thenReturn(block);
 		
 		ESResult<Object> blockEs = new ESResult<>();
         List<Object> blockList = new ArrayList<>();
@@ -103,7 +103,7 @@ public class ApiTestMockBase extends ApiTestData {
         blockList.add(block1);
         blockEs.setRsData(blockList);
         blockEs.setTotal(2l);
-        when(blockESRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
+        when(ESBlockRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
         
         List<Block> bl = new ArrayList<>();
         bl.add(block);

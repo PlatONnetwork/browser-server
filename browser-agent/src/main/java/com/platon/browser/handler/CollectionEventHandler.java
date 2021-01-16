@@ -16,7 +16,7 @@ import com.platon.browser.dao.mapper.CustomNOptBakMapper;
 import com.platon.browser.dao.mapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.utils.BakDataDeleteUtil;
@@ -83,9 +83,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             transactions.sort(Comparator.comparing(Transaction::getIndex));
             for (Transaction tx : transactions) {
                 tx.setId(++this.transactionId);
-                for (ESTokenTransferRecord esTokenTransferRecord : tx.getEsTokenTransferRecords()) {
+                for (OldErcTx oldErcTx : tx.getOldErcTxes()) {
                     // Token交易序号 = 交易所在块号*10000 + 本区块Token交易列表index
-                    esTokenTransferRecord.setSeq(event.getBlock().getNum()*100000+index);
+                    oldErcTx.setSeq(event.getBlock().getNum()*100000+index);
                     index++;
                 }
             }

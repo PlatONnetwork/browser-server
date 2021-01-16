@@ -1,10 +1,8 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +21,7 @@ import java.util.Set;
 @Service
 public class EsNodeOptService implements EsService<NodeOpt>{
     @Resource
-    private NodeOptESRepository nodeOptESRepository;
+    private EsNodeOptRepository ESNodeOptRepository;
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<NodeOpt> nodeOpts) throws IOException {
         if(nodeOpts.isEmpty()) return;
@@ -31,7 +29,7 @@ public class EsNodeOptService implements EsService<NodeOpt>{
             Map<String,NodeOpt> nodeOptMap = new HashMap<>();
             // 使用(<id>)作ES的docId
             nodeOpts.forEach(n->nodeOptMap.put(n.getId().toString(),n));
-            nodeOptESRepository.bulkAddOrUpdate(nodeOptMap);
+            ESNodeOptRepository.bulkAddOrUpdate(nodeOptMap);
         }catch (Exception e){
             log.error("",e);
             throw new BusinessException(e.getMessage());

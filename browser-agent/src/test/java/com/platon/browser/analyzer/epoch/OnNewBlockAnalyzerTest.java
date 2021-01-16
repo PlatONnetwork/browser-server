@@ -19,7 +19,7 @@ import com.alaya.contracts.ppos.dto.resp.GovernParam;
 import com.alaya.contracts.ppos.dto.resp.ParamItem;
 import com.alaya.contracts.ppos.dto.resp.ParamValue;
 import com.alaya.contracts.ppos.dto.resp.TallyResult;
-import com.platon.browser.v015.V015Config;
+import com.platon.browser.v0150.V0150Config;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +58,7 @@ public class OnNewBlockAnalyzerTest extends AgentTestBase {
     @Mock
     private PlatOnClient platOnClient;
     @Mock
-    private V015Config v015Config;
+    private V0150Config v0150Config;
     @InjectMocks
     @Spy
     private OnNewBlockAnalyzer target;
@@ -71,8 +71,8 @@ public class OnNewBlockAnalyzerTest extends AgentTestBase {
                 .stakingBlockNum(new BigInteger("88602"))
                 .build();
 
-        when(v015Config.getAdjustmentActiveVersion()).thenReturn(BigInteger.TEN);
-        when(v015Config.getAdjustmentPipId()).thenReturn("10");
+        when(v0150Config.getAdjustmentActiveVersion()).thenReturn(BigInteger.TEN);
+        when(v0150Config.getAdjustmentPipId()).thenReturn("10");
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         Set<String> proposalSet = new HashSet<>();
         Proposal proposal = proposalList.get(0);

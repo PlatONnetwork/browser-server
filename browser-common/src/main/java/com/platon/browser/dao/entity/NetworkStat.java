@@ -60,6 +60,10 @@ public class NetworkStat {
 
     private Long avgPackTime;
 
+    private Integer erc721TxQty;
+
+    private Integer erc20TxQty;
+
     private String issueRates;
 
     public Integer getId() {
@@ -278,6 +282,22 @@ public class NetworkStat {
         this.avgPackTime = avgPackTime;
     }
 
+    public Integer getErc721TxQty() {
+        return erc721TxQty;
+    }
+
+    public void setErc721TxQty(Integer erc721TxQty) {
+        this.erc721TxQty = erc721TxQty;
+    }
+
+    public Integer getErc20TxQty() {
+        return erc20TxQty;
+    }
+
+    public void setErc20TxQty(Integer erc20TxQty) {
+        this.erc20TxQty = erc20TxQty;
+    }
+
     public String getIssueRates() {
         return issueRates;
     }
@@ -321,6 +341,8 @@ public class NetworkStat {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),
+        erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
+        erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
         issueRates("issue_rates", "issueRates", "LONGVARCHAR", false);
 
         /**

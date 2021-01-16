@@ -1,19 +1,32 @@
-# ***************************测试配置**************************** #
+# ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: local
+profile: dev
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-# 服务器端口号
-server.port: 9061
+#性能配置
+server:
+  port: 9061
+  tomcat:
+    max-connections: 20000
+    threads:
+      max: 2000
+      min-spare: 800
 #Spring框架内部配置
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}_cdm?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}_cdm?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: platon
+    password: platon
+  #Redis配置
+  redis:
+    password: platscan
+    database: 0
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
   #ES配置
   elasticsearch:
     high-level-client:
@@ -22,38 +35,6 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_local
-      transactionIndexName: browser_transaction_local
-      delegationIndexName: browser_delegation_local
-      nodeOptIndexName: browser_nodeopt_local
-      delegationRewardIndexName: browser_delegation_reward_local
-      innerTxIndexName: browser_inner_tx_local
-#redis配置
-redisCluster:
-  configKey: DEFAULT
-  connectionTimeout: 4000
-  soTimeout: 5000
-  maxRedirections: 3000
-  maxTotal: 10
-  maxIdle: 5
-  minIdle: 2
-  maxWaitMillis: 2000
-  testOnBorrow: false
-  testOnReturn: false
-  testWhileIdle: true
-  masterIPs: 192.168.16.171:7000,192.168.16.171:7001,192.168.16.171:7002,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
-  password: platscan
-#性能配置
-server:
-  tomcat:
-    max-connections: 20000
-    threads:
-      min-spare: 800
-      max: 2000
-zuul:
-  FormBodyWrapperFilter:
-    pre:
-     disable: true
 #日志配置
 logging:
   #日志级别
@@ -67,14 +48,17 @@ logging:
   file:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
+#初始化链相关的配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: atp
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.120.151:6791
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -102,7 +86,8 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
+  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -111,6 +96,8 @@ platon:
   chainId: 201018
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
+  #Es索引命名空间
+  es-namespace: browser_${version}_${profile}
 
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
 isRecaptcha: false

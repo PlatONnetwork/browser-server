@@ -1,7 +1,7 @@
 
 package com.platon.browser.param.evidence;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.Data;
 
 @Data
@@ -11,7 +11,7 @@ public class ValidateNode {
     private String address;
     private String nodeId;
     public void setNodeId(String nodeId){
-        this.nodeId= HexTool.prefix(nodeId);
+        this.nodeId= HexUtil.prefix(nodeId);
     }
     private String blsPubKey;
 

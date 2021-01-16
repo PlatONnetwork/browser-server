@@ -4,14 +4,13 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorVararg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.platon.browser.handler.ComplementEventHandler;
 import com.platon.browser.bean.ComplementEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.handler.ComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -31,11 +30,9 @@ public class ComplementEventPublisher extends AbstractPublisher<ComplementEvent>
         event.setNodeOpts((List<NodeOpt>)args[2]);
         event.setDelegationRewards((List<DelegationReward>)args[3]);
     };
-    @Value("${disruptor.queue.complement.buffer-size}")
-    private int ringBufferSize;
     @Override
     public int getRingBufferSize() {
-        return ringBufferSize;
+        return config.getComplementBufferSize();
     }
     private EventFactory<ComplementEvent> eventFactory = ComplementEvent::new;
     @Resource
@@ -43,7 +40,7 @@ public class ComplementEventPublisher extends AbstractPublisher<ComplementEvent>
 
     @PostConstruct
     private void init(){
-        Disruptor<ComplementEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
+        Disruptor<ComplementEvent> disruptor = new Disruptor<>(eventFactory, getRingBufferSize(), DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(complementEventHandler);
         disruptor.start();
         ringBuffer = disruptor.getRingBuffer();

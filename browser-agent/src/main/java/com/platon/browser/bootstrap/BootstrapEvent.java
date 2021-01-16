@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap;
 
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;

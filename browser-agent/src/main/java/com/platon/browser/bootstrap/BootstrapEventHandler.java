@@ -2,12 +2,10 @@ package com.platon.browser.bootstrap;
 
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.ReceiptResult;
-import com.platon.browser.client.SpecialApi;
+import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.cache.AddressCache;
 import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;
@@ -21,7 +19,6 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +47,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     @Resource
     private NOptBakMapper nOptBakMapper;
     @Resource
-    private PlatOnClient platOnClient;
-    @Resource
-    private AddressCache addressCache;
-    @Resource
-    private SpecialApi specialApi;
-    @Resource
-    private Erc20ResolveServiceImpl erc20ResolveService;
+    private BlockAnalyzer blockAnalyzer;
 
     private Set<Block> blocks = new HashSet<>();
     private Set<Transaction> transactions = new HashSet<>();
@@ -74,9 +65,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,
-                receiptResult, this.platOnClient, this.addressCache, this.specialApi, this.erc20ResolveService);
-            this.erc20ResolveService.initContractAddressCache(block.getTransactions(), this.addressCache);
+            CollectionBlock block = blockAnalyzer.analyze(rawBlock,receiptResult);
 
             this.clear();
             this.blocks.add(block);

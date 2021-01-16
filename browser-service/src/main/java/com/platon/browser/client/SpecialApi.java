@@ -19,17 +19,15 @@ import com.alaya.tx.exceptions.ContractCallException;
 import com.alaya.utils.JSONUtil;
 import com.alaya.utils.Numeric;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.bean.*;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.utils.HexTool;
-import com.platon.browser.utils.NodeTool;
-import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.v0150.bean.AdjustParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -161,7 +159,7 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
+    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null){
@@ -381,7 +379,7 @@ public class SpecialApi {
             data = data.replace("delete","delegate");
             List<AdjustParam> adjustParams = JSON.parseArray(data, AdjustParam.class);
             adjustParams.forEach(param->{
-                param.setNodeId(HexTool.prefix(param.getNodeId()));
+                param.setNodeId(HexUtil.prefix(param.getNodeId()));
                 param.setCurrBlockNum(blockNumber);
             });
             return adjustParams;

@@ -4,7 +4,7 @@ import com.alaya.protocol.Web3j;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.client.HistoryLowRateSlash;
+import com.platon.browser.bean.HistoryLowRateSlash;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
@@ -19,9 +19,9 @@ import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -51,7 +51,7 @@ public class OnElectionAnalyzer {
 	@Resource
 	private StakingMapper stakingMapper;
 	@Resource
-	private StakeMiscService stakeMiscService;
+	private StakeEpochService stakeEpochService;
 
 	public List<NodeOpt> analyze(CollectionEvent event, Block block) {
 		long startTime = System.currentTimeMillis();
@@ -63,7 +63,7 @@ public class OnElectionAnalyzer {
 			if(!slashList.isEmpty()){
 				List<String> slashNodeIdList = new ArrayList<>();
 				// 统一节点ID格式： 0x开头
-				slashList.forEach(n->slashNodeIdList.add(HexTool.prefix(n.getNodeId())));
+				slashList.forEach(n->slashNodeIdList.add(HexUtil.prefix(n.getNodeId())));
 				log.info("低出块节点：{}",slashNodeIdList);
 				// 查询节点
 				StakingExample stakingExample = new StakingExample();
@@ -101,7 +101,7 @@ public class OnElectionAnalyzer {
 	 */
 	private List<NodeOpt> slash(CollectionEvent event,Block block, int settleEpoch, List<Staking> slashNodeList){
 		// 更新锁定结算周期数
-		BigInteger  zeroProduceFreezeDuration = stakeMiscService.getZeroProduceFreeDuration();
+		BigInteger  zeroProduceFreezeDuration = stakeEpochService.getZeroProduceFreeDuration();
 		slashNodeList.forEach(staking -> {
 			staking.setZeroProduceFreezeDuration(zeroProduceFreezeDuration.intValue());
 		});
@@ -157,9 +157,9 @@ public class OnElectionAnalyzer {
 				// 如果扣除处罚金额后【犹豫+锁定】质押金小于质押门槛，则节点置为退出中
 				if(remainStakingAmount.compareTo(chainConfig.getStakeThreshold())<0){
 					// 更新解质押到账需要经过的结算周期数
-					BigInteger unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+					BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
 					// 低出块不需要理会对比提案的生效周期
-					BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
+					BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(staking.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
 					election.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
 					election.setUnStakeEndBlock(unStakeEndBlock);
 					exitingNodes.add(customStaking);

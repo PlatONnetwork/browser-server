@@ -34,11 +34,28 @@ public class Transaction {
     private Date updTime;
     private String input;
     private String info;
+    private String erc721TxInfo; // 存储基本信息的json数组串，来自erc721TxList
+    private String erc20TxInfo; // 存储基本信息的json数组串，来自erc20TxList
+    private String transferTxInfo; // 存储基本信息的json数组串，来自transferTxList
+    private String pposTxInfo; // 存储基本信息的json数组串，来自pposTxList
     private String failReason;
     private Integer contractType;
     private String method;
     private String bin;
     private String contractAddress;
+
+    // erc721交易列表
+    @JsonIgnore
+    private List<ErcTx> erc721TxList = new ArrayList<>();
+    // erc20 交易列表
+    @JsonIgnore
+    private List<ErcTx> erc20TxList = new ArrayList<>();
+    // 内部转账交易
+    @JsonIgnore
+    private List<Transaction> transferTxList = new ArrayList<>();
+    // PPOS调用交易
+    @JsonIgnore
+    private List<Transaction> pposTxList = new ArrayList<>();
 
     // 虚拟交易，
     @JsonIgnore
@@ -46,7 +63,7 @@ public class Transaction {
 
     // 虚拟erc20交易，
     @JsonIgnore
-    private List<ESTokenTransferRecord> esTokenTransferRecords = new ArrayList<>();
+    private List<OldErcTx> oldErcTxes = new ArrayList<>();
 
     /******** 把字符串类数值转换为大浮点数的便捷方法 ********/
     public BigDecimal decimalGasLimit() {

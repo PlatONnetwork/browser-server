@@ -3,7 +3,7 @@ package com.platon.browser;
 import com.platon.browser.service.BlockSyncService;
 import com.platon.browser.service.Erc20TransactionSyncService;
 import com.platon.browser.service.TransactionSyncService;
-import com.platon.browser.util.SleepUtil;
+import com.platon.browser.utils.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;

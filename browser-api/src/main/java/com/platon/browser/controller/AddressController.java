@@ -1,7 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
-import com.platon.browser.config.CommonMethod;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.request.address.QueryDetailRequest;
@@ -10,15 +8,15 @@ import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.address.QueryDetailResp;
 import com.platon.browser.response.address.QueryRPPlanDetailResp;
 import com.platon.browser.service.AddressService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.WebAsyncTask;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.concurrent.Callable;
 
 /**
  *          地址具体实现Controller 提供地址详情页面使用
@@ -27,6 +25,7 @@ import java.util.concurrent.Callable;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
+@Slf4j
 @RestController
 public class AddressController {
 
@@ -35,33 +34,19 @@ public class AddressController {
     @Resource
     private I18nUtil i18n;
 
-    @PostMapping(value = "address/details")
-	public WebAsyncTask<BaseResp<QueryDetailResp>> details(@Valid @RequestBody QueryDetailRequest req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-        WebAsyncTask<BaseResp<QueryDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-            QueryDetailResp queryDetailResp = addressService.getDetails(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), queryDetailResp);
+    @PostMapping( "address/details")
+	public Mono<BaseResp<QueryDetailResp>> details(@Valid @RequestBody QueryDetailRequest req) {
+        return Mono.create(sink -> {
+            QueryDetailResp resp = addressService.getDetails(req);
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp));
         });
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;  
 	}
 
-    @PostMapping(value = "address/rpplanDetail")
-	public WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> rpplanDetail(@Valid @RequestBody QueryRPPlanDetailRequest req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-        WebAsyncTask<BaseResp<QueryRPPlanDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, new Callable<BaseResp<QueryRPPlanDetailResp>>() {  
-            @Override  
-            public BaseResp<QueryRPPlanDetailResp> call() throws Exception {  
-            	QueryRPPlanDetailResp dueryRPPlanDetailResp = addressService.rpplanDetail(req);
-        		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), dueryRPPlanDetailResp);
-            }  
-        });  
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;
+    @PostMapping("address/rpplanDetail")
+	public Mono<BaseResp<QueryRPPlanDetailResp>> rpplanDetail(@Valid @RequestBody QueryRPPlanDetailRequest req) {
+        return Mono.create(sink -> {
+            QueryRPPlanDetailResp resp = addressService.rpplanDetail(req);
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp));
+        });
 	}
-
 }

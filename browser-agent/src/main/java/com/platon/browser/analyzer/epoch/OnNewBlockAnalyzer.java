@@ -10,7 +10,7 @@ import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.v015.V015Config;
+import com.platon.browser.v0150.V0150Config;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
@@ -22,8 +22,8 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.proposal.ProposalService;
-import com.platon.browser.v015.bean.AdjustParam;
-import com.platon.browser.v015.service.StakingDelegateBalanceAdjustmentService;
+import com.platon.browser.v0150.bean.AdjustParam;
+import com.platon.browser.v0150.service.StakingDelegateBalanceAdjustmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +53,7 @@ public class OnNewBlockAnalyzer {
     @Resource
     private PlatOnClient platOnClient;
     @Resource
-    private V015Config v015Config;
+    private V0150Config v0150Config;
     @Resource
     private StakingDelegateBalanceAdjustmentService stakingDelegateBalanceAdjustmentService;
     @Resource
@@ -119,12 +119,15 @@ public class OnNewBlockAnalyzer {
 
                             BigInteger proposalVersion = new BigInteger(proposal.getNewVersion());
                             String proposalPipid = proposal.getPipId();
-                            BigInteger configVersion = v015Config.getAdjustmentActiveVersion();
-                            String configPipid = v015Config.getAdjustmentPipId();
+                            BigInteger configVersion = v0150Config.getAdjustmentActiveVersion();
+                            String configPipid = v0150Config.getAdjustmentPipId();
                             if(proposalVersion.compareTo(configVersion)>=0&&proposalPipid.equals(configPipid)){
                                 // 升级提案版本号及提案ID与配置文件中指定的一样，则执行调账逻辑
                                 List<AdjustParam> adjustParams = specialApi.getStakingDelegateAdjustDataList(platOnClient.getWeb3jWrapper().getWeb3j(),BigInteger.valueOf(block.getNum()));
-                                adjustParams.forEach(param->param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount()));
+                                adjustParams.forEach(param->{
+                                    param.setBlockTime(block.getTime());
+                                    param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount());
+                                });
                                 String msg = stakingDelegateBalanceAdjustmentService.adjust(adjustParams);
                                 log.warn("msg:{}",msg);
                             }

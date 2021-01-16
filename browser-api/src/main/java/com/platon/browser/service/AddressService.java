@@ -3,7 +3,7 @@ package com.platon.browser.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
@@ -13,7 +13,7 @@ import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
@@ -22,8 +22,8 @@ import com.platon.browser.request.address.QueryRPPlanDetailRequest;
 import com.platon.browser.response.address.DetailsRPPlanResp;
 import com.platon.browser.response.address.QueryDetailResp;
 import com.platon.browser.response.address.QueryRPPlanDetailResp;
-import com.platon.browser.util.ConvertUtil;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.ConvertUtil;
+import com.platon.browser.utils.I18nUtil;
 import com.alaya.contracts.ppos.RestrictingPlanContract;
 import com.alaya.contracts.ppos.dto.CallResponse;
 import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
@@ -68,7 +68,7 @@ public class AddressService {
     @Resource
     private BlockChainConfig blockChainConfig;
     @Resource
-	private BlockESRepository blockESRepository;
+	private EsBlockRepository ESBlockRepository;
     @Resource
     private SpecialApi specialApi;
     
@@ -165,7 +165,7 @@ public class AddressService {
 			/** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
 			Block block = null;
 			try {
-				block = blockESRepository.get(String.valueOf(rPlan.getNumber()), Block.class);
+				block = ESBlockRepository.get(String.valueOf(rPlan.getNumber()), Block.class);
 			} catch (IOException e) {
 				logger.error("获取区块错误。", e);
 			}

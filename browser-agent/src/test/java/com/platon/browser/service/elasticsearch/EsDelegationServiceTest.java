@@ -2,7 +2,6 @@ package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,13 +21,13 @@ import static org.mockito.Mockito.doThrow;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsDelegationServiceTest extends AgentTestBase {
     @Mock
-    private DelegationESRepository delegationESRepository;
+    private EsDelegationRepository ESDelegationRepository;
     @Spy
     private EsDelegationService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "delegationESRepository", delegationESRepository);
+        ReflectionTestUtils.setField(target, "delegationESRepository", ESDelegationRepository);
     }
 
     /**
@@ -40,7 +39,7 @@ public class EsDelegationServiceTest extends AgentTestBase {
         Set<Delegation> data = new HashSet<>();
         data.add(new Delegation());
         target.save(data);
-        doThrow(new RuntimeException("")).when(delegationESRepository).bulkAddOrUpdate(anyMap());
+        doThrow(new RuntimeException("")).when(ESDelegationRepository).bulkAddOrUpdate(anyMap());
         target.save(data);
     }
 }

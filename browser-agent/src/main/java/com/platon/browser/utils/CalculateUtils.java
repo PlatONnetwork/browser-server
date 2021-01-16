@@ -2,7 +2,7 @@ package com.platon.browser.utils;
 
 import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.service.erc20.ExtendEvent;
 import lombok.extern.slf4j.Slf4j;
 import com.alaya.utils.Convert;
@@ -66,7 +66,7 @@ public class CalculateUtils {
 		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
 		BigDecimal circulationByYear = BigDecimal.ONE;
-		for(String rate: issueRates.split(BrowserConst.HTTP_SPILT)) {
+		for(String rate: issueRates.split(Browser.HTTP_SPILT)) {
 			circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
 		}
 		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
@@ -85,7 +85,7 @@ public class CalculateUtils {
 		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
 		BigDecimal circulationByYear = BigDecimal.ONE;
-		for(String rate: issueRates.split(BrowserConst.HTTP_SPILT)) {
+		for(String rate: issueRates.split(Browser.HTTP_SPILT)) {
 			circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
 		}
 		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
@@ -102,7 +102,7 @@ public class CalculateUtils {
 		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
 		BigDecimal circulationByYear = BigDecimal.ONE;
-		for(String rate: issueRates.split(BrowserConst.HTTP_SPILT)) {
+		for(String rate: issueRates.split(Browser.HTTP_SPILT)) {
 			circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
 		}
 		//计算流通量 = 初始发行量 * 年份增发量 - 锁仓余额  - 质押余额 - 实时激励池余额 - 委托账户合约余额

@@ -3,8 +3,8 @@ package com.platon.browser.evm.bean;
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.utils.HexTool;
-import com.platon.browser.utils.NodeTool;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.NodeUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -37,9 +37,9 @@ public class CollectionBlock extends Block {
         if(block.getNumber().longValue()==0){
             nodeId="000000000000000000000000000000000";
         }else{
-            nodeId = NodeTool.getPublicKey(block);
+            nodeId = NodeUtil.getPublicKey(block);
         }
-        nodeId = HexTool.prefix(nodeId);
+        nodeId = HexUtil.prefix(nodeId);
         this.setNum(block.getNumber().longValue())
             .setHash(block.getHash())
             .setPHash(block.getParentHash())

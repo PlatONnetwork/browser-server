@@ -172,8 +172,8 @@ DROP TABLE IF EXISTS `token_expand`;
 CREATE TABLE `token_expand` (
   `address` varchar(64) NOT NULL COMMENT '合约地址',
   `icon` text COMMENT '合约图标',
-  `web_site` varchar(256) COMMENT '合约地址',
-  `details` varchar(256) COMMENT '合约官网',
+  `web_site` varchar(256) COMMENT '合约官网',
+  `details` varchar(256) COMMENT '合约详情',
   `is_show_in_aton` tinyint(1) DEFAULT '0' COMMENT 'aton中是否显示，0-隐藏 1-展示',
   `is_show_in_scan` tinyint(1) DEFAULT '0' COMMENT 'scan中是否显示，0-隐藏 1-展示',
   `is_can_transfer` tinyint(1) DEFAULT '0' COMMENT '是否可转账 0-不可转账 1-可转账',
@@ -269,12 +269,12 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
 
 ##### 3.2 Elasticsearch设计
 
-##### 3.2.1 browser_erc721_tx_* 模板
+##### 3.2.1 *_erc721_tx 模板
 
 ```
 {
   "index_patterns": [
-    "browser_erc721_tx_*"
+    "*_erc721_tx"
   ],
   "settings": {
     "index": {
@@ -325,20 +325,29 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       "fromType": {                    //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
       },
+      "remark": {                      //交易备注信息， aton使用
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
+      },
+      "txFee": {                       //交易手续费    
+        "type": "keyword"
+      }
     }
   }
 }
 ```
 
-##### 3.2.2 browser_erc20_tx_* 模板(同 browser_erc721_tx_*)
+##### 3.2.2 *_erc20_tx 模板(同 *_erc721_tx)
 
-##### 3.2.3 browser_inner_tx_* 模板
+##### 3.2.3 *_transfer_tx 模板
 > 合约内部转账交易
 
 ```
 {
   "index_patterns": [
-    "browser_inner_tx_*"
+    "*_transfer_tx"
   ],
   "settings": {
     "index": {
@@ -379,18 +388,21 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       },
       "fromType": {                    //地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         "type": "integer"
+      },
+      "txFee": {                       //交易手续费    
+        "type": "keyword"
       }
     }
   }
 }
 ```
 
-##### 3.2.4 browser_transaction_* 模板
+##### 3.2.4 *_transaction 模板
 
 ```
 {
   "index_patterns": [
-    "browser_transaction_*"
+    "*_transaction"
   ],
   "settings": {
     "index": {
@@ -480,25 +492,25 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
         "type": "text",
         "doc_values": false
       },
-      "erc721List": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc721_tx_* 模板）
+      "erc721TxInfo": {             //合约中erc721内部交易定义，json数组。（对象定义参考  *_erc721_tx 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },      
-      "erc20List": {             //合约中erc721内部交易定义，json数组。（对象定义参考  browser_erc20_tx_* 模板）
+      "erc20TxInfo": {             //合约中erc721内部交易定义，json数组。（对象定义参考  *_erc20_tx 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },   
-      "innerTxList": {          //合约中内部交易定义，json数组。（对象定义参考 browser_inner_tx_* 模板）
+      "transferTxInfo": {          //合约中内部交易定义，json数组。（对象定义参考 *_transfer_tx 模板）
         "norms": false,
         "index": false,
         "type": "text",
         "doc_values": false
       },  
-      "pposList": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
+      "pposTxInfo": {             //合约中erc721内部交易定义，json数组。（对象定义参考 type及info定义）
         "norms": false,
         "index": false,
         "type": "text",
@@ -517,6 +529,12 @@ ALTER TABLE `address` ADD COLUMN `erc20_tx_qty` INT(11) DEFAULT 0  NOT NULL COMM
       "updTime": {               //本地更新时间
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
         "type": "date"
+      },
+      "remark": {                //交易备注信息， aton使用
+        "norms": false,
+        "index": false,
+        "type": "text",
+        "doc_values": false
       }
     }
   }

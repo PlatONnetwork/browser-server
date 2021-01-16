@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,13 +21,13 @@ import static org.mockito.Mockito.doThrow;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsBlockServiceTest extends AgentTestBase {
     @Mock
-    private BlockESRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
     @Spy
     private EsBlockService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "blockESRepository", blockESRepository);
+        ReflectionTestUtils.setField(target, "blockESRepository", ESBlockRepository);
     }
 
     /**
@@ -46,7 +45,7 @@ public class EsBlockServiceTest extends AgentTestBase {
         data.clear();
         data.add(new Block());
         target.save(data);
-        doThrow(new RuntimeException("")).when(blockESRepository).bulkAddOrUpdate(anyMap());
+        doThrow(new RuntimeException("")).when(ESBlockRepository).bulkAddOrUpdate(anyMap());
         target.save(data);
     }
 }

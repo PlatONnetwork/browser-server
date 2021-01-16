@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenAddressRel;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
@@ -45,8 +45,6 @@ public class Erc20TokenUpdateTask {
     @Resource
     protected Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
-    @Value("${task.erc20-batch-size:4}")
-    private int batchSize;
     private ExecutorService EXECUTOR = Executors.newFixedThreadPool(30);
 
     @Scheduled(cron = "0/5  * * * * ?")
@@ -55,13 +53,13 @@ public class Erc20TokenUpdateTask {
         if (!AppStatusUtil.isRunning()) return;
         // 1、更新erc20_token_address_rel表的balance字段
         try {
-            Set<String> data = this.redisTemplate.opsForSet().members(BrowserConst.ERC_BALANCE_KEY);
+            Set<String> data = this.redisTemplate.opsForSet().members(Browser.ERC_BALANCE_KEY);
             if (data != null && !data.isEmpty()) {
                 int size = data.size();
                 List<Erc20TokenAddressRel> erc20TokenAddressRelList = Collections.synchronizedList(new ArrayList<>(size));
                 CountDownLatch countDownLatch = new CountDownLatch(size);
                 data.forEach(d->{
-                    String[] ds = d.split(BrowserConst.ERC_SPILT);
+                    String[] ds = d.split(Browser.ERC_SPILT);
                     EXECUTOR.submit(() -> {
                         //查询余额并回填
                         BigInteger balance = erc20ResolveServiceImpl.getBalance(ds[0], ds[1]);
@@ -76,7 +74,7 @@ public class Erc20TokenUpdateTask {
 
                 //更新成功则删除对应的数据
                 this.customErc20TokenAddressRelMapper.updateAddressBalance(erc20TokenAddressRelList);
-                this.redisTemplate.opsForSet().remove(BrowserConst.ERC_BALANCE_KEY, data.toArray());
+                this.redisTemplate.opsForSet().remove(Browser.ERC_BALANCE_KEY, data.toArray());
             }
         } catch (Exception e) {
             log.error("on ErcTokenUpdateTask error", e);

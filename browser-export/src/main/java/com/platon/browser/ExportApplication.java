@@ -1,9 +1,8 @@
 package com.platon.browser;
 
 import com.platon.browser.service.ExportGallyService;
-import com.platon.browser.service.ExportService;
 import com.platon.browser.service.ExportTpsService;
-import com.platon.browser.util.SleepUtil;
+import com.platon.browser.utils.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.mybatis.spring.annotation.MapperScan;

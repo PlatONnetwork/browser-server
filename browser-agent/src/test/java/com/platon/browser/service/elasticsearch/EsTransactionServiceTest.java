@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,13 +21,13 @@ import static org.mockito.Mockito.doThrow;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsTransactionServiceTest extends AgentTestBase {
     @Mock
-    private TransactionESRepository transactionESRepository;
+    private EsTransactionRepository ESTransactionRepository;
     @Spy
     private EsTransactionService target;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "transactionESRepository", transactionESRepository);
+        ReflectionTestUtils.setField(target, "transactionESRepository", ESTransactionRepository);
     }
 
     /**
@@ -40,7 +39,7 @@ public class EsTransactionServiceTest extends AgentTestBase {
         Set<Transaction> data = new HashSet<>();
         data.add(new Transaction());
         target.save(data);
-        doThrow(new RuntimeException("")).when(transactionESRepository).bulkAddOrUpdate(anyMap());
+        doThrow(new RuntimeException("")).when(ESTransactionRepository).bulkAddOrUpdate(anyMap());
         target.save(data);
     }
 }

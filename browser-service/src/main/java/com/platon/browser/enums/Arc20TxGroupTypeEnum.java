@@ -2,7 +2,7 @@ package com.platon.browser.enums;
 
 public enum Arc20TxGroupTypeEnum {
     FROM("from","from"),
-    TTO( "tto","tto"),
+    TO( "to","to"),
     CONTRACT("contract","contract");
     private String terms;
     private String field;

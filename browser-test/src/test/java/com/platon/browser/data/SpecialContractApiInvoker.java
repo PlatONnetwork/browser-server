@@ -10,7 +10,7 @@ import com.alaya.protocol.Web3j;
 import com.alaya.protocol.core.DefaultBlockParameterName;
 import com.alaya.protocol.websocket.WebSocketService;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.EpochInfo;
+import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.SpecialApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,10 +1,10 @@
 package com.platon.browser.service;
 
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TokenTransferRecordESRepository;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.service.redis.RedisTransferTokenRecordService;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
+import com.platon.browser.elasticsearch.dto.OldErcTx;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.redis.OldRedisErc20TxService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +28,9 @@ public class Erc20TransactionSyncService {
     @Setter
     private static volatile boolean done =false;
     @Autowired
-    private TokenTransferRecordESRepository esRepository;
+    private OldEsErc20TxRepository esRepository;
     @Autowired
-    private RedisTransferTokenRecordService redisService;
+    private OldRedisErc20TxService redisService;
     @Value("${paging.erc20-transaction.page-size}")
     private int pageSize;
     @Value("${paging.erc20-transaction.page-count}")
@@ -40,10 +40,10 @@ public class Erc20TransactionSyncService {
         ESQueryBuilderConstructor transactionConstructor = new ESQueryBuilderConstructor();
         transactionConstructor.setDesc("seq");
         // 分页查询区块数据
-        ESResult<ESTokenTransferRecord> esResult=null;
+        ESResult<OldErcTx> esResult=null;
         for (int pageNo = 0; pageNo <= pageCount; pageNo++) {
             try {
-                esResult = esRepository.search(transactionConstructor,ESTokenTransferRecord.class,pageNo,pageSize);
+                esResult = esRepository.search(transactionConstructor, OldErcTx.class,pageNo,pageSize);
             } catch (Exception e) {
                 if(e.getMessage().contains("all shards failed")){
                     break;
@@ -55,7 +55,7 @@ public class Erc20TransactionSyncService {
                 // 如果查询结果为空则结束
                 break;
             }
-            List<ESTokenTransferRecord> transactions = esResult.getRsData();
+            List<OldErcTx> transactions = esResult.getRsData();
             try{
                 redisService.save(new HashSet<>(transactions),false);
                 log.info("【syncEsErc20Transaction2Redis()】第{}页,{}条记录",pageNo,transactions.size());
