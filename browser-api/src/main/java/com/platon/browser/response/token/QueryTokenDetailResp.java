@@ -1,6 +1,8 @@
 package com.platon.browser.response.token;
 
+import com.platon.browser.bean.CustomTokenDetail;
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.utils.ConvertUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -27,6 +30,8 @@ public class QueryTokenDetailResp {
     private String address;
     @ApiModelProperty(value = "合约名称")
     private String name;
+    @ApiModelProperty(value = "合约类型")
+    private String type;
     @ApiModelProperty(value = "合约符号")
     private String symbol;
     @ApiModelProperty(value = "合约精度")
@@ -71,6 +76,27 @@ public class QueryTokenDetailResp {
                 .txCount(token.getTxCount())
                 .createTime(token.getCreateTime())
                 .holder(token.getHolder())
+                .build();
+    }
+
+    public static QueryTokenDetailResp fromTokenDetail(CustomTokenDetail token) {
+        if (null == token) {
+            return null;
+        }
+        BigDecimal totalSupply = BigDecimal.ZERO;
+        if(token.getTotalSupply() != null && token.getDecimal()!=null){
+            totalSupply = ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal());
+        }
+        return QueryTokenDetailResp.builder()
+                .address(token.getAddress()).name(token.getName())
+                .symbol(token.getSymbol()).decimal(token.getDecimal())
+                .totalSupply(totalSupply.toString())
+                .creator(token.getCreator()).txHash(token.getTxHash())
+                .txCount(token.getTxCount())
+                .createTime(token.getCreateTime())
+                .holder(token.getHolder())
+                .binCode(token.getBinCode())
+                .webSite(token.getWebSite())
                 .build();
     }
 }

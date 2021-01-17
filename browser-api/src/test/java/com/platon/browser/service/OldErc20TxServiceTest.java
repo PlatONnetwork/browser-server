@@ -2,7 +2,7 @@ package com.platon.browser.service;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.ApiTestMockBase;
-import com.platon.browser.cache.TokenTransferRecordCacheDto;
+import com.platon.browser.cache.OldTokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.entity.Erc20TokenTransferRecord;
 import com.platon.browser.dao.mapper.CustomErc20TokenAddressRelMapper;
@@ -76,7 +76,7 @@ public class OldErc20TxServiceTest extends ApiTestMockBase {
 		queryResultFromES.setRsData(this.oldErcTxes);
 		queryResultFromES.setTotal(3l);
 		doReturn(queryResultFromES).when(this.esTokenTransferRecordRepository).search(any(), any(), anyInt(), anyInt());
-		TokenTransferRecordCacheDto trrcd = new TokenTransferRecordCacheDto();
+		OldTokenTransferRecordCacheDto trrcd = new OldTokenTransferRecordCacheDto();
 		trrcd.setTransferRecordList(new ArrayList<>());
 		RespPage page = new RespPage();
 		page.setTotalCount(500);

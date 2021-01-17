@@ -1,6 +1,8 @@
 package com.platon.browser.response.token;
 
+import com.platon.browser.bean.CustomToken;
 import com.platon.browser.dao.entity.Erc20Token;
+import com.platon.browser.dao.entity.Token;
 import com.platon.browser.utils.ConvertUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,8 @@ public class QueryTokenListResp {
 
     @ApiModelProperty(value = "合约地址")
     private String address;
+    @ApiModelProperty(value = "合约类型")
+    private String type;
     @ApiModelProperty(value = "合约名称")
     private String name;
     @ApiModelProperty(value = "合约符号")
@@ -37,28 +41,41 @@ public class QueryTokenListResp {
     private BigDecimal totalSupply;
     @ApiModelProperty(value = "合约图标（base64编码）")
     private String icon;
-    @ApiModelProperty(value = "合约创建者")
-    private String creator;
-    @ApiModelProperty(value = "合约部署所在哈希")
-    private String txHash;
     @ApiModelProperty(value = "合约对应官方网站")
     private String webSite;
-    @ApiModelProperty(value = "持有人数")
-    private Integer holder;
-    @ApiModelProperty(value = "合约创建时间")
-    private Date blockTimestamp;
+    @ApiModelProperty(value = "合约信息")
+    private String details;
     @ApiModelProperty(value = "交易记录时间")
     private Date createTime;
+    @ApiModelProperty(value = "持有人数")
+    private Integer holder;
 
-    public static QueryTokenListResp fromErc20Token(Erc20Token token) {
+//    @ApiModelProperty(value = "合约创建者")
+//    private String creator;
+//    @ApiModelProperty(value = "合约部署所在哈希")
+//    private String txHash;
+//    @ApiModelProperty(value = "合约创建时间")
+//    private Date blockTimestamp;
+
+//    public static QueryTokenListResp fromErc20Token(Erc20Token token) {
+//        return QueryTokenListResp.builder()
+//                .address(token.getAddress()).name(token.getName())
+//                .symbol(token.getSymbol()).decimal(token.getDecimal())
+//                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal()))
+//                .creator(token.getCreator()).txHash(token.getTxHash())
+//                .blockTimestamp(token.getBlockTimestamp())
+//                .createTime(token.getCreateTime())
+//                .holder(token.getHolder())
+//                .build();
+//    }
+
+    public static QueryTokenListResp fromToken(CustomToken token) {
         return QueryTokenListResp.builder()
-                .address(token.getAddress()).name(token.getName())
+                .address(token.getAddress()).name(token.getName()).type(token.getType())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())
                 .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal()))
-                .creator(token.getCreator()).txHash(token.getTxHash())
-                .blockTimestamp(token.getBlockTimestamp())
                 .createTime(token.getCreateTime())
-                .holder(token.getHolder())
+                .details(token.getDetails()).holder(token.getHolder())
                 .build();
     }
 }

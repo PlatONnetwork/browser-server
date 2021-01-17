@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomTokenHolderMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TokenHolder">
+    <id column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
+    <id column="address" jdbcType="VARCHAR" property="address" />
+    <result column="balance" jdbcType="DECIMAL" property="balance" />
+    <result column="token_tx_qty" jdbcType="INTEGER" property="txCount" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="symbol" jdbcType="VARCHAR" property="symbol" />
+    <result column="total_supply" jdbcType="DECIMAL" property="totalSupply" />
+    <result column="decimal" jdbcType="INTEGER" property="decimal" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+  </resultMap>
+  <select id="selectListByParams" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select t.type,t.symbol,t.total_supply,t.decimal,t.name
+    ,th.token_address,th.address,th.balance,th.token_tx_qty
+    from token_holder th left join  token t on th.token_address = t.address
+    where 1=1
+    <if test="tokenAddress != null">
+      and th.token_address = #{tokenAddress}
+    </if>
+    <if test="address != null">
+      and th.address = #{address}
+    </if>
+    order by balance desc
+  </select>
+</mapper>

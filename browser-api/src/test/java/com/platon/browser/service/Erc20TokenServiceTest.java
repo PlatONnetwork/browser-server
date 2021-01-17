@@ -28,7 +28,7 @@ public class Erc20TokenServiceTest extends ApiTestMockBase {
 	@Mock
 	private Erc20TokenDetailMapper erc20TokenDetailMapper;
 	@Spy
-	private Erc20TokenService target;
+	private TokenService target;
 
 	@Before
 	public void setup() {
