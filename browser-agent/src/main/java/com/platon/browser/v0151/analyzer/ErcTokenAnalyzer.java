@@ -136,7 +136,7 @@ public class ErcTokenAnalyzer {
         transactionReceipt.setLogs(receipt.getLogs());
         transactionReceipt.setContractAddress(contractAddress);
         List<ErcContract.ErcTxEvent> eventList;
-        List<ErcTx> txList = Collections.EMPTY_LIST;
+        List<ErcTx> txList = Collections.emptyList();
         switch (typeEnum){
             case ERC20:
                 eventList = ercDetectService.getErc20TxEvents(transactionReceipt);
