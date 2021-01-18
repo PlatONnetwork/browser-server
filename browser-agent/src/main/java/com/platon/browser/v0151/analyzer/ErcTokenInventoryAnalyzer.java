@@ -37,17 +37,15 @@ public class ErcTokenInventoryAnalyzer {
                 tokenInventory = new TokenInventory();
                 tokenInventory.setTokenAddress(key.getTokenAddress());
                 tokenInventory.setTokenId(key.getTokenId());
-                tokenInventory.setOwner(tx.getTo());
                 tokenInventory.setCreateTime(date);
-                tokenInventory.setUpdateTime(date);
                 tokenInventory.setTokenTxQty(1);
                 insert.add(tokenInventory);
             }else{
-                tokenInventory.setOwner(tx.getTo());
-                tokenInventory.setUpdateTime(date);
                 tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty()+1);
                 update.add(tokenInventory);
             }
+            tokenInventory.setOwner(tx.getTo());
+            tokenInventory.setUpdateTime(date);
         });
         if(!insert.isEmpty()) tokenInventoryMapper.batchInsert(insert);
         if(!update.isEmpty()) {
