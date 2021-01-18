@@ -37,6 +37,8 @@ public class ErcContractAnalyzer {
     @Resource
     private AddressCache addressCache;
     @Resource
+    private ErcTokenInventoryAnalyzer ercTokenInventoryAnalyzer;
+    @Resource
     private TokenMapper tokenMapper;
 
     /**
@@ -81,21 +83,21 @@ public class ErcContractAnalyzer {
     private List<ErcTx> resolveErcTxFromEvent(CollectionTransaction tx,List<ErcContract.ErcTxEvent> eventList){
         List<ErcTx> txList = new ArrayList<>();
         AtomicInteger seq = new AtomicInteger((int)(tx.getNum()*100000));
-        eventList.forEach(transferEvent -> {
+        eventList.forEach(event -> {
             // 仅添加与指定的合约地址相同的记录
-            if (transferEvent.getLog().getAddress().equalsIgnoreCase(tx.getTo())) {
+            if (event.getLog().getAddress().equalsIgnoreCase(tx.getTo())) {
                 // 转换参数进行设置内部交易
                 ErcTx ercTx = ErcTx.builder()
                         .seq(seq.longValue())
                         .contract(tx.getTo())
-                        .from(transferEvent.getFrom())
-                        .to(transferEvent.getTo())
-                        .value(transferEvent.getValue().toString())
+                        .from(event.getFrom())
+                        .to(event.getTo())
+                        .value(event.getValue().toString())
                         .bn(tx.getNum())
                         .hash(tx.getHash())
                         .bTime(tx.getTime()).value(tx.getValue())
-                        .fromType(addressCache.getTypeData(transferEvent.getFrom()))
-                        .toType(addressCache.getTypeData(transferEvent.getTo()))
+                        .fromType(addressCache.getTypeData(event.getFrom()))
+                        .toType(addressCache.getTypeData(event.getTo()))
                         .build();
                 seq.getAndIncrement();
                 txList.add(ercTx);
@@ -144,6 +146,7 @@ public class ErcContractAnalyzer {
                 txList = resolveErcTxFromEvent(tx,eventList);
                 tx.setErc721TxList(txList);
                 tx.setErc721TxInfo(getErcTxInfo(txList));
+                ercTokenInventoryAnalyzer.analyze(txList);
                 break;
         }
     }
