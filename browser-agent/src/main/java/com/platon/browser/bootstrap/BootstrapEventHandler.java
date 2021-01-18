@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ReceiptResult;

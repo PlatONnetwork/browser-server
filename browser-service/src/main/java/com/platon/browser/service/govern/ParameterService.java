@@ -7,7 +7,7 @@ import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
-import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,7 @@
 package com.platon.browser.bootstrap.service;
 
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.client.ReceiptResult;

@@ -11,7 +11,7 @@ import com.platon.browser.bean.BlockEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;

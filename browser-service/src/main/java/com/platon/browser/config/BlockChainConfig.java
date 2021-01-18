@@ -1,10 +1,10 @@
 package com.platon.browser.config;
 
-import com.alaya.contracts.ppos.dto.resp.GovernParam;
-import com.alaya.contracts.ppos.dto.resp.ParamItem;
-import com.alaya.contracts.ppos.dto.resp.ParamValue;
-import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
-import com.alaya.utils.Convert;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.ParamItem;
+import com.platon.contracts.ppos.dto.resp.ParamValue;
+import com.platon.protocol.core.methods.response.bean.EconomicConfig;
+import com.platon.utils.Convert;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.bean.CustomStaking;
@@ -201,7 +201,7 @@ public class BlockChainConfig {
     @PostConstruct
     public void init() throws ConfigLoadingException {
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.ATP);
+        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.KPVON);
         updateWithEconomicConfig(client.getEconomicConfig());
 //        updateWithGovernParams(client.getGovernParamValue(""));
     }

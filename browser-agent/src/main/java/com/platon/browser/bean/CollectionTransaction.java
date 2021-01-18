@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Receipt;
 import com.platon.browser.client.SpecialApi;
@@ -42,7 +42,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithRawTransaction(com.alaya.protocol.core.methods.response.Transaction transaction) {
+    CollectionTransaction updateWithRawTransaction(com.platon.protocol.core.methods.response.Transaction transaction) {
         this.setNum(transaction.getBlockNumber().longValue()).setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash()).setValue(transaction.getValue().toString())
             .setIndex(transaction.getTransactionIndex().intValue()).setGasPrice(transaction.getGasPrice().toString())

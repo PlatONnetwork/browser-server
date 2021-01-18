@@ -11,9 +11,9 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.Request;
-import com.alaya.protocol.core.methods.response.PlatonGetBalance;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.Request;
+import com.platon.protocol.core.methods.response.PlatonGetBalance;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

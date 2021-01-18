@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap.service;
 
-import com.alaya.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bean.CollectionNetworkStat;

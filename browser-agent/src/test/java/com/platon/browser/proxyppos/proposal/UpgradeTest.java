@@ -1,6 +1,6 @@
 package com.platon.browser.proxyppos.proposal;
 
-import com.alaya.contracts.ppos.dto.resp.Proposal;
+import com.platon.contracts.ppos.dto.resp.Proposal;
 import org.junit.Test;
 
 import java.math.BigInteger;

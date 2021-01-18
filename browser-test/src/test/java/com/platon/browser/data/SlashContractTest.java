@@ -1,15 +1,15 @@
 package com.platon.browser.data;//package com.platon.browser.data;
 
-import com.alaya.contracts.ppos.SlashContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.TransactionResponse;
-import com.alaya.contracts.ppos.dto.common.DuplicateSignType;
+import com.platon.contracts.ppos.SlashContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.TransactionResponse;
+import com.platon.contracts.ppos.dto.common.DuplicateSignType;
 import org.junit.Before;
 import org.junit.Test;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
-import com.alaya.protocol.http.HttpService;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.methods.response.PlatonSendTransaction;
+import com.platon.protocol.http.HttpService;
 
 import java.math.BigInteger;
 
@@ -29,7 +29,7 @@ public class SlashContractTest {
 
 		credentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
 
-		slashContract = SlashContract.load(web3j, credentials, 108l);
+		slashContract = SlashContract.load(web3j, credentials);
 	}
 
 	/**

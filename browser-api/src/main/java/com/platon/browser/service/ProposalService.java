@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.alaya.utils.Convert;
+import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomProposal;
@@ -151,8 +151,8 @@ public class ProposalService {
 				 * 如果参数是需要转换lat的，则进一步转换
 				 */
 				if(BrowserConst.EXTRA_LAT_PARAM.contains(proposal.getName())) {
-					currentValue = Convert.fromVon(currentValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
-					newValue = Convert.fromVon(newValue, Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
+					currentValue = Convert.fromVon(currentValue, Convert.Unit.KPVON).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
+					newValue = Convert.fromVon(newValue, Convert.Unit.KPVON).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "ATP";
 				} 
 				/**
 				 * 去除无用的0

@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.alaya.contracts.ppos.dto.resp.Reward;
+import com.platon.contracts.ppos.dto.resp.Reward;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;

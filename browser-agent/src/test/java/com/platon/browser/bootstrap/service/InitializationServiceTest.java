@@ -17,7 +17,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.misc.StakeMiscService;
-import com.alaya.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

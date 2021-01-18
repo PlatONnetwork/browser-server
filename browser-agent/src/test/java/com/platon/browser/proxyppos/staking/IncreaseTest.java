@@ -1,14 +1,14 @@
 package com.platon.browser.proxyppos.staking;
 
-import com.alaya.abi.solidity.datatypes.BytesType;
-import com.alaya.abi.solidity.datatypes.generated.Uint16;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.contracts.ppos.abi.Function;
-import com.alaya.contracts.ppos.dto.common.FunctionType;
-import com.alaya.contracts.ppos.dto.enums.StakingAmountType;
-import com.alaya.contracts.ppos.utils.EncoderUtils;
-import com.alaya.utils.Convert;
-import com.alaya.utils.Numeric;
+import com.platon.abi.solidity.datatypes.BytesType;
+import com.platon.abi.solidity.datatypes.generated.Uint16;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.contracts.ppos.abi.Function;
+import com.platon.contracts.ppos.dto.common.FunctionType;
+import com.platon.contracts.ppos.dto.enums.StakingAmountType;
+import com.platon.contracts.ppos.utils.EncoderUtils;
+import com.platon.utils.Convert;
+import com.platon.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class IncreaseTest extends StakingBase {
     private byte[] encode(String nodeId,String addAmount){
         StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
-        BigDecimal amount = Convert.toVon(addAmount, Convert.Unit.ATP).add(new BigDecimal("999999999999999998"));
+        BigDecimal amount = Convert.toVon(addAmount, Convert.Unit.KPVON).add(new BigDecimal("999999999999999998"));
 
         Function function = new Function(FunctionType.ADD_STAKING_FUNC_TYPE,
                 Arrays.asList(new BytesType(Numeric.hexStringToByteArray(nodeId)),

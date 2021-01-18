@@ -1,6 +1,6 @@
 package com.platon.browser.utils;
 
-import com.alaya.parameters.NetworkParameters;
+import com.platon.parameters.NetworkParameters;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ public class NetworkParams {
 
 	public static Long getChainId() {
 		if(chainId == null) {
-			return NetworkParameters.MainNetParams.getChainId();
+			return NetworkParameters.getChainId();
 		}
 		return chainId;
 	}

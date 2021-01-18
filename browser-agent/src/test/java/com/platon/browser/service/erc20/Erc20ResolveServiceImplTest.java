@@ -1,6 +1,6 @@
 package com.platon.browser.service.erc20;
 
-import com.alaya.protocol.Web3j;
+import com.platon.protocol.Web3j;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;

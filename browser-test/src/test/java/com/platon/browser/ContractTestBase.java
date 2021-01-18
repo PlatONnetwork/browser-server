@@ -1,15 +1,15 @@
 package com.platon.browser;
 
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.tx.RawTransactionManager;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.Transfer;
-import com.alaya.tx.gas.ContractGasProvider;
-import com.alaya.tx.gas.GasProvider;
-import com.alaya.utils.Convert;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.http.HttpService;
+import com.platon.tx.RawTransactionManager;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.Transfer;
+import com.platon.tx.gas.ContractGasProvider;
+import com.platon.tx.gas.GasProvider;
+import com.platon.utils.Convert;
 import com.platon.browser.contract.AlatContract;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -45,7 +45,7 @@ public abstract class ContractTestBase {
 	public void init() {
 		ownerWallet = Credentials.create(privateKey);
 		web3j = Web3j.build(new HttpService(nodeUrl));
-		transactionManager = new RawTransactionManager(web3j, ownerWallet, chainId);
+		transactionManager = new RawTransactionManager(web3j, ownerWallet);
 		gasProvider = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
 	}
 
@@ -60,10 +60,9 @@ public abstract class ContractTestBase {
 		Transfer.sendFunds(
 				web3j,
 				ownerWallet,
-				chainId,
 				testWalletA.getAddress(),
 				BigDecimal.valueOf(10000000),
-				Convert.Unit.ATP
+				Convert.Unit.KPVON
 		).send();
 		BigInteger testWalletABalance = web3j.platonGetBalance(testWalletA.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
 		log.info("testWalletABalance:{}",testWalletABalance);
@@ -71,10 +70,9 @@ public abstract class ContractTestBase {
 		Transfer.sendFunds(
 				web3j,
 				ownerWallet,
-				chainId,
 				testWalletB.getAddress(),
 				BigDecimal.valueOf(10000000),
-				Convert.Unit.ATP
+				Convert.Unit.KPVON
 		).send();
 		BigInteger testWalletBBalance = web3j.platonGetBalance(testWalletB.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
 		log.info("testWalletBBalance:{}",testWalletBBalance);
@@ -82,10 +80,9 @@ public abstract class ContractTestBase {
 		Transfer.sendFunds(
 				web3j,
 				ownerWallet,
-				chainId,
 				testWalletC.getAddress(),
 				BigDecimal.valueOf(10000000),
-				Convert.Unit.ATP
+				Convert.Unit.KPVON
 		).send();
 		BigInteger testWalletCBalance = web3j.platonGetBalance(testWalletC.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
 		log.info("testWalletCBalance:{}",testWalletCBalance);
@@ -93,7 +90,7 @@ public abstract class ContractTestBase {
 
 	protected AlatContract loadContract(String address, Credentials credentials){
 //		AlatContract.load()
-		return AlatContract.load(address, web3j, credentials, gasProvider, chainId);
+		return AlatContract.load(address, web3j, credentials, gasProvider);
 	}
 
 	protected String getCurrContractAddress(){

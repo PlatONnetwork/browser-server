@@ -1,7 +1,7 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.alaya.contracts.ppos.dto.resp.GovernParam;
-import com.alaya.contracts.ppos.dto.resp.TallyResult;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.TallyResult;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.cache.NetworkStatCache;

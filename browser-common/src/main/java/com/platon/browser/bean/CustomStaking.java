@@ -4,7 +4,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
-import com.alaya.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

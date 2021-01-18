@@ -1,22 +1,22 @@
 package com.platon.browser.proxyppos;
 
-import com.alaya.abi.wasm.WasmFunctionEncoder;
-import com.alaya.abi.wasm.datatypes.WasmFunction;
-import com.alaya.contracts.ppos.RewardContract;
-import com.alaya.contracts.ppos.dto.resp.Reward;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.core.methods.request.Transaction;
-import com.alaya.protocol.core.methods.response.PlatonEstimateGas;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.rlp.solidity.RlpDecoder;
-import com.alaya.rlp.solidity.RlpList;
-import com.alaya.rlp.solidity.RlpString;
-import com.alaya.rlp.solidity.RlpType;
-import com.alaya.tx.RawTransactionManager;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.Transfer;
-import com.alaya.utils.Convert;
-import com.alaya.utils.Numeric;
+import com.platon.abi.wasm.WasmFunctionEncoder;
+import com.platon.abi.wasm.datatypes.WasmFunction;
+import com.platon.contracts.ppos.RewardContract;
+import com.platon.contracts.ppos.dto.resp.Reward;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.methods.request.Transaction;
+import com.platon.protocol.core.methods.response.PlatonEstimateGas;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.rlp.solidity.RlpDecoder;
+import com.platon.rlp.solidity.RlpList;
+import com.platon.rlp.solidity.RlpString;
+import com.platon.rlp.solidity.RlpType;
+import com.platon.tx.RawTransactionManager;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.Transfer;
+import com.platon.utils.Convert;
+import com.platon.utils.Numeric;
 import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 
@@ -36,15 +36,15 @@ public class CommonTest extends TestBase {
     @Test
     public void transfer() throws Exception {
 
-        TransactionManager transactionManager = new RawTransactionManager(defaultWeb3j, defaultCredentials, chainId);
-        new Transfer(defaultWeb3j,transactionManager).sendFunds(proxyStakingContractAddress,new BigDecimal("50000000"), Convert.Unit.ATP,GAS_PRICE,GAS_LIMIT).send();
+        TransactionManager transactionManager = new RawTransactionManager(defaultWeb3j, defaultCredentials);
+        new Transfer(defaultWeb3j,transactionManager).sendFunds(proxyStakingContractAddress,new BigDecimal("50000000"), Convert.Unit.KPVON,GAS_PRICE,GAS_LIMIT).send();
         System.out.println("balance="+ defaultWeb3j.platonGetBalance(proxyStakingContractAddress, DefaultBlockParameterName.LATEST).send().getBalance());
 
-        new Transfer(defaultWeb3j,transactionManager).sendFunds(proxyDelegateContractAddress,new BigDecimal("50000000"), Convert.Unit.ATP,GAS_PRICE,GAS_LIMIT).send();
+        new Transfer(defaultWeb3j,transactionManager).sendFunds(proxyDelegateContractAddress,new BigDecimal("50000000"), Convert.Unit.KPVON,GAS_PRICE,GAS_LIMIT).send();
         System.out.println("balance="+ defaultWeb3j.platonGetBalance(proxyDelegateContractAddress, DefaultBlockParameterName.LATEST).send().getBalance());
 
-        String address = delegateCredentials.getAddress(chainId);
-        new Transfer(defaultWeb3j,transactionManager).sendFunds(address,new BigDecimal("50000000"), Convert.Unit.ATP,GAS_PRICE,GAS_LIMIT).send();
+        String address = delegateCredentials.getAddress();
+        new Transfer(defaultWeb3j,transactionManager).sendFunds(address,new BigDecimal("50000000"), Convert.Unit.KPVON,GAS_PRICE,GAS_LIMIT).send();
         System.out.println("balance="+ defaultWeb3j.platonGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance());
     }
 

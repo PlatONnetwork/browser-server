@@ -1,17 +1,17 @@
 package com.platon.browser.service.erc20;
 
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.Address;
-import com.alaya.abi.solidity.datatypes.Event;
-import com.alaya.abi.solidity.datatypes.Utf8String;
-import com.alaya.abi.solidity.datatypes.generated.*;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.Address;
+import com.platon.abi.solidity.datatypes.Event;
+import com.platon.abi.solidity.datatypes.Utf8String;
+import com.platon.abi.solidity.datatypes.generated.*;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.GasProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -30,11 +30,11 @@ public class ExtendEvent extends Contract {
                     new TypeReference<Uint256>() {}));
 
     public ExtendEvent(String contractAddress, Web3j web3j, Credentials credentials, GasProvider gasProvider, long chainId) {
-        super(BINARY, contractAddress, web3j, credentials, gasProvider, chainId);
+        super(BINARY, contractAddress, web3j, credentials, gasProvider);
     }
 
     public ExtendEvent(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider gasProvider, long chainId) {
-        super(BINARY, contractAddress, web3j, transactionManager, gasProvider, chainId);
+        super(BINARY, contractAddress, web3j, transactionManager, gasProvider);
     }
 
     public List<TokenCreatedResponse> getTransferEvents(final TransactionReceipt transactionReceipt) {

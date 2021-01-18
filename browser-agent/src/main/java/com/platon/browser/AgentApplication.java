@@ -1,6 +1,6 @@
 package com.platon.browser;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.service.ConsistencyService;

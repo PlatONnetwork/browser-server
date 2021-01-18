@@ -1,10 +1,10 @@
 package com.platon.browser.client;
 
-import com.alaya.contracts.ppos.*;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.Web3jService;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.protocol.websocket.WebSocketService;
+import com.platon.contracts.ppos.*;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.Web3jService;
+import com.platon.protocol.http.HttpService;
+import com.platon.protocol.websocket.WebSocketService;
 import com.platon.browser.enums.Web3jProtocolEnum;
 import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.utils.NetworkParams;
@@ -115,12 +115,12 @@ public class RetryableClient {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     private void updateContract(){
     	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
+        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j());
+        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j());
+        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j());
+        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j());
+        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j());
+        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j());
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)

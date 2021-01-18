@@ -1,26 +1,26 @@
 package com.platon.browser.contract;
 
-import com.alaya.abi.solidity.EventEncoder;
-import com.alaya.abi.solidity.FunctionEncoder;
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.Address;
-import com.alaya.abi.solidity.datatypes.Bool;
-import com.alaya.abi.solidity.datatypes.Event;
-import com.alaya.abi.solidity.datatypes.Function;
-import com.alaya.abi.solidity.datatypes.Type;
-import com.alaya.abi.solidity.datatypes.Utf8String;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.abi.solidity.datatypes.generated.Uint8;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.request.PlatonFilter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.EventEncoder;
+import com.platon.abi.solidity.FunctionEncoder;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.Address;
+import com.platon.abi.solidity.datatypes.Bool;
+import com.platon.abi.solidity.datatypes.Event;
+import com.platon.abi.solidity.datatypes.Function;
+import com.platon.abi.solidity.datatypes.Type;
+import com.platon.abi.solidity.datatypes.Utf8String;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.abi.solidity.datatypes.generated.Uint8;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.request.PlatonFilter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.GasProvider;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,12 +97,12 @@ public class AlatContract extends Contract {
             Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Uint256>() {}));
     ;
 
-    protected AlatContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider, chainId);
+    protected AlatContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    protected AlatContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider, chainId);
+    protected AlatContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public static RemoteCall<AlatContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId, BigInteger _supply, String _symbol, BigInteger _decimals, String _name, String _rewardValueAddr) {
@@ -111,7 +111,7 @@ public class AlatContract extends Contract {
                 new Uint8(_decimals),
                 new Utf8String(_name),
                 new Address(_rewardValueAddr)));
-        return deployRemoteCall(AlatContract.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor, chainId);
+        return deployRemoteCall(AlatContract.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor);
     }
 
     public static RemoteCall<AlatContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId, BigInteger _supply, String _symbol, BigInteger _decimals, String _name, String _rewardValueAddr) {
@@ -120,7 +120,7 @@ public class AlatContract extends Contract {
                 new Uint8(_decimals),
                 new Utf8String(_name),
                 new Address(_rewardValueAddr)));
-        return deployRemoteCall(AlatContract.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor, chainId);
+        return deployRemoteCall(AlatContract.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor);
     }
 
     public List<ApprovalEventResponse> getApprovalEvents(TransactionReceipt transactionReceipt) {
@@ -413,12 +413,12 @@ public class AlatContract extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
-    public static AlatContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {
-        return new AlatContract(contractAddress, web3j, credentials, contractGasProvider, chainId);
+    public static AlatContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+        return new AlatContract(contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    public static AlatContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId) {
-        return new AlatContract(contractAddress, web3j, transactionManager, contractGasProvider, chainId);
+    public static AlatContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+        return new AlatContract(contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public static class ApprovalEventResponse {

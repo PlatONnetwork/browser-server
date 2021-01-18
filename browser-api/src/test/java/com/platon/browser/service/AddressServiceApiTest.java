@@ -20,10 +20,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.Request;
-import com.alaya.protocol.core.methods.response.PlatonGetBalance;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.Request;
+import com.platon.protocol.core.methods.response.PlatonGetBalance;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.ApiTestMockBase;
@@ -37,11 +37,11 @@ import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.request.address.QueryDetailRequest;
 import com.platon.browser.request.address.QueryRPPlanDetailRequest;
-import com.alaya.contracts.ppos.RestrictingPlanContract;
-import com.alaya.contracts.ppos.RewardContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
-import com.alaya.contracts.ppos.dto.resp.Reward;
+import com.platon.contracts.ppos.RestrictingPlanContract;
+import com.platon.contracts.ppos.RewardContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.resp.RestrictingItem;
+import com.platon.contracts.ppos.dto.resp.Reward;
 
 
 @RunWith(MockitoJUnitRunner.Silent.class)

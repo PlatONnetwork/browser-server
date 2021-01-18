@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.alaya.utils.Convert;
+import com.platon.utils.Convert;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -249,9 +249,9 @@ public class TransactionService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18)),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.ATP).setScale(18, RoundingMode.DOWN), 18))
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)),
+                    HexTool.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18))
             };
             rows.add(row);
         });

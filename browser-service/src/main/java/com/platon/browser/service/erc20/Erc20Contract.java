@@ -1,18 +1,18 @@
 package com.platon.browser.service.erc20;
 
-import com.alaya.abi.solidity.EventEncoder;
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.*;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.request.PlatonFilter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.EventEncoder;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.*;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.request.PlatonFilter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.gas.GasProvider;
 import lombok.Data;
 import rx.Observable;
 import rx.functions.Func1;
@@ -129,12 +129,12 @@ public class Erc20Contract extends Contract {
 
     public Erc20Contract(final String contractAddress, final Web3j web3j, final Credentials credentials,
                          final GasProvider gasProvider, final long chainId) {
-        super("", contractAddress, web3j, credentials, gasProvider, chainId);
+        super("", contractAddress, web3j, credentials, gasProvider);
     }
 
     public Erc20Contract(final String contractAddress, final Web3j web3j, final Credentials credentials,
                          final long chainId) {
-        super("", contractAddress, web3j, credentials, null, chainId);
+        super("", contractAddress, web3j, credentials, null);
     }
 
     public List<IssueEventResponse> getIssueEvents(final TransactionReceipt transactionReceipt) {

@@ -1,33 +1,33 @@
 package com.platon.browser.data;
 
-import com.alaya.abi.solidity.datatypes.BytesType;
-import com.alaya.abi.solidity.datatypes.generated.Uint16;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.contracts.ppos.DelegateContract;
-import com.alaya.contracts.ppos.StakingContract;
-import com.alaya.contracts.ppos.abi.Function;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.TransactionResponse;
-import com.alaya.contracts.ppos.dto.common.FunctionType;
-import com.alaya.contracts.ppos.dto.enums.StakingAmountType;
-import com.alaya.contracts.ppos.dto.req.StakingParam;
-import com.alaya.contracts.ppos.dto.req.UpdateStakingParam;
-import com.alaya.contracts.ppos.dto.resp.Node;
-import com.alaya.contracts.ppos.utils.EncoderUtils;
-import com.alaya.crypto.Credentials;
-import com.alaya.crypto.Hash;
-import com.alaya.crypto.RawTransaction;
-import com.alaya.crypto.TransactionEncoder;
-import com.alaya.parameters.NetworkParameters;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.core.methods.response.PlatonGetTransactionCount;
-import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.tx.Transfer;
-import com.alaya.utils.Convert;
-import com.alaya.utils.Convert.Unit;
-import com.alaya.utils.Numeric;
+import com.platon.abi.solidity.datatypes.BytesType;
+import com.platon.abi.solidity.datatypes.generated.Uint16;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.contracts.ppos.DelegateContract;
+import com.platon.contracts.ppos.StakingContract;
+import com.platon.contracts.ppos.abi.Function;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.TransactionResponse;
+import com.platon.contracts.ppos.dto.common.FunctionType;
+import com.platon.contracts.ppos.dto.enums.StakingAmountType;
+import com.platon.contracts.ppos.dto.req.StakingParam;
+import com.platon.contracts.ppos.dto.req.UpdateStakingParam;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.utils.EncoderUtils;
+import com.platon.crypto.Credentials;
+import com.platon.crypto.Hash;
+import com.platon.crypto.RawTransaction;
+import com.platon.crypto.TransactionEncoder;
+import com.platon.parameters.NetworkParameters;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.methods.response.PlatonGetTransactionCount;
+import com.platon.protocol.core.methods.response.PlatonSendTransaction;
+import com.platon.protocol.http.HttpService;
+import com.platon.tx.Transfer;
+import com.platon.utils.Convert;
+import com.platon.utils.Convert.Unit;
+import com.platon.utils.Numeric;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,23 +55,23 @@ public class StakingContractTest {
     @Before
     public void init() throws Exception {
     	superCredentials = Credentials.create("0xa689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
-    	System.out.println("superCredentials balance="+ web3j.platonGetBalance(superCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
+    	System.out.println("superCredentials balance="+ web3j.platonGetBalance(superCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
 
     	stakingCredentials = Credentials.create("0x009614c2b32f2d5d3421591ab3ffc03ac66c831fb6807b532f6e3a8e7aac31f1d9");
-    	System.out.println("stakingCredentials balance="+ web3j.platonGetBalance(stakingCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
+    	System.out.println("stakingCredentials balance="+ web3j.platonGetBalance(stakingCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
     	
     	benefitCredentials = Credentials.create("0x3581985348bffd03b286b37712165f7addf3a8d907b25efc44addf54117e9b91");
-    	System.out.println("benefitCredentials balance="+ web3j.platonGetBalance(benefitCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
+    	System.out.println("benefitCredentials balance="+ web3j.platonGetBalance(benefitCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
   	
-        stakingContract = StakingContract.load( web3j,stakingCredentials, chainId);  
+        stakingContract = StakingContract.load( web3j,stakingCredentials);
         
-        delegateContract = DelegateContract.load( web3j,stakingCredentials, chainId); 
+        delegateContract = DelegateContract.load( web3j,stakingCredentials);
     }
     
     @Test
     public void transfer() throws Exception {
-    	Transfer.sendFunds(web3j, superCredentials, chainId, "0xfbdf3c5bf983cdf67685883f8eaabfd4e31249ec", new BigDecimal("10000000"), Unit.ATP).send();
-    	System.out.println("stakingCredentials balance="+ web3j.platonGetBalance(stakingCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
+    	Transfer.sendFunds(web3j, superCredentials, "0xfbdf3c5bf983cdf67685883f8eaabfd4e31249ec", new BigDecimal("10000000"), Unit.KPVON).send();
+    	System.out.println("stakingCredentials balance="+ web3j.platonGetBalance(stakingCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
     }
     
     @Test
@@ -118,12 +118,12 @@ public class StakingContractTest {
     public void staking() throws Exception {   	
         try {
         	StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
-        	String benifitAddress = benefitCredentials.getAddress(chainId);
+        	String benifitAddress = benefitCredentials.getAddress();
         	String externalId = "";
             String nodeName = "chendai-node3";
             String webSite = "www.baidu.com";
             String details = "chendai-node3-details";
-            BigDecimal stakingAmount = Convert.toVon("5000000", Unit.ATP);
+            BigDecimal stakingAmount = Convert.toVon("5000000", Unit.KPVON);
             BigInteger rewardPer = BigInteger.valueOf(10L);
 
         	
@@ -151,7 +151,7 @@ public class StakingContractTest {
     @Test
     public void updateStakingInfo() {
         try {
-        	String benifitAddress = benefitCredentials.getAddress(chainId);
+        	String benifitAddress = benefitCredentials.getAddress();
         	String externalId = "";
             String nodeName = "chendai-node3-u";
             String webSite = "www.baidu.com-u";
@@ -179,7 +179,7 @@ public class StakingContractTest {
     public void addStaking() {
         try {
         	StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
-            BigDecimal addStakingAmount = Convert.toVon("4000000", Unit.ATP).add(new BigDecimal("999999999999999998"));
+            BigDecimal addStakingAmount = Convert.toVon("4000000", Unit.KPVON).add(new BigDecimal("999999999999999998"));
         	
             PlatonSendTransaction platonSendTransaction = stakingContract.addStakingReturnTransaction(nodeId, stakingAmountType, addStakingAmount.toBigInteger()).send();
             TransactionResponse baseResponse = stakingContract.getTransactionResponse(platonSendTransaction).send();
@@ -240,7 +240,7 @@ public class StakingContractTest {
         BigInteger gasPrice = web3j.platonGasPrice().send().getGasPrice();
         BigInteger gasLimit = new BigInteger("472388");
         BigInteger amount = BigInteger.ZERO;
-        String toAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
+        String toAddress = NetworkParameters.getPposContractAddressOfStaking();
 
         RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, gasLimit, toAddress, amount, EncoderUtils.functionEncoder(function));
 
@@ -254,12 +254,12 @@ public class StakingContractTest {
         Credentials credentials = Credentials.create(stakingCredentials.getEcKeyPair());
 
         StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
-        String benifitAddress = benefitCredentials.getAddress(chainId);
+        String benifitAddress = benefitCredentials.getAddress();
         String externalId = "";
         String nodeName = "chendai-node3";
         String webSite = "www.baidu.com";
         String details = "chendai-node3-details";
-        BigDecimal stakingAmount = Convert.toVon("5000000", Unit.ATP);
+        BigDecimal stakingAmount = Convert.toVon("5000000", Unit.KPVON);
         BigInteger rewardPer = BigInteger.valueOf(10L);
 
         StakingParam stakingParam =  new StakingParam.Builder()
@@ -284,7 +284,7 @@ public class StakingContractTest {
         BigInteger gasPrice = web3j.platonGasPrice().send().getGasPrice();
         BigInteger gasLimit = new BigInteger("472388");
         BigInteger amount = BigInteger.ZERO;
-        String toAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
+        String toAddress = NetworkParameters.getPposContractAddressOfStaking();
 
         RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, gasLimit, toAddress, amount, EncoderUtils.functionEncoder(function));
 
@@ -298,7 +298,7 @@ public class StakingContractTest {
 
         StakingAmountType stakingAmountType = StakingAmountType.FREE_AMOUNT_TYPE;
 
-        BigDecimal delegate = Convert.toVon("20", Unit.ATP);
+        BigDecimal delegate = Convert.toVon("20", Unit.KPVON);
         Function function = new Function(FunctionType.DELEGATE_FUNC_TYPE,
 				Arrays.asList(new Uint16(stakingAmountType.getValue())
 				, new BytesType(Numeric.hexStringToByteArray(nodeId))
@@ -307,7 +307,7 @@ public class StakingContractTest {
         BigInteger gasPrice = web3j.platonGasPrice().send().getGasPrice();
         BigInteger gasLimit = new BigInteger("472388");
         BigInteger amount = BigInteger.ZERO;
-        String toAddress = NetworkParameters.getPposContractAddressOfStaking(chainId);
+        String toAddress = NetworkParameters.getPposContractAddressOfStaking();
 
         RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, gasLimit, toAddress, amount, EncoderUtils.functionEncoder(function));
 
@@ -318,11 +318,11 @@ public class StakingContractTest {
 
     private BigInteger getNonce(Credentials credentials) throws IOException {
         PlatonGetTransactionCount ethGetTransactionCount = web3j.platonGetTransactionCount(
-                credentials.getAddress(chainId), DefaultBlockParameterName.PENDING).send();
+                credentials.getAddress(), DefaultBlockParameterName.PENDING).send();
 
         if (ethGetTransactionCount.getTransactionCount().intValue() == 0) {
             ethGetTransactionCount = web3j.platonGetTransactionCount(
-                    credentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send();
+                    credentials.getAddress(), DefaultBlockParameterName.LATEST).send();
         }
 
         return ethGetTransactionCount.getTransactionCount();
