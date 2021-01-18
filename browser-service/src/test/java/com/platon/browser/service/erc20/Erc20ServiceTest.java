@@ -4,6 +4,7 @@ import com.alaya.protocol.core.RemoteCall;
 import com.alaya.protocol.core.methods.response.Log;
 import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.v0151.contract.Erc20Contract;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

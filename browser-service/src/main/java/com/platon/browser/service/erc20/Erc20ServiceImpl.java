@@ -5,6 +5,7 @@ import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.alaya.tx.exceptions.ContractCallException;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.utils.NetworkParams;
+import com.platon.browser.v0151.contract.Erc20Contract;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

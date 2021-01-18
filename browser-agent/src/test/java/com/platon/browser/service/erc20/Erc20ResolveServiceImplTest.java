@@ -7,6 +7,7 @@ import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.v0151.contract.Erc20Contract;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

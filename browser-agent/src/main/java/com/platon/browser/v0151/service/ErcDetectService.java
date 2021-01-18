@@ -6,11 +6,16 @@ import com.alaya.protocol.core.DefaultBlockParameterName;
 import com.alaya.protocol.core.methods.request.Transaction;
 import com.alaya.protocol.core.methods.response.PlatonCall;
 import com.alaya.tx.exceptions.ContractCallException;
+import com.alaya.tx.gas.ContractGasProvider;
+import com.alaya.tx.gas.GasProvider;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.service.erc20.Erc20Contract;
 import com.platon.browser.utils.NetworkParams;
-import com.platon.browser.v0151.bean.Erc20ContractId;
+import com.platon.browser.v0151.bean.ErcContractId;
+import com.platon.browser.v0151.contract.Erc20Contract;
+import com.platon.browser.v0151.contract.Erc721Contract;
+import com.platon.browser.v0151.contract.ErcContract;
+import com.platon.browser.v0151.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -18,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -28,6 +34,10 @@ import java.security.NoSuchProviderException;
 @Slf4j
 @Service
 public class ErcDetectService {
+    private static final String PRIVATE_KEY = "4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7";
+    private static final BigInteger GAS_LIMIT = BigInteger.valueOf(2104836);
+    private static final BigInteger GAS_PRICE = BigInteger.valueOf(100000000000L);
+    private static final GasProvider GAS_PROVIDER = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
     @Resource
     private PlatOnClient platOnClient;
     // 检测输入数据
@@ -49,7 +59,7 @@ public class ErcDetectService {
         return platonCall.getResult();
     }
     // 是否支持Erc165标准
-    public boolean isSupportErc165(String contractAddress) {
+    private boolean isSupportErc165(String contractAddress) {
         String result = detectInputData(contractAddress,"0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000");
         if(!"0x0000000000000000000000000000000000000000000000000000000000000001".equals(result)){
             return false;
@@ -70,49 +80,75 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
     // 是否Erc721合约
-    public boolean isSupportErc721(String contractAddress){
+    private boolean isSupportErc721(String contractAddress){
         // 支持erc721，则必定要支持erc165
         if(!isSupportErc165(contractAddress)) return false;
         String result = detectInputData(contractAddress,"0x01ffc9a780ac58cd00000000000000000000000000000000000000000000000000000000");
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
-    // 是否Erc20合约
-    public boolean isSupportErc20(String contractAddress){
-        Erc20ContractId contractId = detectErc20ContractId(contractAddress);
-        return contractId.isSupportErc20();
+    private ErcContractId getErc20ContractId(String contractAddress){
+        ErcContract ercContract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
+                Credentials.create(PRIVATE_KEY),
+                NetworkParams.getChainId());
+        ErcContractId contractId = resolveContractId(ercContract);
+        contractId.setTypeEnum(ErcTypeEnum.ERC20);
+        return contractId;
+    }
+
+    private ErcContractId getErc721ContractId(String contractAddress){
+        ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
+                Credentials.create(PRIVATE_KEY),
+                GAS_PROVIDER, NetworkParams.getChainId());
+        ErcContractId contractId = resolveContractId(ercContract);
+        contractId.setTypeEnum(ErcTypeEnum.ERC721);
+        return contractId;
     }
 
     // 检测Erc20合约标识
-    public Erc20ContractId detectErc20ContractId(String contractAddress){
-        Erc20ContractId contractId = new Erc20ContractId();
-        if (StringUtils.isBlank(contractAddress)) throw new RuntimeException("contractAddress can not be null!");
-        Erc20Contract erc20Contract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
-                Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
-                NetworkParams.getChainId());
+    private ErcContractId resolveContractId(ErcContract ercContract){
+        ErcContractId contractId = new ErcContractId();
         try {
             try {
-                contractId.setName(erc20Contract.name().send());
+                contractId.setName(ercContract.name().send());
             } catch (Exception e) {
                 log.error(" erc get name error", e);
             }
             try {
-                contractId.setSymbol(erc20Contract.symbol().send());
+                contractId.setSymbol(ercContract.symbol().send());
             } catch (Exception e) {
                 log.error(" erc get symbol error", e);
             }
             try {
-                contractId.setDecimal(erc20Contract.decimals().send().intValue());
+                contractId.setDecimal(ercContract.decimals().send().intValue());
             } catch (Exception e) {
                 log.error(" erc get decimal error", e);
             }
             try {
-                contractId.setTotalSupply(new BigDecimal(erc20Contract.totalSupply().send()));
+                contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
             } catch (Exception e) {
                 log.error(" erc get totalSupply error", e);
             }
         } catch (ContractCallException e) {
-            log.error(" not erc contract,{}", contractAddress, e);
+            log.error(" not erc contract,{}", ercContract, e);
+        }
+        return contractId;
+    }
+
+    public ErcContractId getContractId(String contractAddress){
+        // 先检测是否支持ERC721
+        boolean isErc721 = isSupportErc721(contractAddress);
+        ErcContractId contractId;
+        if(isErc721){
+            // 取ERC721合约信息
+            contractId = getErc721ContractId(contractAddress);
+        }else{
+            // 不是ERC721，则检测是否是ERC20
+            contractId = getErc20ContractId(contractAddress);
+            if(StringUtils.isBlank(contractId.getName())||StringUtils.isBlank(contractId.getSymbol())|contractId.getDecimal()==null||contractId.getTotalSupply()==null){
+                // name/symbol/decimals/totalSupply 其中之一为空，则是判定为未知类型
+                contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+            }
         }
         return contractId;
     }
