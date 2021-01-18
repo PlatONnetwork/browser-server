@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,6 +39,8 @@ public class ErcContractAnalyzer {
     private AddressCache addressCache;
     @Resource
     private ErcTokenInventoryAnalyzer ercTokenInventoryAnalyzer;
+    @Resource
+    private ErcTokenHolderAnalyzer ercTokenHolderAnalyzer;
     @Resource
     private TokenMapper tokenMapper;
 
@@ -133,7 +136,7 @@ public class ErcContractAnalyzer {
         transactionReceipt.setLogs(receipt.getLogs());
         transactionReceipt.setContractAddress(contractAddress);
         List<ErcContract.ErcTxEvent> eventList;
-        List<ErcTx> txList;
+        List<ErcTx> txList = Collections.EMPTY_LIST;
         switch (typeEnum){
             case ERC20:
                 eventList = ercDetectService.getErc20TxEvents(transactionReceipt);
@@ -149,5 +152,6 @@ public class ErcContractAnalyzer {
                 ercTokenInventoryAnalyzer.analyze(txList);
                 break;
         }
+        ercTokenHolderAnalyzer.analyze(txList);
     }
 }
