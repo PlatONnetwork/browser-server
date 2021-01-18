@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Erc合约相关服务
+ * Erc Token 服务
  */
 @Slf4j
 @Service
