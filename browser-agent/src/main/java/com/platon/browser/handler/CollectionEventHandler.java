@@ -1,13 +1,9 @@
 package com.platon.browser.handler;
 
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.TxAnalyseResult;
 import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.publisher.ComplementEventPublisher;
-import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.statistic.StatisticService;
-import com.platon.browser.service.transaction.TransactionService;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;
@@ -16,9 +12,12 @@ import com.platon.browser.dao.mapper.CustomNOptBakMapper;
 import com.platon.browser.dao.mapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.publisher.ComplementEventPublisher;
+import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.statistic.StatisticService;
+import com.platon.browser.service.transaction.TransactionService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -78,18 +76,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
         try {
             List<Transaction> transactions = event.getTransactions();
-            // 确保交易从小到大的索引顺序
-            int index = 0;
-            transactions.sort(Comparator.comparing(Transaction::getIndex));
-            for (Transaction tx : transactions) {
-                tx.setId(++this.transactionId);
-                for (OldErcTx oldErcTx : tx.getOldErcTxes()) {
-                    // Token交易序号 = 交易所在块号*10000 + 本区块Token交易列表index
-                    oldErcTx.setSeq(event.getBlock().getNum()*100000+index);
-                    index++;
-                }
-            }
-
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockService.analyze(event);
             // 根据交易解析出业务参数

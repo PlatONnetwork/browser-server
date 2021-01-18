@@ -2,16 +2,15 @@ package com.platon.browser.handler;
 
 import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bean.BlockEvent;
-import com.platon.browser.publisher.CollectionEventPublisher;
 import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
+import com.platon.browser.publisher.CollectionEventPublisher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,8 +40,6 @@ public class BlockEventHandlerTest extends AgentTestBase {
     private PlatOnClient platOnClient;
     @Mock
     private AddressCache addressCache;
-    @Mock
-    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
     @InjectMocks
     @Spy

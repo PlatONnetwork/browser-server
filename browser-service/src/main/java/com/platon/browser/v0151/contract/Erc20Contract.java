@@ -14,6 +14,7 @@ import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.alaya.tx.Contract;
 import com.alaya.tx.gas.GasProvider;
 import lombok.Data;
+import org.apache.http.MethodNotSupportedException;
 import rx.Observable;
 
 import java.math.BigInteger;
@@ -389,33 +390,39 @@ public class Erc20Contract extends Contract implements ErcContract {
         return this.approvalEventObservable(filter);
     }
 
-    public List<TransferEventResponse> getTransferEvents(final TransactionReceipt transactionReceipt) {
+    @Override
+    public List<ErcTxEvent> getTxEvents(final TransactionReceipt transactionReceipt) {
         final List<EventValuesWithLog> valueList = this.extractEventParametersWithLog(TRANSFER_EVENT, transactionReceipt);
-        final ArrayList<TransferEventResponse> responses = new ArrayList<>(valueList.size());
+        final ArrayList<ErcTxEvent> responses = new ArrayList<>(valueList.size());
         for (final EventValuesWithLog eventValues : valueList) {
-            final TransferEventResponse typedResponse = new TransferEventResponse();
-            typedResponse.log = eventValues.getLog();
-            typedResponse.from = (String)eventValues.getIndexedValues().get(0).getValue();
-            typedResponse.to = (String)eventValues.getIndexedValues().get(1).getValue();
-            typedResponse.value = (BigInteger)eventValues.getNonIndexedValues().get(0).getValue();
-            responses.add(typedResponse);
+            final ErcTxEvent response = new ErcTxEvent();
+            response.setLog(eventValues.getLog());
+            response.setFrom((String)eventValues.getIndexedValues().get(0).getValue());
+            response.setTo((String)eventValues.getIndexedValues().get(1).getValue());
+            response.setValue((BigInteger)eventValues.getNonIndexedValues().get(0).getValue());
+            responses.add(response);
         }
         return responses;
     }
 
-    public Observable<TransferEventResponse> transferEventObservable(final PlatonFilter filter) {
+    @Override
+    public RemoteCall<String> getTokenURI(BigInteger tokenId) throws MethodNotSupportedException {
+        throw new MethodNotSupportedException("ERC20 NOT SUPPORT THIS METHOD!");
+    }
+
+    public Observable<ErcTxEvent> transferEventObservable(final PlatonFilter filter) {
         return this.web3j.platonLogObservable(filter).map(log -> {
             final EventValuesWithLog eventValues = Erc20Contract.this.extractEventParametersWithLog(TRANSFER_EVENT, log);
-            final TransferEventResponse typedResponse = new TransferEventResponse();
-            typedResponse.log = log;
-            typedResponse.from = (String)eventValues.getIndexedValues().get(0).getValue();
-            typedResponse.to = (String)eventValues.getIndexedValues().get(1).getValue();
-            typedResponse.value = (BigInteger)eventValues.getNonIndexedValues().get(0).getValue();
-            return typedResponse;
+            final ErcTxEvent response = new ErcTxEvent();
+            response.setLog(log);
+            response.setFrom((String)eventValues.getIndexedValues().get(0).getValue());
+            response.setTo((String)eventValues.getIndexedValues().get(1).getValue());
+            response.setValue((BigInteger)eventValues.getNonIndexedValues().get(0).getValue());
+            return response;
         });
     }
 
-    public Observable<TransferEventResponse> transferEventObservable(final DefaultBlockParameter startBlock,
+    public Observable<ErcTxEvent> transferEventObservable(final DefaultBlockParameter startBlock,
         final DefaultBlockParameter endBlock) {
         final PlatonFilter filter = new PlatonFilter(startBlock, endBlock, this.getContractAddress());
         filter.addSingleTopic(EventEncoder.encode(TRANSFER_EVENT));
@@ -655,13 +662,7 @@ public class Erc20Contract extends Contract implements ErcContract {
         private String spender;
         private BigInteger value;
     }
-    @Data
-    public static class TransferEventResponse {
-        private Log log;
-        private String from;
-        private String to;
-        private BigInteger value;
-    }
+
     @Data
     public static class PauseEventResponse {
         private Log log;

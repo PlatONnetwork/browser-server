@@ -1,6 +1,7 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Assert;
@@ -27,7 +28,9 @@ public class EsImportServiceTest extends AgentTestBase {
     @Mock
     private EsDelegateRewardService delegateRewardService;
     @Mock
-    private OldEsErc20TxService oldEsErc20TxService;
+    private EsErc20TxRepository esErc20TxRepository;
+    @Mock
+    private EsErc721TxRepository esErc721TxRepository;
     @InjectMocks
     @Spy
     private EsImportService target;
@@ -50,12 +53,15 @@ public class EsImportServiceTest extends AgentTestBase {
     public void getOldErc20TxList() {
         Set<Transaction> transactions = new HashSet<>();
         Transaction transaction = new Transaction();
-        List<OldErcTx> oldErcTxList = new ArrayList<>();
-        OldErcTx oldErcTx = new OldErcTx();
-        oldErcTxList.add(oldErcTx);
-        transaction.setOldErcTxes(oldErcTxList);
+        List<ErcTx> ercTxList = new ArrayList<>();
+        ErcTx ercTx = new ErcTx();
+        ercTxList.add(ercTx);
+        transaction.setErc20TxList(ercTxList);
         transactions.add(transaction);
-        target.getOldErc20TxList(transactions);
+        target.getErc20TxList(transactions);
+        transaction.setErc721TxList(ercTxList);
+        transactions.add(transaction);
+        target.getErc721TxList(transactions);
         Assert.assertTrue(true);
     }
 }

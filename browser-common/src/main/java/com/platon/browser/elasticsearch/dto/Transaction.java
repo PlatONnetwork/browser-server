@@ -61,10 +61,6 @@ public class Transaction {
     @JsonIgnore
     private List<Transaction> virtualTransactions = new ArrayList<>();
 
-    // 虚拟erc20交易，
-    @JsonIgnore
-    private List<OldErcTx> oldErcTxes = new ArrayList<>();
-
     /******** 把字符串类数值转换为大浮点数的便捷方法 ********/
     public BigDecimal decimalGasLimit() {
         return new BigDecimal(this.getGasLimit());

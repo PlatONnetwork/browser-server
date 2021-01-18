@@ -5,6 +5,7 @@ import com.alaya.crypto.Keys;
 import com.alaya.protocol.core.DefaultBlockParameterName;
 import com.alaya.protocol.core.methods.request.Transaction;
 import com.alaya.protocol.core.methods.response.PlatonCall;
+import com.alaya.protocol.core.methods.response.TransactionReceipt;
 import com.alaya.tx.exceptions.ContractCallException;
 import com.alaya.tx.gas.ContractGasProvider;
 import com.alaya.tx.gas.GasProvider;
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.List;
 
 /**
  * Erc探测服务
@@ -151,5 +153,19 @@ public class ErcDetectService {
             }
         }
         return contractId;
+    }
+
+    public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt) {
+        ErcContract ercContract = new Erc20Contract(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(),
+                Credentials.create(PRIVATE_KEY),
+                NetworkParams.getChainId());
+        return ercContract.getTxEvents(receipt);
+    }
+
+    public List<ErcContract.ErcTxEvent> getErc721TxEvents(TransactionReceipt receipt) {
+        ErcContract ercContract = Erc721Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(),
+                Credentials.create(PRIVATE_KEY),
+                GAS_PROVIDER, NetworkParams.getChainId());
+        return ercContract.getTxEvents(receipt);
     }
 }

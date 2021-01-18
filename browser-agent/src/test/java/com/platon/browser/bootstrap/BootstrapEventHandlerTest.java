@@ -1,18 +1,18 @@
 package com.platon.browser.bootstrap;
 
+import com.alaya.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
-import com.platon.browser.service.redis.RedisImportService;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.service.elasticsearch.EsImportService;
+import com.platon.browser.service.redis.RedisImportService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.alaya.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,8 +49,6 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     private PlatOnClient platOnClient;
     @Mock
     private AddressCache addressCache;
-    @Mock
-    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
     @InjectMocks
     @Spy
     private BootstrapEventHandler target;

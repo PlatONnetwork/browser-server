@@ -12,7 +12,6 @@ import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.*;
 import com.platon.browser.service.erc20.ERCData;
-import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.service.erc20.TransferEvent;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -178,11 +177,6 @@ public class TransactionUtilsTest extends AgentTestData {
         ComplementInfo ci = new ComplementInfo();
         ci.setContractType(ContractTypeEnum.EVM.getCode());
         CollectionTransaction collectionTransaction = CollectionTransaction.newInstance();
-        Erc20ResolveServiceImpl erc20Service = mock(Erc20ResolveServiceImpl.class);
-        ERCData ercData = new ERCData();
-        when(erc20Service.getErcData(any())).thenReturn(ercData);
-        TransactionUtil.resolveErcContract(collectionTransaction, ci, "123",
-                erc20Service, this.addressCache);
 
         String contractAddress = "atp19t25777unzaxrwd95a5y42nlkkwma0dv50zqgx";
         List<Log> logs = new ArrayList<>();
@@ -203,9 +197,6 @@ public class TransactionUtilsTest extends AgentTestData {
         log2.setAddress(contractAddress);
         transferEvent2.setLog(log2);
         transferEvents.add(transferEvent2);
-        when(erc20Service.getTransferEvents(any())).thenReturn(transferEvents);
-        TransactionUtil.resolveInnerToken(collectionTransaction, ci, logs,
-                erc20Service, this.addressCache,contractAddress);
     }
 
 }

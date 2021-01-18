@@ -25,6 +25,7 @@ import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
+import com.platon.browser.v0151.cache.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -65,8 +66,6 @@ public class InitializationService {
     @Resource
     private ParameterService parameterService;
     @Resource
-    private ProposalMapper proposalMapper;
-    @Resource
     private ProposalCache proposalCache;
     @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
@@ -90,14 +89,14 @@ public class InitializationService {
     private EsErc721TxRepository esErc721TxRepository;
     @Resource
     private EsTransferTxRepository esTransferTxRepository;
+    @Resource
+    private ErcCache ercCache;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
-        // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
-        ProposalExample proposalExample = new ProposalExample();
-        proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
-        List<Proposal> proposalList = proposalMapper.selectByExample(proposalExample);
-        proposalCache.init(proposalList);
+
+        proposalCache.init();
+        ercCache.init();
 
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);

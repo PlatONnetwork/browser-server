@@ -207,34 +207,34 @@ public class Erc721Contract extends Contract implements ErcContract {
         filter.addSingleTopic(EventEncoder.encode(OWNERSHIPTRANSFERRED_EVENT));
         return ownershipTransferredEventObservable(filter);
     }
-
-    public List<TransferEventResponse> getTransferEvents(TransactionReceipt transactionReceipt) {
+    @Override
+    public List<ErcTxEvent> getTxEvents(TransactionReceipt transactionReceipt) {
         List<EventValuesWithLog> valueList = extractEventParametersWithLog(TRANSFER_EVENT, transactionReceipt);
-        ArrayList<TransferEventResponse> responses = new ArrayList<>(valueList.size());
+        ArrayList<ErcTxEvent> responses = new ArrayList<>(valueList.size());
         for (EventValuesWithLog eventValues : valueList) {
-            TransferEventResponse typedResponse = new TransferEventResponse();
-            typedResponse.log = eventValues.getLog();
-            typedResponse._from = (String) eventValues.getIndexedValues().get(0).getValue();
-            typedResponse._to = (String) eventValues.getIndexedValues().get(1).getValue();
-            typedResponse._tokenId = (BigInteger) eventValues.getIndexedValues().get(2).getValue();
-            responses.add(typedResponse);
+            ErcTxEvent response = new ErcTxEvent();
+            response.setLog(eventValues.getLog());
+            response.setFrom((String) eventValues.getIndexedValues().get(0).getValue());
+            response.setTo((String) eventValues.getIndexedValues().get(1).getValue());
+            response.setValue((BigInteger) eventValues.getIndexedValues().get(2).getValue());
+            responses.add(response);
         }
         return responses;
     }
 
-    public Observable<TransferEventResponse> transferEventObservable(PlatonFilter filter) {
+    public Observable<ErcTxEvent> transferEventObservable(PlatonFilter filter) {
         return web3j.platonLogObservable(filter).map(log -> {
             EventValuesWithLog eventValues = extractEventParametersWithLog(TRANSFER_EVENT, log);
-            TransferEventResponse typedResponse = new TransferEventResponse();
-            typedResponse.log = log;
-            typedResponse._from = (String) eventValues.getIndexedValues().get(0).getValue();
-            typedResponse._to = (String) eventValues.getIndexedValues().get(1).getValue();
-            typedResponse._tokenId = (BigInteger) eventValues.getIndexedValues().get(2).getValue();
-            return typedResponse;
+            ErcTxEvent response = new ErcTxEvent();
+            response.setLog(log);
+            response.setFrom((String) eventValues.getIndexedValues().get(0).getValue());
+            response.setTo((String) eventValues.getIndexedValues().get(1).getValue());
+            response.setValue((BigInteger) eventValues.getIndexedValues().get(2).getValue());
+            return response;
         });
     }
 
-    public Observable<TransferEventResponse> transferEventObservable(DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
+    public Observable<ErcTxEvent> transferEventObservable(DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
         PlatonFilter filter = new PlatonFilter(startBlock, endBlock, getContractAddress());
         filter.addSingleTopic(EventEncoder.encode(TRANSFER_EVENT));
         return transferEventObservable(filter);
@@ -402,7 +402,7 @@ public class Erc721Contract extends Contract implements ErcContract {
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);
     }
 
-    public RemoteCall<String> tokenURI(BigInteger _tokenId) {
+    public RemoteCall<String> getTokenURI(BigInteger _tokenId) {
         final Function function = new Function(FUNC_TOKENURI,
                 Collections.singletonList(new Uint256(_tokenId)),
                 Collections.singletonList(new TypeReference<Utf8String>() {
@@ -470,15 +470,5 @@ public class Erc721Contract extends Contract implements ErcContract {
         public String previousOwner;
 
         public String newOwner;
-    }
-
-    public static class TransferEventResponse {
-        public Log log;
-
-        public String _from;
-
-        public String _to;
-
-        public BigInteger _tokenId;
     }
 }

@@ -10,7 +10,6 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.NodeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +28,6 @@ import java.util.Map;
 public class BlockAnalyzer {
     @Resource
     private TransactionAnalyzer transactionAnalyzer;
-    @Resource
-    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
 
     public CollectionBlock analyze(PlatonBlock.Block rawBlock, ReceiptResult receipt) throws ContractInvokeException, BlankResponseException, BeanCreateOrUpdateException {
         String nodeId;
@@ -66,13 +63,8 @@ public class BlockAnalyzer {
                 CollectionTransaction transaction = transactionAnalyzer.analyze(result,rawTransaction,receiptMap.get(rawTransaction.getHash()));
                 // 把解析好的交易添加到当前区块的交易列表
                 result.getTransactions().add(transaction);
-                // 累加当前当前区块的token交易数
-                result.setTokenQty(result.getTokenQty() + transaction.getOldErcTxes().size());
             }
         }
-
-        // 初始化合约缓存
-        erc20ResolveServiceImpl.initContractAddressCache(result.getTransactions());
         return result;
     }
 }
