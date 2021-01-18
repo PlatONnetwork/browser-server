@@ -146,7 +146,7 @@ public class ErcDetectService {
             // 不是ERC721，则检测是否是ERC20
             contractId = getErc20ContractId(contractAddress);
             if(StringUtils.isBlank(contractId.getName())||StringUtils.isBlank(contractId.getSymbol())|contractId.getDecimal()==null||contractId.getTotalSupply()==null){
-                // name/symbol/decimals/totalSupply 其中之一为空，则是判定为未知类型
+                // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
                 contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
             }
         }

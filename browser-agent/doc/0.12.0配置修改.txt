@@ -1,2 +1,0 @@
-修改：
-proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/TestNet/PIP-%s.md

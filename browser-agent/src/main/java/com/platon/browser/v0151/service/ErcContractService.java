@@ -1,5 +1,6 @@
 package com.platon.browser.v0151.service;
 
+import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.v0151.analyzer.Erc20TxAnalyzer;
 import com.platon.browser.v0151.analyzer.Erc721TxAnalyzer;
 import com.platon.browser.v0151.bean.ErcContractId;
@@ -64,7 +65,12 @@ public class ErcContractService {
         return token;
     }
 
-    public void analyze(String contractAddress) {
+    /**
+     * 分析ERC合约交易信息
+     * @param transaction
+     * @param contractAddress
+     */
+    public void analyze(CollectionTransaction transaction,String contractAddress) {
         // 先更新缓存
         ErcToken token = updateErcCache(contractAddress);
         // 根据ERC类型调用各自的分析器

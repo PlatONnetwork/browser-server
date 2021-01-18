@@ -110,7 +110,7 @@ public class TransactionAnalyzer {
                     // 把回执里的合约地址回填到交易的to字段
                     result.setTo(receipt.getContractAddress());
                     // 检测当前合约是否是erc相关合约
-                    ercContractService.analyze(receipt.getContractAddress());
+                    ercContractService.analyze(result,receipt.getContractAddress());
                     // 解析ERC合约信息
                     TransactionUtil.resolveErcContract(result, ci, receipt.getContractAddress(), erc20ResolveServiceImpl, addressCache);
                     addressCache.updateFirst(receipt.getContractAddress(), ci);
