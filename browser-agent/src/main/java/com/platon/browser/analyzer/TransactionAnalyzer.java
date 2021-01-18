@@ -16,7 +16,7 @@ import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
-import com.platon.browser.v0151.analyzer.ErcContractAnalyzer;
+import com.platon.browser.v0151.analyzer.ErcTokenAnalyzer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ public class TransactionAnalyzer {
     @Resource
     private SpecialApi specialApi;
     @Resource
-    private ErcContractAnalyzer ercContractAnalyzer;
+    private ErcTokenAnalyzer ercTokenAnalyzer;
     
     // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存
     // <普通合约地址,合约类型枚举>
@@ -101,7 +101,7 @@ public class TransactionAnalyzer {
                         // 把成功的虚拟交易挂到当前普通合约交易上
                         result.setVirtualTransactions(successVirtualTransactions);
                         // 解析ERC交易
-                        ercContractAnalyzer.resolveTx(result,receipt);
+                        ercTokenAnalyzer.resolveTx(result,receipt);
                     }
                     receipt.getContractCreated().forEach(contractAddress->GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contractAddress, contractTypeEnum));
                 } else {
@@ -115,7 +115,7 @@ public class TransactionAnalyzer {
         }
 
         // 解析ERC Token，有就入库，没有拉倒
-        receipt.getContractCreated().forEach(contractAddress-> ercContractAnalyzer.resolveToken(contractAddress));
+        receipt.getContractCreated().forEach(contractAddress-> ercTokenAnalyzer.resolveToken(contractAddress));
 
         if (ci.getType() == null) {
             throw new BeanCreateOrUpdateException(

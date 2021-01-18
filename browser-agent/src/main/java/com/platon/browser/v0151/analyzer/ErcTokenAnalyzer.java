@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Service
-public class ErcContractAnalyzer {
+public class ErcTokenAnalyzer {
     @Resource
     private ErcDetectService ercDetectService;
     @Resource
