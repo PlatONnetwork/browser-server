@@ -88,7 +88,7 @@ public class TransactionAnalyzer {
                 ContractTypeEnum contractTypeEnum = ContractTypeEnum.getEnum(ci.getContractType());
                 // 把合约地址与合约类型映射
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(result.getTo(), contractTypeEnum);
-                receipt.getContractCreated().forEach(contractAddress->GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contractAddress, contractTypeEnum));
+                receipt.getContractCreated().forEach(contract->GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum));
             } else {
                 if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.containsKey(result.getTo()) && inputWithoutPrefix.length() >= 8) {
                     // 如果是普通合约调用（EVM||WASM）
@@ -103,7 +103,7 @@ public class TransactionAnalyzer {
                         // 解析ERC交易
                         ercTokenAnalyzer.resolveTx(result,receipt);
                     }
-                    receipt.getContractCreated().forEach(contractAddress->GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contractAddress, contractTypeEnum));
+                    receipt.getContractCreated().forEach(contract->GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum));
                 } else {
                     BigInteger value = StringUtils.isNotBlank(result.getValue()) ? new BigInteger(result.getValue()) : BigInteger.ZERO;
                     if (value.compareTo(BigInteger.ZERO) >= 0) {
@@ -115,7 +115,7 @@ public class TransactionAnalyzer {
         }
 
         // 解析ERC Token，有就入库，没有拉倒
-        receipt.getContractCreated().forEach(contractAddress-> ercTokenAnalyzer.resolveToken(contractAddress));
+        receipt.getContractCreated().forEach(contract-> ercTokenAnalyzer.resolveToken(contract.getAddress()));
 
         if (ci.getType() == null) {
             throw new BeanCreateOrUpdateException(

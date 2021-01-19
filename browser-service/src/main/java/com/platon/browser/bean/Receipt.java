@@ -24,7 +24,7 @@ public class Receipt {
     private String transactionIndex;
     private String status;
     private String contractAddress;
-    private List<String> contractCreated;
+    private List<ContractInfo> contractCreated;
     private List<String> topics;
 
     private int logStatus;
