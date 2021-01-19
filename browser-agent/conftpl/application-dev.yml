@@ -9,7 +9,7 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/_DB_NAME_?useUnicode=true
+    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/_DB_NAME_?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: _DB_USER_
     password: _DB_PASS_
   #Redis配置
@@ -71,6 +71,10 @@ logging:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #PlatOn相关配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: atp
+  # 金额显示单位
+  valueUnit: ATP
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址

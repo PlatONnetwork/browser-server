@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: 1
+profile: hrp
 # 密码加密配置
 jasypt:
   encryptor:
@@ -11,17 +11,37 @@ server.port: 9061
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/_DB_NAME_?useUnicode=true
-    username: _DB_USER_
-    password: _DB_PASS_
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_hrp?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    #下面为连接池的补充设置，应用到上面所有数据源中
+    #初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 10
+    maxActive: 100
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 100
   #ES配置
   elasticsearch:
     high-level-client:
-      hosts: _ES_IPS_
-      port: _ES_PORT_
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
+      port: 9200
       schema: http
-      username: _ES_USER_
-      password: _ES_PWD_
+      username: elastic
+      password: changeme
       blockIndexName: browser_block_${profile}
       transactionIndexName: browser_transaction_${profile}
       delegationIndexName: browser_delegation_${profile}
@@ -41,15 +61,15 @@ redisCluster:
   testOnBorrow: false
   testOnReturn: false
   testWhileIdle: true
-  masterIPs: _REDIS_IPS_
-  password: _REDIS_PWD_
+  masterIPs: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+  password: platscan
 #性能配置
 server:
   tomcat:
     max-connections: 20000
     threads:
-      max: 2000
       min-spare: 800
+      max: 2000
 zuul:
   FormBodyWrapperFilter:
     pre:
@@ -67,10 +87,9 @@ logging:
   file:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
-#初始化链相关的配置
 platon:
   # 地址HRP前缀
-  addressPrefix: atp
+  addressPrefix: lfp
   # 金额显示单位
   valueUnit: ATP
   # 交易输入参数并行解码线程数
@@ -79,7 +98,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.112.141:6789,192.168.112.141:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -114,7 +133,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201018
+  chainId: 201040
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
 

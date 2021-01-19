@@ -88,6 +88,10 @@ logging:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: atp
+  # 金额显示单位
+  valueUnit: ATP
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址

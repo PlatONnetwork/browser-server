@@ -128,12 +128,11 @@ public class Erc20Contract extends Contract {
     public static final Event UNPAUSE_EVENT = new Event("Unpause", Arrays.<TypeReference<?>>asList());
 
     public Erc20Contract(final String contractAddress, final Web3j web3j, final Credentials credentials,
-                         final GasProvider gasProvider, final long chainId) {
+                         final GasProvider gasProvider) {
         super("", contractAddress, web3j, credentials, gasProvider);
     }
 
-    public Erc20Contract(final String contractAddress, final Web3j web3j, final Credentials credentials,
-                         final long chainId) {
+    public Erc20Contract(final String contractAddress, final Web3j web3j, final Credentials credentials) {
         super("", contractAddress, web3j, credentials, null);
     }
 

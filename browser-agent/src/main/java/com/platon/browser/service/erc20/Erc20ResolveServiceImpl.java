@@ -133,8 +133,7 @@ public class Erc20ResolveServiceImpl extends Erc20ServiceImpl {
         List<String> contractList = new ArrayList<>();
         ExtendEvent extendEvent = new ExtendEvent("", this.platOnClient.getWeb3jWrapper().getWeb3j(),
                 new ReadonlyTransactionManager(this.platOnClient.getWeb3jWrapper().getWeb3j(), ""),
-                new DefaultGasProvider(),
-                NetworkParams.getChainId());
+                new DefaultGasProvider());
         for (ExtendEvent.EventWrapper eventWrapper : eventWrappers) {
             Event event = ExtendEvent.buildEvent(eventWrapper.getEventName(), eventWrapper.getEventDefineList());
             // 根据地址位置，判定是否为 indexed

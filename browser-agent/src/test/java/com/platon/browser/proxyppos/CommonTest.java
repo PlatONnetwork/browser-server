@@ -67,7 +67,7 @@ public class CommonTest extends TestBase {
         String nodeId1 = "411a6c3640b6cd13799e7d4ed286c95104e3a31fbb05d7ae0004463db648f26e93f7f5848ee9795fb4bbb5f83985afd63f750dc4cf48f53b0e84d26d6834c20c";
         String nodeId2 = "77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050";
 
-        RewardContract rewardContract = RewardContract.load(defaultWeb3j,chainId);
+        RewardContract rewardContract = RewardContract.load(defaultWeb3j);
         List<Reward> rewards = rewardContract.getDelegateReward(
         "lax1ufjvfyxxxy6q3j5ayth97pcrn9pn475swqed9h",
                 Arrays.asList(nodeId1,nodeId2)

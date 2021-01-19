@@ -32,8 +32,7 @@ public class Erc20ServiceImpl {
             throw new RuntimeException("contractAddress is not null");
         }
         Erc20Contract erc20Contract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
-            Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"),
-            NetworkParams.getChainId());
+            Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7"));
         return erc20Contract;
     }
 

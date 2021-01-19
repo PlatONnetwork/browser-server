@@ -64,6 +64,15 @@ subprojects {
         mavenCentral()
     }
 
+//    configurations {
+//        all {
+////            exclude module: "junit"
+////            默认24小时 这样配置jar包会直接去配置的仓库拿
+//            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+//        }
+//    }
+
+
     dependencies {
         testCompile "junit:junit:$junitVersion"
         testCompile "org.projectlombok:lombok:${lombokVersion}"

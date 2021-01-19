@@ -1,29 +1,27 @@
 package com.platon.browser.utils;
 
 import com.platon.parameters.NetworkParameters;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Component
+@Getter
 public class NetworkParams {
 
-	private static Long chainId;
+	@Value("${platon.chainId}")
+	private long chainId;
 
-	public static Long getChainId() {
-		if(chainId == null) {
-			return NetworkParameters.getChainId();
-		}
-		return chainId;
-	}
+	@Value("${platon.addressPrefix}")
+	private String hrp;
 
-	/**
-	 * 默认主网链id100
-	 * @param chainId
-	 */
-	@Value("${platon.chainId:100}")
-	public void setChainId(String chainId) {
-		NetworkParams.chainId = Long.valueOf(chainId);
+	@Value("${platon.valueUnit}")
+	private String unit;
+
+	@PostConstruct
+	public void init(){
+		NetworkParameters.init(chainId,hrp);
 	}
-	
-	
 }

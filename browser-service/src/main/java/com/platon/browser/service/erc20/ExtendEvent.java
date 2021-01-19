@@ -29,11 +29,11 @@ public class ExtendEvent extends Contract {
                     new TypeReference<Uint8>() {},
                     new TypeReference<Uint256>() {}));
 
-    public ExtendEvent(String contractAddress, Web3j web3j, Credentials credentials, GasProvider gasProvider, long chainId) {
+    public ExtendEvent(String contractAddress, Web3j web3j, Credentials credentials, GasProvider gasProvider) {
         super(BINARY, contractAddress, web3j, credentials, gasProvider);
     }
 
-    public ExtendEvent(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider gasProvider, long chainId) {
+    public ExtendEvent(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider gasProvider) {
         super(BINARY, contractAddress, web3j, transactionManager, gasProvider);
     }
 

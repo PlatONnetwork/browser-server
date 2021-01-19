@@ -1,13 +1,12 @@
 package com.platon.browser.client;
 
+import com.platon.browser.enums.Web3jProtocolEnum;
+import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.contracts.ppos.*;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.Web3jService;
 import com.platon.protocol.http.HttpService;
 import com.platon.protocol.websocket.WebSocketService;
-import com.platon.browser.enums.Web3jProtocolEnum;
-import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.browser.utils.NetworkParams;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,7 +113,7 @@ public class RetryableClient {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     private void updateContract(){
-    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
+    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j());
         delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j());
         nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j());
         proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j());
