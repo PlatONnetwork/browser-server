@@ -1,8 +1,9 @@
 package com.platon.browser.service.erc;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
 import com.alaya.crypto.Credentials;
-import com.alaya.tx.exceptions.ContractCallException;
 import com.alaya.tx.gas.ContractGasProvider;
 import com.alaya.tx.gas.GasProvider;
 import com.platon.browser.client.PlatOnClient;
@@ -13,15 +14,16 @@ import com.platon.browser.v0151.contract.Erc721Contract;
 import com.platon.browser.v0151.contract.ErcContract;
 import com.platon.browser.v0151.enums.ErcTypeEnum;
 import com.platon.browser.v0151.service.ErcDetectService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.math.BigInteger;
 
-@Slf4j
 @Component
 public class ErcServiceImpl {
+
+    private static final Log log = LogFactory.get();
 
     private static final String PRIVATE_KEY = "4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7";
 
@@ -46,6 +48,7 @@ public class ErcServiceImpl {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
+    @Valid
     public BigInteger getBalance(String contractAddress, String account) {
         BigInteger balance = BigInteger.ZERO;
         try {
@@ -54,10 +57,8 @@ public class ErcServiceImpl {
             if (ObjectUtil.isNotNull(ercContract)) {
                 balance = ercContract.balanceOf(account).send();
             }
-        } catch (ContractCallException e) {
-            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
-            log.error("获取地址代币余额异常", e);
+            log.error(e, "获取地址代币余额异常,contractAddress:{},account:{}", contractAddress, account);
         }
         return balance;
     }
@@ -78,10 +79,8 @@ public class ErcServiceImpl {
             if (ObjectUtil.isNotNull(ercContract)) {
                 totalSupply = ercContract.totalSupply().send();
             }
-        } catch (ContractCallException e) {
-            log.debug(" not erc contract,{}", contractAddress);
         } catch (Exception e) {
-            log.error(" erc get totalSupply error", e);
+            log.error(e, "获取供应总量异常,contractAddress：{}", contractAddress);
         }
         return totalSupply;
     }
@@ -112,8 +111,8 @@ public class ErcServiceImpl {
     /**
      * 获取TokenURI
      *
-     * @param contractAddress
-     * @param tokenId
+     * @param contractAddress 合约地址
+     * @param tokenId         token id
      * @return java.lang.String
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
@@ -127,8 +126,9 @@ public class ErcServiceImpl {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }
         } catch (Exception e) {
-            log.error("", e);
+            log.error(e, "getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId);
         }
         return tokenURI;
     }
+
 }
