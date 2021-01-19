@@ -1,5 +1,8 @@
 import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonBuilder
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 group = 'com.platon.browser'
 version = "${projectVersion}"
@@ -22,10 +25,29 @@ def yamlFilter = new FilenameFilter() {
 file("${projectDir.path}/docs/apidef").listFiles(yamlFilter).each { api ->
     file("${projectDir.path}/docs/apidef/${api.name}.json").write(new JsonBuilder(new Yaml().load(api.text.replace("_VERSION_","$projectVersion"))).toString(),"utf-8")
 }
-file("${projectDir.path}/estpl").listFiles(yamlFilter).each{tpl ->
-    file("browser-agent/src/main/resources/estpl/" + tpl.name).write(tpl.text,"utf-8")
-    file("browser-service/src/test/resources/estpl/" + tpl.name).write(tpl.text,"utf-8")
+
+file("${projectDir.path}/estpl").listFiles(yamlFilter).each { tpl ->
+    Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-agent/src/main/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
+    Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-service/src/test/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
 }
+
+def recursiveProcess(startDir,replaceDir){
+    file(startDir).listFiles().each{conf ->
+        if(conf.isDirectory()) {
+            recursiveProcess(conf.path,replaceDir)
+        }else{
+            def classPathFile = file(conf.path.replace(replaceDir,'browser-api/build/resources/main/public'))
+            def packagePathFile = file(conf.path.replace(replaceDir,'browser-api/build/package/public'))
+            if(!classPathFile.exists()) classPathFile.parentFile.mkdirs()
+            if(!packagePathFile.exists()) packagePathFile.parentFile.mkdirs()
+            Files.copy(Paths.get(conf.path), Paths.get(classPathFile.path), StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(Paths.get(conf.path), Paths.get(packagePathFile.path), StandardCopyOption.REPLACE_EXISTING)
+        }
+    }
+}
+recursiveProcess('webconfig','webconfig')
+recursiveProcess('docs','docs')
+
 
 apply plugin: "org.sonarqube"
 
