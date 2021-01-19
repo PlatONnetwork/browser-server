@@ -87,9 +87,8 @@ public class EsImportService {
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (null != tx && null != tx.getErc20TxList() && !tx.getErc20TxList().isEmpty()) {
-                    result.addAll(tx.getErc20TxList());
-                }
+                if(tx.getErc20TxList().isEmpty())continue;
+                result.addAll(tx.getErc20TxList());
             }
         }
         return result;
@@ -102,9 +101,8 @@ public class EsImportService {
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (null != tx && null != tx.getErc20TxList() && !tx.getErc20TxList().isEmpty()) {
-                    result.addAll(tx.getErc721TxList());
-                }
+                if (tx.getErc721TxList().isEmpty()) continue;
+                result.addAll(tx.getErc721TxList());
             }
         }
         return result;
