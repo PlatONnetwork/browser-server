@@ -4,7 +4,7 @@ info:
   title: 浏览器API文档
   description:
 host: localhost:9061
-basePath: /browser-server
+basePath: "_BASE_PATH_"
 
 schemes:
   - http

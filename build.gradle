@@ -23,7 +23,7 @@ def yamlFilter = new FilenameFilter() {
     }
 }
 file("${projectDir.path}/docs/apidef").listFiles(yamlFilter).each { api ->
-    file("${projectDir.path}/docs/apidef/${api.name}.json").write(new JsonBuilder(new Yaml().load(api.text.replace("_VERSION_","$projectVersion"))).toString(),"utf-8")
+    file("${projectDir.path}/docs/apidef/${api.name}.json").write(new JsonBuilder(new Yaml().load(api.text.replace("_VERSION_","$projectVersion").replace("_BASE_PATH_","/browser-api"))).toString(),"utf-8")
 }
 
 file("${projectDir.path}/estpl").listFiles(yamlFilter).each { tpl ->
@@ -31,10 +31,10 @@ file("${projectDir.path}/estpl").listFiles(yamlFilter).each { tpl ->
     Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-service/src/test/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
 }
 
-def recursiveProcess(startDir,replaceDir){
+def recursiveCopy(startDir,replaceDir){
     file(startDir).listFiles().each{conf ->
         if(conf.isDirectory()) {
-            recursiveProcess(conf.path,replaceDir)
+            recursiveCopy(conf.path,replaceDir)
         }else{
             def classPathFile = file(conf.path.replace(replaceDir,'browser-api/build/resources/main/public'))
             def packagePathFile = file(conf.path.replace(replaceDir,'browser-api/build/package/public'))
@@ -45,8 +45,8 @@ def recursiveProcess(startDir,replaceDir){
         }
     }
 }
-recursiveProcess('webconfig','webconfig')
-recursiveProcess('docs','docs')
+recursiveCopy('webconfig','webconfig')
+recursiveCopy('docs','docs')
 
 
 apply plugin: "org.sonarqube"
