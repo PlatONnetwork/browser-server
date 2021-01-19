@@ -63,6 +63,9 @@ public class BlockAnalyzer {
                 CollectionTransaction transaction = transactionAnalyzer.analyze(result,rawTransaction,receiptMap.get(rawTransaction.getHash()));
                 // 把解析好的交易添加到当前区块的交易列表
                 result.getTransactions().add(transaction);
+                // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
+                result.setErc20TxQty(result.getErc20TxQty()+transaction.getErc20TxList().size());
+                result.setErc721TxQty(result.getErc721TxQty()+transaction.getErc721TxList().size());
             }
         }
         return result;

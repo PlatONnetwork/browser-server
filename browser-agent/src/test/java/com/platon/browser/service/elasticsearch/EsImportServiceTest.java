@@ -2,7 +2,6 @@ package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Assert;
 import org.junit.Before;

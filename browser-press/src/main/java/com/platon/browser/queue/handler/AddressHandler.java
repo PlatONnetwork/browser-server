@@ -73,7 +73,8 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
             address.setStakingValue(BigDecimal.ZERO);
             address.setTransferQty(0);
             address.setTxQty(0);
-            address.setTokenQty(0);
+            address.setErc20TxQty(0);
+            address.setErc721TxQty(0);
             address.setUpdateTime(new Date());
             address.setType(1);
             address.setContractName("");

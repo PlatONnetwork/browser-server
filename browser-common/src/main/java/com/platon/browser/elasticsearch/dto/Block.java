@@ -1,22 +1,23 @@
 package com.platon.browser.elasticsearch.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 @Data
 @Accessors(chain = true)
 public class Block {
-    @JsonIgnore
+    @JSONField(serialize = false)
     protected List<Transaction> transactions = new ArrayList<>();
-    @JsonIgnore
-    private Integer tokenQty = 0;
+    @JSONField(serialize = false)
+    private Integer erc20TxQty = 0;
+    @JSONField(serialize = false)
+    private Integer erc721TxQty = 0;
     private Long num;
     private String hash;
     private String pHash;
