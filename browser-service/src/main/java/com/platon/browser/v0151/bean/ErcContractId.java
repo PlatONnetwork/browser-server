@@ -11,9 +11,21 @@ import java.math.BigDecimal;
  */
 @Data
 public class ErcContractId {
-    private ErcTypeEnum typeEnum=ErcTypeEnum.UNKNOWN;
+    private ErcTypeEnum typeEnum = ErcTypeEnum.UNKNOWN;
+    /**
+     * 合约名称
+     */
     private String name;
+    /**
+     * 合约符号
+     */
     private String symbol;
+    /**
+     * 合约精度
+     */
     private Integer decimal;
+    /**
+     * 供应总量
+     */
     private BigDecimal totalSupply;
 }

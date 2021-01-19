@@ -3,10 +3,12 @@ package com.platon.browser.v0151.bean;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.v0151.enums.ErcTypeEnum;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Data
+@Component
 public class ErcToken extends Token {
     private ErcTypeEnum typeEnum;
     public ErcToken() {

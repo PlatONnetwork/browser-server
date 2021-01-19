@@ -28,4 +28,38 @@
             update `erc20_token_address_rel` set `total_supply` = #{item.totalSupply} where `contract` = #{item.address};
         </foreach>
     </update>
+
+    <!--在定时任务ErcTokenUpdateTask中，定时检测Token地址的总发行量，并更新至相关表-->
+    <update id="updateTokenTotalSupply">
+        <foreach collection="totalSupplyParams" item="item" index="index">
+            update `token` set `total_supply` = #{item.totalSupply},`update_time` = #{item.updateTime} where `address` = #{item.address};
+        </foreach>
+    </update>
+
+    <!-- 更新token_holder表balance -->
+    <update id="updateAddressBalance">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update `token_holder`
+            <set>
+                `balance` = #{item.balance},
+                `update_time` = #{item.updateTime}
+            </set>
+            where token_address=#{item.tokenAddress,jdbcType=VARCHAR} AND address=#{item.address,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+    <!-- 更新token_inventory -->
+    <update id="updateTokenInventory">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update `token_inventory`
+            <set>
+                `image` = #{item.image},
+                `description` = #{item.description},
+                `name` = #{item.name},
+                `update_time` = #{item.updateTime}
+            </set>
+            where token_address=#{item.tokenAddress,jdbcType=VARCHAR} AND token_id=#{item.tokenId}
+        </foreach>
+    </update>
+
 </mapper>

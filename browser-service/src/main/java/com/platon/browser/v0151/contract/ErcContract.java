@@ -14,6 +14,7 @@ public interface ErcContract {
     RemoteCall<String> symbol();
     RemoteCall<BigInteger> decimals();
     RemoteCall<BigInteger> totalSupply();
+    RemoteCall<BigInteger> balanceOf(String who);
     List<ErcTxEvent> getTxEvents(final TransactionReceipt transactionReceipt);
     RemoteCall<String> getTokenURI(BigInteger tokenId) throws MethodNotSupportedException;
     @Data

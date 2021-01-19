@@ -265,6 +265,7 @@ public class Erc721Contract extends Contract implements ErcContract {
         return executeRemoteCallTransaction(function);
     }
 
+    @Override
     public RemoteCall<BigInteger> balanceOf(String _owner) {
         final Function function = new Function(FUNC_BALANCEOF,
                 Collections.singletonList(new Address(_owner)),
