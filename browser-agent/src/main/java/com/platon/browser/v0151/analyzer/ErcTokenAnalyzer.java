@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,28 +84,29 @@ public class ErcTokenAnalyzer {
         return token;
     }
 
-    private List<ErcTx> resolveErcTxFromEvent(CollectionTransaction tx,List<ErcContract.ErcTxEvent> eventList){
+    private List<ErcTx> resolveErcTxFromEvent(Token token,CollectionTransaction tx,List<ErcContract.ErcTxEvent> eventList){
         List<ErcTx> txList = new ArrayList<>();
         AtomicInteger seq = new AtomicInteger((int)(tx.getNum()*100000));
         eventList.forEach(event -> {
-            // 仅添加与指定的合约地址相同的记录
-            if (event.getLog().getAddress().equalsIgnoreCase(tx.getTo())) {
-                // 转换参数进行设置内部交易
-                ErcTx ercTx = ErcTx.builder()
-                        .seq(seq.longValue())
-                        .contract(tx.getTo())
-                        .from(event.getFrom())
-                        .to(event.getTo())
-                        .value(event.getValue().toString())
-                        .bn(tx.getNum())
-                        .hash(tx.getHash())
-                        .bTime(tx.getTime()).value(tx.getValue())
-                        .fromType(addressCache.getTypeData(event.getFrom()))
-                        .toType(addressCache.getTypeData(event.getTo()))
-                        .build();
-                seq.getAndIncrement();
-                txList.add(ercTx);
-            }
+            // 转换参数进行设置内部交易
+            ErcTx ercTx = ErcTx.builder()
+                    .seq(seq.longValue())
+                    .bn(tx.getNum())
+                    .hash(tx.getHash())
+                    .bTime(tx.getTime())
+                    .txFee(tx.getCost())
+                    .fromType(addressCache.getTypeData(event.getFrom()))
+                    .toType(addressCache.getTypeData(event.getTo()))
+                    .from(event.getFrom())
+                    .to(event.getTo())
+                    .value(event.getValue().toString())
+                    .name(token.getName())
+                    .symbol(token.getSymbol())
+                    .decimal(token.getDecimal())
+                    .contract(token.getAddress())
+                    .build();
+            seq.getAndIncrement();
+            txList.add(ercTx);
         });
         return txList;
     }
@@ -140,13 +142,13 @@ public class ErcTokenAnalyzer {
         switch (typeEnum){
             case ERC20:
                 eventList = ercDetectService.getErc20TxEvents(transactionReceipt);
-                txList = resolveErcTxFromEvent(tx,eventList);
+                txList = resolveErcTxFromEvent(token,tx,eventList);
                 tx.setErc20TxList(txList);
                 tx.setErc20TxInfo(getErcTxInfo(txList));
                 break;
             case ERC721:
                 eventList = ercDetectService.getErc721TxEvents(transactionReceipt);
-                txList = resolveErcTxFromEvent(tx,eventList);
+                txList = resolveErcTxFromEvent(token,tx,eventList);
                 tx.setErc721TxList(txList);
                 tx.setErc721TxInfo(getErcTxInfo(txList));
                 ercTokenInventoryAnalyzer.analyze(txList);
