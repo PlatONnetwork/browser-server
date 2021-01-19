@@ -62,4 +62,19 @@
         </foreach>
     </update>
 
+    <select id="findTokenHolder" resultType="com.platon.browser.task.bean.TokenHolderNum">
+        SELECT token_address as tokenAddress,COUNT(1) as holderNum FROM token_holder GROUP BY token_address;
+    </select>
+
+    <update id="updateTokenHolder">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update `token`
+            <set>
+                `holder` = #{item.holderNum},
+                `update_time` = #{item.updateTime}
+            </set>
+            where address = #{item.tokenAddress}
+        </foreach>
+    </update>
+
 </mapper>

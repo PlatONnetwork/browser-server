@@ -16,6 +16,7 @@ import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.param.sync.TotalSupplyUpdateParam;
 import com.platon.browser.service.erc.ErcServiceImpl;
+import com.platon.browser.task.bean.TokenHolderNum;
 import com.platon.browser.utils.AppStatusUtil;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -180,6 +181,30 @@ public class ErcTokenUpdateTask {
             }
         } catch (Exception e) {
             log.error(e, "定期更新token_inventory异常");
+        }
+    }
+
+    /**
+     * 定期更新token对应的持有人的数量
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/19
+     */
+    @Scheduled(cron = "0/5  * * * * ?")
+    public void cronUpdateTokenHolder() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning())
+            return;
+        try {
+            List<TokenHolderNum> list = syncTokenInfoMapper.findTokenHolder();
+            if (CollUtil.isNotEmpty(list)) {
+                list.stream().forEach(value -> value.setUpdateTime(DateUtil.date()));
+                syncTokenInfoMapper.updateTokenHolder(list);
+            }
+        } catch (Exception e) {
+            log.error(e, "定期更新token对应的持有人的数量异常");
         }
     }
 
