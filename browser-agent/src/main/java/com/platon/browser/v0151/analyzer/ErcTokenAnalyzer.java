@@ -20,7 +20,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,6 +78,7 @@ public class ErcTokenAnalyzer {
         }
         if(token.getTypeEnum()!= ErcTypeEnum.UNKNOWN){
             // 入库ERC721或ERC20 Token记录
+            token.setTokenTxQty(1);
             tokenMapper.insert(token);
         }
         return token;
@@ -155,5 +155,7 @@ public class ErcTokenAnalyzer {
                 break;
         }
         ercTokenHolderAnalyzer.analyze(txList);
+        token.setTokenTxQty(token.getTokenTxQty()+txList.size());
+        tokenMapper.updateByPrimaryKey(token);
     }
 }

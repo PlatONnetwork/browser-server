@@ -59,8 +59,6 @@ public class TransactionAnalyzer {
                     .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
             addressCache.getWasmContractAddressCache()
                     .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
-            addressCache.getEvmErc20ContractAddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
         }
     }
 

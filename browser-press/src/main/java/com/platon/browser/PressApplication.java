@@ -61,10 +61,10 @@ public class PressApplication implements ApplicationRunner {
     private StakePublisher stakePublisher;
     @Autowired
     private DelegationPublisher delegationPublisher;
-    @Autowired
-    private Erc20TokenPublisher erc20TokenPublisher;
-    @Autowired
-    private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
+//    @Autowired
+//    private Erc20TokenPublisher erc20TokenPublisher;
+//    @Autowired
+//    private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
     @Autowired
     private ProposalPublisher proposalPublisher;
     @Autowired
@@ -77,8 +77,8 @@ public class PressApplication implements ApplicationRunner {
     private EstimatePublisher estimatePublisher;
     @Autowired
     private SlashPublisher slashPublisher;
-    @Autowired
-    private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
+//    @Autowired
+//    private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -168,10 +168,10 @@ public class PressApplication implements ApplicationRunner {
             // 构造【gas】数据
             makeEstimate(blockResult);*/
 
-            // 构造【代币】数据
-            makeErc20Token(blockResult);
-            // 构造【代币转账】数据
-            makeTokenTransferRecord(blockResult);
+//            // 构造【代币】数据
+//            makeErc20Token(blockResult);
+//            // 构造【代币转账】数据
+//            makeTokenTransferRecord(blockResult);
 
             // 区块号累加
             blockNumber=blockNumber.add(BigInteger.ONE);
@@ -495,43 +495,43 @@ public class PressApplication implements ApplicationRunner {
         }
     }
 
-    /**
-     * 构造代币合约
-     * @param blockResult
-     */
-    private void makeErc20Token(BlockResult blockResult){
-        if (currentTokenCount < tokenMaxCount) {
-            List<Erc20Token> tokenList = new ArrayList<>();
-            for (Transaction tx : blockResult.getTransactionList()) {
-                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
-                    tokenList.add(dataGenService.getErc20Token(tx));
-                    currentTokenCount++;
-                }
-            }
-            erc20TokenPublisher.publish(tokenList);
-
-            // 代币与地址关系：1:1000000，按此关系来（一般）
-            List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
-            tokenList.forEach(token -> {
-                erc20TokenAddressRelList.addAll(dataGenService.getErc20TokenAddressRel(token, addressCountPerToken));
-            });
-            erc20TokenAddressRelPublisher.publish(erc20TokenAddressRelList);
-        }
-    }
-
-    /**
-     * 构建代币转账交易
-     */
-    private void makeTokenTransferRecord(BlockResult blockResult) {
-        if (currentTokenTransferCount < tokenTransferMaxCount) {
-            List<OldErcTx> transferRecordList = new ArrayList<>();
-            for (Transaction tx : blockResult.getTransactionList()) {
-                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
-                    transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
-                    currentTokenTransferCount++;
-                }
-            }
-            esTokenTransferRecordPublisher.publish(transferRecordList);
-        }
-    }
+//    /**
+//     * 构造代币合约
+//     * @param blockResult
+//     */
+//    private void makeErc20Token(BlockResult blockResult){
+//        if (currentTokenCount < tokenMaxCount) {
+//            List<Erc20Token> tokenList = new ArrayList<>();
+//            for (Transaction tx : blockResult.getTransactionList()) {
+//                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
+//                    tokenList.add(dataGenService.getErc20Token(tx));
+//                    currentTokenCount++;
+//                }
+//            }
+////            erc20TokenPublisher.publish(tokenList);
+//
+//            // 代币与地址关系：1:1000000，按此关系来（一般）
+//            List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
+//            tokenList.forEach(token -> {
+//                erc20TokenAddressRelList.addAll(dataGenService.getErc20TokenAddressRel(token, addressCountPerToken));
+//            });
+////            erc20TokenAddressRelPublisher.publish(erc20TokenAddressRelList);
+//        }
+//    }
+//
+//    /**
+//     * 构建代币转账交易
+//     */
+//    private void makeTokenTransferRecord(BlockResult blockResult) {
+//        if (currentTokenTransferCount < tokenTransferMaxCount) {
+//            List<OldErcTx> transferRecordList = new ArrayList<>();
+//            for (Transaction tx : blockResult.getTransactionList()) {
+//                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
+//                    transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
+//                    currentTokenTransferCount++;
+//                }
+//            }
+////            esTokenTransferRecordPublisher.publish(transferRecordList);
+//        }
+//    }
 }
