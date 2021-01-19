@@ -10,7 +10,6 @@ import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
-import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.service.receipt.ReceiptService;
 import com.platon.browser.utils.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -40,31 +39,9 @@ public class ConsistencyService {
     @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
     @Resource
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
-    @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
-    /**
-     * 同步ARC20相关地址交易数统计数据
-     */
-/*
-
-    private void syncTxCount(){
-        TokenTxSummary summary = oldEsErc20TxRepository.groupContractTxCount();
-        List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParams = summary.addressTokenQtyUpdateParamList();
-        List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.erc20TokenAddressRelTxCountUpdateParamList();
-        List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.erc20TokenTxCountUpdateParamList();
-        NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam = summary.networkStatTokenQtyUpdateParam();
-        syncTokenInfoMapper.syncTokenTxCount(
-            addressTokenQtyUpdateParams,
-            erc20TokenTxCountUpdateParams,
-            erc20TokenAddressRelTxCountUpdateParams,
-            networkStatTokenQtyUpdateParam
-        );
-        log.info("同步ES中的Token交易数至Mysql数据库成功！");
-    }
-*/
 
     /**
      * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准

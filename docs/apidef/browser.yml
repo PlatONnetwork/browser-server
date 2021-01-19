@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.15.1.0
+  version: _VERSION_
   title: 浏览器API文档
   description:
 host: localhost:9061

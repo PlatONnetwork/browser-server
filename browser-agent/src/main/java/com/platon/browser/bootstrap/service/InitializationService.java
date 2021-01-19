@@ -75,8 +75,6 @@ public class InitializationService {
     @Resource
     private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Resource
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
-    @Resource
     private EsNodeOptRepository ESNodeOptRepository;
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
@@ -290,7 +288,6 @@ public class InitializationService {
         	ESTransactionRepository.initIndex();
         	ESDelegationRewardRepository.initIndex();
         	ESNodeOptRepository.initIndex();
-            oldEsErc20TxRepository.initIndex();
         	esTransferTxRepository.initIndex();
         	esErc20TxRepository.initIndex();
         	esErc721TxRepository.initIndex();

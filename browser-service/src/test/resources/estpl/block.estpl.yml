@@ -1,104 +1,82 @@
 index_patterns:
-  - "*_transaction"
+  - "*_block"
 settings:
   index:
-    max_result_window: '2000000000'
+    max_result_window: '1000000000'
     number_of_shards: '5'
     number_of_replicas: '1'
 mappings:
   properties:
-    type:
+    tx_gas_limit:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    reward:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    tx_qty:
       type: short
-    seq:
-      type: long
-    bHash:
-      type: keyword
     num:
       type: long
-    index:
+    gas_used:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    node_name:
+      type: text
+    s_qty:
       type: short
-    hash:
-      type: keyword
-    from:
-      type: keyword
-    to:
-      type: keyword
-    fromType:
-      type: integer
-    toType:
-      type: integer
-    nonce:
-      type: long
-    gasLimit:
+    tran_qty:
+      type: short
+    miner:
       norms: false
       index: false
       type: text
       doc_values: false
-    gasPrice:
+    p_qty:
+      type: short
+    tx_fee:
       norms: false
       index: false
       type: text
       doc_values: false
-    gasUsed:
+    gas_limit:
       norms: false
       index: false
       type: text
       doc_values: false
-    cost:
+    cre_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    size:
       norms: false
       index: false
       type: text
       doc_values: false
-    value:
+    d_qty:
+      type: short
+    p_hash:
+      norms: false
+      index: false
       type: text
-    status:
-      type: integer
+      doc_values: false
+    extra:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    upd_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
     time:
       format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
       type: date
-    input:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    info:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    erc721List:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    erc20List:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    transferList:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    pposList:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    failReason:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
-    creTime:
-      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
-      type: date
-    updTime:
-      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
-      type: date
-    remark:
-      norms: false
-      index: false
-      type: text
-      doc_values: false
+    hash:
+      type: keyword
+    node_id:
+      type: keyword
+

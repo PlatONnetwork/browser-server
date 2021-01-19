@@ -51,7 +51,7 @@ import java.util.Map;
 @Slf4j
 public abstract class AbstractEsRepository {
 	private final static String CLASSPATH_ES_TPL_DIR = "/estpl/";
-	private final static String TPL_FILE_SUFFIX=".yml";
+	private final static String TPL_FILE_SUFFIX=".estpl.yml";
 	private static final String CONSUME_TIME_TIPS="处理耗时:{} ms";
 	@Resource(name = "restHighLevelClient")
 	protected RestHighLevelClient client;
