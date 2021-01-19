@@ -2,24 +2,19 @@ package com.platon.browser.bootstrap.service;
 
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.*;
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.bean.CollectionNetworkStat;
-import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
-import com.platon.browser.bean.AnnualizedRateInfo;
-import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.bean.CustomNode;
-import com.platon.browser.bean.CustomProposal;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.service.elasticsearch.*;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
@@ -156,7 +151,6 @@ public class InitializationService {
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
         addressList = addressMapper.selectByExample(addressExample);
-        addressCache.initEvmErc20ContractAddressCache(addressList);
 
         // 初始化WASM合约地址缓存，用于后续交易的类型判断（调用WASM合约）
         addressExample = new AddressExample();
