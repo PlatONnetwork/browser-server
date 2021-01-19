@@ -6,7 +6,6 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.v0150.bean.AdjustParam;
 import org.apache.commons.io.FileUtils;

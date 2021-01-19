@@ -185,7 +185,8 @@ public class AddressCache {
             address = this.createDefaultAddress(addr);
             this.addressMap.put(addr, address);
         }
-        address.setTokenQty(address.getTokenQty() + 1);
+        address.setErc20TxQty(address.getErc20TxQty() + 1);
+        address.setErc721TxQty(address.getErc721TxQty() + 1);
     }
 
     private Address createDefaultAddress(String addr) {
@@ -212,7 +213,8 @@ public class AddressCache {
         }
 
         address.setTxQty(0);
-        address.setTokenQty(0);
+        address.setErc20TxQty(0);
+        address.setErc721TxQty(0);
         address.setTransferQty(0);
         address.setStakingQty(0);
         address.setDelegateQty(0);

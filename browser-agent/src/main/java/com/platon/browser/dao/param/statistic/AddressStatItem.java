@@ -26,9 +26,13 @@ public class AddressStatItem {
     private Integer txQty;
 
     /**
-     * token交易总数
+     * erc20交易数
      */
-    private Integer tokenQty;
+    private Integer erc20TxQty;
+	/**
+	 * erc721交易数
+	 */
+	private Integer erc721TxQty;
 
 	/**
 	 * 转账交易总数

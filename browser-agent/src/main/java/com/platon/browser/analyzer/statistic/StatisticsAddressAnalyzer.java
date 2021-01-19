@@ -44,7 +44,10 @@ public class StatisticsAddressAnalyzer {
         List<String> addresses = new ArrayList<>();
         this.addressCache.getAll().forEach(cache -> {
             AddressStatItem item = AddressStatItem.builder().address(cache.getAddress()).type(cache.getType())
-                .txQty(cache.getTxQty()).tokenQty(cache.getTokenQty()).transferQty(cache.getTransferQty())
+                .txQty(cache.getTxQty())
+                    .erc20TxQty(cache.getErc20TxQty())
+                    .erc721TxQty(cache.getErc721TxQty())
+                    .transferQty(cache.getTransferQty())
                 .delegateQty(cache.getDelegateQty())
                 .stakingQty(cache.getStakingQty()).proposalQty(cache.getProposalQty())
                 .contractName(cache.getContractName()).contractCreate(cache.getContractCreate())
@@ -84,7 +87,8 @@ public class StatisticsAddressAnalyzer {
             Address fromDb = dbMap.get(fromCache.getAddress());
             if (null != fromDb) {
                 fromCache.setTxQty(fromDb.getTxQty() + fromCache.getTxQty()); // 交易数量
-                fromCache.setTokenQty(fromDb.getTokenQty() + fromCache.getTokenQty()); // token交易数量
+                fromCache.setErc20TxQty(fromDb.getErc20TxQty() + fromCache.getErc20TxQty()); // token交易数量
+                fromCache.setErc721TxQty(fromDb.getErc721TxQty() + fromCache.getErc721TxQty()); // token交易数量
                 fromCache.setTransferQty(fromDb.getTransferQty() + fromCache.getTransferQty()); // 转账数量
                 fromCache.setDelegateQty(fromDb.getDelegateQty() + fromCache.getDelegateQty()); // 委托数量
                 fromCache.setStakingQty(fromDb.getStakingQty() + fromCache.getStakingQty()); // 质押数量

@@ -154,7 +154,6 @@ public class ErcTokenAnalyzer {
                 ercTokenInventoryAnalyzer.analyze(txList);
                 break;
         }
-        ercTokenHolderAnalyzer.analyze(txList);
         token.setTokenTxQty(token.getTokenTxQty()+txList.size());
         tokenMapper.updateByPrimaryKey(token);
     }
