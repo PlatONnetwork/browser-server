@@ -1,3 +1,5 @@
+PATH=$PATH:../../../tools
+echo $PATH
 #清除Redis缓存
 redis-cli -c -h 192.168.16.171 -p 7000 -a platscan DEL browser:_VERSION_:_PROFILE_:blocks;
 redis-cli -c -h 192.168.16.171 -p 7001 -a platscan DEL browser:_VERSION_:_PROFILE_:blocks;
