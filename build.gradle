@@ -160,6 +160,10 @@ subprojects {
                     ,"utf-8")
                 if(startTpl.exists()) file("build/package/start.sh").write(startTpl.text.replace('_PROJECT_NAME_',project.name),"utf-8")
                 if(stopTpl.exists()) file("build/package/stop.sh").write(stopTpl.text.replace('_PROJECT_NAME_',project.name),"utf-8")
+                def fullSql=file("${scriptDir}/${project.parent.name}-${projectVersion}.all.sql")
+                if(fullSql.exists()) file("build/package/${project.parent.name}-${projectVersion}.all.sql").write(fullSql.text,"utf-8")
+                def upgradeSql=file("${scriptDir}/${project.parent.name}-${projectVersion}.upgrade.sql")
+                if(upgradeSql.exists()) file("build/package/${project.parent.name}-${projectVersion}.upgrade.sql").write(upgradeSql.text,"utf-8")
             }
         }
 
