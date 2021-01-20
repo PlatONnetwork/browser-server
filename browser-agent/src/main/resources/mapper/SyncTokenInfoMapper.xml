@@ -77,4 +77,18 @@
         </foreach>
     </update>
 
+    <select id="findTokenHolderType" resultType="com.platon.browser.task.bean.TokenHolderType">
+        SELECT
+            a.token_address as tokenAddress,
+            a.address as address,
+            a.balance as balance,
+            a.create_time as createTime,
+            a.update_time as updateTime,
+            a.token_tx_qty as tokenTxQty,
+            b.type AS type
+        FROM
+            token_holder a
+                LEFT JOIN token b ON a.token_address = b.address;
+    </select>
+
 </mapper>

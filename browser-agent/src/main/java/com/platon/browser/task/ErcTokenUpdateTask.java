@@ -11,12 +11,12 @@ import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
-import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.param.sync.TotalSupplyUpdateParam;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.task.bean.TokenHolderNum;
+import com.platon.browser.task.bean.TokenHolderType;
 import com.platon.browser.utils.AppStatusUtil;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -48,9 +48,6 @@ public class ErcTokenUpdateTask {
     private SyncTokenInfoMapper syncTokenInfoMapper;
 
     @Resource
-    private TokenHolderMapper tokenHolderMapper;
-
-    @Resource
     private TokenInventoryMapper tokenInventoryMapper;
 
     @Resource
@@ -79,27 +76,24 @@ public class ErcTokenUpdateTask {
             return;
         // 更新token_holder表的balance字段
         try {
-            List<TokenHolder> data = tokenHolderMapper.selectByExample(null);
-            if (CollUtil.isNotEmpty(data)) {
-                int size = data.size();
+            List<TokenHolderType> tokenTypeList = syncTokenInfoMapper.findTokenHolderType();
+            if (CollUtil.isNotEmpty(tokenTypeList)) {
+                int size = tokenTypeList.size();
                 List<TokenHolder> tokenHolderList = Collections.synchronizedList(new ArrayList<>(size));
                 CountDownLatch countDownLatch = new CountDownLatch(size);
-                data.forEach(d -> {
+                tokenTypeList.forEach(d -> {
                     EXECUTOR.submit(() -> {
                         // 查询余额并回填
-                        BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getAddress());
-                        TokenHolder tokenHolder = new TokenHolder();
-                        tokenHolder.setTokenAddress(d.getTokenAddress());
-                        tokenHolder.setAddress(d.getAddress());
-                        tokenHolder.setBalance(new BigDecimal(balance));
-                        tokenHolder.setUpdateTime(DateUtil.date());
-                        tokenHolderList.add(tokenHolder);
+                        BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getType(), d.getAddress());
+                        d.setBalance(new BigDecimal(balance));
+                        d.setUpdateTime(DateUtil.date());
+                        tokenHolderList.add(d);
                         countDownLatch.countDown();
                     });
                 });
                 countDownLatch.await();
                 if (CollUtil.isNotEmpty(tokenHolderList)) {
-                    this.syncTokenInfoMapper.updateAddressBalance(tokenHolderList);
+                    syncTokenInfoMapper.updateAddressBalance(tokenHolderList);
                 }
             }
         } catch (Exception e) {
@@ -137,7 +131,7 @@ public class ErcTokenUpdateTask {
     }
 
     /**
-     * 定期更新token_inventory
+     * 定期更新token_inventory表name、description、image
      *
      * @param
      * @return void
@@ -200,12 +194,12 @@ public class ErcTokenUpdateTask {
         try {
             List<TokenHolderNum> list = syncTokenInfoMapper.findTokenHolder();
             if (CollUtil.isNotEmpty(list)) {
-                list.stream().forEach(value -> value.setUpdateTime(DateUtil.date()));
+                list.forEach(value -> value.setUpdateTime(DateUtil.date()));
                 syncTokenInfoMapper.updateTokenHolder(list);
             }
         } catch (Exception e) {
             log.error(e, "定期更新token对应的持有人的数量异常");
         }
     }
-
+    
 }
