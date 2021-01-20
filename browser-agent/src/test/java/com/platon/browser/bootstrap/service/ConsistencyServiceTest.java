@@ -9,7 +9,6 @@ import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
-import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
 import com.platon.browser.service.receipt.ReceiptService;
 import org.junit.Before;
@@ -44,8 +43,6 @@ public class ConsistencyServiceTest extends AgentTestBase {
     private BootstrapEventPublisher bootstrapEventPublisher;
     @Mock
     private ShutdownCallback shutdownCallback;
-    @Mock
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Mock
     private SyncTokenInfoMapper syncTokenInfoMapper;
 

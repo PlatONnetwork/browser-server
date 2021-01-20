@@ -114,22 +114,22 @@ public class ErcDetectService {
             try {
                 contractId.setName(ercContract.name().send());
             } catch (Exception e) {
-                log.error(" erc get name error", e);
+                log.warn(" erc get name error", e);
             }
             try {
                 contractId.setSymbol(ercContract.symbol().send());
             } catch (Exception e) {
-                log.error(" erc get symbol error", e);
+                log.warn(" erc get symbol error", e);
             }
             try {
                 contractId.setDecimal(ercContract.decimals().send().intValue());
             } catch (Exception e) {
-                log.error(" erc get decimal error", e);
+                log.warn(" erc get decimal error", e);
             }
             try {
                 contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
             } catch (Exception e) {
-                log.error(" erc get totalSupply error", e);
+                log.warn(" erc get totalSupply error", e);
             }
         } catch (ContractCallException e) {
             log.error(" not erc contract,{}", ercContract, e);

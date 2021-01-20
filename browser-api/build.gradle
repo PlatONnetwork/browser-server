@@ -17,30 +17,6 @@ dependencies {
 	compile 'io.projectreactor.netty:reactor-netty:0.8.10.RELEASE'
 }
 
-// 拷贝接口文档至类路径
-task copyDocsToClasspath(type: Copy) {
-    file('build/resources/main/public').mkdirs()
-    from "${project.parent.projectDir}/docs"
-    into 'build/resources/main/public'
-}
-task copyDocsToDistribute(type: Copy) {
-    file('build/package/public').mkdirs()
-    from "${project.parent.projectDir}/docs"
-    into 'build/package/public'
-}
-
-// 拷贝网站配置文件至类路径
-task copyWebsiteConfToClasspath(type: Copy){
-    file('build/resources/main/public').mkdirs()
-    from "webconfig"
-    into 'build/resources/main/public'
-}
-task copyWebsiteConfToDistribute(type: Copy){
-    file('build/package/public').mkdirs()
-    from "webconfig"
-    into 'build/package/public'
-}
-
 //sonar扫描的路径
 sonarqube {
     properties {

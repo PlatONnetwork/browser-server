@@ -1,8 +1,11 @@
+import org.yaml.snakeyaml.Yaml
+import groovy.json.JsonBuilder
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 group = 'com.platon.browser'
 version = "${projectVersion}"
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 buildscript {
   repositories {
     maven {url "https://plugins.gradle.org/m2/"}
@@ -10,30 +13,41 @@ buildscript {
   }
   dependencies {
     classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
-    classpath 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.1'
+    classpath  'org.yaml:snakeyaml:1.27'
   }
 }
 
-/*=====================API生成配置 START=======================*/
-def apiDefDir = file(projectDir.path+"/docs/apidef")
-files(apiDefDir.listFiles(new FilenameFilter() {
+def yamlFilter = new FilenameFilter() {
     boolean accept(File dir, String name) {
         return name.endsWith(".yml")
     }
-})).each{yml ->
-    println yml.name
-    def json = yamlToJson(yml.text)
-    def jsonFile = file(apiDefDir.path+"/"+yml.name+".json")
-    jsonFile.write(json,"utf-8")
+}
+file("${projectDir.path}/docs/apidef").listFiles(yamlFilter).each { api ->
+    file("${projectDir.path}/docs/apidef/${api.name}.json").write(new JsonBuilder(new Yaml().load(api.text.replace("_VERSION_","$projectVersion").replace("_BASE_PATH_","/browser-api"))).toString(),"utf-8")
 }
 
-static yamlToJson(String yaml) {
-    ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
-    Object obj = yamlReader.readValue(yaml, Object.class);
-    ObjectMapper jsonWriter = new ObjectMapper();
-    return jsonWriter.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+file("${projectDir.path}/estpl").listFiles(yamlFilter).each { tpl ->
+    Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-agent/src/main/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
+    Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-service/src/test/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
 }
-/*=====================API生成配置 END=======================*/
+
+def recursiveCopy(startDir,replaceDir){
+    file(startDir).listFiles().each{conf ->
+        if(conf.isDirectory()) {
+            recursiveCopy(conf.path,replaceDir)
+        }else{
+            def classPathFile = file(conf.path.replace(replaceDir,'browser-api/build/resources/main/public'))
+            def packagePathFile = file(conf.path.replace(replaceDir,'browser-api/build/package/public'))
+            if(!classPathFile.exists()) classPathFile.parentFile.mkdirs()
+            if(!packagePathFile.exists()) packagePathFile.parentFile.mkdirs()
+            Files.copy(Paths.get(conf.path), Paths.get(classPathFile.path), StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(Paths.get(conf.path), Paths.get(packagePathFile.path), StandardCopyOption.REPLACE_EXISTING)
+        }
+    }
+}
+recursiveCopy('webconfig','webconfig')
+recursiveCopy('docs','docs')
+
 
 apply plugin: "org.sonarqube"
 

@@ -1,0 +1,31 @@
+index_patterns:
+  - "*_nodeopt"
+settings:
+  index:
+    max_result_window: '1000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    cre_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    b_num:
+      type: long
+    tx_hash:
+      type: text
+    upd_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    type:
+      type: integer
+    node_id:
+      type: keyword
+    desc:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
