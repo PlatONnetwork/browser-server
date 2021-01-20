@@ -51,10 +51,12 @@ public abstract class AbstractAdjustContext {
         adjustParam.setStakingLocked(staking.getStakingLocked());
         adjustParam.setStakingReduction(staking.getStakingReduction());
         adjustParam.setStakingReductionEpoch(staking.getStakingReductionEpoch());
+        adjustParam.setStakeHaveDeleReward(staking.getHaveDeleReward());
         // 设置节点相关统计字段原始状态和值
         adjustParam.setNodeTotalValue(node.getTotalValue());
         adjustParam.setNodeStatDelegateValue(node.getStatDelegateValue());
         adjustParam.setNodeStatDelegateReleased(node.getStatDelegateReleased());
+        adjustParam.setNodeHaveDeleReward(node.getHaveDeleReward());
         // 设置质押相关统计字段原始状态和值
         adjustParam.setStakeStatDelegateHes(staking.getStatDelegateHes());
         adjustParam.setStakeStatDelegateLocked(staking.getStatDelegateLocked());
