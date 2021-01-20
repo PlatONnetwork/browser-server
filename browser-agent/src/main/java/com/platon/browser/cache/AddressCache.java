@@ -177,7 +177,7 @@ public class AddressCache {
         address.setTxQty(address.getTxQty() + 1);
     }
 
-    public void updateTokenAddress(String addr) {
+    public void updateErc20TxQty(String addr) {
         if (addr == null)
             return;
         Address address = this.addressMap.get(addr);
@@ -186,6 +186,16 @@ public class AddressCache {
             this.addressMap.put(addr, address);
         }
         address.setErc20TxQty(address.getErc20TxQty() + 1);
+    }
+
+    public void updateErc721TxQty(String addr) {
+        if (addr == null)
+            return;
+        Address address = this.addressMap.get(addr);
+        if (address == null) {
+            address = this.createDefaultAddress(addr);
+            this.addressMap.put(addr, address);
+        }
         address.setErc721TxQty(address.getErc721TxQty() + 1);
     }
 
