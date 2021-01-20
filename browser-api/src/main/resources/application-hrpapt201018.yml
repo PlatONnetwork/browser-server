@@ -1,12 +1,12 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrplfp201040
+profile: hrpapt201018
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 # 服务器端口号
-server.port: 45000
+server.port: 45001
 #Spring框架内部配置
 spring:
   #数据源配置
@@ -89,7 +89,7 @@ logging:
 #初始化链相关的配置
 platon:
   # 地址HRP前缀
-  addressPrefix: lfp
+  addressPrefix: atp
   # 金额显示单位
   valueUnit: ATP
   # 交易输入参数并行解码线程数
@@ -98,7 +98,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.112.141:6789,192.168.112.141:6790
+    addresses: 192.168.120.151:6789,192.168.120.151:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -133,7 +133,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201040
+  chainId: 201018
   #Redis命名空间
   redis-namespace: browser:${profile}
 
