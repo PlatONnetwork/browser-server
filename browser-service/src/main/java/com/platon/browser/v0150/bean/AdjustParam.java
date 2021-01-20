@@ -24,6 +24,7 @@ public class AdjustParam {
     private String addr;
     private BigDecimal lock;
     private BigDecimal hes;
+    private BigDecimal reward;
 
     /*委托和质押调整通用属性*/
     private BigDecimal nodeTotalValue; // 节点有效的质押委托总数
@@ -35,9 +36,11 @@ public class AdjustParam {
     private BigDecimal delegateReleased; // 待提取的金额
     private BigDecimal nodeStatDelegateValue; // 节点有效的委托金额
     private BigDecimal nodeStatDelegateReleased; // 节点待提取的委托金额
+    private BigDecimal nodeHaveDeleReward; // 所有质押已领取委托奖励
     private BigDecimal stakeStatDelegateHes; // 质押未锁定的委托
     private BigDecimal stakeStatDelegateLocked; // 质押锁定的委托
     private BigDecimal stakeStatDelegateReleased; // 质押待提取的委托
+    private BigDecimal stakeHaveDeleReward; // 當前质押已领取委托奖励
 
     /*质押调整专用属性*/
     private int status; // 节点状态:1候选中,2退出中,3已退出,4已锁定

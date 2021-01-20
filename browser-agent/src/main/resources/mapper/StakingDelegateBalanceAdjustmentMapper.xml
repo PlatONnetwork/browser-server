@@ -15,13 +15,15 @@
         update `node` set
             `total_value`=#{adjustParam.nodeTotalValue},
             `stat_delegate_value`=#{adjustParam.nodeStatDelegateValue},
-            `stat_delegate_released`=#{adjustParam.nodeStatDelegateReleased}
+            `stat_delegate_released`=#{adjustParam.nodeStatDelegateReleased},
+            `have_dele_reward`=#{adjustParam.nodeHaveDeleReward}
         where `node_id` = #{adjustParam.nodeId};
 
         update `staking` set
              `stat_delegate_hes`=#{adjustParam.stakeStatDelegateHes},
              `stat_delegate_locked`=#{adjustParam.stakeStatDelegateLocked},
-             `stat_delegate_released`=#{adjustParam.stakeStatDelegateReleased}
+             `stat_delegate_released`=#{adjustParam.stakeStatDelegateReleased},
+             `have_dele_reward`=#{adjustParam.stakeHaveDeleReward}
         where `node_id` = #{adjustParam.nodeId}
           and `staking_block_num` = #{adjustParam.stakingBlockNum};
     </update>

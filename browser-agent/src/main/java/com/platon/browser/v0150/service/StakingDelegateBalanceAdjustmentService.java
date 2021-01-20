@@ -1,6 +1,8 @@
 package com.platon.browser.v0150.service;
 
+import com.platon.browser.cache.AddressCache;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.param.ppos.DelegateExit;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v0150.V0150Config;
 import com.platon.browser.dao.entity.*;
@@ -20,6 +22,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -40,6 +44,8 @@ public class StakingDelegateBalanceAdjustmentService {
     protected BlockChainConfig chainConfig;
     @Resource
     protected V0150Config v0150Config;
+    @Resource
+    protected AddressCache addressCache;
 
     private static final Logger log = Logger.getLogger(StakingDelegateBalanceAdjustmentService.class.getName());
     @PostConstruct
@@ -119,8 +125,18 @@ public class StakingDelegateBalanceAdjustmentService {
         // 委托调账
         for (AbstractAdjustContext context : validatedContext.getDelegateAdjustContextList()) {
             if(StringUtils.isBlank(context.errorInfo())){
+                AdjustParam param = context.getAdjustParam();
                 // 调账上下文没有错误信息，则执行调账操作
-                stakingDelegateBalanceAdjustmentMapper.adjustDelegateData(context.getAdjustParam());
+                stakingDelegateBalanceAdjustmentMapper.adjustDelegateData(param);
+
+                // 更新缓存中的委托者地址已领取奖励
+                Delegation delegation = ((DelegateAdjustContext)context).getDelegation();
+                DelegateExit delegateExit= DelegateExit.builder()
+                        .txFrom(delegation.getDelegateAddr())
+                        .delegateReward(param.getReward())
+                        .build();
+                addressCache.update(delegateExit);
+
                 StringBuilder sb = new StringBuilder("============ ")
                         .append(context.getAdjustParam().getOptType())
                         .append("调账成功 ============\n")
