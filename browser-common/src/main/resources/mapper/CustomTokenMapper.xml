@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomTokenMapper">
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into token (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'address'.toString() == column.value">
+          #{item.address,jdbcType=VARCHAR}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
+        </if>
+        <if test="'name'.toString() == column.value">
+          #{item.name,jdbcType=VARCHAR}
+        </if>
+        <if test="'symbol'.toString() == column.value">
+          #{item.symbol,jdbcType=VARCHAR}
+        </if>
+        <if test="'total_supply'.toString() == column.value">
+          #{item.totalSupply,jdbcType=DECIMAL}
+        </if>
+        <if test="'decimal'.toString() == column.value">
+          #{item.decimal,jdbcType=INTEGER}
+        </if>
+        <if test="'is_support_erc165'.toString() == column.value">
+          #{item.isSupportErc165,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc20'.toString() == column.value">
+          #{item.isSupportErc20,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc721'.toString() == column.value">
+          #{item.isSupportErc721,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc721_enumeration'.toString() == column.value">
+          #{item.isSupportErc721Enumeration,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc721_metadata'.toString() == column.value">
+          #{item.isSupportErc721Metadata,jdbcType=BIT}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'token_tx_qty'.toString() == column.value">
+          #{item.tokenTxQty,jdbcType=INTEGER}
+        </if>
+        <if test="'holder'.toString() == column.value">
+          #{item.holder,jdbcType=INTEGER}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

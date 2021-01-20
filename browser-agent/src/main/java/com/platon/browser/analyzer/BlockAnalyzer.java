@@ -14,6 +14,7 @@ import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.NodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class BlockAnalyzer {
     @Resource
     private TransactionAnalyzer transactionAnalyzer;
-
+    @Transactional(rollbackFor = Exception.class)
     public CollectionBlock analyze(PlatonBlock.Block rawBlock, ReceiptResult receipt) throws ContractInvokeException, BlankResponseException, BeanCreateOrUpdateException {
         String nodeId;
         if (rawBlock.getNumber().longValue() == 0) {
