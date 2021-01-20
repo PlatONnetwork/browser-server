@@ -1,6 +1,5 @@
 plugins {
     id 'org.springframework.boot' version "$springbootVersion"
-    id 'org.hidetake.ssh' version '2.10.1'
 }
 apply plugin: 'io.spring.dependency-management'
 configurations {
@@ -50,32 +49,4 @@ test {
     exclude '/**/proxyppos/*Test.class'
     exclude '/**/proxyppos/**/*Test.class'
     exclude '/**/StakingDelegateBalanceAdjustmentServiceTest2.class'
-}
-
-remotes {
-    webServer {
-        host = "$deployServerHost"
-        user = "$deployServerUser"
-        port = Integer.parseInt("$deployServerPort")
-        password = "$deployServerPassword"
-    }
-}
-
-// 包名
-def packageName = "${project.name}-${version}"
-def deployDir = "$deployRootDir/debug"
-
-task deployToTestEnv(dependsOn:[
-    'buildTar'
-],group: 'deploy') {
-    doLast {
-        ssh.run {
-            session(remotes.webServer) {
-                execute "rm -rf $deployDir/$packageName* && mkdir -p $deployDir"
-                put from: "$buildDir/distributions/${packageName}.tar.gz", into: "$deployDir"
-                def result = execute "cd $deployDir && tar -xvf ${packageName}.tar.gz"
-                println(result)
-            }
-        }
-    }
 }

@@ -1,3 +1,17 @@
+buildscript {
+    repositories {
+        maven {url "https://plugins.gradle.org/m2/"}
+        maven {url "https://mvnrepository.com/artifact/"}
+    }
+    dependencies {
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
+        classpath  'org.yaml:snakeyaml:1.27'
+    }
+}
+plugins {
+    id 'org.hidetake.ssh' version '2.10.1'
+}
+
 import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonBuilder
 import static java.nio.file.Files.*
@@ -6,16 +20,6 @@ import static java.nio.file.StandardCopyOption.*
 
 group = 'com.platon.browser'
 version = "${projectVersion}"
-buildscript {
-  repositories {
-    maven {url "https://plugins.gradle.org/m2/"}
-    maven {url "https://mvnrepository.com/artifact/"}
-  }
-  dependencies {
-    classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
-    classpath  'org.yaml:snakeyaml:1.27'
-  }
-}
 
 def yamlFilter = new FilenameFilter() {
     boolean accept(File dir, String name) {
@@ -108,7 +112,6 @@ subprojects {
     apply plugin: 'jacoco'
 
     group 'com.platon.browser'
-    version "${projectVersion}"
     version "$projectVersion-$shortCommitId"
     sourceCompatibility = '1.8'
 
@@ -218,6 +221,29 @@ subprojects {
                 'build',
                 copyConf
         ]){}
+
+        remotes {
+            webServer {
+                host = "$deployServerHost"
+                user = "$deployServerUser"
+                port = Integer.parseInt("$deployServerPort")
+                password = "$deployServerPassword"
+            }
+        }
+
+        // 拷包到测试环境
+        def packageName = "${project.name}-${version}"
+        def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
+        task deployToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
+            doLast {
+                ssh.run {
+                    session(remotes.webServer) {
+                        execute "rm -rf $deployDir/${project.name}*.jar"
+                        put from: "$buildDir/libs/${packageName}.jar", into: "$deployDir"
+                    }
+                }
+            }
+        }
     }
 
     //sonar扫描的路径
