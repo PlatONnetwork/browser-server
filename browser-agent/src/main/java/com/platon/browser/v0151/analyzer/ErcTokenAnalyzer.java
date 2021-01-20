@@ -6,6 +6,7 @@ import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.entity.Token;
+import com.platon.browser.dao.mapper.CustomTokenMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.v0151.bean.ErcContractId;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Erc Token 服务
@@ -43,6 +45,8 @@ public class ErcTokenAnalyzer {
     private ErcTokenHolderAnalyzer ercTokenHolderAnalyzer;
     @Resource
     private TokenMapper tokenMapper;
+    @Resource
+    private CustomTokenMapper customTokenMapper;
 
     /**
      * 解析Token,在合约创建时调用
@@ -78,15 +82,15 @@ public class ErcTokenAnalyzer {
         }
         if(token.getTypeEnum()!= ErcTypeEnum.UNKNOWN){
             // 入库ERC721或ERC20 Token记录
-            token.setTokenTxQty(1);
-            tokenMapper.insert(token);
+            token.setTokenTxQty(0);
+            customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token),Token.Column.values());
         }
         return token;
     }
 
     private List<ErcTx> resolveErcTxFromEvent(Token token,CollectionTransaction tx,List<ErcContract.ErcTxEvent> eventList){
         List<ErcTx> txList = new ArrayList<>();
-        AtomicInteger seq = new AtomicInteger((int)(tx.getNum()*100000));
+        AtomicLong seq = new AtomicLong(tx.getNum()*100000);
         eventList.forEach(event -> {
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()

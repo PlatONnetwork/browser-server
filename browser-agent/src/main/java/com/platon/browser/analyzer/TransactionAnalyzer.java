@@ -98,8 +98,6 @@ public class TransactionAnalyzer {
                         List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock, specialApi, platOnClient, result, receipt, log);
                         // 把成功的虚拟交易挂到当前普通合约交易上
                         result.setVirtualTransactions(successVirtualTransactions);
-                        // 解析ERC交易
-                        ercTokenAnalyzer.resolveTx(result,receipt);
                     }
                     receipt.getContractCreated().forEach(contract->GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum));
                 } else {
@@ -114,6 +112,8 @@ public class TransactionAnalyzer {
 
         // 解析ERC Token，有就入库，没有拉倒
         receipt.getContractCreated().forEach(contract-> ercTokenAnalyzer.resolveToken(contract.getAddress()));
+        // 解析ERC交易
+        ercTokenAnalyzer.resolveTx(result,receipt);
 
         if (ci.getType() == null) {
             throw new BeanCreateOrUpdateException(
