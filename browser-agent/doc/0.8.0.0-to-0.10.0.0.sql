@@ -1,2 +1,0 @@
-ALTER TABLE `node` ADD COLUMN `un_stake_freeze_duration` int   NOT NULL COMMENT '解质押锁定的结算周期数' after `exception_status` ;
-ALTER TABLE `staking` ADD COLUMN `un_stake_freeze_duration` int   NOT NULL COMMENT '解质押锁定的结算周期数' after `exception_status` ;
