@@ -1,8 +1,8 @@
 import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonBuilder
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
+import static java.nio.file.Files.*
+import static java.nio.file.Paths.*
+import static java.nio.file.StandardCopyOption.*
 
 group = 'com.platon.browser'
 version = "${projectVersion}"
@@ -27,8 +27,8 @@ file("${projectDir.path}/docs/apidef").listFiles(yamlFilter).each { api ->
 }
 
 file("${projectDir.path}/estpl").listFiles(yamlFilter).each { tpl ->
-    Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-agent/src/main/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
-    Files.copy(Paths.get(tpl.path), Paths.get("${projectDir.path}/browser-service/src/test/resources/estpl").resolve(tpl.name), StandardCopyOption.REPLACE_EXISTING)
+    copy(get(tpl.path), get("${projectDir.path}/browser-agent/src/main/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+    copy(get(tpl.path), get("${projectDir.path}/browser-service/src/test/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
 }
 
 def recursiveCopy(startDir,replaceDir){
@@ -40,14 +40,53 @@ def recursiveCopy(startDir,replaceDir){
             def packagePathFile = file(conf.path.replace(replaceDir,'browser-api/build/package/public'))
             if(!classPathFile.exists()) classPathFile.parentFile.mkdirs()
             if(!packagePathFile.exists()) packagePathFile.parentFile.mkdirs()
-            Files.copy(Paths.get(conf.path), Paths.get(classPathFile.path), StandardCopyOption.REPLACE_EXISTING)
-            Files.copy(Paths.get(conf.path), Paths.get(packagePathFile.path), StandardCopyOption.REPLACE_EXISTING)
+            copy(get(conf.path), get(classPathFile.path), REPLACE_EXISTING)
+            copy(get(conf.path), get(packagePathFile.path), REPLACE_EXISTING)
         }
     }
 }
 recursiveCopy('webconfig','webconfig')
 recursiveCopy('docs','docs')
 
+def scriptDir="${projectDir.path}/scripts/"
+def resetTpl=file("${scriptDir}/reset.tpl.sh")
+if(resetTpl.exists()){
+    def desFile = file("${projectDir.path}/browser-agent/build/package/reset.sh")
+    if(!desFile.exists()) desFile.parentFile.mkdirs()
+    desFile.write(resetTpl.text
+    .replace('_VERSION_',"$projectVersion")
+    .replace('_PROFILE_',"dev")
+    .replace('_DB_HOST_',"$dbHost")
+    .replace('_DB_USER_',"$dbUser")
+    .replace('_DB_PASS_',"$dbPass")
+    ,"utf-8")
+}
+def startTpl=file("${scriptDir}/start.tpl.sh")
+if(startTpl.exists()) {
+    def desFile = file("${projectDir.path}/browser-agent/build/package/start.sh")
+    if(!desFile.exists()) desFile.parentFile.mkdirs()
+    desFile.write(startTpl.text.replace('_PROJECT_NAME_','browser-agent'),"utf-8")
+    desFile = file("${projectDir.path}/browser-api/build/package/start.sh")
+    if(!desFile.exists()) desFile.parentFile.mkdirs()
+    desFile.write(startTpl.text.replace('_PROJECT_NAME_','browser-api'),"utf-8")
+}
+def stopTpl=file("${scriptDir}/stop.tpl.sh")
+if(stopTpl.exists()) {
+    def desFile = file("${projectDir.path}/browser-agent/build/package/stop.sh")
+    if(!desFile.exists()) desFile.parentFile.mkdirs()
+    desFile.write(stopTpl.text.replace('_PROJECT_NAME_','browser-agent'),"utf-8")
+    desFile = file("${projectDir.path}/browser-api/build/package/stop.sh")
+    if(!desFile.exists()) desFile.parentFile.mkdirs()
+    desFile.write(stopTpl.text.replace('_PROJECT_NAME_','browser-api'),"utf-8")
+}
+def fullSql=file("${scriptDir}/${project.name}-${projectVersion}.all.sql")
+if(fullSql.exists()) {
+    copy(get(fullSql.path), get("${projectDir.path}/browser-agent/build/package").resolve(fullSql.name), REPLACE_EXISTING)
+}
+def upgradeSql=file("${scriptDir}/${project.name}-${projectVersion}.upgrade.sql")
+if(upgradeSql.exists()) {
+    copy(get(upgradeSql.path), get("${projectDir.path}/browser-agent/build/package").resolve(upgradeSql.name), REPLACE_EXISTING)
+}
 
 apply plugin: "org.sonarqube"
 
@@ -160,25 +199,6 @@ subprojects {
             from('status.hook')
             from('build/libs')
             into('build/package')
-            doLast {
-                def scriptDir="../scripts/"
-                def resetTpl=file("${scriptDir}/reset.tpl.sh"),startTpl=file("${scriptDir}/start.tpl.sh")
-                def stopTpl=file("${scriptDir}/stop.tpl.sh")
-                if(resetTpl.exists()) file("build/package/reset.sh").write(
-                    resetTpl.text
-                    .replace('_VERSION_',"$projectVersion")
-                    .replace('_PROFILE_',"dev")
-                    .replace('_DB_HOST_',"$dbHost")
-                    .replace('_DB_USER_',"$dbUser")
-                    .replace('_DB_PASS_',"$dbPass")
-                    ,"utf-8")
-                if(startTpl.exists()) file("build/package/start.sh").write(startTpl.text.replace('_PROJECT_NAME_',project.name),"utf-8")
-                if(stopTpl.exists()) file("build/package/stop.sh").write(stopTpl.text.replace('_PROJECT_NAME_',project.name),"utf-8")
-                def fullSql=file("${scriptDir}/${project.parent.name}-${projectVersion}.all.sql")
-                if(fullSql.exists()) file("build/package/${project.parent.name}-${projectVersion}.all.sql").write(fullSql.text,"utf-8")
-                def upgradeSql=file("${scriptDir}/${project.parent.name}-${projectVersion}.upgrade.sql")
-                if(upgradeSql.exists()) file("build/package/${project.parent.name}-${projectVersion}.upgrade.sql").write(upgradeSql.text,"utf-8")
-            }
         }
 
         distributions {
@@ -192,7 +212,7 @@ subprojects {
 
         monitorDistTar.dependsOn  'copyConf'
         monitorDistTar.compression = Compression.GZIP
-        monitorDistTar.extension = 'tar.gz'
+        monitorDistTar.archiveExtension.set('tar.gz')
 
         task buildTar(dependsOn: [
                 'build',
