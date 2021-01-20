@@ -586,12 +586,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据
-  /token/arc721-token-id/list:
+  /token/arc721-inventory/list:
     post:
-      operationId: tokenIdList
+      operationId: arc721InventoryList
       tags:
         - Token令牌接口
-      summary: ARC721 TokenId列表
+      summary: ARC721 库存列表
       description: 实现逻辑：|
         查询mysql中数据<br/>
         如果传入合约地址，则返回当前合约内的所有tokenId记录<br/>
@@ -610,12 +610,12 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/721TokenIdListResult'
-  /token/arc721-token-id/export:
+  /token/arc721-inventory/export:
     get:
-      operationId: exportTokenIdList
+      operationId: arc721InventoryExport
       tags:
         - Token令牌接口
-      summary: ARC721 TokenId列表导出
+      summary: ARC721 库存列表导出
       description: 实现逻辑：|
         查询mysql中数据<br/>
         如果传入合约地址，则返回当前合约内的所有tokenId记录<br/>
@@ -657,12 +657,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据
-  /token/arc721-token-id/detail:
+  /token/arc721-inventory/detail:
     post:
-      operationId: tokenIdDetail
+      operationId: arc721InventoryDetail
       tags:
         - Token令牌接口
-      summary: ARC721 TokenId详情
+      summary: ARC721 库存详情
       description: 实现逻辑：|
         - 查询数据库中数据
       produces:

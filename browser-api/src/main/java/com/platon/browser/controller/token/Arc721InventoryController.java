@@ -18,8 +18,8 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping("token/arc721-token-id")
-public class Arc721TokenIdController {
+@RequestMapping("token/arc721-inventory")
+public class Arc721InventoryController {
     @Resource
     private I18nUtil i18n;
 
