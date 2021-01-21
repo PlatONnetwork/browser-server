@@ -10,13 +10,14 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenInventory;
+import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.param.sync.TotalSupplyUpdateParam;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.task.bean.TokenHolderNum;
-import com.platon.browser.task.bean.TokenHolderType;
 import com.platon.browser.utils.AppStatusUtil;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -48,6 +49,9 @@ public class ErcTokenUpdateTask {
     private SyncTokenInfoMapper syncTokenInfoMapper;
 
     @Resource
+    private TokenHolderMapper tokenHolderMapper;
+
+    @Resource
     private TokenInventoryMapper tokenInventoryMapper;
 
     @Resource
@@ -69,31 +73,34 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/30  * * * * ?")
     public void cron() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning())
             return;
         // 更新token_holder表的balance字段
         try {
-            List<TokenHolderType> tokenTypeList = syncTokenInfoMapper.findTokenHolderType();
-            if (CollUtil.isNotEmpty(tokenTypeList)) {
-                int size = tokenTypeList.size();
+            List<TokenHolder> data = tokenHolderMapper.selectByExample(null);
+            if (CollUtil.isNotEmpty(data)) {
+                int size = data.size();
                 List<TokenHolder> tokenHolderList = Collections.synchronizedList(new ArrayList<>(size));
                 CountDownLatch countDownLatch = new CountDownLatch(size);
-                tokenTypeList.forEach(d -> {
+                data.forEach(d -> {
                     EXECUTOR.submit(() -> {
                         // 查询余额并回填
-                        BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getType(), d.getAddress());
-                        d.setBalance(new BigDecimal(balance));
-                        d.setUpdateTime(DateUtil.date());
-                        tokenHolderList.add(d);
+                        BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getAddress());
+                        TokenHolder tokenHolder = new TokenHolder();
+                        tokenHolder.setTokenAddress(d.getTokenAddress());
+                        tokenHolder.setAddress(d.getAddress());
+                        tokenHolder.setBalance(new BigDecimal(balance));
+                        tokenHolder.setUpdateTime(DateUtil.date());
+                        tokenHolderList.add(tokenHolder);
                         countDownLatch.countDown();
                     });
                 });
                 countDownLatch.await();
                 if (CollUtil.isNotEmpty(tokenHolderList)) {
-                    syncTokenInfoMapper.updateAddressBalance(tokenHolderList);
+                    this.syncTokenInfoMapper.updateAddressBalance(tokenHolderList);
                 }
             }
         } catch (Exception e) {
@@ -128,23 +135,14 @@ public class ErcTokenUpdateTask {
         } catch (Exception e) {
             log.error(e, "定期更新Erc供应总量(包含erc20和erc721)异常");
         }
-    }
 
-    /**
-     * 定期更新token_inventory表name、description、image
-     *
-     * @param
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/18
-     */
-    @Scheduled(cron = "0/5  * * * * ?")
-    public void cronUpdateTokenInventory() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning())
-            return;
+        //定期更新token_inventory
         try {
-            List<TokenInventory> tokenInventoryList = tokenInventoryMapper.selectByExample(null);
+            TokenInventoryExample example = new TokenInventoryExample();
+            example.createCriteria().andNameIsNull()
+                    .andDescriptionIsNull()
+                    .andImageIsNull();
+            List<TokenInventory> tokenInventoryList = tokenInventoryMapper.selectByExample(example);
             if (CollUtil.isNotEmpty(tokenInventoryList)) {
                 int size = tokenInventoryList.size();
                 List<TokenInventory> params = Collections.synchronizedList(new ArrayList<>(size));
@@ -155,12 +153,17 @@ public class ErcTokenUpdateTask {
                         if (StrUtil.isNotBlank(tokenURI)) {
                             Request request = new Request.Builder().url(tokenURI).build();
                             try (Response response = client.newCall(request).execute()) {
-                                String resp = response.body().string();
-                                TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
-                                tokenInventory.setUpdateTime(DateUtil.date());
-                                tokenInventory.setTokenId(token.getTokenId());
-                                tokenInventory.setTokenAddress(token.getTokenAddress());
-                                params.add(tokenInventory);
+                                if(response.code()==200){
+                                    String resp = response.body().string();
+                                    TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
+                                    tokenInventory.setUpdateTime(DateUtil.date());
+                                    tokenInventory.setTokenId(token.getTokenId());
+                                    tokenInventory.setTokenAddress(token.getTokenAddress());
+                                    params.add(tokenInventory);
+                                }
+                                if(response.code()==404){
+                                    log.error("token[{}] resource [{}] does not exist",token.getTokenAddress(),tokenURI);
+                                }
                             } catch (Exception e) {
                                 log.error(e, "请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
                             }
@@ -186,7 +189,7 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/19
      */
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/15  * * * * ?")
     public void cronUpdateTokenHolder() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning())
@@ -201,5 +204,5 @@ public class ErcTokenUpdateTask {
             log.error(e, "定期更新token对应的持有人的数量异常");
         }
     }
-    
+
 }

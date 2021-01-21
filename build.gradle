@@ -234,12 +234,14 @@ subprojects {
         // 拷包到测试环境
         def packageName = "${project.name}-${version}"
         def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
+        def activeProfile = "$deployProfile"
         task deployToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
             doLast {
                 ssh.run {
                     session(remotes.webServer) {
-                        execute "rm -rf $deployDir/${project.name}*.jar"
+                        execute "mkdir -p $deployDir/backup && mv $deployDir/${project.name}*.jar $deployDir/backup"
                         put from: "$buildDir/libs/${packageName}.jar", into: "$deployDir"
+                        execute "cd $deployDir && nohup ./start.sh $activeProfile &"
                     }
                 }
             }
