@@ -3,23 +3,26 @@
   "siteName":"AlayaScan",
   "chainName":"Alaya",
   "logo":"/images/logo.svg",
-  "links": {
-    "about":{
+  "links": [
+    {
+      "order": 0,
       "name":{"cn":"关于Alaya","en":"About Alaya"},
       "logo": "",
       "url":"https://www.alaya.network/"
     },
-    "aton":{
+    {
+      "order": 1,
       "name": {"cn":"ATON钱包下载","en":"ATON Download"},
       "logo": "",
       "url": "https://www.platon.network/developer/#aton"
     },
-    "devdoc": {
+    {
+      "order": 2,
       "name": {"cn":"开发者帮助","en":"Developer"},
       "logo": "",
       "url": "https://devdocs.alaya.network/alaya-devdocs/zh-CN/"
     }
-  },
+  ],
   "social":[
     {
       "order": 0,
