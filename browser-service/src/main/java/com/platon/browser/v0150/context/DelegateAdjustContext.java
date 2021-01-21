@@ -119,6 +119,10 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
         BigDecimal delegateReleased = adjustParam.getDelegateReleased();
         if(delegateHes.add(delegateLocked).add(delegateReleased).compareTo(BigDecimal.ZERO)<=0){
             adjustParam.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
+
+            // 节点和质押中加上调账参数中的reward
+            adjustParam.setStakeHaveDeleReward(adjustParam.getStakeHaveDeleReward().add(adjustParam.getReward()));
+            adjustParam.setNodeHaveDeleReward(adjustParam.getNodeHaveDeleReward().add(adjustParam.getReward()));
         }
     }
 

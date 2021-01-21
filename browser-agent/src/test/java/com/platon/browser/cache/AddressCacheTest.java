@@ -79,8 +79,6 @@ public class AddressCacheTest extends AgentTestBase {
         tx.setType(Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
         this.addressCache.update(tx);
 
-        this.addressCache.updateTokenAddress("");
-
         List<Reward> claims = new ArrayList<>();
         Reward reward = Reward.builder().reward(BigDecimal.TEN).build();
         claims.add(reward);

@@ -24,7 +24,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -161,5 +160,19 @@ public class ErcTokenAnalyzer {
         token.setTokenTxQty(token.getTokenTxQty()+txList.size());
         tokenMapper.updateByPrimaryKey(token);
         ercTokenHolderAnalyzer.analyze(txList);
+
+        // 以上所有操作无误，最后更新地址表erc交易数缓存
+        txList.forEach(ercTx->{
+            switch (typeEnum){
+                case ERC20:
+                    addressCache.updateErc20TxQty(ercTx.getFrom());
+                    addressCache.updateErc20TxQty(ercTx.getTo());
+                    break;
+                case ERC721:
+                    addressCache.updateErc721TxQty(ercTx.getFrom());
+                    addressCache.updateErc721TxQty(ercTx.getTo());
+                    break;
+            }
+        });
     }
 }
