@@ -31,7 +31,8 @@ public class Arc20Transfer extends Arc20Base {
     @Test
     public void transfer() throws Exception {
         for (Credentials wallet : wallets) {
-            send(adminWallet, wallet, new BigInteger("1000000000000000000000"));
+            log.error("adminWallet balance:{}",getBalance(adminWallet.getAddress()));
+            send(adminWallet, wallet, new BigInteger("1000000000000000000"));
             for (int i = 0; i < transferCount; i++) send(adminWallet, wallet);
         }
     }
