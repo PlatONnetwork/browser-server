@@ -238,8 +238,9 @@ subprojects {
             doLast {
                 ssh.run {
                     session(remotes.webServer) {
-                        execute "rm -rf $deployDir/${project.name}*.jar"
+                        execute "mkdir -p $deployDir/backup && mv $deployDir/${project.name}*.jar $deployDir/backup"
                         put from: "$buildDir/libs/${packageName}.jar", into: "$deployDir"
+                        execute "cd $deployDir && chmod a+x *.sh && ./start.sh ${deployProfile}"
                     }
                 }
             }
