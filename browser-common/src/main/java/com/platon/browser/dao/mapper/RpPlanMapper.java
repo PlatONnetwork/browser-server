@@ -4,8 +4,9 @@ import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 public interface RpPlanMapper {
     long countByExample(RpPlanExample example);
 

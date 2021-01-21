@@ -3,8 +3,9 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenExample;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 public interface TokenMapper {
     long countByExample(TokenExample example);
 

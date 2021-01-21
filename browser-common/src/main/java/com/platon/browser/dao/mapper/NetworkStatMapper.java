@@ -3,8 +3,9 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 public interface NetworkStatMapper {
     long countByExample(NetworkStatExample example);
 

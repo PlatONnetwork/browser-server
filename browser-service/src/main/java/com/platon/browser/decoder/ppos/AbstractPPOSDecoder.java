@@ -8,8 +8,6 @@ import com.alaya.rlp.solidity.RlpString;
 import com.alaya.rlp.solidity.RlpType;
 import com.alaya.utils.Numeric;
 import com.platon.browser.param.RestrictingCreateParam;
-import com.platon.browser.param.TxParam;
-import com.platon.browser.utils.NetworkParams;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -45,7 +43,7 @@ public abstract class AbstractPPOSDecoder {
          * 判断是否为主网
          */
         String hrp = NetworkParameters.TestNetParams.getHrp();
-        if(NetworkParams.getChainId().compareTo(NetworkParameters.MainNetParams.getChainId())==0) {
+        if(NetworkParameters.CurrentNetwork.getChainId()==NetworkParameters.MainNetParams.getChainId()) {
         	hrp = NetworkParameters.MainNetParams.getHrp();
         }
         return Bech32.addressEncode(hrp,Numeric.toHexString(stringsListString.getBytes()));

@@ -4,8 +4,9 @@ import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryKey;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 public interface TokenInventoryMapper {
     long countByExample(TokenInventoryExample example);
 

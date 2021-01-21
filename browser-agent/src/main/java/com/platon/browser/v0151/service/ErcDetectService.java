@@ -10,8 +10,8 @@ import com.alaya.tx.exceptions.ContractCallException;
 import com.alaya.tx.gas.ContractGasProvider;
 import com.alaya.tx.gas.GasProvider;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.utils.NetworkParams;
 import com.platon.browser.v0151.bean.ErcContractId;
 import com.platon.browser.v0151.contract.Erc20Contract;
 import com.platon.browser.v0151.contract.Erc721Contract;
@@ -42,6 +42,8 @@ public class ErcDetectService {
     private static final GasProvider GAS_PROVIDER = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
     @Resource
     private PlatOnClient platOnClient;
+    @Resource
+    private BlockChainConfig chainConfig;
     // 检测输入数据
     private String detectInputData(String contractAddress,String inputData) {
         Transaction transaction = null;
@@ -92,7 +94,7 @@ public class ErcDetectService {
     private ErcContractId getErc20ContractId(String contractAddress){
         ErcContract ercContract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                 Credentials.create(PRIVATE_KEY),
-                NetworkParams.getChainId());
+                chainConfig.getChainId());
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC20);
         return contractId;
@@ -101,7 +103,7 @@ public class ErcDetectService {
     private ErcContractId getErc721ContractId(String contractAddress){
         ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                 Credentials.create(PRIVATE_KEY),
-                GAS_PROVIDER, NetworkParams.getChainId());
+                GAS_PROVIDER, chainConfig.getChainId());
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC721);
         return contractId;
@@ -114,22 +116,26 @@ public class ErcDetectService {
             try {
                 contractId.setName(ercContract.name().send());
             } catch (Exception e) {
-                log.warn(" erc get name error", e);
+                log.warn("erc get name error");
+                log.debug("", e);
             }
             try {
                 contractId.setSymbol(ercContract.symbol().send());
             } catch (Exception e) {
-                log.warn(" erc get symbol error", e);
+                log.warn("erc get symbol error");
+                log.debug("", e);
             }
             try {
                 contractId.setDecimal(ercContract.decimals().send().intValue());
             } catch (Exception e) {
-                log.warn(" erc get decimal error", e);
+                log.warn("erc get decimal error");
+                log.debug("", e);
             }
             try {
                 contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
             } catch (Exception e) {
-                log.warn(" erc get totalSupply error", e);
+                log.warn("erc get totalSupply error");
+                log.debug("", e);
             }
         } catch (ContractCallException e) {
             log.error(" not erc contract,{}", ercContract, e);
@@ -158,14 +164,14 @@ public class ErcDetectService {
     public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt) {
         ErcContract ercContract = new Erc20Contract(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(),
                 Credentials.create(PRIVATE_KEY),
-                NetworkParams.getChainId());
+                chainConfig.getChainId());
         return ercContract.getTxEvents(receipt);
     }
 
     public List<ErcContract.ErcTxEvent> getErc721TxEvents(TransactionReceipt receipt) {
         ErcContract ercContract = Erc721Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(),
                 Credentials.create(PRIVATE_KEY),
-                GAS_PROVIDER, NetworkParams.getChainId());
+                GAS_PROVIDER, chainConfig.getChainId());
         return ercContract.getTxEvents(receipt);
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableEncryptableProperties
 @EnableAsync
-@MapperScan(basePackages = "com.platon.browser.dao.mapper")
+@MapperScan(basePackages = "com.platon.browser")
 public class BrowserApiApplication {
 
 	/**

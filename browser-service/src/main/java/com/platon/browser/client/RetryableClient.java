@@ -1,20 +1,21 @@
 package com.platon.browser.client;
 
 import com.alaya.contracts.ppos.*;
+import com.alaya.parameters.NetworkParameters;
 import com.alaya.protocol.Web3j;
 import com.alaya.protocol.Web3jService;
 import com.alaya.protocol.http.HttpService;
 import com.alaya.protocol.websocket.WebSocketService;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.Web3jProtocolEnum;
 import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.browser.utils.NetworkParams;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
-@DependsOn("networkParams")
 public class RetryableClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
     @Value("${platon.web3j.protocol}")
@@ -113,14 +113,14 @@ public class RetryableClient {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    private void updateContract(){
-    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
-        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParams.getChainId());
+    public void updateContract(){
+    	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
+        delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
+        nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
+        proposalContract = ProposalContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
+        restrictingPlanContract = RestrictingPlanContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
+        slashContract = SlashContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
+        stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j(), NetworkParameters.CurrentNetwork.getChainId());
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)

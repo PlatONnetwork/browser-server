@@ -7,7 +7,7 @@ import com.alaya.crypto.Credentials;
 import com.alaya.tx.gas.ContractGasProvider;
 import com.alaya.tx.gas.GasProvider;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.utils.NetworkParams;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.v0151.bean.ErcContractId;
 import com.platon.browser.v0151.contract.Erc20Contract;
 import com.platon.browser.v0151.contract.Erc721Contract;
@@ -38,6 +38,8 @@ public class ErcServiceImpl {
 
     @Resource
     private ErcDetectService ercDetectService;
+    @Resource
+    private BlockChainConfig chainConfig;
 
     /**
      * 获取地址代币余额, ERC20为金额，ERC721为tokenId数
@@ -51,9 +53,9 @@ public class ErcServiceImpl {
     @Valid
     public BigInteger getBalance(String contractAddress, String account) {
         BigInteger balance = BigInteger.ZERO;
+        ErcContractId ercContractId = ercDetectService.getContractId(contractAddress);
+        ErcContract ercContract = getErcContract(contractAddress, ercContractId.getTypeEnum());
         try {
-            ErcContractId ercContractId = ercDetectService.getContractId(contractAddress);
-            ErcContract ercContract = getErcContract(contractAddress, ercContractId.getTypeEnum());
             if (ObjectUtil.isNotNull(ercContract)) {
                 balance = ercContract.balanceOf(account).send();
             }
@@ -99,11 +101,11 @@ public class ErcServiceImpl {
         if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
             ercContract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                     Credentials.create(PRIVATE_KEY),
-                    NetworkParams.getChainId());
+                    chainConfig.getChainId());
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
             ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                     Credentials.create(PRIVATE_KEY),
-                    GAS_PROVIDER, NetworkParams.getChainId());
+                    GAS_PROVIDER, chainConfig.getChainId());
         }
         return ercContract;
     }

@@ -161,12 +161,17 @@ public class ErcTokenUpdateTask {
                         if (StrUtil.isNotBlank(tokenURI)) {
                             Request request = new Request.Builder().url(tokenURI).build();
                             try (Response response = client.newCall(request).execute()) {
-                                String resp = response.body().string();
-                                TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
-                                tokenInventory.setUpdateTime(DateUtil.date());
-                                tokenInventory.setTokenId(token.getTokenId());
-                                tokenInventory.setTokenAddress(token.getTokenAddress());
-                                params.add(tokenInventory);
+                                if(response.code()==200){
+                                    String resp = response.body().string();
+                                    TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
+                                    tokenInventory.setUpdateTime(DateUtil.date());
+                                    tokenInventory.setTokenId(token.getTokenId());
+                                    tokenInventory.setTokenAddress(token.getTokenAddress());
+                                    params.add(tokenInventory);
+                                }
+                                if(response.code()==404){
+                                    log.error("token[{}] resource [{}] does not exist",token.getTokenAddress(),tokenURI);
+                                }
                             } catch (Exception e) {
                                 log.error(e, "请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
                             }

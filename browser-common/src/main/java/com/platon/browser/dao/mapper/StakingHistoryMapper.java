@@ -4,8 +4,9 @@ import com.platon.browser.dao.entity.StakingHistory;
 import com.platon.browser.dao.entity.StakingHistoryExample;
 import com.platon.browser.dao.entity.StakingHistoryKey;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 public interface StakingHistoryMapper {
     long countByExample(StakingHistoryExample example);
 
