@@ -1,4 +1,4 @@
-package com.platon.browser.contract;
+package com.platon.browser.contract.arc20;
 
 import com.alaya.abi.solidity.TypeReference;
 import com.alaya.abi.solidity.datatypes.Function;
