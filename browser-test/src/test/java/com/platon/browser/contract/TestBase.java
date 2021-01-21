@@ -37,7 +37,7 @@ public abstract class TestBase {
 	protected static final long CHAIN_ID = 201018;
 	protected static final Web3j WEB3J = Web3j.build(new HttpService("http://192.168.120.151:6789"));
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4700000);
-	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(1000000L);
+	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(10000000000L);
 
 	protected GasProvider gasProvider;
 	protected String contractAddressFilePath;

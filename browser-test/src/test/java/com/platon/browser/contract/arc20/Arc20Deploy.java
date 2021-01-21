@@ -28,9 +28,9 @@ public class Arc20Deploy extends Arc20Base {
                     gasProvider,
                     CHAIN_ID,
                     new BigInteger("10000000000000000000"),
-                    "name-"+str,
-                    BigInteger.valueOf(16L),
                     "symbol-"+str,
+                    BigInteger.valueOf(16L),
+                    "name-"+str,
                     adminWallet.getAddress()
             ).send();
             try{
