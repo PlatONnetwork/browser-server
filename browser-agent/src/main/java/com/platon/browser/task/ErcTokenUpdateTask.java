@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenInventory;
+import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
@@ -72,7 +73,7 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/30  * * * * ?")
     public void cron() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning())
@@ -134,23 +135,14 @@ public class ErcTokenUpdateTask {
         } catch (Exception e) {
             log.error(e, "定期更新Erc供应总量(包含erc20和erc721)异常");
         }
-    }
 
-    /**
-     * 定期更新token_inventory
-     *
-     * @param
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/18
-     */
-    @Scheduled(cron = "0/5  * * * * ?")
-    public void cronUpdateTokenInventory() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning())
-            return;
+        //定期更新token_inventory
         try {
-            List<TokenInventory> tokenInventoryList = tokenInventoryMapper.selectByExample(null);
+            TokenInventoryExample example = new TokenInventoryExample();
+            example.createCriteria().andNameIsNull()
+                    .andDescriptionIsNull()
+                    .andImageIsNull();
+            List<TokenInventory> tokenInventoryList = tokenInventoryMapper.selectByExample(example);
             if (CollUtil.isNotEmpty(tokenInventoryList)) {
                 int size = tokenInventoryList.size();
                 List<TokenInventory> params = Collections.synchronizedList(new ArrayList<>(size));
@@ -197,7 +189,7 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/19
      */
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/15  * * * * ?")
     public void cronUpdateTokenHolder() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning())
@@ -205,7 +197,7 @@ public class ErcTokenUpdateTask {
         try {
             List<TokenHolderNum> list = syncTokenInfoMapper.findTokenHolder();
             if (CollUtil.isNotEmpty(list)) {
-                list.stream().forEach(value -> value.setUpdateTime(DateUtil.date()));
+                list.forEach(value -> value.setUpdateTime(DateUtil.date()));
                 syncTokenInfoMapper.updateTokenHolder(list);
             }
         } catch (Exception e) {
