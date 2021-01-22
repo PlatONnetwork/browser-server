@@ -10,6 +10,7 @@ buildscript {
 }
 plugins {
     id 'org.hidetake.ssh' version '2.10.1'
+    id "github.com.sakamotodesu.jcifs" version "0.2.2"
 }
 
 import org.yaml.snakeyaml.Yaml
@@ -235,7 +236,7 @@ subprojects {
         def packageName = "${project.name}-${version}"
         def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
         def activeProfile = "$deployProfile"
-        task deployToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
+        task copyToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
             doLast {
                 ssh.run {
                     session(remotes.webServer) {
@@ -245,6 +246,13 @@ subprojects {
                     }
                 }
             }
+        }
+
+        def parentDir = project.name.contains('agent')?'scan-agent':'scan-api'
+        def destDir = "${projectVersion}"+'-'+new Date().format("yyyy.MM.dd.HHmm")
+        task copyToCifs(type: github.com.sakamotodesu.JcifsCopy,dependsOn:['buildTar'],group: 'deploy') {
+            from "${projectDir.path}/build/distributions/${packageName}.tar.gz"
+            into "smb://chendongming:CDM00juzix@192.168.21.210/proupdate/alaya/scan/${parentDir}/${destDir}/"
         }
     }
 
