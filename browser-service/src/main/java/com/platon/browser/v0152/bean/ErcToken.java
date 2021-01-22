@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Data
-@Component
 public class ErcToken extends Token {
     private ErcTypeEnum typeEnum;
     public ErcToken() {

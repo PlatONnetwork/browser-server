@@ -3,6 +3,7 @@ package com.platon.browser.v0152.cache;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.v0152.bean.ErcToken;
+import com.platon.browser.v0152.bean.ErcTokenCacheItem;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +19,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Data
 @Component
 public class ErcCache {
-    private Map<String, ErcToken> tokenMap = new ConcurrentHashMap<>();
+    private Map<String, ErcTokenCacheItem> tokenCache = new ConcurrentHashMap<>();
     private Set<String> erc20AddressCache = new ConcurrentSkipListSet<>();
     private Set<String> erc721AddressCache = new ConcurrentSkipListSet<>();
     @Resource
@@ -26,17 +27,17 @@ public class ErcCache {
     public void init(){
         List<Token> tokens = tokenMapper.selectByExample(null);
         tokens.forEach(token->{
-            ErcToken et = new ErcToken();
-            BeanUtils.copyProperties(token,et);
+            ErcTokenCacheItem cacheItem = new ErcTokenCacheItem();
+            BeanUtils.copyProperties(token,cacheItem);
             ErcTypeEnum typeEnum = ErcTypeEnum.valueOf(token.getType().toUpperCase());
-            et.setTypeEnum(typeEnum);
-            tokenMap.put(et.getAddress(),et);
+            cacheItem.setTypeEnum(typeEnum);
+            tokenCache.put(cacheItem.getAddress(),cacheItem);
             switch (typeEnum){
                 case ERC721:
-                    erc721AddressCache.add(et.getAddress());
+                    erc721AddressCache.add(cacheItem.getAddress());
                     break;
                 case ERC20:
-                    erc20AddressCache.add(et.getAddress());
+                    erc20AddressCache.add(cacheItem.getAddress());
                     break;
             }
         });
