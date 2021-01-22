@@ -4,9 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.Log;
-import cn.hutool.log.LogFactory;
-import com.alaya.crypto.Credentials;
 import com.alibaba.fastjson.JSON;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.platon.browser.dao.entity.Token;
@@ -16,14 +13,12 @@ import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.mapper.CustomTokenMapper;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
-import com.platon.browser.dao.mapper.TokenMapper;
-import com.platon.browser.param.sync.TotalSupplyUpdateParam;
 import com.platon.browser.service.erc.ErcServiceImpl;
-import com.platon.browser.task.bean.TokenHolderNum;
 import com.platon.browser.task.bean.TokenHolderType;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.cache.ErcCache;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -46,16 +41,11 @@ import java.util.concurrent.*;
  * @author huangyongpeng@matrixelements.com
  * @date 2021/1/22
  */
+@Slf4j
 @Component
 public class ErcTokenUpdateTask {
-
-    private static final Log log = LogFactory.get();
-
     // 并发查询Token信息的线程大小
     private static final int BATH_SIZE = 20;
-
-    @Resource
-    private TokenMapper tokenMapper;
     @Resource
     private CustomTokenMapper customTokenMapper;
     @Resource
@@ -132,7 +122,8 @@ public class ErcTokenUpdateTask {
                             updateList.add(token);
                         }
                     } catch (Exception e) {
-                        log.error("{}",e.getMessage());
+                        log.error(e.getMessage());
+                        log.error("",e);
                     } finally {
                         latch.countDown();
                     }
@@ -183,7 +174,7 @@ public class ErcTokenUpdateTask {
                 }
             }
         } catch (Exception e) {
-            log.error(e, "更新地址代币余额异常");
+            log.error("更新地址代币余额异常",e);
         }
     }
 
@@ -202,40 +193,46 @@ public class ErcTokenUpdateTask {
             if (CollUtil.isNotEmpty(tokenInventoryList)) {
                 int size = tokenInventoryList.size();
                 List<TokenInventory> params = Collections.synchronizedList(new ArrayList<>(size));
-                CountDownLatch countDownLatch = new CountDownLatch(size);
+                CountDownLatch latch = new CountDownLatch(size);
                 tokenInventoryList.forEach(token -> {
                     pool.submit(() -> {
-                        String tokenURI = ercServiceImpl.getTokenURI(token.getTokenAddress(), Convert.toBigInteger(token.getTokenId()));
-                        if (StrUtil.isNotBlank(tokenURI)) {
-                            Request request = new Request.Builder().url(tokenURI).build();
-                            try (Response response = client.newCall(request).execute()) {
-                                if (response.code() == 200) {
-                                    String resp = response.body().string();
-                                    TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
-                                    tokenInventory.setUpdateTime(DateUtil.date());
-                                    tokenInventory.setTokenId(token.getTokenId());
-                                    tokenInventory.setTokenAddress(token.getTokenAddress());
-                                    params.add(tokenInventory);
+                        try {
+                            String tokenURI = ercServiceImpl.getTokenURI(token.getTokenAddress(), Convert.toBigInteger(token.getTokenId()));
+                            if (StrUtil.isNotBlank(tokenURI)) {
+                                Request request = new Request.Builder().url(tokenURI).build();
+                                try (Response response = client.newCall(request).execute()) {
+                                    if (response.code() == 200) {
+                                        String resp = response.body().string();
+                                        TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
+                                        tokenInventory.setUpdateTime(DateUtil.date());
+                                        tokenInventory.setTokenId(token.getTokenId());
+                                        tokenInventory.setTokenAddress(token.getTokenAddress());
+                                        params.add(tokenInventory);
+                                    }
+                                    if (response.code() == 404) {
+                                        log.error("token[{}] resource [{}] does not exist", token.getTokenAddress(), tokenURI);
+                                    }
+                                } catch (Exception e) {
+                                    log.error("请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
+                                    log.error("", e);
                                 }
-                                if (response.code() == 404) {
-                                    log.error("token[{}] resource [{}] does not exist", token.getTokenAddress(), tokenURI);
-                                }
-                            } catch (Exception e) {
-                                log.error(e, "请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
+                            } else {
+                                log.error("请求TokenURI为空，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
                             }
-                        } else {
-                            log.error("请求TokenURI为空，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
+                        } catch (Exception e) {
+                            log.error("{}",e.getMessage());
+                        } finally {
+                            latch.countDown();
                         }
-                        countDownLatch.countDown();
                     });
                 });
-                countDownLatch.await();
+                latch.await();
                 if (CollUtil.isNotEmpty(params)) {
                     syncTokenInfoMapper.updateTokenInventory(params);
                 }
             }
         } catch (Exception e) {
-            log.error(e, "定期更新token_inventory异常");
+            log.error("定期更新token_inventory异常",e);
         }
     }
 }
