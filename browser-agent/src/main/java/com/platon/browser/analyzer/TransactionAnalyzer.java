@@ -16,7 +16,7 @@ import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
-import com.platon.browser.v0151.analyzer.ErcTokenAnalyzer;
+import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

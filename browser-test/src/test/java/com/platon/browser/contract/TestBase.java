@@ -12,19 +12,17 @@ import com.alaya.tx.Transfer;
 import com.alaya.tx.gas.ContractGasProvider;
 import com.alaya.tx.gas.GasProvider;
 import com.alaya.utils.Convert;
-import com.platon.browser.contract.arc20.Arc20Contract;
-import com.platon.browser.v0151.contract.Erc721Contract;
+import com.platon.browser.v0152.contract.Erc20Contract;
+import com.platon.browser.v0152.contract.Erc721Contract;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,8 +107,8 @@ public abstract class TestBase {
 		}
 	}
 
-	protected Arc20Contract loadArc20Contract(String address, Credentials credentials){
-		return Arc20Contract.load(address, WEB3J, credentials, gasProvider, CHAIN_ID);
+	protected Erc20Contract loadArc20Contract(String address, Credentials credentials){
+		return Erc20Contract.load(address, WEB3J, credentials, gasProvider, CHAIN_ID);
 	}
 
 	protected Erc721Contract loadArc721Contract(String address, Credentials credentials){

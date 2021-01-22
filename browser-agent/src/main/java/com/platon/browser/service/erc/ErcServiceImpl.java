@@ -8,12 +8,12 @@ import com.alaya.tx.gas.ContractGasProvider;
 import com.alaya.tx.gas.GasProvider;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.v0151.bean.ErcContractId;
-import com.platon.browser.v0151.contract.Erc20Contract;
-import com.platon.browser.v0151.contract.Erc721Contract;
-import com.platon.browser.v0151.contract.ErcContract;
-import com.platon.browser.v0151.enums.ErcTypeEnum;
-import com.platon.browser.v0151.service.ErcDetectService;
+import com.platon.browser.v0152.bean.ErcContractId;
+import com.platon.browser.v0152.contract.Erc20Contract;
+import com.platon.browser.v0152.contract.Erc721Contract;
+import com.platon.browser.v0152.contract.ErcContract;
+import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.platon.browser.v0152.service.ErcDetectService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -99,8 +99,9 @@ public class ErcServiceImpl {
     private ErcContract getErcContract(String contractAddress, ErcTypeEnum ercTypeEnum) {
         ErcContract ercContract = null;
         if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
-            ercContract = new Erc20Contract(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
-                    Credentials.create(PRIVATE_KEY),
+            ercContract = Erc20Contract.load(contractAddress,platOnClient.getWeb3jWrapper().getWeb3j(),
+                    ErcDetectService.CREDENTIALS,
+                    ErcDetectService.GAS_PROVIDER,
                     chainConfig.getChainId());
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
             ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
