@@ -13,7 +13,6 @@ import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
-import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.param.sync.TotalSupplyUpdateParam;
@@ -83,9 +82,9 @@ public class ErcTokenUpdateTask {
     @Scheduled(cron = "0/30  * * * * ?")
     public void cron() {
         // 只有程序正常运行才执行任务
-//        if (!AppStatusUtil.isRunning()) {
-//            return;
-//        }
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
         // 更新token_holder表的balance字段
         try {
             List<TokenHolderType> tokenTypeList = syncTokenInfoMapper.findTokenHolderType();
@@ -172,6 +171,8 @@ public class ErcTokenUpdateTask {
                             } catch (Exception e) {
                                 log.error(e, "请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
                             }
+                        } else {
+                            log.error("请求TokenURI为空，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
                         }
                         countDownLatch.countDown();
                     });
