@@ -3,9 +3,8 @@ package com.platon.browser.task;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.Log;
-import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson.JSON;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.platon.browser.dao.entity.Token;
@@ -20,6 +19,7 @@ import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.task.bean.TokenHolderNum;
 import com.platon.browser.task.bean.TokenHolderType;
 import com.platon.browser.utils.AppStatusUtil;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -41,10 +41,9 @@ import java.util.concurrent.*;
  * @author huangyongpeng@matrixelements.com
  * @date 2021/1/22
  */
+@Slf4j
 @Component
 public class ErcTokenUpdateTask {
-
-    private static final Log log = LogFactory.get();
 
     @Resource
     private TokenMapper tokenMapper;
@@ -61,11 +60,17 @@ public class ErcTokenUpdateTask {
     /**
      * 线程名前缀
      */
-    private final static String ThreadFactoryName = "token-task-pool-";
+    private final static String THREAD_NAME = "token-task-";
 
+    /**
+     * 线程工厂
+     */
     private final ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
-            .setNameFormat(ThreadFactoryName + "%d").build();
+            .setNameFormat(THREAD_NAME + "%d").build();
 
+    /**
+     * 线程池
+     */
     private final ExecutorService pool = new ThreadPoolExecutor(30, 30,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
@@ -113,7 +118,7 @@ public class ErcTokenUpdateTask {
                 }
             }
         } catch (Exception e) {
-            log.error(e, "更新地址代币余额异常");
+            log.error(StrFormatter.format("更新地址代币余额异常"), e);
         }
 
         // 更新token表的total_supply字段
@@ -142,7 +147,7 @@ public class ErcTokenUpdateTask {
                 }
             }
         } catch (Exception e) {
-            log.error(e, "定期更新Erc供应总量(包含erc20和erc721)异常");
+            log.error("定期更新Erc供应总量(包含erc20和erc721)异常", e);
         }
 
         //定期更新token_inventory
@@ -174,7 +179,7 @@ public class ErcTokenUpdateTask {
                                     log.error("token[{}] resource [{}] does not exist", token.getTokenAddress(), tokenURI);
                                 }
                             } catch (Exception e) {
-                                log.error(e, "请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
+                                log.error(StrFormatter.format("请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId()), e);
                             }
                         } else {
                             log.error("请求TokenURI为空，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
@@ -188,7 +193,7 @@ public class ErcTokenUpdateTask {
                 }
             }
         } catch (Exception e) {
-            log.error(e, "定期更新token_inventory异常");
+            log.error("定期更新token_inventory异常", e);
         }
     }
 
@@ -213,7 +218,7 @@ public class ErcTokenUpdateTask {
                 syncTokenInfoMapper.updateTokenHolder(list);
             }
         } catch (Exception e) {
-            log.error(e, "定期更新token对应的持有人的数量异常");
+            log.error("定期更新token对应的持有人的数量异常", e);
         }
     }
 
