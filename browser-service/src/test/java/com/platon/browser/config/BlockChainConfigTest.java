@@ -84,7 +84,6 @@ public class BlockChainConfigTest {
         ReflectionTestUtils.setField(target,"client",client);
 
         Set<String> set = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        target.setINNER_CONTRACT_ADDR(set);
         target.getInnerContractAddr();
         for(Method method:BlockChainConfig.class.getDeclaredMethods()){
             if(method.getName().contains("get")){
