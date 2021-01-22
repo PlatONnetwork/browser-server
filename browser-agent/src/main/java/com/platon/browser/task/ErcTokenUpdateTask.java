@@ -58,8 +58,13 @@ public class ErcTokenUpdateTask {
     @Resource
     private ErcServiceImpl ercServiceImpl;
 
+    /**
+     * 线程名前缀
+     */
+    private final static String ThreadFactoryName = "token-task-pool-";
+
     private final ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("demo-pool-%d").build();
+            .setNameFormat(ThreadFactoryName + "%d").build();
 
     private final ExecutorService pool = new ThreadPoolExecutor(30, 30,
             0L, TimeUnit.MILLISECONDS,
@@ -198,9 +203,9 @@ public class ErcTokenUpdateTask {
     @Scheduled(cron = "0/15  * * * * ?")
     public void cronUpdateTokenHolder() {
         // 只有程序正常运行才执行任务
-//        if (!AppStatusUtil.isRunning()) {
-//            return;
-//        }
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
         try {
             List<TokenHolderNum> list = syncTokenInfoMapper.findTokenHolder();
             if (CollUtil.isNotEmpty(list)) {
