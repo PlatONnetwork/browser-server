@@ -136,7 +136,7 @@ public class ErcTokenUpdateTask {
             }
         });
 
-        if(!batchList.isEmpty()) {
+        if(!updateList.isEmpty()) {
             // 批量更新总供应量有变动的记录
             customTokenMapper.batchInsertOrUpdateSelective(updateList,Token.Column.values());
         }
