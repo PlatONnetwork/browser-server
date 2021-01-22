@@ -3,9 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.entity.TxBakExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 public interface TxBakMapper {
     long countByExample(TxBakExample example);
 

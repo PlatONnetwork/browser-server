@@ -27,13 +27,16 @@ import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-//@EnableRetry
+@EnableRetry
 @Configuration
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
 @MapperScan(basePackages = {
-	"com.platon.browser"
+	"com.platon.browser",
+	"com.platon.browser.dao.mapper",
+	"com.platon.browser.v0150.dao",
+	"com.platon.browser.v0151.dao"
 })
 public class AgentApplication implements ApplicationRunner {
 	// 区块服务

@@ -32,8 +32,7 @@ public class Erc20Transfer extends Erc20Base {
     @Test
     public void transfer() throws Exception {
         for (Credentials wallet : wallets) {
-            log.error("adminWallet balance:{}",getBalance(adminWallet.getAddress()));
-            send(adminWallet, wallet, new BigInteger("1000000000000000000"));
+            send(adminWallet, wallet, new BigInteger("1000000000000000000000"));
             for (int i = 0; i < transferCount; i++) send(adminWallet, wallet);
         }
     }

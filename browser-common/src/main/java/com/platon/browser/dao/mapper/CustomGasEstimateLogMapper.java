@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+@Mapper
 public interface CustomGasEstimateLogMapper {
     int batchInsertOrUpdateSelective(@Param("list") List<GasEstimateLog> list, @Param("selective") GasEstimateLog.Column... selective);
 }

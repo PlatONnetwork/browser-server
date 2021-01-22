@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface CustomDelegationMapper {
 
     List<CustomDelegation> selectByNodeId ( @Param("nodeId") String nodeId );

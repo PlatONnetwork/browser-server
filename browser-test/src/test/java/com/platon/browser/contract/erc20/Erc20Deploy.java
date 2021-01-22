@@ -28,9 +28,9 @@ public class Erc20Deploy extends Erc20Base {
                     gasProvider,
                     CHAIN_ID,
                     new BigInteger("10000000000000000000"),
-                    "symbol-"+str,
-                    BigInteger.valueOf(16L),
                     "name-"+str,
+                    BigInteger.valueOf(16L),
+                    "symbol-"+str,
                     adminWallet.getAddress()
             ).send();
             try{

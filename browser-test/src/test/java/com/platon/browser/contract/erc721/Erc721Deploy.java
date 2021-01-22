@@ -16,7 +16,6 @@ public class Erc721Deploy extends Erc721Base {
     @Test
     public void deploy() throws Exception {
         for(int i =0;i<=deployCount;i++){
-            log.error("adminWallet balance:{}",getBalance(adminWallet.getAddress()));
             String str =randomStr();
             Erc721Contract contract = Erc721Contract.deploy(WEB3J,adminWallet,gasProvider,CHAIN_ID,"name-"+str,"symbol-"+str).send();
             log.info("合约地址：{}",contract.getContractAddress());

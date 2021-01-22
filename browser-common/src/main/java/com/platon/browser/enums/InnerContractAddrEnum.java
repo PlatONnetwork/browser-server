@@ -2,6 +2,7 @@ package com.platon.browser.enums;
 
 
 import com.alaya.parameters.NetworkParameters;
+import com.platon.browser.utils.NetworkParams;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,33 +16,25 @@ import java.util.Set;
  *
  */
 public enum InnerContractAddrEnum {
-    RESTRICTING_PLAN_CONTRACT("锁仓合约"),
-    STAKING_CONTRACT("质押合约"),
-    DELEGATE_CONTRACT("质押合约"),
-    NODE_CONTRACT("节点相关合约"),
-    SLASH_CONTRACT("惩罚合约"),
-    PROPOSAL_CONTRACT("治理(提案)合约"),
-    INCENTIVE_POOL_CONTRACT("激励池合约"),
-    REWARD_CONTRACT("领取奖励合约");
+    RESTRICTING_PLAN_CONTRACT(NetworkParameters.getPposContractAddressOfRestrctingPlan(NetworkParams.getChainId()),"锁仓合约"),
+    STAKING_CONTRACT(NetworkParameters.getPposContractAddressOfStaking(NetworkParams.getChainId()),"质押合约"),
+    DELEGATE_CONTRACT(NetworkParameters.getPposContractAddressOfStaking(NetworkParams.getChainId()),"质押合约"),
+    SLASH_CONTRACT(NetworkParameters.getPposContractAddressOfSlash(NetworkParams.getChainId()),"惩罚合约"),
+    PROPOSAL_CONTRACT(NetworkParameters.getPposContractAddressOfProposal(NetworkParams.getChainId()),"治理(提案)合约"),
+    INCENTIVE_POOL_CONTRACT(NetworkParameters.getPposContractAddressOfIncentivePool(NetworkParams.getChainId()),"激励池合约"),
+    NODE_CONTRACT(NetworkParameters.getPposContractAddressOfStaking(NetworkParams.getChainId()),"节点相关合约"),
+    REWARD_CONTRACT(NetworkParameters.getPposContractAddressOfReward(NetworkParams.getChainId()),"领取奖励合约");
 
+    private String address;
     private String desc;
 
-    InnerContractAddrEnum(String desc) {
+    InnerContractAddrEnum(String address, String desc) {
+        this.address = address;
         this.desc = desc;
     }
 
     public String getAddress() {
-        switch (this){
-            case RESTRICTING_PLAN_CONTRACT: return NetworkParameters.getPposContractAddressOfRestrctingPlan(NetworkParameters.CurrentNetwork.getChainId());
-            case STAKING_CONTRACT:
-            case DELEGATE_CONTRACT:
-            case NODE_CONTRACT: return NetworkParameters.getPposContractAddressOfStaking(NetworkParameters.CurrentNetwork.getChainId());
-            case SLASH_CONTRACT: return NetworkParameters.getPposContractAddressOfSlash(NetworkParameters.CurrentNetwork.getChainId());
-            case PROPOSAL_CONTRACT: return NetworkParameters.getPposContractAddressOfProposal(NetworkParameters.CurrentNetwork.getChainId());
-            case INCENTIVE_POOL_CONTRACT: return NetworkParameters.getPposContractAddressOfIncentivePool(NetworkParameters.CurrentNetwork.getChainId());
-            case REWARD_CONTRACT: return NetworkParameters.getPposContractAddressOfReward(NetworkParameters.CurrentNetwork.getChainId());
-        }
-        return null;
+        return address;
     }
 
     public String getDesc() {
@@ -52,6 +45,6 @@ public enum InnerContractAddrEnum {
     public static Set<String> getAddresses(){return ADDRESSES;}
 
     static {
-        Arrays.asList(InnerContractAddrEnum.values()).forEach(e-> ADDRESSES.add(e.getAddress()));
+        Arrays.asList(InnerContractAddrEnum.values()).forEach(innerContractAddEnum-> ADDRESSES.add(innerContractAddEnum.address));
     }
 }

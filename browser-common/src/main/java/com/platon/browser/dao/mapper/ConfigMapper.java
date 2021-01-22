@@ -3,9 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.ConfigExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 public interface ConfigMapper {
     long countByExample(ConfigExample example);
 

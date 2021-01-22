@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+@Mapper
 public interface StakingDelegateBalanceAdjustmentMapper {
     /**
      * 质押相关表调账

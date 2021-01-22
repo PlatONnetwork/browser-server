@@ -3,9 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.SlashExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 public interface SlashMapper {
     long countByExample(SlashExample example);
 

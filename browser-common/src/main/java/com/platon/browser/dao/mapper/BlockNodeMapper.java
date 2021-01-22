@@ -3,9 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.entity.BlockNodeExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 public interface BlockNodeMapper {
     long countByExample(BlockNodeExample example);
 

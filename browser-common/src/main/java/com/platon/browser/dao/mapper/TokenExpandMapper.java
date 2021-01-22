@@ -3,9 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.TokenExpand;
 import com.platon.browser.dao.entity.TokenExpandExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 public interface TokenExpandMapper {
     long countByExample(TokenExpandExample example);
 

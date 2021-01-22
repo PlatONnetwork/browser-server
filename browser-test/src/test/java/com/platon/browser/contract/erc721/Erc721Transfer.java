@@ -18,7 +18,6 @@ public class Erc721Transfer extends Erc721Base {
     @Test
     public void mint() throws Exception {
         for (String contractAddress : contractAddressList) {
-            log.error("adminWallet balance:{}",getBalance(adminWallet.getAddress()));
             Erc721Contract contract = loadArc721Contract(contractAddress, adminWallet);
             int count = 0;
             for (String address : walletAddressList) {

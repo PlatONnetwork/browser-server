@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -77,10 +76,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
         try {
             List<Transaction> transactions = event.getTransactions();
-            // 确保交易从小到大的索引顺序
-            transactions.sort(Comparator.comparing(Transaction::getIndex));
-            for (Transaction tx:transactions) tx.setId(++transactionId);
-
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockService.analyze(event);
             // 根据交易解析出业务参数

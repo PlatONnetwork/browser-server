@@ -1,7 +1,6 @@
 package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Config;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
