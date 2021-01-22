@@ -6,12 +6,14 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.alaya.crypto.Credentials;
 import com.alibaba.fastjson.JSON;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
+import com.platon.browser.dao.mapper.CustomTokenMapper;
 import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
@@ -20,6 +22,8 @@ import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.task.bean.TokenHolderNum;
 import com.platon.browser.task.bean.TokenHolderType;
 import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.v0152.bean.ErcToken;
+import com.platon.browser.v0152.cache.ErcCache;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,6 +36,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -46,8 +51,15 @@ public class ErcTokenUpdateTask {
 
     private static final Log log = LogFactory.get();
 
+    // 并发查询Token信息的线程大小
+    private static final int BATH_SIZE = 20;
+
     @Resource
     private TokenMapper tokenMapper;
+    @Resource
+    private CustomTokenMapper customTokenMapper;
+    @Resource
+    private ErcCache ercCache;
 
     @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
@@ -66,7 +78,7 @@ public class ErcTokenUpdateTask {
     private final ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat(ThreadFactoryName + "%d").build();
 
-    private final ExecutorService pool = new ThreadPoolExecutor(30, 30,
+    private final ExecutorService pool = new ThreadPoolExecutor(BATH_SIZE, BATH_SIZE,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 
@@ -78,36 +90,94 @@ public class ErcTokenUpdateTask {
             .build();
 
     /**
-     * 余额补充定时器
+     * 更新ERC 20 token的总供应量
      *
      * @return void
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
     @Scheduled(cron = "0/30  * * * * ?")
-    public void cron() {
+    public void updateTokenTotalSupply() {
         // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
+        if (!AppStatusUtil.isRunning()) return;
+
+        List<List<ErcToken>> batchList = new ArrayList<>();
+        // 从缓存中获取Token更新参数，并构造批次列表
+        List<ErcToken> batch = new ArrayList<>();
+        batchList.add(batch);
+        for (ErcToken token : ercCache.getErc20TokenCache()) {
+            if(batch.size()==BATH_SIZE){
+                // 本批次达到大小限制，则新建批次，并加入批次列表
+                batch = new ArrayList<>();
+                batchList.add(batch);
+            }
+            // 加入批次中
+            batch.add(token);
         }
-        // 更新token_holder表的balance字段
+
+        List<Token> updateList = new ArrayList<>();
+        // 分批并发查询Token totalSupply
+        batchList.forEach(b->{
+            CountDownLatch latch = new CountDownLatch(b.size());
+            for (ErcToken token : b) {
+                pool.submit(() -> {
+                    try {
+                        // 查询总供应量
+                        BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
+                        totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
+                        if(token.getTotalSupply().compareTo(new BigDecimal(totalSupply))!=0){
+                            // 有变动添加到更新列表中
+                            token.setTotalSupply(new BigDecimal(totalSupply));
+                            token.setUpdateTime(new Date());
+                            updateList.add(token);
+                        }
+                    } catch (Exception e) {
+                        log.error("{}",e.getMessage());
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                log.error("",e);
+            }
+        });
+
+        if(!batchList.isEmpty()) {
+            // 批量更新总供应量有变动的记录
+            customTokenMapper.batchInsertOrUpdateSelective(updateList,Token.Column.values());
+        }
+    }
+
+    /**
+     * 更新token持有者余额
+     */
+    @Scheduled(cron = "0/30  * * * * ?")
+    public void updateTokenHolderBalance(){
         try {
             List<TokenHolderType> tokenTypeList = syncTokenInfoMapper.findTokenHolderType();
             if (CollUtil.isNotEmpty(tokenTypeList)) {
                 int size = tokenTypeList.size();
                 List<TokenHolder> tokenHolderList = Collections.synchronizedList(new ArrayList<>(size));
-                CountDownLatch countDownLatch = new CountDownLatch(size);
+                CountDownLatch latch = new CountDownLatch(size);
                 tokenTypeList.forEach(d -> {
                     pool.submit(() -> {
-                        // 查询余额并回填
-                        BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getType(), d.getAddress());
-                        d.setBalance(new BigDecimal(balance));
-                        d.setUpdateTime(DateUtil.date());
-                        tokenHolderList.add(d);
-                        countDownLatch.countDown();
+                        try {
+                            // 查询余额并回填
+                            BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getType(), d.getAddress());
+                            d.setBalance(new BigDecimal(balance));
+                            d.setUpdateTime(DateUtil.date());
+                            tokenHolderList.add(d);
+                        } catch (Exception e) {
+                            log.error("{}",e.getMessage());
+                        } finally {
+                            latch.countDown();
+                        }
                     });
                 });
-                countDownLatch.await();
+                latch.await();
                 if (CollUtil.isNotEmpty(tokenHolderList)) {
                     this.syncTokenInfoMapper.updateAddressBalance(tokenHolderList);
                 }
@@ -115,36 +185,13 @@ public class ErcTokenUpdateTask {
         } catch (Exception e) {
             log.error(e, "更新地址代币余额异常");
         }
+    }
 
-        // 更新token表的total_supply字段
-        try {
-            List<Token> tokens = tokenMapper.selectByExample(null);
-            if (CollUtil.isNotEmpty(tokens)) {
-                int size = tokens.size();
-                List<TotalSupplyUpdateParam> params = Collections.synchronizedList(new ArrayList<>(size));
-                CountDownLatch countDownLatch = new CountDownLatch(size);
-                tokens.forEach(token -> {
-                    pool.submit(() -> {
-                        // 查询总供应量
-                        BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
-                        totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
-                        TotalSupplyUpdateParam tsp = new TotalSupplyUpdateParam();
-                        tsp.setAddress(token.getAddress());
-                        tsp.setTotalSupply(new BigDecimal(totalSupply));
-                        tsp.setUpdateTime(DateUtil.date());
-                        params.add(tsp);
-                        countDownLatch.countDown();
-                    });
-                });
-                countDownLatch.await();
-                if (CollUtil.isNotEmpty(params)) {
-                    syncTokenInfoMapper.updateTokenTotalSupply(params);
-                }
-            }
-        } catch (Exception e) {
-            log.error(e, "定期更新Erc供应总量(包含erc20和erc721)异常");
-        }
-
+    /**
+     * 更新token库存信息
+     */
+    @Scheduled(cron = "0/30  * * * * ?")
+    public void updateTokenInventory(){
         //定期更新token_inventory
         try {
             TokenInventoryExample example = new TokenInventoryExample();
@@ -191,30 +238,4 @@ public class ErcTokenUpdateTask {
             log.error(e, "定期更新token_inventory异常");
         }
     }
-
-    /**
-     * 定期更新token对应的持有人的数量
-     *
-     * @param
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/19
-     */
-    @Scheduled(cron = "0/15  * * * * ?")
-    public void cronUpdateTokenHolder() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
-        }
-        try {
-            List<TokenHolderNum> list = syncTokenInfoMapper.findTokenHolder();
-            if (CollUtil.isNotEmpty(list)) {
-                list.forEach(value -> value.setUpdateTime(DateUtil.date()));
-                syncTokenInfoMapper.updateTokenHolder(list);
-            }
-        } catch (Exception e) {
-            log.error(e, "定期更新token对应的持有人的数量异常");
-        }
-    }
-
 }

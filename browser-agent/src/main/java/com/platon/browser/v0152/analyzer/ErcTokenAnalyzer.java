@@ -11,7 +11,6 @@ import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.bean.ErcToken;
-import com.platon.browser.v0152.bean.ErcTokenCacheItem;
 import com.platon.browser.v0152.bean.ErcTxInfo;
 import com.platon.browser.v0152.cache.ErcCache;
 import com.platon.browser.v0152.contract.ErcContract;
@@ -59,8 +58,6 @@ public class ErcTokenAnalyzer {
         BeanUtils.copyProperties(contractId,token);
         token.setTypeEnum(contractId.getTypeEnum());
         token.setType(contractId.getTypeEnum().name().toLowerCase());
-        ErcTokenCacheItem cacheItem = new ErcTokenCacheItem();
-        cacheItem.init(token);
         switch (contractId.getTypeEnum()){
             case ERC20:
                 token.setIsSupportErc20(true);
@@ -68,7 +65,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(false);
                 token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
                 token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                ercCache.getTokenCache().put(contractAddress,cacheItem);
+                ercCache.getErc20TokenCache().add(token);
                 ercCache.getErc20AddressCache().add(contractAddress);
                 break;
             case ERC721:
@@ -77,7 +74,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress));
                 token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress));
-                ercCache.getTokenCache().put(contractAddress,cacheItem);
+                ercCache.getErc721TokenCache().add(token);
                 ercCache.getErc721AddressCache().add(contractAddress);
                 break;
             default:
@@ -162,7 +159,7 @@ public class ErcTokenAnalyzer {
         }
         token.setTokenTxQty(token.getTokenTxQty()+txList.size());
         tokenMapper.updateByPrimaryKey(token);
-        ercTokenHolderAnalyzer.analyze(txList);
+        ercTokenHolderAnalyzer.analyze(token,txList);
 
         // 以上所有操作无误，最后更新地址表erc交易数缓存
         txList.forEach(ercTx->{

@@ -1,9 +1,11 @@
 package com.platon.browser.v0152.analyzer;
 
+import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.v0152.cache.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,10 @@ import java.util.List;
 public class ErcTokenHolderAnalyzer {
     @Resource
     private TokenHolderMapper tokenHolderMapper;
+    @Resource
+    private ErcCache ercCache;
     private void resolveTokenHolder(
+            Token token,
             String tokenAddress,
             String userAddress,
             List<TokenHolder> update,
@@ -45,16 +50,22 @@ public class ErcTokenHolderAnalyzer {
             update.add(tokenHolder);
         }
         tokenHolder.setUpdateTime(date);
+        if(!ercCache.getHolderCache().contains(token.getAddress())){
+            // holder缓存中不存在当前的holder地址，则token holder地址数 + 1
+            token.setHolder(token.getHolder()+1);
+        }
+        // 把holder地址添加到holder缓存
+        ercCache.getHolderCache().add(tokenHolder.getAddress());
     }
     /**
      * 解析Token Holder
      */
-    public void analyze(List<ErcTx> txList) {
+    public void analyze(Token token, List<ErcTx> txList) {
         List<TokenHolder> update = new ArrayList<>();
         List<TokenHolder> insert = new ArrayList<>();
         txList.forEach(tx->{
-            resolveTokenHolder(tx.getContract(),tx.getFrom(),update,insert);
-            resolveTokenHolder(tx.getContract(),tx.getTo(),update,insert);
+            resolveTokenHolder(token,tx.getContract(),tx.getFrom(),update,insert);
+            resolveTokenHolder(token,tx.getContract(),tx.getTo(),update,insert);
         });
         if(!insert.isEmpty()) tokenHolderMapper.batchInsert(insert);
         if(!update.isEmpty()) {
