@@ -119,7 +119,11 @@ public class ErcTokenUpdateTask {
                             // 有变动添加到更新列表中
                             token.setTotalSupply(new BigDecimal(totalSupply));
                             token.setUpdateTime(new Date());
+                            token.setDirty(true);
+                        }
+                        if(token.isDirty()){
                             updateList.add(token);
+                            token.setDirty(false);
                         }
                     } catch (Exception e) {
                         log.error(e.getMessage());

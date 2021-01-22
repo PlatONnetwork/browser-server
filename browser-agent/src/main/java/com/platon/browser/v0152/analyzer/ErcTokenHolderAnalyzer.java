@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.cache.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class ErcTokenHolderAnalyzer {
     @Resource
     private ErcCache ercCache;
     private void resolveTokenHolder(
-            Token token,
+            ErcToken token,
             String tokenAddress,
             String userAddress,
             List<TokenHolder> update,
@@ -53,6 +54,8 @@ public class ErcTokenHolderAnalyzer {
         if(!ercCache.getHolderCache().contains(token.getAddress())){
             // holder缓存中不存在当前的holder地址，则token holder地址数 + 1
             token.setHolder(token.getHolder()+1);
+            token.setDirty(true);
+            token.setUpdateTime(new Date());
         }
         // 把holder地址添加到holder缓存
         ercCache.getHolderCache().add(tokenHolder.getAddress());
@@ -60,7 +63,7 @@ public class ErcTokenHolderAnalyzer {
     /**
      * 解析Token Holder
      */
-    public void analyze(Token token, List<ErcTx> txList) {
+    public void analyze(ErcToken token, List<ErcTx> txList) {
         List<TokenHolder> update = new ArrayList<>();
         List<TokenHolder> insert = new ArrayList<>();
         txList.forEach(tx->{

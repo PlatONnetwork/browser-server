@@ -58,6 +58,8 @@ public class ErcTokenAnalyzer {
         BeanUtils.copyProperties(contractId,token);
         token.setTypeEnum(contractId.getTypeEnum());
         token.setType(contractId.getTypeEnum().name().toLowerCase());
+        ErcToken cache = new ErcToken();
+        BeanUtils.copyProperties(token,cache);
         switch (contractId.getTypeEnum()){
             case ERC20:
                 token.setIsSupportErc20(true);
@@ -65,7 +67,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(false);
                 token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
                 token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                ercCache.getErc20TokenCache().add(token);
+                ercCache.getErc20TokenCache().add(cache);
                 ercCache.getErc20AddressCache().add(contractAddress);
                 break;
             case ERC721:
@@ -74,7 +76,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress));
                 token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress));
-                ercCache.getErc721TokenCache().add(token);
+                ercCache.getErc721TokenCache().add(cache);
                 ercCache.getErc721AddressCache().add(contractAddress);
                 break;
             default:
