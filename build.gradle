@@ -110,7 +110,7 @@ subprojects {
     }
 
     // 配置文件更新&生成
-    def bootApps = ['browser-agent','browser-api','browser-common','browser-export','browser-press','browser-sync']
+    def bootApps = ['browser-agent','browser-api','browser-export','browser-press','browser-sync']
     if(project.name in bootApps){
         def desc='通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录'
         def tplPath="${projectDir.path}/conftpl/"
