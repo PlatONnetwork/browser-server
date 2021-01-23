@@ -8,14 +8,15 @@ import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.dao.entity.Erc20TokenDetailWithBLOBs;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenExample;
-import com.platon.browser.dao.mapper.CustomTokenMapper;
-import com.platon.browser.dao.mapper.Erc20TokenDetailMapper;
-import com.platon.browser.dao.mapper.Erc20TokenMapper;
-import com.platon.browser.dao.mapper.TokenMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.request.token.QueryTokenDetailReq;
+import com.platon.browser.request.token.QueryTokenIdDetailReq;
+import com.platon.browser.request.token.QueryTokenIdListReq;
 import com.platon.browser.request.token.QueryTokenListReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.token.QueryTokenDetailResp;
+import com.platon.browser.response.token.QueryTokenIdDetailResp;
+import com.platon.browser.response.token.QueryTokenIdListResp;
 import com.platon.browser.response.token.QueryTokenListResp;
 import com.platon.browser.service.redis.RedisErc20TokenService;
 import com.platon.browser.utils.ConvertUtil;
@@ -42,12 +43,10 @@ import java.util.stream.Collectors;
 public class TokenService {
 
     @Resource
-    private Erc20TokenMapper erc20TokenMapper;
-    @Resource
-    private Erc20TokenDetailMapper erc20TokenDetailMapper;
+    private CustomTokenMapper customTokenMapper;
 
     @Resource
-    private CustomTokenMapper customTokenMapper;
+    private CustomTokenInventoryMapper customTokenInventoryMapper;
 
     public RespPage<QueryTokenListResp> queryTokenList(QueryTokenListReq req) {
         // page params: #{offset}, #{size}
@@ -117,5 +116,22 @@ public class TokenService {
 //        }
 //        return response;
     }
+
+
+    public RespPage<QueryTokenIdListResp> queryTokenList(QueryTokenIdListReq req) {
+        RespPage<QueryTokenIdListResp> result = new RespPage<>();
+        PageHelper.startPage(req.getPageNo(), req.getPageSize());
+//        Page<CustomToken> customTokens = customTokenMapper.selectListByType(req.getType());
+//        List<QueryTokenListResp> data = customTokens.stream().map(customToken -> QueryTokenListResp.fromToken(customToken)).collect(Collectors.toList());
+//        result.init(customTokens, data);
+        return result;
+    }
+
+    public QueryTokenIdDetailResp queryTokenIdDetail(QueryTokenIdDetailReq req) {
+//        QueryTokenIdDetailResp resp = customTokenMapper.selectDetailByAddress(req.getAddress());
+//        return  QueryTokenIdDetailResp.fromTokenDetail(customTokenDetail);
+        return null;
+    }
+
 
 }
