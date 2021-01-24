@@ -10,7 +10,11 @@ import java.util.Map;
  * @Description:
  */
 public enum ContractTypeEnum {
-    INNER(0, "INNER"), EVM(1, "EVM"), WASM(2, "WASM"), UNKNOWN(3, "UNKNOWN"), ERC20_EVM(4, "ERC20_EVM");
+    INNER(0, "INNER"),
+    EVM(1, "EVM"),
+    WASM(2, "WASM"),
+    UNKNOWN(3, "UNKNOWN"),
+    ERC20_EVM(4, "ERC20_EVM");
 
     private int code;
     private String desc;

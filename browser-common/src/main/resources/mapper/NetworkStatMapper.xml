@@ -25,7 +25,6 @@
     <result column="add_issue_end" jdbcType="BIGINT" property="addIssueEnd" />
     <result column="next_settle" jdbcType="BIGINT" property="nextSettle" />
     <result column="node_opt_seq" jdbcType="BIGINT" property="nodeOptSeq" />
-    <result column="token_qty" jdbcType="INTEGER" property="tokenQty" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="avg_pack_time" jdbcType="BIGINT" property="avgPackTime" />
@@ -97,7 +96,7 @@
     id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
     turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
     proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
-    add_issue_end, next_settle, node_opt_seq, token_qty, create_time, update_time, avg_pack_time, 
+    add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time, 
     erc721_tx_qty, erc20_tx_qty
   </sql>
   <sql id="Blob_Column_List">
@@ -159,10 +158,9 @@
       staking_value, doing_proposal_qty, proposal_qty, 
       address_qty, block_reward, staking_reward, 
       settle_staking_reward, add_issue_begin, add_issue_end, 
-      next_settle, node_opt_seq, token_qty, 
-      create_time, update_time, avg_pack_time, 
-      erc721_tx_qty, erc20_tx_qty, issue_rates
-      )
+      next_settle, node_opt_seq, create_time, 
+      update_time, avg_pack_time, erc721_tx_qty, 
+      erc20_tx_qty, issue_rates)
     values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
       #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, 
       #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, 
@@ -170,10 +168,9 @@
       #{stakingValue,jdbcType=DECIMAL}, #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
       #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, 
       #{settleStakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
-      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{tokenQty,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT}, 
-      #{erc721TxQty,jdbcType=INTEGER}, #{erc20TxQty,jdbcType=INTEGER}, #{issueRates,jdbcType=LONGVARCHAR}
-      )
+      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT}, #{erc721TxQty,jdbcType=INTEGER}, 
+      #{erc20TxQty,jdbcType=INTEGER}, #{issueRates,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into network_stat
@@ -246,9 +243,6 @@
       </if>
       <if test="nodeOptSeq != null">
         node_opt_seq,
-      </if>
-      <if test="tokenQty != null">
-        token_qty,
       </if>
       <if test="createTime != null">
         create_time,
@@ -338,9 +332,6 @@
       </if>
       <if test="nodeOptSeq != null">
         #{nodeOptSeq,jdbcType=BIGINT},
-      </if>
-      <if test="tokenQty != null">
-        #{tokenQty,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -440,9 +431,6 @@
       <if test="record.nodeOptSeq != null">
         node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
       </if>
-      <if test="record.tokenQty != null">
-        token_qty = #{record.tokenQty,jdbcType=INTEGER},
-      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -491,7 +479,6 @@
       add_issue_end = #{record.addIssueEnd,jdbcType=BIGINT},
       next_settle = #{record.nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
-      token_qty = #{record.tokenQty,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
@@ -527,7 +514,6 @@
       add_issue_end = #{record.addIssueEnd,jdbcType=BIGINT},
       next_settle = #{record.nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
-      token_qty = #{record.tokenQty,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
@@ -606,9 +592,6 @@
       <if test="nodeOptSeq != null">
         node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
       </if>
-      <if test="tokenQty != null">
-        token_qty = #{tokenQty,jdbcType=INTEGER},
-      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -654,7 +637,6 @@
       add_issue_end = #{addIssueEnd,jdbcType=BIGINT},
       next_settle = #{nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
-      token_qty = #{tokenQty,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
@@ -687,7 +669,6 @@
       add_issue_end = #{addIssueEnd,jdbcType=BIGINT},
       next_settle = #{nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
-      token_qty = #{tokenQty,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
@@ -705,8 +686,8 @@
     (id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
       turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
       proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, 
-      add_issue_begin, add_issue_end, next_settle, node_opt_seq, token_qty, create_time, 
-      update_time, avg_pack_time, erc721_tx_qty, erc20_tx_qty, issue_rates)
+      add_issue_begin, add_issue_end, next_settle, node_opt_seq, create_time, update_time, 
+      avg_pack_time, erc721_tx_qty, erc20_tx_qty, issue_rates)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
@@ -718,9 +699,9 @@
         #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL}, 
         #{item.settleStakingReward,jdbcType=DECIMAL}, #{item.addIssueBegin,jdbcType=BIGINT}, 
         #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT}, 
-        #{item.tokenQty,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.avgPackTime,jdbcType=BIGINT}, #{item.erc721TxQty,jdbcType=INTEGER}, #{item.erc20TxQty,jdbcType=INTEGER}, 
-        #{item.issueRates,jdbcType=LONGVARCHAR})
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.avgPackTime,jdbcType=BIGINT}, 
+        #{item.erc721TxQty,jdbcType=INTEGER}, #{item.erc20TxQty,jdbcType=INTEGER}, #{item.issueRates,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -807,9 +788,6 @@
         <if test="'node_opt_seq'.toString() == column.value">
           #{item.nodeOptSeq,jdbcType=BIGINT}
         </if>
-        <if test="'token_qty'.toString() == column.value">
-          #{item.tokenQty,jdbcType=INTEGER}
-        </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
@@ -832,4 +810,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

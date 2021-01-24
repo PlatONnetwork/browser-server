@@ -2,29 +2,25 @@ package com.platon.browser.bootstrap.service;
 
 import com.alaya.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.*;
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.bean.CollectionNetworkStat;
-import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
-import com.platon.browser.bean.AnnualizedRateInfo;
-import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.bean.CustomNode;
-import com.platon.browser.bean.CustomProposal;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.service.elasticsearch.*;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
+import com.platon.browser.v0152.cache.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -65,8 +61,6 @@ public class InitializationService {
     @Resource
     private ParameterService parameterService;
     @Resource
-    private ProposalMapper proposalMapper;
-    @Resource
     private ProposalCache proposalCache;
     @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
@@ -81,8 +75,6 @@ public class InitializationService {
     @Resource
     private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Resource
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
-    @Resource
     private EsNodeOptRepository ESNodeOptRepository;
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
@@ -90,14 +82,14 @@ public class InitializationService {
     private EsErc721TxRepository esErc721TxRepository;
     @Resource
     private EsTransferTxRepository esTransferTxRepository;
+    @Resource
+    private ErcCache ercCache;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
-        // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
-        ProposalExample proposalExample = new ProposalExample();
-        proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
-        List<Proposal> proposalList = proposalMapper.selectByExample(proposalExample);
-        proposalCache.init(proposalList);
+
+        proposalCache.init();
+        ercCache.init();
 
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
@@ -157,7 +149,6 @@ public class InitializationService {
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
         addressList = addressMapper.selectByExample(addressExample);
-        addressCache.initEvmErc20ContractAddressCache(addressList);
 
         // 初始化WASM合约地址缓存，用于后续交易的类型判断（调用WASM合约）
         addressExample = new AddressExample();
@@ -297,7 +288,6 @@ public class InitializationService {
         	ESTransactionRepository.initIndex();
         	ESDelegationRewardRepository.initIndex();
         	ESNodeOptRepository.initIndex();
-            oldEsErc20TxRepository.initIndex();
         	esTransferTxRepository.initIndex();
         	esErc20TxRepository.initIndex();
         	esErc721TxRepository.initIndex();

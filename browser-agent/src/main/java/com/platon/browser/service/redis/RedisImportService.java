@@ -3,10 +3,8 @@ package com.platon.browser.service.redis;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +31,11 @@ public class RedisImportService {
     @Resource
     private RedisStatisticService redisStatisticService;
     @Resource
-    private OldRedisErc20TxService oldRedisErc20TxService;
-    @Resource
     private RedisErc20TxService redisErc20TxService;
     @Resource
     private RedisErc721TxService redisErc721TxService;
 
-    private static final int SERVICE_COUNT = 6;
+    private static final int SERVICE_COUNT = 5;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
@@ -60,14 +56,12 @@ public class RedisImportService {
         log.debug("Redis批量导入:{}(blocks({}),transactions({}),statistics({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),statistics.size());
         long startTime = System.currentTimeMillis();
         try{
-            Set<OldErcTx> oldErc20TxList = getOldErc20TxList(transactions);
             Set<ErcTx> erc20TxList = getErc20TxList(transactions);
             Set<ErcTx> erc721TxList = getErc721TxList(transactions);
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
             submit(redisBlockService,blocks,false,latch);
             submit(redisTransactionService,transactions,false,latch);
             submit(redisStatisticService,statistics,true,latch);
-            submit(oldRedisErc20TxService, oldErc20TxList,false,latch);
             submit(redisErc20TxService, erc20TxList,false,latch);
             submit(redisErc721TxService, erc721TxList,false,latch);
             latch.await();
@@ -79,34 +73,14 @@ public class RedisImportService {
     }
 
     /**
-     * 取Token交易列表
-     */
-    public Set<OldErcTx> getOldErc20TxList(Set<Transaction> txSet){
-        Set<OldErcTx> recordSet = new HashSet<>();
-        if (txSet != null && !txSet.isEmpty()) {
-            for (Transaction tx : txSet) {
-                if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
-                    recordSet.addAll(tx.getOldErcTxes());
-                }
-            }
-        }
-        return recordSet;
-    }
-
-    /**
      * 取erc20交易列表
      */
     public Set<ErcTx> getErc20TxList(Set<Transaction> transactions){
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (null != tx && null != tx.getOldErcTxes() && !tx.getOldErcTxes().isEmpty()) {
-                    tx.getOldErcTxes().forEach(e->{
-                        ErcTx ercTx = new ErcTx();
-                        BeanUtils.copyProperties(e,ercTx);
-                        result.add(ercTx);
-                    });
-                }
+                if(tx.getErc20TxList().isEmpty()) continue;
+                result.addAll(tx.getErc20TxList());
             }
         }
         return result;
@@ -116,19 +90,13 @@ public class RedisImportService {
      * 取erc721交易列表
      */
     public Set<ErcTx> getErc721TxList(Set<Transaction> transactions){
-        // TODO: 取出erc721交易
         Set<ErcTx> result = new HashSet<>();
-//        if (transactions != null && !transactions.isEmpty()) {
-//            for (Transaction tx : transactions) {
-//                if (null != tx && null != tx.getEsTokenTransferRecords() && !tx.getEsTokenTransferRecords().isEmpty()) {
-//                    tx.getEsTokenTransferRecords().forEach(e->{
-//                        EsErcTx ercTx = new EsErcTx();
-//                        BeanUtils.copyProperties(e,ercTx);
-//                        result.add(ercTx);
-//                    });
-//                }
-//            }
-//        }
+        if (transactions != null && !transactions.isEmpty()) {
+            for (Transaction tx : transactions) {
+                if(tx.getErc721TxList().isEmpty()) continue;
+                result.addAll(tx.getErc721TxList());
+            }
+        }
         return result;
     }
 }

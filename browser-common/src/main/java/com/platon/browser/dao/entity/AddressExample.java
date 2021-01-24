@@ -596,66 +596,6 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andTokenQtyIsNull() {
-            addCriterion("token_qty is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyIsNotNull() {
-            addCriterion("token_qty is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyEqualTo(Integer value) {
-            addCriterion("token_qty =", value, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyNotEqualTo(Integer value) {
-            addCriterion("token_qty <>", value, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyGreaterThan(Integer value) {
-            addCriterion("token_qty >", value, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("token_qty >=", value, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyLessThan(Integer value) {
-            addCriterion("token_qty <", value, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyLessThanOrEqualTo(Integer value) {
-            addCriterion("token_qty <=", value, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyIn(List<Integer> values) {
-            addCriterion("token_qty in", values, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyNotIn(List<Integer> values) {
-            addCriterion("token_qty not in", values, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyBetween(Integer value1, Integer value2) {
-            addCriterion("token_qty between", value1, value2, "tokenQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenQtyNotBetween(Integer value1, Integer value2) {
-            addCriterion("token_qty not between", value1, value2, "tokenQty");
-            return (Criteria) this;
-        }
-
         public Criteria andTransferQtyIsNull() {
             addCriterion("transfer_qty is null");
             return (Criteria) this;

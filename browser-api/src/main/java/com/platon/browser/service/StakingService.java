@@ -237,7 +237,7 @@ public class StakingService {
 			/**
 			 * 带提取的委托等于hes+lock
 			 */
-			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReleased());
+			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateValue().add(stakingNode.getStatDelegateReleased()));
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSettle()));
 			historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
 
@@ -342,7 +342,7 @@ public class StakingService {
                     }
 				}
 				// 待提取的委托金额(von)
-				resp.setStatDelegateReduction(stakingNode.getStatDelegateReleased());
+				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
 			}
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);

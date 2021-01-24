@@ -6,8 +6,7 @@
     replace into `address` (
         `address`,
         `type`,
-    `tx_qty`,
-    `token_qty`,
+        `tx_qty`,
         `transfer_qty`,
         `delegate_qty`,
         `staking_qty`,
@@ -17,14 +16,15 @@
         `contract_createHash`,
         `have_reward`,
         `contract_destroy_hash`,
-        `contract_bin`
+        `contract_bin`,
+        `erc20_tx_qty`,
+        `erc721_tx_qty`
     ) values
     <foreach collection="addressStatItemList" item="item" separator=",">
     (
         #{item.address},
         #{item.type},
         #{item.txQty},
-        #{item.tokenQty},
         #{item.transferQty},
         #{item.delegateQty},
         #{item.stakingQty},
@@ -34,7 +34,9 @@
         #{item.contractCreatehash},
         #{item.haveReward},
         #{item.contractDestroyHash},
-        #{item.contractBin}
+        #{item.contractBin},
+        #{item.erc20TxQty},
+        #{item.erc721TxQty}
     )
     </foreach>
 </update>

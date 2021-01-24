@@ -34,7 +34,8 @@ public class NetworkStatCache {
         int tps = this.tpsCalcCache.getTps();
         int maxTps = this.tpsCalcCache.getMaxTps();
         this.networkStat.setTxQty(block.getTransactions().size() + this.networkStat.getTxQty());
-        this.networkStat.setTokenQty(block.getTokenQty() + this.networkStat.getTokenQty());
+        this.networkStat.setErc20TxQty(block.getErc20TxQty() + this.networkStat.getErc20TxQty());
+        this.networkStat.setErc721TxQty(block.getErc721TxQty() + this.networkStat.getErc721TxQty());
         this.networkStat.setProposalQty(proposalQty + this.networkStat.getProposalQty());
         this.networkStat.setCurTps(tps);
         this.networkStat.setCurBlockHash(block.getHash());

@@ -1,13 +1,9 @@
 package com.platon.browser.cache;
 
 import com.platon.browser.bean.ComplementInfo;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.param.ppos.DelegateExit;
 import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.Erc20Token;
-import com.platon.browser.dao.entity.Erc20TokenAddressRel;
-import com.platon.browser.bean.CustomErc20Token;
-import com.platon.browser.service.erc20.ERCData;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractDescEnum;
@@ -28,12 +24,6 @@ public class AddressCache {
     // 当前地址缓存，此缓存会在StatisticsAddressConverter执行完业务逻辑后被清除，
     // 所以这是上一次执行StatisticsAddressConverter业务时到当前的累计地址缓存，并不是全部的
     private Map<String, Address> addressMap = new ConcurrentHashMap<>();
-
-    private Map<String, Erc20Token> erc20TokenMap = new ConcurrentHashMap<>();
-
-    private Map<String, Erc20TokenAddressRel> erc20TokenAddressRelMap = new ConcurrentHashMap<>();
-
-    private Map<String, Erc20Token> preErc20TokenMap = new ConcurrentHashMap<>();
 
     // 全量EVM合约地址缓存
     private Set<String> evmContractAddressCache = new HashSet<>();
@@ -57,17 +47,6 @@ public class AddressCache {
         return this.wasmContractAddressCache.contains(address);
     }
 
-    // 全量EVM-erc20合约地址缓存
-    private Set<String> evmErc20ContractAddressCache = new HashSet<>();
-
-    public Set<String> getEvmErc20ContractAddressCache() {
-        return this.evmErc20ContractAddressCache;
-    }
-
-    public boolean isEvmErc20ContractAddress(String address) {
-        return this.evmErc20ContractAddressCache.contains(address);
-    }
-
     public Integer getTypeData(String address) {
         if (InnerContractAddrEnum.getAddresses().contains(address)) {
             return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
@@ -75,9 +54,7 @@ public class AddressCache {
             return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
         } else if (this.isWasmContractAddress(address)) {
             return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
-        } else if (this.isEvmErc20ContractAddress(address)) {
-            return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
-        } else {
+        } else  {
             return Transaction.ToTypeEnum.ACCOUNT.getCode();
         }
     }
@@ -117,10 +94,6 @@ public class AddressCache {
                     address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
                     this.wasmContractAddressCache.add(addr);
                     break;
-                case ERC20_EVM:
-                    address.setType(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
-                    this.evmErc20ContractAddressCache.add(addr);
-                    break;
                 default:
                     break;
             }
@@ -132,39 +105,8 @@ public class AddressCache {
         return this.addressMap.values();
     }
 
-    public Collection<Erc20Token> getAllErc20Token() {
-        return this.erc20TokenMap.values();
-    }
-
-    public Erc20Token getErc20Token(String contractAddress) {
-        Erc20Token erc20Token = this.erc20TokenMap.get(contractAddress);
-        // 防止参数erc数据为null
-        if (null == erc20Token) {
-            erc20Token = this.preErc20TokenMap.get(contractAddress);
-        }
-        return erc20Token;
-    }
-
     public void cleanAll() {
         this.addressMap.clear();
-    }
-
-    public synchronized void cleanErc20TokenCache() {
-        this.preErc20TokenMap.clear();
-        this.preErc20TokenMap.putAll(this.erc20TokenMap);
-        this.erc20TokenMap.clear();
-    }
-
-    public Map<String, Erc20TokenAddressRel> getErc20TokenAddressRelMap() {
-        return this.erc20TokenAddressRelMap;
-    }
-
-    public Erc20TokenAddressRel putErc20TokenAddressRelMap(String key, Erc20TokenAddressRel erc20TokenAddressRel) {
-        return this.erc20TokenAddressRelMap.put(key, erc20TokenAddressRel);
-    }
-
-    public void cleanErc20TokenAddressRelMap() {
-        this.erc20TokenAddressRelMap.clear();
     }
 
     private void updateAddress(Transaction tx, String addr) {
@@ -210,15 +152,6 @@ public class AddressCache {
                 this.evmContractAddressCache.add(addr);
                 address.setContractBin(tx.getBin());
                 break;
-            case ERC20_CONTRACT_CREATE:
-                // 如果地址是EVM合约创建的回执里返回的合约地址
-                address.setContractCreatehash(tx.getHash());
-                address.setContractCreate(tx.getFrom());
-                // 覆盖createDefaultAddress()中设置的值
-                address.setType(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
-                this.evmErc20ContractAddressCache.add(addr);
-                address.setContractBin(tx.getBin());
-                break;
             case WASM_CONTRACT_CREATE:
                 // 如果地址是WASM合约创建的回执里返回的合约地址
                 address.setContractCreatehash(tx.getHash());
@@ -244,7 +177,7 @@ public class AddressCache {
         address.setTxQty(address.getTxQty() + 1);
     }
 
-    public void updateTokenAddress(String addr) {
+    public void updateErc20TxQty(String addr) {
         if (addr == null)
             return;
         Address address = this.addressMap.get(addr);
@@ -252,7 +185,18 @@ public class AddressCache {
             address = this.createDefaultAddress(addr);
             this.addressMap.put(addr, address);
         }
-        address.setTokenQty(address.getTokenQty() + 1);
+        address.setErc20TxQty(address.getErc20TxQty() + 1);
+    }
+
+    public void updateErc721TxQty(String addr) {
+        if (addr == null)
+            return;
+        Address address = this.addressMap.get(addr);
+        if (address == null) {
+            address = this.createDefaultAddress(addr);
+            this.addressMap.put(addr, address);
+        }
+        address.setErc721TxQty(address.getErc721TxQty() + 1);
     }
 
     private Address createDefaultAddress(String addr) {
@@ -279,82 +223,14 @@ public class AddressCache {
         }
 
         address.setTxQty(0);
-        address.setTokenQty(0);
+        address.setErc20TxQty(0);
+        address.setErc721TxQty(0);
         address.setTransferQty(0);
         address.setStakingQty(0);
         address.setDelegateQty(0);
         address.setProposalQty(0);
         address.setHaveReward(BigDecimal.ZERO);
         return address;
-    }
-
-    /**
-     * 初始化默认参数填入erc数据中
-     *
-     * @param addr
-     * @return
-     */
-    public synchronized Erc20Token createDefaultErc20(String addr) {
-        Erc20Token erc20Token = this.erc20TokenMap.get(addr);
-        if (erc20Token == null) {
-            erc20Token = Erc20Token.builder().address(addr).createTime(new Date()).symbol("")
-                    .totalSupply(BigDecimal.ZERO).name("").decimal(0).status(CustomErc20Token.StatusEnum.HIDE.getCode())
-                    .creator("").txHash("").blockTimestamp(new Date()).type("").txCount(0).holder(0).build();
-        }
-        return erc20Token;
-    }
-
-    /**
-     * 创建erc20合约时候调用初始化参数
-     * 
-     * @param addr
-     * @param creator
-     * @param txHash
-     * @param time
-     * @param type
-     * @param ercData
-     * @return
-     */
-    public Erc20Token createFirstErc20(String addr, String creator, String txHash, Date time, String type,
-        ERCData ercData) {
-        Erc20Token erc20Token = this.createDefaultErc20(addr);
-        erc20Token.setAddress(addr);
-        erc20Token.setCreateTime(new Date());
-        erc20Token.setSymbol(ercData.getSymbol());
-        erc20Token.setTotalSupply(new BigDecimal(ercData.getTotalSupply()));
-        erc20Token.setName(ercData.getName());
-        erc20Token.setDecimal(ercData.getDecimal());
-        erc20Token.setCreator(creator);
-        erc20Token.setTxHash(txHash);
-        erc20Token.setBlockTimestamp(time);
-        erc20Token.setType(type);
-        erc20Token.setTxCount(0);
-        erc20Token.setHolder(0);
-        erc20Token.setStatus(0);
-        this.erc20TokenMap.put(addr, erc20Token);
-        return erc20Token;
-    }
-
-    /**
-     * 对地址进行更新加1
-     *
-     * @param addr
-     */
-    public synchronized void updateErcTx(String addr) {
-        Erc20Token erc20Token = this.createDefaultErc20(addr);
-        erc20Token.setTxCount(erc20Token.getTxCount() + 1);
-        this.erc20TokenMap.put(addr, erc20Token);
-    }
-
-    /**
-     * 对地址进行持有加1
-     *
-     * @param addr
-     */
-    public synchronized void updateErcHolder(String addr) {
-        Erc20Token erc20Token = this.createDefaultErc20(addr);
-        erc20Token.setHolder(erc20Token.getHolder() + 1);
-        this.erc20TokenMap.put(addr, erc20Token);
     }
 
     /**
@@ -369,23 +245,6 @@ public class AddressCache {
         addressList.forEach(address -> {
             if (address.getType() == AddressTypeEnum.EVM_CONTRACT.getCode()) {
                 this.evmContractAddressCache.add(address.getAddress());
-            }
-        });
-    }
-
-    /**
-     * 初始化EVM-ERC20地址缓存
-     *
-     * @param addressList
-     *            地址实体列表
-     */
-    public void initEvmErc20ContractAddressCache(List<Address> addressList) {
-        if (addressList.isEmpty())
-            return;
-        this.evmErc20ContractAddressCache.clear();
-        addressList.forEach(address -> {
-            if (address.getType() == AddressTypeEnum.ERC20_EVM_CONTRACT.getCode()) {
-                this.evmErc20ContractAddressCache.add(address.getAddress());
             }
         });
     }

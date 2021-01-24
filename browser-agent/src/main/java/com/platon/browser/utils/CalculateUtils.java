@@ -1,16 +1,14 @@
 package com.platon.browser.utils;
 
+import com.alaya.utils.Convert;
 import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
-import com.platon.browser.service.erc20.ExtendEvent;
 import lombok.extern.slf4j.Slf4j;
-import com.alaya.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -202,48 +200,5 @@ public class CalculateUtils {
 				.multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
 				.multiply(BigDecimal.valueOf(100));
 		return rate.setScale(2,RoundingMode.FLOOR);
-	}
-
-	public static List<ExtendEvent.EventWrapper> buildEvents(BlockChainConfig chainConfig) {
-		List<ExtendEvent.EventWrapper> response = new ArrayList<>();
-		Map<String, String> eventDefineMap = chainConfig.getEventDefine();
-		if (eventDefineMap == null) {
-			log.warn("未配置代币的Event定义，无需进一步解析");
-			return null;
-		}
-		// "0#address:indexed,string:non-indexed,uint256:non-indexed"
-		for (Map.Entry<String, String> item : eventDefineMap.entrySet()) {
-			String eventName = item.getKey();
-			String val = item.getValue();
-			log.info("解析事件定义，名称:{}, 定义：{}", eventName, val);
-			String[] eventArray = val.split("#");
-			if (eventArray.length != 2) {
-				continue;
-			}
-			String addressIndex = eventArray[0];
-
-			// 解析事件定义-类型
-			// address:indexed,string:non-indexed,uint256:non-indexed
-			String eventDefine = eventArray[1];
-			String[] eventDefineArray = eventDefine.split(",");
-			List<ExtendEvent.EventDefine> eventDefineList = new ArrayList<>();
-			for (int i = 0; i < eventDefineArray.length; i++) {
-				String typeIndexedStr = eventDefineArray[i];
-				String[] typeIndexedArray = typeIndexedStr.split(":");
-				if (typeIndexedArray.length != 2) {
-					break;
-				}
-				String type = typeIndexedArray[0];
-				String indexed = typeIndexedArray[1];
-				ExtendEvent.EventDefine event = new ExtendEvent.EventDefine();
-				event.setType(type);
-				event.setIndexed(indexed.equalsIgnoreCase("indexed") ? true : false);
-				eventDefineList.add(event);
-			}
-			if (eventDefineList.size() != 0) {
-				response.add(new ExtendEvent.EventWrapper(eventName, eventDefineList, Integer.valueOf(addressIndex)));
-			}
-		}
-		return response;
 	}
 }

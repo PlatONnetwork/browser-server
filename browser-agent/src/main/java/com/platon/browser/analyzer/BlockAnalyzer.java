@@ -10,11 +10,11 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.erc20.Erc20ResolveServiceImpl;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.NodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -29,9 +29,7 @@ import java.util.Map;
 public class BlockAnalyzer {
     @Resource
     private TransactionAnalyzer transactionAnalyzer;
-    @Resource
-    private Erc20ResolveServiceImpl erc20ResolveServiceImpl;
-
+    @Transactional(rollbackFor = Exception.class)
     public CollectionBlock analyze(PlatonBlock.Block rawBlock, ReceiptResult receipt) throws ContractInvokeException, BlankResponseException, BeanCreateOrUpdateException {
         String nodeId;
         if (rawBlock.getNumber().longValue() == 0) {
@@ -66,13 +64,11 @@ public class BlockAnalyzer {
                 CollectionTransaction transaction = transactionAnalyzer.analyze(result,rawTransaction,receiptMap.get(rawTransaction.getHash()));
                 // 把解析好的交易添加到当前区块的交易列表
                 result.getTransactions().add(transaction);
-                // 累加当前当前区块的token交易数
-                result.setTokenQty(result.getTokenQty() + transaction.getOldErcTxes().size());
+                // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
+                result.setErc20TxQty(result.getErc20TxQty()+transaction.getErc20TxList().size());
+                result.setErc721TxQty(result.getErc721TxQty()+transaction.getErc721TxList().size());
             }
         }
-
-        // 初始化合约缓存
-        erc20ResolveServiceImpl.initContractAddressCache(result.getTransactions());
         return result;
     }
 }

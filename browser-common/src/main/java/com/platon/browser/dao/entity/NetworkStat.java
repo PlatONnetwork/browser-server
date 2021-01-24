@@ -52,8 +52,6 @@ public class NetworkStat {
 
     private Long nodeOptSeq;
 
-    private Integer tokenQty;
-
     private Date createTime;
 
     private Date updateTime;
@@ -250,14 +248,6 @@ public class NetworkStat {
         this.nodeOptSeq = nodeOptSeq;
     }
 
-    public Integer getTokenQty() {
-        return tokenQty;
-    }
-
-    public void setTokenQty(Integer tokenQty) {
-        this.tokenQty = tokenQty;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -337,7 +327,6 @@ public class NetworkStat {
         addIssueEnd("add_issue_end", "addIssueEnd", "BIGINT", false),
         nextSettle("next_settle", "nextSettle", "BIGINT", false),
         nodeOptSeq("node_opt_seq", "nodeOptSeq", "BIGINT", false),
-        tokenQty("token_qty", "tokenQty", "INTEGER", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),

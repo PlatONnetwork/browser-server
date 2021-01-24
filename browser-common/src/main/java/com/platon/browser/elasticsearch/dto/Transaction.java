@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -45,25 +46,20 @@ public class Transaction {
     private String contractAddress;
 
     // erc721交易列表
-    @JsonIgnore
+    @JSONField(serialize = false)
     private List<ErcTx> erc721TxList = new ArrayList<>();
     // erc20 交易列表
-    @JsonIgnore
+    @JSONField(serialize = false)
     private List<ErcTx> erc20TxList = new ArrayList<>();
     // 内部转账交易
-    @JsonIgnore
+    @JSONField(serialize = false)
     private List<Transaction> transferTxList = new ArrayList<>();
     // PPOS调用交易
-    @JsonIgnore
+    @JSONField(serialize = false)
     private List<Transaction> pposTxList = new ArrayList<>();
-
     // 虚拟交易，
-    @JsonIgnore
+    @JSONField(serialize = false)
     private List<Transaction> virtualTransactions = new ArrayList<>();
-
-    // 虚拟erc20交易，
-    @JsonIgnore
-    private List<OldErcTx> oldErcTxes = new ArrayList<>();
 
     /******** 把字符串类数值转换为大浮点数的便捷方法 ********/
     public BigDecimal decimalGasLimit() {

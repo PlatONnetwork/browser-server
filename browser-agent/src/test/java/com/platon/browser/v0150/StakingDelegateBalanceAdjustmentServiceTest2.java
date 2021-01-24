@@ -59,7 +59,7 @@
 //
 //    private Node node;
 //    private Staking staking;
-//    private Delegation delegate.yml;
+//    private Delegation delegate.estpl.yml;
 //    private List<AdjustParam> delegateAdjustParamList = new ArrayList<>();
 //    private List<AdjustParam> stakingAdjustParamList = new ArrayList<>();
 //
@@ -77,10 +77,10 @@
 //        staking.setStakingHes(BigDecimal.ONE);
 //        staking.setStakingLocked(BigDecimal.ONE);
 //        staking.setStakingReduction(BigDecimal.valueOf(2));
-//        delegate.yml = delegationList.get(0);
-//        delegate.yml.setDelegateHes(BigDecimal.ONE);
-//        delegate.yml.setDelegateLocked(BigDecimal.ONE);
-//        delegate.yml.setDelegateReleased(BigDecimal.valueOf(2));
+//        delegate.estpl.yml = delegationList.get(0);
+//        delegate.estpl.yml.setDelegateHes(BigDecimal.ONE);
+//        delegate.estpl.yml.setDelegateLocked(BigDecimal.ONE);
+//        delegate.estpl.yml.setDelegateReleased(BigDecimal.valueOf(2));
 //
 //        adjustParamList = specialApi.getStakingDelegateAdjustDataList(web3j, BigInteger.valueOf(9641));
 //        adjustParamList.forEach(param->{
@@ -94,7 +94,7 @@
 //
 //        when(nodeMapper.selectByPrimaryKey(any())).thenReturn(node);
 //        when(stakingMapper.selectByPrimaryKey(any())).thenReturn(staking);
-//        when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegate.yml);
+//        when(delegationMapper.selectByPrimaryKey(any())).thenReturn(delegate.estpl.yml);
 //    }
 //
 //    private void adjustDelegate() throws BlockNumberException {

@@ -1,0 +1,28 @@
+index_patterns:
+  - "*_delegation_reward"
+settings:
+  index:
+    max_result_window: '2000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    cre_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    extra_clean:
+      type: text
+    extra:
+      type: text
+    node_name:
+      type: text
+    upd_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    addr:
+      type: keyword
+    hash:
+      type: keyword

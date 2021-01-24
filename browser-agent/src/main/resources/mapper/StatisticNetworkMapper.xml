@@ -25,7 +25,6 @@
         `node_id`,
         `node_name`,
         `tx_qty`,
-        `token_qty`,
         `cur_tps`,
         `max_tps`,
         `issue_value`,
@@ -44,7 +43,9 @@
         `address_qty`,
         `settle_staking_reward`,
         `avg_pack_time`,
-        `issue_rates`
+        `issue_rates`,
+        `erc20_tx_qty`,
+        `erc721_tx_qty`
     )
     values
     (
@@ -53,7 +54,6 @@
         #{nodeId},
         #{nodeName},
         #{txQty},
-        #{tokenQty},
         #{curTps},
         #{maxTps},
         #{issueValue},
@@ -72,7 +72,9 @@
         #{addressQty},
         #{settleStakingReward},
         #{avgPackTime},
-        #{issueRates}
+        #{issueRates},
+        #{erc20TxQty},
+        #{erc721TxQty}
     )
     on duplicate
     key update
@@ -80,7 +82,6 @@
         `node_id` = #{nodeId},
         `node_name` = #{nodeName},
         `tx_qty` = #{txQty},
-        `token_qty` = #{tokenQty},
         `cur_tps` = #{curTps},
         `max_tps` = #{maxTps},
         `issue_value` = #{issueValue},
@@ -99,7 +100,9 @@
         `address_qty` = #{addressQty},
         `settle_staking_reward` = #{settleStakingReward},
         `avg_pack_time` = #{avgPackTime},
-        `issue_rates` = #{issueRates}
+        `issue_rates` = #{issueRates},
+        `erc20_tx_qty` = #{erc20TxQty},
+        `erc721_tx_qty` = #{erc721TxQty}
         ;
 </update>
 </mapper>

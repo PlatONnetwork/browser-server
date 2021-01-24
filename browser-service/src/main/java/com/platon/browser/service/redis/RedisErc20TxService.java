@@ -2,7 +2,6 @@ package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class RedisErc20TxService extends AbstractRedisService<ErcTx> {
 
     @Override
     public void updateExistScore(Set<String> exist) {
-        Objects.requireNonNull(exist).forEach(item -> existScore.add(JSON.parseObject(item, OldErcTx.class).getSeq()));
+        Objects.requireNonNull(exist).forEach(item -> existScore.add(JSON.parseObject(item, ErcTx.class).getSeq()));
     }
 
     @Override

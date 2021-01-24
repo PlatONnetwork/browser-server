@@ -15,6 +15,6 @@ public class EsErc721TxRepository extends AbstractEsRepository {
     }
     @Override
     public String getTemplateFileName() {
-        return "erc721_tx";
+        return "erc721-tx";
     }
 }

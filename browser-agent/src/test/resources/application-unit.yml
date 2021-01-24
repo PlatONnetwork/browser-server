@@ -108,10 +108,6 @@ platon:
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
   #链id
   chainId: 201018
-  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
-  eventDefine: {
-    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
-  }
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
   #Es索引命名空间
