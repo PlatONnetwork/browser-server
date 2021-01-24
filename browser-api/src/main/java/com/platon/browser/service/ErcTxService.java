@@ -3,16 +3,12 @@ package com.platon.browser.service;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.platon.browser.bean.CustomToken;
 import com.platon.browser.bean.CustomTokenHolder;
-import com.platon.browser.cache.OldTokenTransferRecordCacheDto;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
 import com.platon.browser.request.token.QueryTokenHolderListReq;
@@ -40,7 +36,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -58,8 +53,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ErcTxService {
 
-    @Resource
-    private Erc20TokenTransferRecordMapper erc20TokenTransferRecordMapper;
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
     @Resource
@@ -154,8 +147,9 @@ public class ErcTxService {
         List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
         if(networkStatList!=null&&!networkStatList.isEmpty()){
             NetworkStat networkStat = networkStatList.get(0);
-            result.setTotalCount(networkStat.getTokenQty());
-            result.setDisplayTotalCount(networkStat.getTokenQty());
+            totalCount = isErc20? networkStat.getErc20TxQty():networkStat.getErc721TxQty();
+            result.setTotalCount(totalCount);
+            result.setDisplayTotalCount(totalCount);
         }
         return result;
     }
@@ -406,11 +400,4 @@ public class ErcTxService {
 //        return this.ercService.getBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
     }
 
-    public int save(Erc20TokenTransferRecord record) {
-        return this.erc20TokenTransferRecordMapper.insert(record);
-    }
-
-    public int batchSave(List<Erc20TokenTransferRecord> list) {
-        return this.erc20TokenTransferRecordMapper.batchInsert(list);
-    }
 }

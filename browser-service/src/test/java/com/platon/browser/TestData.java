@@ -6,7 +6,6 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.v0150.bean.AdjustParam;
 import org.apache.commons.io.FileUtils;
@@ -45,10 +44,6 @@ public class TestData {
     protected List<CustomDelegation> delegationList= Collections.emptyList();
     protected List<Node> nodeList = new ArrayList<>();
     protected List<Block> blockList = Collections.emptyList();
-    protected List<Erc20Token> erc20Tokens = Collections.emptyList();
-    protected List<Erc20TokenDetailWithBLOBs> erc20TokenDetails = Collections.emptyList();
-    protected List<OldErcTx> oldErcTxes = Collections.emptyList();
-    protected List<Erc20TokenAddressRel> erc20TokenAddressRels = Collections.emptyList();
     protected List<AdjustParam> adjustParamList = new ArrayList<>();
 
     @Before
@@ -81,18 +76,6 @@ public class TestData {
                         break;
                     case "block":
                         this.blockList = JSON.parseArray(content, Block.class);
-                        break;
-                    case "erc20Token":
-                        this.erc20Tokens = JSON.parseArray(content, Erc20Token.class);
-                        break;
-                    case "erc20TokenDetail":
-                        this.erc20TokenDetails = JSON.parseArray(content, Erc20TokenDetailWithBLOBs.class);
-                        break;
-                    case "erc20TokenAddressRel":
-                        this.erc20TokenAddressRels = JSON.parseArray(content, Erc20TokenAddressRel.class);
-                        break;
-                    case "erc20TokenTransfer":
-                        this.oldErcTxes = JSON.parseArray(content, OldErcTx.class);
                         break;
                     case "adjust-data":
                         adjustParamList = JSON.parseArray(content, AdjustParam.class);

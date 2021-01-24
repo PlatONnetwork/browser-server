@@ -7,7 +7,6 @@ import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.springframework.stereotype.Service;
 
@@ -67,18 +66,6 @@ public class StatisticCacheService extends CacheBase {
 			blockRedisList.add(blockRedis);
 		});
 		return blockRedisList;
-	}
-
-	public OldTokenTransferRecordCacheDto getTokenTransferRecordCache(Integer pageNum, Integer pageSize) {
-		/* 分页根据key来获取交易数据  */
-		CachePageInfo<Class<OldErcTx>> cpi = this.getCachePageInfo(redisKeyConfig.getErc20Tx(), pageNum, pageSize);
-		List<OldErcTx> oldErcTxList = new LinkedList<>();
-		cpi.data.forEach(str -> {
-			/* 获取数据转换成对象 */
-			OldErcTx tokenTransferRedis = JSON.parseObject(str, OldErcTx.class);
-			oldErcTxList.add(tokenTransferRedis);
-		});
-		return new OldTokenTransferRecordCacheDto(oldErcTxList, cpi.page);
 	}
 
 	public TokenTransferRecordCacheDto getTokenTransferCache(Integer pageNum, Integer pageSize,boolean isErc20) {

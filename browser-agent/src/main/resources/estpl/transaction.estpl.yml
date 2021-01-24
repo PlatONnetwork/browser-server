@@ -1,0 +1,104 @@
+index_patterns:
+  - "*_transaction"
+settings:
+  index:
+    max_result_window: '2000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    type:
+      type: short
+    seq:
+      type: long
+    bHash:
+      type: keyword
+    num:
+      type: long
+    index:
+      type: short
+    hash:
+      type: keyword
+    from:
+      type: keyword
+    to:
+      type: keyword
+    fromType:
+      type: integer
+    toType:
+      type: integer
+    nonce:
+      type: long
+    gasLimit:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    gasPrice:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    gasUsed:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    cost:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    value:
+      type: text
+    status:
+      type: integer
+    time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    input:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    info:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    erc721TxInfo:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    erc20TxInfo:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    transferTxInfo:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    pposTxInfo:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    failReason:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    creTime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    updTime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    remark:
+      norms: false
+      index: false
+      type: text
+      doc_values: false

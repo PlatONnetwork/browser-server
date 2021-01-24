@@ -16,6 +16,6 @@ public class EsDelegationRewardRepository extends AbstractEsRepository {
 
     @Override
     public String getTemplateFileName() {
-        return "delegate_reward";
+        return "delegate-reward";
     }
 }

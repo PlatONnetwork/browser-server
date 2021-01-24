@@ -9,7 +9,7 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_0.15.1.0?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: platon
     password: platon
   #Redis配置
@@ -109,10 +109,6 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 201018
-  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
-  eventDefine: {
-    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
-  }
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
   #Es索引命名空间
@@ -123,7 +119,7 @@ platon:
       pageSize: 2000
       pageCount: 250
 # v0.15.0.0版本新增功能涉及的配置
-v015:
+v0150:
   #锁仓最小释放金额参数生效版本
   restrictingMinimumReleaseActiveVersion: 3584
   #调账生效版本

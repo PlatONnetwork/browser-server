@@ -86,6 +86,10 @@ public class PlatOnClient {
         }
     }
 
+    public void updateContract(){
+        retryableClient.updateContract();
+    }
+
     public BigInteger getLatestBlockNumber() throws IOException {
         return retryableClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
     }

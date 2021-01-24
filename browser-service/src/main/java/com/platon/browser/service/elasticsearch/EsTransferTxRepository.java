@@ -15,6 +15,6 @@ public class EsTransferTxRepository extends AbstractEsRepository {
     }
     @Override
     public String getTemplateFileName() {
-        return "transfer_tx";
+        return "transfer-tx";
     }
 }

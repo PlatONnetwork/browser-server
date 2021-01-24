@@ -22,8 +22,6 @@ public class Address {
 
     private Integer txQty;
 
-    private Integer tokenQty;
-
     private Integer transferQty;
 
     private Integer delegateQty;
@@ -122,14 +120,6 @@ public class Address {
 
     public void setTxQty(Integer txQty) {
         this.txQty = txQty;
-    }
-
-    public Integer getTokenQty() {
-        return tokenQty;
-    }
-
-    public void setTokenQty(Integer tokenQty) {
-        this.tokenQty = tokenQty;
     }
 
     public Integer getTransferQty() {
@@ -292,7 +282,6 @@ public class Address {
         delegateValue("delegate_value", "delegateValue", "DECIMAL", false),
         redeemedValue("redeemed_value", "redeemedValue", "DECIMAL", false),
         txQty("tx_qty", "txQty", "INTEGER", false),
-        tokenQty("token_qty", "tokenQty", "INTEGER", false),
         transferQty("transfer_qty", "transferQty", "INTEGER", false),
         delegateQty("delegate_qty", "delegateQty", "INTEGER", false),
         stakingQty("staking_qty", "stakingQty", "INTEGER", false),

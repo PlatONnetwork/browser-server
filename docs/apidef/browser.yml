@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  version: 0.15.1.0
+  version: _VERSION_
   title: 浏览器API文档
   description:
 host: localhost:9061
-basePath: /browser-server
+basePath: "_BASE_PATH_"
 
 schemes:
   - http
@@ -283,13 +283,14 @@ paths:
           description: 返回区块详情
           schema:
             $ref: '#/definitions/BlockDetailResult'
-  #合约相关接口
-  /token/tokenList:
+
+  #Token令牌相关接口
+  /token/list:
     post:
       operationId: tokenList
       tags:
-        - token合约接口
-      summary: 令牌列表
+        - Token令牌接口
+      summary: Token令牌列表
       description: 实现逻辑：|
         查询mysql中数据<br/>
         查询可展示的token列表,是否允许展示需要关联token_expand表中is_show_in_scan字段<br/>
@@ -306,12 +307,33 @@ paths:
           description: 返回区块列表
           schema:
             $ref: '#/definitions/TokenListResult'
-  /token/20tokenTransferList:
+  /token/detail:
     post:
-      operationId: 20tokenTransferList
+      operationId: tokenDetail
       tags:
-        - token合约接口
-      summary: ERC20合约内部交易列表
+        - Token令牌接口
+      summary: Token令牌详情
+      description: 实现逻辑：|
+        查询MySQL数据库，同时附加附属信息返回
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/TokenDetailParam'
+      responses:
+        '200':
+          description: 返回令牌详情
+          schema:
+            $ref: '#/definitions/TokenDetailResult'
+  /token/arc20-tx/list:
+    post:
+      operationId: arc20TxList
+      tags:
+        - Token令牌接口
+      summary: ARC20交易列表
       description: 实现逻辑：|
         查询ES中索引数据<br/>
         如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -331,13 +353,13 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/TokenTransferListResult'
-  /token/20exportTokenTransferList:
+  /token/arc20-tx/export:
     get:
-      operationId: 20exportTokenTransferList
+      operationId: arc20TxExport
       tags:
-        - token合约接口
-      summary: 导出ERC20合约内部交易列表
-      description: 实现逻辑同/token/20tokenTransferList
+        - Token令牌接口
+      summary: ARC20交易列表导出
+      description:
       produces:
         - application/json
       parameters:
@@ -374,13 +396,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据流
-
-  /token/721tokenTransferList:
+  /token/arc721-tx/list:
     post:
-      operationId: tokenTransferList
+      operationId: arc721TxList
       tags:
-        - token合约接口
-      summary: ERC721合约内部交易列表
+        - Token令牌接口
+      summary: ARC721交易列表
       description: 实现逻辑：|
         查询ES中索引数据<br/>
         如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -400,12 +421,12 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/721TokenTransferListResult'
-  /token/721exportTokenTransferList:
+  /token/arc721-tx/export:
     get:
-      operationId: exportTokenTransferList
+      operationId: arc721TxExport
       tags:
-        - token合约接口
-      summary: 导出ERC721合约内部交易列表
+        - Token令牌接口
+      summary: ARC721交易列表导出
       description: 实现逻辑：|
         查询ES中索引数据<br/>
         如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -447,35 +468,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据流
-
-  /token/tokenDetail:
-    post:
-      operationId: tokenDetail
-      tags:
-        - token合约接口
-      summary: 查询令牌详情
-      description: 实现逻辑：|
-        查询MySQL数据库，同时附加附属信息返回
-      produces:
-        - application/json
-      parameters:
-        - name: body
-          description: 参数对象
-          in: body
-          schema:
-            $ref: '#/definitions/TokenDetailParam'
-      responses:
-        '200':
-          description: 返回令牌详情
-          schema:
-            $ref: '#/definitions/TokenDetailResult'
-
-  /token/tokenHolderList:
+  /token/holder/list:
     post:
       operationId: tokenHolderList
       tags:
-        - token合约接口
-      summary: 令牌持有人信息列表
+        - Token令牌接口
+      summary: Token令牌持有人列表
       description: 实现逻辑：|
         - 查询数据库中数据
       produces:
@@ -491,12 +489,12 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/TokenHolderListResult'
-  /token/exportTokenHolderList:
+  /token/holder/export:
     get:
-      operationId: exportTokenHolderList
+      operationId: tokenHolderExport
       tags:
-        - token合约接口
-      summary: 导出令牌持有人信息列表
+        - Token令牌接口
+      summary: Token令牌持有人列表导出
       description: 实现逻辑：|
          查询ES中索引数据<br/>
          如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -528,12 +526,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据
-  /token/holderTokenList:
+  /token/holder-token/list:
     post:
       operationId: holderTokenList
       tags:
-        - token合约接口
-      summary: 持有人持有token信息列表
+        - Token令牌接口
+      summary: 持有者的Token令牌列表
       description: 实现逻辑：|
          查询数据库中数据<br/>
          如果传入合约地址，则返回当前合约内的所有持有人记录<br/>
@@ -551,12 +549,12 @@ paths:
           description: 返回持有人token列表
           schema:
             $ref: '#/definitions/HolderTokenListResult'
-  /token/exportHolderTokenList:
+  /token/holder-token/export:
     get:
-      operationId: exportHolderTokenList
+      operationId: holderTokenExport
       tags:
-        - token合约接口
-      summary: 导出持有人对应token列表
+        - Token令牌接口
+      summary: 持有者的Token令牌列表导出
       description: 实现逻辑：|
          查询ES中索引数据<br/>
          如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -588,13 +586,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据
-
-  /token/721tokenIdList:
+  /token/arc721-inventory/list:
     post:
-      operationId: tokenIdList
+      operationId: arc721InventoryList
       tags:
-        - token合约接口
-      summary: ERC20合约持有人信息列表
+        - Token令牌接口
+      summary: ARC721 库存列表
       description: 实现逻辑：|
         查询mysql中数据<br/>
         如果传入合约地址，则返回当前合约内的所有tokenId记录<br/>
@@ -613,12 +610,12 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/721TokenIdListResult'
-  /token/721exportTokenIdList:
+  /token/arc721-inventory/export:
     get:
-      operationId: exportTokenIdList
+      operationId: arc721InventoryExport
       tags:
-        - token合约接口
-      summary: 导出ERC20合约持有人信息列表
+        - Token令牌接口
+      summary: ARC721 库存列表导出
       description: 实现逻辑：|
         查询mysql中数据<br/>
         如果传入合约地址，则返回当前合约内的所有tokenId记录<br/>
@@ -660,12 +657,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据
-  /token/721tokenIdDetail:
+  /token/arc721-inventory/detail:
     post:
-      operationId: tokenIdDetail
+      operationId: arc721InventoryDetail
       tags:
-        - token合约接口
-      summary: ERC20合约持有人信息列表
+        - Token令牌接口
+      summary: ARC721 库存详情
       description: 实现逻辑：|
         - 查询数据库中数据
       produces:
@@ -680,7 +677,10 @@ paths:
         '200':
           description: 返回合约列表
           schema:
-            $ref: '#/definitions/721TokenIdDetailResult'
+          $ref: '#/definitions/721TokenIdDetailResult'
+
+
+  #治理参数配置
   /extra/queryConfig:
     post:
       operationId: queryConfig

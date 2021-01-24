@@ -1,10 +1,10 @@
 # ***************************通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录**************************** #
 # 应用版本
-version: 0.15.1.0
+version: 0.15.2.0
 #服务器配置
 server:
   servlet:
-    context-path: /browser-server
+    context-path: /browser-api
 #Spring应用配置
 spring:
   profiles.active: test

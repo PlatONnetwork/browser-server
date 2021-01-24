@@ -18,7 +18,6 @@ import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.service.elasticsearch.EsDelegationRewardRepository;
 import com.platon.browser.service.elasticsearch.EsTransactionRepository;
-import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
@@ -76,8 +75,6 @@ public class TransactionService {
     private EsTransactionRepository ESTransactionRepository;
     @Resource
     private EsDelegationRewardRepository ESDelegationRewardRepository;
-    @Resource
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
     @Resource
     private I18nUtil i18n;
     @Resource

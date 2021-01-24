@@ -2,22 +2,15 @@ package com.platon.browser.bootstrap.service;
 
 
 import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.bootstrap.ShutdownCallback;
-import com.platon.browser.bean.ReceiptResult;
-import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
-import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.erc20.Erc20TransactionSyncService;
-import com.platon.browser.service.receipt.ReceiptService;
-import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
+import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
-import com.platon.browser.param.sync.AddressTokenQtyUpdateParam;
-import com.platon.browser.param.sync.Erc20TokenAddressRelTxCountUpdateParam;
-import com.platon.browser.param.sync.Erc20TokenTxCountUpdateParam;
-import com.platon.browser.param.sync.NetworkStatTokenQtyUpdateParam;
+import com.platon.browser.service.receipt.ReceiptService;
 import com.platon.browser.utils.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -47,33 +39,9 @@ public class ConsistencyService {
     @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
     @Resource
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
-    @Resource
     private SyncTokenInfoMapper syncTokenInfoMapper;
-    @Resource
-    private Erc20TransactionSyncService erc20TransactionSyncService;
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
-    /**
-     * 同步ARC20相关地址交易数统计数据
-     */
-/*
-
-    private void syncTxCount(){
-        TokenTxSummary summary = oldEsErc20TxRepository.groupContractTxCount();
-        List<AddressTokenQtyUpdateParam> addressTokenQtyUpdateParams = summary.addressTokenQtyUpdateParamList();
-        List<Erc20TokenAddressRelTxCountUpdateParam> erc20TokenAddressRelTxCountUpdateParams = summary.erc20TokenAddressRelTxCountUpdateParamList();
-        List<Erc20TokenTxCountUpdateParam> erc20TokenTxCountUpdateParams = summary.erc20TokenTxCountUpdateParamList();
-        NetworkStatTokenQtyUpdateParam networkStatTokenQtyUpdateParam = summary.networkStatTokenQtyUpdateParam();
-        syncTokenInfoMapper.syncTokenTxCount(
-            addressTokenQtyUpdateParams,
-            erc20TokenTxCountUpdateParams,
-            erc20TokenAddressRelTxCountUpdateParams,
-            networkStatTokenQtyUpdateParam
-        );
-        log.info("同步ES中的Token交易数至Mysql数据库成功！");
-    }
-*/
 
     /**
      * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
@@ -85,10 +53,6 @@ public class ConsistencyService {
         if(networkStat==null) {
             return;
         }
-
-        // 把es中的arc20交易同步至Redis
-        erc20TransactionSyncService.sync();
-        //syncTxCount();
 
         // mysql中的最高块号
         long mysqlMaxBlockNum = networkStat.getCurNumber();

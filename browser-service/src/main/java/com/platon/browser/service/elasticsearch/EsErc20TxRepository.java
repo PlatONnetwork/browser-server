@@ -14,5 +14,5 @@ public class EsErc20TxRepository extends AbstractEsRepository {
         return config.getErc20TxIndexName();
     }
     @Override
-    public String getTemplateFileName(){return "erc20_tx";}
+    public String getTemplateFileName(){return "erc20-tx";}
 }

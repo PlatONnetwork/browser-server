@@ -1,18 +1,16 @@
 package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bootstrap.ShutdownCallback;
-import com.platon.browser.bootstrap.BootstrapEventPublisher;
-import com.platon.browser.service.elasticsearch.OldEsErc20TxRepository;
-import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.receipt.ReceiptService;
 import com.platon.browser.bean.CollectionNetworkStat;
-import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.bootstrap.BootstrapEventPublisher;
+import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
+import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
-import com.platon.browser.service.erc20.Erc20TransactionSyncService;
+import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
+import com.platon.browser.service.receipt.ReceiptService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,11 +44,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private ShutdownCallback shutdownCallback;
     @Mock
-    private OldEsErc20TxRepository oldEsErc20TxRepository;
-    @Mock
     private SyncTokenInfoMapper syncTokenInfoMapper;
-    @Mock
-    private Erc20TransactionSyncService erc20TransactionSyncService;
 
     @InjectMocks
     @Spy
