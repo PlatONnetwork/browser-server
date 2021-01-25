@@ -28,62 +28,62 @@
       "order": 0,
       "name": "telegram",
       "logo": "",
-      "url": "https://t.me/PlatONNetworkCN"
+      "url": {"cn": "https://t.me/PlatONNetworkCN","en": "https://t.me/PlatONNetwork"}
     },
     {
       "order": 1,
       "name": "wechat",
       "logo": "",
       "qrcode": "/images/wechat.jpg",
-      "url": ""
+      "url": {"cn": "","en": ""}
     },
     {
       "order": 2,
       "name": "twitter",
       "logo": "",
-      "url": "https://twitter.com/PlatON_Network"
+      "url": {"cn": "https://twitter.com/PlatON_Network","en": "https://twitter.com/PlatON_Network"}
     },
     {
       "order": 3,
       "name": "reddit",
       "logo": "",
-      "url": "https://www.reddit.com/user/PlatON_Network"
+      "url": {"cn": "https://www.reddit.com/user/PlatON_Network","en": "https://www.reddit.com/user/PlatON_Network"}
     },
     {
       "order": 4,
       "name": "medium",
       "logo": "",
-      "url": "https://medium.com/@PlatON_Network"
+      "url": {"cn": "https://medium.com/@PlatON_Network","en": "https://medium.com/@PlatON_Network"}
     },
     {
       "order": 5,
       "name": "github",
       "logo": "",
-      "url": "https://github.com/PlatONnetwork"
+      "url": {"cn": "https://github.com/PlatONnetwork","en": "https://github.com/PlatONnetwork"}
     },
     {
       "order": 6,
       "name": "linkedin",
       "logo": "",
-      "url": "https://www.linkedin.com/company/platonnetwork/"
+      "url": {"cn": "https://www.linkedin.com/company/platonnetwork/","en": "https://www.linkedin.com/company/platonnetwork/"}
     },
     {
       "order": 7,
       "name": "facebook",
       "logo": "",
-      "url": "https://www.facebook.com/PlatONNetwork/"
+      "url": {"cn": "https://www.facebook.com/PlatONNetwork/","en": "https://www.facebook.com/PlatONNetwork/"}
     },
     {
       "order": 8,
       "name": "bihu",
       "logo": "",
-      "url": "https://bihu.com/people/1215832888"
+      "url": {"cn": "https://bihu.com/people/1215832888","en": "https://bihu.com/people/1215832888"}
     },
     {
       "order": 9,
       "name": "chainnode",
       "logo": "",
-      "url": "https://www.chainnode.com/forum/267"
+      "url": {"cn": "https://www.chainnode.com/forum/267","en": "https://www.chainnode.com/forum/267"}
     }
   ]
 }
