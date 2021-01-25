@@ -1,7 +1,7 @@
 package com.platon.browser.analyzer;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
-import com.alaya.protocol.core.methods.response.Transaction;
+import com.platon.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.Transaction;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;

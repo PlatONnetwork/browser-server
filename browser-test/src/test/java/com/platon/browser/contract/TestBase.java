@@ -1,17 +1,17 @@
 package com.platon.browser.contract;
 
-import com.alaya.bech32.Bech32;
-import com.alaya.crypto.Credentials;
-import com.alaya.parameters.NetworkParameters;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.tx.RawTransactionManager;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.Transfer;
-import com.alaya.tx.gas.ContractGasProvider;
-import com.alaya.tx.gas.GasProvider;
-import com.alaya.utils.Convert;
+import com.platon.bech32.Bech32;
+import com.platon.crypto.Credentials;
+import com.platon.parameters.NetworkParameters;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.http.HttpService;
+import com.platon.tx.RawTransactionManager;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.Transfer;
+import com.platon.tx.gas.ContractGasProvider;
+import com.platon.tx.gas.GasProvider;
+import com.platon.utils.Convert;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +37,10 @@ public abstract class TestBase {
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4700000);
 	protected static final BigInteger GAS_PRICE = BigInteger.valueOf(1000000L);
 
+	static {
+		NetworkParameters.init(CHAIN_ID, HRP);
+	}
+
 	protected GasProvider gasProvider;
 	protected String contractAddressFilePath;
 	protected TransactionManager transactionManager;
@@ -53,14 +57,13 @@ public abstract class TestBase {
 
 	@Before
 	public void init() {
-		NetworkParameters.CurrentNetwork.setChainId(CHAIN_ID);
 		wallets.addAll(Arrays.asList(
 			Credentials.create("0x690a32ceb7eab4131f7be318c1672d3b9b2dadeacba20b99432a7847c1e926e1"),
 			Credentials.create("0xf51ca759562e1daf9e5302d121f933a8152915d34fcbc27e542baf256b5e4b74"),
 			Credentials.create("0x3a4130e4abb887a296eb38c15bbd83253ab09492a505b10a54b008b7dcc1668")
 		));
 
-		transactionManager = new RawTransactionManager(WEB3J, wallets.get(0), CHAIN_ID);
+		transactionManager = new RawTransactionManager(WEB3J, wallets.get(0));
 		gasProvider = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
 		contractAddressList = Collections.emptyList();
 		try {
@@ -97,10 +100,9 @@ public abstract class TestBase {
 			Transfer.sendFunds(
 					WEB3J,
 					adminWallet,
-					CHAIN_ID,
 					wallet.getAddress(),
 					BigDecimal.valueOf(10000),
-					Convert.Unit.ATP
+					Convert.Unit.KPVON
 			).send();
 			BigInteger balance = WEB3J.platonGetBalance(wallet.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
 			log.info("address:{},balance:{}", wallet.getAddress(),balance);
@@ -108,7 +110,7 @@ public abstract class TestBase {
 	}
 
 	protected Erc20Contract loadArc20Contract(String address, Credentials credentials){
-		return Erc20Contract.load(address, WEB3J, credentials, gasProvider, CHAIN_ID);
+		return Erc20Contract.load(address, WEB3J, credentials, gasProvider);
 	}
 
 	protected Erc721Contract loadArc721Contract(String address, Credentials credentials){
@@ -116,7 +118,7 @@ public abstract class TestBase {
 		Erc721Contract contract = Erc721Contract.load(address,
 				WEB3J,
 				credentials,
-				gasProvider, CHAIN_ID);
+				gasProvider);
 		return contract;
 	}
 

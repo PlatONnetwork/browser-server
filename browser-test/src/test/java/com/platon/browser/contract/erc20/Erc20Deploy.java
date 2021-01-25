@@ -26,7 +26,6 @@ public class Erc20Deploy extends Erc20Base {
                     WEB3J,
                     adminWallet,
                     gasProvider,
-                    CHAIN_ID,
                     new BigInteger("10000000000000000000"),
                     "name-"+str,
                     BigInteger.valueOf(16L),
