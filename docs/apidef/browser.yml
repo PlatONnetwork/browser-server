@@ -677,7 +677,7 @@ paths:
         '200':
           description: 返回合约列表
           schema:
-          $ref: '#/definitions/721TokenIdDetailResult'
+           $ref: '#/definitions/721TokenIdDetailResult'
 
 
   #治理参数配置

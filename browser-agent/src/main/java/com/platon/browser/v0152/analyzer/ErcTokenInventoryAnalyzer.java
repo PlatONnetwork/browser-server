@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +34,7 @@ public class ErcTokenInventoryAnalyzer {
         txList.forEach(tx->{
             TokenInventoryKey key = new TokenInventory();
             key.setTokenAddress(tx.getContract());
-            key.setTokenId(Long.parseLong(tx.getValue()));
+            key.setTokenId(new BigInteger(tx.getValue()));
             TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(key);
             if(tokenInventory==null){
                 tokenInventory = new TokenInventory();
