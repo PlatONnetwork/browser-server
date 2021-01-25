@@ -354,7 +354,7 @@ paths:
           schema:
             $ref: '#/definitions/TokenTransferListResult'
   /token/arc20-tx/export:
-    get:
+    post:
       operationId: arc20TxExport
       tags:
         - Token令牌接口
@@ -384,7 +384,7 @@ paths:
           type: string
           required: true
         - name: timeZone
-          description: 时区
+          description: 时区：例如UTC
           in: query
           type: string
           required: true
@@ -422,7 +422,7 @@ paths:
           schema:
             $ref: '#/definitions/721TokenTransferListResult'
   /token/arc721-tx/export:
-    get:
+    post:
       operationId: arc721TxExport
       tags:
         - Token令牌接口
@@ -456,7 +456,7 @@ paths:
           type: string
           required: true
         - name: timeZone
-          description: 时区
+          description: 时区：例如UTC
           in: query
           type: string
           required: true
@@ -490,7 +490,7 @@ paths:
           schema:
             $ref: '#/definitions/TokenHolderListResult'
   /token/holder/export:
-    get:
+    post:
       operationId: tokenHolderExport
       tags:
         - Token令牌接口
@@ -514,7 +514,7 @@ paths:
           type: string
           required: true
         - name: timeZone
-          description: 时区
+          description: 时区：例如UTC
           in: query
           type: string
           required: true
@@ -550,7 +550,7 @@ paths:
           schema:
             $ref: '#/definitions/HolderTokenListResult'
   /token/holder-token/export:
-    get:
+    post:
       operationId: holderTokenExport
       tags:
         - Token令牌接口
@@ -574,7 +574,7 @@ paths:
           type: string
           required: true
         - name: timeZone
-          description: 时区
+          description: 时区：例如UTC
           in: query
           type: string
           required: true
@@ -611,7 +611,7 @@ paths:
           schema:
             $ref: '#/definitions/721TokenIdListResult'
   /token/arc721-inventory/export:
-    get:
+    post:
       operationId: arc721InventoryExport
       tags:
         - Token令牌接口
@@ -645,7 +645,7 @@ paths:
           type: string
           required: true
         - name: timeZone
-          description: 时区
+          description: 时区：例如UTC
           in: query
           type: string
           required: true
@@ -1751,7 +1751,7 @@ definitions:
     type: object
     properties:
       address:
-        description: 合约地址（可选）
+        description: 合约地址（必填）
         type: string
       pageNo:
         description: 页数(必填)
