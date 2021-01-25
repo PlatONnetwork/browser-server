@@ -1,6 +1,7 @@
 package com.platon.browser.v0150.service;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
@@ -51,6 +52,8 @@ public class AdjustServiceTest extends AgentTestBase {
     @Spy
     @InjectMocks
     private StakingDelegateBalanceAdjustmentService target;
+    @Mock
+    private AddressCache addressCache;
 
     private Node node;
     private Staking staking;

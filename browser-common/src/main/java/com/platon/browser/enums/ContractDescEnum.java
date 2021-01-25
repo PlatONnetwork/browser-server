@@ -1,6 +1,6 @@
 package com.platon.browser.enums;
 
-import com.alaya.parameters.NetworkParameters;
+import com.platon.parameters.NetworkParameters;
 import com.platon.browser.utils.NetworkParams;
 
 import java.util.*;
@@ -11,12 +11,12 @@ import java.util.*;
  * @Description: 内置合约地址描述枚举
  */
 public enum  ContractDescEnum {
-    RESTRICTING_PLAN_CONTRACT(NetworkParameters.getPposContractAddressOfRestrctingPlan(NetworkParams.getChainId()),"RestrictingContract","system",""),
-    STAKING_CONTRACT(NetworkParameters.getPposContractAddressOfStaking(NetworkParams.getChainId()),"StakingContract","system",""),
-    INCENTIVE_POOL_CONTRACT(NetworkParameters.getPposContractAddressOfIncentivePool(NetworkParams.getChainId()),"RewardManagerPool","system",""),
-    SLASH_CONTRACT(NetworkParameters.getPposContractAddressOfSlash(NetworkParams.getChainId()),"SlashingContract","system",""),
-    PROPOSAL_CONTRACT(NetworkParameters.getPposContractAddressOfProposal(NetworkParams.getChainId()),"GovContract","system",""),
-	REWARD_CONTRACT(NetworkParameters.getPposContractAddressOfReward(NetworkParams.getChainId()),"DelegateRewardPool","system","");
+    RESTRICTING_PLAN_CONTRACT(NetworkParameters.getPposContractAddressOfRestrctingPlan(),"RestrictingContract","system",""),
+    STAKING_CONTRACT(NetworkParameters.getPposContractAddressOfStaking(),"StakingContract","system",""),
+    INCENTIVE_POOL_CONTRACT(NetworkParameters.getPposContractAddressOfIncentivePool(),"RewardManagerPool","system",""),
+    SLASH_CONTRACT(NetworkParameters.getPposContractAddressOfSlash(),"SlashingContract","system",""),
+    PROPOSAL_CONTRACT(NetworkParameters.getPposContractAddressOfProposal(),"GovContract","system",""),
+	REWARD_CONTRACT(NetworkParameters.getPposContractAddressOfReward(),"DelegateRewardPool","system","");
 
     private String address;
     private String contractName;

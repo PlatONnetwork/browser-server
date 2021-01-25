@@ -19,6 +19,7 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.*;
 import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.NetworkParams;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,8 @@ public class HomeService {
 	private CommonService commonService;
 	@Resource
 	private CustomNodeMapper customNodeMapper;
+	@Resource
+	private NetworkParams networkParams;
 
 	private final static String BLOCK_ERR_TIPS="获取区块错误。";
 
@@ -123,7 +126,7 @@ public class HomeService {
 					queryNavigationStructResp.setNodeId(HexUtil.prefix(node.getNodeId()));
 				}
 			}
-			if (keyword.startsWith(blockChainConfig.getAddressPrefix())) {
+			if (keyword.startsWith(networkParams.getHrp())) {
 				if (keyword.length() == 42) {
 					/* 判断为合约或账户地址 */
 					Address address = addressMapper.selectByPrimaryKey(keyword);

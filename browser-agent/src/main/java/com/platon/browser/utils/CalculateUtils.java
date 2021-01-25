@@ -1,9 +1,9 @@
 package com.platon.browser.utils;
 
-import com.alaya.utils.Convert;
+import com.platon.browser.constant.Browser;
+import com.platon.utils.Convert;
 import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.constant.Browser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -60,7 +60,7 @@ public class CalculateUtils {
 
 		//获取初始发行金额
 		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
-		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.ATP);
+		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.KPVON);
 		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
 		BigDecimal circulationByYear = BigDecimal.ONE;
@@ -72,13 +72,13 @@ public class CalculateUtils {
 		return initIssueAmount
 				.multiply(circulationByYear)
 				.subtract(incentivePoolAccountBalance)
-				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.ATP):BigDecimal.ZERO);
+				.add(foundationAmount != null?Convert.toVon(foundationAmount,Convert.Unit.KPVON):BigDecimal.ZERO);
 	}
 	
 	public static BigDecimal calculationAvailableValue(String issueRates, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance){
 		//获取初始发行金额
 		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
-		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.ATP);
+		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.KPVON);
 
 		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
@@ -96,7 +96,7 @@ public class CalculateUtils {
 	public static BigDecimal calculationTurnValue(BlockChainConfig chainConfig, String issueRates,BigDecimal inciteBalance,BigDecimal stakingBalance,BigDecimal restrictBalance,BigDecimal rewardBalance){
     	//获取初始发行金额
 		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
-		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.ATP);
+		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.KPVON);
 		//获取增发比例
 		//年份增发量 = (1+增发比例)的增发年份次方
 		BigDecimal circulationByYear = BigDecimal.ONE;

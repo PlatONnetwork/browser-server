@@ -88,12 +88,11 @@ public class ErcServiceImpl {
         if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
             ercContract = Erc20Contract.load(contractAddress,platOnClient.getWeb3jWrapper().getWeb3j(),
                     ErcDetectService.CREDENTIALS,
-                    ErcDetectService.GAS_PROVIDER,
-                    chainConfig.getChainId());
+                    ErcDetectService.GAS_PROVIDER);
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
             ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                     ErcDetectService.CREDENTIALS,
-                    ErcDetectService.GAS_PROVIDER, chainConfig.getChainId());
+                    ErcDetectService.GAS_PROVIDER);
         }
         return ercContract;
     }

@@ -17,7 +17,7 @@ public class Erc721Deploy extends Erc721Base {
     public void deploy() throws Exception {
         for(int i =0;i<=deployCount;i++){
             String str =randomStr();
-            Erc721Contract contract = Erc721Contract.deploy(WEB3J,adminWallet,gasProvider,CHAIN_ID,"name-"+str,"symbol-"+str).send();
+            Erc721Contract contract = Erc721Contract.deploy(WEB3J,adminWallet,gasProvider,"name-"+str,"symbol-"+str).send();
             log.info("合约地址：{}",contract.getContractAddress());
             try{
                 FileUtils.write(new File(contractAddressFilePath),contract.getContractAddress()+"\n", "UTF-8",true);

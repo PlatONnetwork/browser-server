@@ -1,6 +1,6 @@
 package com.platon.browser.evm.bean;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.utils.HexUtil;

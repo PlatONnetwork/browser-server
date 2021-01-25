@@ -2,12 +2,14 @@ package com.platon.browser.v0152.analyzer;
 
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryKey;
+import com.platon.browser.dao.mapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,18 +22,19 @@ import java.util.List;
 public class ErcTokenInventoryAnalyzer {
     @Resource
     private TokenInventoryMapper tokenInventoryMapper;
+    @Resource
+    private CustomTokenInventoryMapper customTokenInventoryMapper;
 
     /**
      * 解析Token库存
      */
     public void analyze(List<ErcTx> txList) {
-        List<TokenInventory> update = new ArrayList<>();
-        List<TokenInventory> insert = new ArrayList<>();
+        List<TokenInventory> insertOrUpdate = new ArrayList<>();
         Date date = new Date();
         txList.forEach(tx->{
             TokenInventoryKey key = new TokenInventory();
             key.setTokenAddress(tx.getContract());
-            key.setTokenId(Long.parseLong(tx.getValue()));
+            key.setTokenId(new BigInteger(tx.getValue()));
             TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(key);
             if(tokenInventory==null){
                 tokenInventory = new TokenInventory();
@@ -39,17 +42,13 @@ public class ErcTokenInventoryAnalyzer {
                 tokenInventory.setTokenId(key.getTokenId());
                 tokenInventory.setCreateTime(date);
                 tokenInventory.setTokenTxQty(1);
-                insert.add(tokenInventory);
             }else{
                 tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty()+1);
-                update.add(tokenInventory);
             }
             tokenInventory.setOwner(tx.getTo());
             tokenInventory.setUpdateTime(date);
+            insertOrUpdate.add(tokenInventory);
         });
-        if(!insert.isEmpty()) tokenInventoryMapper.batchInsert(insert);
-        if(!update.isEmpty()) {
-            update.forEach(ti->tokenInventoryMapper.updateByPrimaryKey(ti));
-        }
+        if(!insertOrUpdate.isEmpty()) customTokenInventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate,TokenInventory.Column.values());
     }
 }

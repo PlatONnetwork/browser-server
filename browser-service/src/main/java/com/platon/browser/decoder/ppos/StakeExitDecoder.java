@@ -1,7 +1,7 @@
 package com.platon.browser.decoder.ppos;
 
-import com.alaya.rlp.solidity.RlpList;
-import com.alaya.rlp.solidity.RlpString;
+import com.platon.rlp.solidity.RlpList;
+import com.platon.rlp.solidity.RlpString;
 import com.platon.browser.param.StakeExitParam;
 import com.platon.browser.param.TxParam;
 

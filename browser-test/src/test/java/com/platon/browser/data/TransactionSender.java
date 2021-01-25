@@ -1,33 +1,33 @@
 package com.platon.browser.data;
 
-import com.alaya.contracts.ppos.DelegateContract;
-import com.alaya.contracts.ppos.NodeContract;
-import com.alaya.contracts.ppos.ProposalContract;
-import com.alaya.contracts.ppos.RewardContract;
-import com.alaya.contracts.ppos.StakingContract;
-import com.alaya.contracts.ppos.dto.BaseResponse;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.TransactionResponse;
-import com.alaya.contracts.ppos.dto.common.ProposalType;
-import com.alaya.contracts.ppos.dto.enums.StakingAmountType;
-import com.alaya.contracts.ppos.dto.req.StakingParam;
-import com.alaya.contracts.ppos.dto.req.UpdateStakingParam;
-import com.alaya.contracts.ppos.dto.resp.Node;
-import com.alaya.contracts.ppos.dto.resp.Proposal;
+import com.platon.contracts.ppos.DelegateContract;
+import com.platon.contracts.ppos.NodeContract;
+import com.platon.contracts.ppos.ProposalContract;
+import com.platon.contracts.ppos.RewardContract;
+import com.platon.contracts.ppos.StakingContract;
+import com.platon.contracts.ppos.dto.BaseResponse;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.TransactionResponse;
+import com.platon.contracts.ppos.dto.common.ProposalType;
+import com.platon.contracts.ppos.dto.enums.StakingAmountType;
+import com.platon.contracts.ppos.dto.req.StakingParam;
+import com.platon.contracts.ppos.dto.req.UpdateStakingParam;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.dto.resp.Proposal;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.alaya.crypto.CipherException;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.core.methods.response.PlatonBlockNumber;
-import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.tx.Transfer;
-import com.alaya.tx.gas.GasProvider;
-import com.alaya.utils.Convert;
-import com.alaya.utils.Convert.Unit;
+import com.platon.crypto.CipherException;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.methods.response.PlatonBlockNumber;
+import com.platon.protocol.core.methods.response.PlatonSendTransaction;
+import com.platon.protocol.http.HttpService;
+import com.platon.tx.Transfer;
+import com.platon.tx.gas.GasProvider;
+import com.platon.utils.Convert;
+import com.platon.utils.Convert.Unit;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -50,11 +50,11 @@ public class TransactionSender {
     private static  Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
 //    private Credentials credentials1 = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     private static Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
-    private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j,chainId);
-    private static StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
-    private static DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
-    private static RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials,chainId);
-    private static ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials,chainId);
+    private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
+    private static StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials);
+    private static DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials);
+    private static RewardContract rewardContract = RewardContract.load(currentValidWeb3j,delegateCredentials);
+    private static ProposalContract proposalContract = ProposalContract.load(currentValidWeb3j,credentials);
     private String stakingPubKey = "0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
     private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 
@@ -77,10 +77,9 @@ public class TransactionSender {
 			Transfer.sendFunds(
 			        currentValidWeb3j,
 			        credentials,
-			        chainId,
 			        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 			        BigDecimal.valueOf(1000000000),
-			        Unit.ATP
+			        Unit.KPVON
 			).send();
 //			Transfer.sendFunds(
 //			        currentValidWeb3j,
@@ -110,7 +109,7 @@ public class TransactionSender {
         String nodeName = "zrj-node1";
         String webSite = "www.baidu.com";
         String details = "chendai-node1-details";
-        BigDecimal stakingAmount = Convert.toVon("20000000", Unit.ATP);
+        BigDecimal stakingAmount = Convert.toVon("20000000", Unit.KPVON);
         PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTransaction(new StakingParam.Builder()
                .setNodeId(stakingPubKey)
                .setAmount(stakingAmount.toBigInteger())
@@ -150,7 +149,7 @@ public class TransactionSender {
     // 增持质押(增加自有质押)
     @Test
     public void addStaking() throws Exception {
-    	BigDecimal stakingAmount = Convert.toVon("5000000", Unit.ATP);
+    	BigDecimal stakingAmount = Convert.toVon("5000000", Unit.KPVON);
         TransactionResponse res = stakingContract.addStaking(
         		stakingPubKey,
                 StakingAmountType.FREE_AMOUNT_TYPE,
@@ -171,7 +170,7 @@ public class TransactionSender {
     // 发送委托交易
     @Test
     public void delegate() throws Exception {
-    	BigDecimal delegate = Convert.toVon("65000", Unit.ATP);
+    	BigDecimal delegate = Convert.toVon("65000", Unit.KPVON);
         TransactionResponse res = delegateContract.delegate(
         		stakingPubKey,
                 StakingAmountType.FREE_AMOUNT_TYPE,
@@ -233,7 +232,7 @@ public class TransactionSender {
     // 发送解委托交易
     @Test
     public void unDelegate() throws Exception {
-    	BigDecimal delegate = Convert.toVon("5000", Unit.ATP);
+    	BigDecimal delegate = Convert.toVon("5000", Unit.KPVON);
         TransactionResponse res = delegateContract.unDelegate(
         		stakingPubKey,
                 BigInteger.valueOf(86),
@@ -335,10 +334,9 @@ public class TransactionSender {
 					Transfer.sendFunds(
 							web3j,
 					        c,
-					        chainId,
 					        "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
 					        BigDecimal.valueOf(1),
-					        Convert.Unit.ATP
+					        Convert.Unit.KPVON
 					).sendAsync();
 					System.out.println("发送交易："+i);
 				}
@@ -410,9 +408,9 @@ public class TransactionSender {
         }
 
 
-        BigDecimal bg = Convert.toVon("1", Unit.ATP);
+        BigDecimal bg = Convert.toVon("1", Unit.KPVON);
         System.out.println(bg);
-        bg = Convert.fromVon("10000000000000000000000000", Unit.ATP);
+        bg = Convert.fromVon("10000000000000000000000000", Unit.KPVON);
         System.out.println(bg);
 
         CallResponse<Node> nodes = stakingContract.getStakingInfo("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc").send();

@@ -1,12 +1,10 @@
 package com.platon.browser.v0152.analyzer;
 
-import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
+import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.v0152.bean.ErcToken;
-import com.platon.browser.v0152.cache.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +23,11 @@ public class ErcTokenHolderAnalyzer {
     @Resource
     private TokenHolderMapper tokenHolderMapper;
     @Resource
-    private ErcCache ercCache;
+    private CustomTokenHolderMapper customTokenHolderMapper;
     private void resolveTokenHolder(
-            ErcToken token,
             String tokenAddress,
             String userAddress,
-            List<TokenHolder> update,
-            List<TokenHolder> insert
+            List<TokenHolder> insertOrUpdate
     ){
         Date date = new Date();
         TokenHolderKey key = new TokenHolderKey();
@@ -45,34 +41,21 @@ public class ErcTokenHolderAnalyzer {
             tokenHolder.setCreateTime(date);
             tokenHolder.setTokenTxQty(1);
             tokenHolder.setBalance(BigDecimal.ZERO);
-            insert.add(tokenHolder);
         }else{
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty()+1);
-            update.add(tokenHolder);
         }
         tokenHolder.setUpdateTime(date);
-        if(!ercCache.getHolderCache().contains(token.getAddress())){
-            // holder缓存中不存在当前的holder地址，则token holder地址数 + 1
-            token.setHolder(token.getHolder()+1);
-            token.setDirty(true);
-            token.setUpdateTime(new Date());
-        }
-        // 把holder地址添加到holder缓存
-        ercCache.getHolderCache().add(tokenHolder.getAddress());
+        insertOrUpdate.add(tokenHolder);
     }
     /**
      * 解析Token Holder
      */
-    public void analyze(ErcToken token, List<ErcTx> txList) {
-        List<TokenHolder> update = new ArrayList<>();
-        List<TokenHolder> insert = new ArrayList<>();
+    public void analyze(List<ErcTx> txList) {
+        List<TokenHolder> insertOrUpdate = new ArrayList<>();
         txList.forEach(tx->{
-            resolveTokenHolder(token,tx.getContract(),tx.getFrom(),update,insert);
-            resolveTokenHolder(token,tx.getContract(),tx.getTo(),update,insert);
+            resolveTokenHolder(tx.getContract(),tx.getFrom(),insertOrUpdate);
+            resolveTokenHolder(tx.getContract(),tx.getTo(),insertOrUpdate);
         });
-        if(!insert.isEmpty()) tokenHolderMapper.batchInsert(insert);
-        if(!update.isEmpty()) {
-            update.forEach(th->tokenHolderMapper.updateByPrimaryKey(th));
-        }
+        if(!insertOrUpdate.isEmpty()) customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate,TokenHolder.Column.values());
     }
 }

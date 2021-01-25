@@ -1,7 +1,6 @@
 package com.platon.browser.cache;
 
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.OldErcTx;
 import com.platon.browser.response.RespPage;
 
 import java.util.ArrayList;

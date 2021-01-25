@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
-import com.alaya.bech32.Bech32;
-import com.alaya.parameters.NetworkParameters;
+import com.platon.bech32.Bech32;
+import com.platon.parameters.NetworkParameters;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -50,9 +50,9 @@ public class BlockResult {
             String txHash = HexUtil.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
             tx.setHash(txHash);
             String from = HexUtil.prefix(DigestUtils.sha1Hex(txHash));
-            tx.setFrom(FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), from),addressReusedTimes));
+            tx.setFrom(FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), from),addressReusedTimes));
             String to = HexUtil.prefix(DigestUtils.sha1Hex(from));
-            tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(NetworkParameters.Hrp.ATX.getHrp(), to),addressReusedTimes));
+            tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), to),addressReusedTimes));
             tx.setIndex(i);
             long seq = tx.getNum()*100000+i;
             tx.setSeq(seq);

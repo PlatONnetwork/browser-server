@@ -1,12 +1,12 @@
 package com.platon.browser.decoder.ppos;
 
-import com.alaya.bech32.Bech32;
-import com.alaya.parameters.NetworkParameters;
-import com.alaya.rlp.solidity.RlpDecoder;
-import com.alaya.rlp.solidity.RlpList;
-import com.alaya.rlp.solidity.RlpString;
-import com.alaya.rlp.solidity.RlpType;
-import com.alaya.utils.Numeric;
+import com.platon.bech32.Bech32;
+import com.platon.parameters.NetworkParameters;
+import com.platon.rlp.solidity.RlpDecoder;
+import com.platon.rlp.solidity.RlpList;
+import com.platon.rlp.solidity.RlpString;
+import com.platon.rlp.solidity.RlpType;
+import com.platon.utils.Numeric;
 import com.platon.browser.param.RestrictingCreateParam;
 import com.platon.browser.param.TxParam;
 import com.platon.browser.utils.NetworkParams;
@@ -41,14 +41,7 @@ public abstract class AbstractPPOSDecoder {
         RlpList stringsList = RlpDecoder.decode(rlpString.getBytes());
         if (stringsList.getValues().isEmpty()) return null;
         RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
-        /**
-         * 判断是否为主网
-         */
-        String hrp = NetworkParameters.TestNetParams.getHrp();
-        if(NetworkParams.getChainId().compareTo(NetworkParameters.MainNetParams.getChainId())==0) {
-        	hrp = NetworkParameters.MainNetParams.getHrp();
-        }
-        return Bech32.addressEncode(hrp,Numeric.toHexString(stringsListString.getBytes()));
+        return Bech32.addressEncode(NetworkParameters.getHrp(),Numeric.toHexString(stringsListString.getBytes()));
     }
 
     static List<RestrictingCreateParam.RestrictingPlan> resolvePlan(RlpString rlpString) {

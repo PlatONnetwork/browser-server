@@ -9,9 +9,9 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: platon
-    password: platon
+    url: jdbc:mysql://192.168.16.171:3306/platon_browser_0.14.0_test?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
+    password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
   #Redis配置
   redis:
     password: platscan
@@ -66,6 +66,8 @@ logging:
 platon:
   # 地址HRP前缀
   addressPrefix: atp
+  # 金额显示单位
+  valueUnit: ATP
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
@@ -127,7 +129,7 @@ v0150:
   #调账提案ID
   adjustmentPipId: '1609410836.4141252'
   #调账日志输出文件
-  adjustLogFilePath: E:\Java\browser-server\browser-agent\build\adjust.log
+  adjustLogFilePath: ./adjust.log
 
 task:
   #地址统计任务批次大小
