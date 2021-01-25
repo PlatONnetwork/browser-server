@@ -65,6 +65,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(false);
                 token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
                 token.setIsSupportErc721Metadata(token.getIsSupportErc721());
+                ercCache.erc20AddressCache.add(contractAddress);
                 break;
             case ERC721:
                 token.setIsSupportErc20(false);
@@ -72,6 +73,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress));
                 token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress));
+                ercCache.erc721AddressCache.add(contractAddress);
                 break;
             default:
         }

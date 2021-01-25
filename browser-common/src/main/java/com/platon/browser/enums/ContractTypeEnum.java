@@ -14,7 +14,8 @@ public enum ContractTypeEnum {
     EVM(1, "EVM"),
     WASM(2, "WASM"),
     UNKNOWN(3, "UNKNOWN"),
-    ERC20_EVM(4, "ERC20_EVM");
+    ERC20_EVM(4, "ERC20_EVM"),
+    ERC721_EVM(5, "ERC721_EVM");
 
     private int code;
     private String desc;
