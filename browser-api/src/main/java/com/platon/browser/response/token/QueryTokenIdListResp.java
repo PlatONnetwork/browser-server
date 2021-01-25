@@ -1,6 +1,7 @@
 package com.platon.browser.response.token;
 
 import com.platon.browser.bean.CustomToken;
+import com.platon.browser.dao.entity.TokenInventory;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,11 +33,11 @@ public class QueryTokenIdListResp {
     @ApiModelProperty(value = "交易数")
     private Integer txCount;
 
-    public static QueryTokenIdListResp fromToken(CustomToken token) {
+    public static QueryTokenIdListResp fromToken(TokenInventory token) {
         return QueryTokenIdListResp.builder()
-                .address(token.getAddress()).contract(token.getName())
-                .tokenId(token.getSymbol()).image(token.getAddress())
-                .txCount(null)
+                .address(token.getOwner()).contract(token.getTokenAddress())
+                .tokenId(token.getTokenAddress()).image(token.getImage())
+                .txCount(token.getTokenTxQty())
                 .build();
     }
 }

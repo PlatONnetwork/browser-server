@@ -13,9 +13,9 @@ import lombok.Data;
 @Data
 public class QueryTokenIdDetailReq extends PageReq {
 
-    @ApiModelProperty(allowEmptyValue = true, required = false, value = "合约地址")
+    @ApiModelProperty(allowEmptyValue = true, required = true, value = "合约地址")
     private String contract;//
 
-    @ApiModelProperty(allowEmptyValue = true, required = false, value = "tokenId")
+    @ApiModelProperty(allowEmptyValue = true, required = true, value = "tokenId")
     private String tokenId;//
 }
