@@ -23,7 +23,7 @@
   <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
     select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
     t.holder,te.web_site,te.details
-    from token t left join  token_expand te on t.addres = te.address
+    from token t left join  token_expand te on t.address = te.address
     where 1=1
     <if test="type != null">
       and t.type = #{type}
