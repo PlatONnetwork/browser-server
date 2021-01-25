@@ -1,5 +1,8 @@
 package com.platon.browser.service;
 
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.TokenInventoryMapper;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.utils.Convert;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -10,10 +13,6 @@ import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.constant.Browser;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.service.elasticsearch.EsDelegationRewardRepository;
@@ -81,6 +80,8 @@ public class TransactionService {
     private StakingMapper stakingMapper;
     @Resource
     private ProposalMapper proposalMapper;
+    @Resource
+    private TokenInventoryMapper tokenInventoryMapper;
     @Resource
     private StatisticCacheService statisticCacheService;
     @Resource
@@ -659,18 +660,6 @@ public class TransactionService {
                         resp.setTxAmount(rewardSum);
                         resp.setRewards(rewards);
                         break;
-                    /**
-                     * 合约创建
-                     */
-                    case EVM_CONTRACT_CREATE:
-                    case WASM_CONTRACT_CREATE:
-                    case ERC20_CONTRACT_CREATE:
-                        /**
-                         * to地址设置为合约地址
-                         */
-                        resp.setTo(transaction.getContractAddress());
-                        resp.setTxInfo(transaction.getInput());
-                        break;
                 }
             }
             //补充填充合约的相关数据
@@ -689,6 +678,39 @@ public class TransactionService {
                     break;
                 case CONTRACT_EXEC:
                 case ERC20_CONTRACT_EXEC:
+                    //获取arc20交易进行转换
+                    List<ErcTx> erc20List = JSONObject.parseArray(transaction.getErc20TxInfo(),ErcTx.class);
+                    if(erc20List != null){
+                        List<Arc20Param> arc20Params = new ArrayList<>();
+                        erc20List.forEach(erc20 -> {
+                            Arc20Param arc20Param = Arc20Param.builder().innerContractAddr(erc20.getContract())
+                                    .innerContractName(erc20.getName()).innerDecimal(String.valueOf(erc20.getDecimal()))
+                                    .innerFrom(erc20.getFrom()).innerSymbol(erc20.getSymbol())
+                                    .innerTo(erc20.getTo()).innerValue(erc20.getValue()).build();
+                            arc20Params.add(arc20Param);
+                        });
+                        resp.setErc20Params(arc20Params);
+                    }
+                    //获取arc721交易进行转换
+                    List<ErcTx> erc721List = JSONObject.parseArray(transaction.getErc721TxInfo(),ErcTx.class);
+                    if(erc721List != null){
+                        List<Arc721Param> arc721Params = new ArrayList<>();
+                        erc721List.forEach(erc721 -> {
+                            Arc721Param arc721Param = Arc721Param.builder().innerContractAddr(erc721.getContract())
+                                    .innerContractName(erc721.getName()).innerDecimal(String.valueOf(erc721.getDecimal()))
+                                    .innerFrom(erc721.getFrom()).innerSymbol(erc721.getSymbol())
+                                    .innerTo(erc721.getTo()).innerValue(erc721.getValue())
+                                    .build();
+                            //查询对应的图片进行回填
+                            TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
+                            tokenInventoryKey.setTokenAddress(erc721.getContract());
+                            tokenInventoryKey.setTokenId(new BigInteger(erc721.getValue()));
+                            TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
+                            if(tokenInventory!=null) arc721Param.setInnerImage(tokenInventory.getImage());
+                            arc721Params.add(arc721Param);
+                        });
+                        resp.setErc721Params(arc721Params);
+                    }
                     resp.setTxInfo(transaction.getInput());
                     break;
             }

@@ -87,7 +87,9 @@ public class TransactionDetailsResp {
     // private String innerContractName; // 内部交易对应名称
     // private String innerSymbol; // 内部交易对应单位
 
-    private List<Erc20Param> erc20Params;
+    private List<Arc20Param> erc20Params;
+
+    private List<Arc721Param> erc721Params;
 
     public String getTxHash() {
         return this.txHash;
@@ -580,11 +582,19 @@ public class TransactionDetailsResp {
         this.contractName = contractName;
     }
 
-    public List<Erc20Param> getErc20Params() {
-        return this.erc20Params;
+    public List<Arc721Param> getErc721Params() {
+        return erc721Params;
     }
 
-    public void setErc20Params(List<Erc20Param> erc20Params) {
+    public void setErc721Params(List<Arc721Param> erc721Params) {
+        this.erc721Params = erc721Params;
+    }
+
+    public List<Arc20Param> getErc20Params() {
+        return erc20Params;
+    }
+
+    public void setErc20Params(List<Arc20Param> erc20Params) {
         this.erc20Params = erc20Params;
     }
 }
