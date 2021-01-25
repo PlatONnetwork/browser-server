@@ -91,7 +91,7 @@ public class ErcTxService {
         long displayTotalCount = 0;
         if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
             // 仅分页查询，直接走缓存
-            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(),isErc20);
+            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(), isErc20);
             records = tokenTransferRecordCacheDto.getTransferRecordList();
             totalCount = tokenTransferRecordCacheDto.getPage().getTotalCount();
             displayTotalCount = tokenTransferRecordCacheDto.getPage().getTotalPages();

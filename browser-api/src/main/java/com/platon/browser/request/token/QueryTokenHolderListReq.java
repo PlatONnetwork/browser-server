@@ -23,8 +23,8 @@ import javax.validation.constraints.Size;
 public class QueryTokenHolderListReq extends PageReq {
 
     @ApiModelProperty(value = "合约地址")
+    @NotBlank(message = "{contract address required}")
     @Size(min = 42, max = 42)
-    @NotBlank
     private String contract;
 
 }
