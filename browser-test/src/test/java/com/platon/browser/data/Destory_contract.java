@@ -1,15 +1,15 @@
 package com.platon.browser.data;
 
-import com.alaya.abi.wasm.WasmFunctionEncoder;
-import com.alaya.abi.wasm.datatypes.WasmFunction;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.rlp.wasm.datatypes.Uint64;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.WasmContract;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.wasm.WasmFunctionEncoder;
+import com.platon.abi.wasm.datatypes.WasmFunction;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.rlp.wasm.datatypes.Uint64;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.WasmContract;
+import com.platon.tx.gas.GasProvider;
 
 import java.util.Arrays;
 
@@ -40,21 +40,21 @@ public class Destory_contract extends WasmContract {
     public static final String FUNC_MIGRATE = "migrate";
 
     protected Destory_contract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider,chainId);
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
     protected Destory_contract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider,chainId);
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public static RemoteCall<Destory_contract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, String address,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList(address));
-        return deployRemoteCall(Destory_contract.class, web3j, credentials, contractGasProvider, encodedConstructor,chainId);
+        return deployRemoteCall(Destory_contract.class, web3j, credentials, contractGasProvider, encodedConstructor);
     }
 
     public static RemoteCall<Destory_contract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, String address,Long chainId) {
         String encodedConstructor = WasmFunctionEncoder.encodeConstructor(BINARY, Arrays.asList(address));
-        return deployRemoteCall(Destory_contract.class, web3j, transactionManager, contractGasProvider, encodedConstructor,chainId);
+        return deployRemoteCall(Destory_contract.class, web3j, transactionManager, contractGasProvider, encodedConstructor);
     }
 
     public RemoteCall<TransactionReceipt> get_ower() {

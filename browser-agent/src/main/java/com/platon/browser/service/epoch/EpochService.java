@@ -1,6 +1,6 @@
 package com.platon.browser.service.epoch;
 
-import com.alaya.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.BlockNode;

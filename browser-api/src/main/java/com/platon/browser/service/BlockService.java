@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.alaya.utils.Convert;
+import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
 import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
@@ -232,8 +232,8 @@ public class BlockService {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
                     block.getTxQty(),
-                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN))),
-                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.ATP).setScale(18,RoundingMode.DOWN)))
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.KPVON).setScale(18,RoundingMode.DOWN))),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.KPVON).setScale(18,RoundingMode.DOWN)))
             };
             rows.add(row);
         });

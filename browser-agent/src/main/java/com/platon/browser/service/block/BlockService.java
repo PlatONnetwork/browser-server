@@ -1,6 +1,6 @@
 package com.platon.browser.service.block;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.analyzer.epoch.OnConsensusAnalyzer;
 import com.platon.browser.analyzer.epoch.OnElectionAnalyzer;
 import com.platon.browser.analyzer.epoch.OnNewBlockAnalyzer;
