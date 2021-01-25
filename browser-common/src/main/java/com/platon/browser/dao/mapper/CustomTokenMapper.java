@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Mapper
 public interface CustomTokenMapper {
 
     Page<CustomToken> selectListByType(@Param("type")String type);
@@ -19,4 +18,5 @@ public interface CustomTokenMapper {
     CustomTokenDetail selectDetailByAddress(@Param("address")String address);
 
     int batchInsertOrUpdateSelective(@Param("list") List<Token> list, @Param("selective") Token.Column... selective);
+    int updateTokenHolderCount();
 }

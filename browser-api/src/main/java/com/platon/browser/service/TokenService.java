@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -106,7 +107,7 @@ public class TokenService {
     }
 
     public QueryTokenIdDetailResp queryTokenIdDetail(QueryTokenIdDetailReq req) {
-        Long tokenId = StringUtils.isNotBlank(req.getTokenId())?Long.valueOf(req.getTokenId()):0l;
+        BigInteger tokenId = StringUtils.isNotBlank(req.getTokenId())?new BigInteger(req.getTokenId()):BigInteger.ZERO;
         TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
         tokenInventoryKey.setTokenAddress(req.getContract());
         tokenInventoryKey.setTokenId(tokenId);

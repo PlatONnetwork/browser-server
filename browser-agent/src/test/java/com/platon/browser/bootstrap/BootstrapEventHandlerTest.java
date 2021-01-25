@@ -1,6 +1,6 @@
 package com.platon.browser.bootstrap;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.cache.AddressCache;

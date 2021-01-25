@@ -1,7 +1,6 @@
 package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.cache.OldTokenTransferRecordCacheDto;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.dao.entity.NetworkStat;

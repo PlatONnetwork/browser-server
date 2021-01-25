@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;
 

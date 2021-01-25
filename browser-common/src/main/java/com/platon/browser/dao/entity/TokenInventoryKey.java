@@ -1,12 +1,13 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TokenInventoryKey {
     private String tokenAddress;
 
-    private Long tokenId;
+    private BigInteger tokenId;
 
     public String getTokenAddress() {
         return tokenAddress;
@@ -16,11 +17,11 @@ public class TokenInventoryKey {
         this.tokenAddress = tokenAddress == null ? null : tokenAddress.trim();
     }
 
-    public Long getTokenId() {
+    public BigInteger getTokenId() {
         return tokenId;
     }
 
-    public void setTokenId(Long tokenId) {
+    public void setTokenId(BigInteger tokenId) {
         this.tokenId = tokenId;
     }
 

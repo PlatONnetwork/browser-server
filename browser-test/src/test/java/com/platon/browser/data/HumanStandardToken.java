@@ -1,21 +1,21 @@
 package com.platon.browser.data;
 
-import com.alaya.abi.solidity.EventEncoder;
-import com.alaya.abi.solidity.FunctionEncoder;
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.*;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.abi.solidity.datatypes.generated.Uint8;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.request.PlatonFilter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.EventEncoder;
+import com.platon.abi.solidity.FunctionEncoder;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.*;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.abi.solidity.datatypes.generated.Uint8;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.request.PlatonFilter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.GasProvider;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -76,11 +76,11 @@ public class HumanStandardToken extends Contract {
 
 
 	protected HumanStandardToken(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
-		super(BINARY, contractAddress, web3j, credentials, contractGasProvider, chainId);
+		super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
 	}
 
 	protected HumanStandardToken(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
-		super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider,chainId);
+		super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
 	}
 
 	public RemoteCall<String> name() {
@@ -162,7 +162,7 @@ public class HumanStandardToken extends Contract {
 		String encodedConstructor = FunctionEncoder.encodeConstructor(
 				Arrays.<Type>asList(new Uint256(_initialAmount), new Utf8String(_tokenName),
 						new Uint8(_decimalUnits), new Utf8String(_tokenSymbol)));
-		return deployRemoteCall(HumanStandardToken.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor,chainId);
+		return deployRemoteCall(HumanStandardToken.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor);
 	}
 
 	public static RemoteCall<HumanStandardToken> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,
@@ -170,7 +170,7 @@ public class HumanStandardToken extends Contract {
 		String encodedConstructor = FunctionEncoder.encodeConstructor(
 				Arrays.<Type>asList(new Uint256(_initialAmount), new Utf8String(_tokenName),
 						new Uint8(_decimalUnits), new Utf8String(_tokenSymbol)));
-		return deployRemoteCall(HumanStandardToken.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor,chainId);
+		return deployRemoteCall(HumanStandardToken.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor);
 	}
 
 

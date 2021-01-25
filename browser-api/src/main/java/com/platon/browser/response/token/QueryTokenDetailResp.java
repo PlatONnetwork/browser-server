@@ -1,7 +1,6 @@
 package com.platon.browser.response.token;
 
 import com.platon.browser.bean.CustomTokenDetail;
-import com.platon.browser.dao.entity.Erc20Token;
 import com.platon.browser.utils.ConvertUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -62,22 +61,6 @@ public class QueryTokenDetailResp {
     private String binCode;
     @ApiModelProperty(value = "合约源码")
     private String sourceCode;
-
-    public static QueryTokenDetailResp fromErc20Token(Erc20Token token) {
-        if (null == token) {
-            return null;
-        }
-        return QueryTokenDetailResp.builder()
-                .address(token.getAddress()).name(token.getName())
-                .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(token.getTotalSupply().toString())
-                .creator(token.getCreator()).txHash(token.getTxHash())
-                .blockTimestamp(token.getBlockTimestamp())
-                .txCount(token.getTxCount())
-                .createTime(token.getCreateTime())
-                .holder(token.getHolder())
-                .build();
-    }
 
     public static QueryTokenDetailResp fromTokenDetail(CustomTokenDetail token) {
         if (null == token) {

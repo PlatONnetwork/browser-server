@@ -1,6 +1,6 @@
 package com.platon.browser.v0150.service;
 
-import com.alaya.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.ConfigExample;

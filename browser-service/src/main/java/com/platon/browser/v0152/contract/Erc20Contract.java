@@ -1,21 +1,21 @@
 package com.platon.browser.v0152.contract;
 
-import com.alaya.abi.solidity.EventEncoder;
-import com.alaya.abi.solidity.FunctionEncoder;
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.*;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.abi.solidity.datatypes.generated.Uint8;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.request.PlatonFilter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.EventEncoder;
+import com.platon.abi.solidity.FunctionEncoder;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.*;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.abi.solidity.datatypes.generated.Uint8;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.request.PlatonFilter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.GasProvider;
 import org.apache.http.MethodNotSupportedException;
 import org.springframework.beans.factory.annotation.Value;
 import rx.Observable;
@@ -92,30 +92,30 @@ public class Erc20Contract extends Contract implements ErcContract {
     public static final Event TRANSFER_EVENT = new Event("Transfer",
             Arrays.asList(new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Uint256>() {}));
 
-    protected Erc20Contract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider, chainId);
+    protected Erc20Contract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    protected Erc20Contract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider, chainId);
+    protected Erc20Contract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
-    public static RemoteCall<Erc20Contract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId, BigInteger _supply, String _symbol, BigInteger _decimals, String _name, String _rewardValueAddr) {
+    public static RemoteCall<Erc20Contract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, BigInteger _supply, String _symbol, BigInteger _decimals, String _name, String _rewardValueAddr) {
         String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.asList(new Uint256(_supply),
                 new Utf8String(_symbol),
                 new Uint8(_decimals),
                 new Utf8String(_name),
                 new Address(_rewardValueAddr)));
-        return deployRemoteCall(Erc20Contract.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor, chainId);
+        return deployRemoteCall(Erc20Contract.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor);
     }
 
-    public static RemoteCall<Erc20Contract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId, BigInteger _supply, String _symbol, BigInteger _decimals, String _name, String _rewardValueAddr) {
+    public static RemoteCall<Erc20Contract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, BigInteger _supply, String _symbol, BigInteger _decimals, String _name, String _rewardValueAddr) {
         String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.asList(new Uint256(_supply),
                 new Utf8String(_symbol),
                 new Uint8(_decimals),
                 new Utf8String(_name),
                 new Address(_rewardValueAddr)));
-        return deployRemoteCall(Erc20Contract.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor, chainId);
+        return deployRemoteCall(Erc20Contract.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor);
     }
 
     public List<ApprovalEventResponse> getApprovalEvents(TransactionReceipt transactionReceipt) {
@@ -256,10 +256,10 @@ public class Erc20Contract extends Contract implements ErcContract {
 
     public RemoteCall<TransactionReceipt> approve(String _spender, BigInteger _value) {
         final Function function = new Function(
-                FUNC_APPROVE,
-                Arrays.asList(new Address(_spender),
-                        new Uint256(_value)),
-                Collections.emptyList());
+                FUNC_APPROVE, 
+                Arrays.<Type>asList(new Address(_spender),
+                new Uint256(_value)),
+                Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
     @Override
@@ -368,10 +368,9 @@ public class Erc20Contract extends Contract implements ErcContract {
     }
     @Override
     public RemoteCall<BigInteger> totalSupply() {
-        final Function function = new Function(FUNC_TOTALSUPPLY,
-                Collections.emptyList(),
-                Collections.singletonList(new TypeReference<Uint256>() {
-                }));
+        final Function function = new Function(FUNC_TOTALSUPPLY, 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}));
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);
     }
 
@@ -410,12 +409,12 @@ public class Erc20Contract extends Contract implements ErcContract {
         return executeRemoteCallTransaction(function);
     }
 
-    public static Erc20Contract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {
-        return new Erc20Contract(contractAddress, web3j, credentials, contractGasProvider, chainId);
+    public static Erc20Contract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+        return new Erc20Contract(contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    public static Erc20Contract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId) {
-        return new Erc20Contract(contractAddress, web3j, transactionManager, contractGasProvider, chainId);
+    public static Erc20Contract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+        return new Erc20Contract(contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public static class ApprovalEventResponse {

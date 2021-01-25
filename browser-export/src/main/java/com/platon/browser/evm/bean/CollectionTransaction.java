@@ -1,14 +1,14 @@
 package com.platon.browser.evm.bean;
 
-import com.alaya.contracts.ppos.dto.common.ErrorCode;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.PlatonGetCode;
-import com.alaya.rlp.solidity.RlpDecoder;
-import com.alaya.rlp.solidity.RlpList;
-import com.alaya.rlp.solidity.RlpString;
-import com.alaya.rlp.solidity.RlpType;
-import com.alaya.utils.Numeric;
+import com.platon.contracts.ppos.dto.common.ErrorCode;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.PlatonGetCode;
+import com.platon.rlp.solidity.RlpDecoder;
+import com.platon.rlp.solidity.RlpList;
+import com.platon.rlp.solidity.RlpString;
+import com.platon.rlp.solidity.RlpType;
+import com.platon.utils.Numeric;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -55,7 +55,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    CollectionTransaction updateWithRawTransaction(com.alaya.protocol.core.methods.response.Transaction transaction){
+    CollectionTransaction updateWithRawTransaction(com.platon.protocol.core.methods.response.Transaction transaction){
         this.setNum(transaction.getBlockNumber().longValue())
             .setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash())

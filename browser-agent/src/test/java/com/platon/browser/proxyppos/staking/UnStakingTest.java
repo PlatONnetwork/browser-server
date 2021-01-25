@@ -1,10 +1,10 @@
 package com.platon.browser.proxyppos.staking;
 
-import com.alaya.abi.solidity.datatypes.BytesType;
-import com.alaya.contracts.ppos.abi.Function;
-import com.alaya.contracts.ppos.dto.common.FunctionType;
-import com.alaya.contracts.ppos.utils.EncoderUtils;
-import com.alaya.utils.Numeric;
+import com.platon.abi.solidity.datatypes.BytesType;
+import com.platon.contracts.ppos.abi.Function;
+import com.platon.contracts.ppos.dto.common.FunctionType;
+import com.platon.contracts.ppos.utils.EncoderUtils;
+import com.platon.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
