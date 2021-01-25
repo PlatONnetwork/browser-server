@@ -62,6 +62,8 @@ public class StompPushTask {
     private ParameterService parameterService;
     @Resource
     private StatisticCacheService statisticCacheService;
+    @Resource
+    private TokenService tokenService;
 
     private boolean checkData() {
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
@@ -184,12 +186,12 @@ public class StompPushTask {
             TransactionDetailsReq transactionDetailsReq = new TransactionDetailsReq();
             transactionDetailsReq.setTxHash("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
             this.transactionService.transactionDetails(transactionDetailsReq);
-//            /**
-//             * token交易index做warm
-//             */
-//            QueryTokenDetailReq queryTokenDetailReq = new QueryTokenDetailReq();
-//            queryTokenDetailReq.setAddress("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
-//            this.erc20TokenService.queryTokenDetail(queryTokenDetailReq);
+            /**
+             * token交易index做warm
+             */
+            QueryTokenDetailReq queryTokenDetailReq = new QueryTokenDetailReq();
+            queryTokenDetailReq.setAddress("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
+            this.tokenService.queryTokenDetail(queryTokenDetailReq);
         }
     }
 

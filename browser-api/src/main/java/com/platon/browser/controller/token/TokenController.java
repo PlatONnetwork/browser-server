@@ -6,6 +6,10 @@ import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.request.token.QueryTokenListReq;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
+import com.platon.browser.response.token.QueryTokenDetailResp;
+import com.platon.browser.response.token.QueryTokenIdDetailResp;
+import com.platon.browser.response.token.QueryTokenListResp;
+import com.platon.browser.service.TokenService;
 import com.platon.browser.utils.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,20 +25,25 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("token")
 public class TokenController {
+
+    @Resource
+    private TokenService tokenService;
     @Resource
     private I18nUtil i18n;
 
     @PostMapping( "list")
-    public Mono<BaseResp<String>> list(@Valid @RequestBody QueryTokenDetailReq req) {
+    public Mono<RespPage<QueryTokenListResp>> list(@Valid @RequestBody QueryTokenListReq req) {
         return Mono.create(sink -> {
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),""));
+            RespPage<QueryTokenListResp> resp = tokenService.queryTokenList(req);
+            sink.success(resp);
         });
     }
 
     @PostMapping( "detail")
-    public Mono<BaseResp<String>> detail(@Valid @RequestBody QueryTokenListReq req) {
+    public Mono<BaseResp<QueryTokenDetailResp>> detail(@Valid @RequestBody QueryTokenDetailReq req) {
         return Mono.create(sink -> {
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),""));
+            QueryTokenDetailResp resp = tokenService.queryTokenDetail(req);
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp) );
         });
     }
 }

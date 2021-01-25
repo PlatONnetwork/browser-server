@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomTokenMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.bean.CustomToken">
+    <id column="address" jdbcType="VARCHAR" property="address" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="symbol" jdbcType="VARCHAR" property="symbol" />
+    <result column="total_supply" jdbcType="DECIMAL" property="totalSupply" />
+    <result column="decimal" jdbcType="INTEGER" property="decimal" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
+    <result column="holder" jdbcType="INTEGER" property="holder" />
+    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
+    <result column="details" jdbcType="VARCHAR" property="details" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.platon.browser.bean.CustomTokenDetail" extends="BaseResultMap">
+    <result column="contract_create" jdbcType="VARCHAR" property="creator" />
+    <result column="contract_createHash" jdbcType="VARCHAR" property="txHash" />
+    <result column="contract_bin" jdbcType="LONGVARCHAR" property="binCode" />
+    <result column="tx_qty" jdbcType="INTEGER" property="txCount" />
+  </resultMap>
+  <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
+    t.holder,te.web_site,te.details
+    from token t left join  token_expand te on t.addres = te.address
+    where 1=1
+    <if test="type != null">
+      and t.type = #{type}
+    </if>
+    order by t.holder desc,t.create_time desc
+  </select>
+  <select id="selectDetailByAddress" parameterType="java.lang.String" resultMap="DetailResultMap">
+    select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
+    t.holder,te.web_site,te.details,a.contract_create,a.contract_createHash,a.contract_bin,
+    a.tx_qty
+    from token t left join  token_expand te on t.addres = te.address
+    left join address a on t.address = a.address
+    where 1=1
+    <if test="address != null">
+      and t.address = #{address}
+    </if>
+  </select>
   <insert id="batchInsertOrUpdateSelective" parameterType="map">
     replace into token (
     <foreach collection="selective" item="column" separator=",">

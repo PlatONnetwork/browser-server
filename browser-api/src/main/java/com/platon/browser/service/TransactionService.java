@@ -671,28 +671,6 @@ public class TransactionService {
                         resp.setTo(transaction.getContractAddress());
                         resp.setTxInfo(transaction.getInput());
                         break;
-                    /**
-                     * 合约执行
-                     */
-                    case CONTRACT_EXEC:
-                        resp.setTxInfo(transaction.getInput());
-                        break;
-                    case ERC20_CONTRACT_EXEC:
-                        List<Erc20Param> erc20Params = JSON.parseArray(txInfo, Erc20Param.class);
-                        if (erc20Params != null && !erc20Params.isEmpty()) {
-                            // decimal convert
-                            erc20Params.forEach(erc -> {
-                                int decimal = Integer.parseInt(erc.getInnerDecimal());
-                                BigDecimal afterConverValue =
-                                    ConvertUtil.convertByFactor(new BigDecimal(erc.getInnerValue()), decimal);
-                                erc.setInnerValue(afterConverValue.toString());
-                            });
-                            resp.setErc20Params(erc20Params);
-                        }
-                        resp.setTxInfo(transaction.getInput());
-                        break;
-                    default:
-                        break;
                 }
             }
             //补充填充合约的相关数据
@@ -703,11 +681,14 @@ public class TransactionService {
                 case EVM_CONTRACT_CREATE:
                 case WASM_CONTRACT_CREATE:
                 case ERC20_CONTRACT_CREATE:
-                case CONTRACT_EXEC:
-                case ERC20_CONTRACT_EXEC:
                     /**
                      * to地址设置为合约地址
                      */
+                    resp.setTo(transaction.getContractAddress());
+                    resp.setTxInfo(transaction.getInput());
+                    break;
+                case CONTRACT_EXEC:
+                case ERC20_CONTRACT_EXEC:
                     resp.setTxInfo(transaction.getInput());
                     break;
             }

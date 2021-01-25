@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CustomTokenInventoryMapper {
     int batchInsertOrUpdateSelective(@Param("list") List<TokenInventory> list, @Param("selective") TokenInventory.Column... selective);
+
+
 }
