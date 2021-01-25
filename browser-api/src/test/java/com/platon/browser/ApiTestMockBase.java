@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.platon.browser.service.CommonService;
+import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
 import org.mockito.Mock;
 
@@ -43,6 +44,8 @@ public class ApiTestMockBase extends ApiTestData {
 	protected I18nUtil i18n;
 	@Mock
 	protected CommonService commonService;
+	@Mock
+	protected NetworkParams networkParams;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -59,6 +62,8 @@ public class ApiTestMockBase extends ApiTestData {
         when(customNodeMapper.selectCountByActive()).thenReturn(10);
         when(i18n.i(any(), any(), any())).thenReturn("test");
         when(commonService.getNodeName(any(),any())).thenReturn("test-name");
+        when(networkParams.getUnit()).thenReturn("ATP");
+		when(networkParams.getHrp()).thenReturn("atp");
         
 	}
 

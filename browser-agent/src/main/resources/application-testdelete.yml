@@ -9,10 +9,30 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-  #Redis配置
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
+    username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
+    password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    #下面为连接池的补充设置，应用到上面所有数据源中
+    #初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 10
+    maxActive: 100
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 100
+    #Redis配置
   redis:
     cluster:
       max-redirects: 3
@@ -138,7 +158,7 @@ v015:
   #调账提案ID
   adjustmentPipId: '1609410836.4141252'
   #调账日志输出文件
-  adjustLogFilePath: E:\Java\browser-server\browser-agent\build\adjust.log
+  adjustLogFilePath: ./logs/adjust.log
 
 task:
   #地址统计任务

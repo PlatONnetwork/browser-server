@@ -1,11 +1,11 @@
 package com.platon.browser.v015.context;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.v015.bean.AdjustParam;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.v015.bean.AdjustParam;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,6 @@ import java.util.List;
 @Slf4j()
 @Data
 public abstract class AbstractAdjustContext {
-    protected BigInteger blockNumber;
     protected AdjustParam adjustParam;
     protected Staking staking;
     protected Node node;

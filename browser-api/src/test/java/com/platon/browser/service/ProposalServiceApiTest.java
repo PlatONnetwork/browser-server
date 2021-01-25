@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.request.proposal.ProposalDetailRequest;
+import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +41,7 @@ public class ProposalServiceApiTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);
         ReflectionTestUtils.setField(target,"blockESRepository",blockESRepository);
+        ReflectionTestUtils.setField(target,"networkParams",networkParams);
     }
     
     @Test

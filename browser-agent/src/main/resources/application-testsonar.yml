@@ -138,7 +138,7 @@ v015:
   #调账提案ID
   adjustmentPipId: '1609410836.4141252'
   #调账日志输出文件
-  adjustLogFilePath: E:\Java\browser-server\browser-agent\build\adjust.log
+  adjustLogFilePath: ./logs/adjust.log
 
 task:
   #地址统计任务

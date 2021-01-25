@@ -48,16 +48,6 @@ spring:
       nodeOptIndexName: browser_nodeopt_1
       delegationRewardIndexName: browser_delegation_reward_1
       innerTxIndexName: browser_inner_tx_1
-     #Redis集群配置
-  redis:
-    database: 0
-    key:
-      #区块列表
-      blocks: browser:${profile}:blocks
-      #交易列表
-      transactions: browser:${profile}:transactions
-      #统计信息
-      networkStat: browser:${profile}:networkStat
 #redis配置
 redisCluster:
   configKey: DEFAULT
@@ -153,4 +143,4 @@ limit:
   num: 10
 output:
   file:
-    url: D:/
+    url: ./

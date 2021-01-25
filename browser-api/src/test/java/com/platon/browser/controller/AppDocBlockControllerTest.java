@@ -64,8 +64,8 @@ public class AppDocBlockControllerTest extends ApiTestBase {
     public void blockListByNodeIdDownload() throws Exception{
     	mockMvc
     		.perform(MockMvcRequestBuilders.get("/block/blockListByNodeIdDownload")
-    		.param("nodeId", "0xed52e1686606c6b496bf220c0e450003763a9258cdf3111579cb0d2c2a1b89ea84ec38116f53c4d2fda9860c78de5693d11517228eec9c651fad132b15e12d29")
-    		.param("date", "1571813653000")
+    		.param("nodeId", "0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
+    		.param("date", "1611274441843")
     		.param("local", "en")
     		.param("timeZone", "+8")
     		.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())

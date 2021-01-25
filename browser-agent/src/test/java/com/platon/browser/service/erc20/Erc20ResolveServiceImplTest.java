@@ -61,7 +61,7 @@ public class Erc20ResolveServiceImplTest {
     public void test_initContractData() throws Exception {
         Erc20Contract erc20Contract = mock(Erc20Contract.class);
         PowerMockito.whenNew(Erc20Contract.class)
-                .withArguments(anyString(), any(), any(), anyLong())
+                .withArguments(anyString(), any(), any())
                 .thenReturn(erc20Contract);
 
         String contractAddress = "lax196278ns22j23awdfj9f2d4vz0pedld8au6xelj";

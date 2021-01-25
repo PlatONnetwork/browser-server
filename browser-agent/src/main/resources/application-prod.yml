@@ -110,8 +110,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
-  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/Alaya/PIP-%s.md
   #提案pip_num参数模板
   proposalPipNumTemplate: PIP-%s
   #keysBase网址
@@ -140,7 +139,7 @@ v015:
   #调账提案ID
   adjustmentPipId: '1609410836.4141252'
   #调账日志输出文件
-  adjustLogFilePath: E:\Java\browser-server\browser-agent\build\adjust.log
+  adjustLogFilePath: ./adjust.log
 
 task:
    #地址统计任务
