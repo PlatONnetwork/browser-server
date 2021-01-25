@@ -247,6 +247,9 @@ subprojects {
         def activeProfile = "$deployProfile"
         task copyToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
             doLast {
+                ssh.settings {
+                    knownHosts = allowAnyHosts
+                }
                 ssh.run {
                     session(remotes.webServer) {
                         execute "mkdir -p $deployDir/backup && mv $deployDir/${project.name}*.jar $deployDir/backup"
