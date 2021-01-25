@@ -1,6 +1,6 @@
 package com.platon.browser.contract.erc721;
 
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
 import lombok.extern.slf4j.Slf4j;

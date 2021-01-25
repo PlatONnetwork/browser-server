@@ -1,10 +1,10 @@
 package com.platon.browser.service.epoch;
 
-import com.alaya.contracts.ppos.NodeContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.Node;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.RemoteCall;
+import com.platon.contracts.ppos.NodeContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;

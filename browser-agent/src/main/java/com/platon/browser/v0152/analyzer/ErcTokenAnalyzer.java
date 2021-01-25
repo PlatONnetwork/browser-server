@@ -1,6 +1,6 @@
 package com.platon.browser.v0152.analyzer;
 
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;

@@ -1,14 +1,14 @@
 package com.platon.browser.v0152.service;
 
-import com.alaya.crypto.Credentials;
-import com.alaya.crypto.Keys;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.core.methods.request.Transaction;
-import com.alaya.protocol.core.methods.response.PlatonCall;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.exceptions.ContractCallException;
-import com.alaya.tx.gas.ContractGasProvider;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.crypto.Credentials;
+import com.platon.crypto.Keys;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.methods.request.Transaction;
+import com.platon.protocol.core.methods.response.PlatonCall;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.exceptions.ContractCallException;
+import com.platon.tx.gas.ContractGasProvider;
+import com.platon.tx.gas.GasProvider;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BusinessException;
@@ -92,7 +92,7 @@ public class ErcDetectService {
     }
 
     private ErcContractId getErc20ContractId(String contractAddress){
-        ErcContract ercContract = Erc20Contract.load(contractAddress,platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS,GAS_PROVIDER,chainConfig.getChainId());
+        ErcContract ercContract = Erc20Contract.load(contractAddress,platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS,GAS_PROVIDER);
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC20);
         return contractId;
@@ -101,7 +101,7 @@ public class ErcDetectService {
     private ErcContractId getErc721ContractId(String contractAddress){
         ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                 CREDENTIALS,
-                GAS_PROVIDER, chainConfig.getChainId());
+                GAS_PROVIDER);
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC721);
         return contractId;
@@ -162,15 +162,14 @@ public class ErcDetectService {
     public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt) {
         ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(),platOnClient.getWeb3jWrapper().getWeb3j(),
                 ErcDetectService.CREDENTIALS,
-                ErcDetectService.GAS_PROVIDER,
-                chainConfig.getChainId());
+                ErcDetectService.GAS_PROVIDER);
         return ercContract.getTxEvents(receipt);
     }
 
     public List<ErcContract.ErcTxEvent> getErc721TxEvents(TransactionReceipt receipt) {
         ErcContract ercContract = Erc721Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(),
                 CREDENTIALS,
-                GAS_PROVIDER, chainConfig.getChainId());
+                GAS_PROVIDER);
         return ercContract.getTxEvents(receipt);
     }
 }

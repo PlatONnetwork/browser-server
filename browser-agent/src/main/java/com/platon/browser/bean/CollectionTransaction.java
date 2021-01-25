@@ -25,7 +25,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    public CollectionTransaction updateWithRawTransaction(com.alaya.protocol.core.methods.response.Transaction transaction) {
+    public CollectionTransaction updateWithRawTransaction(com.platon.protocol.core.methods.response.Transaction transaction) {
         this.setNum(transaction.getBlockNumber().longValue()).setBHash(transaction.getBlockHash())
             .setHash(transaction.getHash()).setValue(transaction.getValue().toString())
             .setIndex(transaction.getTransactionIndex().intValue()).setGasPrice(transaction.getGasPrice().toString())

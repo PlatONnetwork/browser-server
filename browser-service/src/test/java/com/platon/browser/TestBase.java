@@ -6,7 +6,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=test")
+@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=testdelete")
 public class TestBase extends TestData{
 
 //	@Test

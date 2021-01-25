@@ -1,6 +1,6 @@
 package com.platon.browser.config;
 
-import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
+import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.InnerContractAddrEnum;

@@ -1,19 +1,19 @@
 package com.platon.browser.data;
 
-import com.alaya.contracts.ppos.ProposalContract;
-import com.alaya.contracts.ppos.dto.BaseResponse;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.TransactionResponse;
-import com.alaya.contracts.ppos.dto.enums.VoteOption;
-import com.alaya.contracts.ppos.dto.resp.GovernParam;
-import com.alaya.contracts.ppos.dto.resp.Proposal;
-import com.alaya.contracts.ppos.dto.resp.TallyResult;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
-import com.alaya.protocol.core.methods.response.bean.ProgramVersion;
-import com.alaya.protocol.http.HttpService;
+import com.platon.contracts.ppos.ProposalContract;
+import com.platon.contracts.ppos.dto.BaseResponse;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.TransactionResponse;
+import com.platon.contracts.ppos.dto.enums.VoteOption;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.Proposal;
+import com.platon.contracts.ppos.dto.resp.TallyResult;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.methods.response.PlatonSendTransaction;
+import com.platon.protocol.core.methods.response.bean.ProgramVersion;
+import com.platon.protocol.http.HttpService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,18 +45,18 @@ public class ProposalContractTest {
 
 		superCredentials = Credentials.create("1a4c5a5b88433a9aaff294cdd7193eca632aec0a41e46e46aa47d82ca16fd19f");
 		System.out.println("superCredentials balance=" + web3j
-				.platonGetBalance(superCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
+				.platonGetBalance(superCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
 
 		stakingCredentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 		System.out.println("stakingCredentials balance="
-				+ web3j.platonGetBalance(stakingCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send()
+				+ web3j.platonGetBalance(stakingCredentials.getAddress(), DefaultBlockParameterName.LATEST).send()
 						.getBalance());
 
 		voteCredentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 		System.out.println("voteCredentials balance=" + web3j
-				.platonGetBalance(voteCredentials.getAddress(chainId), DefaultBlockParameterName.LATEST).send().getBalance());
+				.platonGetBalance(voteCredentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
 
-		proposalContract = ProposalContract.load(web3j, stakingCredentials, chainId);
+		proposalContract = ProposalContract.load(web3j, stakingCredentials);
 
 //        pIDID = String.valueOf(UUID.randomUUID().toString().hashCode());
 	}
@@ -167,7 +167,7 @@ public class ProposalContractTest {
 		try {
 
 			Web3j web3j = Web3j.build(new HttpService(nodeHost));
-			ProposalContract voteContract = ProposalContract.load(web3j, credentials, chainId);
+			ProposalContract voteContract = ProposalContract.load(web3j, credentials);
 
 			ProgramVersion pv = web3j.getProgramVersion().send().getAdminProgramVersion();
 			TransactionResponse baseResponse = voteContract.vote(pv,voteOption,proposalID,nodeId).send();

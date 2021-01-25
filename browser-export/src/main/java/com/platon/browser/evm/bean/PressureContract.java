@@ -1,20 +1,20 @@
 package com.platon.browser.evm.bean;
 
-import com.alaya.abi.solidity.EventEncoder;
-import com.alaya.abi.solidity.FunctionEncoder;
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.*;
-import com.alaya.abi.solidity.datatypes.generated.Uint256;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.request.PlatonFilter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.EventEncoder;
+import com.platon.abi.solidity.FunctionEncoder;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.*;
+import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.request.PlatonFilter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.GasProvider;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -56,12 +56,12 @@ public class PressureContract extends Contract {
             Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Bool>() {}));
     ;
 
-    protected PressureContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider,chainId);
+    protected PressureContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    protected PressureContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider,chainId);
+    protected PressureContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public RemoteCall<String> nodeids(BigInteger param0) {
@@ -127,13 +127,13 @@ public class PressureContract extends Contract {
     public static RemoteCall<PressureContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, BigInteger _beginBlock, BigInteger _endBlock,Long chainId) {
         String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.<Type>asList(new Uint256(_beginBlock),
                 new Uint256(_endBlock)));
-        return deployRemoteCall(PressureContract.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor,chainId);
+        return deployRemoteCall(PressureContract.class, web3j, credentials, contractGasProvider, BINARY, encodedConstructor);
     }
 
     public static RemoteCall<PressureContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, BigInteger _beginBlock, BigInteger _endBlock,Long chainId) {
         String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.<Type>asList(new Uint256(_beginBlock),
                 new Uint256(_endBlock)));
-        return deployRemoteCall(PressureContract.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor,chainId);
+        return deployRemoteCall(PressureContract.class, web3j, transactionManager, contractGasProvider, BINARY, encodedConstructor);
     }
 
 
@@ -170,12 +170,12 @@ public class PressureContract extends Contract {
         return setSuccessEventObservable(filter);
     }
 
-    public static PressureContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider,Long chainId) {
-        return new PressureContract(contractAddress, web3j, credentials, contractGasProvider,chainId);
+    public static PressureContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
+        return new PressureContract(contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    public static PressureContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider,Long chainId) {
-        return new PressureContract(contractAddress, web3j, transactionManager, contractGasProvider,chainId);
+    public static PressureContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
+        return new PressureContract(contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public static class SetSuccessEventResponse {

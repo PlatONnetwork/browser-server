@@ -1,18 +1,18 @@
 package com.platon.browser.proxyppos;
 
-import com.alaya.abi.solidity.EventEncoder;
-import com.alaya.abi.solidity.TypeReference;
-import com.alaya.abi.solidity.datatypes.*;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameter;
-import com.alaya.protocol.core.RemoteCall;
-import com.alaya.protocol.core.methods.request.PlatonFilter;
-import com.alaya.protocol.core.methods.response.Log;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
-import com.alaya.tx.Contract;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.abi.solidity.EventEncoder;
+import com.platon.abi.solidity.TypeReference;
+import com.platon.abi.solidity.datatypes.*;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.RemoteCall;
+import com.platon.protocol.core.methods.request.PlatonFilter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.Contract;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.GasProvider;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -40,11 +40,11 @@ public class ProxyContract extends Contract {
     ;
 
     protected ProxyContract(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {
-        super(BINARY, contractAddress, web3j, credentials, contractGasProvider, chainId);
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
     protected ProxyContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId) {
-        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider, chainId);
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
     public List<ProxyEventEventResponse> getProxyEventEvents(TransactionReceipt transactionReceipt) {
@@ -92,11 +92,11 @@ public class ProxyContract extends Contract {
     }
 
     public static RemoteCall<ProxyContract> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {
-        return deployRemoteCall(ProxyContract.class, web3j, credentials, contractGasProvider, BINARY,  "", chainId);
+        return deployRemoteCall(ProxyContract.class, web3j, credentials, contractGasProvider, BINARY,  "");
     }
 
     public static RemoteCall<ProxyContract> deploy(Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider, Long chainId) {
-        return deployRemoteCall(ProxyContract.class, web3j, transactionManager, contractGasProvider, BINARY,  "", chainId);
+        return deployRemoteCall(ProxyContract.class, web3j, transactionManager, contractGasProvider, BINARY,  "");
     }
 
     public static ProxyContract load(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider, Long chainId) {

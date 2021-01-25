@@ -1,13 +1,12 @@
 package com.platon.browser.config;
 
-import com.alaya.parameters.NetworkParameters;
-import com.alaya.protocol.core.methods.response.bean.EconomicConfig;
-import com.alaya.utils.Convert;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.protocol.core.methods.response.bean.EconomicConfig;
+import com.platon.utils.Convert;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -15,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -200,12 +198,11 @@ public class BlockChainConfig {
 
     @PostConstruct
     public void init() throws ConfigLoadingException {
+
     	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.ATP);
+        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.KPVON);
         // 使用经济模型参数接口返回的数据更新配置
         updateWithEconomicConfig(client.getEconomicConfig());
-        // 设置SDK全局chainId
-        NetworkParameters.setCurrentNetwork(chainId);
         // 刷新合约
         client.updateContract();
     }

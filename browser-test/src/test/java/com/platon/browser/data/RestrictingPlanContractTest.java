@@ -1,17 +1,17 @@
 package com.platon.browser.data;
 
-import com.alaya.contracts.ppos.RestrictingPlanContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.RestrictingPlan;
-import com.alaya.contracts.ppos.dto.TransactionResponse;
-import com.alaya.contracts.ppos.dto.resp.RestrictingItem;
+import com.platon.contracts.ppos.RestrictingPlanContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.RestrictingPlan;
+import com.platon.contracts.ppos.dto.TransactionResponse;
+import com.platon.contracts.ppos.dto.resp.RestrictingItem;
 import org.junit.Before;
 import org.junit.Test;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.methods.response.PlatonSendTransaction;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.methods.response.PlatonSendTransaction;
+import com.platon.protocol.http.HttpService;
+import com.platon.tx.gas.GasProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class RestrictingPlanContractTest {
 
         credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 
-        restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials, 108l);
+        restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials);
     }
 
     /**

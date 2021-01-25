@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.alaya.protocol.core.Response;
+import com.platon.protocol.core.Response;
 import com.platon.browser.utils.HexUtil;
 import lombok.Data;
 

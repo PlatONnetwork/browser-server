@@ -12,7 +12,7 @@ import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.bean.CustomProposal;
-import com.alaya.contracts.ppos.dto.resp.TallyResult;
+import com.platon.contracts.ppos.dto.resp.TallyResult;
 
 import lombok.extern.slf4j.Slf4j;
 
