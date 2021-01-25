@@ -1,8 +1,6 @@
 package com.platon.browser.response.token;
 
 import com.platon.browser.bean.CustomToken;
-import com.platon.browser.dao.entity.Erc20Token;
-import com.platon.browser.dao.entity.Token;
 import com.platon.browser.utils.ConvertUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
