@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-@Mapper
 public interface CustomStakingMapper {
 	List<CustomStaking> selectByNodeId ( @Param("nodeId") String nodeId );
 
