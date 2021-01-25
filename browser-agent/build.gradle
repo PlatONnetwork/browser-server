@@ -8,6 +8,11 @@ configurations {
     }
 }
 
+bootJar {
+    // 排除指定文件
+    exclude("application-*.yml")
+}
+
 dependencies {
     compile project(":browser-service")
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
