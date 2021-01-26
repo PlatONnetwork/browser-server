@@ -285,7 +285,7 @@ subprojects {
                     session(remotes.webServer) {
                         execute "rm -rf $deployDir/${project.name}*.jar"
                         put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
-                        execute "cd $deployDir && ./start.sh $activeProfile"
+                        execute "cd $deployDir && dos2unix *.sh && chmod a+x *.sh && ./start.sh $activeProfile"
                     }
                 }
             }
