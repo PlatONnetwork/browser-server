@@ -56,7 +56,7 @@ tables=(
   'staking_history'
   'vote'
   'config'
-  'gas_estimate_lo'
+  'gas_estimate_log'
   'gas_estimate'
   'block_node'
   'token'
