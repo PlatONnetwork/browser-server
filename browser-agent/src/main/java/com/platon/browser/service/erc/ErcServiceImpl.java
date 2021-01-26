@@ -37,10 +37,10 @@ public class ErcServiceImpl {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/20
      */
-    public BigInteger getBalance(String tokenAddress, String type, String account) {
+    public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account) {
         BigInteger balance = BigInteger.ZERO;
         try {
-            ErcContract ercContract = getErcContract(tokenAddress, ErcTypeEnum.valueOf(type.toUpperCase()));
+            ErcContract ercContract = getErcContract(tokenAddress, type);
             if (ObjectUtil.isNotNull(ercContract)) {
                 balance = ercContract.balanceOf(account).send();
             }

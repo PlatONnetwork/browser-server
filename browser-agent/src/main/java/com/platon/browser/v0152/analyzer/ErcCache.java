@@ -39,8 +39,8 @@ public class ErcCache {
         });
     }
 
-    public Collection<ErcToken> getTokenCache() {
-        return Collections.unmodifiableCollection(tokenCache.values());
+    public Map<String,ErcToken> getTokenCache() {
+        return Collections.unmodifiableMap(tokenCache);
     }
     public Collection<String> getErc20AddressCache() {
         return Collections.unmodifiableCollection(erc20AddressCache);

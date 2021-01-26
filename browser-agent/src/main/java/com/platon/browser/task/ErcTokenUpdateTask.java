@@ -1,20 +1,12 @@
 package com.platon.browser.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.entity.Token;
-import com.platon.browser.dao.entity.TokenHolder;
-import com.platon.browser.dao.entity.TokenInventory;
-import com.platon.browser.dao.entity.TokenInventoryExample;
-import com.platon.browser.dao.mapper.CustomTokenMapper;
-import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
-import com.platon.browser.dao.mapper.TokenInventoryMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.service.erc.ErcServiceImpl;
-import com.platon.browser.task.bean.TokenHolderType;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.bean.ErcToken;
@@ -24,13 +16,17 @@ import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,13 +44,17 @@ public class ErcTokenUpdateTask {
     @Resource
     private CustomTokenMapper customTokenMapper;
     @Resource
-    private ErcCache ercCache;
-
+    private TokenHolderMapper tokenHolderMapper;
     @Resource
-    private SyncTokenInfoMapper syncTokenInfoMapper;
-
+    private CustomTokenHolderMapper customTokenHolderMapper;
     @Resource
     private TokenInventoryMapper tokenInventoryMapper;
+    @Resource
+    private CustomTokenInventoryMapper customTokenInventoryMapper;
+    @Resource
+    private ErcCache ercCache;
+    @Resource
+    private SyncTokenInfoMapper syncTokenInfoMapper;
 
     @Resource
     private ErcServiceImpl ercServiceImpl;
@@ -97,7 +97,7 @@ public class ErcTokenUpdateTask {
         // 从缓存中获取Token更新参数，并构造批次列表
         List<ErcToken> batch = new ArrayList<>();
         batchList.add(batch);
-        for (ErcToken token : ercCache.getTokenCache()) {
+        for (ErcToken token : ercCache.getTokenCache().values()) {
             if(token.isDirty()) updateParams.add(token);
             if(token.getTypeEnum() != ErcTypeEnum.ERC20) continue;
 
@@ -153,32 +153,51 @@ public class ErcTokenUpdateTask {
      */
     @Scheduled(cron = "0/30  * * * * ?")
     public void updateTokenHolderBalance(){
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) return;
         try {
-            List<TokenHolderType> tokenTypeList = syncTokenInfoMapper.findTokenHolderType();
-            if (CollUtil.isNotEmpty(tokenTypeList)) {
-                int size = tokenTypeList.size();
-                List<TokenHolder> tokenHolderList = Collections.synchronizedList(new ArrayList<>(size));
-                CountDownLatch latch = new CountDownLatch(size);
-                tokenTypeList.forEach(d -> {
-                    HOLDER_UPDATE_POOL.submit(() -> {
-                        try {
-                            // 查询余额并回填
-                            BigInteger balance = ercServiceImpl.getBalance(d.getTokenAddress(), d.getType(), d.getAddress());
-                            d.setBalance(new BigDecimal(balance));
-                            d.setUpdateTime(DateUtil.date());
-                            tokenHolderList.add(d);
-                        } catch (Exception e) {
-                            log.error("{}",e.getMessage());
-                        } finally {
-                            latch.countDown();
-                        }
+            // 分页更新holder的balance
+            List<TokenHolder> batch;
+            int page = 0;
+            do {
+                TokenHolderExample condition = new TokenHolderExample();
+                condition.setOrderByClause(" token_address asc, address asc limit "+page*HOLDER_BATCH_SIZE+","+HOLDER_BATCH_SIZE);
+                batch = tokenHolderMapper.selectByExample(condition);
+
+                List<TokenHolder> updateParams = new ArrayList<>();
+                if(!batch.isEmpty()){
+                    CountDownLatch latch = new CountDownLatch(batch.size());
+                    batch.forEach(holder -> {
+                        HOLDER_UPDATE_POOL.submit(() -> {
+                            try {
+                                // 查询余额并回填
+                                ErcToken token = ercCache.getTokenCache().get(holder.getTokenAddress());
+                                if(token!=null){
+                                    BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress());
+                                    if(holder.getBalance().compareTo(new BigDecimal(balance))!=0){
+                                        // 余额有变动才加入更新列表，避免频繁访问表
+                                        holder.setBalance(new BigDecimal(balance));
+                                        holder.setUpdateTime(DateUtil.date());
+                                        updateParams.add(holder);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.error("查询地址【{}】的令牌【{}】余额失败",holder.getAddress(),holder.getTokenAddress());
+                                log.error("",e);
+                            } finally {
+                                latch.countDown();
+                            }
+                        });
                     });
-                });
-                latch.await();
-                if (CollUtil.isNotEmpty(tokenHolderList)) {
-                    this.syncTokenInfoMapper.updateAddressBalance(tokenHolderList);
+                    try {
+                        latch.await();
+                    } catch (InterruptedException e) {
+                        log.error("",e);
+                    }
                 }
-            }
+                if(!updateParams.isEmpty()) customTokenHolderMapper.batchInsertOrUpdateSelective(updateParams,TokenHolder.Column.values());
+                page++;
+            }while (!batch.isEmpty());
         } catch (Exception e) {
             log.error("更新地址代币余额异常",e);
         }
@@ -189,56 +208,81 @@ public class ErcTokenUpdateTask {
      */
     @Scheduled(cron = "0/30  * * * * ?")
     public void updateTokenInventory(){
-        //定期更新token_inventory
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) return;
         try {
-            TokenInventoryExample example = new TokenInventoryExample();
-            example.createCriteria().andNameIsNull()
-                    .andDescriptionIsNull()
-                    .andImageIsNull();
-            List<TokenInventory> tokenInventoryList = tokenInventoryMapper.selectByExample(example);
-            if (CollUtil.isNotEmpty(tokenInventoryList)) {
-                int size = tokenInventoryList.size();
-                List<TokenInventory> params = Collections.synchronizedList(new ArrayList<>(size));
-                CountDownLatch latch = new CountDownLatch(size);
-                tokenInventoryList.forEach(token -> {
-                    INVENTORY_UPDATE_POOL.submit(() -> {
-                        try {
-                            String tokenURI = ercServiceImpl.getTokenURI(token.getTokenAddress(), Convert.toBigInteger(token.getTokenId()));
-                            if (StrUtil.isNotBlank(tokenURI)) {
-                                Request request = new Request.Builder().url(tokenURI).build();
-                                try (Response response = client.newCall(request).execute()) {
-                                    if (response.code() == 200) {
-                                        String resp = response.body().string();
-                                        TokenInventory tokenInventory = JSON.parseObject(resp, TokenInventory.class);
-                                        tokenInventory.setUpdateTime(DateUtil.date());
-                                        tokenInventory.setTokenId(token.getTokenId());
-                                        tokenInventory.setTokenAddress(token.getTokenAddress());
-                                        params.add(tokenInventory);
+            // 分页更新token库存相关信息
+            List<TokenInventory> batch;
+            int page = 0;
+            do {
+                TokenInventoryExample condition = new TokenInventoryExample();
+                condition.setOrderByClause(" token_address asc limit "+page*INVENTORY_BATCH_SIZE+","+INVENTORY_BATCH_SIZE);
+                batch = tokenInventoryMapper.selectByExample(condition);
+
+                List<TokenInventory> updateParams = new ArrayList<>();
+                if(!batch.isEmpty()){
+                    CountDownLatch latch = new CountDownLatch(batch.size());
+                    batch.forEach(inventory -> {
+                        INVENTORY_UPDATE_POOL.submit(() -> {
+                            try {
+                                String tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), inventory.getTokenId());
+                                if (StrUtil.isNotBlank(tokenURI)) {
+                                    Request request = new Request.Builder().url(tokenURI).build();
+                                    try (Response response = client.newCall(request).execute()) {
+                                        if (response.code() == 200) {
+                                            String resp = response.body().string();
+                                            TokenInventory newTi = JSON.parseObject(resp, TokenInventory.class);
+                                            newTi.setUpdateTime(DateUtil.date());
+                                            newTi.setTokenId(inventory.getTokenId());
+                                            newTi.setTokenAddress(inventory.getTokenAddress());
+                                            boolean changed = false;
+                                            // 只要有一个属性变动就添加到更新列表中
+                                            if(StringUtils.isNotBlank(newTi.getImage())&&!newTi.getImage().equals(inventory.getImage())){
+                                                inventory.setImage(newTi.getImage());
+                                                changed = true;
+                                            }
+                                            if(StringUtils.isNotBlank(newTi.getDescription())&&!newTi.getDescription().equals(inventory.getDescription())){
+                                                inventory.setDescription(newTi.getDescription());
+                                                changed = true;
+                                            }
+                                            if(StringUtils.isNotBlank(newTi.getName())&&!newTi.getName().equals(inventory.getName())){
+                                                inventory.setName(newTi.getName());
+                                                changed = true;
+                                            }
+                                            if(changed) {
+                                                inventory.setUpdateTime(new Date());
+                                                updateParams.add(inventory);
+                                            }
+                                        }
+                                        if (response.code() == 404) {
+                                            log.error("token[{}] resource [{}] does not exist", inventory.getTokenAddress(), tokenURI);
+                                        }
+                                    } catch (Exception e) {
+                                        log.error("请求TokenURI异常，token_address：{},token_id:{}", inventory.getTokenAddress(), inventory.getTokenId());
+                                        log.error("", e);
                                     }
-                                    if (response.code() == 404) {
-                                        log.error("token[{}] resource [{}] does not exist", token.getTokenAddress(), tokenURI);
-                                    }
-                                } catch (Exception e) {
-                                    log.error("请求TokenURI异常，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
-                                    log.error("", e);
+                                } else {
+                                    log.error("请求TokenURI为空，token_address：{},token_id:{}", inventory.getTokenAddress(), inventory.getTokenId());
                                 }
-                            } else {
-                                log.error("请求TokenURI为空，token_address：{},token_id:{}", token.getTokenAddress(), token.getTokenId());
+                            } catch (Exception e) {
+                                log.error("{}",e.getMessage());
+                            } finally {
+                                latch.countDown();
                             }
-                        } catch (Exception e) {
-                            log.error("{}",e.getMessage());
-                        } finally {
-                            latch.countDown();
-                        }
+
+                        });
                     });
-                });
-                latch.await();
-                if (CollUtil.isNotEmpty(params)) {
-                    syncTokenInfoMapper.updateTokenInventory(params);
+                    try {
+                        latch.await();
+                    } catch (InterruptedException e) {
+                        log.error("",e);
+                    }
                 }
-            }
+                if(!updateParams.isEmpty()) customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams,TokenInventory.Column.values());
+                page++;
+            }while (!batch.isEmpty());
         } catch (Exception e) {
-            log.error("定期更新token_inventory异常",e);
+            log.error("更新token库存信息",e);
         }
     }
 }
