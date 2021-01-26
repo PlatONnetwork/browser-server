@@ -214,7 +214,7 @@ subprojects {
             from('src/main/resources/application-prod.yml')
             from('jasypt.properties')
             from('status.hook')
-            from('build/libs')
+            from("build/libs/${project.name}-${version}.jar")
             into('build/package')
         }
 
