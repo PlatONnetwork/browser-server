@@ -1,6 +1,7 @@
 package com.platon.browser.v0150.service;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.cache.AddressCache;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.v0150.V0150Config;
 import com.platon.browser.v0150.bean.AdjustParam;
@@ -26,6 +27,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +49,8 @@ public class StakingDelegateBalanceAdjustmentServiceTest extends AgentTestBase {
     private StakingDelegateBalanceAdjustmentMapper adjustmentMapper;
     @Mock
     private V0150Config v0150Config;
+    @Mock
+    private AddressCache addressCache;
 
     @Spy
     @InjectMocks
@@ -64,10 +68,12 @@ public class StakingDelegateBalanceAdjustmentServiceTest extends AgentTestBase {
         ReflectionTestUtils.setField(target,"chainConfig", blockChainConfig);
         ReflectionTestUtils.invokeMethod(target,"init");
         node = nodeList.get(0);
+        node.setLeaveTime(new Date());
         staking = stakingList.get(0);
         staking.setStakingHes(BigDecimal.ONE);
         staking.setStakingLocked(BigDecimal.ONE);
         staking.setStakingReduction(BigDecimal.valueOf(2));
+        staking.setLeaveTime(new Date());
         delegation = delegationList.get(0);
         delegation.setDelegateHes(BigDecimal.ONE);
         delegation.setDelegateLocked(BigDecimal.ONE);

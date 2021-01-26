@@ -1,14 +1,14 @@
 package com.platon.browser.data;
 
-import com.alaya.contracts.ppos.DelegateContract;
-import com.alaya.contracts.ppos.NodeContract;
-import com.alaya.contracts.ppos.ProposalContract;
-import com.alaya.contracts.ppos.RestrictingPlanContract;
-import com.alaya.contracts.ppos.dto.resp.GovernParam;
-import com.alaya.contracts.ppos.dto.resp.Node;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.DefaultBlockParameterName;
-import com.alaya.protocol.websocket.WebSocketService;
+import com.platon.contracts.ppos.DelegateContract;
+import com.platon.contracts.ppos.NodeContract;
+import com.platon.contracts.ppos.ProposalContract;
+import com.platon.contracts.ppos.RestrictingPlanContract;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.websocket.WebSocketService;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.SpecialApi;
@@ -43,10 +43,10 @@ public class SpecialContractApiInvoker {
 
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
-    private static NodeContract nodeContract = NodeContract.load(web3j,chainId);
-    private static DelegateContract delegateContract = DelegateContract.load(web3j,chainId);
-    private static RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(web3j,chainId);
-    private static ProposalContract proposalContract = ProposalContract.load(web3j,chainId);
+    private static NodeContract nodeContract = NodeContract.load(web3j);
+    private static DelegateContract delegateContract = DelegateContract.load(web3j);
+    private static RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(web3j);
+    private static ProposalContract proposalContract = ProposalContract.load(web3j);
     private static SpecialApi sca = new SpecialApi();
 
     public static void main(String args[]) throws Exception {

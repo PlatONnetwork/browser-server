@@ -1,7 +1,7 @@
 package com.platon.browser.bean;
 
 
-import com.alaya.contracts.ppos.dto.resp.Node;
+import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.epoch.EpochService;
 import lombok.Data;

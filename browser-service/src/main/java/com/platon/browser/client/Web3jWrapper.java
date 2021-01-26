@@ -2,8 +2,8 @@ package com.platon.browser.client;
 
 import lombok.Builder;
 import lombok.experimental.Accessors;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.Web3jService;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.Web3jService;
 
 /**
  * @description:

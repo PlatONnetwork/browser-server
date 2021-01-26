@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-public class Erc20TokenControllerTest  extends ApiTestBase {
+public class TokenControllerTest extends ApiTestBase {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;

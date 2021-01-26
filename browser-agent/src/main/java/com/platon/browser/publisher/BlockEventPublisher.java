@@ -1,6 +1,6 @@
 package com.platon.browser.publisher;
 
-import com.alaya.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 区块事件生产者

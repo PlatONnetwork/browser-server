@@ -25,11 +25,11 @@ import javax.validation.constraints.Size;
 public class QueryTokenTransferRecordListReq extends PageReq {
 
     @ApiModelProperty(value = "合约地址")
-    @Size(min = 42, max = 42)
+    //@Size(min = 42, max = 42)
     private String contract;
 
     @ApiModelProperty(value = "用户地址（from/to）")
-    @Size(min = 42, max = 42)
+    //@Size(min = 42, max = 42)
     private String address;
 
     @ApiModelProperty(value = "交易哈希")

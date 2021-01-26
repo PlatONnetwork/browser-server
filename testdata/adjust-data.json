@@ -7,7 +7,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -17,7 +19,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -27,7 +31,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -37,7 +43,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -47,7 +55,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -57,7 +67,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -67,7 +79,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -77,7 +91,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -87,7 +103,9 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   },
   {
     "Hes": 1,
@@ -97,6 +115,8 @@
     "Addr": "atp1e8su9veseal8t8eyj0zuw49nfkvtqlunurqdlj",
     "Lock": 1,
     "currBlockNum":44,
-    "settleBlockCount":250
+    "settleBlockCount":250,
+    "Reward":0,
+    "blockTime":"2021-01-22 20:00:00"
   }
 ]

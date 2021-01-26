@@ -20,7 +20,8 @@ public class QueryDetailResp {
     private BigDecimal delegateValue;       //委托的金额
     private BigDecimal redeemedValue;       //赎回中的金额
     private Integer txQty;             //交易总数
-    private Integer tokenQty; // token交易总数
+    private Integer erc20TxQty; // token erc20交易总数
+	private Integer erc721TxQty; // token erc 721交易总数
     private Integer transferQty;         //转账交易总数
     private Integer delegateQty;         //委托交易总数
     private Integer stakingQty;          //验证人交易总数
@@ -201,11 +202,19 @@ public class QueryDetailResp {
 		this.destroyHash = destroyHash;
 	}
 
-    public Integer getTokenQty() {
-        return this.tokenQty;
-    }
+	public Integer getErc20TxQty() {
+		return erc20TxQty;
+	}
 
-    public void setTokenQty(Integer tokenQty) {
-        this.tokenQty = tokenQty;
-    }
+	public void setErc20TxQty(Integer erc20TxQty) {
+		this.erc20TxQty = erc20TxQty;
+	}
+
+	public Integer getErc721TxQty() {
+		return erc721TxQty;
+	}
+
+	public void setErc721TxQty(Integer erc721TxQty) {
+		this.erc721TxQty = erc721TxQty;
+	}
 }

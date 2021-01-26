@@ -21,9 +21,8 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueryHolderTokenListReq extends PageReq {
-    @ApiModelProperty(value = "用户地址")
+    @NotBlank(message = "{address required}")
     @Size(min = 42, max = 42)
-    @NotBlank
     private String address;
 
 }

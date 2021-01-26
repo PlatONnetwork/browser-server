@@ -86,6 +86,7 @@ public class Transaction {
         TRANSFER(0, "转账"), EVM_CONTRACT_CREATE(1, "EVM合约发布(合约创建)"), CONTRACT_EXEC(2, "合约调用(合约执行)"),
         WASM_CONTRACT_CREATE(3, "WASM合约发布(合约创建)"), OTHERS(4, "其他"), MPC(5, "MPC交易"),
         ERC20_CONTRACT_CREATE(6, "ERC20合约发布(合约创建)"), ERC20_CONTRACT_EXEC(7, "ERC20合约调用(合约执行)"),
+        ERC721_CONTRACT_CREATE(8, "ERC721合约发布(合约创建)"), ERC721_CONTRACT_EXEC(9, "ERC721合约调用(合约执行)"),
         STAKE_CREATE(1000, "发起质押(创建验证人)"), STAKE_MODIFY(1001, "修改质押信息(编辑验证人)"), STAKE_INCREASE(1002, "增持质押(增加自有质押)"),
         STAKE_EXIT(1003, "撤销质押(退出验证人)"), DELEGATE_CREATE(1004, "发起委托(委托)"), DELEGATE_EXIT(1005, "减持/撤销委托(赎回委托)"),
         PROPOSAL_TEXT(2000, "提交文本提案(创建提案)"), PROPOSAL_UPGRADE(2001, "提交升级提案(创建提案)"),
@@ -163,8 +164,12 @@ public class Transaction {
      * 交易接收者类型(to是合约还是账户):地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约
      */
     public enum ToTypeEnum {
-        ACCOUNT(1, "账户"), INNER_CONTRACT(2, "内置合约"), EVM_CONTRACT(3, "EVM合约"), WASM_CONTRACT(4, "WASM合约"),
-        ERC20_CONTRACT(5, "ERC20-EVM合约");
+        ACCOUNT(1, "账户"),
+        INNER_CONTRACT(2, "内置合约"),
+        EVM_CONTRACT(3, "EVM合约"),
+        WASM_CONTRACT(4, "WASM合约"),
+        ERC20_CONTRACT(5, "ERC20-EVM合约"),
+        ERC721_CONTRACT(6, "ERC721-EVM合约");
 
         private int code;
         private String desc;

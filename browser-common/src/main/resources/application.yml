@@ -1,0 +1,62 @@
+# ***************************通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录**************************** #
+# 应用版本
+version: 0.15.1.0
+#服务器配置
+server:
+  port: ${port}
+  servlet:
+    context-path: /browser-common
+#Spring应用配置
+spring:
+  profiles.active: test
+  application.name: browser-api
+  #国际化配置
+  messages.basename: messages
+  #Redis集群配置
+  redis:
+    database: 0
+  #数据源配置
+  datasource:
+    name: test
+    url: ${dburl}
+    username: ${dbuser}
+    password: ${dbpass}
+    #druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    #driver-class-name: com.mysql.jdbc.Driver
+# Platon配置
+platon:
+  web3j:
+    addresses: ${web3j.addresses}
+    collect.batch-size: ${web3j.collect.batch-size}
+
+  fake.location.filename: fakelocation-${version}-${profile}.json
+  # Redis缓存配置
+  redis:
+    key:
+      #区块列表
+      blocks: browser:${version}:${profile}:blocks
+      #交易列表
+      transactions: browser:${version}:${profile}:transactions
+      #统计信息
+      networkStat: browser:${version}:${profile}:networkStat
+      #代币交易
+      innerTx: browser:${version}:${profile}:innerTx
+    max-item: 500000
+
+# MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类别名配置（注意：对应实体类的路径）
+  type-aliases-package: com.platon.browser.dao.entity
+
+# mq设置：
+activemq:
+  brokenHost: ${brokenHost}
+  brokenPort: ${brokenPort}
+  system:
+    username: ${system.username}
+    password: ${system.password}
+  client:
+    username: ${client.username}
+    password: ${client.password}

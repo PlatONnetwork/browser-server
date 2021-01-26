@@ -1,13 +1,13 @@
 # ***************************测试配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: test
+profile: hrpatp201018
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #性能配置
 server:
-  port: 9061
+  port: 45001
   tomcat:
     max-connections: 20000
     threads:
@@ -17,27 +17,9 @@ server:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    #下面为连接池的补充设置，应用到上面所有数据源中
-    #初始化大小，最小，最大
-    initialSize: 5
-    minIdle: 10
-    maxActive: 100
-    # 配置获取连接等待超时的时间
-    maxWait: 60000
-    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-    timeBetweenEvictionRunsMillis: 60000
-    # 配置一个连接在池中最小生存的时间，单位是毫秒
-    minEvictableIdleTimeMillis: 30000
-    validationQuery: select 'x'
-    testWhileIdle: true
-    testOnBorrow: false
-    testOnReturn: false
-    # 打开PSCache，并且指定每个连接上PSCache的大小
-    poolPreparedStatements: true
-    maxPoolPreparedStatementPerConnectionSize: 100
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${profile}?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: platon
+    password: platon
   #Redis配置
   redis:
     password: platscan
@@ -66,16 +48,19 @@ logging:
   file:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
+#初始化链相关的配置
 platon:
   # 地址HRP前缀
   addressPrefix: atp
+  # 金额显示单位
+  valueUnit: ATP
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6791
+    addresses: 192.168.120.151:6789,192.168.120.151:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -103,7 +88,8 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
+  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -121,4 +107,4 @@ limit:
   num: 10
 output:
   file:
-    url: D:/
+    url: ./

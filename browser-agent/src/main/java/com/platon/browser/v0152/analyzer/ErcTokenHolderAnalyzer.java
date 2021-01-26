@@ -2,6 +2,7 @@ package com.platon.browser.v0152.analyzer;
 
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
+import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +22,12 @@ import java.util.List;
 public class ErcTokenHolderAnalyzer {
     @Resource
     private TokenHolderMapper tokenHolderMapper;
+    @Resource
+    private CustomTokenHolderMapper customTokenHolderMapper;
     private void resolveTokenHolder(
             String tokenAddress,
             String userAddress,
-            List<TokenHolder> update,
-            List<TokenHolder> insert
+            List<TokenHolder> insertOrUpdate
     ){
         Date date = new Date();
         TokenHolderKey key = new TokenHolderKey();
@@ -39,26 +41,21 @@ public class ErcTokenHolderAnalyzer {
             tokenHolder.setCreateTime(date);
             tokenHolder.setTokenTxQty(1);
             tokenHolder.setBalance(BigDecimal.ZERO);
-            insert.add(tokenHolder);
         }else{
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty()+1);
-            update.add(tokenHolder);
         }
         tokenHolder.setUpdateTime(date);
+        insertOrUpdate.add(tokenHolder);
     }
     /**
      * 解析Token Holder
      */
     public void analyze(List<ErcTx> txList) {
-        List<TokenHolder> update = new ArrayList<>();
-        List<TokenHolder> insert = new ArrayList<>();
+        List<TokenHolder> insertOrUpdate = new ArrayList<>();
         txList.forEach(tx->{
-            resolveTokenHolder(tx.getContract(),tx.getFrom(),update,insert);
-            resolveTokenHolder(tx.getContract(),tx.getTo(),update,insert);
+            resolveTokenHolder(tx.getContract(),tx.getFrom(),insertOrUpdate);
+            resolveTokenHolder(tx.getContract(),tx.getTo(),insertOrUpdate);
         });
-        if(!insert.isEmpty()) tokenHolderMapper.batchInsert(insert);
-        if(!update.isEmpty()) {
-            update.forEach(th->tokenHolderMapper.updateByPrimaryKey(th));
-        }
+        if(!insertOrUpdate.isEmpty()) customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate,TokenHolder.Column.values());
     }
 }

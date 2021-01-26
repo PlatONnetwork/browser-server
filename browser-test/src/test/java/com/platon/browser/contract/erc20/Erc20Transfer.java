@@ -1,7 +1,7 @@
 package com.platon.browser.contract.erc20;
 
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.ErcContract;
 import lombok.extern.slf4j.Slf4j;

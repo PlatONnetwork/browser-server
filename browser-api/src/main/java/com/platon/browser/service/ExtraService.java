@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.alaya.utils.Convert;
+import com.platon.utils.Convert;
 import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
@@ -96,16 +96,16 @@ public class ExtraService {
 			 */
 			if(Browser.EXTRA_LAT_PARAM.contains(config.getName())) {
 				if(StringUtils.isNotBlank(res2)) {
-					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setStartValue(Convert.fromVon(res2.trim(), Convert.Unit.KPVON).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(res3)) {
-					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setEndValue(Convert.fromVon(res3.trim(), Convert.Unit.KPVON).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(config.getValue())) {
-					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setValue(Convert.fromVon(config.getValue(), Convert.Unit.KPVON).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 				if(StringUtils.isNotBlank(config.getInitValue())) {
-					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.ATP).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
+					configDetail.setInitValue(Convert.fromVon(config.getInitValue(), Convert.Unit.KPVON).setScale(18,RoundingMode.HALF_UP).stripTrailingZeros().toPlainString());
 				}
 			} else {
 				configDetail.setStartValue(res2.trim());

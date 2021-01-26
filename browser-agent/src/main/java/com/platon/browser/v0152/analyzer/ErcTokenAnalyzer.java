@@ -1,6 +1,6 @@
 package com.platon.browser.v0152.analyzer;
 
-import com.alaya.protocol.core.methods.response.TransactionReceipt;
+import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
@@ -12,7 +12,6 @@ import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.bean.ErcTxInfo;
-import com.platon.browser.v0152.cache.ErcCache;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.browser.v0152.service.ErcDetectService;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -43,9 +43,9 @@ public class ErcTokenAnalyzer {
     @Resource
     private ErcTokenHolderAnalyzer ercTokenHolderAnalyzer;
     @Resource
-    private TokenMapper tokenMapper;
-    @Resource
     private CustomTokenMapper customTokenMapper;
+    @Resource
+    private TokenMapper tokenMapper;
 
     /**
      * 解析Token,在合约创建时调用
@@ -65,8 +65,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(false);
                 token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
                 token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                ercCache.getTokenMap().put(contractAddress,token);
-                ercCache.getErc20AddressCache().add(contractAddress);
+                ercCache.erc20AddressCache.add(contractAddress);
                 break;
             case ERC721:
                 token.setIsSupportErc20(false);
@@ -74,8 +73,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress));
                 token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress));
-                ercCache.getTokenMap().put(contractAddress,token);
-                ercCache.getErc721AddressCache().add(contractAddress);
+                ercCache.erc721AddressCache.add(contractAddress);
                 break;
             default:
         }
@@ -83,6 +81,7 @@ public class ErcTokenAnalyzer {
             // 入库ERC721或ERC20 Token记录
             token.setTokenTxQty(0);
             customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token),Token.Column.values());
+            ercCache.tokenCache.put(token.getAddress(),token);
         }
         return token;
     }
@@ -129,7 +128,7 @@ public class ErcTokenAnalyzer {
      * @param tx
      */
     public void resolveTx(CollectionTransaction tx, Receipt receipt) {
-        Token token = tokenMapper.selectByPrimaryKey(tx.getTo());
+        ErcToken token = ercCache.tokenCache.get(tx.getTo());
         if(token==null){
             log.warn("未找到合约地址[{}]对应的Erc Token",tx.getContractAddress());
             return;
@@ -158,7 +157,8 @@ public class ErcTokenAnalyzer {
                 break;
         }
         token.setTokenTxQty(token.getTokenTxQty()+txList.size());
-        tokenMapper.updateByPrimaryKey(token);
+        token.setUpdateTime(new Date());
+        token.setDirty(true);
         ercTokenHolderAnalyzer.analyze(txList);
 
         // 以上所有操作无误，最后更新地址表erc交易数缓存

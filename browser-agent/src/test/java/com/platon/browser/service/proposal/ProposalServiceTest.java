@@ -1,10 +1,10 @@
 package com.platon.browser.service.proposal;
 
-import com.alaya.contracts.ppos.ProposalContract;
-import com.alaya.contracts.ppos.dto.CallResponse;
-import com.alaya.contracts.ppos.dto.resp.TallyResult;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.core.RemoteCall;
+import com.platon.contracts.ppos.ProposalContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.resp.TallyResult;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;

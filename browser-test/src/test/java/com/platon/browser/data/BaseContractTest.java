@@ -3,14 +3,14 @@ package com.platon.browser.data;
 import java.math.BigInteger;
 
 import org.junit.Before;
-import com.alaya.crypto.Credentials;
-import com.alaya.protocol.Web3j;
-import com.alaya.protocol.Web3jService;
-import com.alaya.protocol.http.HttpService;
-import com.alaya.tx.RawTransactionManager;
-import com.alaya.tx.TransactionManager;
-import com.alaya.tx.gas.ContractGasProvider;
-import com.alaya.tx.gas.GasProvider;
+import com.platon.crypto.Credentials;
+import com.platon.protocol.Web3j;
+import com.platon.protocol.Web3jService;
+import com.platon.protocol.http.HttpService;
+import com.platon.tx.RawTransactionManager;
+import com.platon.tx.TransactionManager;
+import com.platon.tx.gas.ContractGasProvider;
+import com.platon.tx.gas.GasProvider;
 
 public abstract class BaseContractTest {
 	protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4700000);
@@ -30,10 +30,10 @@ public abstract class BaseContractTest {
 	@Before
 	public void init() {
 		credentials = Credentials.create(privateKey);
-		address = credentials.getAddress(chainId);
+		address = credentials.getAddress();
 		web3jService = new HttpService(nodeUrl);
 		web3j = Web3j.build(web3jService);
-		transactionManager = new RawTransactionManager(web3j, credentials, chainId);
+		transactionManager = new RawTransactionManager(web3j, credentials);
 		gasProvider = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
 	}
 }

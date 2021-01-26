@@ -1,6 +1,7 @@
 package com.platon.browser.analyzer;
 
-import com.alaya.protocol.core.methods.response.Transaction;
+import com.platon.browser.v0152.analyzer.ErcCache;
+import com.platon.protocol.core.methods.response.Transaction;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
@@ -37,11 +38,13 @@ public class TransactionAnalyzer {
     @Resource
     private AddressCache addressCache;
     @Resource
+    private ErcCache ercCache;
+    @Resource
     private SpecialApi specialApi;
     @Resource
     private ErcTokenAnalyzer ercTokenAnalyzer;
     
-    // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存
+    // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存和erc緩存
     // <普通合约地址,合约类型枚举>
     private static final Map<String, ContractTypeEnum> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP = new HashMap<>();
 
@@ -53,12 +56,16 @@ public class TransactionAnalyzer {
         GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(key, contractTypeEnum);
     }
 
-    private void initGeneralContractCache(AddressCache addressCache) {
+    private void initGeneralContractCache() {
         if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.isEmpty()) {
             addressCache.getEvmContractAddressCache()
                     .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
             addressCache.getWasmContractAddressCache()
                     .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
+            ercCache.getErc20AddressCache()
+                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
+            ercCache.getErc721AddressCache()
+                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC721_EVM));
         }
     }
 
@@ -67,7 +74,7 @@ public class TransactionAnalyzer {
                 .updateWithBlock(collectionBlock)
                 .updateWithRawTransaction(rawTransaction);
         // 使用地址缓存初始化普通合约缓存信息
-        initGeneralContractCache(addressCache);
+        initGeneralContractCache();
 
         // ============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
