@@ -208,6 +208,7 @@ subprojects {
                 .replace('_DB_HOST_',"$dbHost")
                 .replace('_DB_USER_',"$dbUser")
                 .replace('_DB_PASS_',"$dbPass")
+                .replace('_JAVA_PATH_',"$deployJavaAbsPath")
                 ,"utf-8")
         }
 
@@ -274,16 +275,17 @@ subprojects {
         // 拷包到测试环境
         def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
         def activeProfile = "$deployProfile"
-        task copyToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
+        task copyToTestEnv(/*dependsOn:['buildTar'],*/group: 'deploy') {
             doLast {
                 ssh.settings {
                     knownHosts = allowAnyHosts
+                    pty = true
                 }
                 ssh.run {
                     session(remotes.webServer) {
                         execute "rm -rf $deployDir/${project.name}*.jar"
                         put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
-                        execute "cd $deployDir && nohup ./start.sh $activeProfile &"
+                        execute "cd $deployDir && ./start.sh $activeProfile"
                     }
                 }
             }
