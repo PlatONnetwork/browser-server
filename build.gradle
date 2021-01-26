@@ -221,11 +221,22 @@ subprojects {
         def packageName = "${project.name}-${version}"
         build {
             doFirst {
-                def path = "${buildDir}/package"
-                file(path).listFiles(new FilenameFilter() {
+                file("${buildDir}/package").listFiles(new FilenameFilter() {
                     @Override
                     boolean accept(File dir, String name) {
                         return name.endsWith('.jar')&&!name.contains(packageName)
+                    }
+                }).each { file->file.delete()}
+                file("${buildDir}/distributions").listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        return !name.contains(packageName)
+                    }
+                }).each { file->file.delete()}
+                file("${buildDir}/libs").listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        return !name.contains(packageName)
                     }
                 }).each { file->file.delete()}
             }
