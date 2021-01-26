@@ -218,6 +218,23 @@ subprojects {
             into('build/package')
         }
 
+        def packageName = "${project.name}-${version}"
+        build {
+            doFirst {
+                def path = "${buildDir}/package"
+                file(path).listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        return name.endsWith('.jar')&&!name.contains(packageName)
+                    }
+                }).each { file->file.delete()}
+            }
+        }
+        task buildTar(dependsOn: [
+                'build',
+                copyConf
+        ]){}
+
         distributions {
             monitor {
                 baseName = project.name
@@ -231,11 +248,6 @@ subprojects {
         monitorDistTar.compression = Compression.GZIP
         monitorDistTar.archiveExtension.set('tar.gz')
 
-        task buildTar(dependsOn: [
-                'build',
-                copyConf
-        ]){}
-
         remotes {
             webServer {
                 host = "$deployServerHost"
@@ -246,7 +258,6 @@ subprojects {
         }
 
         // 拷包到测试环境
-        def packageName = "${project.name}-${version}"
         def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
         def activeProfile = "$deployProfile"
         task copyToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
@@ -256,8 +267,8 @@ subprojects {
                 }
                 ssh.run {
                     session(remotes.webServer) {
-                        execute "mkdir -p $deployDir/backup && mv $deployDir/${project.name}*.jar $deployDir/backup"
-                        put from: "$buildDir/libs/${packageName}.jar", into: "$deployDir"
+                        execute "rm -rf $deployDir/${project.name}*.jar"
+                        put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
                         execute "cd $deployDir && nohup ./start.sh $activeProfile &"
                     }
                 }
