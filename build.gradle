@@ -275,7 +275,7 @@ subprojects {
         // 拷包到测试环境
         def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
         def activeProfile = "$deployProfile"
-        task copyToTestEnv(/*dependsOn:['buildTar'],*/group: 'deploy') {
+        task copyToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
             doLast {
                 ssh.settings {
                     knownHosts = allowAnyHosts
