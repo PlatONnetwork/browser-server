@@ -65,6 +65,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(false);
                 token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
                 token.setIsSupportErc721Metadata(token.getIsSupportErc721());
+                ercCache.erc20AddressCache.add(contractAddress);
                 break;
             case ERC721:
                 token.setIsSupportErc20(false);
@@ -72,6 +73,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress));
                 token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress));
+                ercCache.erc721AddressCache.add(contractAddress);
                 break;
             default:
         }
@@ -128,7 +130,7 @@ public class ErcTokenAnalyzer {
     public void resolveTx(CollectionTransaction tx, Receipt receipt) {
         ErcToken token = ercCache.tokenCache.get(tx.getTo());
         if(token==null){
-            log.warn("未找到合约地址[{}]对应的Erc Token",tx.getContractAddress());
+            log.warn("缓存中未找到合约地址[{}]对应的Erc Token",tx.getContractAddress());
             return;
         }
         String contractAddress = token.getAddress();
@@ -154,6 +156,7 @@ public class ErcTokenAnalyzer {
                 ercTokenInventoryAnalyzer.analyze(txList);
                 break;
         }
+
         token.setTokenTxQty(token.getTokenTxQty()+txList.size());
         token.setUpdateTime(new Date());
         token.setDirty(true);

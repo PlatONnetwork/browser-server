@@ -5,10 +5,8 @@ import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.request.token.QueryTokenIdDetailReq;
 import com.platon.browser.request.token.QueryTokenIdListReq;
-import com.platon.browser.request.token.QueryTokenListReq;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
@@ -39,13 +37,14 @@ public class Arc721InventoryController {
 
     @PostMapping( "list")
     public Mono<RespPage<QueryTokenIdListResp>> list(@Valid @RequestBody QueryTokenIdListReq req) {
-        return Mono.create(sink -> {tokenService.queryTokenIdList(req);});
+        return Mono.just(tokenService.queryTokenIdList(req));
     }
 
     @PostMapping( "detail")
     public Mono<BaseResp<QueryTokenIdDetailResp>> detail(@Valid @RequestBody QueryTokenIdDetailReq req) {
         return Mono.create(sink -> {
-            tokenService.queryTokenIdDetail(req);
+            QueryTokenIdDetailResp resp = tokenService.queryTokenIdDetail(req);
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp) );
         });
     }
 

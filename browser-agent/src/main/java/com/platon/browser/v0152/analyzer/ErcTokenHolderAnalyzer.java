@@ -1,5 +1,6 @@
 package com.platon.browser.v0152.analyzer;
 
+import com.platon.bech32.Bech32;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
 import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
@@ -29,6 +30,9 @@ public class ErcTokenHolderAnalyzer {
             String userAddress,
             List<TokenHolder> insertOrUpdate
     ){
+        String hex = Bech32.addressDecodeHex(userAddress);
+        // 零地址不需要創建holder
+        if("0x0000000000000000000000000000000000000000".equals(hex)) return;
         Date date = new Date();
         TokenHolderKey key = new TokenHolderKey();
         key.setTokenAddress(tokenAddress);

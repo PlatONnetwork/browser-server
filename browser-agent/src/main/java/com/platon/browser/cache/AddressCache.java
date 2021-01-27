@@ -10,8 +10,10 @@ import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
+import com.platon.browser.v0152.analyzer.ErcCache;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class AddressCache {
+    @Resource
+    private ErcCache ercCache;
     // 当前地址缓存，此缓存会在StatisticsAddressConverter执行完业务逻辑后被清除，
     // 所以这是上一次执行StatisticsAddressConverter业务时到当前的累计地址缓存，并不是全部的
     private Map<String, Address> addressMap = new ConcurrentHashMap<>();
@@ -36,6 +40,13 @@ public class AddressCache {
         return this.evmContractAddressCache.contains(address);
     }
 
+    public boolean isErc20ContractAddress(String address) {
+        return ercCache.getErc20AddressCache().contains(address);
+    }
+    public boolean isErc721ContractAddress(String address) {
+        return ercCache.getErc721AddressCache().contains(address);
+    }
+
     // 全量WASM合约地址缓存
     private Set<String> wasmContractAddressCache = new HashSet<>();
 
@@ -48,15 +59,12 @@ public class AddressCache {
     }
 
     public Integer getTypeData(String address) {
-        if (InnerContractAddrEnum.getAddresses().contains(address)) {
-            return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
-        } else if (this.isEvmContractAddress(address)) {
-            return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
-        } else if (this.isWasmContractAddress(address)) {
-            return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
-        } else  {
-            return Transaction.ToTypeEnum.ACCOUNT.getCode();
-        }
+        if (InnerContractAddrEnum.getAddresses().contains(address)) return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
+        if (this.isEvmContractAddress(address)) return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
+        if (this.isWasmContractAddress(address)) return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
+        if (isErc20ContractAddress(address)) return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
+        if (isErc721ContractAddress(address)) return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
+        return Transaction.ToTypeEnum.ACCOUNT.getCode();
     }
 
     public void update(Transaction tx) {
@@ -70,6 +78,7 @@ public class AddressCache {
             case EVM_CONTRACT_CREATE:
             case WASM_CONTRACT_CREATE:
             case ERC20_CONTRACT_CREATE:
+            case ERC721_CONTRACT_CREATE:
                 this.updateContractFromAddress(from);
                 this.updateAddress(tx, contractAddress);
                 break;
@@ -159,6 +168,22 @@ public class AddressCache {
                 // 覆盖createDefaultAddress()中设置的值
                 address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
                 this.wasmContractAddressCache.add(addr);
+                address.setContractBin(tx.getBin());
+                break;
+            case ERC20_CONTRACT_CREATE:
+                // 如果地址是EVM合约创建的回执里返回的合约地址
+                address.setContractCreatehash(tx.getHash());
+                address.setContractCreate(tx.getFrom());
+                // 覆盖createDefaultAddress()中设置的值
+                address.setType(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
+                address.setContractBin(tx.getBin());
+                break;
+            case ERC721_CONTRACT_CREATE:
+                // 如果地址是EVM合约创建的回执里返回的合约地址
+                address.setContractCreatehash(tx.getHash());
+                address.setContractCreate(tx.getFrom());
+                // 覆盖createDefaultAddress()中设置的值
+                address.setType(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
                 address.setContractBin(tx.getBin());
                 break;
             default:

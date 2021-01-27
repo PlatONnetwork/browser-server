@@ -7,6 +7,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.v0152.enums.ErcTypeEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -67,8 +68,8 @@ public class StatisticCacheService extends CacheBase {
 		return blockRedisList;
 	}
 
-	public TokenTransferRecordCacheDto getTokenTransferCache(Integer pageNum, Integer pageSize,boolean isErc20) {
-		String key = isErc20?redisKeyConfig.getErc20Tx():redisKeyConfig.getErc721Tx();
+	public TokenTransferRecordCacheDto getTokenTransferCache(Integer pageNum, Integer pageSize, ErcTypeEnum typeEnum) {
+		String key = typeEnum==ErcTypeEnum.ERC20?redisKeyConfig.getErc20Tx():redisKeyConfig.getErc721Tx();
 		/* 分页根据key来获取交易数据  */
 		CachePageInfo<Class<ErcTx>> cpi = this.getCachePageInfo(key, pageNum, pageSize);
 		List<ErcTx> oldErcTxList = new LinkedList<>();

@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -28,6 +29,7 @@ import com.platon.browser.utils.ConvertUtil;
 import com.platon.browser.utils.DateUtil;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -55,28 +57,34 @@ public class ErcTxService {
 
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
+
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private StatisticCacheService statisticCacheService;
+
     @Resource
     private CustomTokenHolderMapper customTokenHolderMapper;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private NetworkStatMapper networkStatMapper;
 
     public RespPage<QueryTokenTransferRecordListResp> token20TransferList(QueryTokenTransferRecordListReq req) {
-        return this.getList(req,esErc20TxRepository,true);
+        return this.getList(req, esErc20TxRepository, ErcTypeEnum.ERC20);
     }
 
     public RespPage<QueryTokenTransferRecordListResp> token721TransferList(QueryTokenTransferRecordListReq req) {
-        return this.getList(req,esErc721TxRepository,false);
+        return this.getList(req, esErc721TxRepository, ErcTypeEnum.ERC721);
     }
 
-    private RespPage<QueryTokenTransferRecordListResp> getList(QueryTokenTransferRecordListReq req, AbstractEsRepository repository,boolean isErc20){
+    private RespPage<QueryTokenTransferRecordListResp> getList(QueryTokenTransferRecordListReq req, AbstractEsRepository repository, ErcTypeEnum typeEnum) {
         if (log.isDebugEnabled()) {
             log.debug("~ queryTokenRecordList, params: " + JSON.toJSONString(req));
         }
@@ -91,7 +99,7 @@ public class ErcTxService {
         long displayTotalCount = 0;
         if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
             // 仅分页查询，直接走缓存
-            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(), isErc20);
+            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(), typeEnum);
             records = tokenTransferRecordCacheDto.getTransferRecordList();
             totalCount = tokenTransferRecordCacheDto.getPage().getTotalCount();
             displayTotalCount = tokenTransferRecordCacheDto.getPage().getTotalPages();
@@ -115,7 +123,7 @@ public class ErcTxService {
             // Set sort field
             constructor.setDesc("seq");
             // response filed to show.
-            constructor.setResult(new String[] { "seq", "hash", "bn", "from", "contract",
+            constructor.setResult(new String[]{"seq", "hash", "bn", "from", "contract",
                     "to", "value", "decimal", "name", "symbol", "result", "bTime"});
             try {
                 queryResultFromES = repository.search(constructor, ErcTx.class,
@@ -145,9 +153,9 @@ public class ErcTxService {
         result.setDisplayTotalCount(displayTotalCount);
         // 从数据库查询网络表取最新的token交易数
         List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
-        if(networkStatList!=null&&!networkStatList.isEmpty()){
+        if (networkStatList != null && !networkStatList.isEmpty()) {
             NetworkStat networkStat = networkStatList.get(0);
-            totalCount = isErc20? networkStat.getErc20TxQty():networkStat.getErc721TxQty();
+            totalCount = typeEnum == ErcTypeEnum.ERC20 ? networkStat.getErc20TxQty() : networkStat.getErc721TxQty();
             result.setTotalCount(totalCount);
             result.setDisplayTotalCount(totalCount);
         }
@@ -155,16 +163,16 @@ public class ErcTxService {
     }
 
     public AccountDownload exportToken20TransferList(String address, String contract, Long date, String local, String timeZone) {
-        return this.exportTokenTransferList(address,contract,date,local,timeZone,esErc20TxRepository,true);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true);
     }
 
     public AccountDownload exportToken721TransferList(String address, String contract, Long date, String local, String timeZone) {
-        return this.exportTokenTransferList(address,contract,date,local,timeZone,esErc20TxRepository,true);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true);
     }
 
 
     public AccountDownload exportTokenTransferList(String address, String contract, Long date, String local, String timeZone
-            , AbstractEsRepository repository,boolean isErc20) {
+            , AbstractEsRepository repository, boolean isErc20) {
         AccountDownload accountDownload = new AccountDownload();
         if (StringUtils.isBlank(address) && StringUtils.isBlank(contract)) {
             return accountDownload;
@@ -181,10 +189,12 @@ public class ErcTxService {
         constructor.must(new ESQueryBuilders().range("bTime", new Date(date).getTime(), currentServerTime.getTime()));
         ESResult<ErcTx> queryResultFromES = new ESResult<>();
         // condition: txHash/contract/txFrom/transferTo
-        if (StringUtils.isNotBlank(contract)) constructor.must(new ESQueryBuilders().term("contract", contract));
-        if (StringUtils.isNotBlank(address)) constructor.buildMust(new BoolQueryBuilder()
-                .should(QueryBuilders.termQuery("from", address))
-                .should(QueryBuilders.termQuery("tto", address)));
+        if (StringUtils.isNotBlank(contract))
+            constructor.must(new ESQueryBuilders().term("contract", contract));
+        if (StringUtils.isNotBlank(address))
+            constructor.buildMust(new BoolQueryBuilder()
+                    .should(QueryBuilders.termQuery("from", address))
+                    .should(QueryBuilders.termQuery("tto", address)));
         // Set sort field
         constructor.setDesc("seq");
         // response filed to show.
@@ -248,7 +258,7 @@ public class ErcTxService {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
         RespPage<QueryTokenHolderListResp> result = new RespPage<>();
-        Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(req.getContract(),null);
+        Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(req.getContract(), null, null);
         if (ids == null || ids.isEmpty()) {
             return result;
         }
@@ -257,8 +267,8 @@ public class ErcTxService {
             QueryTokenHolderListResp resp = new QueryTokenHolderListResp();
             resp.setAddress(tokenHolder.getAddress());
             BigDecimal originBalance = getAddressBalance(tokenHolder);
-            originBalance = (originBalance==null)?BigDecimal.ZERO:originBalance;
-            if(tokenHolder.getDecimal() != null) {
+            originBalance = (originBalance == null) ? BigDecimal.ZERO : originBalance;
+            if (tokenHolder.getDecimal() != null) {
                 //金额转换成对应的值
                 BigDecimal balance = ConvertUtil.convertByFactor(originBalance, tokenHolder.getDecimal());
                 resp.setBalance(balance);
@@ -294,16 +304,19 @@ public class ErcTxService {
         if (log.isDebugEnabled()) {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
+        if (!("erc20".equalsIgnoreCase(req.getType()) || "erc721".equalsIgnoreCase(req.getType()))) {
+            req.setType(null);
+        }
         RespPage<QueryHolderTokenListResp> result = new RespPage<>();
-        Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(null,req.getAddress());
+        Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(null, req.getAddress(), req.getType());
         if (ids == null || ids.isEmpty()) {
             return result;
         }
-
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
         ids.stream().forEach(tokenHolder -> {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
+            queryHolderTokenListResp.setContract(tokenHolder.getTokenAddress());
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
             if (null != balance) {
@@ -314,13 +327,15 @@ public class ErcTxService {
             }
             listResps.add(queryHolderTokenListResp);
         });
+        ids.setTotal(ids.size());
+        ids.setPages(Convert.toInt(Convert.toBigDecimal(ids.getTotal()).divide(Convert.toBigDecimal(req.getPageSize()), 0)));
         result.init(ids, listResps);
         return result;
     }
 
     public AccountDownload exportTokenHolderList(String contract, String local, String timeZone) {
         PageHelper.startPage(1, 3000);
-        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(contract,null);
+        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(contract, null, null);
         List<Object[]> rows = new ArrayList<>();
         rs.stream().forEach(customTokenHolder -> {
             BigDecimal balance = this.getAddressBalance(customTokenHolder);
@@ -340,7 +355,7 @@ public class ErcTxService {
     public AccountDownload exportHolderTokenList(String address, String local, String timeZone) {
 
         PageHelper.startPage(1, 3000);
-        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null,address);
+        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null, address, null);
 
         List<Object[]> rows = new ArrayList<>();
         rs.stream().forEach(customTokenHolder -> {
@@ -369,7 +384,9 @@ public class ErcTxService {
                 .txFrom(record.getFrom()).contract(record.getContract())
                 .transferTo(record.getTo()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
+                .tokenId(record.getValue())
 //                .result(record.getResult())
+                .value(new BigDecimal(record.getValue()))
                 .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
                 .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .fromType(record.getFromType()).toType(record.getToType())

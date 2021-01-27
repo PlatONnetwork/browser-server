@@ -1,6 +1,5 @@
 package com.platon.browser.request.token;
 
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -13,7 +12,6 @@ import javax.validation.constraints.Size;
  */
 public class QueryTokenDetailReq {
 
-    @ApiModelProperty(allowEmptyValue = false, required = true, value = "合约地址")
     @NotBlank(message = "{address required}")
     @Size(min = 42, max = 42)
     private String address;
