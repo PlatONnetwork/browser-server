@@ -1,7 +1,6 @@
 package com.platon.browser.request.token;
 
 import com.platon.browser.request.PageReq;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
