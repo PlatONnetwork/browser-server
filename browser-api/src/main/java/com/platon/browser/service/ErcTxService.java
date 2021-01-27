@@ -371,6 +371,7 @@ public class ErcTxService {
                 .transferTo(record.getTo()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
 //                .result(record.getResult())
+                .value(new BigDecimal(record.getValue()))
                 .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
                 .fromType(record.getFromType()).toType(record.getToType())
                 .build();
