@@ -130,7 +130,7 @@ public class ErcTokenAnalyzer {
     public void resolveTx(CollectionTransaction tx, Receipt receipt) {
         ErcToken token = ercCache.tokenCache.get(tx.getTo());
         if(token==null){
-            log.warn("未找到合约地址[{}]对应的Erc Token",tx.getContractAddress());
+            log.warn("缓存中未找到合约地址[{}]对应的Erc Token",tx.getContractAddress());
             return;
         }
         String contractAddress = token.getAddress();
@@ -156,6 +156,7 @@ public class ErcTokenAnalyzer {
                 ercTokenInventoryAnalyzer.analyze(txList);
                 break;
         }
+
         token.setTokenTxQty(token.getTokenTxQty()+txList.size());
         token.setUpdateTime(new Date());
         token.setDirty(true);

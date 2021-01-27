@@ -1,8 +1,6 @@
 package com.platon.browser.response.token;
 
-import com.platon.browser.bean.CustomToken;
 import com.platon.browser.dao.entity.TokenInventory;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,21 +20,16 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class QueryTokenIdListResp {
 
-    @ApiModelProperty(value = "钱包地址")
     private String address;
-    @ApiModelProperty(value = "合约地址")
     private String contract;
-    @ApiModelProperty(value = "tokenId")
     private String tokenId;
-    @ApiModelProperty(value = "图片")
     private String image;
-    @ApiModelProperty(value = "交易数")
     private Integer txCount;
 
     public static QueryTokenIdListResp fromToken(TokenInventory token) {
         return QueryTokenIdListResp.builder()
                 .address(token.getOwner()).contract(token.getTokenAddress())
-                .tokenId(token.getTokenAddress()).image(token.getImage())
+                .tokenId(token.getTokenId().toString()).image(token.getImage())
                 .txCount(token.getTokenTxQty())
                 .build();
     }

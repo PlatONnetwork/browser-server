@@ -40,6 +40,13 @@ public class AddressCache {
         return this.evmContractAddressCache.contains(address);
     }
 
+    public boolean isErc20ContractAddress(String address) {
+        return ercCache.getErc20AddressCache().contains(address);
+    }
+    public boolean isErc721ContractAddress(String address) {
+        return ercCache.getErc721AddressCache().contains(address);
+    }
+
     // 全量WASM合约地址缓存
     private Set<String> wasmContractAddressCache = new HashSet<>();
 
@@ -55,8 +62,8 @@ public class AddressCache {
         if (InnerContractAddrEnum.getAddresses().contains(address)) return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
         if (this.isEvmContractAddress(address)) return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
         if (this.isWasmContractAddress(address)) return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
-        if (ercCache.getErc20AddressCache().contains(address)) return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
-        if (ercCache.getErc721AddressCache().contains(address)) return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
+        if (isErc20ContractAddress(address)) return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
+        if (isErc721ContractAddress(address)) return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
         return Transaction.ToTypeEnum.ACCOUNT.getCode();
     }
 

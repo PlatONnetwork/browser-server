@@ -28,6 +28,7 @@ import com.platon.browser.utils.ConvertUtil;
 import com.platon.browser.utils.DateUtil;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -69,14 +70,14 @@ public class ErcTxService {
     private NetworkStatMapper networkStatMapper;
 
     public RespPage<QueryTokenTransferRecordListResp> token20TransferList(QueryTokenTransferRecordListReq req) {
-        return this.getList(req,esErc20TxRepository,true);
+        return this.getList(req,esErc20TxRepository,ErcTypeEnum.ERC20);
     }
 
     public RespPage<QueryTokenTransferRecordListResp> token721TransferList(QueryTokenTransferRecordListReq req) {
-        return this.getList(req,esErc721TxRepository,false);
+        return this.getList(req,esErc721TxRepository,ErcTypeEnum.ERC721);
     }
 
-    private RespPage<QueryTokenTransferRecordListResp> getList(QueryTokenTransferRecordListReq req, AbstractEsRepository repository,boolean isErc20){
+    private RespPage<QueryTokenTransferRecordListResp> getList(QueryTokenTransferRecordListReq req, AbstractEsRepository repository,ErcTypeEnum typeEnum){
         if (log.isDebugEnabled()) {
             log.debug("~ queryTokenRecordList, params: " + JSON.toJSONString(req));
         }
@@ -91,7 +92,7 @@ public class ErcTxService {
         long displayTotalCount = 0;
         if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
             // 仅分页查询，直接走缓存
-            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(), isErc20);
+            TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(), typeEnum);
             records = tokenTransferRecordCacheDto.getTransferRecordList();
             totalCount = tokenTransferRecordCacheDto.getPage().getTotalCount();
             displayTotalCount = tokenTransferRecordCacheDto.getPage().getTotalPages();
@@ -136,7 +137,7 @@ public class ErcTxService {
 
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
                 .filter(p -> p != null && p.getDecimal() != null)
-                .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p)).collect(Collectors.toList());
+                .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p,typeEnum)).collect(Collectors.toList());
 
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, recordListResp);
@@ -147,7 +148,7 @@ public class ErcTxService {
         List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
         if(networkStatList!=null&&!networkStatList.isEmpty()){
             NetworkStat networkStat = networkStatList.get(0);
-            totalCount = isErc20? networkStat.getErc20TxQty():networkStat.getErc721TxQty();
+            totalCount = typeEnum==ErcTypeEnum.ERC20? networkStat.getErc20TxQty():networkStat.getErc721TxQty();
             result.setTotalCount(totalCount);
             result.setDisplayTotalCount(totalCount);
         }
@@ -362,7 +363,7 @@ public class ErcTxService {
         return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
-    public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ErcTx record) {
+    public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ErcTx record, ErcTypeEnum ercTypeEnum) {
         QueryTokenTransferRecordListResp resp = QueryTokenTransferRecordListResp.builder()
                 .seq(record.getSeq())
                 .txHash(record.getHash()).blockNumber(record.getBn())
@@ -370,14 +371,16 @@ public class ErcTxService {
                 .transferTo(record.getTo()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
 //                .result(record.getResult())
+                .value(new BigDecimal(record.getValue()))
                 .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
-                .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .fromType(record.getFromType()).toType(record.getToType())
                 .build();
         // Processing accuracy calculation.
         if (null != record.getValue()) {
-            BigDecimal transferValue = new BigDecimal(record.getValue());
-            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            BigDecimal actualTransferValue = new BigDecimal(record.getValue());
+            if(ercTypeEnum==ErcTypeEnum.ERC20){
+                actualTransferValue = ConvertUtil.convertByFactor(actualTransferValue, record.getDecimal());
+            }
             resp.setTransferValue(actualTransferValue);
         } else {
             resp.setTransferValue(BigDecimal.ZERO);
