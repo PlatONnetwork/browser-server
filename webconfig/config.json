@@ -1,5 +1,5 @@
 {
-  "context":"/browser-server",
+  "context":"/browser-api",
   "siteName":"AlayaScan",
   "chainName":"Alaya",
   "logo":"/images/logo.svg",
