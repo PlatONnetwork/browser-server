@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -326,6 +327,8 @@ public class ErcTxService {
             }
             listResps.add(queryHolderTokenListResp);
         });
+        ids.setTotal(ids.size());
+        ids.setPages(Convert.toInt(Convert.toBigDecimal(ids.getTotal()).divide(Convert.toBigDecimal(req.getPageSize()), 0)));
         result.init(ids, listResps);
         return result;
     }
