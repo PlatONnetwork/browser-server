@@ -1753,6 +1753,9 @@ definitions:
       address:
         description: 合约地址（可选）
         type: string
+      type:
+        description: 类型，取值：erc20或erc721（可选）
+        type: string
       pageNo:
         description: 页数(必填)
         type: integer
