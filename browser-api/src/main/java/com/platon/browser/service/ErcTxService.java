@@ -137,7 +137,7 @@ public class ErcTxService {
 
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
                 .filter(p -> p != null && p.getDecimal() != null)
-                .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p,typeEnum)).collect(Collectors.toList());
+                .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p)).collect(Collectors.toList());
 
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         result.init(page, recordListResp);
@@ -363,24 +363,24 @@ public class ErcTxService {
         return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
-    public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ErcTx record, ErcTypeEnum ercTypeEnum) {
+    public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ErcTx record) {
         QueryTokenTransferRecordListResp resp = QueryTokenTransferRecordListResp.builder()
                 .seq(record.getSeq())
                 .txHash(record.getHash()).blockNumber(record.getBn())
                 .txFrom(record.getFrom()).contract(record.getContract())
                 .transferTo(record.getTo()).name(record.getName())
                 .decimal(record.getDecimal()).symbol(record.getSymbol())
+                .tokenId(record.getValue())
 //                .result(record.getResult())
                 .value(new BigDecimal(record.getValue()))
                 .blockTimestamp(record.getBTime()).systemTimestamp(new Date().getTime())
+                .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                 .fromType(record.getFromType()).toType(record.getToType())
                 .build();
         // Processing accuracy calculation.
         if (null != record.getValue()) {
-            BigDecimal actualTransferValue = new BigDecimal(record.getValue());
-            if(ercTypeEnum==ErcTypeEnum.ERC20){
-                actualTransferValue = ConvertUtil.convertByFactor(actualTransferValue, record.getDecimal());
-            }
+            BigDecimal transferValue = new BigDecimal(record.getValue());
+            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
             resp.setTransferValue(actualTransferValue);
         } else {
             resp.setTransferValue(BigDecimal.ZERO);

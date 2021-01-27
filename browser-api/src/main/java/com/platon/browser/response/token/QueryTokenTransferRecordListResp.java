@@ -38,6 +38,7 @@ public class QueryTokenTransferRecordListResp {
     private Integer result;
     private Date blockTimestamp;
     private BigDecimal value;
+    private String tokenId;
     private Long systemTimestamp;
     private String type;   // 交易类型：input 进账， out 出账
     private Integer fromType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
