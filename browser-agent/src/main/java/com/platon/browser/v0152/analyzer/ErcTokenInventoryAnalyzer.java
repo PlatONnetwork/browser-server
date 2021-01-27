@@ -70,7 +70,9 @@ public class ErcTokenInventoryAnalyzer {
             if (!insertOrUpdate.isEmpty()) {
                 customTokenInventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenInventory.Column.values());
             }
-            customTokenInventoryMapper.burnAndDelTokenInventory(delTokenInventory);
+            if (CollUtil.isNotEmpty(delTokenInventory)) {
+                customTokenInventoryMapper.burnAndDelTokenInventory(delTokenInventory);
+            }
         }
     }
 
