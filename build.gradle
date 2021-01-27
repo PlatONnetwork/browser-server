@@ -283,7 +283,7 @@ subprojects {
                 }
                 ssh.run {
                     session(remotes.webServer) {
-                        execute "rm -rf $deployDir/${project.name}*.jar"
+                        execute "mkdir -p $deployDir && rm -rf $deployDir/${project.name}*.jar"
                         put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
                         execute "cd $deployDir && $deployFixScript && chmod a+x *.sh && ./start.sh $activeProfile"
                     }
