@@ -25,6 +25,7 @@
     t.holder,te.web_site,te.details
     from token t left join  token_expand te on t.address = te.address
     where 1=1
+    AND te.is_show_in_scan = 1
     <if test="type != null">
       and t.type = #{type}
     </if>

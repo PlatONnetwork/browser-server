@@ -1,6 +1,10 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -163,16 +167,15 @@ public class ErcTxService {
     }
 
     public AccountDownload exportToken20TransferList(String address, String contract, Long date, String local, String timeZone) {
-        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true, null);
     }
 
-    public AccountDownload exportToken721TransferList(String address, String contract, Long date, String local, String timeZone) {
-        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true);
+    public AccountDownload exportToken721TransferList(String address, String contract, Long date, String local, String timeZone, String tokenId) {
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true, tokenId);
     }
-
 
     public AccountDownload exportTokenTransferList(String address, String contract, Long date, String local, String timeZone
-            , AbstractEsRepository repository, boolean isErc20) {
+            , AbstractEsRepository repository, boolean isErc20, String tokenId) {
         AccountDownload accountDownload = new AccountDownload();
         if (StringUtils.isBlank(address) && StringUtils.isBlank(contract)) {
             return accountDownload;
@@ -180,21 +183,26 @@ public class ErcTxService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        this.log.error("exportTokenTransferList time:{}", format.format(currentServerTime));
+        log.error("exportTokenTransferList time:{}", format.format(currentServerTime));
         String msg = dateFormat.format(currentServerTime);
-        this.log.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
+        log.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
 
         // construct of params
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().range("bTime", new Date(date).getTime(), currentServerTime.getTime()));
         ESResult<ErcTx> queryResultFromES = new ESResult<>();
         // condition: txHash/contract/txFrom/transferTo
-        if (StringUtils.isNotBlank(contract))
+        if (StringUtils.isNotBlank(contract)) {
             constructor.must(new ESQueryBuilders().term("contract", contract));
-        if (StringUtils.isNotBlank(address))
+        }
+        if (StrUtil.isNotBlank(tokenId)) {
+            constructor.must(new ESQueryBuilders().term("value", tokenId));
+        }
+        if (StringUtils.isNotBlank(address)) {
             constructor.buildMust(new BoolQueryBuilder()
                     .should(QueryBuilders.termQuery("from", address))
                     .should(QueryBuilders.termQuery("tto", address)));
+        }
         // Set sort field
         constructor.setDesc("seq");
         // response filed to show.
@@ -304,7 +312,8 @@ public class ErcTxService {
         if (log.isDebugEnabled()) {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
-        if (!("erc20".equalsIgnoreCase(req.getType()) || "erc721".equalsIgnoreCase(req.getType()))) {
+        String[] tokenType = {"erc20", "erc721"};
+        if (!ArrayUtil.contains(tokenType, req.getType())) {
             req.setType(null);
         }
         RespPage<QueryHolderTokenListResp> result = new RespPage<>();
@@ -352,10 +361,15 @@ public class ErcTxService {
         return this.downFileCommon.writeDate("TokenHolder-" + contract + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
-    public AccountDownload exportHolderTokenList(String address, String local, String timeZone) {
+    public AccountDownload exportHolderTokenList(String address, String local, String timeZone, String type) {
 
         PageHelper.startPage(1, 3000);
-        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null, address, null);
+
+        String[] tokenType = {"erc20", "erc721"};
+        if (!ArrayUtil.contains(tokenType, type)) {
+            type = null;
+        }
+        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null, address, type);
 
         List<Object[]> rows = new ArrayList<>();
         rs.stream().forEach(customTokenHolder -> {

@@ -28,10 +28,19 @@ public class TokenController {
 
     @Resource
     private TokenService tokenService;
+
     @Resource
     private I18nUtil i18n;
 
-    @PostMapping( "list")
+    /**
+     * token令牌列表
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenListResp>>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/28
+     */
+    @PostMapping("list")
     public Mono<RespPage<QueryTokenListResp>> list(@Valid @RequestBody QueryTokenListReq req) {
         return Mono.create(sink -> {
             RespPage<QueryTokenListResp> resp = tokenService.queryTokenList(req);
@@ -39,11 +48,12 @@ public class TokenController {
         });
     }
 
-    @PostMapping( "detail")
+    @PostMapping("detail")
     public Mono<BaseResp<QueryTokenDetailResp>> detail(@Valid @RequestBody QueryTokenDetailReq req) {
         return Mono.create(sink -> {
             QueryTokenDetailResp resp = tokenService.queryTokenDetail(req);
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp) );
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp));
         });
     }
+
 }

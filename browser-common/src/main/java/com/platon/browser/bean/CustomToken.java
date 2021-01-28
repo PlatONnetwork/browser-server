@@ -3,12 +3,11 @@ package com.platon.browser.bean;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 @Data
 public class CustomToken {
+
     private String address;
 
     private String type;
