@@ -34,10 +34,13 @@ public class ErcTxController {
 
     @Resource
     private ErcTxService ercTxService;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private CommonMethod commonMethod;
+
     @Resource
     private I18nUtil i18n;
 
@@ -53,11 +56,11 @@ public class ErcTxController {
 
     @GetMapping("token/exportToken20TransferList")
     public void exportToken20TransferList(
-            @RequestParam(value = "address",required = false) String address,
-            @RequestParam(value = "contract",required = false) String contract,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "contract", required = false) String contract,
             @RequestParam(value = "date", required = true) Long date,
-            @RequestParam(value = "local",required = true) String local,
-            @RequestParam(value = "timeZone",required = true) String timeZone,
+            @RequestParam(value = "local", required = true) String local,
+            @RequestParam(value = "timeZone", required = true) String timeZone,
             @RequestParam(value = "token", required = false) String token,
             HttpServletResponse response
     ) {
@@ -77,11 +80,11 @@ public class ErcTxController {
 
     @GetMapping("token/exportToken721TransferList")
     public void exportTokenTransferList(
-            @RequestParam(value = "address",required = false) String address,
-            @RequestParam(value = "contract",required = false) String contract,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "contract", required = false) String contract,
             @RequestParam(value = "date", required = true) Long date,
-            @RequestParam(value = "local",required = true) String local,
-            @RequestParam(value = "timeZone",required = true) String timeZone,
+            @RequestParam(value = "local", required = true) String local,
+            @RequestParam(value = "timeZone", required = true) String timeZone,
             @RequestParam(value = "token", required = false) String token,
             HttpServletResponse response
     ) {
@@ -90,7 +93,7 @@ public class ErcTxController {
              * 鉴权
              */
             commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = ercTxService.exportToken721TransferList(address, contract, date, local, timeZone);
+            AccountDownload accountDownload = ercTxService.exportToken721TransferList(address, contract, date, local, timeZone, null);
             downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
@@ -106,9 +109,9 @@ public class ErcTxController {
 
     @GetMapping("token/exportTokenHolderList")
     public void exportTokenHolderList(
-            @RequestParam(value = "contract",required = true) String contract,
-            @RequestParam(value = "local",required = true) String local,
-            @RequestParam(value = "timeZone",required = true) String timeZone,
+            @RequestParam(value = "contract", required = true) String contract,
+            @RequestParam(value = "local", required = true) String local,
+            @RequestParam(value = "timeZone", required = true) String timeZone,
             @RequestParam(value = "token", required = false) String token,
             HttpServletResponse response
     ) {
@@ -133,9 +136,9 @@ public class ErcTxController {
 
     @GetMapping("token/exportHolderTokenList")
     public void exportHolderTokenList(
-            @RequestParam(value = "address",required = true) String address,
-            @RequestParam(value = "local",required = true) String local,
-            @RequestParam(value = "timeZone",required = true) String timeZone,
+            @RequestParam(value = "address", required = true) String address,
+            @RequestParam(value = "local", required = true) String local,
+            @RequestParam(value = "timeZone", required = true) String timeZone,
             @RequestParam(value = "token", required = false) String token,
             HttpServletResponse response
     ) {
@@ -144,7 +147,7 @@ public class ErcTxController {
              * 鉴权
              */
             commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = ercTxService.exportHolderTokenList(address, local, timeZone);
+            AccountDownload accountDownload = ercTxService.exportHolderTokenList(address, local, timeZone, null);
             downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
@@ -152,4 +155,5 @@ public class ErcTxController {
             throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
+
 }

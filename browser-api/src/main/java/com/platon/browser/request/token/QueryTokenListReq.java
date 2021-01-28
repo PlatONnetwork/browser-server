@@ -18,4 +18,5 @@ public class QueryTokenListReq extends PageReq {
     @NotBlank(message = "{type required}")
     @Size(min = 0, max = 10)
     private String type;//查询类型  erc20,erc721
+
 }

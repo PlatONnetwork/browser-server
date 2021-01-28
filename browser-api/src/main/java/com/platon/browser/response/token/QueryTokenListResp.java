@@ -25,15 +25,25 @@ import java.util.Date;
 public class QueryTokenListResp {
 
     private String address;
+
     private String type;
+
     private String name;
+
     private String symbol;
+
     private Integer decimal;
+
     private BigDecimal totalSupply;
+
     private String icon;
+
     private String webSite;
+
     private String details;
+
     private Date createTime;
+
     private Integer holder;
 
 //    @ApiModelProperty(value = "合约创建者")
@@ -64,4 +74,5 @@ public class QueryTokenListResp {
                 .details(token.getDetails()).holder(token.getHolder())
                 .build();
     }
+
 }

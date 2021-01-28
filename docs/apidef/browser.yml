@@ -465,6 +465,11 @@ paths:
           in: query
           type: string
           required: false
+        - name: tokenId
+          description: token id
+          in: query
+          type: string
+          required: false
       responses:
         '200':
           description: 返回二进制数据流
@@ -580,6 +585,11 @@ paths:
           required: true
         - name: token
           description: 令牌
+          in: query
+          type: string
+          required: false
+        - name: type
+          description: 合约类型，取值erc20或erc721
           in: query
           type: string
           required: false
