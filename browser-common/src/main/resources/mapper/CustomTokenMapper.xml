@@ -18,7 +18,7 @@
     <result column="contract_create" jdbcType="VARCHAR" property="creator" />
     <result column="contract_createHash" jdbcType="VARCHAR" property="txHash" />
     <result column="contract_bin" jdbcType="LONGVARCHAR" property="binCode" />
-    <result column="tx_qty" jdbcType="INTEGER" property="txCount" />
+    <result column="token_tx_qty" jdbcType="INTEGER" property="txCount" />
   </resultMap>
   <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
     select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,

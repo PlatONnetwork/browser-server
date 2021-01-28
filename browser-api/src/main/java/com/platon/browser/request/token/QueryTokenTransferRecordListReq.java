@@ -28,4 +28,10 @@ public class QueryTokenTransferRecordListReq extends PageReq {
     private String address;
 
     private String txHash;
+
+    /**
+     * token_id
+     */
+    private String tokenId;
+
 }

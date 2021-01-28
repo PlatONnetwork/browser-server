@@ -35,6 +35,14 @@ public class Arc721TxController {
     @Resource
     private CommonMethod commonMethod;
 
+    /**
+     * ARC721交易列表
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenTransferRecordListResp>>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/28
+     */
     @PostMapping("list")
     public Mono<RespPage<QueryTokenTransferRecordListResp>> list(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
         return Mono.just(ercTxService.token721TransferList(req));
