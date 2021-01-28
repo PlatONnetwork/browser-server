@@ -89,7 +89,7 @@ public class ErcTokenUpdateTask {
             .build();
 
     /**
-     * 更新ERC 20 token的总供应量
+     * 更新ERC20和Erc721Enumeration token的总供应量
      *
      * @return void
      * @author huangyongpeng@matrixelements.com
@@ -111,10 +111,9 @@ public class ErcTokenUpdateTask {
             if (token.isDirty()) {
                 updateParams.add(token);
             }
-            if (token.getTypeEnum() != ErcTypeEnum.ERC20) {
+            if (!(token.getTypeEnum() == ErcTypeEnum.ERC20 || token.getIsSupportErc721Enumeration())) {
                 continue;
             }
-
             if (batch.size() == TOKEN_BATCH_SIZE) {
                 // 本批次达到大小限制，则新建批次，并加入批次列表
                 batch = new ArrayList<>();
