@@ -117,11 +117,6 @@ public class TransactionAnalyzer {
             }
         }
 
-        // 解析ERC Token，有就入库，没有拉倒
-        receipt.getContractCreated().forEach(contract-> ercTokenAnalyzer.resolveToken(contract.getAddress()));
-        // 解析ERC交易
-        ercTokenAnalyzer.resolveTx(result,receipt);
-
         if (ci.getType() == null) {
             throw new BeanCreateOrUpdateException(
                     "交易类型为空,遇到未知交易:[blockNumber=" + result.getNum() + ",txHash=" + result.getHash() + "]");
@@ -151,6 +146,11 @@ public class TransactionAnalyzer {
             .setContractType(ci.getContractType())
             .setBin(ci.getBinCode())
             .setMethod(ci.getMethod());
+
+        // 解析ERC Token，有就入库，没有拉倒
+        receipt.getContractCreated().forEach(contract-> ercTokenAnalyzer.resolveToken(contract.getAddress()));
+        // 解析ERC交易
+        ercTokenAnalyzer.resolveTx(result,receipt);
 
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);

@@ -47,6 +47,7 @@ public class BlockAnalyzer {
             .setExtra(rawBlock.getExtraData())
             .setMiner(rawBlock.getMiner())
             .setNodeId(nodeId)
+            .setTxFee(rawBlock.getGasUsed().toString())
             .setGasLimit(rawBlock.getGasLimit().toString())
             .setGasUsed(rawBlock.getGasUsed().toString());
 
