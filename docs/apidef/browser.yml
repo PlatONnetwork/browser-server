@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: _VERSION_
+  version: 'v_VERSION_ Build #_COMMIT_ID_'
   title: 浏览器API文档
   description:
 host: localhost:9061
