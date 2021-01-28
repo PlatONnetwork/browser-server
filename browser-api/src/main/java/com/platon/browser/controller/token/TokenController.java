@@ -48,6 +48,14 @@ public class TokenController {
         });
     }
 
+    /**
+     * Token令牌详情
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.token.QueryTokenDetailResp>>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/28
+     */
     @PostMapping("detail")
     public Mono<BaseResp<QueryTokenDetailResp>> detail(@Valid @RequestBody QueryTokenDetailReq req) {
         return Mono.create(sink -> {

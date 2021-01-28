@@ -80,6 +80,11 @@ public class ErcTxService {
     @Resource
     private NetworkStatMapper networkStatMapper;
 
+    /**
+     * 默认精度
+     */
+    private static final Integer decimal = 6;
+
     public RespPage<QueryTokenTransferRecordListResp> token20TransferList(QueryTokenTransferRecordListReq req) {
         return this.getList(req, esErc20TxRepository, ErcTypeEnum.ERC20);
     }
@@ -101,7 +106,7 @@ public class ErcTxService {
         List<ErcTx> records;
         long totalCount = 0;
         long displayTotalCount = 0;
-        if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress())) {
+        if (StringUtils.isEmpty(req.getContract()) && StringUtils.isEmpty(req.getAddress()) && StringUtils.isEmpty(req.getTokenId())) {
             // 仅分页查询，直接走缓存
             TokenTransferRecordCacheDto tokenTransferRecordCacheDto = statisticCacheService.getTokenTransferCache(req.getPageNo(), req.getPageSize(), typeEnum);
             records = tokenTransferRecordCacheDto.getTransferRecordList();
@@ -115,6 +120,9 @@ public class ErcTxService {
             // condition: txHash/contract/txFrom/transferTo
             if (StringUtils.isNotEmpty(req.getContract())) {
                 constructor.must(new ESQueryBuilders().terms("contract", Collections.singletonList(req.getContract())));
+            }
+            if (StrUtil.isNotBlank(req.getTokenId())) {
+                constructor.must(new ESQueryBuilders().term("value", req.getTokenId()));
             }
             if (StringUtils.isNotEmpty(req.getAddress())) {
                 constructor.buildMust(new BoolQueryBuilder()
@@ -288,9 +296,9 @@ public class ErcTxService {
                     // 总供应量大于0, 使用实际的余额除以总供应量
                     resp.setPercent(
                             balance
-                                    .divide(totalSupply, tokenHolder.getDecimal(), RoundingMode.HALF_UP)
+                                    .divide(totalSupply, decimal, RoundingMode.HALF_UP)
                                     .multiply(BigDecimal.valueOf(100))
-                                    .setScale(tokenHolder.getDecimal(), RoundingMode.HALF_UP)
+                                    .setScale(decimal, RoundingMode.HALF_UP)
                                     .stripTrailingZeros()
                                     .toPlainString() + "%"
                     );
