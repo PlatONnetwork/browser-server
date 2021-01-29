@@ -23,24 +23,40 @@ import java.util.Date;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class QueryTokenDetailResp {
+
     private String address;
+
     private String name;
+
     private String type;
+
     private String symbol;
+
     private Integer decimal;
+
     private String totalSupply;
+
     private String icon;
+
     private String creator;
+
     private String txHash;
+
     private String webSite;
+
     private Date blockTimestamp;
+
     private Integer holder;
+
     private Date createTime;
 
     // attach info, maybe is empty.
     private Integer txCount;
+
     private String abi;
+
     private String binCode;
+
     private String sourceCode;
 
     public static QueryTokenDetailResp fromTokenDetail(CustomTokenDetail token) {
@@ -48,7 +64,7 @@ public class QueryTokenDetailResp {
             return null;
         }
         BigDecimal totalSupply = BigDecimal.ZERO;
-        if(token.getTotalSupply() != null && token.getDecimal()!=null){
+        if (token.getTotalSupply() != null && token.getDecimal() != null) {
             totalSupply = ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal());
         }
         return QueryTokenDetailResp.builder()
@@ -61,6 +77,8 @@ public class QueryTokenDetailResp {
                 .holder(token.getHolder())
                 .binCode(token.getBinCode())
                 .webSite(token.getWebSite())
+                .type(token.getType())
                 .build();
     }
+
 }
