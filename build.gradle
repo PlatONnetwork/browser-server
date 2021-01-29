@@ -6,6 +6,8 @@ buildscript {
     dependencies {
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
         classpath  'org.yaml:snakeyaml:1.27'
+        classpath 'cn.hutool:hutool-all:5.5.7'
+        classpath 'javax.mail:mail:1.4.7'
     }
 }
 plugins {
@@ -13,7 +15,8 @@ plugins {
     id "github.com.sakamotodesu.jcifs" version "0.2.2"
 }
 
-
+import cn.hutool.extra.mail.MailAccount
+import cn.hutool.extra.mail.MailUtil
 import github.com.sakamotodesu.JcifsCopy
 import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonBuilder
@@ -25,6 +28,7 @@ group = 'com.platon.browser'
 version = "${projectVersion}"
 
 def shortCommitId = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
+
 
 apply plugin: "org.sonarqube"
 
@@ -241,7 +245,7 @@ subprojects {
         def desDir = "${projectVersion}-"+new Date().format("yyyy.MM.dd.HHmm")
         task releaseToCifs(type: JcifsCopy,dependsOn:['buildTar'],group: 'release') {
             from "${projectDir.path}/build/distributions/${packageName}.tar.gz"
-            into "smb://chendongming:CDM00juzix@192.168.21.210/proupdate/alaya/scan/${parentDir}/${desDir}/"
+            into "smb://${publishServerUser}:${publishServerPassword}@${publishServerHost}/${publishServerPath}/${parentDir}/${desDir}/"
         }
     }
 
@@ -307,5 +311,7 @@ subprojects {
         testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
         compile group: 'org.yaml', name: 'snakeyaml', version: '1.27'
         compile 'cn.hutool:hutool-all:5.5.7'
+
+        implementation 'javax.mail:mail:1.4.7'
     }
 }

@@ -3,9 +3,7 @@ package com.platon.browser.task;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrFormatter;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
@@ -14,8 +12,6 @@ import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -36,9 +32,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 /**
  * token定时器
@@ -96,162 +89,20 @@ public class ErcTokenUpdateTask {
             .build();
 
     /**
-     * 更新标识位
-     */
-    @Getter
-    @Setter
-    private volatile long tokenCreateTime = 0L;
-
-    private Lock lock = new ReentrantLock();
-
-    /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》增量更新
-     *
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/27
-     */
-    @Scheduled(cron = "0/10  * * * * ?")
-    public void cronIncrementUpdateTokenTotalSupply() {
-        if (lock.tryLock()) {
-            try {
-                if (this.getTokenCreateTime() == 0L) {
-                    log.error("获取到增量更新的标记为{}，相当于全量更新", DateUtil.date(this.getTokenCreateTime()));
-                } else {
-                    log.error("获取到增量更新的标记为{}", DateUtil.date(this.getTokenCreateTime()));
-                }
-
-                this.incrementUpdateTokenTotalSupply();
-                ercCache.init();
-            } catch (Exception e) {
-                log.error("增量更新token的总供应量异常", e);
-            } finally {
-                lock.unlock();
-            }
-        } else {
-            log.error("该次TotalSupply增量更新抢不到锁，增量更新的标记为{}(时间维度)", DateUtil.date(this.getTokenCreateTime()));
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("打印结果为："+DateUtil.date(1611649635000L));
-    }
-    /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》增量更新
-     *
-     * @param
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/28
-     */
-    private void incrementUpdateTokenTotalSupply() {
-        // 只有程序正常运行才执行任务
-//        if (!AppStatusUtil.isRunning()) {
-//            return;
-//        }
-        Set<ErcToken> updateParams = new ConcurrentHashSet<>();
-        List<List<ErcToken>> batchList = new ArrayList<>();
-        // 从缓存中获取Token更新参数，并构造批次列表
-        List<ErcToken> batch = new ArrayList<>();
-        batchList.add(batch);
-        // 取出比更新标识（创建时间）还要大的数据更新
-        log.error("更新标识======{}", ercCache.getTokenCache().values().size());
-        log.error("更新标识2======{}", JSONUtil.toJsonStr(ercCache.getTokenCache().values()));
-        List<ErcToken> list = ercCache.getTokenCache().values().stream()
-                .filter(value -> DateUtil.compare(value.getCreateTime(), DateUtil.date(this.getTokenCreateTime())) > 0)
-                .collect(Collectors.toList());
-        log.error("更新标识3======{}", list.size());
-        log.error("更新标识4======{}", JSONUtil.toJsonStr(list));
-        for (ErcToken token : list) {
-            if (token.isDirty()) {
-                updateParams.add(token);
-            }
-            if (!(token.getTypeEnum() == ErcTypeEnum.ERC20 || token.getIsSupportErc721Enumeration())) {
-                continue;
-            }
-            if (batch.size() == TOKEN_BATCH_SIZE) {
-                // 本批次达到大小限制，则新建批次，并加入批次列表
-                batch = new ArrayList<>();
-                batchList.add(batch);
-            }
-            // 加入批次中
-            batch.add(token);
-        }
-        // 分批并发查询Token totalSupply
-        batchList.forEach(b -> {
-            CountDownLatch latch = new CountDownLatch(b.size());
-            for (ErcToken token : b) {
-                TOKEN_UPDATE_POOL.submit(() -> {
-                    try {
-                        // 查询总供应量
-                        BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
-                        totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
-                        //if (token.getTotalSupply().compareTo(new BigDecimal(totalSupply)) != 0) {
-                            // 有变动添加到更新列表中
-                            token.setTotalSupply(new BigDecimal(totalSupply));
-                            token.setUpdateTime(new Date());
-                            updateParams.add(token);
-                        //}
-                    } catch (Exception e) {
-                        log.error("异常更新ERC 20 token的总供应量", e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                log.error("", e);
-            }
-        });
-        if (!updateParams.isEmpty()) {
-            // 按创建时间由小到大排序
-            ArrayList<Token> updateList = new ArrayList<>(updateParams);
-            updateList.sort((o1, o2) -> DateUtil.compare(o1.getCreateTime(), o2.getCreateTime()));
-            // 设置增量更新标识
-            long times=updateList.get(updateList.size() - 1).getCreateTime().getTime();
-            this.setTokenCreateTime(times);
-            log.error("增量更新完的标识为{}", DateUtil.date(this.getTokenCreateTime()));
-            // 批量更新总供应量有变动的记录
-            //customTokenMapper.batchInsertOrUpdateSelective(updateList, Token.Column.values());
-            //updateParams.forEach(token -> token.setDirty(false));
-        }
-        //customTokenMapper.updateTokenHolderCount();
-    }
-
-    /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》全量更新
+     * 更新ERC20和Erc721Enumeration token的总供应量
      *
      * @return void
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    //@Scheduled(cron = "0/300 * * * * ?")
-    public void cronUpdateTokenTotalSupply() {
-        try {
-            lock.lock();
-            this.updateTokenTotalSupply();
-        } catch (Exception e) {
-            log.error("全量更新token的总供应量异常", e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》全量更新
-     *
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/18
-     */
+    @Scheduled(cron = "0/30  * * * * ?")
     public void updateTokenTotalSupply() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
         }
         Set<ErcToken> updateParams = new ConcurrentHashSet<>();
+
         List<List<ErcToken>> batchList = new ArrayList<>();
         // 从缓存中获取Token更新参数，并构造批次列表
         List<ErcToken> batch = new ArrayList<>();
@@ -271,6 +122,7 @@ public class ErcTokenUpdateTask {
             // 加入批次中
             batch.add(token);
         }
+
         // 分批并发查询Token totalSupply
         batchList.forEach(b -> {
             CountDownLatch latch = new CountDownLatch(b.size());
@@ -299,18 +151,13 @@ public class ErcTokenUpdateTask {
                 log.error("", e);
             }
         });
+
         if (!updateParams.isEmpty()) {
-            // 按创建时间由小到大排序
-            ArrayList<Token> updateList = new ArrayList<>(updateParams);
-            updateList.sort((o1, o2) -> DateUtil.compare(o1.getCreateTime(), o2.getCreateTime()));
-            // 设置增量更新标识
-            this.setTokenCreateTime(updateList.get(updateList.size() - 1).getCreateTime().getTime());
-            log.error("全量更新完的标识为{}", DateUtil.date(this.getTokenCreateTime()));
             // 批量更新总供应量有变动的记录
-            //customTokenMapper.batchInsertOrUpdateSelective(updateList, Token.Column.values());
-            //updateParams.forEach(token -> token.setDirty(false));
+            customTokenMapper.batchInsertOrUpdateSelective(new ArrayList<>(updateParams), Token.Column.values());
+            updateParams.forEach(token -> token.setDirty(false));
         }
-        //customTokenMapper.updateTokenHolderCount();
+        customTokenMapper.updateTokenHolderCount();
     }
 
     /**
