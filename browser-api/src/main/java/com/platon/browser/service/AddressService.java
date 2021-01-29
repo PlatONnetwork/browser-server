@@ -16,6 +16,7 @@ import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.TokenTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.request.address.QueryDetailRequest;
 import com.platon.browser.request.address.QueryRPPlanDetailRequest;
@@ -90,7 +91,7 @@ public class AddressService {
         /** 根据主键查询地址信息 */
         CustomAddressDetail item = customAddressMapper.findAddressDetail(req.getAddress());
         QueryDetailResp resp = new QueryDetailResp();
-        if ("erc20".equalsIgnoreCase(item.getTokenType())) {
+        if (TokenTypeEnum.ERC20.getType().equalsIgnoreCase(item.getTokenType())) {
             resp.setHasErc20(true);
         } else {
             resp.setHasErc721(true);
