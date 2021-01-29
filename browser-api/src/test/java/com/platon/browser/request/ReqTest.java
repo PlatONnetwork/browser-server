@@ -101,13 +101,13 @@ public class ReqTest {
 
     @Test
     public void test_method() {
-        QueryHolderTokenListReq queryHolderTokenListReq = new QueryHolderTokenListReq("");
+        QueryHolderTokenListReq queryHolderTokenListReq = new QueryHolderTokenListReq();
         assertNotNull(queryHolderTokenListReq);
 
         QueryTokenHolderListReq queryTokenHolderListReq = new QueryTokenHolderListReq("");
         assertNotNull(queryTokenHolderListReq);
 
-        QueryTokenTransferRecordListReq queryTokenTransferRecordListReq = new QueryTokenTransferRecordListReq("", "", "");
+        QueryTokenTransferRecordListReq queryTokenTransferRecordListReq = new QueryTokenTransferRecordListReq();
         assertNotNull(queryTokenTransferRecordListReq);
 
     }
