@@ -1257,6 +1257,12 @@ definitions:
       destroyHash:
         description: 销毁hash
         type: string
+      tokenSymbol:
+        description: 合约符号
+        type: string
+      tokenName:
+        description: 合约名称
+        type: string
   AddressDetailResult:
     type: object
     properties:

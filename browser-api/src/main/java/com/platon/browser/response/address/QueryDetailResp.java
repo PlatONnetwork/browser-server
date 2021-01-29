@@ -79,6 +79,16 @@ public class QueryDetailResp {
 
     private String destroyHash; //合约销毁哈希
 
+    /**
+     * 合约符号
+     */
+    private String tokenSymbol;
+
+    /**
+     * 合约名称
+     */
+    private String tokenName;
+
     public Integer getType() {
         return this.type;
     }
@@ -320,6 +330,22 @@ public class QueryDetailResp {
 
     public void setHasErc721(boolean hasErc721) {
         this.hasErc721 = hasErc721;
+    }
+
+    public String getTokenSymbol() {
+        return tokenSymbol;
+    }
+
+    public void setTokenSymbol(String tokenSymbol) {
+        this.tokenSymbol = tokenSymbol;
+    }
+
+    public String getTokenName() {
+        return tokenName;
+    }
+
+    public void setTokenName(String tokenName) {
+        this.tokenName = tokenName;
     }
 
 }

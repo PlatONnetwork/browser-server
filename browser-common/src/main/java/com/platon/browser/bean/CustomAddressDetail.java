@@ -17,4 +17,14 @@ public class CustomAddressDetail extends Address {
      */
     private String tokenType;
 
+    /**
+     * 合约符号
+     */
+    private String tokenSymbol;
+
+    /**
+     * 合约名称
+     */
+    private String tokenName;
+
 }

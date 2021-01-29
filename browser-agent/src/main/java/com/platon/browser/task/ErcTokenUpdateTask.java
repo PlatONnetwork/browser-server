@@ -104,7 +104,7 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/27
      */
-    @Scheduled(cron = "0/30  * * * * ?")
+    //@Scheduled(cron = "0/30  * * * * ?")
     public void cronIncrementUpdateTokenTotalSupply() {
         if (lock.tryLock()) {
             try {
@@ -207,7 +207,8 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Scheduled(cron = "0 0 0 /7 * ?")
+    //@Scheduled(cron = "0 0 0 /7 * ?")
+    @Scheduled(cron = "0/30  * * * * ?")
     public void cronUpdateTokenTotalSupply() {
         lock.lock();
         try {
