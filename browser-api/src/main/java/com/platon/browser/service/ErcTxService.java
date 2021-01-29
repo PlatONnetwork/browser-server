@@ -274,6 +274,7 @@ public class ErcTxService {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
         RespPage<QueryTokenHolderListResp> result = new RespPage<>();
+        PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(req.getContract(), null, null);
         if (ids == null || ids.isEmpty()) {
             return result;
@@ -324,6 +325,7 @@ public class ErcTxService {
         if (!ArrayUtil.contains(tokenType, req.getType())) {
             req.setType(null);
         }
+        PageHelper.startPage(req.getPageNo(), req.getPageSize());
         RespPage<QueryHolderTokenListResp> result = new RespPage<>();
         Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(null, req.getAddress(), req.getType());
         if (ids == null || ids.isEmpty()) {
@@ -344,8 +346,6 @@ public class ErcTxService {
             }
             listResps.add(queryHolderTokenListResp);
         });
-        ids.setTotal(ids.size());
-        ids.setPages(Convert.toInt(Convert.toBigDecimal(ids.getTotal()).divide(Convert.toBigDecimal(req.getPageSize()), 0)));
         result.init(ids, listResps);
         return result;
     }

@@ -23,27 +23,38 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("token/holder")
 public class HolderController {
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private ErcTxService ercTxService;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private CommonMethod commonMethod;
 
-
-    @PostMapping( "list")
+    /**
+     * Token令牌持有人列表
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenHolderListResp>>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/29
+     */
+    @PostMapping("list")
     public Mono<RespPage<QueryTokenHolderListResp>> list(@Valid @RequestBody QueryTokenHolderListReq req) {
         return Mono.just(ercTxService.tokenHolderList(req));
     }
 
-    @PostMapping( "export")
-    public void export(@RequestParam(value = "contract",required = true) String contract,
-                                         @RequestParam(value = "local",required = true) String local,
-                                         @RequestParam(value = "timeZone",required = true) String timeZone,
-                                         @RequestParam(value = "token", required = false) String token,
-                                         HttpServletResponse response) {
+    @PostMapping("export")
+    public void export(@RequestParam(value = "contract", required = true) String contract,
+                       @RequestParam(value = "local", required = true) String local,
+                       @RequestParam(value = "timeZone", required = true) String timeZone,
+                       @RequestParam(value = "token", required = false) String token,
+                       HttpServletResponse response) {
         try {
             /**
              * 鉴权
