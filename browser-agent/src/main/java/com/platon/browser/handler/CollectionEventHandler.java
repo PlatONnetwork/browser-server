@@ -17,7 +17,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.statistic.StatisticService;
-import com.platon.browser.service.transaction.TransactionService;
+import com.platon.browser.service.ppos.PPOSService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -38,7 +38,7 @@ import java.util.List;
 public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
-    private TransactionService transactionService;
+    private PPOSService pposService;
     @Resource
     private BlockService blockService;
     @Resource
@@ -86,7 +86,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockService.analyze(event);
             // 根据交易解析出业务参数
-            TxAnalyseResult txAnalyseResult = transactionService.analyze(event);
+            TxAnalyseResult txAnalyseResult = pposService.analyze(event);
             // 统计业务参数
             statisticService.analyze(event);
 

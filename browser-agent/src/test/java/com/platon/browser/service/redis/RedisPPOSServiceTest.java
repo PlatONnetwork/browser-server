@@ -21,7 +21,7 @@ import java.util.Set;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RedisTransactionServiceTest extends AgentTestBase {
+public class RedisPPOSServiceTest extends AgentTestBase {
     @Mock
     protected RedisTemplate<String,String> redisTemplate;
     @InjectMocks
