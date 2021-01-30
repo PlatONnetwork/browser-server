@@ -32,33 +32,41 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 @Service
 public class ErcTokenAnalyzer {
+
     @Resource
     private ErcDetectService ercDetectService;
+
     @Resource
     private ErcCache ercCache;
+
     @Resource
     private AddressCache addressCache;
+
     @Resource
     private ErcTokenInventoryAnalyzer ercTokenInventoryAnalyzer;
+
     @Resource
     private ErcTokenHolderAnalyzer ercTokenHolderAnalyzer;
+
     @Resource
     private CustomTokenMapper customTokenMapper;
+
     @Resource
     private TokenMapper tokenMapper;
 
     /**
      * 解析Token,在合约创建时调用
+     *
      * @param contractAddress
      */
     public ErcToken resolveToken(String contractAddress) {
         ErcToken token = new ErcToken();
         token.setAddress(contractAddress);
         ErcContractId contractId = ercDetectService.getContractId(contractAddress);
-        BeanUtils.copyProperties(contractId,token);
+        BeanUtils.copyProperties(contractId, token);
         token.setTypeEnum(contractId.getTypeEnum());
         token.setType(contractId.getTypeEnum().name().toLowerCase());
-        switch (contractId.getTypeEnum()){
+        switch (contractId.getTypeEnum()) {
             case ERC20:
                 token.setIsSupportErc20(true);
                 token.setIsSupportErc165(false);
@@ -77,18 +85,18 @@ public class ErcTokenAnalyzer {
                 break;
             default:
         }
-        if(token.getTypeEnum()!= ErcTypeEnum.UNKNOWN){
+        if (token.getTypeEnum() != ErcTypeEnum.UNKNOWN) {
             // 入库ERC721或ERC20 Token记录
             token.setTokenTxQty(0);
-            customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token),Token.Column.values());
-            ercCache.tokenCache.put(token.getAddress(),token);
+            customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token), Token.Column.values());
+            ercCache.tokenCache.put(token.getAddress(), token);
         }
         return token;
     }
 
-    private List<ErcTx> resolveErcTxFromEvent(Token token,CollectionTransaction tx,List<ErcContract.ErcTxEvent> eventList){
+    private List<ErcTx> resolveErcTxFromEvent(Token token, CollectionTransaction tx, List<ErcContract.ErcTxEvent> eventList) {
         List<ErcTx> txList = new ArrayList<>();
-        AtomicLong seq = new AtomicLong(tx.getNum()*100000);
+        AtomicLong seq = new AtomicLong(tx.getNum() * 100000);
         eventList.forEach(event -> {
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
@@ -113,11 +121,11 @@ public class ErcTokenAnalyzer {
         return txList;
     }
 
-    private String getErcTxInfo(List<ErcTx> txList){
+    private String getErcTxInfo(List<ErcTx> txList) {
         List<ErcTxInfo> infoList = new ArrayList<>();
-        txList.forEach(tx->{
+        txList.forEach(tx -> {
             ErcTxInfo eti = new ErcTxInfo();
-            BeanUtils.copyProperties(tx,eti);
+            BeanUtils.copyProperties(tx, eti);
             infoList.add(eti);
         });
         return JSON.toJSONString(infoList);
@@ -125,13 +133,14 @@ public class ErcTokenAnalyzer {
 
     /**
      * 解析ERC交易, 在合约调用时调用
+     *
      * @param tx
      */
-    public void resolveTx(CollectionTransaction tx, Receipt receipt) {
+    public ErcTypeEnum resolveTx(CollectionTransaction tx, Receipt receipt) {
         ErcToken token = ercCache.tokenCache.get(tx.getTo());
-        if(token==null){
-            log.warn("缓存中未找到合约地址[{}]对应的Erc Token",tx.getContractAddress());
-            return;
+        if (token == null) {
+            log.warn("缓存中未找到合约地址[{}]对应的Erc Token", tx.getContractAddress());
+            return ErcTypeEnum.UNKNOWN;
         }
         String contractAddress = token.getAddress();
         ErcTypeEnum typeEnum = ErcTypeEnum.valueOf(token.getType().toUpperCase());
@@ -141,30 +150,30 @@ public class ErcTokenAnalyzer {
         transactionReceipt.setContractAddress(contractAddress);
         List<ErcContract.ErcTxEvent> eventList;
         List<ErcTx> txList = Collections.emptyList();
-        switch (typeEnum){
+        switch (typeEnum) {
             case ERC20:
                 eventList = ercDetectService.getErc20TxEvents(transactionReceipt);
-                txList = resolveErcTxFromEvent(token,tx,eventList);
+                txList = resolveErcTxFromEvent(token, tx, eventList);
                 tx.setErc20TxList(txList);
                 tx.setErc20TxInfo(getErcTxInfo(txList));
                 break;
             case ERC721:
                 eventList = ercDetectService.getErc721TxEvents(transactionReceipt);
-                txList = resolveErcTxFromEvent(token,tx,eventList);
+                txList = resolveErcTxFromEvent(token, tx, eventList);
                 tx.setErc721TxList(txList);
                 tx.setErc721TxInfo(getErcTxInfo(txList));
                 ercTokenInventoryAnalyzer.analyze(txList);
                 break;
         }
 
-        token.setTokenTxQty(token.getTokenTxQty()+txList.size());
+        token.setTokenTxQty(token.getTokenTxQty() + txList.size());
         token.setUpdateTime(new Date());
         token.setDirty(true);
         ercTokenHolderAnalyzer.analyze(txList);
 
         // 以上所有操作无误，最后更新地址表erc交易数缓存
-        txList.forEach(ercTx->{
-            switch (typeEnum){
+        txList.forEach(ercTx -> {
+            switch (typeEnum) {
                 case ERC20:
                     addressCache.updateErc20TxQty(ercTx.getFrom());
                     addressCache.updateErc20TxQty(ercTx.getTo());
@@ -175,5 +184,7 @@ public class ErcTokenAnalyzer {
                     break;
             }
         });
+        return typeEnum;
     }
+
 }
