@@ -10,7 +10,7 @@ import lombok.Data;
  * @create 2020-09-23 14:36
  */
 @Data
-public class QueryTokenIdDetailReq extends PageReq {
+public class QueryTokenIdDetailReq {
 
     private String contract;//
 

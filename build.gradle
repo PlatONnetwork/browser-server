@@ -6,6 +6,8 @@ buildscript {
     dependencies {
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
         classpath  'org.yaml:snakeyaml:1.27'
+        classpath 'cn.hutool:hutool-all:5.5.7'
+        classpath 'javax.mail:mail:1.4.7'
     }
 }
 plugins {
@@ -13,6 +15,9 @@ plugins {
     id "github.com.sakamotodesu.jcifs" version "0.2.2"
 }
 
+import cn.hutool.extra.mail.MailAccount
+import cn.hutool.extra.mail.MailUtil
+import github.com.sakamotodesu.JcifsCopy
 import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonBuilder
 import static java.nio.file.Files.*
@@ -22,18 +27,15 @@ import static java.nio.file.StandardCopyOption.*
 group = 'com.platon.browser'
 version = "${projectVersion}"
 
-def yamlFilter = new FilenameFilter() {
-    boolean accept(File dir, String name) {
-        return name.endsWith(".yml")
-    }
-}
-file("${projectDir.path}/docs/apidef").listFiles(yamlFilter).each { api ->
-    file("${projectDir.path}/docs/apidef/${api.name}.json").write(new JsonBuilder(new Yaml().load(api.text.replace("_VERSION_","$projectVersion").replace("_BASE_PATH_","/browser-api"))).toString(),"utf-8")
-}
+def shortCommitId = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
 
-file("${projectDir.path}/estpl").listFiles(yamlFilter).each { tpl ->
-    copy(get(tpl.path), get("${projectDir.path}/browser-agent/src/main/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
-    copy(get(tpl.path), get("${projectDir.path}/browser-service/src/test/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+
+apply plugin: "org.sonarqube"
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+    }
 }
 
 def recursiveCopy(startDir,replaceDir){
@@ -53,72 +55,16 @@ def recursiveCopy(startDir,replaceDir){
         }
     }
 }
-recursiveCopy('webconfig','webconfig')
-recursiveCopy('docs','docs')
-
-def scriptDir="${projectDir.path}/scripts/"
-def resetTpl=file("${scriptDir}/reset.tpl.sh")
-if(resetTpl.exists()){
-    def desFile = file("${projectDir.path}/browser-agent/build/package/reset.sh")
-    if(!desFile.exists()) desFile.parentFile.mkdirs()
-    desFile.write(resetTpl.text
-    .replace('_VERSION_',"$projectVersion")
-    .replace('_PROFILE_',"dev")
-    .replace('_DB_HOST_',"$dbHost")
-    .replace('_DB_USER_',"$dbUser")
-    .replace('_DB_PASS_',"$dbPass")
-    ,"utf-8")
-}
-def startTpl=file("${scriptDir}/start.tpl.sh")
-if(startTpl.exists()) {
-    def desFile = file("${projectDir.path}/browser-agent/build/package/start.sh")
-    if(!desFile.exists()) desFile.parentFile.mkdirs()
-    desFile.write(startTpl.text.replace('_PROJECT_NAME_','browser-agent'),"utf-8")
-    desFile = file("${projectDir.path}/browser-api/build/package/start.sh")
-    if(!desFile.exists()) desFile.parentFile.mkdirs()
-    desFile.write(startTpl.text.replace('_PROJECT_NAME_','browser-api'),"utf-8")
-}
-def stopTpl=file("${scriptDir}/stop.tpl.sh")
-if(stopTpl.exists()) {
-    def desFile = file("${projectDir.path}/browser-agent/build/package/stop.sh")
-    if(!desFile.exists()) desFile.parentFile.mkdirs()
-    desFile.write(stopTpl.text.replace('_PROJECT_NAME_','browser-agent'),"utf-8")
-    desFile = file("${projectDir.path}/browser-api/build/package/stop.sh")
-    if(!desFile.exists()) desFile.parentFile.mkdirs()
-    desFile.write(stopTpl.text.replace('_PROJECT_NAME_','browser-api'),"utf-8")
-}
-def fullSql=file("${scriptDir}/${project.name}-${projectVersion}.all.sql")
-if(fullSql.exists()) {
-    copy(get(fullSql.path), get("${projectDir.path}/browser-agent/build/package").resolve(fullSql.name), REPLACE_EXISTING)
-}
-def upgradeSql=file("${scriptDir}/${project.name}-${projectVersion}.upgrade.sql")
-if(upgradeSql.exists()) {
-    copy(get(upgradeSql.path), get("${projectDir.path}/browser-agent/build/package").resolve(upgradeSql.name), REPLACE_EXISTING)
-}
-
-apply plugin: "org.sonarqube"
-
-sonarqube {
-    properties {
-        property "sonar.sourceEncoding", "UTF-8"
-    }
-}
 
 subprojects {
-    def shortCommitId = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
-
-    // …Ë÷√±‡“Î∆˜ π”√µƒ±‡¬Î
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
     }
-
     apply plugin: 'java'
     apply plugin: 'jacoco'
-
     group 'com.platon.browser'
     version "$projectVersion-$shortCommitId"
     sourceCompatibility = '1.8'
-
     repositories {
         maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
         maven {url "https://sdk.platon.network/nexus/content/groups/public/"}
@@ -128,11 +74,207 @@ subprojects {
 //    configurations {
 //        all {
 ////            exclude module: "junit"
-////            ƒ¨»œ24–° ± ’‚—˘≈‰÷√jar∞¸ª·÷±Ω”»•≈‰÷√µƒ≤÷ø‚ƒ√
+////            ÈªòËÆ§24Â∞èÊó∂ ËøôÊ†∑ÈÖçÁΩÆjarÂåÖ‰ºöÁõ¥Êé•ÂéªÈÖçÁΩÆÁöÑ‰ªìÂ∫ìÊãø
 //            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 //        }
 //    }
 
+    // ÈÖçÁΩÆÊñá‰ª∂Êõ¥Êñ∞&ÁîüÊàê
+    def bootApps = ['browser-agent','browser-api','browser-export','browser-press','browser-sync']
+    if(project.name in bootApps){
+        file("${projectDir.path}/conftpl").listFiles().each {tpl->
+            def txt = tpl.text
+                    .replace('_VERSION_',"$projectVersion")
+                    .replace('_DESCRIPTION_',"$description")
+                    .replace('_DB_HOST_',"$dbHost")
+                    .replace('_DB_PORT_',"$dbPort")
+                    .replace('_DB_NAME_',"$dbName")
+                    .replace('_DB_USER_',"$dbUser")
+                    .replace('_DB_PASS_',"$dbPass")
+                    .replace('_REDIS_IPS_',"$redisIps")
+                    .replace('_REDIS_PWD_',"$redisPwd")
+                    .replace('_REDIS_DB_',"$redisDb")
+                    .replace('_ES_IPS_',"$esIps")
+                    .replace('_ES_PORT_',"$esPort")
+                    .replace('_ES_USER_',"$esUser")
+                    .replace('_ES_PWD_',"$esPwd")
+            file(tpl.absolutePath.replace('conftpl','src/main/resources')).write(txt,"utf-8")
+            file(tpl.absolutePath.replace('conftpl','src/test/resources')).write(txt,"utf-8")
+        }
+    }
+
+    def yamlFilter = new FilenameFilter() {
+        boolean accept(File dir, String name) {
+            return name.endsWith(".yml")
+        }
+    }
+
+    if(project.name.contains('browser-agent')){
+        file("${rootDir}/estpl").listFiles(yamlFilter).each { tpl ->
+            copy(get(tpl.path), get("${projectDir}/src/main/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+            copy(get(tpl.path), get("${rootDir}/browser-service/src/test/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+        }
+        file("${rootDir}/scripts/").listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(File dir, String name) {
+                return name.endsWith(".sql")&&name.contains(projectVersion)
+            }
+        }).each { srcFile->
+            def desFile = file("${buildDir}/package/${srcFile.name}")
+            if(!desFile.exists()) desFile.parentFile.mkdirs()
+            copy(get(srcFile.path), get(desFile.path), REPLACE_EXISTING)
+        }
+    }
+
+    if(project.name.contains('browser-api')){
+        file("${rootDir}/docs/apidef").listFiles(yamlFilter).each { api ->
+            file("${rootDir}/docs/apidef/${api.name}.json").write(
+                    new JsonBuilder(
+                            new Yaml().load(api.text
+                                    .replace("_VERSION_","$projectVersion")
+                                    .replace("_COMMIT_ID_",shortCommitId)
+                                    .replace("_BASE_PATH_","/browser-api")
+                            )
+                    ).toString(),"utf-8"
+            )
+        }
+        recursiveCopy('webconfig','webconfig')
+        recursiveCopy('docs','docs')
+    }
+
+    if(project.name in ['browser-agent','browser-api']){
+        apply plugin: 'distribution' //ÊâìÂåÖtarÂåÖÁî®Âà∞ÁöÑÊèí‰ª∂
+        def packageName = "${project.name}-${version}"
+
+        file("${rootDir}/scripts").listFiles(new FilenameFilter() {
+            boolean accept(File dir, String name) {
+                return name.endsWith("tpl.sh")
+            }
+        }).each{tpl ->
+            def desFile = file(tpl.path.replace('scripts',"${project.name}/build/package").replace("tpl.sh","sh"))
+            if(!desFile.exists()) desFile.parentFile.mkdirs()
+            desFile.write(tpl.text
+                    .replace('_PROJECT_NAME_',project.name)
+                    .replace('_VERSION_',"$projectVersion")
+                    .replace('_PROFILE_',"dev")
+                    .replace('_DB_HOST_',"$dbHost")
+                    .replace('_DB_USER_',"$dbUser")
+                    .replace('_DB_PASS_',"$dbPass")
+                    .replace('_JAVA_PATH_',"$deployJavaAbsPath")
+                    ,"utf-8")
+        }
+
+        // Â§çÂà∂ÈÖçÁΩÆÊñá‰ª∂
+        task copyConf(type: Copy) {
+            from('src/main/resources/application-prod.yml')
+            from('jasypt.properties')
+            from('status.hook')
+            from("build/libs/${packageName}.jar")
+            into('build/package')
+        }
+
+        build {
+            doFirst {
+                file("${buildDir}/package").listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        return name.endsWith('.jar')&&!name.contains(packageName)
+                    }
+                }).each { file->file.delete()}
+                file("${buildDir}/distributions").listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        return !name.contains(packageName)
+                    }
+                }).each { file->file.delete()}
+                file("${buildDir}/libs").listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        return !name.contains(packageName)
+                    }
+                }).each { file->file.delete()}
+            }
+        }
+        task buildTar(dependsOn: [
+                'build',
+                copyConf
+        ]){}
+
+        distributions {
+            monitor {
+                baseName = project.name
+                contents {
+                    from { 'build/package' }
+                }
+            }
+        }
+
+        monitorDistTar.dependsOn  'copyConf'
+        monitorDistTar.compression = Compression.GZIP
+        monitorDistTar.archiveExtension.set('tar.gz')
+
+        remotes {
+            webServer {
+                host = "$deployServerHost"
+                user = "$deployServerUser"
+                port = Integer.parseInt("$deployServerPort")
+                password = "$deployServerPassword"
+            }
+        }
+
+        // Êã∑ÂåÖÂà∞ÊµãËØïÁéØÂ¢É
+        def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
+        def activeProfile = "$deployProfile"
+        task deployToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
+            doLast {
+                ssh.settings {
+                    knownHosts = allowAnyHosts
+                    pty = true
+                }
+                ssh.run {
+                    session(remotes.webServer) {
+                        execute "mkdir -p $deployDir && rm -rf $deployDir/${project.name}*.jar"
+                        put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
+                        execute "cd $deployDir && $deployFixScript && chmod a+x *.sh && ./start.sh $activeProfile"
+                    }
+                }
+            }
+        }
+
+        def parentDir = project.name.contains('agent')?'scan-agent':'scan-api'
+        def desDir = "${projectVersion}-"+new Date().format("yyyy.MM.dd.HHmm")
+        task releaseToCifs(type: JcifsCopy,dependsOn:['buildTar'],group: 'release') {
+            from "${projectDir.path}/build/distributions/${packageName}.tar.gz"
+            into "smb://${publishServerUser}:${publishServerPassword}@${publishServerHost}/${publishServerPath}/${parentDir}/${desDir}/"
+        }
+    }
+
+    //sonarÊâ´ÊèèÁöÑË∑ØÂæÑ
+    sonarqube {
+        properties {
+            property "sonar.sources", "src/main/java"
+        }
+    }
+
+    //jacocoÊµãËØïÊä•Ë°®ÁöÑÂäüËÉΩ
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+            html.enabled true
+        }
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.7
+                }
+            }
+        }
+    }
+
+    check.dependsOn jacocoTestReport
 
     dependencies {
         testCompile "junit:junit:$junitVersion"
@@ -169,138 +311,7 @@ subprojects {
         testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
         compile group: 'org.yaml', name: 'snakeyaml', version: '1.27'
         compile 'cn.hutool:hutool-all:5.5.7'
+
+        implementation 'javax.mail:mail:1.4.7'
     }
-
-    // ≈‰÷√Œƒº˛∏¸–¬&…˙≥…
-    def bootApps = ['browser-agent','browser-api','browser-export','browser-press','browser-sync']
-    if(project.name in bootApps){
-        def desc='Õ®”√≈‰÷√: «Î≤ª“™–ﬁ∏ƒ¥ÀŒƒº˛£¨¥ÀŒƒº˛”…ƒ£∞Â◊‘∂Ø…˙≥…£¨»Ù“™–ﬁ∏ƒ£¨«Î“∆≤Ω÷¡conftplƒø¬º'
-        def tplPath="${projectDir.path}/conftpl/"
-        def mainRes="${projectDir.path}/src/main/resources/"
-        def testRes="${projectDir.path}/src/test/resources/"
-        def tpl = file(projectDir.path+"/conftpl/application.yml")
-        if(tpl.exists()){
-            def txt = tpl.text.replace('_VERSION_',"$projectVersion").replace('_DESCRIPTION_',desc)
-            file("${mainRes}application.yml").write(txt,"utf-8")
-            file("${testRes}application.yml").write(txt,"utf-8")
-        }
-
-        tpl = file("${tplPath}application-dev.yml")
-        if(tpl.exists()){
-            def txt = tpl.text.replace('_VERSION_',"$projectVersion").replace('_DESCRIPTION_',desc)
-                    .replace('_DB_HOST_',"$dbHost")
-                    .replace('_DB_PORT_',"$dbPort")
-                    .replace('_DB_NAME_',"$dbName")
-                    .replace('_DB_USER_',"$dbUser")
-                    .replace('_DB_PASS_',"$dbPass")
-                    .replace('_REDIS_IPS_',"$redisIps")
-                    .replace('_REDIS_PWD_',"$redisPwd")
-                    .replace('_REDIS_DB_',"$redisDb")
-                    .replace('_ES_IPS_',"$esIps")
-                    .replace('_ES_PORT_',"$esPort")
-                    .replace('_ES_USER_',"$esUser")
-                    .replace('_ES_PWD_',"$esPwd")
-            file("${mainRes}application-dev.yml").write(txt,"utf-8")
-            file("${testRes}application-dev.yml").write(txt,"utf-8")
-        }
-    }
-
-    def releaseApps = ['browser-agent','browser-api']
-    if(project.name in releaseApps){
-        clean {
-            doFirst {
-                def path = "${project.projectDir}/out"
-                file(path).deleteDir()
-            }
-        }
-        apply plugin: 'distribution' //¥Ú∞¸tar∞¸”√µΩµƒ≤Âº˛
-        // ∏¥÷∆≈‰÷√Œƒº˛
-        task copyConf(type: Copy) {
-            from('src/main/resources/application-prod.yml')
-            from('jasypt.properties')
-            from('status.hook')
-            from('build/libs')
-            into('build/package')
-        }
-
-        distributions {
-            monitor {
-                baseName = project.name
-                contents {
-                    from { 'build/package' }
-                }
-            }
-        }
-
-        monitorDistTar.dependsOn  'copyConf'
-        monitorDistTar.compression = Compression.GZIP
-        monitorDistTar.archiveExtension.set('tar.gz')
-
-        task buildTar(dependsOn: [
-                'build',
-                copyConf
-        ]){}
-
-        remotes {
-            webServer {
-                host = "$deployServerHost"
-                user = "$deployServerUser"
-                port = Integer.parseInt("$deployServerPort")
-                password = "$deployServerPassword"
-            }
-        }
-
-        // øΩ∞¸µΩ≤‚ ‘ª∑æ≥
-        def packageName = "${project.name}-${version}"
-        def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
-        def activeProfile = "$deployProfile"
-        task copyToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
-            doLast {
-                ssh.settings {
-                    knownHosts = allowAnyHosts
-                }
-                ssh.run {
-                    session(remotes.webServer) {
-                        execute "mkdir -p $deployDir/backup && mv $deployDir/${project.name}*.jar $deployDir/backup"
-                        put from: "$buildDir/libs/${packageName}.jar", into: "$deployDir"
-                        execute "cd $deployDir && nohup ./start.sh $activeProfile &"
-                    }
-                }
-            }
-        }
-
-        def parentDir = project.name.contains('agent')?'scan-agent':'scan-api'
-        def destDir = "${projectVersion}"+'-'+new Date().format("yyyy.MM.dd.HHmm")
-        task copyToCifs(type: github.com.sakamotodesu.JcifsCopy,dependsOn:['buildTar'],group: 'deploy') {
-            from "${projectDir.path}/build/distributions/${packageName}.tar.gz"
-            into "smb://chendongming:CDM00juzix@192.168.21.210/proupdate/alaya/scan/${parentDir}/${destDir}/"
-        }
-    }
-
-    //sonar…®√Ëµƒ¬∑æ∂
-    sonarqube {
-        properties {
-            property "sonar.sources", "src/main/java"
-        }
-    }
-
-    //jacoco≤‚ ‘±®±Ìµƒπ¶ƒ‹
-    jacocoTestReport {
-	    reports {
-	        xml.enabled true
-	        html.enabled true
-	    }
-	}
-
-	jacocoTestCoverageVerification {
-		violationRules {
-			rule {
-				limit {
-					minimum = 0.7
-				}
-			}
-		}
-	 }
-
-	check.dependsOn jacocoTestReport
 }

@@ -670,6 +670,7 @@ public class TransactionService {
                 case EVM_CONTRACT_CREATE:
                 case WASM_CONTRACT_CREATE:
                 case ERC20_CONTRACT_CREATE:
+                case ERC721_CONTRACT_CREATE:
                     /**
                      * to地址设置为合约地址
                      */
@@ -678,6 +679,7 @@ public class TransactionService {
                     break;
                 case CONTRACT_EXEC:
                 case ERC20_CONTRACT_EXEC:
+                case ERC721_CONTRACT_EXEC:
                     //获取arc20交易进行转换
                     List<ErcTx> erc20List = JSONObject.parseArray(transaction.getErc20TxInfo(),ErcTx.class);
                     if(erc20List != null){
