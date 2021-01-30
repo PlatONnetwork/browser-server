@@ -13,7 +13,7 @@
     t.decimal,
     th.token_tx_qty as txCount
     from token_holder th left join  token t on th.token_address = t.address
-    where 1=1
+    where th.balance != 0
     <if test="tokenAddress != null">
       and th.token_address = #{tokenAddress}
     </if>
