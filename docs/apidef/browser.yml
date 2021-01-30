@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: _VERSION_
+  version: 'v_VERSION_ Build #_COMMIT_ID_'
   title: 浏览器API文档
   description:
 host: localhost:9061
@@ -465,6 +465,11 @@ paths:
           in: query
           type: string
           required: false
+        - name: tokenId
+          description: token id
+          in: query
+          type: string
+          required: false
       responses:
         '200':
           description: 返回二进制数据流
@@ -580,6 +585,11 @@ paths:
           required: true
         - name: token
           description: 令牌
+          in: query
+          type: string
+          required: false
+        - name: type
+          description: 合约类型，取值erc20或erc721
           in: query
           type: string
           required: false
@@ -1193,9 +1203,15 @@ definitions:
       proposalQty:
         description: 治理交易总数
         type: integer
+      hasErc20:
+        description: 是否是erc20
+        type: boolean
       erc20TxQty:
         description: erc20交易总数
         type: integer
+      hasErc721:
+        description: 是否是erc721
+        type: boolean
       erc721TxQty:
         description: erc20交易总数
         type: integer
@@ -1240,6 +1256,12 @@ definitions:
         type: integer
       destroyHash:
         description: 销毁hash
+        type: string
+      tokenSymbol:
+        description: 合约符号
+        type: string
+      tokenName:
+        description: 合约名称
         type: string
   AddressDetailResult:
     type: object
@@ -1752,6 +1774,9 @@ definitions:
     properties:
       address:
         description: 合约地址（可选）
+        type: string
+      type:
+        description: 类型，取值：erc20或erc721（可选）
         type: string
       pageNo:
         description: 页数(必填)

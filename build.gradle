@@ -107,7 +107,7 @@ sonarqube {
 subprojects {
     def shortCommitId = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
 
-    // è®¾ç½®ç¼–è¯‘å™¨ä½¿ç”¨çš„ç¼–ç 
+    // ÉèÖÃ±àÒëÆ÷Ê¹ÓÃµÄ±àÂë
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
     }
@@ -128,7 +128,7 @@ subprojects {
 //    configurations {
 //        all {
 ////            exclude module: "junit"
-////            é»˜è®¤24å°æ—¶ è¿™æ ·é…ç½®jaråŒ…ä¼šç›´æ¥å»é…ç½®çš„ä»“åº“æ‹¿
+////            Ä¬ÈÏ24Ğ¡Ê± ÕâÑùÅäÖÃjar°ü»áÖ±½ÓÈ¥ÅäÖÃµÄ²Ö¿âÄÃ
 //            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 //        }
 //    }
@@ -171,10 +171,10 @@ subprojects {
         compile 'cn.hutool:hutool-all:5.5.7'
     }
 
-    // é…ç½®æ–‡ä»¶æ›´æ–°&ç”Ÿæˆ
+    // ÅäÖÃÎÄ¼ş¸üĞÂ&Éú³É
     def bootApps = ['browser-agent','browser-api','browser-export','browser-press','browser-sync']
     if(project.name in bootApps){
-        def desc='é€šç”¨é…ç½®: è¯·ä¸è¦ä¿®æ”¹æ­¤æ–‡ä»¶ï¼Œæ­¤æ–‡ä»¶ç”±æ¨¡æ¿è‡ªåŠ¨ç”Ÿæˆï¼Œè‹¥è¦ä¿®æ”¹ï¼Œè¯·ç§»æ­¥è‡³conftplç›®å½•'
+        def desc='Í¨ÓÃÅäÖÃ: Çë²»ÒªĞŞ¸Ä´ËÎÄ¼ş£¬´ËÎÄ¼şÓÉÄ£°å×Ô¶¯Éú³É£¬ÈôÒªĞŞ¸Ä£¬ÇëÒÆ²½ÖÁconftplÄ¿Â¼'
         def tplPath="${projectDir.path}/conftpl/"
         def mainRes="${projectDir.path}/src/main/resources/"
         def testRes="${projectDir.path}/src/test/resources/"
@@ -213,8 +213,8 @@ subprojects {
                 file(path).deleteDir()
             }
         }
-        apply plugin: 'distribution' //æ‰“åŒ…taråŒ…ç”¨åˆ°çš„æ’ä»¶
-        // å¤åˆ¶é…ç½®æ–‡ä»¶
+        apply plugin: 'distribution' //´ò°ütar°üÓÃµ½µÄ²å¼ş
+        // ¸´ÖÆÅäÖÃÎÄ¼ş
         task copyConf(type: Copy) {
             from('src/main/resources/application-prod.yml')
             from('jasypt.properties')
@@ -250,7 +250,7 @@ subprojects {
             }
         }
 
-        // æ‹·åŒ…åˆ°æµ‹è¯•ç¯å¢ƒ
+        // ¿½°üµ½²âÊÔ»·¾³
         def packageName = "${project.name}-${version}"
         def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
         def activeProfile = "$deployProfile"
@@ -277,14 +277,14 @@ subprojects {
         }
     }
 
-    //sonaræ‰«æçš„è·¯å¾„
+    //sonarÉ¨ÃèµÄÂ·¾¶
     sonarqube {
         properties {
             property "sonar.sources", "src/main/java"
         }
     }
 
-    //jacocoæµ‹è¯•æŠ¥è¡¨çš„åŠŸèƒ½
+    //jacoco²âÊÔ±¨±íµÄ¹¦ÄÜ
     jacocoTestReport {
 	    reports {
 	        xml.enabled true

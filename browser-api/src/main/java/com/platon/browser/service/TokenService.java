@@ -4,13 +4,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomToken;
 import com.platon.browser.bean.CustomTokenDetail;
-import com.platon.browser.bean.CustomTokenHolder;
-import com.platon.browser.bean.CustomTokenInventory;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryKey;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.CustomTokenInventoryMapper;
+import com.platon.browser.dao.mapper.CustomTokenMapper;
+import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.request.token.QueryTokenIdDetailReq;
@@ -22,16 +22,12 @@ import com.platon.browser.response.token.QueryTokenDetailResp;
 import com.platon.browser.response.token.QueryTokenIdDetailResp;
 import com.platon.browser.response.token.QueryTokenIdListResp;
 import com.platon.browser.response.token.QueryTokenListResp;
-import com.platon.browser.utils.ConvertUtil;
-import com.platon.browser.utils.DateUtil;
-import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,36 +60,42 @@ public class TokenService {
     private TokenInventoryMapper tokenInventoryMapper;
 
 
-
     public RespPage<QueryTokenListResp> queryTokenList(QueryTokenListReq req) {
         // page params: #{offset}, #{size}
         RespPage<QueryTokenListResp> result = new RespPage<>();
-        PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<CustomToken> customTokens = customTokenMapper.selectListByType(req.getType());
         List<QueryTokenListResp> data = customTokens.stream().map(customToken -> QueryTokenListResp.fromToken(customToken)).collect(Collectors.toList());
-        result.init(customTokens,data);
+        result.init(customTokens, data);
         return result;
     }
 
     public QueryTokenDetailResp queryTokenDetail(QueryTokenDetailReq req) {
         CustomTokenDetail customTokenDetail = customTokenMapper.selectDetailByAddress(req.getAddress());
-        return  QueryTokenDetailResp.fromTokenDetail(customTokenDetail);
+        return QueryTokenDetailResp.fromTokenDetail(customTokenDetail);
     }
 
-
+    /**
+     * ARC721 库存列表
+     *
+     * @param req
+     * @return com.platon.browser.response.RespPage<com.platon.browser.response.token.QueryTokenIdListResp>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/28
+     */
     public RespPage<QueryTokenIdListResp> queryTokenIdList(QueryTokenIdListReq req) {
         RespPage<QueryTokenIdListResp> result = new RespPage<>();
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         TokenInventoryExample example = new TokenInventoryExample();
         TokenInventoryExample.Criteria criteria = example.createCriteria();
         //根据地址、合约地址、tokenid去查询列表
-        if(StringUtils.isNotBlank(req.getAddress())){
+        if (StringUtils.isNotBlank(req.getAddress())) {
             criteria.andOwnerEqualTo(req.getAddress());
         }
-        if(StringUtils.isNotBlank(req.getContract())){
+        if (StringUtils.isNotBlank(req.getContract())) {
             criteria.andTokenAddressEqualTo(req.getContract());
         }
-        if(StringUtils.isNotBlank(req.getTokenId())){
+        if (StringUtils.isNotBlank(req.getTokenId())) {
             criteria.andTokenIdEqualTo(Long.valueOf(req.getTokenId()));
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
@@ -102,17 +104,17 @@ public class TokenService {
             QueryTokenIdListResp resp = QueryTokenIdListResp.fromToken(tokenInventory);
             resps.add(resp);
         });
-        result.init(tokenInventorys,resps);
+        result.init(tokenInventorys, resps);
         return result;
     }
 
     public QueryTokenIdDetailResp queryTokenIdDetail(QueryTokenIdDetailReq req) {
-        BigInteger tokenId = StringUtils.isNotBlank(req.getTokenId())?new BigInteger(req.getTokenId()):BigInteger.ZERO;
+        BigInteger tokenId = StringUtils.isNotBlank(req.getTokenId()) ? new BigInteger(req.getTokenId()) : BigInteger.ZERO;
         TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
         tokenInventoryKey.setTokenAddress(req.getContract());
         tokenInventoryKey.setTokenId(tokenId);
-        TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey( tokenInventoryKey);
-        return  QueryTokenIdDetailResp.fromTokenIdDetail(tokenInventory);
+        TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
+        return QueryTokenIdDetailResp.fromTokenIdDetail(tokenInventory);
     }
 
     public AccountDownload exportTokenId(String address, String contract, String tokenId, String local, String timeZone) {
@@ -120,13 +122,13 @@ public class TokenService {
         TokenInventoryExample example = new TokenInventoryExample();
         TokenInventoryExample.Criteria criteria = example.createCriteria();
         //根据地址、合约地址、tokenid去查询列表
-        if(StringUtils.isNotBlank(address)){
+        if (StringUtils.isNotBlank(address)) {
             criteria.andOwnerEqualTo(address);
         }
-        if(StringUtils.isNotBlank(contract)){
+        if (StringUtils.isNotBlank(contract)) {
             criteria.andTokenAddressEqualTo(contract);
         }
-        if(StringUtils.isNotBlank(tokenId)){
+        if (StringUtils.isNotBlank(tokenId)) {
             criteria.andTokenIdEqualTo(Long.valueOf(tokenId));
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
@@ -139,8 +141,8 @@ public class TokenService {
         };
         List<Object[]> rows = new ArrayList<>();
         tokenInventorys.forEach(tokenInventory -> {
-            Object[] row = {tokenInventory.getName(),tokenInventory.getTokenAddress(),tokenInventory.getOwner()
-                    ,tokenInventory.getTokenId(),tokenInventory.getTokenTxQty()
+            Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getOwner()
+                    , tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()
             };
             rows.add(row);
         });

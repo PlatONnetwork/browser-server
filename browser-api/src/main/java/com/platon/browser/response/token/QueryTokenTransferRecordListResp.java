@@ -2,7 +2,6 @@ package com.platon.browser.response.token;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.json.CustomLatSerializer;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,41 +24,24 @@ import java.util.Date;
 @Accessors(chain = true)
 public class QueryTokenTransferRecordListResp {
 
-    @ApiModelProperty(value = "序号")
     private Long seq;
-    @ApiModelProperty(value = "交易哈希")
     private String txHash;
-    @ApiModelProperty(value = "区块高度")
     private Long blockNumber;
-    @ApiModelProperty(value = "交易发起者")
     private String txFrom;
-    @ApiModelProperty(value = "Token合约（交易to）")
     private String contract;
-    @ApiModelProperty(value = "代币转账接收者")
     private String transferTo;
-    @ApiModelProperty(value = "代币转账金额（单位：1）")
     private BigDecimal transferValue;
-    @ApiModelProperty(value = "代币精度")
     private Integer decimal;
-    @ApiModelProperty(value = "代币符号")
     private String symbol;
-    @ApiModelProperty(value = "代币名称")
     private String name;
-    @ApiModelProperty(value = "交易函数签名")
     private String methodSign;
-    @ApiModelProperty(value = "交易结果 0 失败，1 成功")
     private Integer result;
-    @ApiModelProperty(value = "区块时间")
     private Date blockTimestamp;
-    @ApiModelProperty(value = "交易value金额（单位：LAT）")
     private BigDecimal value;
-    @ApiModelProperty(value = "服务器时间")
+    private String tokenId;
     private Long systemTimestamp;
-    @ApiModelProperty(value = "交易方向：INPUT 入账，OUT 出账")
     private String type;   // 交易类型：input 进账， out 出账
-    @ApiModelProperty(value = "from 类型")
     private Integer fromType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
-    @ApiModelProperty(value = "to类型")
     private Integer toType; // 地址类型：1-账户地址，2-内置地址，3-evm地址，4-wasm地址，5-evm-erc地址，
 
     public Long getSeq() {

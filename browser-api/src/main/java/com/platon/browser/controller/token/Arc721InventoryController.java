@@ -5,10 +5,8 @@ import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.request.token.QueryTokenIdDetailReq;
 import com.platon.browser.request.token.QueryTokenIdListReq;
-import com.platon.browser.request.token.QueryTokenListReq;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
@@ -28,33 +26,46 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("token/arc721-inventory")
 public class Arc721InventoryController {
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private CommonMethod commonMethod;
+
     @Resource
     private TokenService tokenService;
 
-    @PostMapping( "list")
+    /**
+     * ARC721 库存列表
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenIdListResp>>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/28
+     */
+    @PostMapping("list")
     public Mono<RespPage<QueryTokenIdListResp>> list(@Valid @RequestBody QueryTokenIdListReq req) {
-        return Mono.create(sink -> {tokenService.queryTokenIdList(req);});
+        return Mono.just(tokenService.queryTokenIdList(req));
     }
 
-    @PostMapping( "detail")
+    @PostMapping("detail")
     public Mono<BaseResp<QueryTokenIdDetailResp>> detail(@Valid @RequestBody QueryTokenIdDetailReq req) {
         return Mono.create(sink -> {
-            tokenService.queryTokenIdDetail(req);
+            QueryTokenIdDetailResp resp = tokenService.queryTokenIdDetail(req);
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp));
         });
     }
 
-    @PostMapping( "export")
-    public void export(@RequestParam(value = "address",required = false) String address,
-                       @RequestParam(value = "contract",required = false) String contract,
-                       @RequestParam(value = "tokenId",required = false) String tokenId,
-                       @RequestParam(value = "local",required = true) String local,
-                       @RequestParam(value = "timeZone",required = true) String timeZone,
+    @PostMapping("export")
+    public void export(@RequestParam(value = "address", required = false) String address,
+                       @RequestParam(value = "contract", required = false) String contract,
+                       @RequestParam(value = "tokenId", required = false) String tokenId,
+                       @RequestParam(value = "local", required = true) String local,
+                       @RequestParam(value = "timeZone", required = true) String timeZone,
                        @RequestParam(value = "token", required = false) String token,
                        HttpServletResponse response) {
         try {
@@ -70,4 +81,5 @@ public class Arc721InventoryController {
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
+
 }

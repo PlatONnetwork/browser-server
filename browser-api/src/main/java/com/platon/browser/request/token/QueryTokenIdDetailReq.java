@@ -1,7 +1,6 @@
 package com.platon.browser.request.token;
 
 import com.platon.browser.request.PageReq;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -13,9 +12,7 @@ import lombok.Data;
 @Data
 public class QueryTokenIdDetailReq extends PageReq {
 
-    @ApiModelProperty(allowEmptyValue = true, required = true, value = "合约地址")
     private String contract;//
 
-    @ApiModelProperty(allowEmptyValue = true, required = true, value = "tokenId")
     private String tokenId;//
 }

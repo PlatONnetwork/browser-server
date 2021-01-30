@@ -20,6 +20,9 @@
     <if test="address != null">
       and th.address = #{address}
     </if>
+    <if test="type != null">
+      AND t.type = #{type}
+    </if>
     order by balance desc
   </select>
   <insert id="batchInsertOrUpdateSelective" parameterType="map">

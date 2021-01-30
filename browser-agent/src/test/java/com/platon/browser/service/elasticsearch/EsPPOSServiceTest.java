@@ -19,7 +19,7 @@ import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class EsTransactionServiceTest extends AgentTestBase {
+public class EsPPOSServiceTest extends AgentTestBase {
     @Mock
     private EsTransactionRepository ESTransactionRepository;
     @Spy

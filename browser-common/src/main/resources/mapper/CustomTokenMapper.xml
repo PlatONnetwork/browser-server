@@ -18,13 +18,14 @@
     <result column="contract_create" jdbcType="VARCHAR" property="creator" />
     <result column="contract_createHash" jdbcType="VARCHAR" property="txHash" />
     <result column="contract_bin" jdbcType="LONGVARCHAR" property="binCode" />
-    <result column="tx_qty" jdbcType="INTEGER" property="txCount" />
+    <result column="token_tx_qty" jdbcType="INTEGER" property="txCount" />
   </resultMap>
   <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
     select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
     t.holder,te.web_site,te.details
     from token t left join  token_expand te on t.address = te.address
     where 1=1
+    AND te.is_show_in_scan = 1
     <if test="type != null">
       and t.type = #{type}
     </if>

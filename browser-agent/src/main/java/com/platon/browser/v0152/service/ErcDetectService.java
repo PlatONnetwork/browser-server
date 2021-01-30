@@ -161,8 +161,8 @@ public class ErcDetectService {
 
     public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt) {
         ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(),platOnClient.getWeb3jWrapper().getWeb3j(),
-                ErcDetectService.CREDENTIALS,
-                ErcDetectService.GAS_PROVIDER);
+                CREDENTIALS,
+                GAS_PROVIDER);
         return ercContract.getTxEvents(receipt);
     }
 

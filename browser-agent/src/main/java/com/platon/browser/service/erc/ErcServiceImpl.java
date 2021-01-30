@@ -1,5 +1,6 @@
 package com.platon.browser.service.erc;
 
+import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
@@ -24,6 +25,7 @@ public class ErcServiceImpl {
 
     @Resource
     private ErcDetectService ercDetectService;
+
     @Resource
     private BlockChainConfig chainConfig;
 
@@ -37,16 +39,15 @@ public class ErcServiceImpl {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/20
      */
-    public BigInteger getBalance(String tokenAddress, String type, String account) {
+    public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account) {
         BigInteger balance = BigInteger.ZERO;
         try {
-            ErcContract ercContract = getErcContract(tokenAddress, ErcTypeEnum.valueOf(type.toUpperCase()));
+            ErcContract ercContract = getErcContract(tokenAddress, type);
             if (ObjectUtil.isNotNull(ercContract)) {
                 balance = ercContract.balanceOf(account).send();
             }
         } catch (Exception e) {
-            log.error("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account);
-            log.error("",e);
+            log.error(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
         }
         return balance;
     }
@@ -68,8 +69,7 @@ public class ErcServiceImpl {
                 totalSupply = ercContract.totalSupply().send();
             }
         } catch (Exception e) {
-            log.error("获取供应总量异常,contractAddress：{}", contractAddress);
-            log.error("",e);
+            log.error(StrFormatter.format("获取供应总量异常,contractAddress：{}", contractAddress), e);
         }
         return totalSupply;
     }
@@ -86,7 +86,7 @@ public class ErcServiceImpl {
     private ErcContract getErcContract(String contractAddress, ErcTypeEnum ercTypeEnum) {
         ErcContract ercContract = null;
         if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
-            ercContract = Erc20Contract.load(contractAddress,platOnClient.getWeb3jWrapper().getWeb3j(),
+            ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                     ErcDetectService.CREDENTIALS,
                     ErcDetectService.GAS_PROVIDER);
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
@@ -115,9 +115,9 @@ public class ErcServiceImpl {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }
         } catch (Exception e) {
-            log.error("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId);
-            log.error("",e);
+            log.error(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
         }
         return tokenURI;
     }
+
 }

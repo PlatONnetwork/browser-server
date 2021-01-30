@@ -1,14 +1,5 @@
 package com.platon.browser.utils;
 
-import com.platon.contracts.ppos.dto.common.ErrorCode;
-import com.platon.protocol.core.DefaultBlockParameter;
-import com.platon.protocol.core.methods.response.Log;
-import com.platon.protocol.core.methods.response.PlatonGetCode;
-import com.platon.rlp.solidity.RlpDecoder;
-import com.platon.rlp.solidity.RlpList;
-import com.platon.rlp.solidity.RlpString;
-import com.platon.rlp.solidity.RlpType;
-import com.platon.utils.Numeric;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
@@ -30,6 +21,15 @@ import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
+import com.platon.contracts.ppos.dto.common.ErrorCode;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.methods.response.Log;
+import com.platon.protocol.core.methods.response.PlatonGetCode;
+import com.platon.rlp.solidity.RlpDecoder;
+import com.platon.rlp.solidity.RlpList;
+import com.platon.rlp.solidity.RlpString;
+import com.platon.rlp.solidity.RlpType;
+import com.platon.utils.Numeric;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
@@ -279,10 +279,22 @@ public class TransactionUtil {
         if (decodedResult.getTypeEnum() == Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
             ci.setToType(Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.EVM.getCode());
+            return;
         }
         if (decodedResult.getTypeEnum() == Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
             ci.setToType(Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.WASM.getCode());
+            return;
+        }
+        if (decodedResult.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
+            ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+            ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
+            return;
+        }
+        if (decodedResult.getTypeEnum() == Transaction.TypeEnum.ERC721_CONTRACT_CREATE) {
+            ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+            ci.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
+            return;
         }
     }
 
@@ -312,7 +324,10 @@ public class TransactionUtil {
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
             ci.setType(Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode());
         }
-
+        if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
+            ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode());
+        }
     }
 
     /**
@@ -333,70 +348,28 @@ public class TransactionUtil {
             ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.INNER.getCode());
             ci.setMethod(ContractDescEnum.getMap().get(toAddress).getContractName());
-        } else if (addressCache.isEvmContractAddress(toAddress)) {
+            return;
+        }
+        if (addressCache.isEvmContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.EVM.getCode());
-        } else if (addressCache.isWasmContractAddress(toAddress)) {
+            return;
+        }
+        if (addressCache.isWasmContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.WASM.getCode());
-        } else {
-            ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());
+            return;
         }
-    }
-
-    /**
-     * 解析erc合约交易
-     * 
-     * @param tx
-     * @param ci
-     * @param contractAddress
-     */
-/*    public static void resolveErcContract(CollectionTransaction tx, ComplementInfo ci, String contractAddress,
-                                          Erc20ResolveServiceImpl erc20ResolveService, AddressCache addressCache) {
-        ERCData ercData = erc20ResolveService.getErcData(contractAddress);
-        if (ercData != null && ci.getContractType() == ContractTypeEnum.EVM.getCode()) {
-            ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
+        if (addressCache.isErc20ContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
-            ci.setType(Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
-            addressCache.createFirstErc20(contractAddress, tx.getFrom(), tx.getHash(), tx.getTime(),
-                CustomErc20Token.TypeEnum.EVM.getCode(), ercData);
+            ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
+            return;
         }
-    }*/
-
-    /**
-     * 解析token交易
-     * @param tx
-     * @param ci
-     * @param logs
-     * @param addressCache
-     * @return
-     */
-/*    public static List<OldErcTx> resolveInnerToken(CollectionTransaction tx, ComplementInfo ci,
-                                                   List<Log> logs, Erc20ServiceImpl erc20Service, AddressCache addressCache, String contractAddress) {
-        TransactionReceipt transactionReceipt = new TransactionReceipt();
-        transactionReceipt.setLogs(logs);
-        transactionReceipt.setContractAddress(contractAddress);
-        List<TransferEvent> transferEvents = erc20Service.getTransferEvents(transactionReceipt);
-        List<OldErcTx> oldErcTxes = new ArrayList<>();
-        if(transferEvents == null || transferEvents.size() == 0){
-            return oldErcTxes;
+        if (addressCache.isErc721ContractAddress(toAddress)) {
+            ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+            ci.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
+            return;
         }
-        AtomicInteger i = new AtomicInteger();
-        transferEvents.forEach(transferEvent -> {
-            // 仅添加与指定的合约地址相同的记录
-            if (transferEvent.getLog().getAddress().equalsIgnoreCase(contractAddress)) {
-                // 转换参数进行设置内部交易
-                OldErcTx oldErcTx =
-                        OldErcTx.builder().from(transferEvent.getFrom()).tto(transferEvent.getTo())
-                                .tValue(transferEvent.getValue().toString()).bn(tx.getNum()).hash(tx.getHash())
-                                .contract(contractAddress).result(1).bTime(tx.getTime()).value(tx.getValue())
-                                .info(transferEvent.getLog().getData()).ctime(new Date()).build();
-                oldErcTx.setFromType(addressCache.getTypeData(transferEvent.getFrom()));
-                oldErcTx.setToType(addressCache.getTypeData(transferEvent.getTo()));
-                i.getAndIncrement();
-                oldErcTxes.add(oldErcTx);
-            }
-        });
-        return oldErcTxes;
-    }*/
+        ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());
+    }
 }

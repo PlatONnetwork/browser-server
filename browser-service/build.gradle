@@ -1,7 +1,6 @@
 dependencies {
     compile project(":browser-common")
     compile "com.alibaba:druid:$druidVersion"
-    compile "com.maxmind.geoip2:geoip2:$maxmindGeoVersion"
     compile "com.univocity:univocity-parsers:$univocityVersion"
     runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
     compileOnly "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
@@ -16,9 +15,6 @@ dependencies {
     compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2"
     compile "org.mapstruct:mapstruct-jdk8:$mapstructVersion"
     compile "org.mapstruct:mapstruct-processor:$mapstructVersion"
-
-    compile 'io.springfox:springfox-swagger2:2.9.2'
-    compile 'io.springfox:springfox-swagger-ui:2.9.2'
 }
 
 sonarqube {
