@@ -1,10 +1,9 @@
-package com.platon.browser.service.transaction;
+package com.platon.browser.service.ppos;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.platon.browser.analyzer.ppos.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.cache.AddressCache;
@@ -31,43 +30,43 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.Resource;
 
 /**
- * @description: 业务入库参数服务
+ * @description: ppos服务
  * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 17:58:27
  **/
 @Slf4j
 @Service
-public class TransactionService {
+public class PPOSService {
     @Resource
-    private StakeCreateAnalyzer stakeCreateConverter;
+    private StakeCreateAnalyzer stakeCreateAnalyzer;
     @Resource
-    private StakeModifyAnalyzer stakeModifyConverter;
+    private StakeModifyAnalyzer stakeModifyAnalyzer;
     @Resource
-    private StakeIncreaseAnalyzer stakeIncreaseConverter;
+    private StakeIncreaseAnalyzer stakeIncreaseAnalyzer;
     @Resource
-    private StakeExitAnalyzer stakeExitConverter;
+    private StakeExitAnalyzer stakeExitAnalyzer;
     @Resource
-    private ReportAnalyzer reportConverter;
+    private ReportAnalyzer reportAnalyzer;
     @Resource
     private DelegateCreateAnalyzer delegateCreateAnalyzer;
     @Resource
-    private DelegateExitAnalyzer delegateExitConverter;
+    private DelegateExitAnalyzer delegateExitAnalyzer;
     @Resource
-    private ProposalTextAnalyzer proposalTextConverter;
+    private ProposalTextAnalyzer proposalTextAnalyzer;
     @Resource
-    private ProposalUpgradeAnalyzer proposalUpgradeConverter;
+    private ProposalUpgradeAnalyzer proposalUpgradeAnalyzer;
     @Resource
-    private ProposalParameterAnalyzer proposalParameterConverter;
+    private ProposalParameterAnalyzer proposalParameterAnalyzer;
     @Resource
-    private ProposalCancelAnalyzer proposalCancelConverter;
+    private ProposalCancelAnalyzer proposalCancelAnalyzer;
     @Resource
-    private ProposalVoteAnalyzer proposalVoteConverter;
+    private ProposalVoteAnalyzer proposalVoteAnalyzer;
     @Resource
-    private VersionDeclareAnalyzer proposalVersionConverter;
+    private VersionDeclareAnalyzer proposalVersionAnalyzer;
     @Resource
-    private RestrictingCreateAnalyzer restrictingCreateConverter;
+    private RestrictingCreateAnalyzer restrictingCreateAnalyzer;
     @Resource
-    private DelegateRewardClaimAnalyzer delegateRewardClaimConverter;
+    private DelegateRewardClaimAnalyzer delegateRewardClaimAnalyzer;
     @Resource
     private NetworkStatCache networkStatCache;
     @Resource
@@ -152,62 +151,62 @@ public class TransactionService {
 
             switch (tx.getTypeEnum()) {
                 case STAKE_CREATE: // 1000 创建验证人
-                    nodeOpt = this.stakeCreateConverter.analyze(event, tx);
+                    nodeOpt = this.stakeCreateAnalyzer.analyze(event, tx);
                     break;
                 case STAKE_MODIFY: // 1001 编辑验证人
-                    nodeOpt = this.stakeModifyConverter.analyze(event, tx);
+                    nodeOpt = this.stakeModifyAnalyzer.analyze(event, tx);
                     break;
                 case STAKE_INCREASE: // 1002 增持质押
-                    nodeOpt = this.stakeIncreaseConverter.analyze(event, tx);
+                    nodeOpt = this.stakeIncreaseAnalyzer.analyze(event, tx);
                     break;
                 case STAKE_EXIT: // 1003 退出质押
-                    nodeOpt = this.stakeExitConverter.analyze(event, tx);
+                    nodeOpt = this.stakeExitAnalyzer.analyze(event, tx);
                     break;
                 case DELEGATE_CREATE: // 1004
                     this.delegateCreateAnalyzer.analyze(event, tx);
                     break;
                 case DELEGATE_EXIT: // 1005
-                    DelegateExitResult der = this.delegateExitConverter.analyze(event, tx);
+                    DelegateExitResult der = this.delegateExitAnalyzer.analyze(event, tx);
                     delegationReward = der.getDelegationReward();
                     break;
                 case PROPOSAL_TEXT: // 2000
-                    nodeOpt = this.proposalTextConverter.analyze(event, tx);
+                    nodeOpt = this.proposalTextAnalyzer.analyze(event, tx);
                     if (Transaction.StatusEnum.SUCCESS.getCode() == tx.getStatus()) {
                         tar.setProposalQty(tar.getProposalQty() + 1);
                     }
                     break;
                 case PROPOSAL_UPGRADE: // 2001
-                    nodeOpt = this.proposalUpgradeConverter.analyze(event, tx);
+                    nodeOpt = this.proposalUpgradeAnalyzer.analyze(event, tx);
                     if (Transaction.StatusEnum.SUCCESS.getCode() == tx.getStatus()) {
                         tar.setProposalQty(tar.getProposalQty() + 1);
                     }
                     break;
                 case PROPOSAL_PARAMETER: // 2002
-                    nodeOpt = this.proposalParameterConverter.analyze(event, tx);
+                    nodeOpt = this.proposalParameterAnalyzer.analyze(event, tx);
                     if (Transaction.StatusEnum.SUCCESS.getCode() == tx.getStatus()) {
                         tar.setProposalQty(tar.getProposalQty() + 1);
                     }
                     break;
                 case PROPOSAL_CANCEL: // 2005
-                    nodeOpt = this.proposalCancelConverter.analyze(event, tx);
+                    nodeOpt = this.proposalCancelAnalyzer.analyze(event, tx);
                     if (Transaction.StatusEnum.SUCCESS.getCode() == tx.getStatus()) {
                         tar.setProposalQty(tar.getProposalQty() + 1);
                     }
                     break;
                 case PROPOSAL_VOTE: // 2003
-                    nodeOpt = this.proposalVoteConverter.analyze(event, tx);
+                    nodeOpt = this.proposalVoteAnalyzer.analyze(event, tx);
                     break;
                 case VERSION_DECLARE: // 2004
-                    nodeOpt = this.proposalVersionConverter.analyze(event, tx);
+                    nodeOpt = this.proposalVersionAnalyzer.analyze(event, tx);
                     break;
                 case REPORT: // 3000
-                    nodeOpt = this.reportConverter.analyze(event, tx);
+                    nodeOpt = this.reportAnalyzer.analyze(event, tx);
                     break;
                 case RESTRICTING_CREATE: // 4000
-                    this.restrictingCreateConverter.analyze(event, tx);
+                    this.restrictingCreateAnalyzer.analyze(event, tx);
                     break;
                 case CLAIM_REWARDS: // 5000
-                    delegationReward = this.delegateRewardClaimConverter.analyze(event, tx);
+                    delegationReward = this.delegateRewardClaimAnalyzer.analyze(event, tx);
                     break;
                 default:
                     break;

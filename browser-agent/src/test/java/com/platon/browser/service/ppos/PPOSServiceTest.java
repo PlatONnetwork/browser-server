@@ -1,4 +1,4 @@
-package com.platon.browser.service.transaction;
+package com.platon.browser.service.ppos;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.analyzer.ppos.*;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
  * @create: 2019-11-13 11:41:00
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class TransactionServiceTest extends AgentTestBase {
+public class PPOSServiceTest extends AgentTestBase {
     @Mock
     private StakeCreateAnalyzer stakeCreateAnalyzer;
     @Mock
@@ -72,7 +72,7 @@ public class TransactionServiceTest extends AgentTestBase {
     private AddressCache addressCache;
     @InjectMocks
     @Spy
-    private TransactionService target;
+    private PPOSService target;
 
     @Before
     public void setup() throws Exception {

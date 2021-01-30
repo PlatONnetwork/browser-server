@@ -3,12 +3,8 @@ package com.platon.browser.controller.token;//package com.platon.browser.control
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
-import com.platon.browser.request.token.QueryTokenDetailReq;
-import com.platon.browser.request.token.QueryTokenListReq;
-import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.token.QueryHolderTokenListResp;
@@ -26,32 +22,50 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("token/holder-token")
 public class HolderTokenController {
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private ErcTxService ercTxService;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private CommonMethod commonMethod;
 
-    @PostMapping( "list")
+    @PostMapping("list")
     public Mono<RespPage<QueryHolderTokenListResp>> list(@Valid @RequestBody QueryHolderTokenListReq req) {
         return Mono.just(ercTxService.holderTokenList(req));
     }
 
-    @PostMapping( "export")
-    public void export(@RequestParam(value = "address",required = true) String address,
-                                         @RequestParam(value = "local",required = true) String local,
-                                         @RequestParam(value = "timeZone",required = true) String timeZone,
-                                         @RequestParam(value = "token", required = false) String token,
-                                         HttpServletResponse response) {
+    /**
+     * 持有者的token令牌导出
+     *
+     * @param address  合约地址
+     * @param local    区域：en或者zh-cn
+     * @param timeZone 时区
+     * @param token    令牌
+     * @param type     合约类型（取值erc20或erc721）
+     * @param response
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/1/27
+     */
+    @GetMapping("export")
+    public void export(@RequestParam(value = "address", required = true) String address,
+                       @RequestParam(value = "local", required = true) String local,
+                       @RequestParam(value = "timeZone", required = true) String timeZone,
+                       @RequestParam(value = "token", required = false) String token,
+                       @RequestParam(value = "type", required = false) String type,
+                       HttpServletResponse response) {
         try {
             /**
              * 鉴权
              */
             commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = ercTxService.exportHolderTokenList(address, local, timeZone);
+            AccountDownload accountDownload = ercTxService.exportHolderTokenList(address, local, timeZone, type);
             downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
@@ -59,4 +73,5 @@ public class HolderTokenController {
             throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
+
 }

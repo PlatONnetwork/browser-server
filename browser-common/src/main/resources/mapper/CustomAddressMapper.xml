@@ -29,6 +29,8 @@
         <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty"/>
         <result column="contract_bin" jdbcType="LONGVARCHAR" property="contractBin"/>
         <result column="tokenType" jdbcType="VARCHAR" property="tokenType"/>
+        <result column="tokenSymbol" jdbcType="VARCHAR" property="tokenSymbol"/>
+        <result column="tokenName" jdbcType="VARCHAR" property="tokenName"/>
     </resultMap>
 
     <select id="findAddressDetail" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -48,7 +50,7 @@
                a.delegate_hes,
                a.delegate_locked,
                a.delegate_released,
-               b.`name` AS contract_name,
+               a.contract_name AS contract_name,
                a.contract_create,
                a.contract_createHash,
                a.contract_destroy_hash,
@@ -58,7 +60,9 @@
                a.erc721_tx_qty,
                a.erc20_tx_qty,
                a.contract_bin,
-               b.type AS tokenType
+               b.type AS tokenType,
+               b.symbol AS tokenSymbol,
+               b.`name` AS tokenName
         FROM address a
                  LEFT JOIN token b ON a.address = b.address
         WHERE a.address = #{address};
