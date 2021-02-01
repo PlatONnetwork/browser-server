@@ -110,21 +110,19 @@ subprojects {
             }
         }
 
-        if(project.name.contains('browser-agent')){
-            file("${rootDir}/estpl").listFiles(yamlFilter).each { tpl ->
-                copy(get(tpl.path), get("${projectDir}/src/main/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
-                copy(get(tpl.path), get("${rootDir}/browser-service/src/test/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+        file("${rootDir}/estpl").listFiles(yamlFilter).each { tpl ->
+            copy(get(tpl.path), get("${rootDir}/browser-agent/src/main/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+            copy(get(tpl.path), get("${rootDir}/browser-service/src/test/resources/estpl").resolve(tpl.name), REPLACE_EXISTING)
+        }
+        file("${rootDir}/scripts/").listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(File dir, String name) {
+                return name.endsWith(".sql")&&name.contains(projectVersion)
             }
-            file("${rootDir}/scripts/").listFiles(new FilenameFilter() {
-                @Override
-                boolean accept(File dir, String name) {
-                    return name.endsWith(".sql")&&name.contains(projectVersion)
-                }
-            }).each { srcFile->
-                def desFile = file("${buildDir}/package/${srcFile.name}")
-                if(!desFile.exists()) desFile.parentFile.mkdirs()
-                copy(get(srcFile.path), get(desFile.path), REPLACE_EXISTING)
-            }
+        }).each { srcFile->
+            def desFile = file("${rootDir}/browser-agent/build/package/${srcFile.name}")
+            if(!desFile.exists()) desFile.parentFile.mkdirs()
+            copy(get(srcFile.path), get(desFile.path), REPLACE_EXISTING)
         }
 
         if(project.name.contains('browser-api')){
@@ -143,24 +141,34 @@ subprojects {
             recursiveCopy('docs','docs')
         }
 
-        if(project.name in ['browser-agent','browser-api']) {
-            file("${rootDir}/scripts").listFiles(new FilenameFilter() {
-                boolean accept(File dir, String name) {
-                    return name.endsWith("tpl.sh")
-                }
-            }).each { tpl ->
-                def desFile = file(tpl.path.replace('scripts', "${project.name}/build/package").replace("tpl.sh", "sh"))
-                if (!desFile.exists()) desFile.parentFile.mkdirs()
-                desFile.write(tpl.text
-                        .replace('_PROJECT_NAME_', project.name)
-                        .replace('_VERSION_', "$projectVersion")
-                        .replace('_PROFILE_', "dev")
-                        .replace('_DB_HOST_', "$dbHost")
-                        .replace('_DB_USER_', "$dbUser")
-                        .replace('_DB_PASS_', "$dbPass")
-                        .replace('_JAVA_PATH_', "$deployJavaAbsPath")
-                        , "utf-8")
+        file("${rootDir}/scripts").listFiles(new FilenameFilter() {
+            boolean accept(File dir, String name) {
+                return name.endsWith("tpl.sh")
             }
+        }).each { tpl ->
+            def desFile = file(tpl.path.replace('scripts', "browser-api/build/package").replace("tpl.sh", "sh"))
+            if (!desFile.exists()) desFile.parentFile.mkdirs()
+            desFile.write(tpl.text
+                    .replace('_PROJECT_NAME_', "browser-api")
+                    .replace('_VERSION_', "$projectVersion")
+                    .replace('_PROFILE_', "dev")
+                    .replace('_DB_HOST_', "$dbHost")
+                    .replace('_DB_USER_', "$dbUser")
+                    .replace('_DB_PASS_', "$dbPass")
+                    .replace('_JAVA_PATH_', "$deployJavaAbsPath")
+                    , "utf-8")
+
+            desFile = file(tpl.path.replace('scripts', "browser-agent/build/package").replace("tpl.sh", "sh"))
+            if (!desFile.exists()) desFile.parentFile.mkdirs()
+            desFile.write(tpl.text
+                    .replace('_PROJECT_NAME_', "browser-agent")
+                    .replace('_VERSION_', "$projectVersion")
+                    .replace('_PROFILE_', "dev")
+                    .replace('_DB_HOST_', "$dbHost")
+                    .replace('_DB_USER_', "$dbUser")
+                    .replace('_DB_PASS_', "$dbPass")
+                    .replace('_JAVA_PATH_', "$deployJavaAbsPath")
+                    , "utf-8")
         }
 
     }
