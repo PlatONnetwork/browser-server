@@ -1,9 +1,5 @@
 package com.platon.browser.analyzer;
 
-import cn.hutool.core.collection.CollUtil;
-import com.platon.browser.v0152.analyzer.ErcCache;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
-import com.platon.protocol.core.methods.response.Transaction;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
@@ -19,7 +15,10 @@ import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
+import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
+import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -85,6 +84,7 @@ public class TransactionAnalyzer {
 
         // ============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
+
         String inputWithoutPrefix = StringUtils.isNotBlank(result.getInput()) ? result.getInput().replace("0x", "") : "";
         if (InnerContractAddrEnum.getAddresses().contains(result.getTo()) && StringUtils.isNotBlank(inputWithoutPrefix)) {
             // 如果to地址是内置合约地址，则解码交易输入
@@ -153,15 +153,27 @@ public class TransactionAnalyzer {
                 .setBin(ci.getBinCode())
                 .setMethod(ci.getMethod());
 
+        // 上一步解析出EVM交易还是WASM交易，继续根据EVM交易分析是EVM_ERC20还是EVM_ERC721
         // 解析ERC Token，有就入库，没有拉倒
         receipt.getContractCreated().forEach(contract -> ercTokenAnalyzer.resolveToken(contract.getAddress()));
         // 解析ERC交易
         ErcTypeEnum typeEnum = ercTokenAnalyzer.resolveTx(result, receipt);
         if (ErcTypeEnum.ERC721 == typeEnum) {
+            if (ContractTypeEnum.EVM.getCode() == result.getContractType()) {
+                result.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
+                result.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
+                result.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+            }
             GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(result.getTo(), ContractTypeEnum.ERC721_EVM);
         } else if (ErcTypeEnum.ERC20 == typeEnum) {
+            if (ContractTypeEnum.EVM.getCode() == result.getContractType()) {
+                result.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
+                result.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
+                result.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+            }
             GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(result.getTo(), ContractTypeEnum.ERC20_EVM);
         }
+        log.info("GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP数据为{}", GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP);
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);
         // 累加具体业务交易数
