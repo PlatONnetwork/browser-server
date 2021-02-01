@@ -110,6 +110,33 @@ public class AddressCache {
         }
     }
 
+    // 先初始化合约map，防止后续合约交易找不到对应的合约而统计错误
+    public void updateFirst(String addr, ContractTypeEnum contractTypeEnum) {
+        Address address = this.addressMap.get(addr);
+        if (address == null) {
+            address = this.createDefaultAddress(addr);
+            switch (contractTypeEnum) {
+                case EVM:
+                    address.setType(AddressTypeEnum.EVM_CONTRACT.getCode());
+                    this.evmContractAddressCache.add(addr);
+                    break;
+                case WASM:
+                    address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
+                    this.wasmContractAddressCache.add(addr);
+                    break;
+                case ERC20_EVM:
+                    address.setType(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
+                    break;
+                case ERC721_EVM:
+                    address.setType(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
+                    break;
+                default:
+                    break;
+            }
+            this.addressMap.put(addr, address);
+        }
+    }
+
     public Collection<Address> getAll() {
         return this.addressMap.values();
     }

@@ -99,9 +99,10 @@ public class TransactionUtilsTest extends AgentTestData {
         platonGetCode.setResult("0x123");
         when(request.send()).thenReturn(platonGetCode);
         collectionTransaction.setNum(100l);
-        TransactionUtil.resolveGeneralContractCreateTxComplementInfo(collectionTransaction, "", this.platOnClient, ci, logger);
+        //TODO 可能报错
+        TransactionUtil.resolveGeneralContractCreateTxComplementInfo(collectionTransaction, "", this.platOnClient, ci, logger,  ContractTypeEnum.EVM);
         platonGetCode.setResult("0x0061736d");
-        TransactionUtil.resolveGeneralContractCreateTxComplementInfo(collectionTransaction, "", this.platOnClient, ci, logger);
+        TransactionUtil.resolveGeneralContractCreateTxComplementInfo(collectionTransaction, "", this.platOnClient, ci, logger, ContractTypeEnum.EVM);
 
         TransactionUtil.resolveGeneralContractInvokeTxComplementInfo(collectionTransaction, this.platOnClient, ci, ContractTypeEnum.EVM, logger);
         TransactionUtil.resolveGeneralContractInvokeTxComplementInfo(collectionTransaction, this.platOnClient, ci, ContractTypeEnum.WASM, logger);

@@ -267,35 +267,26 @@ public class TransactionUtil {
      * @param ci
      * @throws IOException
      */
-    public static void resolveGeneralContractCreateTxComplementInfo(CollectionTransaction tx, String contractAddress,
-        PlatOnClient platOnClient, ComplementInfo ci, Logger logger) throws BeanCreateOrUpdateException {
+    public static void resolveGeneralContractCreateTxComplementInfo(CollectionTransaction result, String contractAddress,
+        PlatOnClient platOnClient, ComplementInfo ci, Logger log, ContractTypeEnum contractTypeEnum ) throws BeanCreateOrUpdateException {
         ci.setInfo("");
-        ci.setBinCode(getContractBinCode(tx, platOnClient, contractAddress, logger));
-        // 解码合约创建交易前缀，用于区分EVM||WASM
-        TxInputDecodeResult decodedResult = TxInputDecodeUtil.decode(tx.getInput());
-        ci.setType(decodedResult.getTypeEnum().getCode());
-        ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());
-        ci.setContractType(ContractTypeEnum.UNKNOWN.getCode());
-        if (decodedResult.getTypeEnum() == Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
-            ci.setToType(Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
-            ci.setContractType(ContractTypeEnum.EVM.getCode());
-            return;
+        ci.setBinCode(TransactionUtil.getContractBinCode(result, platOnClient, result.getContractAddress(), log));
+
+        if(contractTypeEnum ==  ContractTypeEnum.ERC20_EVM){
+            ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
+            ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+        }else if(contractTypeEnum ==  ContractTypeEnum.ERC721_EVM){
+            ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
+            ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+        }else if(contractTypeEnum ==  ContractTypeEnum.WASM){
+            ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
+            ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
+        }else{
+            ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode());
+            ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
         }
-        if (decodedResult.getTypeEnum() == Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
-            ci.setToType(Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
-            ci.setContractType(ContractTypeEnum.WASM.getCode());
-            return;
-        }
-        if (decodedResult.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
-            ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
-            ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
-            return;
-        }
-        if (decodedResult.getTypeEnum() == Transaction.TypeEnum.ERC721_CONTRACT_CREATE) {
-            ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
-            ci.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
-            return;
-        }
+        ci.setContractType(contractTypeEnum.getCode());
+
     }
 
     /**
