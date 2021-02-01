@@ -4,7 +4,7 @@ version: 0.15.2.0
 #服务器配置
 server:
   servlet:
-    context-path: /browser-api
+    context-path: /browser-server
 #Spring应用配置
 spring:
   profiles.active: test

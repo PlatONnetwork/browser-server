@@ -61,7 +61,7 @@ logging:
     com.platon.browser.persistence.queue.handler: error
     com.platon.browser.task: error
   file:
-    name: ./logs/${spring.application.name}-${version}-${profile}.log
+    name: ./logs/${spring.application.name}-${profile}.log
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -112,9 +112,9 @@ platon:
   #链id
   chainId: 201018
   #Redis命名空间
-  redis-namespace: browser:${version}:${profile}
+  redis-namespace: browser:${profile}
   #Es索引命名空间
-  es-namespace: browser_${version}_${profile}
+  es-namespace: browser_${profile}
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
