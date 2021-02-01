@@ -111,7 +111,7 @@ public class TransactionAnalyzer {
             GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
 
             // 补充address
-            addressCache.updateFirst(receipt.getContractAddress(), contractTypeEnum);
+            addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
         });
 
         // 处理交易信息
