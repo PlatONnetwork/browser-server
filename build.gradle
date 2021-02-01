@@ -140,21 +140,19 @@ subprojects {
                     copy(get(srcFile.path), get(desFile.path), REPLACE_EXISTING)
                 }
 
-                if(project.name.contains('browser-api')){
-                    file("${rootDir}/docs/apidef").listFiles(yamlFilter).each { api ->
-                        file("${rootDir}/docs/apidef/${api.name}.json").write(
-                                new JsonBuilder(
-                                        new Yaml().load(api.text
-                                                .replace("_VERSION_","$projectVersion")
-                                                .replace("_COMMIT_ID_",shortCommitId)
-                                                .replace("_BASE_PATH_","/browser-api")
-                                        )
-                                ).toString(),"utf-8"
-                        )
-                    }
-                    recursiveCopy('webconfig','webconfig')
-                    recursiveCopy('docs','docs')
+                file("${rootDir}/docs/apidef").listFiles(yamlFilter).each { api ->
+                    file("${rootDir}/docs/apidef/${api.name}.json").write(
+                            new JsonBuilder(
+                                    new Yaml().load(api.text
+                                            .replace("_VERSION_","$projectVersion")
+                                            .replace("_COMMIT_ID_",shortCommitId)
+                                            .replace("_BASE_PATH_","/browser-api")
+                                    )
+                            ).toString(),"utf-8"
+                    )
                 }
+                recursiveCopy('webconfig','webconfig')
+                recursiveCopy('docs','docs')
 
                 file("${rootDir}/scripts").listFiles(new FilenameFilter() {
                     boolean accept(File dir, String name) {
