@@ -232,7 +232,7 @@ subprojects {
         }
 
         // 拷包到测试环境
-        def deployDir = "$deployRootDir/${projectVersion}/${project.name}"
+        def deployDir = "$deployRootDir/${project.name}"
         def activeProfile = "$deployProfile"
         task deployToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
             doLast {
