@@ -1,12 +1,21 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
+import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.service.elasticsearch.AbstractEsRepository;
+import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
+import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
@@ -20,23 +29,21 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 /**
  * token定时器
@@ -69,6 +76,12 @@ public class ErcTokenUpdateTask {
     @Resource
     private ErcServiceImpl ercServiceImpl;
 
+    @Resource
+    private EsErc20TxRepository esErc20TxRepository;
+
+    @Resource
+    private EsErc721TxRepository esErc721TxRepository;
+
     private static final int TOKEN_BATCH_SIZE = 10;
 
     private static final ExecutorService TOKEN_UPDATE_POOL = Executors.newFixedThreadPool(TOKEN_BATCH_SIZE);
@@ -77,9 +90,13 @@ public class ErcTokenUpdateTask {
 
     private static final ExecutorService HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
 
+    private static final ExecutorService INCREMENT_HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
+
     private static final int INVENTORY_BATCH_SIZE = 10;
 
     private static final ExecutorService INVENTORY_UPDATE_POOL = Executors.newFixedThreadPool(INVENTORY_BATCH_SIZE);
+
+    private static final ExecutorService INCREMENT_INVENTORY_UPDATE_POOL = Executors.newFixedThreadPool(INVENTORY_BATCH_SIZE);
 
     private final static OkHttpClient client = new OkHttpClient.Builder()
             .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
@@ -89,116 +106,38 @@ public class ErcTokenUpdateTask {
             .build();
 
     /**
-     * 更新标识位
+     * token更新标识位
      */
     @Getter
     @Setter
     private volatile long tokenCreateTime = 0L;
 
+    /**
+     * tokenInventory更新标识位
+     */
+    @Getter
+    @Setter
+    private volatile int tokenInventoryPage = 0;
+
+    /**
+     * TokenHolderERC20更新标识
+     */
+    @Getter
+    @Setter
+    private volatile Long erc20TxSeq = 0L;
+
+    /**
+     * TokenHolderERC721更新标识
+     */
+    @Getter
+    @Setter
+    private volatile Long erc721TxSeq = 0L;
+
     private final Lock lock = new ReentrantLock();
 
-    /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》增量更新
-     *
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/27
-     */
-    //@Scheduled(cron = "0/30  * * * * ?")
-    public void cronIncrementUpdateTokenTotalSupply() {
-        if (lock.tryLock()) {
-            try {
-                this.incrementUpdateTokenTotalSupply();
-            } catch (Exception e) {
-                log.error("增量更新token的总供应量异常", e);
-            } finally {
-                lock.unlock();
-            }
-        } else {
-            log.error("该次TotalSupply增量更新抢不到锁，增量更新的标记为{},对应毫秒数为{}(时间维度)", DateUtil.date(this.getTokenCreateTime()), this.getTokenCreateTime());
-        }
-    }
+    private final Lock tokenInventoryLock = new ReentrantLock();
 
-    /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》增量更新
-     *
-     * @param
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/1/28
-     */
-    private void incrementUpdateTokenTotalSupply() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
-        }
-        Set<ErcToken> updateParams = new ConcurrentHashSet<>();
-        List<List<ErcToken>> batchList = new ArrayList<>();
-        // 从缓存中获取Token更新参数，并构造批次列表
-        List<ErcToken> batch = new ArrayList<>();
-        batchList.add(batch);
-        // 取出比更新标识（创建时间）还要大的数据更新
-        List<ErcToken> list = ercCache.getTokenCache().values().stream()
-                .filter(value -> DateUtil.compare(value.getCreateTime(), DateUtil.date(this.getTokenCreateTime())) > 0)
-                .collect(Collectors.toList());
-        log.error("获取到增量更新的标记为{}(时间维度),对应毫秒数为{},缓存数据为{}条,需要更新的数据为{}条", DateUtil.date(this.getTokenCreateTime()), this.getTokenCreateTime(), ercCache.getTokenCache().values().size(), list.size());
-        for (ErcToken token : list) {
-            if (token.isDirty()) {
-                updateParams.add(token);
-            }
-            if (!(token.getTypeEnum() == ErcTypeEnum.ERC20 || token.getIsSupportErc721Enumeration())) {
-                continue;
-            }
-            if (batch.size() == TOKEN_BATCH_SIZE) {
-                // 本批次达到大小限制，则新建批次，并加入批次列表
-                batch = new ArrayList<>();
-                batchList.add(batch);
-            }
-            // 加入批次中
-            batch.add(token);
-        }
-        // 分批并发查询Token totalSupply
-        batchList.forEach(b -> {
-            CountDownLatch latch = new CountDownLatch(b.size());
-            for (ErcToken token : b) {
-                TOKEN_UPDATE_POOL.submit(() -> {
-                    try {
-                        // 查询总供应量
-                        BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
-                        totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
-                        if (token.getTotalSupply().compareTo(new BigDecimal(totalSupply)) != 0) {
-                            // 有变动添加到更新列表中
-                            token.setTotalSupply(new BigDecimal(totalSupply));
-                            token.setUpdateTime(new Date());
-                            updateParams.add(token);
-                        }
-                    } catch (Exception e) {
-                        log.error("异常更新ERC 20 token的总供应量", e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                log.error("", e);
-            }
-        });
-        if (!updateParams.isEmpty()) {
-            // 按创建时间由小到大排序
-            ArrayList<Token> updateList = new ArrayList<>(updateParams);
-            updateList.sort((o1, o2) -> DateUtil.compare(o1.getCreateTime(), o2.getCreateTime()));
-            // 取最大的时间设置增量更新标识
-            long times = updateList.get(updateList.size() - 1).getCreateTime().getTime();
-            this.setTokenCreateTime(times);
-            log.error("增量更新完的标识为{},对应毫秒数为{}", DateUtil.date(this.getTokenCreateTime()), this.getTokenCreateTime());
-            // 批量更新总供应量有变动的记录
-            customTokenMapper.batchInsertOrUpdateSelective(updateList, Token.Column.values());
-            updateParams.forEach(token -> token.setDirty(false));
-        }
-        customTokenMapper.updateTokenHolderCount();
-    }
+    private final Lock tokenHolderLock = new ReentrantLock();
 
     /**
      * 更新ERC20和Erc721Enumeration token的总供应量===》全量更新
@@ -207,7 +146,6 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    //@Scheduled(cron = "0 0 0 /7 * ?")
     @Scheduled(cron = "0/30  * * * * ?")
     public void cronUpdateTokenTotalSupply() {
         lock.lock();
@@ -289,14 +227,116 @@ public class ErcTokenUpdateTask {
     }
 
     /**
-     * 更新token持有者余额
+     * 更新token持有者余额===》增量更新
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/2/1
      */
     @Scheduled(cron = "0/30  * * * * ?")
+    public void cronIncrementUpdateTokenHolderBalance() {
+        if (tokenHolderLock.tryLock()) {
+            try {
+                incrementUpdateTokenHolderBalance(esErc20TxRepository, ErcTypeEnum.ERC20, this.getErc20TxSeq());
+                incrementUpdateTokenHolderBalance(esErc721TxRepository, ErcTypeEnum.ERC721, this.getErc721TxSeq());
+            } catch (Exception e) {
+                log.error("增量更新token持有者余额异常", e);
+            } finally {
+                tokenHolderLock.unlock();
+            }
+        } else {
+            log.error("本次增量更新token持有者余额抢不到锁,erc20TxSeq:{},erc721TxSeq:{}", erc20TxSeq, erc721TxSeq);
+        }
+    }
+
+    private void incrementUpdateTokenHolderBalance(AbstractEsRepository abstractEsRepository, ErcTypeEnum typeEnum, Long txSeq) {
+        try {
+            List<TokenHolder> updateParams = new ArrayList<>();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            ESResult<ErcTx> queryResultFromES = new ESResult<>();
+            constructor.setAsc("seq");
+            constructor.setResult(new String[]{"seq", "from", "contract", "to"});
+            ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
+            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("seq").gt(txSeq));
+            constructor.must(esQueryBuilders);
+            queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class,
+                    1, 5000);
+            List<ErcTx> list = queryResultFromES.getRsData();
+            if (CollUtil.isEmpty(list)) {
+                return;
+            }
+            HashMap<String, HashSet<String>> map = new HashMap();
+            list.sort(Comparator.comparing(ErcTx::getSeq));
+            if (typeEnum == ErcTypeEnum.ERC20) {
+                this.setErc20TxSeq(list.get(list.size() - 1).getSeq());
+            } else if (typeEnum == ErcTypeEnum.ERC721) {
+                this.setErc721TxSeq(list.get(list.size() - 1).getSeq());
+            }
+            list.forEach(v -> {
+                if (map.containsKey(v.getContract())) {
+                    map.get(v.getContract()).add(v.getFrom());
+                    map.get(v.getContract()).add(v.getTo());
+                } else {
+                    HashSet<String> addressSet = new HashSet<String>();
+                    addressSet.add(v.getFrom());
+                    addressSet.add(v.getTo());
+                    map.put(v.getContract(), addressSet);
+                }
+            });
+            if (MapUtil.isNotEmpty(map)) {
+                AtomicInteger size = new AtomicInteger();
+                map.forEach((k, v) -> {
+                    size.addAndGet(v.size());
+                });
+                CountDownLatch latch = new CountDownLatch(size.get());
+                map.forEach((contract, addressSet) -> {
+                    addressSet.forEach(address -> {
+                        INCREMENT_HOLDER_UPDATE_POOL.submit(() -> {
+                            try {
+                                BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
+                                TokenHolder holder = new TokenHolder();
+                                holder.setTokenAddress(contract);
+                                holder.setAddress(address);
+                                holder.setBalance(new BigDecimal(balance));
+                                holder.setUpdateTime(DateUtil.date());
+                                updateParams.add(holder);
+                            } catch (Exception e) {
+                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
+                            } finally {
+                                latch.countDown();
+                            }
+                        });
+                    });
+                });
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    log.error("", e);
+                }
+            }
+            if (!updateParams.isEmpty()) {
+                customTokenHolderMapper.batchInsertOrUpdateSelective(updateParams,
+                        TokenHolder.Column.tokenAddress,
+                        TokenHolder.Column.address,
+                        TokenHolder.Column.balance,
+                        TokenHolder.Column.updateTime);
+            }
+        } catch (Exception e) {
+            log.error("更新token持有者余额异常", e);
+        }
+    }
+
+    /**
+     * 更新token持有者余额===》全量更新
+     */
+    @Scheduled(cron = "0 0 0 1/7 * ?")
     public void updateTokenHolderBalance() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
         }
+        tokenHolderLock.lock();
         try {
             // 分页更新holder的balance
             List<TokenHolder> batch;
@@ -305,7 +345,6 @@ public class ErcTokenUpdateTask {
                 TokenHolderExample condition = new TokenHolderExample();
                 condition.setOrderByClause(" token_address asc, address asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
                 batch = tokenHolderMapper.selectByExample(condition);
-
                 List<TokenHolder> updateParams = new ArrayList<>();
                 if (!batch.isEmpty()) {
                     CountDownLatch latch = new CountDownLatch(batch.size());
@@ -343,14 +382,60 @@ public class ErcTokenUpdateTask {
             } while (!batch.isEmpty());
         } catch (Exception e) {
             log.error("更新地址代币余额异常", e);
+        } finally {
+            tokenHolderLock.unlock();
+        }
+    }
+
+    /**
+     * 更新token库存信息=>全量更新
+     */
+    @Scheduled(cron = "0 0 0 1/7 * ?")
+    public void updateTokenInventory() {
+        tokenInventoryLock.lock();
+        try {
+            updateTokenInventory(INVENTORY_UPDATE_POOL, 0, false);
+        } catch (Exception e) {
+            log.error("更新token库存信息", e);
+        } finally {
+            tokenInventoryLock.unlock();
+        }
+    }
+
+    /**
+     * 更新token库存信息=>增量更新
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/2/1
+     */
+    @Scheduled(cron = "0/30  * * * * ?")
+    public void cronIncrementUpdateTokenInventory() {
+        if (tokenInventoryLock.tryLock()) {
+            try {
+                updateTokenInventory(INCREMENT_INVENTORY_UPDATE_POOL, this.getTokenInventoryPage(), true);
+            } catch (Exception e) {
+                log.error("增量更新token库存信息异常", e);
+            } finally {
+                tokenInventoryLock.unlock();
+            }
+        } else {
+            log.error("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
         }
     }
 
     /**
      * 更新token库存信息
+     *
+     * @param pool        线程池
+     * @param pageNum     当前页码
+     * @param isIncrement 是否增量更新
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/2/2
      */
-    @Scheduled(cron = "0/30  * * * * ?")
-    public void updateTokenInventory() {
+    public void updateTokenInventory(ExecutorService pool, int pageNum, boolean isIncrement) {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -358,17 +443,16 @@ public class ErcTokenUpdateTask {
         try {
             // 分页更新token库存相关信息
             List<TokenInventory> batch;
-            int page = 0;
+            int page = pageNum;
             do {
                 TokenInventoryExample condition = new TokenInventoryExample();
                 condition.setOrderByClause(" token_address asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
                 batch = tokenInventoryMapper.selectByExample(condition);
-
                 List<TokenInventory> updateParams = new ArrayList<>();
                 if (!batch.isEmpty()) {
                     CountDownLatch latch = new CountDownLatch(batch.size());
                     batch.forEach(inventory -> {
-                        INVENTORY_UPDATE_POOL.submit(() -> {
+                        pool.submit(() -> {
                             try {
                                 String tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), inventory.getTokenId());
                                 if (StrUtil.isNotBlank(tokenURI)) {
@@ -413,7 +497,6 @@ public class ErcTokenUpdateTask {
                             } finally {
                                 latch.countDown();
                             }
-
                         });
                     });
                     try {
@@ -421,12 +504,15 @@ public class ErcTokenUpdateTask {
                     } catch (InterruptedException e) {
                         log.error("", e);
                     }
+                    page++;
                 }
                 if (!updateParams.isEmpty()) {
                     customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
                 }
-                page++;
             } while (!batch.isEmpty());
+            if (isIncrement) {
+                this.setTokenInventoryPage(page);
+            }
         } catch (Exception e) {
             log.error("更新token库存信息", e);
         }
