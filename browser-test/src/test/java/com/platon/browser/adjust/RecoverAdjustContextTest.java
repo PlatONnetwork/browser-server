@@ -68,12 +68,8 @@ public class RecoverAdjustContextTest {
         Map<String, List<DelegateAdjustContext>> groupMap = new HashMap<>();
         delegateAdjustContextList.forEach(ctx->{
             String key = ctx.getNode().getNodeId()+"-"+ctx.getNode().getStakingBlockNum();
-            List<DelegateAdjustContext> group = groupMap.get(key);
-            if(group==null){
-                group = new ArrayList<>();
-                group.add(ctx);
-                groupMap.put(key,group);
-            }
+            List<DelegateAdjustContext> group = groupMap.computeIfAbsent(key, k -> new ArrayList<>());
+            group.add(ctx);
         });
 
         // 每组排除最后一条
