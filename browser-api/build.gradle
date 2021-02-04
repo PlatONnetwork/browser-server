@@ -50,7 +50,7 @@ task copyConf(type: Copy) {
     	println 'copy conf from src/main/resources all'
 	    from('src/main/resources/application-hrpatp201018.yml')
 	    into('build/package/browser-api')
-	    from('src/main/resources/application-hrplfp201040.yml')
+	    from('src/main/resources/application-hrpatp201040.yml')
 	    into('build/package/browser-api')
 	    from('src/main/resources/application-prod.yml')
 	    into('build/package/browser-api')
