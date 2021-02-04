@@ -13,14 +13,15 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 // 根据调账日志恢复调账上下文
 @Slf4j
 public class RecoverAdjustContextTest {
     public static void main(String[] args) throws IOException {
-
-        String content = FileUtils.readFileToString(new File("E:\\Java\\browser-server\\browser-test\\src\\test\\resources\\staking-delegate-adjust.log"),"utf-8");
+        String path = RecoverAdjustContextTest.class.getResource("/staking-delegate-adjust.log").getPath();
+        String content = FileUtils.readFileToString(new File(path),"utf-8");
         String[] jsonArray = content.split("oooo");
 
         List<DelegateAdjustContext> delegateAdjustContextList = new ArrayList<>();
@@ -61,6 +62,39 @@ public class RecoverAdjustContextTest {
                 delegateAdjustContextList.add(dac);
             }
         }
-        log.error("");
+
+        // 委托调账金额汇总
+        Map<String, AdjustSummary> delegateAdjustSummary = new HashMap<>();
+        delegateAdjustContextList.forEach(ctx->{
+            String key = ctx.getNode().getNodeId()+"-"+ctx.getNode().getStakingBlockNum();
+            AdjustSummary summary = delegateAdjustSummary.get(key);
+            if(summary==null){
+                summary = new AdjustSummary();
+                summary.setType(ctx.getAdjustParam().getOptType());
+                delegateAdjustSummary.put(key,summary);
+            }
+            summary.setRewardSum(summary.getRewardSum().add(ctx.getAdjustParam().getReward()));
+            summary.setLockSum(summary.getLockSum().add(ctx.getAdjustParam().getLock()));
+            summary.setHesSum(summary.getHesSum().add(ctx.getAdjustParam().getHes()));
+        });
+
+
+        // 质押调账金额汇总
+        Map<String, AdjustSummary> staKingAdjustSummary = new HashMap<>();
+        stakingAdjustContextList.forEach(ctx->{
+            String key = ctx.getNode().getNodeId()+"-"+ctx.getNode().getStakingBlockNum();
+            AdjustSummary summary = staKingAdjustSummary.get(key);
+            if(summary==null){
+                summary = new AdjustSummary();
+                summary.setType(ctx.getAdjustParam().getOptType());
+                staKingAdjustSummary.put(key,summary);
+            }
+            summary.setRewardSum(summary.getRewardSum().add(ctx.getAdjustParam().getReward()));
+            summary.setLockSum(summary.getLockSum().add(ctx.getAdjustParam().getLock()));
+            summary.setHesSum(summary.getHesSum().add(ctx.getAdjustParam().getHes()));
+        });
+
+        log.error("委托调账汇总：{}",JSON.toJSONString(delegateAdjustSummary,true));
+        log.error("质押调账汇总：{}",JSON.toJSONString(staKingAdjustSummary,true));
     }
 }
