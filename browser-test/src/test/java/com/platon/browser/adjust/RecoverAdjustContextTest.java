@@ -9,6 +9,7 @@ import com.platon.browser.v0150.context.DelegateAdjustContext;
 import com.platon.browser.v0150.context.StakingAdjustContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,38 +64,35 @@ public class RecoverAdjustContextTest {
             }
         }
 
-        // 委托调账金额汇总
-        Map<String, AdjustSummary> delegateAdjustSummary = new HashMap<>();
+        // 按nodeId+"-"+stakingBlockNum对委托context分组，且保留顺序
+        Map<String, List<DelegateAdjustContext>> groupMap = new HashMap<>();
         delegateAdjustContextList.forEach(ctx->{
             String key = ctx.getNode().getNodeId()+"-"+ctx.getNode().getStakingBlockNum();
-            AdjustSummary summary = delegateAdjustSummary.get(key);
-            if(summary==null){
-                summary = new AdjustSummary();
-                summary.setType(ctx.getAdjustParam().getOptType());
-                delegateAdjustSummary.put(key,summary);
+            List<DelegateAdjustContext> group = groupMap.get(key);
+            if(group==null){
+                group = new ArrayList<>();
+                group.add(ctx);
+                groupMap.put(key,group);
             }
-            summary.setRewardSum(summary.getRewardSum().add(ctx.getAdjustParam().getReward()));
-            summary.setLockSum(summary.getLockSum().add(ctx.getAdjustParam().getLock()));
-            summary.setHesSum(summary.getHesSum().add(ctx.getAdjustParam().getHes()));
         });
 
+        // 每组排除最后一条
+        groupMap.forEach((key,group)->group.remove(group.size()-1));
 
-        // 质押调账金额汇总
-        Map<String, AdjustSummary> staKingAdjustSummary = new HashMap<>();
-        stakingAdjustContextList.forEach(ctx->{
-            String key = ctx.getNode().getNodeId()+"-"+ctx.getNode().getStakingBlockNum();
-            AdjustSummary summary = staKingAdjustSummary.get(key);
-            if(summary==null){
-                summary = new AdjustSummary();
+        // 委托调账金额汇总
+        Map<String, AdjustSummary> delegateAdjustSummary = new HashMap<>();
+        groupMap.forEach((key,group)->{
+            AdjustSummary summary = new AdjustSummary();
+            group.forEach(ctx->{
                 summary.setType(ctx.getAdjustParam().getOptType());
-                staKingAdjustSummary.put(key,summary);
-            }
-            summary.setRewardSum(summary.getRewardSum().add(ctx.getAdjustParam().getReward()));
-            summary.setLockSum(summary.getLockSum().add(ctx.getAdjustParam().getLock()));
-            summary.setHesSum(summary.getHesSum().add(ctx.getAdjustParam().getHes()));
+                summary.setRewardSum(summary.getRewardSum().add(ctx.getAdjustParam().getReward()));
+                summary.setLockSum(summary.getLockSum().add(ctx.getAdjustParam().getLock()));
+                summary.setHesSum(summary.getHesSum().add(ctx.getAdjustParam().getHes()));
+            });
+            delegateAdjustSummary.put(key,summary);
         });
+
 
         log.error("委托调账汇总：{}",JSON.toJSONString(delegateAdjustSummary,true));
-        log.error("质押调账汇总：{}",JSON.toJSONString(staKingAdjustSummary,true));
     }
 }
