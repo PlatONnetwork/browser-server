@@ -72,17 +72,17 @@ public class StakingDelegateBalanceAdjustmentService {
      * @param adjustParams
      * @return
      */
-    public ValidatedContext validate(List<AdjustParam> adjustParams) throws BlockNumberException {
+    public void adjust(List<AdjustParam> adjustParams) throws BlockNumberException {
         ValidatedContext validatedContext = new ValidatedContext();
-        if(adjustParams.isEmpty()) return validatedContext;
+        if(adjustParams.isEmpty()) return;
         // 针对每笔委托调账数据获取完整的【调账上下文数据】
         for (AdjustParam adjustParam : adjustParams) {
-            AbstractAdjustContext aac=null;
+            AbstractAdjustContext context=null;
             if("staking".equals(adjustParam.getOptType())){
                 // 拼装质押调账需要的完整上下文数据
                 StakingAdjustContext sac = new StakingAdjustContext();
                 validatedContext.getStakingAdjustContextList().add(sac);
-                aac=sac;
+                context=sac;
             }
 
             if("delegate".equals(adjustParam.getOptType())){
@@ -96,76 +96,70 @@ public class StakingDelegateBalanceAdjustmentService {
                 DelegateAdjustContext dac = new DelegateAdjustContext();
                 dac.setDelegation(delegation);
                 validatedContext.getDelegateAdjustContextList().add(dac);
-                aac=dac;
+                context=dac;
             }
 
-            if(aac!=null){
-                aac.setChainConfig(chainConfig);
-                aac.setAdjustParam(adjustParam);
+            if(context!=null){
+                context.setChainConfig(chainConfig);
+                context.setAdjustParam(adjustParam);
                 // 根据<质押块高,节点ID>找到对应的质押信息
                 StakingKey stakingKey = new StakingKey();
                 stakingKey.setNodeId(adjustParam.getNodeId());
                 stakingKey.setStakingBlockNum(Long.valueOf(adjustParam.getStakingBlockNum()));
                 Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-                aac.setStaking(staking);
+                context.setStaking(staking);
                 // 根据<节点ID>找到对应的节点信息
                 Node node = nodeMapper.selectByPrimaryKey(adjustParam.getNodeId());
-                aac.setNode(node);
+                context.setNode(node);
                 // 校验上下文
-                aac.validate();
+                context.validate();
+
+                String adjustMsg;
+                if("delegate".equals(adjustParam.getOptType())){
+                    // 委托调账
+                    if(StringUtils.isBlank(context.errorInfo())){
+                        AdjustParam param = context.getAdjustParam();
+                        // 调账上下文没有错误信息，则执行调账操作
+                        stakingDelegateBalanceAdjustmentMapper.adjustDelegateData(param);
+
+                        // 更新缓存中的委托者地址已领取奖励
+                        Delegation delegation = ((DelegateAdjustContext)context).getDelegation();
+                        DelegateExit delegateExit= DelegateExit.builder()
+                                .txFrom(delegation.getDelegateAddr())
+                                .delegateReward(param.getReward())
+                                .build();
+                        addressCache.update(delegateExit);
+
+                        StringBuilder sb = new StringBuilder("============ ")
+                                .append(context.getAdjustParam().getOptType())
+                                .append("调账成功 ============\n")
+                                .append(context.contextInfo());
+                        adjustMsg = sb.toString();
+                        log.info(adjustMsg);
+                    }else{
+                        // 调账上下文有错误信息，调账参数打印到错误文件
+                        adjustMsg = context.errorInfo();
+                        log.warning(adjustMsg);
+                    }
+                }
+
+                if("staking".equals(adjustParam.getOptType())){
+                    if(StringUtils.isBlank(context.errorInfo())){
+                        // 调账上下文没有错误信息，则执行调账操作
+                        stakingDelegateBalanceAdjustmentMapper.adjustStakingData(context.getAdjustParam());
+                        StringBuilder sb = new StringBuilder("============ ")
+                                .append(context.getAdjustParam().getOptType())
+                                .append("调账成功 ============\n")
+                                .append(context.contextInfo());
+                        adjustMsg=sb.toString();
+                        log.info(adjustMsg);
+                    }else{
+                        // 调账上下文有错误信息，调账参数打印到错误文件
+                        adjustMsg=context.errorInfo();
+                        log.warning(adjustMsg);
+                    }
+                }
             }
         }
-        return validatedContext;
-    }
-
-    public String adjust(List<AdjustParam> adjustParams) throws BlockNumberException {
-        // 构造调账上下文并验证调账参数
-        ValidatedContext validatedContext = validate(adjustParams);
-        String adjustMsg = "";
-        // 委托调账
-        for (AbstractAdjustContext context : validatedContext.getDelegateAdjustContextList()) {
-            if(StringUtils.isBlank(context.errorInfo())){
-                AdjustParam param = context.getAdjustParam();
-                // 调账上下文没有错误信息，则执行调账操作
-                stakingDelegateBalanceAdjustmentMapper.adjustDelegateData(param);
-
-                // 更新缓存中的委托者地址已领取奖励
-                Delegation delegation = ((DelegateAdjustContext)context).getDelegation();
-                DelegateExit delegateExit= DelegateExit.builder()
-                        .txFrom(delegation.getDelegateAddr())
-                        .delegateReward(param.getReward())
-                        .build();
-                addressCache.update(delegateExit);
-
-                StringBuilder sb = new StringBuilder("============ ")
-                        .append(context.getAdjustParam().getOptType())
-                        .append("调账成功 ============\n")
-                        .append(context.contextInfo());
-                adjustMsg = sb.toString();
-                log.info(adjustMsg);
-            }else{
-                // 调账上下文有错误信息，调账参数打印到错误文件
-                adjustMsg = context.errorInfo();
-                log.warning(adjustMsg);
-            }
-        }
-        // 质押调账
-        for (AbstractAdjustContext context : validatedContext.getStakingAdjustContextList()) {
-            if(StringUtils.isBlank(context.errorInfo())){
-                // 调账上下文没有错误信息，则执行调账操作
-                stakingDelegateBalanceAdjustmentMapper.adjustStakingData(context.getAdjustParam());
-                StringBuilder sb = new StringBuilder("============ ")
-                        .append(context.getAdjustParam().getOptType())
-                        .append("调账成功 ============\n")
-                        .append(context.contextInfo());
-                adjustMsg=sb.toString();
-                log.info(adjustMsg);
-            }else{
-                // 调账上下文有错误信息，调账参数打印到错误文件
-                adjustMsg=context.errorInfo();
-                log.warning(adjustMsg);
-            }
-        }
-        return adjustMsg;
     }
 }
