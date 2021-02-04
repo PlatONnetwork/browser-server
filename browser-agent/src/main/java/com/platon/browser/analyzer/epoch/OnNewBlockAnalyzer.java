@@ -128,8 +128,7 @@ public class OnNewBlockAnalyzer {
                                     param.setBlockTime(block.getTime());
                                     param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount());
                                 });
-                                String msg = stakingDelegateBalanceAdjustmentService.adjust(adjustParams);
-                                log.warn("msg:{}",msg);
+                                stakingDelegateBalanceAdjustmentService.adjust(adjustParams);
                             }
                         }
                     }
