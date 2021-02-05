@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
 // 根据调账日志恢复调账上下文
 @Slf4j
 public class RecoverAdjustContextTest {
@@ -72,8 +74,19 @@ public class RecoverAdjustContextTest {
             group.add(ctx);
         });
 
+        // 打印[ nodeId  stakingBlockNum ]
+        List<String> lines = new ArrayList<>();
+        lines.add("#节点调账信息");
+        lines.add("|节点ID|质押块高|");
+        lines.add("|:----|:----|");
+        groupMap.keySet().forEach(key-> lines.add("|"+key.replace("-"," | ")+"|"));
+        FileUtils.writeLines(
+                new File("E:\\Java\\browser-server\\browser-test\\src\\test\\resources\\节点调账(节点-质押块高)信息.md"),
+                lines
+        );
+
         // 每组排除最后一条
-        groupMap.forEach((key,group)->group.remove(group.size()-1));
+        //groupMap.forEach((key,group)->group.remove(group.size()-1));
 
         // 委托调账金额汇总
         Map<String, AdjustSummary> delegateAdjustSummary = new HashMap<>();
