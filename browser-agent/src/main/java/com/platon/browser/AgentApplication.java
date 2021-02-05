@@ -67,10 +67,10 @@ public class AgentApplication implements ApplicationRunner {
 		if(AppStatusUtil.isStopped()) return;
 		// 把应用置为BOOTING开机状态
 		AppStatusUtil.setStatus(AppStatus.BOOTING);
-        // 进入一致性开机自检子流程
-        consistencyService.post();
 		// 进入应用初始化子流程
 		InitializationResult initialResult = initializationService.init();
+        // 进入一致性开机自检子流程
+        consistencyService.post();
 		// 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
 		AppStatusUtil.setStatus(AppStatus.RUNNING);
 		// 已采最高块号
