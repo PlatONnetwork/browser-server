@@ -10,10 +10,10 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.v015.V015Config;
-import com.platon.browser.v015.bean.AdjustParam;
-import com.platon.browser.v015.dao.StakingDelegateBalanceAdjustmentMapper;
-import com.platon.browser.v015.service.StakingDelegateBalanceAdjustmentService;
+import com.platon.browser.v0150.V0150Config;
+import com.platon.browser.v0150.bean.AdjustParam;
+import com.platon.browser.v0150.dao.StakingDelegateBalanceAdjustmentMapper;
+import com.platon.browser.v0150.service.StakingDelegateBalanceAdjustmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class AdjustServiceTest extends AgentTestBase {
     @Mock
     private StakingDelegateBalanceAdjustmentMapper stakingDelegateBalanceAdjustmentMapper;
     @Mock
-    private V015Config v015Config;
+    private V0150Config v015Config;
     private String adjustLogFile = System.getProperty("user.dir")+ File.separator+"adjust.log";
     @Spy
     @InjectMocks
