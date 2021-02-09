@@ -22,7 +22,7 @@ public class AbstractRedisServiceTest extends AgentTestBase {
     @Before
     public void setup(){
         ReflectionTestUtils.setField(target, "redisTemplate", redisTemplate);
-        ReflectionTestUtils.setField(target, "maxItemCount", 500000);
+        //ReflectionTestUtils.setField(target, "maxItemCount", 500000);
     }
 
     /**

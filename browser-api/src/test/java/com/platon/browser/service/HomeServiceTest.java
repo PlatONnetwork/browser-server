@@ -32,8 +32,8 @@ public class HomeServiceTest extends ApiTestMockBase {
     @Before
 	public void setup() {
         ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
-        ReflectionTestUtils.setField(target,"blockESRepository", ESBlockRepository);
-        ReflectionTestUtils.setField(target,"transactionESRepository", ESTransactionRepository);
+        ReflectionTestUtils.setField(target,"ESBlockRepository", ESBlockRepository);
+        ReflectionTestUtils.setField(target,"ESTransactionRepository", ESTransactionRepository);
         ReflectionTestUtils.setField(target,"nodeMapper",nodeMapper);
         ReflectionTestUtils.setField(target,"addressMapper",addressMapper);
         ReflectionTestUtils.setField(target,"blockChainConfig",blockChainConfig);

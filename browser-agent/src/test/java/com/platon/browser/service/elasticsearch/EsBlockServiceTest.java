@@ -20,14 +20,16 @@ import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsBlockServiceTest extends AgentTestBase {
+
     @Mock
     private EsBlockRepository ESBlockRepository;
+
     @Spy
     private EsBlockService target;
 
     @Before
-    public void setup(){
-        ReflectionTestUtils.setField(target, "blockESRepository", ESBlockRepository);
+    public void setup() {
+        ReflectionTestUtils.setField(target, "ESBlockRepository", ESBlockRepository);
     }
 
     /**
@@ -45,7 +47,9 @@ public class EsBlockServiceTest extends AgentTestBase {
         data.clear();
         data.add(new Block());
         target.save(data);
+        doThrow(new RuntimeException("")).when(target).save(data);
         doThrow(new RuntimeException("")).when(ESBlockRepository).bulkAddOrUpdate(anyMap());
         target.save(data);
     }
+
 }

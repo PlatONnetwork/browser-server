@@ -27,7 +27,7 @@ public class EsNodeOptServiceTest extends AgentTestBase {
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "nodeOptESRepository", ESNodeOptRepository);
+        ReflectionTestUtils.setField(target, "ESNodeOptRepository", ESNodeOptRepository);
     }
 
     /**
