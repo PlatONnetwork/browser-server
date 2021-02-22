@@ -27,7 +27,7 @@ public class EsDelegationServiceTest extends AgentTestBase {
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "delegationESRepository", ESDelegationRepository);
+        ReflectionTestUtils.setField(target, "ESDelegationRepository", ESDelegationRepository);
     }
 
     /**

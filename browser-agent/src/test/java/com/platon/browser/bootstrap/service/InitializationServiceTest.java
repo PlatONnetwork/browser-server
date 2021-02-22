@@ -9,6 +9,7 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
+import com.platon.browser.service.elasticsearch.*;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.GasEstimateLog;
@@ -17,6 +18,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
+import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -42,39 +45,83 @@ import static org.mockito.Mockito.when;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class InitializationServiceTest extends AgentTestBase {
+
     @Mock
     private EpochRetryService epochRetryService;
+
     @Mock
     private BlockChainConfig chainConfig;
+
     @Mock
     private NodeMapper nodeMapper;
+
     @Mock
     private StakingMapper stakingMapper;
+
     @Mock
     private NetworkStatMapper networkStatMapper;
+
     @Mock
     private AddressMapper addressMapper;
+
     @Mock
     private NodeCache nodeCache;
+
     @Mock
     private NetworkStatCache networkStatCache;
+
     @Mock
     private AddressCache addressCache;
+
     @Mock
     private ProposalMapper proposalMapper;
+
     @Mock
     private ProposalCache proposalCache;
+
     @Mock
     private ParameterService parameterService;
+
     @Mock
     private GasEstimateLogMapper gasEstimateLogMapper;
+
     @Mock
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+
     @Mock
     private StakeEpochService stakeEpochService;
+
     @InjectMocks
     @Spy
     private InitializationService target;
+
+    @Mock
+    private ErcCache ercCache;
+
+    @Mock
+    private TokenMapper tokenMapper;
+
+    @Mock
+    private EsBlockRepository ESBlockRepository;
+
+    @Mock
+    private EsTransactionRepository ESTransactionRepository;
+
+    @Mock
+    private EsDelegationRewardRepository ESDelegationRewardRepository;
+
+    @Mock
+    private EsNodeOptRepository ESNodeOptRepository;
+
+    @Mock
+    private EsErc20TxRepository esErc20TxRepository;
+
+    @Mock
+    private EsErc721TxRepository esErc721TxRepository;
+
+    @Mock
+    private EsTransferTxRepository esTransferTxRepository;
+
     @Before
     public void setup() throws Exception {
         // 修改测试数据
@@ -105,7 +152,7 @@ public class InitializationServiceTest extends AgentTestBase {
         gasEstimateLogs.add(gel);
         when(gasEstimateLogMapper.selectByExample(any())).thenReturn(gasEstimateLogs);
         when(stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
-        when(stakeEpochService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeEndBlock(anyString(), any(BigInteger.class), anyBoolean())).thenReturn(BigInteger.TEN);
     }
 
     @Test
@@ -113,7 +160,7 @@ public class InitializationServiceTest extends AgentTestBase {
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
         InitializationResult result = target.init();
-        assertEquals(-1L,result.getCollectedBlockNumber().longValue());
+        assertEquals(-1L, result.getCollectedBlockNumber().longValue());
 
         networkStat = CollectionNetworkStat.newInstance();
         networkStat.setCurNumber(7000L);
@@ -121,7 +168,7 @@ public class InitializationServiceTest extends AgentTestBase {
         Page<com.platon.browser.dao.entity.Node> page = new Page<>();
         when(nodeMapper.selectByExample(any())).thenReturn(page);
         result = target.init();
-        assertEquals(7000L,result.getCollectedBlockNumber().longValue());
+        assertEquals(7000L, result.getCollectedBlockNumber().longValue());
     }
 
 }

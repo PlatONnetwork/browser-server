@@ -60,7 +60,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(this.target,"customStakingMapper", this.customStakingMapper);
         ReflectionTestUtils.setField(this.target,"customDelegationMapper", this.customDelegationMapper);
         ReflectionTestUtils.setField(this.target,"nodeMapper", this.nodeMapper);
-        ReflectionTestUtils.setField(this.target,"nodeOptESRepository", this.ESNodeOptRepository);
+        ReflectionTestUtils.setField(this.target,"ESNodeOptRepository", this.ESNodeOptRepository);
         ReflectionTestUtils.setField(this.target,"i18n", this.i18n);
         ReflectionTestUtils.setField(this.target,"blockChainConfig", this.blockChainConfig);
         ReflectionTestUtils.setField(this.target,"platonClient", this.platonClient);

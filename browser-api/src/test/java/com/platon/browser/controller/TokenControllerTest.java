@@ -3,6 +3,8 @@ package com.platon.browser.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestBase;
 import com.platon.browser.request.PageReq;
+import com.platon.browser.request.token.QueryTokenDetailReq;
+import com.platon.browser.request.token.QueryTokenListReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 public class TokenControllerTest extends ApiTestBase {
+
     @Autowired
     private WebApplicationContext wac;
+
     private MockMvc mockMvc;
 
     @Before
@@ -32,22 +36,23 @@ public class TokenControllerTest extends ApiTestBase {
 
     @Test
     public void tokenList() throws Exception {
-        PageReq pageReq = new PageReq();
-        pageReq.setPageNo(0);
-        pageReq.setPageSize(10);
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/token/tokenList")
+        QueryTokenListReq req = new QueryTokenListReq();
+        req.setPageNo(0);
+        req.setPageSize(10);
+        req.setType("erc20");
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/token/list")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content((JSONObject.toJSONString(pageReq)).getBytes()))
+                .content((JSONObject.toJSONString(req)).getBytes()))
                 .andExpect(status().isOk()).andDo(print());
     }
 
     @Test
     public void tokenDetail() throws Exception {
-        String requestBody = "{\"address\":\"lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e\"}";
-        ;
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/token/tokenDetail")
+        QueryTokenDetailReq req = new QueryTokenDetailReq();
+        req.setAddress("lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e");
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/token/detail")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(requestBody.getBytes()))
+                .content((JSONObject.toJSONString(req)).getBytes()))
                 .andExpect(status().isOk()).andDo(print());
     }
 

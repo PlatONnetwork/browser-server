@@ -19,8 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class TestData {
-    public static final String testDataDir = TestData.class.getClassLoader().getResource("./").getPath()+"../../../../../testdata/";
-    private static String suffix=".json",encode="UTF8";
+
+    public static final String testDataDir = TestData.class.getClassLoader().getResource("./").getPath() + "../../../../../testdata/";
+
+    private static String suffix = ".json", encode = "UTF8";
+
     private static String[] dataFile = {
             "transaction",
             "blockChainConfig",
@@ -36,14 +39,23 @@ public class TestData {
             "erc20TokenTransfer",
             "adjust-data"
     };
+
     protected List<Transaction> transactionList = Collections.emptyList();
+
     protected BlockChainConfig blockChainConfig = new BlockChainConfig();
+
     protected List<NetworkStat> networkStatList = new ArrayList<>();
+
     protected List<Address> addressList = Collections.emptyList();
-    protected List<CustomStaking> stakingList= Collections.emptyList();
-    protected List<CustomDelegation> delegationList= Collections.emptyList();
+
+    protected List<CustomStaking> stakingList = Collections.emptyList();
+
+    protected List<CustomDelegation> delegationList = Collections.emptyList();
+
     protected List<Node> nodeList = new ArrayList<>();
+
     protected List<Block> blockList = Collections.emptyList();
+
     protected List<AdjustParam> adjustParamList = new ArrayList<>();
 
     @Before
@@ -86,15 +98,18 @@ public class TestData {
             }
         });
     }
-    
+
     public enum TestDataFileNameEnum {
         NODE("nodes-"),
         BLOCK("blocks-"),
         TRANSACTION("transactions-"),
         PENDINGTX("pendingTxes-");
+
         public String prefix;
-        TestDataFileNameEnum(String prefix){
-            this.prefix=prefix;
+
+        TestDataFileNameEnum(String prefix) {
+            this.prefix = prefix;
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.platon.browser.v0152.analyzer;
 
+import com.platon.browser.utils.AddressUtil;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionTransaction;
@@ -173,15 +174,19 @@ public class ErcTokenAnalyzer {
 
         // 以上所有操作无误，最后更新地址表erc交易数缓存
         txList.forEach(ercTx -> {
-            switch (typeEnum) {
-                case ERC20:
-                    addressCache.updateErc20TxQty(ercTx.getFrom());
-                    addressCache.updateErc20TxQty(ercTx.getTo());
-                    break;
-                case ERC721:
-                    addressCache.updateErc721TxQty(ercTx.getFrom());
-                    addressCache.updateErc721TxQty(ercTx.getTo());
-                    break;
+            if (!AddressUtil.isAddrZero(ercTx.getFrom(), ercTx.getTo())) {
+                switch (typeEnum) {
+                    case ERC20:
+                        addressCache.updateErc20TxQty(ercTx.getFrom());
+                        addressCache.updateErc20TxQty(ercTx.getTo());
+                        break;
+                    case ERC721:
+                        addressCache.updateErc721TxQty(ercTx.getFrom());
+                        addressCache.updateErc721TxQty(ercTx.getTo());
+                        break;
+                }
+            } else {
+                log.error("其中有地址是0地址,不加载到地址缓存中,from:{},to:{}", ercTx.getFrom(), ercTx.getTo());
             }
         });
         return typeEnum;

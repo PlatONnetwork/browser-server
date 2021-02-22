@@ -44,6 +44,7 @@ public class TokenControllerTest extends ApiTestBase {
         QueryTokenListReq req = new QueryTokenListReq();
         req.setPageNo(1);
         req.setPageSize(10);
+        req.setType("erc20");
         this.mockMvc.perform(MockMvcRequestBuilders.post("/token/list")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content((JSONObject.toJSONString(req)).getBytes()))
@@ -53,7 +54,7 @@ public class TokenControllerTest extends ApiTestBase {
     @Test
     public void tokenDetail() throws Exception {
         QueryTokenDetailReq req = new QueryTokenDetailReq();
-        req.setAddress("0x");
+        req.setAddress("atp1x903k8rxp7kpd7h7v5mg0dr3lms00tamvll2n2");
         this.mockMvc.perform(MockMvcRequestBuilders.post("/token/detail")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content((JSONObject.toJSONString(req)).getBytes()))

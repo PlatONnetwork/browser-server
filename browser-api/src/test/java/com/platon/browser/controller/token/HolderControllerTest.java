@@ -43,6 +43,7 @@ public class HolderControllerTest extends ApiTestBase {
         QueryTokenHolderListReq req = new QueryTokenHolderListReq();
         req.setPageNo(1);
         req.setPageSize(10);
+        req.setContract("atp1meyrsd2lp84dg7pd08f483cjhg4sd49xdg2gyw");
         this.mockMvc.perform(MockMvcRequestBuilders.post("/token/holder/list")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content((JSONObject.toJSONString(req)).getBytes()))
@@ -52,7 +53,7 @@ public class HolderControllerTest extends ApiTestBase {
     @Test
     public void tokenExport() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/token/holder/export")
+                .perform(MockMvcRequestBuilders.post("/token/holder/export")
                         .param("contract", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
                         .param("token", "")
                         .param("local", "en")

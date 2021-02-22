@@ -51,7 +51,7 @@ public class Arc20TxControllerTest extends ApiTestBase {
     @Test
     public void tokenTxExport() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/token/arc20-tx/export")
+                .perform(MockMvcRequestBuilders.post("/token/arc20-tx/export")
                         .param("address", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
                         .param("contract", "")
                         .param("token", "")

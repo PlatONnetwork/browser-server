@@ -16,6 +16,7 @@ import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
+import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.TransactionUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
@@ -97,21 +98,25 @@ public class TransactionAnalyzer {
 
             // 内存中更新地址类型
             ContractTypeEnum contractTypeEnum;
-            if(ercToken.getTypeEnum() == ErcTypeEnum.ERC20
-                    && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE){
+            if (ercToken.getTypeEnum() == ErcTypeEnum.ERC20
+                    && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
                 contractTypeEnum = ContractTypeEnum.ERC20_EVM;
-            } else if(ercToken.getTypeEnum() == ErcTypeEnum.ERC721
-                    && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE){
+            } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC721
+                    && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
                 contractTypeEnum = ContractTypeEnum.ERC721_EVM;
-            } else if(txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE){
+            } else if (txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
                 contractTypeEnum = ContractTypeEnum.WASM;
             } else {
                 contractTypeEnum = ContractTypeEnum.EVM;
             }
             GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
 
-            // 补充address
-            addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
+            if (!AddressUtil.isAddrZero(contract.getAddress())) {
+                // 补充address
+                addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
+            } else {
+                log.error("该地址{}是0地址,不加载到地址缓存中", contract.getAddress());
+            }
         });
 
         // 处理交易信息

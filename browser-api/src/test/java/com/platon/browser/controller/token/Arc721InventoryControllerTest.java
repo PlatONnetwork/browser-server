@@ -62,7 +62,7 @@ public class Arc721InventoryControllerTest extends ApiTestBase {
     @Test
     public void tokenIdExport() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/token/arc721-inventory/export")
+                .perform(MockMvcRequestBuilders.post("/token/arc721-inventory/export")
                         .param("address", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
                         .param("contract", "")
                         .param("tokenId", "")
