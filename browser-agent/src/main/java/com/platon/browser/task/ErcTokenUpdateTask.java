@@ -324,11 +324,7 @@ public class ErcTokenUpdateTask {
                 }
             }
             if (!updateParams.isEmpty()) {
-                customTokenHolderMapper.batchInsertOrUpdateSelective(updateParams,
-                        TokenHolder.Column.tokenAddress,
-                        TokenHolder.Column.address,
-                        TokenHolder.Column.balance,
-                        TokenHolder.Column.updateTime);
+                customTokenHolderMapper.batchUpdate(updateParams);
             }
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
