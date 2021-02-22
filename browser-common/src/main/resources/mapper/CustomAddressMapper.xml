@@ -31,6 +31,7 @@
         <result column="tokenType" jdbcType="VARCHAR" property="tokenType"/>
         <result column="tokenSymbol" jdbcType="VARCHAR" property="tokenSymbol"/>
         <result column="tokenName" jdbcType="VARCHAR" property="tokenName"/>
+        <result column="token_tx_qty" jdbcType="VARCHAR" property="tokenTxQty"/>
     </resultMap>
 
     <select id="findAddressDetail" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -62,7 +63,8 @@
                a.contract_bin,
                b.type AS tokenType,
                b.symbol AS tokenSymbol,
-               b.`name` AS tokenName
+               b.`name` AS tokenName,
+               b.token_tx_qty
         FROM address a
                  LEFT JOIN token b ON a.address = b.address
         WHERE a.address = #{address};

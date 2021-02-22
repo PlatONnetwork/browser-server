@@ -27,4 +27,9 @@ public class CustomAddressDetail extends Address {
      */
     private String tokenName;
 
+    /**
+     * token对应的交易数
+     */
+    private Integer tokenTxQty;
+
 }

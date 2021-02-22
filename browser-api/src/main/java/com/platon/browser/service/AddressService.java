@@ -98,6 +98,7 @@ public class AddressService {
         }
         if (item != null) {
             BeanUtils.copyProperties(item, resp);
+            resp.setErc721TxQty(item.getTokenTxQty());
             resp.setDelegateUnlock(item.getDelegateHes());
             /** 预先设置是否展示锁仓 */
             resp.setIsRestricting(0);
