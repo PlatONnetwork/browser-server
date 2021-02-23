@@ -6,7 +6,7 @@ jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 # 服务器端口号
-server.port: 45001
+server.port: 50010
 #Spring框架内部配置
 spring:
   #数据源配置
