@@ -164,19 +164,23 @@ public class Erc20TokenTransferRecordService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        this.log.error("exportTokenTransferList time:{}", format.format(currentServerTime));
+        log.error("exportTokenTransferList time:{}", format.format(currentServerTime));
         String msg = dateFormat.format(currentServerTime);
-        this.log.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
+        log.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
 
         // construct of params
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().range("bTime", new Date(date).getTime(), currentServerTime.getTime()));
         ESResult<ESTokenTransferRecord> queryResultFromES = new ESResult<>();
         // condition: txHash/contract/txFrom/transferTo
-        if (StringUtils.isNotBlank(contract)) constructor.must(new ESQueryBuilders().term("contract", contract));
-        if (StringUtils.isNotBlank(address)) constructor.buildMust(new BoolQueryBuilder()
-                .should(QueryBuilders.termQuery("from", address))
-                .should(QueryBuilders.termQuery("tto", address)));
+        if (StringUtils.isNotBlank(contract)) {
+            constructor.must(new ESQueryBuilders().term("contract", contract));
+        }
+        if (StringUtils.isNotBlank(address)) {
+            constructor.buildMust(new BoolQueryBuilder()
+                    .should(QueryBuilders.termQuery("from", address))
+                    .should(QueryBuilders.termQuery("tto", address)));
+        }
         // Set sort field
         constructor.setDesc("seq");
         // response filed to show.
@@ -382,7 +386,7 @@ public class Erc20TokenTransferRecordService {
 
     public AccountDownload exportHolderTokenList(String address, String local, String timeZone, String token, HttpServletResponse response) {
 
-        PageHelper.startPage(1, 3000);
+        PageHelper.startPage(1, 30000);
         Erc20TokenAddressRelExample example = new Erc20TokenAddressRelExample();
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andAddressEqualTo(address);
