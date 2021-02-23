@@ -2,6 +2,7 @@ package com.platon.browser.publisher;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.handler.GasEstimateEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -19,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
@@ -29,20 +29,26 @@ import static org.mockito.Mockito.verify;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class GasEstimateEventPublisherTest extends AgentTestBase {
+
     @Mock
     private GasEstimateEventHandler handler;
+
     @InjectMocks
     @Spy
     private GasEstimateEventPublisher target;
 
+    @Mock
+    protected DisruptorConfig config;
+
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "ringBufferSize", 1024);
+        when(target.getRingBufferSize()).thenReturn(1024);
+        //ReflectionTestUtils.setField(target, "ringBufferSize", 1024);
     }
 
     @Test
-    public void test(){
-        ReflectionTestUtils.invokeMethod(target,"init");
+    public void test() {
+        ReflectionTestUtils.invokeMethod(target, "init");
         EpochMessage epochMessage = EpochMessage.newInstance();
         Block block = blockList.get(0);
         List<Transaction> transactions = new ArrayList<>(transactionList);
@@ -51,8 +57,9 @@ public class GasEstimateEventPublisherTest extends AgentTestBase {
         target.getRingBufferSize();
         target.info();
         target.getPublisherMap();
-        target.register(target.getClass().getSimpleName(),target);
+        target.register(target.getClass().getSimpleName(), target);
         target.unregister(target.getClass().getSimpleName());
-        verify(target, times(1)).publish(any(),any());
+        verify(target, times(1)).publish(any(), any());
     }
+
 }

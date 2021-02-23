@@ -2,6 +2,7 @@ package com.platon.browser.publisher;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.handler.ComplementEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -19,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试
@@ -34,10 +34,12 @@ public class ComplementEventPublisherTest extends AgentTestBase {
     @InjectMocks
     @Spy
     private ComplementEventPublisher target;
-
+    @Mock
+    protected DisruptorConfig config;
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(target, "ringBufferSize", 1024);
+        when(target.getRingBufferSize()).thenReturn(1024);
+        //ReflectionTestUtils.setField(target, "ringBufferSize", 1024);
     }
 
     @Test

@@ -26,33 +26,45 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 共识
+ *
+ * @author huangyongpeng@matrixelements.com
+ * @date 2021/2/3
+ */
 @Slf4j
 @Service
 public class OnConsensusAnalyzer {
-	
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private EpochBusinessMapper epochBusinessMapper;
+
     @Resource
     private StakingMapper stakingMapper;
+
     @Resource
     private NetworkStatCache networkStatCache;
+
     @Resource
     private ReportMultiSignParamCache reportMultiSignParamCache;
+
     @Resource
     private SlashBusinessMapper slashBusinessMapper;
+
     @Resource
     private ProposalParameterService proposalParameterService;
-	
-	public Optional<List<NodeOpt>> analyze(CollectionEvent event, Block block) {
+
+    public Optional<List<NodeOpt>> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
 
-        log.debug("Block Number:{}",block.getNum());
+        log.debug("Block Number:{}", block.getNum());
 
         // 取下一共识周期的节点ID列表
         List<String> nextConsNodeIdList = new ArrayList<>();
-        event.getEpochMessage().getCurValidatorList().forEach(v->nextConsNodeIdList.add(v.getNodeId()));
+        event.getEpochMessage().getCurValidatorList().forEach(v -> nextConsNodeIdList.add(v.getNodeId()));
         // 每个共识周期的期望出块数
         BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(nextConsNodeIdList.size()));
         Consensus consensus = Consensus.builder()
@@ -65,19 +77,20 @@ public class OnConsensusAnalyzer {
         List<String> reportedNodeIdList = reportMultiSignParamCache.getNodeIdList();
         // 如果被举报节点不在下一轮共识周期中，则可对其执行安全的处罚操作
         List<String> notInNextConsNodeIdList = new ArrayList<>();
-        reportedNodeIdList.forEach(reportedNodeId->{
-            if(!nextConsNodeIdList.contains(reportedNodeId)) notInNextConsNodeIdList.add(reportedNodeId);
+        reportedNodeIdList.forEach(reportedNodeId -> {
+            if (!nextConsNodeIdList.contains(reportedNodeId))
+                notInNextConsNodeIdList.add(reportedNodeId);
         });
 
         List<NodeOpt> nodeOpts = new ArrayList<>();
-        if(!notInNextConsNodeIdList.isEmpty()){
+        if (!notInNextConsNodeIdList.isEmpty()) {
             // 以数据库中的数据为准，进行处罚
             List<Staking> slashList = slashBusinessMapper.getException(notInNextConsNodeIdList);
-            if(!slashList.isEmpty()){
-                slashList.forEach(slashNode->{
+            if (!slashList.isEmpty()) {
+                slashList.forEach(slashNode -> {
                     List<Report> reportList = reportMultiSignParamCache.getReportList(slashNode.getNodeId());
                     reportList.forEach(report -> {
-                        NodeOpt nodeOpt = slash(report,block);
+                        NodeOpt nodeOpt = slash(report, block);
                         nodeOpts.add(nodeOpt);
                     });
                     // 双签处罚后需要删除缓存中的双签参数，防止下一次进来重复处罚
@@ -88,12 +101,12 @@ public class OnConsensusAnalyzer {
             }
         }
 
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return Optional.ofNullable(nodeOpts);
-	}
+    }
 
-	private NodeOpt slash(Report businessParam,Block block){
+    private NodeOpt slash(Report businessParam, Block block) {
         /**
          * 处理双签处罚
          * 重要！！！！！！： 一旦节点被双签处罚，节点所有金额都会变成待赎回状态
@@ -106,7 +119,7 @@ public class OnConsensusAnalyzer {
         Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
         // 锁定金额和待赎回只有一个会有值，所以取锁定或赎回的金额作为惩罚金的计算基数
         BigDecimal baseAmount = staking.getStakingLocked();
-        if(baseAmount.compareTo(BigDecimal.ZERO) == 0) {
+        if (baseAmount.compareTo(BigDecimal.ZERO) == 0) {
             baseAmount = staking.getStakingReduction();
         }
         //惩罚的金额=基数x惩罚比例
@@ -115,23 +128,23 @@ public class OnConsensusAnalyzer {
         BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
         // 计算扣除惩罚金额后剩下的待赎回的金额
         BigDecimal codeRemainRedeemAmount = BigDecimal.ZERO;
-        if(staking.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
+        if (staking.getStakingLocked().compareTo(BigDecimal.ZERO) > 0) {
             codeRemainRedeemAmount = staking.getStakingLocked().subtract(codeSlashValue);
         }
         /**
          * 如果节点状态为退出中则需要reduction进行扣减
          * 因为处于退出中状态的节点所有钱都在赎回中状态
          */
-        if(staking.getStatus().intValue() ==  StatusEnum.EXITING.getCode()) {
+        if (staking.getStatus().intValue() == StatusEnum.EXITING.getCode()) {
             codeRemainRedeemAmount = staking.getStakingReduction().subtract(codeSlashValue);
         }
 
-        if(codeRemainRedeemAmount.compareTo(BigDecimal.ZERO)>=0){
+        if (codeRemainRedeemAmount.compareTo(BigDecimal.ZERO) >= 0) {
             // 节点状态置为退出中
             businessParam.setCodeStatus(2);
             // 设置退出操作所在周期
             businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
-        }else {
+        } else {
             // 节点状态置为已退出
             businessParam.setCodeStatus(3);
             businessParam.setCodeStakingReductionEpoch(0);
@@ -147,8 +160,8 @@ public class OnConsensusAnalyzer {
 
         //操作描述:6【PERCENT|AMOUNT】
         String desc = NodeOpt.TypeEnum.MULTI_SIGN.getTpl()
-                .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
-                .replace("AMOUNT",codeSlashValue.toString());
+                .replace("PERCENT", chainConfig.getDuplicateSignSlashRate().toString())
+                .replace("AMOUNT", codeSlashValue.toString());
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());

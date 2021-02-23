@@ -43,28 +43,37 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
 
     @Mock
     private DelegateBusinessMapper delegateBusinessMapper;
+
     @Mock
     private CollectionEvent collectionEvent;
+
     @Mock
     private NodeCache nodeCache;
+
     @Mock
     private DelegationMapper delegationMapper;
+
     @Mock
     private BlockChainConfig chainConfig;
+
     @Mock
     private AddressCache addressCache;
+
     @Mock
     private GasEstimateMapper gasEstimateMapper;
+
     @Mock
     private CustomGasEstimateMapper customGasEstimateMapper;
+
     @Mock
     private StakingMapper stakingMapper;
+
     @InjectMocks
     @Spy
     private DelegateExitAnalyzer target;
 
     @Before
-    public void setup() throws Exception{
+    public void setup() throws Exception {
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")
@@ -75,17 +84,20 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
         this.blockChainConfig.getDelegateThreshold();
         when(this.chainConfig.getDelegateThreshold()).thenReturn(this.blockChainConfig.getDelegateThreshold());
 
-
     }
 
     @Test
     public void convert() throws Exception {
         CustomDelegation delegation = new CustomDelegation();
         for (CustomDelegation delegations : this.delegationList) {
-            if (delegations.getDelegateAddr().equals("lax14m6uq3m39k05utyxj6ercu72xnzrrvrq4ttlxz"))
+            if (delegations.getDelegateAddr().equals("atp12att07xxprevkqddq74qfnj988dgyrq2pcdvt4"))
                 delegation = delegations;
         }
+        delegation.setStakingBlockNum(1606L);
+        delegation.setNodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050");
         delegation.setDelegateReleased(BigDecimal.ONE);
+        delegation.setDelegateHes(new BigDecimal("0"));
+        delegation.setDelegateLocked(new BigDecimal("1000000000000000000"));
         when(this.delegationMapper.selectByPrimaryKey(any())).thenReturn(delegation);
         Staking staking = new Staking();
         staking.setNodeId(delegation.getNodeId());
@@ -104,14 +116,15 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
         delegation.setDelegateReleased(new BigDecimal("500000000000000000000000"));
         when(this.chainConfig.getDelegateThreshold()).thenReturn(BigDecimal.ONE);
 
-        this.target.analyze(this.collectionEvent,tx);
+        this.target.analyze(this.collectionEvent, tx);
         delegation.setDelegateReleased(BigDecimal.ZERO);
         delegation.setDelegateHes(new BigDecimal("900000000000000000000000"));
-        this.target.analyze(this.collectionEvent,tx);
+        this.target.analyze(this.collectionEvent, tx);
 
         delegation.setDelegateHes(new BigDecimal("200000000000000000000000"));
-        this.target.analyze(this.collectionEvent,tx);
+        this.target.analyze(this.collectionEvent, tx);
 
         assertTrue(true);
     }
+
 }

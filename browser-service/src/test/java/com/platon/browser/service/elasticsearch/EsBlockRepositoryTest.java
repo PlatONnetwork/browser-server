@@ -42,8 +42,8 @@ public class EsBlockRepositoryTest {
 
     @Before
     public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"client",client);
-        ReflectionTestUtils.setField(target,"indexName","client");
+        //ReflectionTestUtils.setField(target,"client",client);
+        //ReflectionTestUtils.setField(target,"indexName","client");
         IndicesClient indicesClient = mock(IndicesClient.class);
         when(client.indices()).thenReturn(indicesClient);
         CreateIndexResponse createIndexResponse = mock(CreateIndexResponse.class);

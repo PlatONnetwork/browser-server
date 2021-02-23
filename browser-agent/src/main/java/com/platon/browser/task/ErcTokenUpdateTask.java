@@ -7,6 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -17,6 +18,7 @@ import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.service.erc.ErcServiceImpl;
+import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.bean.ErcToken;
@@ -275,12 +277,18 @@ public class ErcTokenUpdateTask {
             }
             list.forEach(v -> {
                 if (map.containsKey(v.getContract())) {
-                    map.get(v.getContract()).add(v.getFrom());
-                    map.get(v.getContract()).add(v.getTo());
+                    // 判断是否是0地址
+                    if (!AddressUtil.isAddrZero(v.getFrom(), v.getTo())) {
+                        map.get(v.getContract()).add(v.getFrom());
+                        map.get(v.getContract()).add(v.getTo());
+                    }
                 } else {
                     HashSet<String> addressSet = new HashSet<String>();
-                    addressSet.add(v.getFrom());
-                    addressSet.add(v.getTo());
+                    // 判断是否是0地址
+                    if (!AddressUtil.isAddrZero(v.getFrom(), v.getTo())) {
+                        addressSet.add(v.getFrom());
+                        addressSet.add(v.getTo());
+                    }
                     map.put(v.getContract(), addressSet);
                 }
             });
@@ -316,11 +324,7 @@ public class ErcTokenUpdateTask {
                 }
             }
             if (!updateParams.isEmpty()) {
-                customTokenHolderMapper.batchInsertOrUpdateSelective(updateParams,
-                        TokenHolder.Column.tokenAddress,
-                        TokenHolder.Column.address,
-                        TokenHolder.Column.balance,
-                        TokenHolder.Column.updateTime);
+                customTokenHolderMapper.batchUpdate(updateParams);
             }
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);

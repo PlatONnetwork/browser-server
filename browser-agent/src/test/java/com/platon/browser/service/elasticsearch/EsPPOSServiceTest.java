@@ -27,7 +27,7 @@ public class EsPPOSServiceTest extends AgentTestBase {
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(target, "transactionESRepository", ESTransactionRepository);
+        ReflectionTestUtils.setField(target, "ESTransactionRepository", ESTransactionRepository);
     }
 
     /**
