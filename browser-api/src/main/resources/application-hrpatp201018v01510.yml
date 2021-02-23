@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrpatp201018
+profile: hrpatp201018v01510
 # 密码加密配置
 jasypt:
   encryptor:
@@ -73,7 +73,7 @@ server:
 zuul:
   FormBodyWrapperFilter:
     pre:
-     disable: true
+      disable: true
 #日志配置
 logging:
   #日志级别

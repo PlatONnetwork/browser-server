@@ -69,7 +69,7 @@ public class Erc20TokenTransferRecordController {
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error("download error", e);
+            log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
@@ -99,7 +99,7 @@ public class Erc20TokenTransferRecordController {
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error(e.getMessage());
+            log.error(e.getMessage());
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
@@ -129,7 +129,7 @@ public class Erc20TokenTransferRecordController {
             this.downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
                     accountDownload.getData());
         } catch (Exception e) {
-            this.log.error("download error", e);
+            log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }

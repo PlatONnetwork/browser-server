@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrpatp201018
+profile: hrplat100
 # 密码加密配置
 jasypt:
   encryptor:
@@ -81,33 +81,33 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.112.141:6789,192.168.112.141:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
-  initIssueAmount: 100000000
+  initIssueAmount: 10000000000
   #每年固定增发比例
-  addIssueRate: 0.05
+  addIssueRate: 0.025
   #每年增发分配给激励池的比例
-  incentiveRateFromIssue: 0.4
+  incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
   foundationSubsidies: {
-    '1':0,
-    '2':0,
-    '3':0,
-    '4':0,
-    '5':0,
-    '6':0,
-    '7':0,
-    '8':0,
-    '9':0
+    '1':62215742.00000000,
+    '2':55965742.00000000,
+    '3':49559492.00000000,
+    '4':42993086.00000000,
+    '5':36262520.00000000,
+    '6':29363689.00000000,
+    '7':22292388.00000000,
+    '8':15044304.00000000,
+    '9':7615018.00000000
   }
   # 初始内置节点默认质押金额(ATP)
-  defaultStakingLockedAmount: 10500
+  defaultStakingLockedAmount: 100000
   #区块最大Gas限制
-  maxBlockGasLimit: 100800000
+  maxBlockGasLimit: 201600000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
   #提案pip_num参数模板
@@ -117,7 +117,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201018
+  chainId: 201040
   #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
   eventDefine: {
     "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
@@ -141,13 +141,13 @@ v015:
   adjustLogFilePath: ./adjust.log
 
 task:
-   #地址统计任务
-   address-batch-size: 1000
+  #地址统计任务
+  address-batch-size: 1000
   #动态调整参数
-   dynamic-adjust:
-     #agent与实际链上区块号相差多少个块号时触发调整操作
-     threshold: 20
-     #未追上链,批量入ES和Redis的缓存大小
-     cache-batch-max-size: 10
-     #已追上链,批量入ES和Redis的缓存大小
-     cache-batch-min-size: 1
+  dynamic-adjust:
+    #agent与实际链上区块号相差多少个块号时触发调整操作
+    threshold: 20
+    #未追上链,批量入ES和Redis的缓存大小
+    cache-batch-max-size: 10
+    #已追上链,批量入ES和Redis的缓存大小
+    cache-batch-min-size: 1
