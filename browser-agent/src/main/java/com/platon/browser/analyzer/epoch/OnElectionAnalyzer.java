@@ -183,7 +183,7 @@ public class OnElectionAnalyzer {
 				}
 			}
 			// 设置离开验证人列表的时间
-			customStaking.setLeaveTime(new Date());
+			customStaking.setLeaveTime(block.getTime());
 			// 低出块处罚次数+1
 			customStaking.setLowRateSlashCount(staking.getLowRateSlashCount()+1);
 			nodeOpts.add(nodeOpt);
