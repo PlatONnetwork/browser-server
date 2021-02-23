@@ -53,9 +53,9 @@ task copyConf(type: Copy) {
 	    into('build/package/browser-agent')
     } else {
     	println 'copy conf from src/main/resources all'
-	    from('src/main/resources/application-hrpatp201040.yml')
+	    from('src/main/resources/application-hrplat100.yml')
 	    into('build/package/browser-agent')
-	    from('src/main/resources/application-hrpatp201018.yml')
+	    from('src/main/resources/application-hrpatp201018v01510.yml')
 	    into('build/package/browser-agent')
 	    from('src/main/resources/application-prod.yml')
 	    into('build/package/browser-agent')

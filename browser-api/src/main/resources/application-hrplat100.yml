@@ -1,12 +1,12 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrpatp201018v01510
+profile: hrplat100
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 # 服务器端口号
-server.port: 50010
+server.port: 45000
 #Spring框架内部配置
 spring:
   #数据源配置
@@ -98,7 +98,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.112.141:6789,192.168.112.141:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -133,7 +133,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201018
+  chainId: 201040
   #Redis命名空间
   redis-namespace: browser:${profile}
 
