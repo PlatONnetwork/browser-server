@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrplat100
+profile: hrplat100v10000
 # 密码加密配置
 jasypt:
   encryptor:
@@ -72,9 +72,9 @@ logging:
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
-  addressPrefix: atp
+  addressPrefix: lat
   # 金额显示单位
-  valueUnit: ATP
+  valueUnit: LAT
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
