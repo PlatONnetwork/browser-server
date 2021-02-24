@@ -1,10 +1,12 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrplat100
+profile: hrplat100v10000
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+# 服务器端口号
+server.port: 40010
 #Spring框架内部配置
 spring:
   #数据源配置
@@ -12,12 +14,26 @@ spring:
     url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-  #Redis配置
-  redis:
-    cluster:
-      max-redirects: 3
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-    password: platscan
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    #下面为连接池的补充设置，应用到上面所有数据源中
+    #初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 10
+    maxActive: 100
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 100
   #ES配置
   elasticsearch:
     high-level-client:
@@ -32,44 +48,45 @@ spring:
       nodeOptIndexName: browser_nodeopt_${profile}
       delegationRewardIndexName: browser_delegation_reward_${profile}
       innerTxIndexName: browser_inner_tx_${profile}
-# 内存环形缓冲区大小，必须是2的指数倍
-disruptor:
-  queue:
-    # 区块事件环形缓冲区大小
-    block.buffer-size: 1024
-    # 采集事件环形缓冲区大小
-    collection.buffer-size: 1024
-    # 数据补充环形缓冲区大小
-    complement.buffer-size: 1024
-    # gas price估算消息环形缓冲区大小
-    gasestimate.buffer-size: 1024
-    # 数据持久化
-    persistence:
-      #环形缓冲区大小
-      buffer-size: 1024
-      #每次处理多少个
-      batch-size: 10
+#redis配置
+redisCluster:
+  configKey: DEFAULT
+  connectionTimeout: 4000
+  soTimeout: 5000
+  maxRedirections: 3000
+  maxTotal: 10
+  maxIdle: 5
+  minIdle: 2
+  maxWaitMillis: 2000
+  testOnBorrow: false
+  testOnReturn: false
+  testWhileIdle: true
+  masterIPs: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+  password: platscan
+#性能配置
+server:
+  tomcat:
+    max-connections: 20000
+    threads:
+      min-spare: 800
+      max: 2000
+zuul:
+  FormBodyWrapperFilter:
+    pre:
+      disable: true
 #日志配置
 logging:
   #日志级别
   level:
-    org.springframework: error
-    org.springframework.retry: error
-    com.platon.browser: error
-    com.platon.browser.bootstrap: error
-    com.platon.browser.collection: error
-    com.platon.browser.collection.queue.handler: error
-    com.platon.browser.common: error
-    com.platon.browser.complement: error
-    com.platon.browser.complement.handler: error
-    com.platon.browser.complement.converter: error
-    com.platon.browser.persistence: error
-    com.platon.browser.persistence.handler: error
-    com.platon.browser.persistence.queue.handler: error
-    com.platon.browser.task: error
+    org.springframework: debug
+    com.platon.browser: debug
+    com.platon.browser.service: debug
+    com.platon.browser.task: debug
+    com.platon.browser.client: debug
+    com.platon.browser.dao: debug
   file:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
-#PlatOn相关配置
+#初始化链相关的配置
 platon:
   # 地址HRP前缀
   addressPrefix: atp
@@ -109,45 +126,21 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
-  #提案pip_num参数模板
-  proposalPipNumTemplate: PIP-%s
+  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
+  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 201040
-  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
-  eventDefine: {
-    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
-  }
   #Redis命名空间
   redis-namespace: browser:${profile}
-  #同步时的索引查询分页参数配置
-  paging:
-    erc20-transaction:
-      pageSize: 2000
-      pageCount: 250
-# v0.15.0.0版本新增功能涉及的配置
-v015:
-  #锁仓最小释放金额参数生效版本
-  restrictingMinimumReleaseActiveVersion: 3584
-  #调账生效版本
-  adjustmentActiveVersion: 3840
-  #调账提案ID
-  adjustmentPipId: '1609410836.4141252'
-  #调账日志输出文件
-  adjustLogFilePath: ./adjust.log
 
-task:
-  #地址统计任务
-  address-batch-size: 1000
-  #动态调整参数
-  dynamic-adjust:
-    #agent与实际链上区块号相差多少个块号时触发调整操作
-    threshold: 20
-    #未追上链,批量入ES和Redis的缓存大小
-    cache-batch-max-size: 10
-    #已追上链,批量入ES和Redis的缓存大小
-    cache-batch-min-size: 1
+recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
+isRecaptcha: false
+limit:
+  num: 10
+output:
+  file:
+    url: ./

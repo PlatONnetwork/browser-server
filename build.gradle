@@ -143,6 +143,24 @@ subprojects {
         }
     }
 
+    // 拷包到测试环境
+    def deployDir = "$deployRootDir/${project.name}"
+    def activeProfile = "$deployProfile"
+    task deployToTestEnv(dependsOn:['buildTar'],group: 'deploy') {
+        doLast {
+            ssh.settings {
+                knownHosts = allowAnyHosts
+                pty = true
+            }
+            ssh.run {
+                session(remotes.webServer) {
+                    execute "mkdir -p $deployDir && rm -rf $deployDir/${project.name}*.jar"
+                    put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
+                    execute "cd $deployDir && $deployFixScript && chmod a+x *.sh && ./start.sh $activeProfile"
+                }
+            }
+        }
+    }
 
     //sonar扫描的路径
     sonarqube {
