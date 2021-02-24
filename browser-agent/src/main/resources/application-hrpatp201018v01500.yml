@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrpatp201018v01510
+profile: hrpatp201018v01500
 # 密码加密配置
 jasypt:
   encryptor:
@@ -71,17 +71,13 @@ logging:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #PlatOn相关配置
 platon:
-  # 地址HRP前缀
-  addressPrefix: atp
-  # 金额显示单位
-  valueUnit: ATP
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.120.151:6791
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -138,7 +134,7 @@ v015:
   #调账提案ID
   adjustmentPipId: '1609410836.4141252'
   #调账日志输出文件
-  adjustLogFilePath: ./adjust.log
+  adjustLogFilePath: /opt/alaya/0.15.0.0/browser-agent/adjust.log
 
 task:
   #地址统计任务

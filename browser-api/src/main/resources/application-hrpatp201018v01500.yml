@@ -1,6 +1,6 @@
-# ***************************开发配置**************************** #
+# ***************************测试配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: hrpatp201018v01510
+profile: hrpatp201018v01500
 # 密码加密配置
 jasypt:
   encryptor:
@@ -88,17 +88,13 @@ logging:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
 platon:
-  # 地址HRP前缀
-  addressPrefix: atp
-  # 金额显示单位
-  valueUnit: ATP
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
     protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    addresses: 192.168.120.151:6791
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -126,8 +122,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 100800000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
-  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -143,4 +138,4 @@ limit:
   num: 10
 output:
   file:
-    url: ./
+    url: /opt/alaya/0.15.0.0/browser-api/
