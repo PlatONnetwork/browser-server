@@ -122,7 +122,7 @@ platon:
     '9':7615018.00000000
   }
   # 初始内置节点默认质押金额(ATP)
-  defaultStakingLockedAmount: 100000
+  defaultStakingLockedAmount: 150000
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
