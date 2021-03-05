@@ -1,0 +1,108 @@
+profile: {{ app_env }}
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+spring:
+  datasource:
+    url: jdbc:mysql://{{ mysql.one.url }}/{{ mysql.one.scan_agent.db }}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: {{ mysql.one.scan_agent.user }}
+    password: {{ mysql.one.scan_agent.pass }}
+  redis:
+    cluster:
+      max-redirects: 3
+      nodes: {{ redis.url }}
+    password: {{ redis.password }}
+    ssl: {{ ssl_status }}
+  elasticsearch:
+    high-level-client:
+      hosts: {{ es.url }}
+      port: {{ es.port }}
+      schema: http
+      username: {{ es.username }}
+      password: {{ es.password }}
+      blockIndexName: browser_block_{{ app_env }}
+      transactionIndexName: browser_transaction_{{ app_env }}
+      delegationIndexName: browser_delegation_{{ app_env }}
+      nodeOptIndexName: browser_nodeopt_{{ app_env }}
+      delegationRewardIndexName: browser_delegation_reward_{{ app_env }}
+      innerTxIndexName: browser_inner_tx_{{ app_env }}
+disruptor:
+  queue:
+    block.buffer-size: 1024
+    collection.buffer-size: 1024
+    complement.buffer-size: 1024
+    gasestimate.buffer-size: 1024
+    persistence:
+      buffer-size: 1024
+      batch-size: 10
+logging:
+  file:
+    name: ./logs/${spring.application.name}-{{ app_env }}.log
+  level:
+    org.springframework: {{ log_level }}
+    org.springframework.retry: {{ log_level }}
+    com.platon.browser: {{ log_level }}
+    com.platon.browser.bootstrap: warn
+    com.platon.browser.collection: {{ log_level }}
+    com.platon.browser.collection.queue.handler: {{ log_level }}
+    com.platon.browser.common: {{ log_level }}
+    com.platon.browser.complement: {{ log_level }}
+    com.platon.browser.complement.handler: {{ log_level }}
+    com.platon.browser.complement.converter: {{ log_level }}
+    com.platon.browser.persistence: {{ log_level }}
+    com.platon.browser.persistence.handler: {{ log_level }}
+    com.platon.browser.persistence.queue.handler: {{ log_level }}
+    com.platon.browser.task: {{ log_level }}
+platon:
+  addressPrefix: lat
+  valueUnit: LAT
+  txLogDecodeThreadNum: 200
+  web3j:
+    protocol: ws
+  {% if spec_node_info.ip |length == 2 %}
+addresses: {{ spec_node_info.ip[0] }}:{{ spec_node_info.web3j_port }},{{ spec_node_info.ip[1] }}:{{ spec_node_info.web3j_port }}
+  {% else %}
+addresses: {{ spec_node_info.ip[0] }}:{{ spec_node_info.web3j_port }}
+  {% endif %}
+maxSettlePeriodCount4AnnualizedRateStat: 4
+initIssueAmount: 10000000000
+addIssueRate: 0.025
+incentiveRateFromIssue: 0.8
+electionBackwardBlockCount: 20
+foundationSubsidies: {
+  '1':62215742.00000000,
+  '2':55965742.00000000,
+  '3':49559492.00000000,
+  '4':42993086.00000000,
+  '5':36262520.00000000,
+  '6':29363689.00000000,
+  '7':22292388.00000000,
+  '8':15044304.00000000,
+  '9':7615018.00000000
+}
+defaultStakingLockedAmount: 150000
+maxBlockGasLimit: 201600000
+proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/PIPs/PIP-%s.md
+proposalPipNumTemplate: PIP-%s
+keyBase: https://keybase.io/
+keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
+chainId: {{ chainid }}
+eventDefine: {
+  "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
+}
+redis-namespace: browser:{{ app_env }}
+paging:
+  erc20-transaction:
+    pageSize: 2000
+    pageCount: 250
+v015:
+  restrictingMinimumReleaseActiveVersion: 3584
+  adjustmentActiveVersion: 3840
+  adjustmentPipId: 14
+  adjustLogFilePath: ./logs/staking-delegate-adjust.log
+task:
+  address-batch-size: 1000
+  dynamic-adjust:
+    threshold: 20
+    cache-batch-max-size: 10
+    cache-batch-min-size: 1

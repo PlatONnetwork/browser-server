@@ -70,6 +70,7 @@ server:
     threads:
       min-spare: 800
       max: 2000
+    connection-timeout: 5000
 zuul:
   FormBodyWrapperFilter:
     pre:
@@ -126,8 +127,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
-  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -138,7 +138,6 @@ platon:
   redis-namespace: browser:${profile}
 
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
-isRecaptcha: false
 limit:
   num: 10
 output:

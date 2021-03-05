@@ -55,9 +55,7 @@ task copyConf(type: Copy) {
     	println 'copy conf from src/main/resources all'
 	    from('src/main/resources/application-hrplat100v10000.yml')
 	    into('build/package/browser-agent')
-	    from('src/main/resources/application-hrpatp201018v01510.yml')
-	    into('build/package/browser-agent')
-	    from('src/main/resources/application-prod.yml')
+	    from('src/main/resources/application-prod.yml.j2')
 	    into('build/package/browser-agent')
 	    from('jasypt.properties')
 	    into('build/package/browser-agent')
