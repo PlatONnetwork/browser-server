@@ -38,10 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -99,13 +96,30 @@ public abstract class ESRepository {
      */
     public void createIndex(Map<String, ?> mapping) throws IOException {
         long startTime = System.currentTimeMillis();
-
         CreateIndexRequest request = new CreateIndexRequest(getIndexName());
         if (mapping != null && mapping.size() > 0) {
             request.mapping(mapping);
         }
         CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+        log.debug("createIndex:{}", JSON.toJSONString(response, true));
+    }
 
+    /**
+     * 创建索引
+     *
+     * @throws IOException
+     */
+    public void createIndex(Map<String, ?> setting, Map<String, ?> mapping) throws IOException {
+        long startTime = System.currentTimeMillis();
+        CreateIndexRequest request = new CreateIndexRequest(getIndexName());
+        if (mapping != null && mapping.size() > 0) {
+            request.mapping(mapping);
+        }
+        if (setting != null && setting.size() > 0) {
+            request.settings(setting);
+        }
+        CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
         log.debug("createIndex:{}", JSON.toJSONString(response, true));
     }
@@ -151,9 +165,17 @@ public abstract class ESRepository {
      * @throws IOException
      */
     public boolean initIndex() throws IOException {
-        if (this.existsIndex())
+        if (this.existsIndex()) {
             this.deleteIndex();
-        this.createIndex(null);
+        }
+        Map<String, Object> setting = new HashMap(3);
+        // 查询的返回数量，默认是10000
+        setting.put("max_result_window", 2000000000);
+        // 主碎片的数量
+        setting.put("number_of_shards", 5);
+        // 副本每个主碎片的数量
+        setting.put("number_of_replicas", 1);
+        this.createIndex(setting, null);
         return true;
     }
 
