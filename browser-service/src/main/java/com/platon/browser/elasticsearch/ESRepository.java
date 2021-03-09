@@ -32,6 +32,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,356 +51,367 @@ import java.util.Map;
 @Slf4j
 public abstract class ESRepository {
 
-	@Resource(name = "restHighLevelClient")
-	protected RestHighLevelClient client;
+    @Resource(name = "restHighLevelClient")
+    protected RestHighLevelClient client;
 
-	@Autowired
-	private SpringUtils springUtils;
+    @Autowired
+    private SpringUtils springUtils;
 
-	public abstract String getIndexName();
+    public abstract String getIndexName();
 
-	private static final String CONSUME_TIME_TIPS="处理耗时:{} ms";
+    private static final String CONSUME_TIME_TIPS = "处理耗时:{} ms";
 
-	/**
-	 * 索引模板发布
-	 */
-	public void putIndexTemplate(String indexTemplateName, XContentBuilder builder) throws IOException {
-		if (existsTemplate(indexTemplateName)) {
-			log.warn("{" + indexTemplateName + "} index template already exist.");
-			return;
-		}
-		long startTime = System.currentTimeMillis();
-		PutIndexTemplateRequest request = new PutIndexTemplateRequest(indexTemplateName);
-		if (builder != null) {
-			request.source(builder);
-		}
-		AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
-		if (log.isDebugEnabled()) {
-			log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-			log.debug("createIndexWithMapping:{}", JSON.toJSONString(response, true));
-		}
-	}
+    /**
+     * 索引模板发布
+     */
+    public void putIndexTemplate(String indexTemplateName, XContentBuilder builder) throws IOException {
+        if (existsTemplate(indexTemplateName)) {
+            log.warn("{" + indexTemplateName + "} index template already exist.");
+            return;
+        }
+        long startTime = System.currentTimeMillis();
+        PutIndexTemplateRequest request = new PutIndexTemplateRequest(indexTemplateName);
+        if (builder != null) {
+            request.source(builder);
+        }
+        AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
+        if (log.isDebugEnabled()) {
+            log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+            log.debug("createIndexWithMapping:{}", JSON.toJSONString(response, true));
+        }
+    }
 
-	public boolean existsTemplate(String templateName) throws IOException {
-		long startTime = System.currentTimeMillis();
-		IndexTemplatesExistRequest request = new IndexTemplatesExistRequest(templateName);
-		boolean response = client.indices().existsTemplate(request, RequestOptions.DEFAULT);
-		if (log.isDebugEnabled()) {
-			log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
-			log.debug("existsTemplate: {}", response);
-		}
-		return response;
-	}
+    public boolean existsTemplate(String templateName) throws IOException {
+        long startTime = System.currentTimeMillis();
+        IndexTemplatesExistRequest request = new IndexTemplatesExistRequest(templateName);
+        boolean response = client.indices().existsTemplate(request, RequestOptions.DEFAULT);
+        if (log.isDebugEnabled()) {
+            log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+            log.debug("existsTemplate: {}", response);
+        }
+        return response;
+    }
 
-	/**
-	 * 创建索引
-	 *
-	 * @throws IOException
-	 */
-	public void createIndex(Map<String, ?> mapping) throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 创建索引
+     *
+     * @throws IOException
+     */
+    public void createIndex(Map<String, ?> mapping) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		CreateIndexRequest request = new CreateIndexRequest(getIndexName());
-		if (mapping != null && mapping.size() > 0) {
-			request.mapping(mapping);
-		}
-		CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
+        CreateIndexRequest request = new CreateIndexRequest(getIndexName());
+        if (mapping != null && mapping.size() > 0) {
+            request.mapping(mapping);
+        }
+        CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
-		log.debug("createIndex:{}", JSON.toJSONString(response, true));
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+        log.debug("createIndex:{}", JSON.toJSONString(response, true));
+    }
 
-	/**
-	 * 删除索引
-	 *
-	 * @throws IOException
-	 */
-	public void deleteIndex() throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 删除索引
+     *
+     * @throws IOException
+     */
+    public void deleteIndex() throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		DeleteIndexRequest request = new DeleteIndexRequest(getIndexName());
-		AcknowledgedResponse response = client.indices().delete(request, RequestOptions.DEFAULT);
+        DeleteIndexRequest request = new DeleteIndexRequest(getIndexName());
+        AcknowledgedResponse response = client.indices().delete(request, RequestOptions.DEFAULT);
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-		log.debug("deleteIndex:{}", JSON.toJSONString(response, true));
-	}
+        log.debug("deleteIndex:{}", JSON.toJSONString(response, true));
+    }
 
-	/**
-	 * 判断索引是否存在
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	public boolean existsIndex() throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 判断索引是否存在
+     *
+     * @return
+     * @throws IOException
+     */
+    public boolean existsIndex() throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		GetIndexRequest request = new GetIndexRequest(getIndexName());
-		boolean response = client.indices().exists(request, RequestOptions.DEFAULT);
+        GetIndexRequest request = new GetIndexRequest(getIndexName());
+        boolean response = client.indices().exists(request, RequestOptions.DEFAULT);
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-		log.debug("existsIndex:{}", response);
-		return response;
-	}
-	
-	/**
-	 * 初始化index
-	 * @return
-	 * @throws IOException
-	 */
-	public boolean initIndex() throws IOException {
-		if(this.existsIndex()) this.deleteIndex();
-		this.createIndex(null);
-		return true;
-	}
+        log.debug("existsIndex:{}", response);
+        return response;
+    }
 
-	/**
-	 * 增加记录
-	 *
-	 * @throws IOException
-	 */
-	public <T> void add(String id, T doc) throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 初始化index
+     *
+     * @return
+     * @throws IOException
+     */
+    public boolean initIndex() throws IOException {
+        if (this.existsIndex())
+            this.deleteIndex();
+        this.createIndex(null);
+        return true;
+    }
 
-		IndexRequest request = new IndexRequest(getIndexName());
-		request.id(id).source(JSON.toJSONString(doc), XContentType.JSON);
-		IndexResponse response = client.index(request, RequestOptions.DEFAULT);
+    /**
+     * 增加记录
+     *
+     * @throws IOException
+     */
+    public <T> void add(String id, T doc) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        IndexRequest request = new IndexRequest(getIndexName());
+        request.id(id).source(JSON.toJSONString(doc), XContentType.JSON);
+        IndexResponse response = client.index(request, RequestOptions.DEFAULT);
 
-		log.debug("add:{}", JSON.toJSONString(response, true));
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-	/**
-	 * 判断记录是都存在
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	public boolean exists(String id) throws IOException {
-		long startTime = System.currentTimeMillis();
+        log.debug("add:{}", JSON.toJSONString(response, true));
+    }
 
-		GetRequest request = new GetRequest(getIndexName(), id);
-		request.fetchSourceContext(new FetchSourceContext(false)).storedFields("_none_");
-		boolean response = client.exists(request, RequestOptions.DEFAULT);
+    /**
+     * 判断记录是都存在
+     *
+     * @return
+     * @throws IOException
+     */
+    public boolean exists(String id) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        GetRequest request = new GetRequest(getIndexName(), id);
+        request.fetchSourceContext(new FetchSourceContext(false)).storedFields("_none_");
+        boolean response = client.exists(request, RequestOptions.DEFAULT);
 
-		log.debug("add:{}", JSON.toJSONString(response, true));
-		return response;
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-	/**
-	 * 获取记录信息
-	 *
-	 * @param id
-	 * @throws IOException
-	 */
-	public <T> T get(String id, Class<T> clazz) throws IOException {
-		long startTime = System.currentTimeMillis();
+        log.debug("add:{}", JSON.toJSONString(response, true));
+        return response;
+    }
 
-		GetRequest request = new GetRequest(getIndexName(), id);
-		GetResponse response = client.get(request, RequestOptions.DEFAULT);
-		log.debug("get:{}", JSON.toJSONString(response, true));
-		String res = response.getSourceAsString();
+    /**
+     * 获取记录信息
+     *
+     * @param id
+     * @throws IOException
+     */
+    public <T> T get(String id, Class<T> clazz) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        GetRequest request = new GetRequest(getIndexName(), id);
+        GetResponse response = client.get(request, RequestOptions.DEFAULT);
+        log.debug("get:{}", JSON.toJSONString(response, true));
+        String res = response.getSourceAsString();
 
-		return JSON.parseObject(res, clazz);
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-	/**
-	 * 更新记录信息
-	 *
-	 * @throws IOException
-	 */
-	public <T> void update(String id, T block) throws IOException {
-		long startTime = System.currentTimeMillis();
+        return JSON.parseObject(res, clazz);
+    }
 
-		UpdateRequest request = new UpdateRequest(getIndexName(), id);
-		request.doc(JSON.toJSONString(block), XContentType.JSON);
-		UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
+    /**
+     * 更新记录信息
+     *
+     * @throws IOException
+     */
+    public <T> void update(String id, T block) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        UpdateRequest request = new UpdateRequest(getIndexName(), id);
+        request.doc(JSON.toJSONString(block), XContentType.JSON);
+        UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
 
-		log.debug("update:{}", JSON.toJSONString(response, true));
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-	/**
-	 * 删除记录
-	 *
-	 * @param id
-	 * @throws IOException
-	 */
-	public void delete(String id) throws IOException {
-		long startTime = System.currentTimeMillis();
+        log.debug("update:{}", JSON.toJSONString(response, true));
+    }
 
-		DeleteRequest request = new DeleteRequest(getIndexName(), id);
-		DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
+    /**
+     * 删除记录
+     *
+     * @param id
+     * @throws IOException
+     */
+    public void delete(String id) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        DeleteRequest request = new DeleteRequest(getIndexName(), id);
+        DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
 
-		log.debug("delete:{}", JSON.toJSONString(response, true));
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-	/**
-	 * 搜索
-	 *
-	 * @throws IOException
-	 */
-	public <T> ESResult<T> search(Map<String, Object> filter, Class<T> clazz, List<ESSortDto> esSortDtos, int pageNo,
-			int pageSize) throws IOException {
-		long startTime = System.currentTimeMillis();
+        log.debug("delete:{}", JSON.toJSONString(response, true));
+    }
 
-		if (pageNo <= 0)
-			pageNo = 1;
-		SearchRequest searchRequest = new SearchRequest(getIndexName());
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
-		if(filter != null) {
-			filter.forEach((term, value) -> searchSourceBuilder.query(QueryBuilders.matchQuery(term, value)));
-		}
-		if(esSortDtos != null) {
-			esSortDtos.forEach(esSortDto -> searchSourceBuilder.sort(esSortDto.getSortName(), esSortDto.getSortOrder()));
-		}
-		searchRequest.source(searchSourceBuilder);
-		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-		ESResult<T> esResult = new ESResult<>();
-		SearchHits hits = response.getHits();
-		esResult.setTotal(hits.getTotalHits().value);
-		List<T> list = new ArrayList<>();
-		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
-		esResult.setRsData(list);
+    /**
+     * 搜索
+     *
+     * @throws IOException
+     */
+    public <T> ESResult<T> search(Map<String, Object> filter, Class<T> clazz, List<ESSortDto> esSortDtos, int pageNo,
+                                  int pageSize) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        if (pageNo <= 0)
+            pageNo = 1;
+        SearchRequest searchRequest = new SearchRequest(getIndexName());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
+        if (filter != null) {
+            filter.forEach((term, value) -> searchSourceBuilder.query(QueryBuilders.matchQuery(term, value)));
+        }
+        if (esSortDtos != null) {
+            esSortDtos.forEach(esSortDto -> searchSourceBuilder.sort(esSortDto.getSortName(), esSortDto.getSortOrder()));
+        }
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        ESResult<T> esResult = new ESResult<>();
+        SearchHits hits = response.getHits();
+        esResult.setTotal(hits.getTotalHits().value);
+        List<T> list = new ArrayList<>();
+        Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
+        esResult.setRsData(list);
 
-		return esResult;
-	}
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
+        return esResult;
+    }
 
-	/**
-	 * 搜索
-	 *
-	 * @throws IOException
-	 */
-	public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz,int pageNo,
-			int pageSize) throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 搜索
+     *
+     * @throws IOException
+     */
+    public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz, int pageNo,
+                                  int pageSize) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		if (pageNo <= 0)
-			pageNo = 1;
-		SearchRequest searchRequest = new SearchRequest(getIndexName());
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		//排序
+        if (pageNo <= 0)
+            pageNo = 1;
+        SearchRequest searchRequest = new SearchRequest(getIndexName());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //排序
         if (StringUtils.isNotEmpty(constructor.getAsc())) {
-        	searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
+            FieldSortBuilder fieldSortBuilder = new FieldSortBuilder(constructor.getAsc());
+            fieldSortBuilder.order(SortOrder.ASC);
+            if (StringUtils.isNotEmpty(constructor.getUnmappedType())) {
+                fieldSortBuilder.unmappedType(constructor.getUnmappedType());
+            }
+            searchSourceBuilder.sort(fieldSortBuilder);
         }
         if (StringUtils.isNotEmpty(constructor.getDesc())) {
-        	searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
+            FieldSortBuilder fieldSortBuilder = new FieldSortBuilder(constructor.getDesc());
+            fieldSortBuilder.order(SortOrder.DESC);
+            if (StringUtils.isNotEmpty(constructor.getUnmappedType())) {
+                fieldSortBuilder.unmappedType(constructor.getUnmappedType());
+            }
+            searchSourceBuilder.sort(fieldSortBuilder);
         }
         //设置查询体
         searchSourceBuilder.query(constructor.listBuilders());
         searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
-        if(constructor.getResult() != null ) {
-        	searchSourceBuilder.fetchSource(constructor.getResult(), null);
+        if (constructor.getResult() != null) {
+            searchSourceBuilder.fetchSource(constructor.getResult(), null);
         }
-     // 设置SearchSourceBuilder查询属性
-		searchRequest.source(searchSourceBuilder);
-		log.debug("get rs" + searchSourceBuilder.toString());
-		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-		ESResult<T> esResult = new ESResult<>();
-		SearchHits hits = response.getHits();
-		esResult.setTotal(hits.getTotalHits().value);
-		List<T> list = new ArrayList<>();
-		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
-		esResult.setRsData(list);
+        // 设置SearchSourceBuilder查询属性
+        searchRequest.source(searchSourceBuilder);
+        log.debug("get rs" + searchSourceBuilder.toString());
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        ESResult<T> esResult = new ESResult<>();
+        SearchHits hits = response.getHits();
+        esResult.setTotal(hits.getTotalHits().value);
+        List<T> list = new ArrayList<>();
+        Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
+        esResult.setRsData(list);
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-		return esResult;
-	}
+        return esResult;
+    }
 
-	/**
-	 * 查询总数
-	 *
-	 * @throws IOException
-	 */
-	public ESResult<?> Count(ESQueryBuilderConstructor constructor) throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 查询总数
+     *
+     * @throws IOException
+     */
+    public ESResult<?> Count(ESQueryBuilderConstructor constructor) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		CountRequest searchRequest = new CountRequest(getIndexName());
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		//排序
+        CountRequest searchRequest = new CountRequest(getIndexName());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //排序
         if (StringUtils.isNotEmpty(constructor.getAsc())) {
-        	searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
+            searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
         }
         if (StringUtils.isNotEmpty(constructor.getDesc())) {
-        	searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
+            searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
         }
         //设置查询体
         searchSourceBuilder.query(constructor.listBuilders());
-     // 设置SearchSourceBuilder查询属性
-		searchRequest.source(searchSourceBuilder);
-		log.debug("get rs" + searchSourceBuilder.toString());
-		CountResponse response = client.count(searchRequest, RequestOptions.DEFAULT);
-		ESResult<?> esResult = new ESResult<>();
-		esResult.setTotal(response.getCount());
+        // 设置SearchSourceBuilder查询属性
+        searchRequest.source(searchSourceBuilder);
+        log.debug("get rs" + searchSourceBuilder.toString());
+        CountResponse response = client.count(searchRequest, RequestOptions.DEFAULT);
+        ESResult<?> esResult = new ESResult<>();
+        esResult.setTotal(response.getCount());
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-		return esResult;
-	}
+        return esResult;
+    }
 
-	/**
-	 * 批量增加或更新
-	 *
-	 * @throws IOException
-	 */
-	public <T> void bulkAddOrUpdate(Map<String, T> docs) throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 批量增加或更新
+     *
+     * @throws IOException
+     */
+    public <T> void bulkAddOrUpdate(Map<String, T> docs) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		BulkRequest br = new BulkRequest();
-		for (Map.Entry<String, T> doc : docs.entrySet()) {
-			IndexRequest ir = new IndexRequest(getIndexName());
-			ir.id(doc.getKey());
-			ir.source(JSON.toJSONString(doc.getValue()), XContentType.JSON);
-			br.add(ir);
-		}
-		try {
-			BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
-			log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        BulkRequest br = new BulkRequest();
+        for (Map.Entry<String, T> doc : docs.entrySet()) {
+            IndexRequest ir = new IndexRequest(getIndexName());
+            ir.id(doc.getKey());
+            ir.source(JSON.toJSONString(doc.getValue()), XContentType.JSON);
+            br.add(ir);
+        }
+        try {
+            BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+            log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-			log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
-		} catch (Exception e) {
-			if(e instanceof RuntimeException && e.getMessage().contains("Request cannot be executed; I/O reactor status: STOPPED")) {
-				client = (RestHighLevelClient) springUtils.resetSpring("restHighLevelClient");
-				BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
-				log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
-				log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
-			}
-		}
+            log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+        } catch (Exception e) {
+            if (e instanceof RuntimeException && e.getMessage().contains("Request cannot be executed; I/O reactor status: STOPPED")) {
+                client = (RestHighLevelClient) springUtils.resetSpring("restHighLevelClient");
+                BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+                log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+                log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+            }
+        }
 
-	}
+    }
 
-	/**
-	 * 批量删除
-	 *
-	 * @throws IOException
-	 */
-	public void bulkDelete(List<String> ids) throws IOException {
-		long startTime = System.currentTimeMillis();
+    /**
+     * 批量删除
+     *
+     * @throws IOException
+     */
+    public void bulkDelete(List<String> ids) throws IOException {
+        long startTime = System.currentTimeMillis();
 
-		BulkRequest br = new BulkRequest();
-		for (String id : ids) {
-			DeleteRequest dr = new DeleteRequest(getIndexName(), id);
-			br.add(dr);
-		}
-		BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
+        BulkRequest br = new BulkRequest();
+        for (String id : ids) {
+            DeleteRequest dr = new DeleteRequest(getIndexName(), id);
+            br.add(dr);
+        }
+        BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
 
-		log.debug(CONSUME_TIME_TIPS,System.currentTimeMillis()-startTime);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-		log.debug("bulkDelete:{}", JSON.toJSONString(response, true));
-	}
+        log.debug("bulkDelete:{}", JSON.toJSONString(response, true));
+    }
 
 }
