@@ -49,6 +49,7 @@ import com.platon.browser.utils.HexTool;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -138,6 +139,7 @@ public class TransactionService {
             constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
         }
         constructor.setDesc("seq");
+        constructor.setUnmappedType("long");
         constructor.setResult(new String[]{"hash", "time", "status", "from", "to", "value", "num", "type", "toType",
                 "cost", "failReason"});
         /** 根据区块号和类型分页查询交易信息 */
@@ -168,6 +170,7 @@ public class TransactionService {
         constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
                 .should(QueryBuilders.termQuery("to", req.getAddress())));
         constructor.setDesc("seq");
+        constructor.setUnmappedType("long");
         constructor.setResult(new String[]{"hash", "time", "status", "from", "to", "value", "num", "type", "toType",
                 "cost", "failReason"});
         try {
@@ -238,6 +241,7 @@ public class TransactionService {
                 .should(QueryBuilders.termQuery("to", address)));
         ESResult<Transaction> items = new ESResult<>();
         constructor.setDesc("seq");
+        constructor.setUnmappedType("long");
         constructor
                 .setResult(new String[]{"hash", "time", "status", "from", "to", "value", "num", "type", "toType", "cost"});
         try {
