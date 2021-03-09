@@ -366,7 +366,7 @@ public class Erc20TokenTransferRecordService {
         Erc20TokenAddressRelExample.Criteria criteria = example.createCriteria();
         criteria.andContractEqualTo(contract);
         example.setOrderByClause(" update_time desc");
-        PageHelper.startPage(1, 3000);
+        PageHelper.startPage(1, 30000);
         Page<Erc20TokenAddressRel> erc20TokenAddressRels = this.erc20TokenAddressRelMapper.selectByExample(example);
         List<Object[]> rows = new ArrayList<>();
         erc20TokenAddressRels.stream().forEach(erc20TokenAddressRel -> {
