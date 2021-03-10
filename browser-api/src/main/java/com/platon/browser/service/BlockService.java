@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
-import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BrowserConst;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.BlockESRepository;
@@ -22,7 +22,9 @@ import com.platon.browser.response.block.BlockListResp;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.BlockUtil;
 import com.platon.browser.utils.HexTool;
+import com.platon.utils.Convert;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -291,7 +293,6 @@ public class BlockService {
 
     private BlockDetailResp queryBlockByNumber(long blockNumber) {
         /** 根据区块号查询对应数据 */
-
         Block block = null;
         try {
             block = blockESRepository.get(String.valueOf(blockNumber), Block.class);
@@ -310,7 +311,7 @@ public class BlockService {
             blockDetailResp.setStakingQty(block.getSQty());
             blockDetailResp.setStatTxGasLimit(block.getTxGasLimit());
             blockDetailResp.setTimestamp(block.getTime().getTime());
-            blockDetailResp.setServerTime(new Date().getTime());
+            blockDetailResp.setServerTime(System.currentTimeMillis());
             blockDetailResp.setTransferQty(block.getTranQty());
             blockDetailResp.setNodeName(commonService.getNodeName(block.getNodeId(), null));
 
@@ -332,6 +333,13 @@ public class BlockService {
             }
 
             blockDetailResp.setTimestamp(block.getTime().getTime());
+
+            // 只有第0个区块有postscript
+            if (0 == blockNumber) {
+                blockDetailResp.setPostscript(BlockUtil.getPostscriptFromExtraData(blockDetailResp.getExtraData()));
+            } else {
+                blockDetailResp.setPostscript("");
+            }
         }
         return blockDetailResp;
     }
