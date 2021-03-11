@@ -252,6 +252,9 @@ subprojects {
 
         def parentDir = project.name.contains('agent')?'scan-agent':'scan-api'
         def desDir = "${projectVersion}-"+new Date().format("yyyy.MM.dd.HHmm")
+        // 请在系统环境变量配置自己的NAS发布账户
+        def publishServerUser = System.getenv('publishServerUser')
+        def publishServerPassword = System.getenv('publishServerPassword')
         task releaseToCifs(type: JcifsCopy,dependsOn:['buildTar'],group: 'release') {
             from "${projectDir.path}/build/distributions/${packageName}.tar.gz"
             into "smb://${publishServerUser}:${publishServerPassword}@${publishServerHost}/${publishServerPath}/${parentDir}/${desDir}/"
