@@ -39,7 +39,7 @@ ext {
 // task 用来新建一些目录，目录位于build/package下
 task createDirs() {
 	file('build/lib').mkdirs()
-    file('build/package/browser-agent').mkdirs()
+    file('build/package/browser-press').mkdirs()
     file('build/package/lib').mkdirs()
     file('build/package/sql').mkdirs()
 }
@@ -48,30 +48,30 @@ task copyLibs(type: Copy) {
     from('build/libs')
     from('jasypt.properties')
     from('status.hook')
-    into('build/package/browser-agent')
+    into('build/package/browser-press')
 }
 //task 用来复制配置文件
 task copyConf(type: Copy) {
 	if(profile != 'all') {
 	    println 'copy conf from src/main/resources/application-'+profile+'.yml'
 	    from('src/main/resources/application-'+profile+'.yml')
-	    into('build/package/browser-agent')
+	    into('build/package/browser-press')
     } else {
     	println 'copy conf from src/main/resources all'
 	    from('src/main/resources/application-test.yml')
-	    into('build/package/browser-agent')
+	    into('build/package/browser-press')
 	    from('src/main/resources/application-testNet.yml')
-	    into('build/package/browser-agent')
+	    into('build/package/browser-press')
 	    from('src/main/resources/application-prod.yml')
-	    into('build/package/browser-agent')
+	    into('build/package/browser-press')
 	    from('jasypt.properties')
-	    into('build/package/browser-agent')
+	    into('build/package/browser-press')
     }
 }
 //task 用来复制bin下的脚本。这里的fileMode并没有生效，原因不详
 task copyBin(type: Copy) {
     from('src/main/resources/bin')
-    into('build/package/browser-agent')
+    into('build/package/browser-press')
     fileMode 0744
 }
 // task 用来复制启动所依赖的jar包
@@ -108,7 +108,7 @@ task prepareFile(dependsOn: [
 //指定打包的tar包的名字，以及文件来源目录
 distributions {
     monitor {
-        baseName = 'browser-agent'
+        baseName = 'browser-press'
         contents {
             from { 'build/package' }
         }

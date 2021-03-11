@@ -13,13 +13,13 @@ spring:
     database: 0
     key:
       #区块列表
-      blocks: browser:${version}:${profile}:blocks
+      blocks: browser:${profile}:blocks
       #交易列表
-      transactions: browser:${version}:${profile}:transactions
+      transactions: browser:${profile}:transactions
       #统计信息
-      networkStat: browser:${version}:${profile}:networkStat
+      networkStat: browser:${profile}:networkStat
       #代币交易
-      innerTx: browser:${version}:${profile}:innerTx
+      innerTx: browser:${profile}:innerTx
     max-item: 500000
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
