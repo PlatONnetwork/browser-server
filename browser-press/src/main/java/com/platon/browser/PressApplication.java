@@ -49,34 +49,49 @@ public class PressApplication implements ApplicationRunner {
 
     @Autowired
     private BlockPublisher blockPublisher;
+
     @Autowired
     private TransactionPublisher transactionPublisher;
+
     @Autowired
     private NodeOptPublisher nodeOptPublisher;
+
     @Autowired
     private AddressPublisher addressPublisher;
+
     @Autowired
     private NodePublisher nodePublisher;
+
     @Autowired
     private StakePublisher stakePublisher;
+
     @Autowired
     private DelegationPublisher delegationPublisher;
+
     @Autowired
     private Erc20TokenPublisher erc20TokenPublisher;
+
     @Autowired
     private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
+
     @Autowired
     private ProposalPublisher proposalPublisher;
+
     @Autowired
     private VotePublisher votePublisher;
+
     @Autowired
     private RpPlanPublisher rpPlanPublisher;
+
     @Autowired
     private RewardPublisher rewardPublisher;
+
     @Autowired
     private EstimatePublisher estimatePublisher;
+
     @Autowired
     private SlashPublisher slashPublisher;
+
     @Autowired
     private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
 
@@ -85,64 +100,87 @@ public class PressApplication implements ApplicationRunner {
 
     @Autowired
     private NetworkStatMapper networkStatMapper;
+
     @Autowired
     private ConfigMapper configMapper;
 
     @Value("${platon.nodeMaxCount}")
     private long nodeMaxCount;
+
     @Value("${platon.stakeMaxCount}")
     private long stakeMaxCount;
+
     @Value("${platon.delegateMaxCount}")
     private long delegateMaxCount;
+
     @Value("${platon.proposalMaxCount}")
     private long proposalMaxCount;
+
     @Value("${platon.voteMaxCount}")
     private long voteMaxCount;
+
     @Value("${platon.rpplanMaxCount}")
     private long rpplanMaxCount;
+
     @Value("${platon.rewardMaxCount}")
     private long rewardMaxCount;
+
     @Value("${platon.slashMaxCount}")
     private long slashMaxCount;
+
     @Value("${platon.blockMaxCount}")
     private long blockMaxCount;
+
     @Value("${platon.nodeoptMaxCount}")
     private long nodeoptMaxCount;
+
     @Value("${platon.estimateMaxCount}")
     private long estimateMaxCount;
 
     @Value("${platon.tokenMaxCount}")
     private long tokenMaxCount;
+
     @Value("${platon.addressCountPerToken}")
     private int addressCountPerToken;
+
     @Value("${platon.tokenTransferMaxCount}")
     private long tokenTransferMaxCount;
 
     private long currentNodeSum = 0L;
+
     private long currentStakeSum = 0L;
+
     private long currentDelegationSum = 0L;
+
     private long currentProposalSum = 0L;
+
     private long currentVoteSum = 0L;
+
     private long currentRpplanSum = 0L;
+
     private long currentRewardSum = 0L;
+
     private long currentSlashSum = 0L;
+
     private long currentEstimateSum = 0L;
 
     private long currentTokenCount = 0l;
+
     private long currentTokenTransferCount = 0l;
 
-    public static void main ( String[] args ) {
+    public static void main(String[] args) {
         SpringApplication.run(PressApplication.class, args);
     }
+
     @Override
-    public void run ( ApplicationArguments args ) throws IOException, BlockNumberException {
+    public void run(ApplicationArguments args) throws IOException, BlockNumberException {
         BigInteger blockNumber = init();
         NetworkStatExample networkStatExample = new NetworkStatExample();
         networkStatExample.createCriteria().andIdEqualTo(1);
-        while (true){
+        while (true) {
 
-            if(blockPublisher.getTotalCount()>blockMaxCount){
-                log.warn("区块已达到指定数量：{}",blockMaxCount);
+            if (blockPublisher.getTotalCount() > blockMaxCount) {
+                log.warn("区块已达到指定数量：{}", blockMaxCount);
                 System.exit(0);
                 break;
             }
@@ -151,7 +189,7 @@ public class PressApplication implements ApplicationRunner {
             checkAppStatus(blockNumber);
             // 构造【区块&交易&操作日志】数据
             BlockResult blockResult = makeBlock(blockNumber);
-            /*// 构造【节点&质押】数据
+            // 构造【节点&质押】数据
             makeStake(blockResult);
             // 构造【委托】数据
             makeDelegation(blockResult);
@@ -166,15 +204,15 @@ public class PressApplication implements ApplicationRunner {
             // 构造【委托奖励】数据
             makeReward(blockResult);
             // 构造【gas】数据
-            makeEstimate(blockResult);*/
+            makeEstimate(blockResult);
 
             // 构造【代币】数据
-            makeErc20Token(blockResult);
+            //makeErc20Token(blockResult);
             // 构造【代币转账】数据
-            makeTokenTransferRecord(blockResult);
+            //makeTokenTransferRecord(blockResult);
 
             // 区块号累加
-            blockNumber=blockNumber.add(BigInteger.ONE);
+            blockNumber = blockNumber.add(BigInteger.ONE);
             log.info("当前块高：" + blockNumber);
 
             if (blockNumber.intValue() % 1000 == 0) {
@@ -190,36 +228,36 @@ public class PressApplication implements ApplicationRunner {
         }
     }
 
-    private BigInteger init(){
+    private BigInteger init() {
         GracefullyUtil.updateStatus();
         log.warn("加载状态文件:counter.json");
         File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
         CounterBean counterBean = new CounterBean();
         BigInteger blockNumber = BigInteger.ZERO;
         try {
-            String status = FileUtils.readFileToString(counterFile,"UTF8");
-            counterBean = JSON.parseObject(status,CounterBean.class);
+            String status = FileUtils.readFileToString(counterFile, "UTF8");
+            counterBean = JSON.parseObject(status, CounterBean.class);
             blockPublisher.setTotalCount(counterBean.getBlockCount());
             transactionPublisher.setTotalCount(counterBean.getTransactionCount());
             nodeOptPublisher.setTotalCount(counterBean.getNodeOptCount());
             dataGenService.setNodeOptMaxId(counterBean.getNodeOptMaxId());
             addressPublisher.setTotalCount(counterBean.getAddressCount());
-            currentNodeSum=counterBean.getNodeCount();
-            currentStakeSum=counterBean.getStakingCount();
-            currentDelegationSum=counterBean.getDelegationCount();
-            currentProposalSum=counterBean.getProposalCount();
-            currentVoteSum=counterBean.getVoteCount();
-            currentRpplanSum=counterBean.getRpplanCount();
-            currentRewardSum=counterBean.getRewardCount();
-            currentSlashSum=counterBean.getSlashCount();
-            currentEstimateSum=counterBean.getEstimateCount();
+            currentNodeSum = counterBean.getNodeCount();
+            currentStakeSum = counterBean.getStakingCount();
+            currentDelegationSum = counterBean.getDelegationCount();
+            currentProposalSum = counterBean.getProposalCount();
+            currentVoteSum = counterBean.getVoteCount();
+            currentRpplanSum = counterBean.getRpplanCount();
+            currentRewardSum = counterBean.getRewardCount();
+            currentSlashSum = counterBean.getSlashCount();
+            currentEstimateSum = counterBean.getEstimateCount();
             currentTokenCount = counterBean.getTokenCount();
             currentTokenTransferCount = counterBean.getTokenTransferCount();
-            blockNumber=BigInteger.valueOf(counterBean.getLastBlockNumber());
+            blockNumber = BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
         }
-        log.warn("状态加载完成:{}",JSON.toJSONString(counterBean,true));
+        log.warn("状态加载完成:{}", JSON.toJSONString(counterBean, true));
 
         // 初始化配置表
         configMapper.deleteByExample(null);
@@ -265,7 +303,7 @@ public class PressApplication implements ApplicationRunner {
         }
     }
 
-    private void flushCount(BigInteger blockNumber){
+    private void flushCount(BigInteger blockNumber) {
         CounterBean counter = new CounterBean();
         counter.setBlockCount(blockPublisher.getTotalCount());
         counter.setTransactionCount(transactionPublisher.getTotalCount());
@@ -284,26 +322,27 @@ public class PressApplication implements ApplicationRunner {
         counter.setEstimateCount(currentEstimateSum);
         counter.setTokenCount(currentTokenCount);
         counter.setTokenTransferCount(currentTokenTransferCount);
-        String status = JSON.toJSONString(counter,true);
+        String status = JSON.toJSONString(counter, true);
         File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
             bw.write(status);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        log.warn("状态写入完成,可安全停机:{}",status);
+        log.warn("状态写入完成,可安全停机:{}", status);
     }
 
     /**
      * 构造区块、交易、及日志
+     *
      * @param blockNumber
      * @return
      */
-    private BlockResult makeBlock(BigInteger blockNumber){
+    private BlockResult makeBlock(BigInteger blockNumber) {
         BlockResult blockResult = dataGenService.getBlockResult(blockNumber);
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
         transactionPublisher.publish(blockResult.getTransactionList());
-        if(nodeOptPublisher.getTotalCount()<=nodeoptMaxCount){
+        if (nodeOptPublisher.getTotalCount() <= nodeoptMaxCount) {
             //如果日志记录达到指定数量则停止入库ES
             nodeOptPublisher.publish(blockResult.getNodeOptList());
         }
@@ -312,58 +351,64 @@ public class PressApplication implements ApplicationRunner {
 
     /**
      * 构造节点&质押
+     *
      * @param blockResult
      */
     private boolean nodeSatisfied = false;
+
     private boolean stakeSatisfied = false;
+
     private void makeStake(BlockResult blockResult) throws BlockNumberException {
-        List <Node> nodeList = new ArrayList<>();
-        List <Staking> stakingList = new ArrayList<>();
+        List<Node> nodeList = new ArrayList<>();
+        List<Staking> stakingList = new ArrayList<>();
         for (Transaction tx : blockResult.getTransactionList()) {
-            if(
-                (
-                    tx.getTypeEnum()== Transaction.TypeEnum.STAKE_CREATE||
-                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_MODIFY||
-                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_INCREASE||
-                    tx.getTypeEnum()==Transaction.TypeEnum.STAKE_EXIT
-                ) &&
-                (!nodeSatisfied||!stakeSatisfied)
-            ){
+            if (
+                    (
+                            tx.getTypeEnum() == Transaction.TypeEnum.STAKE_CREATE ||
+                                    tx.getTypeEnum() == Transaction.TypeEnum.STAKE_MODIFY ||
+                                    tx.getTypeEnum() == Transaction.TypeEnum.STAKE_INCREASE ||
+                                    tx.getTypeEnum() == Transaction.TypeEnum.STAKE_EXIT
+                    ) &&
+                            (!nodeSatisfied || !stakeSatisfied)
+            ) {
                 StakeResult stakeResult = dataGenService.getStakeResult(tx);
-                if(currentNodeSum<nodeMaxCount){
+                if (currentNodeSum < nodeMaxCount) {
                     // 构造指定数量的节点记录并入库
                     nodeList.add(stakeResult.getNode());
                     currentNodeSum++;
-                }else {
-                    nodeSatisfied=true;
+                } else {
+                    nodeSatisfied = true;
                 }
-                if(currentStakeSum<stakeMaxCount){
+                if (currentStakeSum < stakeMaxCount) {
                     // 构造指定数量的质押记录并入库
                     stakingList.add(stakeResult.getStaking());
                     currentStakeSum++;
-                }else {
-                    stakeSatisfied=true;
+                } else {
+                    stakeSatisfied = true;
                 }
             }
         }
 
-        if(!nodeList.isEmpty()) nodePublisher.publish(nodeList);
-        if(!stakingList.isEmpty()) stakePublisher.publish(stakingList);
+        if (!nodeList.isEmpty())
+            nodePublisher.publish(nodeList);
+        if (!stakingList.isEmpty())
+            stakePublisher.publish(stakingList);
     }
 
     /**
      * 构造委托
+     *
      * @param blockResult
      */
-    private void makeDelegation(BlockResult blockResult){
-        if(currentDelegationSum<delegateMaxCount){
+    private void makeDelegation(BlockResult blockResult) {
+        if (currentDelegationSum < delegateMaxCount) {
             // 构造指定数量的委托记录并入库
-            List <Delegation> delegationList = new ArrayList<>();
+            List<Delegation> delegationList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                        tx.getTypeEnum()== Transaction.TypeEnum.DELEGATE_CREATE||
-                                tx.getTypeEnum()==Transaction.TypeEnum.DELEGATE_EXIT
-                ){
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.DELEGATE_CREATE ||
+                                tx.getTypeEnum() == Transaction.TypeEnum.DELEGATE_EXIT
+                ) {
                     delegationList.add(dataGenService.getDelegation(tx));
                     currentDelegationSum++;
                 }
@@ -374,19 +419,20 @@ public class PressApplication implements ApplicationRunner {
 
     /**
      * 构造提案
+     *
      * @param blockResult
      */
-    private void makeProposal(BlockResult blockResult){
-        if(currentProposalSum<proposalMaxCount){
+    private void makeProposal(BlockResult blockResult) {
+        if (currentProposalSum < proposalMaxCount) {
             // 构造指定数量的提案记录并入库
-            List <Proposal> proposalList = new ArrayList<>();
+            List<Proposal> proposalList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                    tx.getTypeEnum()==Transaction.TypeEnum.PROPOSAL_CANCEL||
-                    tx.getTypeEnum()==Transaction.TypeEnum.PROPOSAL_TEXT||
-                    tx.getTypeEnum()==Transaction.TypeEnum.PROPOSAL_PARAMETER||
-                    tx.getTypeEnum()==Transaction.TypeEnum.PROPOSAL_UPGRADE
-                ){
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.PROPOSAL_CANCEL ||
+                                tx.getTypeEnum() == Transaction.TypeEnum.PROPOSAL_TEXT ||
+                                tx.getTypeEnum() == Transaction.TypeEnum.PROPOSAL_PARAMETER ||
+                                tx.getTypeEnum() == Transaction.TypeEnum.PROPOSAL_UPGRADE
+                ) {
                     proposalList.add(dataGenService.getProposal(tx));
                     currentProposalSum++;
                 }
@@ -397,16 +443,17 @@ public class PressApplication implements ApplicationRunner {
 
     /**
      * 构造投票
+     *
      * @param blockResult
      */
-    private void makeVote(BlockResult blockResult){
-        if(currentVoteSum<voteMaxCount){
+    private void makeVote(BlockResult blockResult) {
+        if (currentVoteSum < voteMaxCount) {
             // 构造指定数量的投票记录并入库
-            List <Vote> voteList = new ArrayList<>();
+            List<Vote> voteList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                    tx.getTypeEnum()== Transaction.TypeEnum.PROPOSAL_VOTE
-                ){
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.PROPOSAL_VOTE
+                ) {
                     voteList.add(dataGenService.getVote(tx));
                     currentVoteSum++;
                 }
@@ -417,16 +464,17 @@ public class PressApplication implements ApplicationRunner {
 
     /**
      * 构造Slash
+     *
      * @param blockResult
      */
     private void makeSlash(BlockResult blockResult) {
-        if(currentSlashSum<slashMaxCount){
+        if (currentSlashSum < slashMaxCount) {
             // 构造指定数量的Slash记录并入库
-            List <Slash> slashList = new ArrayList<>();
+            List<Slash> slashList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                        tx.getTypeEnum()== Transaction.TypeEnum.REPORT
-                ){
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.REPORT
+                ) {
                     slashList.add(dataGenService.getSlash(tx));
                     currentSlashSum++;
                 }
@@ -437,16 +485,17 @@ public class PressApplication implements ApplicationRunner {
 
     /**
      * 构造RpPlan
+     *
      * @param blockResult
      */
     private void makeRpPlan(BlockResult blockResult) throws BlockNumberException {
-        if(currentRpplanSum<rpplanMaxCount){
+        if (currentRpplanSum < rpplanMaxCount) {
             // 构造指定数量的RpPlan记录并入库
-            List <RpPlan> rpPlanList = new ArrayList<>();
+            List<RpPlan> rpPlanList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                        tx.getTypeEnum()== Transaction.TypeEnum.RESTRICTING_CREATE
-                ){
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.RESTRICTING_CREATE
+                ) {
                     rpPlanList.add(dataGenService.getRpPlan(tx));
                     currentRpplanSum++;
                 }
@@ -454,41 +503,43 @@ public class PressApplication implements ApplicationRunner {
             rpPlanPublisher.publish(rpPlanList);
         }
     }
-    
+
     /**
      * 构造委托奖励
+     *
      * @param blockResult
      */
     private void makeReward(BlockResult blockResult) throws BlockNumberException {
-        if(currentRewardSum<rewardMaxCount){
+        if (currentRewardSum < rewardMaxCount) {
             // 构造指定数量的委托奖励记录并入库
-            List <DelegationReward> delegationRewards = new ArrayList<>();
+            List<DelegationReward> delegationRewards = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                        tx.getTypeEnum()== Transaction.TypeEnum.CLAIM_REWARDS
-                ){
-                	delegationRewards.add(dataGenService.getReward(tx));
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.CLAIM_REWARDS
+                ) {
+                    delegationRewards.add(dataGenService.getReward(tx));
                     currentRewardSum++;
                 }
             }
             rewardPublisher.publish(delegationRewards);
         }
     }
-    
+
     /**
      * 构造gas
+     *
      * @param blockResult
      */
     private void makeEstimate(BlockResult blockResult) throws BlockNumberException {
-        if(currentEstimateSum<estimateMaxCount){
+        if (currentEstimateSum < estimateMaxCount) {
             // 构造指定数量的委托奖励记录并入库
-            List <GasEstimate> gasEstimates = new ArrayList<>();
+            List<GasEstimate> gasEstimates = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
-                if(
-                        tx.getTypeEnum()== Transaction.TypeEnum.DELEGATE_CREATE
-                ){
-                	gasEstimates.add(dataGenService.getEstimate(tx));
-                	currentEstimateSum++;
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.DELEGATE_CREATE
+                ) {
+                    gasEstimates.add(dataGenService.getEstimate(tx));
+                    currentEstimateSum++;
                 }
             }
             estimatePublisher.publish(gasEstimates);
@@ -497,9 +548,10 @@ public class PressApplication implements ApplicationRunner {
 
     /**
      * 构造代币合约
+     *
      * @param blockResult
      */
-    private void makeErc20Token(BlockResult blockResult){
+    private void makeErc20Token(BlockResult blockResult) {
         if (currentTokenCount < tokenMaxCount) {
             List<Erc20Token> tokenList = new ArrayList<>();
             for (Transaction tx : blockResult.getTransactionList()) {
@@ -534,4 +586,5 @@ public class PressApplication implements ApplicationRunner {
             esTokenTransferRecordPublisher.publish(transferRecordList);
         }
     }
+
 }

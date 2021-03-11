@@ -1,0 +1,19 @@
+{
+	"addressCount":0,
+	"blockCount":0,
+	"delegationCount":0,
+	"estimateCount":0,
+	"lastBlockNumber":0,
+	"nodeCount":0,
+	"nodeOptCount":0,
+	"nodeOptMaxId":0,
+	"proposalCount":0,
+	"rewardCount":0,
+	"rpplanCount":0,
+	"slashCount":0,
+	"stakingCount":0,
+	"tokenCount":0,
+	"tokenTransferCount":0,
+	"transactionCount":0,
+	"voteCount":0
+}

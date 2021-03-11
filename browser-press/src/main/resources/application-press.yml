@@ -9,23 +9,21 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://10.1.1.54:3306/platon_browser?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
-    password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
+    url: jdbc:mysql://192.168.9.145:3306/platon_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==))
   #Redis配置
   redis:
     cluster:
       max-redirects: 3
-      nodes: 10.1.1.55:6379,10.1.1.55:6380,10.1.1.56:6379,10.1.1.56:6380,10.1.1.57:6380,10.1.1.57:6379
-    password: 4Fz+gV4ypvWH4gDEb
+      nodes: 192.168.9.145:6379,192.168.9.145:6380,192.168.9.146:6379,192.168.9.146:6380,192.168.9.147:6379,192.168.9.147:6380
+    password: fdfjksdfhkf
   #ES配置
   elasticsearch:
     high-level-client:
-      hosts: 10.1.1.55,10.1.1.56,10.1.1.57
+      hosts: 192.168.9.145,192.168.9.146,192.168.9.147
       port: 9200
       schema: http
-      username: elastic
-      password: changeme
       delegationIndexName: browser_delegation_${profile}
       blockIndexName: browser_block_${profile}
       transactionIndexName: browser_transaction_${profile}
@@ -34,11 +32,12 @@ spring:
       innerTxIndexName: browser_inner_tx_${profile}
 #日志配置
 logging:
-  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  file:
+    name: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
-    org.springframework: error
-    org.springframework.retry: error
+    org.springframework: info
+    org.springframework.retry: info
 #同步时的索引查询分页参数配置
 paging:
   block:
@@ -54,19 +53,19 @@ disruptor:
       batch-size: 1024
     transaction:
       buffer-size: 1024
-      batch-size: 8192
+      batch-size: 10240
     nodeopt:
       buffer-size: 1024
       batch-size: 1024
     node:
       buffer-size: 1024
-      batch-size: 3
+      batch-size: 2
     stake:
       buffer-size: 1024
       batch-size: 3
     delegation:
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 1000
     proposal:
       buffer-size: 1024
       batch-size: 3
@@ -99,13 +98,17 @@ disruptor:
       batch-size: 1024
 #PlatOn相关配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: lat
+  # 金额显示单位
+  valueUnit: LAT
   # 交易输入参数并行解码线程数
-  txLogDecodeThreadNum: 10
+  txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: WS
-    addresses: 192.168.112.172:8788
+    protocol: http
+    addresses: 192.168.9.144:6789,192.168.9.144:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -118,20 +121,20 @@ platon:
   electionBackwardBlockCount: 20
   #10年内基金会向激励池填充额度: <第几年-补贴金额(ATP)>
   foundationSubsidies: {
-    '1':62215742,
-    '2':55965742,
-    '3':49559492,
-    '4':42993086,
-    '5':36262520,
-    '6':29363689,
-    '7':22292388,
-    '8':15044304,
-    '9':7615018
+    '1':62215742.00000000,
+    '2':55965742.00000000,
+    '3':49559492.00000000,
+    '4':42993086.00000000,
+    '5':36262520.00000000,
+    '6':29363689.00000000,
+    '7':22292388.00000000,
+    '8':15044304.00000000,
+    '9':7615018.00000000
   }
   # 初始内置节点默认质押金额(ATP)
   defaultStakingLockedAmount: 1500000
   #区块最大Gas限制
-  maxBlockGasLimit: 100800000
+  maxBlockGasLimit: 201600000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
   #提案pip_num参数模板
@@ -139,17 +142,17 @@ platon:
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
-  keyBaseApi: _/api/1.0/user/autocomplete.json?q=
-    #链id
-  chainId: 108
+  keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
+  #链id
+  chainId: 100
   # 地址重复使用的最大次数
   addressReusedTimes: 50
   #节点条数
-  nodeMaxCount: 600
+  nodeMaxCount: 1000
   #质押条数
-  stakeMaxCount: 1200
+  stakeMaxCount: 3000
   #委托条数
-  delegateMaxCount: 1000000
+  delegateMaxCount: 6000000
   #提案条数
   proposalMaxCount: 600
   #投票最大条数
@@ -161,16 +164,19 @@ platon:
   #地址最大条数
   addressMaxCount: 1500000
   #区块最大条数
-  blockMaxCount: 28799250
+  blockMaxCount: 15552000
   #日志最大条数
   nodeoptMaxCount: 1788000
   #代币合约最大条数
   tokenMaxCount: 100000
   #每个代币与地址建立关系的数量
-  addressCountPerToken: 1000000000
+  #addressCountPerToken: 1000000000
+  addressCountPerToken: 100000
   #每个区块的交易数
   txCountPerBlock: 100
   #每个委托奖励数
   rewardMaxCount: 2000000
   #gas 数据
   estimateMaxCount: 1000000
+  #交易数
+  tokenTransferMaxCount: 3110400000

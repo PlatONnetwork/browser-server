@@ -35,6 +35,7 @@
 "create_time":"2019-11-13 19:00:08",
 "update_time":"2019-11-13 21:04:36",
 "reward_per": 1000,
+"next_reward_per": 2000,
 "have_dele_reward": 5271780952726546583132053168,
 "pre_dele_annualized_rate": 12263170.89,
 "dele_annualized_rate": 11325858.46,

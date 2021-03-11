@@ -31,10 +31,13 @@ import java.util.*;
 @Data
 @Service
 public class DataGenService {
+
     private static final Random random = new Random();
 
     private static final List<String> PROPOSAL_HASH = new ArrayList<>();
+
     private static final List<String> NODE_IDS = new ArrayList<>();
+
     private static final List<String> ADDRESS = new ArrayList<>();
 
     @Autowired
@@ -46,56 +49,52 @@ public class DataGenService {
         ADDRESS.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
     }
 
-    static class Status{
+    static class Status {
+
         public Status(int status, int isConsensus, int isSettle, int isInit) {
             this.status = status;
             this.isConsensus = isConsensus;
             this.isSettle = isSettle;
             this.isInit = isInit;
         }
+
         private int status;
+
         private int isConsensus;
+
         private int isSettle;
+
         private int isInit;
+
     }
 
     private static final Status[] STATUSES_ARR = {
-            new Status(1,1,1,2),
-            new Status(1,1,1,2),
-            new Status(2,1,1,2),
-            new Status(2,2,2,2),
-            new Status(3,2,2,2),
-            new Status(3,1,2,2),
+            new Status(1, 1, 1, 2),
+            new Status(1, 1, 1, 2),
+            new Status(2, 1, 1, 2),
+            new Status(2, 2, 2, 2),
+            new Status(3, 2, 2, 2),
+            new Status(3, 1, 2, 2),
     };
-    private Status randomStatus(){
+
+    private Status randomStatus() {
         Status status = STATUSES_ARR[random.nextInt(STATUSES_ARR.length)];
         return status;
     }
 
-    private String randomNodeId(){
+    private String randomNodeId() {
         String nodeId = NODE_IDS.get(random.nextInt(NODE_IDS.size()));
         return nodeId;
     }
 
-    private String randomAddress(){
+    private String randomAddress() {
         String address = ADDRESS.get(random.nextInt(ADDRESS.size()));
         return address;
     }
 
     private String rAddress() {
-    	try {
-			return Bech32.addressEncode(NetworkParameters.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return null;
-    }
-
-    private String rMockAddress() {
         try {
-            return NetworkParameters.getHrp() + "0000000"
-                    + UUID.randomUUID().toString().replace("-","");
+            return Bech32.addressEncode(NetworkParameters.getHrp(), Keys.getAddress(Keys.createEcKeyPair()));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -103,29 +102,56 @@ public class DataGenService {
         return null;
     }
 
-    private String randomProposalHash(){
+    private String rMockAddress() {
+        try {
+            return NetworkParameters.getHrp() + "0000000"
+                    + UUID.randomUUID().toString().replace("-", "");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String randomProposalHash() {
         String hash = PROPOSAL_HASH.get(random.nextInt(PROPOSAL_HASH.size()));
         return hash;
     }
 
     private String blockListStr;
+
     private String transactionListStr;
+
     private String nodeOptListStr;
+
     private String nodeStr;
+
     private String stakingStr;
+
     private String delegationStr;
+
     private String proposalStr;
+
     private String voteStr;
+
     private String rpPlanStr;
+
     private String rewardStr;
+
     private String estimateStr;
+
     private String slashStr;
+
     private String erc20TokenStr;
+
     private String esTokenTransferRecordStr;
 
     private NetworkStat networkStat;
+
     private List<Config> configList;
+
     private String transferTxStr;
+
     private String tokenTransferTxStr;
 
 
@@ -134,21 +160,21 @@ public class DataGenService {
 
     @PostConstruct
     private void init() {
-        String dirPath = System.getProperty("user.dir")+File.separator+"template-data";
+        String dirPath = System.getProperty("user.dir") + File.separator + "template-data";
         File dir = new File(dirPath);
         Arrays.asList(dir.listFiles()).forEach(file -> {
             try {
-                String content = FileUtils.readFileToString(file,"UTF-8");
-                switch (file.getName()){
+                String content = FileUtils.readFileToString(file, "UTF-8");
+                switch (file.getName()) {
                     case "block.json":
                         blockListStr = content;
                         break;
                     case "transaction.json":
                         transactionListStr = content;
-                        List<Transaction> transactionList = JSON.parseArray(content,Transaction.class);
-                        transactionList.forEach(tx->{
-                            if(tx.getTypeEnum()==Transaction.TypeEnum.TRANSFER){
-                                transferTxStr=JSON.toJSONString(tx);
+                        List<Transaction> transactionList = JSON.parseArray(content, Transaction.class);
+                        transactionList.forEach(tx -> {
+                            if (tx.getTypeEnum() == Transaction.TypeEnum.TRANSFER) {
+                                transferTxStr = JSON.toJSONString(tx);
                             }
                             if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
                                 tokenTransferTxStr = JSON.toJSONString(tx);
@@ -159,37 +185,37 @@ public class DataGenService {
                         nodeOptListStr = content;
                         break;
                     case "node.json":
-                        nodeStr=content;
+                        nodeStr = content;
                         break;
                     case "staking.json":
-                        stakingStr=content;
+                        stakingStr = content;
                         break;
                     case "networkstat.json":
-                        networkStat=JSON.parseObject(content, NetworkStat.class);
+                        networkStat = JSON.parseObject(content, NetworkStat.class);
                         break;
                     case "delegation.json":
-                        delegationStr=content;
+                        delegationStr = content;
                         break;
                     case "config.json":
-                        configList=JSON.parseArray(content,Config.class);
+                        configList = JSON.parseArray(content, Config.class);
                         break;
                     case "proposal.json":
-                        proposalStr=content;
+                        proposalStr = content;
                         break;
                     case "vote.json":
-                        voteStr=content;
+                        voteStr = content;
                         break;
                     case "rpplan.json":
-                        rpPlanStr=content;
+                        rpPlanStr = content;
                         break;
                     case "delegatinReward.json":
-                        rewardStr=content;
+                        rewardStr = content;
                         break;
                     case "slash.json":
-                        slashStr=content;
+                        slashStr = content;
                         break;
                     case "gasEstimate.json":
-                    	estimateStr=content;
+                        estimateStr = content;
                         break;
                     case "erc20Token.json":
                         erc20TokenStr = content;
@@ -200,12 +226,12 @@ public class DataGenService {
 
                 }
             } catch (IOException e) {
-                log.error("读取文件内容出错",e);
+                log.error("读取文件内容出错", e);
             }
         });
 
         List<Node> nodeList = nodeMapper.selectByExample(null);
-        nodeList.forEach(node->NODE_IDS.add(node.getNodeId()));
+        nodeList.forEach(node -> NODE_IDS.add(node.getNodeId()));
     }
 
     private long nodeOptMaxId = 0L;
@@ -214,15 +240,15 @@ public class DataGenService {
     private int addressReusedTimes;
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BlockResult getBlockResult(BigInteger blockNumber){
+    public BlockResult getBlockResult(BigInteger blockNumber) {
         BlockResult br = new BlockResult();
 
-        Block block = JSON.parseObject(blockListStr,Block.class);
+        Block block = JSON.parseObject(blockListStr, Block.class);
         br.setBlock(block);
 
-        List<Transaction> transactionList = JSON.parseArray(transactionListStr,Transaction.class);
+        List<Transaction> transactionList = JSON.parseArray(transactionListStr, Transaction.class);
 
-        for(int i=transactionList.size();i<txCountPerBlock;i++){
+        for (int i = transactionList.size(); i < txCountPerBlock; i++) {
             //Transaction tx = JSON.parseObject(transferTxStr,Transaction.class);
             Transaction tx = JSON.parseObject(tokenTransferTxStr, Transaction.class);
             transactionList.add(tx);
@@ -230,22 +256,22 @@ public class DataGenService {
 
         br.setTransactionList(transactionList);
 
-        List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr,NodeOpt.class);
+        List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr, NodeOpt.class);
         br.setNodeOptList(nodeOptList);
 
         String nodeId = randomNodeId();
-        br.buildAssociation(blockNumber,nodeId,++nodeOptMaxId,addressReusedTimes);
+        br.buildAssociation(blockNumber, nodeId, ++nodeOptMaxId, addressReusedTimes);
 
         return br;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public StakeResult getStakeResult(Transaction tx) throws BlockNumberException {
-        Node node = JSON.parseObject(nodeStr,Node.class);
+        Node node = JSON.parseObject(nodeStr, Node.class);
         node.setStakingBlockNum(tx.getNum());
         node.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
-        node.setNodeIcon(node.getNodeId().substring(0,6));
-        node.setNodeName(node.getNodeId().substring(7,10));
+        node.setNodeIcon(node.getNodeId().substring(0, 6));
+        node.setNodeName(node.getNodeId().substring(7, 10));
 
         Status status = randomStatus();
         node.setStatus(status.status);
@@ -254,14 +280,14 @@ public class DataGenService {
         node.setIsInit(status.isInit);
         node.setStakingTxIndex(tx.getIndex());
         node.setStakingAddr(randomAddress());
-        node.setStatVerifierTime(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN).intValue());
+        node.setStatVerifierTime(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()), BigInteger.TEN).intValue());
 
-        if(ADDRESS.size()<5000&&!ADDRESS.contains(tx.getFrom())){
+        if (ADDRESS.size() < 5000 && !ADDRESS.contains(tx.getFrom())) {
             ADDRESS.add(tx.getFrom());
         }
 
-        Staking staking = JSON.parseObject(stakingStr,Staking.class);
-        BeanUtils.copyProperties(node,staking);
+        Staking staking = JSON.parseObject(stakingStr, Staking.class);
+        BeanUtils.copyProperties(node, staking);
 
         StakeResult stakeResult = new StakeResult();
         stakeResult.setNode(node);
@@ -272,7 +298,7 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Delegation getDelegation(Transaction tx){
+    public Delegation getDelegation(Transaction tx) {
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
         copy.setStakingBlockNum(tx.getNum());
         copy.setNodeId(randomNodeId());
@@ -281,14 +307,14 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Proposal getProposal(Transaction tx){
+    public Proposal getProposal(Transaction tx) {
         Proposal copy = JSON.parseObject(proposalStr, Proposal.class);
         copy.setHash(tx.getHash());
         copy.setNodeId(randomNodeId());
-        copy.setNodeName(copy.getNodeId().substring(7,10));
-        copy.setName(copy.getNodeId().substring(0,6));
+        copy.setNodeName(copy.getNodeId().substring(7, 10));
+        copy.setName(copy.getNodeId().substring(0, 6));
         // 1文本提案,2升级提案,3参数提案,4取消提案
-        switch (tx.getTypeEnum()){
+        switch (tx.getTypeEnum()) {
             case PROPOSAL_TEXT:
                 copy.setType(1);
                 break;
@@ -308,10 +334,10 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Vote getVote(Transaction tx){
+    public Vote getVote(Transaction tx) {
         Vote copy = JSON.parseObject(voteStr, Vote.class);
         copy.setNodeId(randomNodeId());
-        copy.setNodeName(copy.getNodeId().substring(7,10));
+        copy.setNodeName(copy.getNodeId().substring(7, 10));
         copy.setHash(tx.getHash());
         copy.setProposalHash(randomProposalHash());
         return copy;
@@ -321,33 +347,33 @@ public class DataGenService {
     public RpPlan getRpPlan(Transaction tx) throws BlockNumberException {
         RpPlan copy = JSON.parseObject(rpPlanStr, RpPlan.class);
         copy.setId(null);
-        copy.setEpoch(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()),BigInteger.TEN));
+        copy.setEpoch(EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()), BigInteger.TEN));
         copy.setAddress(randomAddress());
-        return copy;
-    }
-    
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public DelegationReward getReward(Transaction tx) throws BlockNumberException {
-    	DelegationReward copy = JSON.parseObject(rewardStr, DelegationReward.class);
-    	copy.setHash(tx.getHash());
-        copy.setAddr(randomAddress());
-        return copy;
-    }
-    
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public GasEstimate getEstimate(Transaction tx) throws BlockNumberException {
-    	GasEstimate copy = JSON.parseObject(estimateStr, GasEstimate.class);
-    	try {
-			copy.setAddr(rAddress());
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-        
         return copy;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Slash getSlash(Transaction tx){
+    public DelegationReward getReward(Transaction tx) throws BlockNumberException {
+        DelegationReward copy = JSON.parseObject(rewardStr, DelegationReward.class);
+        copy.setHash(tx.getHash());
+        copy.setAddr(randomAddress());
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public GasEstimate getEstimate(Transaction tx) throws BlockNumberException {
+        GasEstimate copy = JSON.parseObject(estimateStr, GasEstimate.class);
+        try {
+            copy.setAddr(rAddress());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Slash getSlash(Transaction tx) {
         Slash copy = JSON.parseObject(slashStr, Slash.class);
         copy.setHash(tx.getHash());
         copy.setBenefitAddr(randomAddress());
@@ -356,7 +382,7 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Erc20Token getErc20Token(Transaction tx){
+    public Erc20Token getErc20Token(Transaction tx) {
         Erc20Token copy = JSON.parseObject(erc20TokenStr, Erc20Token.class);
         copy.setTxHash(tx.getHash());
         copy.setAddress(rAddress());
@@ -374,7 +400,7 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public ESTokenTransferRecord getESTokenTransferRecord(Transaction tx){
+    public ESTokenTransferRecord getESTokenTransferRecord(Transaction tx) {
         ESTokenTransferRecord transferRecord = JSON.parseObject(esTokenTransferRecordStr, ESTokenTransferRecord.class);
         transferRecord.setSeq(tx.getSeq());
         transferRecord.setBTime(tx.getTime());
@@ -394,7 +420,7 @@ public class DataGenService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock){
+    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock) {
         List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
         for (int i = 0; i < addressCountPerBlock; i++) {
             Erc20TokenAddressRel rel = Erc20TokenAddressRel.builder()
@@ -409,4 +435,5 @@ public class DataGenService {
         }
         return erc20TokenAddressRelList;
     }
+
 }
