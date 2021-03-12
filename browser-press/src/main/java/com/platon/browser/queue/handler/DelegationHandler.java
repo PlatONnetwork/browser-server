@@ -31,22 +31,29 @@ public class DelegationHandler extends AbstractHandler<DelegationEvent> {
     private volatile int batchSize;
 
     private List<Delegation> stage = new ArrayList<>();
-    @PostConstruct
-    private void init(){this.setLogger(log);}
 
+    @PostConstruct
+    private void init() {
+        this.setLogger(log);
+    }
+
+    @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent ( DelegationEvent event, long sequence, boolean endOfBatch ) {
+    public void onEvent(DelegationEvent event, long sequence, boolean endOfBatch) {
         long startTime = System.currentTimeMillis();
         try {
             stage.addAll(event.getDelegationList());
-            if(stage.size()<batchSize) return;
+            if (stage.size() < batchSize) {
+                return;
+            }
             delegationMapper.batchInsert(stage);
             long endTime = System.currentTimeMillis();
-            printTps("委托",stage.size(),startTime,endTime);
+            printTps("委托", stage.size(), startTime, endTime);
             stage.clear();
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw e;
         }
     }
+
 }

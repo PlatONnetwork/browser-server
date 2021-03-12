@@ -239,18 +239,33 @@ public class DataGenService {
     @Value("${platon.addressReusedTimes}")
     private int addressReusedTimes;
 
+
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BlockResult getBlockResult(BigInteger blockNumber) {
+    public BlockResult getBlockResult(BigInteger blockNumber, long nodeMaxCount) {
         BlockResult br = new BlockResult();
 
         Block block = JSON.parseObject(blockListStr, Block.class);
         br.setBlock(block);
-
-        List<Transaction> transactionList = JSON.parseArray(transactionListStr, Transaction.class);
-
-        for (int i = transactionList.size(); i < txCountPerBlock; i++) {
-            //Transaction tx = JSON.parseObject(transferTxStr,Transaction.class);
+        long seq = blockNumber.multiply(BigInteger.valueOf(txCountPerBlock)).longValue();
+        //List<Transaction> transactionList = JSON.parseArray(transactionListStr, Transaction.class);
+        List<Transaction> transactionList = new ArrayList<>();
+        for (int i = 1; i <= txCountPerBlock; i++) {
             Transaction tx = JSON.parseObject(tokenTransferTxStr, Transaction.class);
+            tx.setHash(BlockResult.createNum("0x", 64, i));
+            if (i <= 180) {
+                //转账
+                tx.setType(0);
+            } else if (180 < i && i <= 182) {
+                //发起质押
+                tx.setType(BlockResult.getRandom(1000, 1003));
+            } else if (182 < i && i <= 190) {
+                //委托
+                tx.setType(1004);
+            } else if (190 < i && i <= 200) {
+                tx.setType(1005);
+            }
+            seq++;
+            tx.setSeq(seq);
             transactionList.add(tx);
         }
 
@@ -259,24 +274,29 @@ public class DataGenService {
         List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr, NodeOpt.class);
         br.setNodeOptList(nodeOptList);
 
-        String nodeId = randomNodeId();
+        // String nodeId = randomNodeId();
+        String nodeId = BlockResult.createNodeId(BlockResult.getRandom(1, (int) nodeMaxCount));
         br.buildAssociation(blockNumber, nodeId, ++nodeOptMaxId, addressReusedTimes);
-
         return br;
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public StakeResult getStakeResult(Transaction tx) throws BlockNumberException {
+    public StakeResult getStakeResult(Transaction tx, long currentNodeSum, int multiple) throws BlockNumberException {
         Node node = JSON.parseObject(nodeStr, Node.class);
         node.setStakingBlockNum(tx.getNum());
-        node.setNodeId(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
-        node.setNodeIcon(node.getNodeId().substring(0, 6));
-        node.setNodeName(node.getNodeId().substring(7, 10));
+        long num = currentNodeSum;
+        String nodeId = BlockResult.createNodeId(++num);
+        node.setNodeId(nodeId);
+        String hex = HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString()));
+        node.setNodeIcon(hex.substring(0, 6));
+        node.setNodeName(hex.substring(7, 10));
 
         Status status = randomStatus();
         node.setStatus(status.status);
         node.setIsConsensus(status.isConsensus);
-        node.setIsSettle(status.isSettle);
+        BigInteger[] bigInteger = BigInteger.valueOf(num).divideAndRemainder(BigInteger.valueOf(2L));
+        int isSettle = bigInteger[1].intValue() + 1;
+        node.setIsSettle(isSettle);
         node.setIsInit(status.isInit);
         node.setStakingTxIndex(tx.getIndex());
         node.setStakingAddr(randomAddress());
@@ -285,14 +305,19 @@ public class DataGenService {
         if (ADDRESS.size() < 5000 && !ADDRESS.contains(tx.getFrom())) {
             ADDRESS.add(tx.getFrom());
         }
-
-        Staking staking = JSON.parseObject(stakingStr, Staking.class);
-        BeanUtils.copyProperties(node, staking);
-
+        List<Staking> stakingList = new ArrayList<>();
+        for (int i = 1; i <= multiple; i++) {
+            Staking staking = JSON.parseObject(stakingStr, Staking.class);
+            BeanUtils.copyProperties(node, staking);
+            staking.setStakingBlockNum(staking.getStakingBlockNum() + i);
+            staking.setNodeId(nodeId);
+            staking.setStatus(i);
+            stakingList.add(staking);
+        }
         StakeResult stakeResult = new StakeResult();
         stakeResult.setNode(node);
-        stakeResult.setStaking(staking);
-
+        //stakeResult.setStaking(staking);
+        stakeResult.setStakingList(stakingList);
         NODE_IDS.add(node.getNodeId());
         return stakeResult;
     }
@@ -301,7 +326,8 @@ public class DataGenService {
     public Delegation getDelegation(Transaction tx) {
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
         copy.setStakingBlockNum(tx.getNum());
-        copy.setNodeId(randomNodeId());
+        //copy.setNodeId(randomNodeId());
+        copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         copy.setDelegateAddr(rAddress());
         return copy;
     }
@@ -310,7 +336,7 @@ public class DataGenService {
     public Proposal getProposal(Transaction tx) {
         Proposal copy = JSON.parseObject(proposalStr, Proposal.class);
         copy.setHash(tx.getHash());
-        copy.setNodeId(randomNodeId());
+        copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         copy.setNodeName(copy.getNodeId().substring(7, 10));
         copy.setName(copy.getNodeId().substring(0, 6));
         // 1文本提案,2升级提案,3参数提案,4取消提案
@@ -336,7 +362,7 @@ public class DataGenService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public Vote getVote(Transaction tx) {
         Vote copy = JSON.parseObject(voteStr, Vote.class);
-        copy.setNodeId(randomNodeId());
+        copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         copy.setNodeName(copy.getNodeId().substring(7, 10));
         copy.setHash(tx.getHash());
         copy.setProposalHash(randomProposalHash());
@@ -377,7 +403,7 @@ public class DataGenService {
         Slash copy = JSON.parseObject(slashStr, Slash.class);
         copy.setHash(tx.getHash());
         copy.setBenefitAddr(randomAddress());
-        copy.setNodeId(randomNodeId());
+        copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         return copy;
     }
 
