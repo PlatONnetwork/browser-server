@@ -171,6 +171,8 @@ public class PressApplication implements ApplicationRunner {
 
     public static long currentTransferCount = 0L;
 
+    private long time = 0L;
+
     public static void main(String[] args) {
         SpringApplication.run(PressApplication.class, args);
     }
@@ -258,6 +260,7 @@ public class PressApplication implements ApplicationRunner {
             currentTokenCount = counterBean.getTokenCount();
             currentTokenTransferCount = counterBean.getTokenTransferCount();
             currentTransferCount = counterBean.getTransactionCount();
+            time = TimeUtil.resolving(counterBean.getTime());
             blockNumber = BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -328,7 +331,7 @@ public class PressApplication implements ApplicationRunner {
         counter.setEstimateCount(currentEstimateSum);
         counter.setTokenCount(currentTokenCount);
         counter.setTokenTransferCount(currentTokenTransferCount);
-        counter.setTime(TimeUtil.getTime(startTime, endTime));
+        counter.setTime(TimeUtil.getTime(time, startTime, endTime));
         String status = JSON.toJSONString(counter, true);
         File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
