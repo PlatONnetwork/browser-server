@@ -72,7 +72,7 @@ public class BlockService {
     @Resource
     private CommonService commonService;
 
-    @Value("platon.valueUnit")
+    @Value("${platon.valueUnit}")
     private String valueUnit;
 
     private Lock lock = new ReentrantLock();
