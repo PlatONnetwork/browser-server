@@ -11,6 +11,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class VoteEvent {
+public class VoteEvent implements Event{
     private List <Vote> voteList;
 }

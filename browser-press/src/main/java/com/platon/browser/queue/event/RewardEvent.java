@@ -12,6 +12,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class RewardEvent {
+public class RewardEvent implements Event{
     private List <DelegationReward> delegationRewards;
 }

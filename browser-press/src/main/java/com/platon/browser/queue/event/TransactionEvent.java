@@ -5,6 +5,6 @@ import lombok.Data;
 
 import java.util.List;
 @Data
-public class TransactionEvent {
+public class TransactionEvent implements Event{
     private List<Transaction> transactionList;
 }

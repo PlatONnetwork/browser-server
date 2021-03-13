@@ -12,6 +12,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class EstimateEvent {
+public class EstimateEvent implements Event{
     private List <GasEstimate> gasEstimates;
 }
