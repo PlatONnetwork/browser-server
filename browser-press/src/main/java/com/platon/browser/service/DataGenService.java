@@ -2,6 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.bech32.Bech32;
 import com.platon.browser.PressApplication;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.crypto.Keys;
 import com.platon.parameters.NetworkParameters;
 import com.alibaba.fastjson.JSON;
@@ -155,13 +156,13 @@ public class DataGenService {
 
     private String tokenTransferTxStr;
 
-
     @Value("${platon.txCountPerBlock}")
     private long txCountPerBlock;
 
     @PostConstruct
     private void init() {
-        String dirPath = System.getProperty("user.dir") + File.separator + "template-data";
+        String path = CommonUtil.isWin() ? "browser-press/template-data" : "template-data";
+        String dirPath = System.getProperty("user.dir") + File.separator + path;
         File dir = new File(dirPath);
         Arrays.asList(dir.listFiles()).forEach(file -> {
             try {

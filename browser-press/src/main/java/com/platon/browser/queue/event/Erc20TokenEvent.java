@@ -6,6 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Erc20TokenEvent {
+public class Erc20TokenEvent implements Event{
     private List<Erc20Token> erc20TokenList;
 }

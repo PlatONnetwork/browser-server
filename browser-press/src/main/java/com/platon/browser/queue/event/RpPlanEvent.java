@@ -12,6 +12,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class RpPlanEvent {
+public class RpPlanEvent implements Event{
     private List <RpPlan> rpPlanList;
 }

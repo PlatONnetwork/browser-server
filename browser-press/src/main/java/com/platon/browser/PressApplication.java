@@ -13,6 +13,7 @@ import com.platon.browser.queue.publisher.*;
 import com.platon.browser.service.BlockResult;
 import com.platon.browser.service.DataGenService;
 import com.platon.browser.service.StakeResult;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.CounterBean;
 import com.platon.browser.utils.GracefullyUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -170,12 +171,15 @@ public class PressApplication implements ApplicationRunner {
 
     public static long currentTransferCount = 0L;
 
+    private long time = 0L;
+
     public static void main(String[] args) {
         SpringApplication.run(PressApplication.class, args);
     }
 
     @Override
     public void run(ApplicationArguments args) throws IOException, BlockNumberException {
+        long startTime = System.currentTimeMillis();
         BigInteger blockNumber = init();
         NetworkStatExample networkStatExample = new NetworkStatExample();
         networkStatExample.createCriteria().andIdEqualTo(1);
@@ -188,7 +192,7 @@ public class PressApplication implements ApplicationRunner {
             }
 
             // 检查应用状态
-            checkAppStatus(blockNumber);
+            checkAppStatus(blockNumber, startTime);
             // 构造【区块&交易&操作日志】数据
             BlockResult blockResult = makeBlock(blockNumber);
             // 构造【节点&质押】数据
@@ -218,7 +222,7 @@ public class PressApplication implements ApplicationRunner {
             log.info("当前块高：" + blockNumber);
 
             if (blockNumber.intValue() % 1024 == 0) {
-                flushCount(blockNumber);
+                flushCount(blockNumber, startTime);
             }
 
             /*// 更新网络统计表
@@ -233,7 +237,8 @@ public class PressApplication implements ApplicationRunner {
     private BigInteger init() {
         GracefullyUtil.updateStatus();
         log.warn("加载状态文件:counter.json");
-        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
+        String path = CommonUtil.isWin() ? "/browser-press/counter.json" : "counter.json";
+        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), path);
         CounterBean counterBean = new CounterBean();
         BigInteger blockNumber = BigInteger.ZERO;
         try {
@@ -256,6 +261,7 @@ public class PressApplication implements ApplicationRunner {
             currentTokenCount = counterBean.getTokenCount();
             currentTokenTransferCount = counterBean.getTokenTransferCount();
             currentTransferCount = counterBean.getTransactionCount();
+            time = CommonUtil.resolving(counterBean.getTime());
             blockNumber = BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -273,7 +279,7 @@ public class PressApplication implements ApplicationRunner {
         return blockNumber;
     }
 
-    private void checkAppStatus(BigInteger blockNumber) throws IOException {
+    private void checkAppStatus(BigInteger blockNumber, long startTime) throws IOException {
         try {
             GracefullyUtil.monitor();
         } catch (GracefullyShutdownException | InterruptedException e) {
@@ -301,12 +307,13 @@ public class PressApplication implements ApplicationRunner {
                 bw.write(status);
             }
             log.warn("状态写入完成,可安全停机:{}",status);*/
-            flushCount(blockNumber);
+            flushCount(blockNumber, startTime);
             System.exit(0);
         }
     }
 
-    private void flushCount(BigInteger blockNumber) {
+    private void flushCount(BigInteger blockNumber, long startTime) {
+        long endTime = System.currentTimeMillis();
         CounterBean counter = new CounterBean();
         counter.setBlockCount(blockPublisher.getTotalCount());
         counter.setTransactionCount(transactionPublisher.getTotalCount());
@@ -316,7 +323,7 @@ public class PressApplication implements ApplicationRunner {
         counter.setLastBlockNumber(blockNumber.longValue());
         counter.setNodeCount(currentNodeSum);
         counter.setStakingCount(currentStakeSum);
-        counter.setDelegationCount(currentDelegationSum);
+        counter.setDelegationCount(delegationPublisher.getTotalCount());
         counter.setProposalCount(currentProposalSum);
         counter.setVoteCount(currentVoteSum);
         counter.setRpplanCount(currentRpplanSum);
@@ -325,8 +332,10 @@ public class PressApplication implements ApplicationRunner {
         counter.setEstimateCount(currentEstimateSum);
         counter.setTokenCount(currentTokenCount);
         counter.setTokenTransferCount(currentTokenTransferCount);
+        counter.setTime(CommonUtil.getTime(time, startTime, endTime));
         String status = JSON.toJSONString(counter, true);
-        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
+        String path = CommonUtil.isWin() ? "/browser-press/counter.json" : "counter.json";
+        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), path);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
             bw.write(status);
         } catch (IOException e) {

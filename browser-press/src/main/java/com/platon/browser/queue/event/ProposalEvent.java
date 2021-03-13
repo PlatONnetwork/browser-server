@@ -11,6 +11,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class ProposalEvent {
+public class ProposalEvent implements Event{
     private List <Proposal> proposalList;
 }

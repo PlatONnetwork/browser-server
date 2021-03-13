@@ -12,6 +12,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class SlashEvent {
+public class SlashEvent implements Event{
     private List <Slash> slashList;
 }

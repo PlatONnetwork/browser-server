@@ -11,6 +11,8 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class AddressEvent {
-    private List <Address> addressList;
+public class AddressEvent implements Event {
+
+    private List<Address> addressList;
+
 }

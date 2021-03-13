@@ -5,6 +5,6 @@ import lombok.Data;
 
 import java.util.List;
 @Data
-public class NodeEvent {
+public class NodeEvent implements Event{
     private List<Node> nodeList;
 }

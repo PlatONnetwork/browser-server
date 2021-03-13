@@ -6,6 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ESTokenTransferRecordEvent {
+public class ESTokenTransferRecordEvent implements Event{
     private List<ESTokenTransferRecord> esTokenTransferRecordList;
 }

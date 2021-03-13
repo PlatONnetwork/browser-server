@@ -11,6 +11,6 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class StakeEvent {
+public class StakeEvent implements Event{
     private List <Staking> stakingList;
 }
