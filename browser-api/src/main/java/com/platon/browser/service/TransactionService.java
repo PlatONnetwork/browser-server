@@ -111,7 +111,7 @@ public class TransactionService {
 
     private static final String ERROR_TIPS = "获取区块错误。";
 
-    @Value("platon.valueUnit")
+    @Value("${platon.valueUnit}")
     private String valueUnit;
 
     public RespPage<TransactionListResp> getTransactionList(PageReq req) {
