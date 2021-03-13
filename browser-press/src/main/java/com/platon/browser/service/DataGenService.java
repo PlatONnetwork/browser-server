@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.bech32.Bech32;
+import com.platon.browser.PressApplication;
 import com.platon.crypto.Keys;
 import com.platon.parameters.NetworkParameters;
 import com.alibaba.fastjson.JSON;
@@ -246,7 +247,6 @@ public class DataGenService {
 
         Block block = JSON.parseObject(blockListStr, Block.class);
         br.setBlock(block);
-        long seq = blockNumber.multiply(BigInteger.valueOf(txCountPerBlock)).longValue();
         //List<Transaction> transactionList = JSON.parseArray(transactionListStr, Transaction.class);
         List<Transaction> transactionList = new ArrayList<>();
         for (int i = 1; i <= txCountPerBlock; i++) {
@@ -264,11 +264,10 @@ public class DataGenService {
             } else if (190 < i && i <= 200) {
                 tx.setType(1005);
             }
-            seq++;
-            tx.setSeq(seq);
+            tx.setSeq(++PressApplication.currentTransferCount);
             transactionList.add(tx);
         }
-
+        log.info("当前区块为{}，交易数为{}", blockNumber, PressApplication.currentTransferCount);
         br.setTransactionList(transactionList);
 
         List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr, NodeOpt.class);

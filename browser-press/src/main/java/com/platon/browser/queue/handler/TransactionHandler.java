@@ -59,6 +59,7 @@ public class TransactionHandler extends AbstractHandler<TransactionEvent> {
         this.setLogger(log);
     }
 
+    @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(TransactionEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();

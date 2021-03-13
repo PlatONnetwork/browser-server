@@ -164,11 +164,11 @@ public class PressApplication implements ApplicationRunner {
 
     private long currentEstimateSum = 0L;
 
-    private long currentTokenCount = 0l;
+    private long currentTokenCount = 0L;
 
-    private long currentTokenTransferCount = 0l;
+    private long currentTokenTransferCount = 0L;
 
-    private long currentTransferCount = 0l;
+    public static long currentTransferCount = 0L;
 
     public static void main(String[] args) {
         SpringApplication.run(PressApplication.class, args);
@@ -196,13 +196,13 @@ public class PressApplication implements ApplicationRunner {
             // 构造【委托】数据
             //makeDelegation(blockResult);
             // 构造【提案】数据
-            makeProposal(blockResult);
+            //makeProposal(blockResult);
             // 构造【投票】数据
-            makeVote(blockResult);
+            //makeVote(blockResult);
             // 构造【rpplan】数据
-            makeRpPlan(blockResult);
+            //makeRpPlan(blockResult);
             // 构造【slash】数据
-            makeSlash(blockResult);
+            //makeSlash(blockResult);
             // 构造【委托奖励】数据
             makeReward(blockResult);
             // 构造【gas】数据
@@ -217,7 +217,7 @@ public class PressApplication implements ApplicationRunner {
             blockNumber = blockNumber.add(BigInteger.ONE);
             log.info("当前块高：" + blockNumber);
 
-            if (blockNumber.intValue() % 1000 == 0) {
+            if (blockNumber.intValue() % 1024 == 0) {
                 flushCount(blockNumber);
             }
 
@@ -255,6 +255,7 @@ public class PressApplication implements ApplicationRunner {
             currentEstimateSum = counterBean.getEstimateCount();
             currentTokenCount = counterBean.getTokenCount();
             currentTokenTransferCount = counterBean.getTokenTransferCount();
+            currentTransferCount = counterBean.getTransactionCount();
             blockNumber = BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -395,10 +396,12 @@ public class PressApplication implements ApplicationRunner {
             }
         }
 
-        if (!nodeList.isEmpty())
+        if (!nodeList.isEmpty()) {
             nodePublisher.publish(nodeList);
-        if (!stakingList.isEmpty())
+        }
+        if (!stakingList.isEmpty()) {
             stakePublisher.publish(stakingList);
+        }
     }
 
     /**
