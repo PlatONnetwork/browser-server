@@ -1,6 +1,6 @@
 package com.platon.browser.utils;
 
-public class TimeUtil {
+public class CommonUtil {
 
     public static String getTime(long lastTime, long startTime, long endTime) {
         long h = (endTime - startTime + lastTime) / 1000 / 60 / 60;
@@ -18,9 +18,25 @@ public class TimeUtil {
         return hh + mm;
     }
 
+    /**
+     * 判断当前系统是win(true)还是linux(false)
+     *
+     * @param
+     * @return boolean
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/3/13
+     */
+    public static boolean isWin() {
+        String osname = System.getProperties().getProperty("os.name");
+        if (osname.toLowerCase().indexOf("win") > -1) {
+            return true;
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
-        // System.out.println("打印结果为：" + TimeUtil.getTime(98, 10000000));
-        System.out.println("打印结果为：" + TimeUtil.resolving("12h:10m"));
+        System.out.println("打印结果为：" + System.getProperties().getProperty("os.name").toLowerCase());
+        System.out.println("打印结果为：" + isWin());
     }
 
 }

@@ -13,9 +13,9 @@ import com.platon.browser.queue.publisher.*;
 import com.platon.browser.service.BlockResult;
 import com.platon.browser.service.DataGenService;
 import com.platon.browser.service.StakeResult;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.CounterBean;
 import com.platon.browser.utils.GracefullyUtil;
-import com.platon.browser.utils.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.mybatis.spring.annotation.MapperScan;
@@ -237,7 +237,8 @@ public class PressApplication implements ApplicationRunner {
     private BigInteger init() {
         GracefullyUtil.updateStatus();
         log.warn("加载状态文件:counter.json");
-        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
+        String path = CommonUtil.isWin() ? "/browser-press/counter.json" : "counter.json";
+        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), path);
         CounterBean counterBean = new CounterBean();
         BigInteger blockNumber = BigInteger.ZERO;
         try {
@@ -260,7 +261,7 @@ public class PressApplication implements ApplicationRunner {
             currentTokenCount = counterBean.getTokenCount();
             currentTokenTransferCount = counterBean.getTokenTransferCount();
             currentTransferCount = counterBean.getTransactionCount();
-            time = TimeUtil.resolving(counterBean.getTime());
+            time = CommonUtil.resolving(counterBean.getTime());
             blockNumber = BigInteger.valueOf(counterBean.getLastBlockNumber());
         } catch (IOException e) {
             log.warn("没有状态文件,创建一个!");
@@ -331,9 +332,10 @@ public class PressApplication implements ApplicationRunner {
         counter.setEstimateCount(currentEstimateSum);
         counter.setTokenCount(currentTokenCount);
         counter.setTokenTransferCount(currentTokenTransferCount);
-        counter.setTime(TimeUtil.getTime(time, startTime, endTime));
+        counter.setTime(CommonUtil.getTime(time, startTime, endTime));
         String status = JSON.toJSONString(counter, true);
-        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
+        String path = CommonUtil.isWin() ? "/browser-press/counter.json" : "counter.json";
+        File counterFile = FileUtils.getFile(System.getProperty("user.dir"), path);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
             bw.write(status);
         } catch (IOException e) {
