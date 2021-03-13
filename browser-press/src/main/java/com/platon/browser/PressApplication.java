@@ -168,6 +168,8 @@ public class PressApplication implements ApplicationRunner {
 
     private long currentTokenTransferCount = 0l;
 
+    private long currentTransferCount = 0l;
+
     public static void main(String[] args) {
         SpringApplication.run(PressApplication.class, args);
     }
@@ -192,7 +194,7 @@ public class PressApplication implements ApplicationRunner {
             // 构造【节点&质押】数据
             makeStake(blockResult);
             // 构造【委托】数据
-            makeDelegation(blockResult);
+            //makeDelegation(blockResult);
             // 构造【提案】数据
             makeProposal(blockResult);
             // 构造【投票】数据
@@ -339,7 +341,7 @@ public class PressApplication implements ApplicationRunner {
      * @return
      */
     private BlockResult makeBlock(BigInteger blockNumber) {
-        BlockResult blockResult = dataGenService.getBlockResult(blockNumber);
+        BlockResult blockResult = dataGenService.getBlockResult(blockNumber, nodeMaxCount);
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
         transactionPublisher.publish(blockResult.getTransactionList());
         if (nodeOptPublisher.getTotalCount() <= nodeoptMaxCount) {
@@ -371,7 +373,9 @@ public class PressApplication implements ApplicationRunner {
                     ) &&
                             (!nodeSatisfied || !stakeSatisfied)
             ) {
-                StakeResult stakeResult = dataGenService.getStakeResult(tx);
+                // bigInteger[0].intValue()=stakeMaxCount/nodeMaxCount 质押相对节点倍
+                BigInteger[] bigInteger = BigInteger.valueOf(stakeMaxCount).divideAndRemainder(BigInteger.valueOf(nodeMaxCount));
+                StakeResult stakeResult = dataGenService.getStakeResult(tx, currentNodeSum, bigInteger[0].intValue());
                 if (currentNodeSum < nodeMaxCount) {
                     // 构造指定数量的节点记录并入库
                     nodeList.add(stakeResult.getNode());
@@ -381,8 +385,10 @@ public class PressApplication implements ApplicationRunner {
                 }
                 if (currentStakeSum < stakeMaxCount) {
                     // 构造指定数量的质押记录并入库
-                    stakingList.add(stakeResult.getStaking());
-                    currentStakeSum++;
+                    stakingList.addAll(stakeResult.getStakingList());
+                    //stakingList.add(stakeResult.getStaking());
+                    currentStakeSum += stakeResult.getStakingList().size();
+                    //currentStakeSum++;
                 } else {
                     stakeSatisfied = true;
                 }

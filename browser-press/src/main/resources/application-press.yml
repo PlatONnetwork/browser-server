@@ -173,7 +173,7 @@ platon:
   #addressCountPerToken: 1000000000
   addressCountPerToken: 100000
   #每个区块的交易数
-  txCountPerBlock: 100
+  txCountPerBlock: 200
   #每个委托奖励数
   rewardMaxCount: 2000000
   #gas 数据

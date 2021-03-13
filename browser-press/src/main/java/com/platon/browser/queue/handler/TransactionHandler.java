@@ -1,9 +1,13 @@
 package com.platon.browser.queue.handler;
 
 import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.event.TransactionEvent;
 import com.platon.browser.queue.publisher.AddressPublisher;
+import com.platon.browser.queue.publisher.DelegationPublisher;
+import com.platon.browser.service.BlockResult;
+import com.platon.browser.service.DataGenService;
 import com.platon.browser.service.elasticsearch.EsTransactionService;
 import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.Getter;
@@ -25,15 +29,22 @@ import java.util.Set;
  */
 @Slf4j
 @Component
-public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
+public class TransactionHandler extends AbstractHandler<TransactionEvent> {
+
+    @Autowired
+    private DataGenService dataGenService;
 
     @Autowired
     private EsTransactionService esTransactionService;
+
     @Autowired
     private RedisTransactionService redisTransactionService;
 
     @Autowired
     private AddressPublisher addressPublisher;
+
+    @Autowired
+    private DelegationPublisher delegationPublisher;
 
     @Setter
     @Getter
@@ -41,8 +52,9 @@ public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
     private volatile int batchSize;
 
     private StageCache<Transaction> stage = new StageCache<>();
+
     @PostConstruct
-    private void init(){
+    private void init() {
         stage.setBatchSize(batchSize);
         this.setLogger(log);
     }
@@ -53,28 +65,45 @@ public class TransactionHandler  extends AbstractHandler<TransactionEvent> {
         Set<Transaction> cache = stage.getData();
         try {
             cache.addAll(event.getTransactionList());
-            if(cache.size()<batchSize) return;
+            if (cache.size() < batchSize) {
+                return;
+            }
             esTransactionService.save(stage);
-            redisTransactionService.save(cache,false);
+            redisTransactionService.save(cache, false);
             long endTime = System.currentTimeMillis();
-            printTps("交易",cache.size(),startTime,endTime);
+            printTps("交易", cache.size(), startTime, endTime);
 
             // 地址数量未达到指定数量，则继续入库
             List<Address> addressList = new ArrayList<>();
-            cache.forEach(tx->{
-                Address address=new Address();
+            List<Delegation> delegationList = new ArrayList<>();
+            cache.forEach(tx -> {
+                Address address = new Address();
                 address.setAddress(tx.getFrom());
                 addressList.add(address);
-                address=new Address();
+                address = new Address();
                 address.setAddress(tx.getTo());
                 addressList.add(address);
+
+                if (
+                        tx.getTypeEnum() == Transaction.TypeEnum.DELEGATE_CREATE ||
+                                tx.getTypeEnum() == Transaction.TypeEnum.DELEGATE_EXIT
+                ) {
+                    Set<Integer> set = BlockResult.getNoRepetitionRandom(1, 1000, 4);
+                    for (Integer nodeId : set) {
+                        Delegation delegation = dataGenService.getDelegation(tx);
+                        delegation.setNodeId(BlockResult.createNodeId(nodeId));
+                        delegationList.add(delegation);
+                    }
+                }
+
             });
             addressPublisher.publish(addressList);
-
+            delegationPublisher.publish(delegationList);
             cache.clear();
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw e;
         }
     }
+
 }
