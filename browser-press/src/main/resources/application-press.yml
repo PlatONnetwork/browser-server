@@ -50,10 +50,10 @@ disruptor:
   queue:
     block:
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 256
     transaction:
       buffer-size: 1024
-      batch-size: 10240
+      batch-size: 51200
     nodeopt:
       buffer-size: 1024
       batch-size: 1024

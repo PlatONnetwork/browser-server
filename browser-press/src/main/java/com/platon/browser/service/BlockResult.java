@@ -63,8 +63,8 @@ public class BlockResult {
             String to = HexTool.prefix(DigestUtils.sha1Hex(from));
             tx.setTo(TO_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), to), addressReusedTimes));
             tx.setIndex(i);
-            long seq = tx.getNum() * 100000 + i;
-            tx.setSeq(seq);
+            //long seq = tx.getNum() * 100000 + i;
+            //tx.setSeq(seq);
             i++;
         }
 
