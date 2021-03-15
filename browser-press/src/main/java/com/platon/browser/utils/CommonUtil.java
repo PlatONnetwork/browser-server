@@ -1,7 +1,13 @@
 package com.platon.browser.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jasypt.util.text.BasicTextEncryptor;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 @Slf4j
 public class CommonUtil {
@@ -66,9 +72,36 @@ public class CommonUtil {
         return false;
     }
 
+    /**
+     * jasypt加密
+     *
+     * @param str 要加密的字符串
+     * @return java.lang.String
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/3/15
+     */
+    public static String getEncrypt(String str) {
+        try {
+            String path = CommonUtil.isWin() ? "/browser-press/jasypt.properties" : "jasypt.properties";
+            File jasyptFile = FileUtils.getFile(System.getProperty("user.dir"), path);
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(jasyptFile));
+            String propertiesValue = properties.getProperty("jasypt.encryptor.password", "my123456");
+            BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+            //加密所需的salt(盐)
+            textEncryptor.setPassword(propertiesValue);
+            //要加密的数据（数据库的用户名或密码）
+            return textEncryptor.encrypt(str);
+        } catch (Exception e) {
+            log.error("加密异常", e);
+            return "";
+        }
+    }
+
     public static void main(String[] args) {
         System.out.println("打印结果为：" + System.getProperties().getProperty("os.name").toLowerCase());
-        System.out.println("打印结果为：" + isWin());
+        System.out.println("打印结果为：" + getEncrypt("root"));
+        System.out.println("打印结果为：" + getEncrypt("Juzix123!"));
     }
 
 }
