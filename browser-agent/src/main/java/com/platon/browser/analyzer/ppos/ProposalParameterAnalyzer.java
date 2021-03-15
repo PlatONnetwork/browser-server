@@ -12,7 +12,7 @@ import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalParameterParam;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.util.RoundCalculation;
+import com.platon.browser.utils.RoundCalculation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

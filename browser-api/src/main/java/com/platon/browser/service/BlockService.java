@@ -1,14 +1,14 @@
 package com.platon.browser.service;
 
+import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.BrowserConst;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.request.PageReq;
@@ -19,12 +19,10 @@ import com.platon.browser.request.newblock.BlockListByNodeIdReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
-import com.platon.browser.util.DateUtil;
-import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.I18nUtil;
-import com.platon.browser.utils.BlockUtil;
-import com.platon.browser.utils.HexTool;
-import com.platon.utils.Convert;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.utils.EnergonUtil;
+import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.HexUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +62,7 @@ public class BlockService {
     private StatisticCacheService statisticCacheService;
 
     @Resource
-    private BlockESRepository blockESRepository;
+    private EsBlockRepository esBlockRepository;
 
     @Resource
     private I18nUtil i18n;
@@ -72,10 +70,10 @@ public class BlockService {
     @Resource
     private CommonService commonService;
 
+    private Lock lock = new ReentrantLock();
+
     @Value("${platon.valueUnit}")
     private String valueUnit;
-
-    private Lock lock = new ReentrantLock();
 
     private static final String ERROR_TIPS = "获取区块错误。";
 
@@ -87,7 +85,7 @@ public class BlockService {
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
         Long bNumber = networkStatRedis.getCurNumber();
         /** 小于50万条查询redis */
-        if (req.getPageNo() * req.getPageSize() < BrowserConst.MAX_NUM) {
+        if (req.getPageNo() * req.getPageSize() < Browser.MAX_NUM) {
             /**
              * 当页号等于1，重新获取数据，与首页保持一致
              */
@@ -117,9 +115,9 @@ public class BlockService {
             constructor.setDesc("num");
             constructor.setResult(new String[]{"num", "time", "txQty", "reward",
                     "nodeName", "nodeId", "gasUsed", "txGasLimit", "size"});
+            lock.lock();
             try {
-                lock.lock();
-                blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
+                blocks = esBlockRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
             } catch (IOException e) {
                 logger.error(ERROR_TIPS, e);
             } finally {
@@ -129,7 +127,7 @@ public class BlockService {
 
         }
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-        page.setTotal(networkStatRedis.getCurNumber());
+        page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
         respPage.init(page, lists);
         if (System.currentTimeMillis() - startTime > 100) {
             logger.error("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
@@ -156,7 +154,7 @@ public class BlockService {
             blockListResp.setNumber(block.getNum());
             blockListResp.setStatTxGasLimit(block.getTxGasLimit());
             blockListResp.setStatTxQty(block.getTxQty());
-            blockListResp.setServerTime(new Date().getTime());
+            blockListResp.setServerTime(System.currentTimeMillis());
             blockListResp.setTimestamp(block.getTime().getTime());
             String nodeName = nodes.get(block.getNodeId());
             /**
@@ -183,7 +181,7 @@ public class BlockService {
         constructor.setResult(new String[]{"num", "time", "txQty", "reward"});
         ESResult<Block> blocks = new ESResult<>();
         try {
-            blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
+            blocks = esBlockRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             logger.error(ERROR_TIPS, e);
             return respPage;
@@ -195,7 +193,7 @@ public class BlockService {
             blockListResp.setBlockReward(new BigDecimal(block.getReward()));
             blockListResp.setNumber(block.getNum());
             blockListResp.setStatTxQty(block.getTxQty());
-            blockListResp.setServerTime(new Date().getTime());
+            blockListResp.setServerTime(System.currentTimeMillis());
             blockListResp.setTimestamp(block.getTime().getTime());
             lists.add(blockListResp);
         }
@@ -231,7 +229,7 @@ public class BlockService {
                 "txFee"});
         ESResult<Block> blockList = new ESResult<>();
         try {
-            blockList = blockESRepository.search(constructor, Block.class, 1, 30000);
+            blockList = esBlockRepository.search(constructor, Block.class, 1, 30000);
         } catch (Exception e) {
             logger.error(ERROR_TIPS, e);
             return blockDownload;
@@ -243,8 +241,8 @@ public class BlockService {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
                     block.getTxQty(),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN))),
-                    HexTool.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN)))
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN))),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN)))
             };
             rows.add(row);
         });
@@ -293,9 +291,10 @@ public class BlockService {
 
     private BlockDetailResp queryBlockByNumber(long blockNumber) {
         /** 根据区块号查询对应数据 */
+
         Block block = null;
         try {
-            block = blockESRepository.get(String.valueOf(blockNumber), Block.class);
+            block = esBlockRepository.get(String.valueOf(blockNumber), Block.class);
         } catch (IOException e) {
             logger.error(ERROR_TIPS, e);
         }
@@ -318,7 +317,7 @@ public class BlockService {
             /** 取上一个区块,如果存在则设置标识和hash */
             blockDetailResp.setFirst(false);
             if (blockNumber == 0) {
-                blockDetailResp.setTimeDiff(0l);
+                blockDetailResp.setTimeDiff(0L);
                 blockDetailResp.setFirst(true);
             }
 
@@ -333,13 +332,6 @@ public class BlockService {
             }
 
             blockDetailResp.setTimestamp(block.getTime().getTime());
-
-            // 只有第0个区块有postscript
-            if (0 == blockNumber) {
-                blockDetailResp.setPostscript(BlockUtil.getPostscriptFromExtraData(blockDetailResp.getExtraData()));
-            } else {
-                blockDetailResp.setPostscript("");
-            }
         }
         return blockDetailResp;
     }

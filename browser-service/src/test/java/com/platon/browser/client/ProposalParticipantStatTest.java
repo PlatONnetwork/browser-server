@@ -1,5 +1,6 @@
 package com.platon.browser.client;
 
+import com.platon.browser.bean.ProposalParticipantStat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

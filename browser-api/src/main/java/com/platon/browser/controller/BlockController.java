@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
@@ -16,11 +15,12 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
 import com.platon.browser.service.BlockService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.WebAsyncTask;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +33,7 @@ import javax.validation.Valid;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
+@Slf4j
 @RestController
 public class BlockController {
 	private final Logger logger = LoggerFactory.getLogger(BlockController.class);
@@ -45,27 +46,17 @@ public class BlockController {
 	@Resource
 	private CommonMethod commonMethod;
 
-	@PostMapping(value = "block/blockList")
-	public WebAsyncTask<RespPage<BlockListResp>> blockList(@Valid @RequestBody PageReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> blockService.blockList(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;  
+	@PostMapping("block/blockList")
+	public Mono<RespPage<BlockListResp>> blockList(@Valid @RequestBody PageReq req) {
+		return Mono.just(blockService.blockList(req));
 	}
 
-	@PostMapping(value = "block/blockListByNodeId")
-	public WebAsyncTask<RespPage<BlockListResp>> blockListByNodeId(@Valid @RequestBody BlockListByNodeIdReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-        WebAsyncTask<RespPage<BlockListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> blockService.blockListByNodeId(req));
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;  
+	@PostMapping("block/blockListByNodeId")
+	public Mono<RespPage<BlockListResp>> blockListByNodeId(@Valid @RequestBody BlockListByNodeIdReq req) {
+		return Mono.just(blockService.blockListByNodeId(req));
 	}
 
-	@GetMapping(value = "block/blockListByNodeIdDownload")
+	@GetMapping("block/blockListByNodeIdDownload")
 	public void blockListByNodeIdDownload(
 			@RequestParam(value = "nodeId", required = false)String nodeId,
 			@RequestParam(value = "date", required = true)Long date,
@@ -87,29 +78,19 @@ public class BlockController {
 		}
 	}
 
-	@PostMapping(value = "block/blockDetails")
-	public WebAsyncTask<BaseResp<BlockDetailResp>> blockDetails(@Valid @RequestBody BlockDetailsReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-            BlockDetailResp blockDetailResp = blockService.blockDetails(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
-        });
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask;  
+	@PostMapping("block/blockDetails")
+	public Mono<BaseResp<BlockDetailResp>> blockDetails(@Valid @RequestBody BlockDetailsReq req) {
+		return Mono.create(sink -> {
+			BlockDetailResp resp = blockService.blockDetails(req);
+			sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp));
+		});
 	}
 
-	@PostMapping(value = "block/blockDetailNavigate")
-	public WebAsyncTask<BaseResp<BlockDetailResp>> blockDetailNavigate(@Valid @RequestBody BlockDetailNavigateReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-        WebAsyncTask<BaseResp<BlockDetailResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> {
-            BlockDetailResp blockDetailResp = blockService.blockDetailNavigate(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailResp);
-        });
-        CommonMethod.onTimeOut(webAsyncTask);
-        return webAsyncTask; 
+	@PostMapping("block/blockDetailNavigate")
+	public Mono<BaseResp<BlockDetailResp>> blockDetailNavigate(@Valid @RequestBody BlockDetailNavigateReq req) {
+		return Mono.create(sink -> {
+			BlockDetailResp resp = blockService.blockDetailNavigate(req);
+			sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp));
+		});
 	}
 }

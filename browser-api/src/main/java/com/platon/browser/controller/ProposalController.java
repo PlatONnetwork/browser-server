@@ -1,9 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
-import com.platon.browser.config.CommonMethod;
-import com.platon.browser.service.ProposalService;
-import com.platon.browser.service.VoteService;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.request.proposal.ProposalDetailRequest;
 import com.platon.browser.request.proposal.VoteListRequest;
@@ -12,12 +8,13 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.proposal.ProposalDetailsResp;
 import com.platon.browser.response.proposal.ProposalListResp;
 import com.platon.browser.response.proposal.VoteListResp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.platon.browser.service.ProposalService;
+import com.platon.browser.service.VoteService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.WebAsyncTask;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -30,43 +27,26 @@ import javax.validation.Valid;
  * @author zhangrj
  * @data 2019年8月31日
  */
+@Slf4j
 @RestController
 public class ProposalController {
-	Logger logger = LoggerFactory.getLogger(ProposalController.class);
 	@Resource
 	private ProposalService proposalService;
 	@Resource
 	private VoteService voteService;
 
-	@PostMapping(value = "proposal/proposalList")
-	public WebAsyncTask<RespPage<ProposalListResp>> proposalList(@Valid @RequestBody(required = false) PageReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<RespPage<ProposalListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> proposalService.list(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("proposal/proposalList")
+	public Mono<RespPage<ProposalListResp>> proposalList(@Valid @RequestBody(required = false) PageReq req) {
+		return Mono.just(proposalService.list(req));
 	}
 
-	@PostMapping(value = "proposal/proposalDetails")
-	public WebAsyncTask<BaseResp<ProposalDetailsResp>> proposalDetails(@Valid @RequestBody ProposalDetailRequest req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<BaseResp<ProposalDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> proposalService.get(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("proposal/proposalDetails")
+	public Mono<BaseResp<ProposalDetailsResp>> proposalDetails(@Valid @RequestBody ProposalDetailRequest req) {
+		return Mono.just(proposalService.get(req));
 	}
 
-	@PostMapping(value = "proposal/voteList")
-	public WebAsyncTask<RespPage<VoteListResp>> voteList(@Valid @RequestBody VoteListRequest req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<RespPage<VoteListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT, () -> voteService.queryByProposal(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("proposal/voteList")
+	public Mono<RespPage<VoteListResp>> voteList(@Valid @RequestBody VoteListRequest req) {
+		return Mono.just(voteService.queryByProposal(req));
 	}
 }

@@ -5,7 +5,7 @@
 //import com.platon.browser.elasticsearch.TransactionESRepository;
 //import com.platon.browser.elasticsearch.dto.Block;
 //import com.platon.browser.elasticsearch.dto.Transaction;
-//import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+//import com.platon.browser.elasticsearch.query.ESQueryBuilderConstructor;
 //import com.platon.browser.service.redis.RedisBlockService;
 //import com.platon.browser.service.redis.RedisTransactionService;
 //import org.junit.Before;

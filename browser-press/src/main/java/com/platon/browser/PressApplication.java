@@ -5,7 +5,6 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.GracefullyShutdownException;
@@ -25,6 +24,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 @EnableRetry
 @EnableScheduling
+@EnableConfigurationProperties
 @MapperScan(basePackages = {"com.platon.browser.dao.mapper"})
 @SpringBootApplication
 public class PressApplication implements ApplicationRunner {
@@ -68,12 +69,10 @@ public class PressApplication implements ApplicationRunner {
 
     @Autowired
     private DelegationPublisher delegationPublisher;
-
-    @Autowired
-    private Erc20TokenPublisher erc20TokenPublisher;
-
-    @Autowired
-    private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
+//    @Autowired
+//    private Erc20TokenPublisher erc20TokenPublisher;
+//    @Autowired
+//    private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
 
     @Autowired
     private ProposalPublisher proposalPublisher;
@@ -92,9 +91,8 @@ public class PressApplication implements ApplicationRunner {
 
     @Autowired
     private SlashPublisher slashPublisher;
-
-    @Autowired
-    private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
+//    @Autowired
+//    private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -212,10 +210,10 @@ public class PressApplication implements ApplicationRunner {
             // 构造【gas】数据
             makeEstimate(blockResult);
 
-            // 构造【代币】数据
-            //makeErc20Token(blockResult);
-            // 构造【代币转账】数据
-            //makeTokenTransferRecord(blockResult);
+//            // 构造【代币】数据
+//            makeErc20Token(blockResult);
+//            // 构造【代币转账】数据
+//            makeTokenTransferRecord(blockResult);
 
             // 区块号累加
             blockNumber = blockNumber.add(BigInteger.ONE);
@@ -275,7 +273,6 @@ public class PressApplication implements ApplicationRunner {
         networkStatMapper.deleteByExample(null);
         dataGenService.getNetworkStat().setCurNumber(0L);
         networkStatMapper.insert(dataGenService.getNetworkStat());
-
         return blockNumber;
     }
 
@@ -284,29 +281,6 @@ public class PressApplication implements ApplicationRunner {
             GracefullyUtil.monitor();
         } catch (GracefullyShutdownException | InterruptedException e) {
             log.warn("检测到SHUTDOWN钩子,放弃执行业务逻辑,写入当前状态...");
-            /*CounterBean counter = new CounterBean();
-            counter.setBlockCount(blockPublisher.getTotalCount());
-            counter.setTransactionCount(transactionPublisher.getTotalCount());
-            counter.setNodeOptCount(nodeOptPublisher.getTotalCount());
-            counter.setNodeOptMaxId(dataGenService.getNodeOptMaxId());
-            counter.setAddressCount(addressPublisher.getTotalCount());
-            counter.setLastBlockNumber(blockNumber.longValue());
-            counter.setNodeCount(currentNodeSum);
-            counter.setStakingCount(currentStakeSum);
-            counter.setDelegationCount(currentDelegationSum);
-            counter.setProposalCount(currentProposalSum);
-            counter.setVoteCount(currentVoteSum);
-            counter.setRpplanCount(currentRpplanSum);
-            counter.setSlashCount(currentSlashSum);
-            counter.setRewardCount(currentRewardSum);
-            counter.setEstimateCount(currentEstimateSum);
-            counter.setTokenCount(currentTokenCount);
-            String status = JSON.toJSONString(counter,true);
-            File counterFile = FileUtils.getFile(System.getProperty("user.dir"), "counter.json");
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(counterFile))) {
-                bw.write(status);
-            }
-            log.warn("状态写入完成,可安全停机:{}",status);*/
             flushCount(blockNumber, startTime);
             System.exit(0);
         }
@@ -564,45 +538,43 @@ public class PressApplication implements ApplicationRunner {
         }
     }
 
-    /**
-     * 构造代币合约
-     *
-     * @param blockResult
-     */
-    private void makeErc20Token(BlockResult blockResult) {
-        if (currentTokenCount < tokenMaxCount) {
-            List<Erc20Token> tokenList = new ArrayList<>();
-            for (Transaction tx : blockResult.getTransactionList()) {
-                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
-                    tokenList.add(dataGenService.getErc20Token(tx));
-                    currentTokenCount++;
-                }
-            }
-            erc20TokenPublisher.publish(tokenList);
-
-            // 代币与地址关系：1:1000000，按此关系来（一般）
-            List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
-            tokenList.forEach(token -> {
-                erc20TokenAddressRelList.addAll(dataGenService.getErc20TokenAddressRel(token, addressCountPerToken));
-            });
-            erc20TokenAddressRelPublisher.publish(erc20TokenAddressRelList);
-        }
-    }
-
-    /**
-     * 构建代币转账交易
-     */
-    private void makeTokenTransferRecord(BlockResult blockResult) {
-        if (currentTokenTransferCount < tokenTransferMaxCount) {
-            List<ESTokenTransferRecord> transferRecordList = new ArrayList<>();
-            for (Transaction tx : blockResult.getTransactionList()) {
-                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
-                    transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
-                    currentTokenTransferCount++;
-                }
-            }
-            esTokenTransferRecordPublisher.publish(transferRecordList);
-        }
-    }
-
+//    /**
+//     * 构造代币合约
+//     * @param blockResult
+//     */
+//    private void makeErc20Token(BlockResult blockResult){
+//        if (currentTokenCount < tokenMaxCount) {
+//            List<Erc20Token> tokenList = new ArrayList<>();
+//            for (Transaction tx : blockResult.getTransactionList()) {
+//                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE) {
+//                    tokenList.add(dataGenService.getErc20Token(tx));
+//                    currentTokenCount++;
+//                }
+//            }
+////            erc20TokenPublisher.publish(tokenList);
+//
+//            // 代币与地址关系：1:1000000，按此关系来（一般）
+//            List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
+//            tokenList.forEach(token -> {
+//                erc20TokenAddressRelList.addAll(dataGenService.getErc20TokenAddressRel(token, addressCountPerToken));
+//            });
+////            erc20TokenAddressRelPublisher.publish(erc20TokenAddressRelList);
+//        }
+//    }
+//
+//    /**
+//     * 构建代币转账交易
+//     */
+//    private void makeTokenTransferRecord(BlockResult blockResult) {
+//        if (currentTokenTransferCount < tokenTransferMaxCount) {
+//            List<OldErcTx> transferRecordList = new ArrayList<>();
+//            for (Transaction tx : blockResult.getTransactionList()) {
+//                if (tx.getTypeEnum() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC) {
+//                    transferRecordList.add(dataGenService.getESTokenTransferRecord(tx));
+//                    currentTokenTransferCount++;
+//                }
+//            }
+////            esTokenTransferRecordPublisher.publish(transferRecordList);
+//        }
+//    }
 }

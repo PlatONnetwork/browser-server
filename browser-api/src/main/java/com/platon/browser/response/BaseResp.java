@@ -1,6 +1,6 @@
 package com.platon.browser.response;
 
-import com.platon.browser.util.I18NUtils;
+import com.platon.browser.utils.I18NUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**

@@ -5,8 +5,14 @@ profile: testsonar
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-# 服务器端口号
-server.port: 9061
+#性能配置
+server:
+  port: 9061
+  tomcat:
+    max-connections: 20000
+    threads:
+      max: 2000
+      min-spare: 800
 #Spring框架内部配置
 spring:
   #数据源配置
@@ -14,8 +20,6 @@ spring:
     url: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
     username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
     password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
     #下面为连接池的补充设置，应用到上面所有数据源中
     #初始化大小，最小，最大
     initialSize: 5
@@ -34,12 +38,13 @@ spring:
     # 打开PSCache，并且指定每个连接上PSCache的大小
     poolPreparedStatements: true
     maxPoolPreparedStatementPerConnectionSize: 100
-    #Redis配置
+  #Redis配置
   redis:
+    password: platscan
+    database: 0
     cluster:
       max-redirects: 3
-      nodes: 192.168.16.171:7000,192.168.16.171:7001,192.168.16.171:7002,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
-    password: platscan
+      nodes: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
   #ES配置
   elasticsearch:
     high-level-client:
@@ -48,41 +53,8 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_testsonar
-      transactionIndexName: browser_transaction_testsonar
-      delegationIndexName: browser_delegation_testsonar
-      nodeOptIndexName: browser_nodeopt_testsonar
-      delegationRewardIndexName: browser_delegation_reward_testsonar
-      innerTxIndexName: browser_inner_tx_testsonar
-#redis配置
-redisCluster:
-  configKey: DEFAULT
-  connectionTimeout: 4000
-  soTimeout: 5000
-  maxRedirections: 3000
-  maxTotal: 10
-  maxIdle: 5
-  minIdle: 2
-  maxWaitMillis: 2000
-  testOnBorrow: false
-  testOnReturn: false
-  testWhileIdle: true
-  masterIPs: 192.168.16.171:7000,192.168.16.171:7001,192.168.16.171:7002,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
-  password: platscan
-#性能配置
-server:
-  tomcat:
-    max-connections: 20000
-    min-spare-threads: 800
-    max-threads: 2000
-  connection-timeout: 5000
-zuul:
-  FormBodyWrapperFilter:
-    pre:
-      disable: true
 #日志配置
 logging:
-  file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
     org.springframework: debug
@@ -91,8 +63,12 @@ logging:
     com.platon.browser.task: debug
     com.platon.browser.client: debug
     com.platon.browser.dao: debug
+  file:
+    name: ./logs/${spring.application.name}-${version}-${profile}.log
 #初始化链相关的配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: atp
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
@@ -136,10 +112,10 @@ platon:
   chainId: 108
   #锁仓最小释放金额参数生效版本
   restrictingMinimumReleaseActiveVersion: 3584
-  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
-  eventDefine: {
-    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
-  }
+  #Redis命名空间
+  redis-namespace: browser:${version}:${profile}
+  #Es索引命名空间
+  es-namespace: browser_${version}_${profile}
 
 brokenHost: 192.168.16.173
 brokenPort: 61613
@@ -147,16 +123,3 @@ system.username: admin
 system.password: admin
 client.username: guest
 client.password: guest
-
-
-task:
-  #地址统计任务
-  address-batch-size: 1000
-  #动态调整参数
-  dynamic-adjust:
-    #agent与实际链上区块号相差多少个块号时触发调整操作
-    threshold: 20
-    #未追上链,批量入ES和Redis的缓存大小
-    cache-batch-max-size: 10
-    #已追上链,批量入ES和Redis的缓存大小
-    cache-batch-min-size: 1

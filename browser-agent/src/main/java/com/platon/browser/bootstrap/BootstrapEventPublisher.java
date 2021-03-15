@@ -5,11 +5,10 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.publisher.AbstractPublisher;
-import com.platon.browser.client.ReceiptResult;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -28,11 +27,10 @@ public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
         event.setReceiptCF(receiptCF);
         event.setCallback(callback);
     };
-    @Value("${disruptor.queue.block.buffer-size}")
-    private int ringBufferSize;
+
     @Override
     public int getRingBufferSize() {
-        return ringBufferSize;
+        return config.getBlockBufferSize();
     }
 
     private EventFactory<BootstrapEvent> eventFactory = BootstrapEvent::new;
@@ -44,7 +42,7 @@ public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
 
     @PostConstruct
     public void init(){
-        disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
+        disruptor = new Disruptor<>(eventFactory, getRingBufferSize(), DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(handler);
         disruptor.start();
         ringBuffer = disruptor.getRingBuffer();

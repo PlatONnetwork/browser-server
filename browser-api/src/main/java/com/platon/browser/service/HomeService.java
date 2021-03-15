@@ -9,16 +9,16 @@ import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.TransactionESRepository;
-import com.platon.browser.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.*;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.NetworkParams;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,9 +44,9 @@ import java.util.List;
 public class HomeService {
 
 	@Resource
-	private BlockESRepository blockESRepository;
+	private EsBlockRepository ESBlockRepository;
 	@Resource
-	private TransactionESRepository transactionESRepository;
+	private EsTransactionRepository ESTransactionRepository;
 	@Resource
 	private StatisticCacheService statisticCacheService;
 	@Resource
@@ -104,7 +104,7 @@ public class HomeService {
 			/* 存在区块信息则返回区块号 */
 			Block block = null;
 			try {
-				block = blockESRepository.get(String.valueOf(number), Block.class);
+				block = ESBlockRepository.get(String.valueOf(number), Block.class);
 			} catch (IOException e) {
 				log.error(BLOCK_ERR_TIPS, e);
 			}
@@ -120,10 +120,10 @@ public class HomeService {
 //			}
 			if (keyword.length() == 128) {
 				/* 判断为节点Id */
-				Node node = nodeMapper.selectByPrimaryKey(HexTool.prefix(keyword.toLowerCase()));
+				Node node = nodeMapper.selectByPrimaryKey(HexUtil.prefix(keyword.toLowerCase()));
 				if(node != null) {
 					result.setType(STAKING_TYPE);
-					queryNavigationStructResp.setNodeId(HexTool.prefix(node.getNodeId()));
+					queryNavigationStructResp.setNodeId(HexUtil.prefix(node.getNodeId()));
 				}
 			}
 			if (keyword.startsWith(networkParams.getHrp())) {
@@ -155,7 +155,7 @@ public class HomeService {
 					keyword = keyword.toLowerCase();
 					Transaction items = null;
 					try {
-						items = transactionESRepository.get(keyword, Transaction.class);
+						items = ESTransactionRepository.get(keyword, Transaction.class);
 					} catch (IOException e) {
 						log.error(BLOCK_ERR_TIPS, e);
 					}
@@ -169,7 +169,7 @@ public class HomeService {
 						blockConstructor.must(new ESQueryBuilders().term("hash", keyword));
 						ESResult<Block> blockList = new ESResult<>();
 						try {
-							blockList = blockESRepository.search(blockConstructor, Block.class, 1, 1);
+							blockList = ESBlockRepository.search(blockConstructor, Block.class, 1, 1);
 						} catch (IOException e) {
 							log.error(BLOCK_ERR_TIPS, e);
 						}

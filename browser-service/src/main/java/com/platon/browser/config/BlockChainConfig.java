@@ -1,26 +1,22 @@
 package com.platon.browser.config;
 
-import com.platon.contracts.ppos.dto.resp.GovernParam;
-import com.platon.contracts.ppos.dto.resp.ParamItem;
-import com.platon.contracts.ppos.dto.resp.ParamValue;
-import com.platon.protocol.core.methods.response.bean.EconomicConfig;
-import com.platon.utils.Convert;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.protocol.core.methods.response.bean.EconomicConfig;
+import com.platon.utils.Convert;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,53 +28,46 @@ import java.util.*;
 
 /**
  * 链参数统一配置项
- *
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
  * @Description:
  */
 
 @Slf4j
-@DependsOn("networkParams")
+@Data
 @Configuration
-@ConfigurationProperties(prefix = "platon")
+@ConfigurationProperties(prefix="platon")
 public class BlockChainConfig {
-
-    @Autowired
+    private static Set<String> INNER_CONTRACT_ADDR ;
+    @Resource
     private ConfigMapper configMapper;
+    @Resource
+    private PlatOnClient client;
 
     static {
         File saltFile = FileUtils.getFile(System.getProperty("user.dir"), "jasypt.properties");
         Properties properties = new Properties();
-        try (InputStream in = new FileInputStream(saltFile)) {
+        try(InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
-            String salt = properties.getProperty("jasypt.encryptor.password");
-            if (StringUtils.isBlank(salt)) {
-                throw new ConfigLoadingException("加密盐不能为空!");
-            }
-            salt = salt.trim();
-            System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
-            log.info("salt:{}", salt);
+            String salt=properties.getProperty("jasypt.encryptor.password");
+            if(StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
+            salt=salt.trim();
+            System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
+            log.info("salt:{}",salt);
         } catch (IOException | ConfigLoadingException e) {
-            log.error("加载解密文件出错", e);
+            log.error("加载解密文件出错",e);
             System.exit(1);
         }
     }
 
-    @Autowired
-    private PlatOnClient client;
-
-    private static Set<String> INNER_CONTRACT_ADDR;
-
-    public Set<String> getInnerContractAddr() {
+    public Set<String> getInnerContractAddr(){
         return Collections.unmodifiableSet(INNER_CONTRACT_ADDR);
     }
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
-
-    /**
-     * 【通用】默认每个区块的最大Gas
-     */
+    @Value("${platon.chainId}")
+    private long chainId;
+    //【通用】默认每个区块的最大Gas
     @Value("${platon.maxBlockGasLimit}")
     private BigDecimal maxBlockGasLimit;
 
@@ -367,600 +356,109 @@ public class BlockChainConfig {
      */
     private Map<String, String> eventDefine;
 
+    // 地址前缀
+    private String addressPrefix;
+
     @PostConstruct
     public void init() throws ConfigLoadingException {
-        BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        defaultStakingLockedAmount = Convert.toVon(defaultStakingLockedAmount, Convert.Unit.KPVON);
-        updateWithEconomicConfig(client.getEconomicConfig());
-        // updateWithGovernParams(client.getGovernParamValue(""));
-    }
 
-    private void updateWithGovernParams(List<GovernParam> governParam) {
-        governParam.forEach(param -> {
-            ParamItem pi = param.getParamItem();
-            ParamValue pv = param.getParamValue();
-            ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(pi.getName());
-            switch (paramEnum) {
-                case ZERO_PRODUCE_NUMBER_THRESHOLD:
-                    this.setZeroProduceNumberThreshold(Integer.valueOf(pv.getValue()));
-                    break;
-                // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
-                case ZERO_PRODUCE_CUMULATIVE_TIME:
-                    this.setZeroProduceCumulativeTime(Integer.valueOf(pv.getValue()));
-                    break;
-                default:
-                    break;
-            }
-        });
+    	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
+        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.KPVON);
+        // 使用经济模型参数接口返回的数据更新配置
+        updateWithEconomicConfig(client.getEconomicConfig());
+        // 刷新合约
+        client.updateContract();
     }
 
     private void updateWithEconomicConfig(EconomicConfig dec) {
         //【通用】每个验证人每个共识周期出块数量目标值
-        this.setExpectBlockCount(dec.getCommon().getPerRoundBlocks());
+        setExpectBlockCount(dec.getCommon().getPerRoundBlocks());
         //【通用】每个共识轮验证节点数量
-        this.setConsensusValidatorCount(dec.getCommon().getMaxConsensusVals());
+        setConsensusValidatorCount(dec.getCommon().getMaxConsensusVals());
         //【通用】每个结算周期验证节点数量
-        this.setSettlementValidatorCount(dec.getStaking().getMaxValidators());
+        setSettlementValidatorCount(dec.getStaking().getMaxValidators());
         //【通用】增发周期规定的分钟数
-        this.setAdditionalCycleMinutes(dec.getCommon().getAdditionalCycleTime());
+        setAdditionalCycleMinutes(dec.getCommon().getAdditionalCycleTime());
         //【通用】每个结算周期的分钟数
-        this.setSettlementCycleMinutes(dec.getCommon().getMaxEpochMinutes());
+        setSettlementCycleMinutes(dec.getCommon().getMaxEpochMinutes());
         //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-        this.setBlockInterval(dec.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount));
+        setBlockInterval(dec.getCommon().getNodeBlockTimeWindow().divide(expectBlockCount));
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
-        this.setConsensusPeriodBlockCount(this.expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals()));
+        setConsensusPeriodBlockCount(expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals()));
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        this.setSettlePeriodBlockCount(settlementCycleMinutes
+        setSettlePeriodBlockCount(settlementCycleMinutes
                 .multiply(BigInteger.valueOf(60))
-                .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
-                .multiply(this.consensusPeriodBlockCount));
+                .divide(blockInterval.multiply(consensusPeriodBlockCount))
+                .multiply(consensusPeriodBlockCount));
         //【通用】PlatOn基金会账户地址
-        this.setPlatOnFundAccount(dec.getInnerAcc().getPlatonFundAccount());
+        setPlatOnFundAccount(dec.getInnerAcc().getPlatonFundAccount());
         //【通用】PlatOn基金会账户初始余额
-        this.setPlatOnFundInitAmount(new BigDecimal(dec.getInnerAcc().getPlatonFundBalance()));
+        setPlatOnFundInitAmount(new BigDecimal(dec.getInnerAcc().getPlatonFundBalance()));
         //【通用】社区开发者激励基金账户地址
-        this.setCommunityFundAccount(dec.getInnerAcc().getCdfAccount());
+        setCommunityFundAccount(dec.getInnerAcc().getCdfAccount());
         //【通用】社区开发者激励基金账户初始余额
-        this.setCommunityFundInitAmount(new BigDecimal(dec.getInnerAcc().getCdfBalance()));
+        setCommunityFundInitAmount(new BigDecimal(dec.getInnerAcc().getCdfBalance()));
+
         //【质押】创建验证人最低的质押Token数(VON)
-        this.setStakeThreshold(new BigDecimal(dec.getStaking().getStakeThreshold()));
+        setStakeThreshold(new BigDecimal(dec.getStaking().getStakeThreshold()));
         //【质押】委托人每次委托及赎回的最低Token数(VON)
-        this.setDelegateThreshold(new BigDecimal(dec.getStaking().getOperatingThreshold()));
+        setDelegateThreshold(new BigDecimal(dec.getStaking().getOperatingThreshold()));
         //【质押】节点质押退回锁定的结算周期数
-        this.setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
+        setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
         //【惩罚】双签奖励百分比
-        this.setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
+        setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
         //【惩罚】双签处罚万分比
-        this.setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【惩罚】举报证据有效周期数
-        this.setEvidenceValidEpoch(new BigDecimal(dec.getSlashing().getMaxEvidenceAge()));
+        setEvidenceValidEpoch(new BigDecimal(dec.getSlashing().getMaxEvidenceAge()));
         //【惩罚】扣除区块奖励的个数
-        this.setSlashBlockRewardCount(new BigDecimal(dec.getSlashing().getSlashBlocksReward()));
+        setSlashBlockRewardCount(new BigDecimal(dec.getSlashing().getSlashBlocksReward()));
+
         //【治理】文本提案参与率: >
-        this.setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】文本提案支持率：>=
-        this.setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】取消提案参与率: >
-        this.setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】取消提案支持率：>=
-        this.setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】升级提案通过率
-        this.setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】文本提案投票周期
-        this.setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
+        setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
                 .divide(
                         new BigDecimal(
                                 BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
                                         .multiply(dec.getCommon().getPerRoundBlocks())
-                                        .multiply(this.consensusValidatorCount)) //每个共识轮验证节点数量
-                        , 0, RoundingMode.FLOOR
+                                        .multiply(consensusValidatorCount)) //每个共识轮验证节点数量
+                        ,0,RoundingMode.FLOOR
                 ));
 
         //【治理】参数提案的投票持续最长的时间（单位：s）
-        this.setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
+        setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
         //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
-        this.setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
         //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
-        this.setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+
         //【奖励】激励池分配给出块激励的比例
-        this.setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
+        setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
-        this.setStakeRewardRate(BigDecimal.ONE.subtract(this.blockRewardRate));
+        setStakeRewardRate(BigDecimal.ONE.subtract(blockRewardRate));
         //【奖励】Platon基金会年限
-        this.setPlatOnFoundationYear(dec.getReward().getPlatonFoundationYear());
+        setPlatOnFoundationYear(dec.getReward().getPlatonFoundationYear());
         //【惩罚】零出块次数
-        this.setZeroProduceCumulativeTime(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
+        setZeroProduceCumulativeTime(dec.getSlashing().getZeroProduceCumulativeTime().intValue());
         //【惩罚】零出块阈值
-        this.setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
+        setZeroProduceNumberThreshold(dec.getSlashing().getZeroProduceNumberThreshold().intValue());
         // 节点零出块惩罚被锁定时间
-        this.setZeroProduceFreezeDuration(dec.getSlashing().getZeroProduceFreezeDuration().intValue());
+        setZeroProduceFreezeDuration(dec.getSlashing().getZeroProduceFreezeDuration().intValue());
         //【质押】委托比例调整幅度限制
-        this.setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
+        setRewardPerMaxChangeRange(dec.getStaking().getRewardPerMaxChangeRange().intValue());
         //【质押】委托比例调整间隔
-        this.setRewardPerChangeInterval(dec.getStaking().getRewardPerChangeInterval().intValue());
+        setRewardPerChangeInterval(dec.getStaking().getRewardPerChangeInterval().intValue());
         //【锁仓】最小锁仓释放金额,（debug_economic接口platon版本会返回minimumRelease，alaya版本不会返回minimumRelease
         // 此值在alaya版本浏览器需要在ParameterService.initConfigTable()中进行设置
-        //this.setRestrictingMinimumRelease(new BigDecimal(dec.getRestricting().getMinimumRelease()));
+        //setRestrictingMinimumRelease(new BigDecimal(dec.getRestricting().getMinimumRelease()));
     }
-
-    public ConfigMapper getConfigMapper() {
-        return configMapper;
-    }
-
-    public void setConfigMapper(ConfigMapper configMapper) {
-        this.configMapper = configMapper;
-    }
-
-    public PlatOnClient getClient() {
-        return client;
-    }
-
-    public void setClient(PlatOnClient client) {
-        this.client = client;
-    }
-
-    public BigDecimal getMaxBlockGasLimit() {
-        return maxBlockGasLimit;
-    }
-
-    public void setMaxBlockGasLimit(BigDecimal maxBlockGasLimit) {
-        this.maxBlockGasLimit = maxBlockGasLimit;
-    }
-
-    public BigInteger getExpectBlockCount() {
-        return expectBlockCount;
-    }
-
-    public void setExpectBlockCount(BigInteger expectBlockCount) {
-        this.expectBlockCount = expectBlockCount;
-    }
-
-    public BigInteger getConsensusValidatorCount() {
-        return consensusValidatorCount;
-    }
-
-    public void setConsensusValidatorCount(BigInteger consensusValidatorCount) {
-        this.consensusValidatorCount = consensusValidatorCount;
-    }
-
-    public BigInteger getSettlementValidatorCount() {
-        return settlementValidatorCount;
-    }
-
-    public void setSettlementValidatorCount(BigInteger settlementValidatorCount) {
-        this.settlementValidatorCount = settlementValidatorCount;
-    }
-
-    public BigInteger getAdditionalCycleMinutes() {
-        return additionalCycleMinutes;
-    }
-
-    public void setAdditionalCycleMinutes(BigInteger additionalCycleMinutes) {
-        this.additionalCycleMinutes = additionalCycleMinutes;
-    }
-
-    public BigInteger getSettlementCycleMinutes() {
-        return settlementCycleMinutes;
-    }
-
-    public void setSettlementCycleMinutes(BigInteger settlementCycleMinutes) {
-        this.settlementCycleMinutes = settlementCycleMinutes;
-    }
-
-    public BigInteger getSettlePeriodCountPerIssue() {
-        return settlePeriodCountPerIssue;
-    }
-
-    public void setSettlePeriodCountPerIssue(BigInteger settlePeriodCountPerIssue) {
-        this.settlePeriodCountPerIssue = settlePeriodCountPerIssue;
-    }
-
-    public BigInteger getBlockInterval() {
-        return blockInterval;
-    }
-
-    public void setBlockInterval(BigInteger blockInterval) {
-        this.blockInterval = blockInterval;
-    }
-
-    public BigInteger getConsensusPeriodBlockCount() {
-        return consensusPeriodBlockCount;
-    }
-
-    public void setConsensusPeriodBlockCount(BigInteger consensusPeriodBlockCount) {
-        this.consensusPeriodBlockCount = consensusPeriodBlockCount;
-    }
-
-    public BigInteger getSettlePeriodBlockCount() {
-        return settlePeriodBlockCount;
-    }
-
-    public void setSettlePeriodBlockCount(BigInteger settlePeriodBlockCount) {
-        this.settlePeriodBlockCount = settlePeriodBlockCount;
-    }
-
-    public BigInteger getAddIssuePeriodBlockCount() {
-        return addIssuePeriodBlockCount;
-    }
-
-    public void setAddIssuePeriodBlockCount(BigInteger addIssuePeriodBlockCount) {
-        this.addIssuePeriodBlockCount = addIssuePeriodBlockCount;
-    }
-
-    public String getPlatOnFundAccount() {
-        return platOnFundAccount;
-    }
-
-    public void setPlatOnFundAccount(String platOnFundAccount) {
-        this.platOnFundAccount = platOnFundAccount;
-    }
-
-    public BigDecimal getPlatOnFundInitAmount() {
-        return platOnFundInitAmount;
-    }
-
-    public void setPlatOnFundInitAmount(BigDecimal platOnFundInitAmount) {
-        this.platOnFundInitAmount = platOnFundInitAmount;
-    }
-
-    public String getCommunityFundAccount() {
-        return communityFundAccount;
-    }
-
-    public void setCommunityFundAccount(String communityFundAccount) {
-        this.communityFundAccount = communityFundAccount;
-    }
-
-    public BigDecimal getCommunityFundInitAmount() {
-        return communityFundInitAmount;
-    }
-
-    public void setCommunityFundInitAmount(BigDecimal communityFundInitAmount) {
-        this.communityFundInitAmount = communityFundInitAmount;
-    }
-
-    public BigDecimal getStakeThreshold() {
-        return stakeThreshold;
-    }
-
-    public void setStakeThreshold(BigDecimal stakeThreshold) {
-        this.stakeThreshold = stakeThreshold;
-    }
-
-    public BigDecimal getDelegateThreshold() {
-        return delegateThreshold;
-    }
-
-    public void setDelegateThreshold(BigDecimal delegateThreshold) {
-        this.delegateThreshold = delegateThreshold;
-    }
-
-    public BigInteger getUnStakeRefundSettlePeriodCount() {
-        return unStakeRefundSettlePeriodCount;
-    }
-
-    public void setUnStakeRefundSettlePeriodCount(BigInteger unStakeRefundSettlePeriodCount) {
-        this.unStakeRefundSettlePeriodCount = unStakeRefundSettlePeriodCount;
-    }
-
-    public BigDecimal getDuplicateSignRewardRate() {
-        return duplicateSignRewardRate;
-    }
-
-    public void setDuplicateSignRewardRate(BigDecimal duplicateSignRewardRate) {
-        this.duplicateSignRewardRate = duplicateSignRewardRate;
-    }
-
-    public BigDecimal getDuplicateSignSlashRate() {
-        return duplicateSignSlashRate;
-    }
-
-    public void setDuplicateSignSlashRate(BigDecimal duplicateSignSlashRate) {
-        this.duplicateSignSlashRate = duplicateSignSlashRate;
-    }
-
-    public BigDecimal getEvidenceValidEpoch() {
-        return evidenceValidEpoch;
-    }
-
-    public void setEvidenceValidEpoch(BigDecimal evidenceValidEpoch) {
-        this.evidenceValidEpoch = evidenceValidEpoch;
-    }
-
-    public BigDecimal getSlashBlockRewardCount() {
-        return slashBlockRewardCount;
-    }
-
-    public void setSlashBlockRewardCount(BigDecimal slashBlockRewardCount) {
-        this.slashBlockRewardCount = slashBlockRewardCount;
-    }
-
-    public BigDecimal getMinProposalTextParticipationRate() {
-        return minProposalTextParticipationRate;
-    }
-
-    public void setMinProposalTextParticipationRate(BigDecimal minProposalTextParticipationRate) {
-        this.minProposalTextParticipationRate = minProposalTextParticipationRate;
-    }
-
-    public BigDecimal getMinProposalTextSupportRate() {
-        return minProposalTextSupportRate;
-    }
-
-    public void setMinProposalTextSupportRate(BigDecimal minProposalTextSupportRate) {
-        this.minProposalTextSupportRate = minProposalTextSupportRate;
-    }
-
-    public BigDecimal getMinProposalCancelParticipationRate() {
-        return minProposalCancelParticipationRate;
-    }
-
-    public void setMinProposalCancelParticipationRate(BigDecimal minProposalCancelParticipationRate) {
-        this.minProposalCancelParticipationRate = minProposalCancelParticipationRate;
-    }
-
-    public BigDecimal getMinProposalCancelSupportRate() {
-        return minProposalCancelSupportRate;
-    }
-
-    public void setMinProposalCancelSupportRate(BigDecimal minProposalCancelSupportRate) {
-        this.minProposalCancelSupportRate = minProposalCancelSupportRate;
-    }
-
-    public BigDecimal getMinProposalUpgradePassRate() {
-        return minProposalUpgradePassRate;
-    }
-
-    public void setMinProposalUpgradePassRate(BigDecimal minProposalUpgradePassRate) {
-        this.minProposalUpgradePassRate = minProposalUpgradePassRate;
-    }
-
-    public BigDecimal getProposalTextConsensusRounds() {
-        return proposalTextConsensusRounds;
-    }
-
-    public void setProposalTextConsensusRounds(BigDecimal proposalTextConsensusRounds) {
-        this.proposalTextConsensusRounds = proposalTextConsensusRounds;
-    }
-
-    public BigDecimal getVersionProposalActiveConsensusRounds() {
-        return versionProposalActiveConsensusRounds;
-    }
-
-    public void setVersionProposalActiveConsensusRounds(BigDecimal versionProposalActiveConsensusRounds) {
-        this.versionProposalActiveConsensusRounds = versionProposalActiveConsensusRounds;
-    }
-
-    public BigInteger getParamProposalVoteDurationSeconds() {
-        return paramProposalVoteDurationSeconds;
-    }
-
-    public void setParamProposalVoteDurationSeconds(BigInteger paramProposalVoteDurationSeconds) {
-        this.paramProposalVoteDurationSeconds = paramProposalVoteDurationSeconds;
-    }
-
-    public BigDecimal getParamProposalVoteRate() {
-        return paramProposalVoteRate;
-    }
-
-    public void setParamProposalVoteRate(BigDecimal paramProposalVoteRate) {
-        this.paramProposalVoteRate = paramProposalVoteRate;
-    }
-
-    public BigDecimal getParamProposalSupportRate() {
-        return paramProposalSupportRate;
-    }
-
-    public void setParamProposalSupportRate(BigDecimal paramProposalSupportRate) {
-        this.paramProposalSupportRate = paramProposalSupportRate;
-    }
-
-    public BigDecimal getBlockRewardRate() {
-        return blockRewardRate;
-    }
-
-    public void setBlockRewardRate(BigDecimal blockRewardRate) {
-        this.blockRewardRate = blockRewardRate;
-    }
-
-    public BigDecimal getStakeRewardRate() {
-        return stakeRewardRate;
-    }
-
-    public void setStakeRewardRate(BigDecimal stakeRewardRate) {
-        this.stakeRewardRate = stakeRewardRate;
-    }
-
-    public BigInteger getPlatOnFoundationYear() {
-        return platOnFoundationYear;
-    }
-
-    public void setPlatOnFoundationYear(BigInteger platOnFoundationYear) {
-        this.platOnFoundationYear = platOnFoundationYear;
-    }
-
-    public BigDecimal getIssueEpochRound() {
-        return issueEpochRound;
-    }
-
-    public void setIssueEpochRound(BigDecimal issueEpochRound) {
-        this.issueEpochRound = issueEpochRound;
-    }
-
-    public BigDecimal getIssueEpochStartBlockNumber() {
-        return issueEpochStartBlockNumber;
-    }
-
-    public void setIssueEpochStartBlockNumber(BigDecimal issueEpochStartBlockNumber) {
-        this.issueEpochStartBlockNumber = issueEpochStartBlockNumber;
-    }
-
-    public BigDecimal getIssueEpochEndBlockNumber() {
-        return issueEpochEndBlockNumber;
-    }
-
-    public void setIssueEpochEndBlockNumber(BigDecimal issueEpochEndBlockNumber) {
-        this.issueEpochEndBlockNumber = issueEpochEndBlockNumber;
-    }
-
-    public BigInteger getMaxSettlePeriodCount4AnnualizedRateStat() {
-        return maxSettlePeriodCount4AnnualizedRateStat;
-    }
-
-    public void setMaxSettlePeriodCount4AnnualizedRateStat(BigInteger maxSettlePeriodCount4AnnualizedRateStat) {
-        this.maxSettlePeriodCount4AnnualizedRateStat = maxSettlePeriodCount4AnnualizedRateStat;
-    }
-
-    public BigDecimal getInitIssueAmount() {
-        return initIssueAmount;
-    }
-
-    public void setInitIssueAmount(BigDecimal initIssueAmount) {
-        this.initIssueAmount = initIssueAmount;
-    }
-
-    public BigDecimal getAddIssueRate() {
-        return addIssueRate;
-    }
-
-    public void setAddIssueRate(BigDecimal addIssueRate) {
-        this.addIssueRate = addIssueRate;
-    }
-
-    public BigDecimal getIncentiveRateFromIssue() {
-        return incentiveRateFromIssue;
-    }
-
-    public void setIncentiveRateFromIssue(BigDecimal incentiveRateFromIssue) {
-        this.incentiveRateFromIssue = incentiveRateFromIssue;
-    }
-
-    public BigInteger getElectionBackwardBlockCount() {
-        return electionBackwardBlockCount;
-    }
-
-    public void setElectionBackwardBlockCount(BigInteger electionBackwardBlockCount) {
-        this.electionBackwardBlockCount = electionBackwardBlockCount;
-    }
-
-    public Map<Integer, BigDecimal> getFoundationSubsidies() {
-        return foundationSubsidies;
-    }
-
-    public void setFoundationSubsidies(Map<Integer, BigDecimal> foundationSubsidies) {
-        this.foundationSubsidies = foundationSubsidies;
-    }
-
-    public String getProposalUrlTemplate() {
-        return proposalUrlTemplate;
-    }
-
-    public void setProposalUrlTemplate(String proposalUrlTemplate) {
-        this.proposalUrlTemplate = proposalUrlTemplate;
-    }
-
-    public String getProposalPipNumTemplate() {
-        return proposalPipNumTemplate;
-    }
-
-    public void setProposalPipNumTemplate(String proposalPipNumTemplate) {
-        this.proposalPipNumTemplate = proposalPipNumTemplate;
-    }
-
-    public String getKeyBase() {
-        return keyBase;
-    }
-
-    public void setKeyBase(String keyBase) {
-        this.keyBase = keyBase;
-    }
-
-    public String getKeyBaseApi() {
-        return keyBaseApi;
-    }
-
-    public void setKeyBaseApi(String keyBaseApi) {
-        this.keyBaseApi = keyBaseApi;
-    }
-
-    public BigDecimal getDefaultStakingLockedAmount() {
-        return defaultStakingLockedAmount;
-    }
-
-    public void setDefaultStakingLockedAmount(BigDecimal defaultStakingLockedAmount) {
-        this.defaultStakingLockedAmount = defaultStakingLockedAmount;
-    }
-
-    public Integer getZeroProduceNumberThreshold() {
-        return zeroProduceNumberThreshold;
-    }
-
-    public void setZeroProduceNumberThreshold(Integer zeroProduceNumberThreshold) {
-        this.zeroProduceNumberThreshold = zeroProduceNumberThreshold;
-    }
-
-    public Integer getZeroProduceCumulativeTime() {
-        return zeroProduceCumulativeTime;
-    }
-
-    public void setZeroProduceCumulativeTime(Integer zeroProduceCumulativeTime) {
-        this.zeroProduceCumulativeTime = zeroProduceCumulativeTime;
-    }
-
-    public Integer getZeroProduceFreezeDuration() {
-        return zeroProduceFreezeDuration;
-    }
-
-    public void setZeroProduceFreezeDuration(Integer zeroProduceFreezeDuration) {
-        this.zeroProduceFreezeDuration = zeroProduceFreezeDuration;
-    }
-
-    public Integer getRewardPerMaxChangeRange() {
-        return rewardPerMaxChangeRange;
-    }
-
-    public void setRewardPerMaxChangeRange(Integer rewardPerMaxChangeRange) {
-        this.rewardPerMaxChangeRange = rewardPerMaxChangeRange;
-    }
-
-    public Integer getRewardPerChangeInterval() {
-        return rewardPerChangeInterval;
-    }
-
-    public void setRewardPerChangeInterval(Integer rewardPerChangeInterval) {
-        this.rewardPerChangeInterval = rewardPerChangeInterval;
-    }
-
-    public List<CustomStaking> getDefaultStakingList() {
-        return defaultStakingList;
-    }
-
-    public void setDefaultStakingList(List<CustomStaking> defaultStakingList) {
-        this.defaultStakingList = defaultStakingList;
-    }
-
-    public static Set<String> getINNER_CONTRACT_ADDR() {
-        return INNER_CONTRACT_ADDR;
-    }
-
-    public static void setINNER_CONTRACT_ADDR(Set<String> iNNER_CONTRACT_ADDR) {
-        INNER_CONTRACT_ADDR = iNNER_CONTRACT_ADDR;
-    }
-
-    public Map<String, String> getEventDefine() {
-        return eventDefine;
-    }
-
-    public void setEventDefine(Map<String, String> eventDefine) {
-        this.eventDefine = eventDefine;
-    }
-
-    public BigDecimal getRestrictingMinimumRelease() {
-        return restrictingMinimumRelease;
-    }
-
-    public void setRestrictingMinimumRelease(BigDecimal restrictingMinimumRelease) {
-        this.restrictingMinimumRelease = restrictingMinimumRelease;
-    }
-
 }

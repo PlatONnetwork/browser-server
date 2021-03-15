@@ -1,18 +1,16 @@
 package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bootstrap.ShutdownCallback;
-import com.platon.browser.bootstrap.BootstrapEventPublisher;
-import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.receipt.ReceiptService;
 import com.platon.browser.bean.CollectionNetworkStat;
-import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.bootstrap.BootstrapEventPublisher;
+import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.elasticsearch.bean.TokenTxSummary;
-import com.platon.browser.elasticsearch.BlockESRepository;
-import com.platon.browser.elasticsearch.InnerTxESRepository;
-import com.platon.browser.service.erc20.Erc20TransactionSyncService;
+import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
+import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
+import com.platon.browser.service.receipt.ReceiptService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +34,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private NetworkStatMapper networkStatMapper;
     @Mock
-    private BlockESRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
     @Mock
     private BlockService blockService;
     @Mock
@@ -46,11 +44,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     @Mock
     private ShutdownCallback shutdownCallback;
     @Mock
-    private InnerTxESRepository tokenTxESRepository;
-    @Mock
     private SyncTokenInfoMapper syncTokenInfoMapper;
-    @Mock
-    private Erc20TransactionSyncService erc20TransactionSyncService;
 
     @InjectMocks
     @Spy
@@ -65,7 +59,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     public void post() throws IOException {
 
         TokenTxSummary summary = new TokenTxSummary();
-        when(tokenTxESRepository.groupContractTxCount()).thenReturn(summary);
+        //when(oldEsErc20TxRepository.groupContractTxCount()).thenReturn(summary);
 
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
@@ -74,9 +68,9 @@ public class ConsistencyServiceTest extends AgentTestBase {
         networkStat = CollectionNetworkStat.newInstance();
         networkStat.setCurNumber(10L);
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
-        when(blockESRepository.exists(anyString())).thenReturn(false);
+        when(ESBlockRepository.exists(anyString())).thenReturn(false);
         target.post();
-        when(blockESRepository.exists(anyString())).thenReturn(true);
+        when(ESBlockRepository.exists(anyString())).thenReturn(true);
         target.post();
 
         when(blockService.getBlockAsync(anyLong())).thenReturn(null);

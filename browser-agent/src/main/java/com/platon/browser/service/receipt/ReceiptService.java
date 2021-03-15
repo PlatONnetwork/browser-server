@@ -1,6 +1,6 @@
 package com.platon.browser.service.receipt;
 
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

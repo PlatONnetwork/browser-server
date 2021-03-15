@@ -8,10 +8,10 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.Set;
 @Slf4j
 public abstract class ServiceBase {
     @Autowired
-    protected TransactionESRepository transactionESRepository;
+    protected EsTransactionRepository ESTransactionRepository;
     @Autowired
     private PlatOnClient platonClient;
     @Autowired
@@ -84,7 +84,7 @@ public abstract class ServiceBase {
         ESResult<Transaction> esResult = null;
         for (int pageNo = 1; pageNo <= Integer.MAX_VALUE; pageNo++) {
             try {
-                esResult = transactionESRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
+                esResult = ESTransactionRepository.search(constructor, Transaction.class, pageNo, transactionPageSize);
             } catch (Exception e) {
                 if (e.getMessage().contains("all shards failed")) {
                     break;

@@ -25,17 +25,20 @@ public class EpochMessageTest extends AgentTestBase {
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException {
         EpochMessage message = EpochMessage.newInstance();
-        for (Method m:EpochMessage.class.getDeclaredMethods()){
-            if(m.getName().contains("set")){
-                if(m.getName().contains("List")){
-                    m.invoke(message,validatorList);
-                }else if(m.getName().contains("Reward")){
+        for (Method m : EpochMessage.class.getDeclaredMethods()) {
+            if (m.getName().contains("set")) {
+                if (m.getName().contains("List")) {
+                    m.invoke(message, validatorList);
+                } else if (m.getName().contains("Reward")) {
                     m.invoke(message, BigDecimal.TEN);
-                }else{
+                } else if (m.getName().contains("ExpectBlockCount")) {
+                    m.invoke(message, Long.valueOf("10"));
+                } else {
                     m.invoke(message, BigInteger.TEN);
                 }
             }
-            if(m.getName().contains("get")) m.invoke(message);
+            if (m.getName().contains("get"))
+                m.invoke(message);
         }
         EpochService epochService = new EpochService();
         message.updateWithEpochService(epochService);
@@ -44,4 +47,5 @@ public class EpochMessageTest extends AgentTestBase {
 
         assertTrue(true);
     }
+
 }

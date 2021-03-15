@@ -9,7 +9,7 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.evm.bean.CollectionBlock;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,14 +252,14 @@ public class ExportTpsService extends ServiceBase {
 					nodes = specialApi.getHistoryValidatorList(getClient(), BigInteger.valueOf(begin));
 					StringBuilder sBuilder = new StringBuilder();
 					for(Node node:nodes) {
-						if(!nodeNameMap.containsKey(HexTool.prefix(node.getNodeId()))) {
-							com.platon.browser.dao.entity.Node node2 = nodeMapper.selectByPrimaryKey(HexTool.prefix(node.getNodeId()));
+						if(!nodeNameMap.containsKey(HexUtil.prefix(node.getNodeId()))) {
+							com.platon.browser.dao.entity.Node node2 = nodeMapper.selectByPrimaryKey(HexUtil.prefix(node.getNodeId()));
 							if (node2 != null)
-							nodeNameMap.put(HexTool.prefix(node.getNodeId()), node2.getNodeName());
+							nodeNameMap.put(HexUtil.prefix(node.getNodeId()), node2.getNodeName());
 						}
 						
-						node.setNodeId(HexTool.prefix(node.getNodeId()));
-						sBuilder.append(node.getNodeId()).append("(").append(nodeNameMap.get(HexTool.prefix(node.getNodeId())))
+						node.setNodeId(HexUtil.prefix(node.getNodeId()));
+						sBuilder.append(node.getNodeId()).append("(").append(nodeNameMap.get(HexUtil.prefix(node.getNodeId())))
 							.append(")").append(";");
 						if(nodeMap.containsKey(node.getNodeId())) {
 							NodeData nodeData = nodeMap.get(node.getNodeId());

@@ -1,9 +1,9 @@
 package com.platon.browser.service;
 
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisBlockService;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +27,7 @@ public class BlockSyncService {
     @Setter
     private static volatile boolean done =false;
     @Autowired
-    private BlockESRepository esRepository;
+    private EsBlockRepository esRepository;
     @Autowired
     private RedisBlockService redisService;
     @Value("${paging.block.page-size}")

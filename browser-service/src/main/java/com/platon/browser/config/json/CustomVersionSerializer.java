@@ -3,7 +3,7 @@ package com.platon.browser.config.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.platon.browser.utils.VerUtil;
+import com.platon.browser.utils.ChainVersionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class CustomVersionSerializer  extends JsonSerializer<String>{
 	@Override
 	public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 		if(StringUtils.isNotBlank(value)) {
-			gen.writeString(VerUtil.toVersion(new BigInteger(value)));
+			gen.writeString(ChainVersionUtil.toStringVersion(new BigInteger(value)));
 		} else {
 			gen.writeString("");
 		}

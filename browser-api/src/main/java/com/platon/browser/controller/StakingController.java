@@ -1,7 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.config.BrowserConst;
-import com.platon.browser.config.CommonMethod;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.request.staking.*;
@@ -9,12 +7,13 @@ import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.*;
 import com.platon.browser.service.StakingService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.I18nUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.WebAsyncTask;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -27,6 +26,7 @@ import javax.validation.Valid;
  * @author zhangrj
  * @data 2019年8月31日
  */
+@Slf4j
 @RestController
 public class StakingController {
 
@@ -35,94 +35,47 @@ public class StakingController {
 	@Resource
 	private StakingService stakingService;
 
-	@SubscribeMapping(value = "topic/staking/statistic/new")
-	@PostMapping(value = "staking/statistic")
-	public WebAsyncTask<BaseResp<StakingStatisticNewResp>> stakingStatisticNew() {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<BaseResp<StakingStatisticNewResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> {
-					StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
-					return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS),
-							stakingStatisticNewResp);
-				});
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@SubscribeMapping("topic/staking/statistic/new")
+	@PostMapping("staking/statistic")
+	public Mono<BaseResp<StakingStatisticNewResp>> stakingStatisticNew() {
+		return Mono.create(sink -> {
+			StakingStatisticNewResp resp = stakingService.stakingStatisticNew();
+			sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp));
+		});
 	}
 
-	@PostMapping(value = "staking/aliveStakingList")
-	public WebAsyncTask<RespPage<AliveStakingListResp>> aliveStakingList(@Valid @RequestBody AliveStakingListReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<RespPage<AliveStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.aliveStakingList(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/aliveStakingList")
+	public Mono<RespPage<AliveStakingListResp>> aliveStakingList(@Valid @RequestBody AliveStakingListReq req) {
+		return Mono.just(stakingService.aliveStakingList(req));
 	}
 
-	@PostMapping(value = "staking/historyStakingList")
-	public WebAsyncTask<RespPage<HistoryStakingListResp>> historyStakingList(@Valid @RequestBody HistoryStakingListReq req) {
-		// 5s钟没返回，则认为超时
-		WebAsyncTask<RespPage<HistoryStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.historyStakingList(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/historyStakingList")
+	public Mono<RespPage<HistoryStakingListResp>> historyStakingList(@Valid @RequestBody HistoryStakingListReq req) {
+		return Mono.just(stakingService.historyStakingList(req));
 	}
 
-	@PostMapping(value = "staking/stakingDetails")
-	public WebAsyncTask<BaseResp<StakingDetailsResp>> stakingDetails(@Valid @RequestBody StakingDetailsReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<BaseResp<StakingDetailsResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.stakingDetails(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/stakingDetails")
+	public Mono<BaseResp<StakingDetailsResp>> stakingDetails(@Valid @RequestBody StakingDetailsReq req) {
+		return Mono.just(stakingService.stakingDetails(req));
 	}
 
-	@PostMapping(value = "staking/stakingOptRecordList")
-	public WebAsyncTask<RespPage<StakingOptRecordListResp>> stakingOptRecordList(@Valid @RequestBody StakingOptRecordListReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<RespPage<StakingOptRecordListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.stakingOptRecordList(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/stakingOptRecordList")
+	public Mono<RespPage<StakingOptRecordListResp>> stakingOptRecordList(@Valid @RequestBody StakingOptRecordListReq req) {
+		return Mono.just(stakingService.stakingOptRecordList(req));
 	}
 
-	@PostMapping(value = "staking/delegationListByStaking")
-	public WebAsyncTask<RespPage<DelegationListByStakingResp>> delegationListByStaking(@Valid @RequestBody DelegationListByStakingReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<RespPage<DelegationListByStakingResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.delegationListByStaking(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/delegationListByStaking")
+	public Mono<RespPage<DelegationListByStakingResp>> delegationListByStaking(@Valid @RequestBody DelegationListByStakingReq req) {
+		return Mono.just(stakingService.delegationListByStaking(req));
 	}
 
-	@PostMapping(value = "staking/delegationListByAddress")
-	public WebAsyncTask<RespPage<DelegationListByAddressResp>> delegationListByAddress(@Valid @RequestBody DelegationListByAddressReq req) {
-		/**
-		 * 异步调用，超时则进入timeout  
-		 */
-		WebAsyncTask<RespPage<DelegationListByAddressResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.delegationListByAddress(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/delegationListByAddress")
+	public Mono<RespPage<DelegationListByAddressResp>> delegationListByAddress(@Valid @RequestBody DelegationListByAddressReq req) {
+		return Mono.just(stakingService.delegationListByAddress(req));
 	}
 
-	@PostMapping(value = "staking/lockedStakingList")
-	public WebAsyncTask<RespPage<LockedStakingListResp>> lockedStakingList(@Valid @RequestBody LockedStakingListReq req) {
-		/**
-		 * 异步调用，超时则进入timeout
-		 */
-		WebAsyncTask<RespPage<LockedStakingListResp>> webAsyncTask = new WebAsyncTask<>(BrowserConst.WEB_TIME_OUT,
-				() -> stakingService.lockedStakingList(req));
-		CommonMethod.onTimeOut(webAsyncTask);
-		return webAsyncTask;
+	@PostMapping("staking/lockedStakingList")
+	public Mono<RespPage<LockedStakingListResp>> lockedStakingList(@Valid @RequestBody LockedStakingListReq req) {
+		return Mono.just(stakingService.lockedStakingList(req));
 	}
 }

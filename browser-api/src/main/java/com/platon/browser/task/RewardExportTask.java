@@ -2,19 +2,19 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.config.redis.RedisFactory;
 import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
-import com.platon.browser.elasticsearch.NodeOptESRepository;
-import com.platon.browser.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
+import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -39,11 +39,11 @@ import java.util.List;
 public class RewardExportTask {
 
     @Resource
-    private NodeOptESRepository nodeOptESRepository;
+    private EsNodeOptRepository ESNodeOptRepository;
     @Resource
     private PlatOnClient platOnClient;
     @Resource
-    private RedisFactory redisFactory;
+    private RedisTemplate<String,String> redisTemplate;
     @Resource
     private BlockChainConfig chainConfig;
     @Resource
@@ -65,14 +65,15 @@ public class RewardExportTask {
     @Scheduled(cron = "0/5 * * * * ?")
     public void exportRewardNode() {
         try {
-            String v = this.redisFactory.createRedisCommands().setnx(REWARD_KEY, REWARD_KEY, 30000l);
-            if (!"OK".equals(v)) {
+            Boolean v = redisTemplate.opsForValue().setIfAbsent(REWARD_KEY, "30000");
+            if (v==null||!v) {
                 return;
             }
-            String consensus = this.redisFactory.createRedisCommands().get(ROUND_KEY);
+//            String consensus = jedisClient.get(ROUND_KEY);
+            String consensus = redisTemplate.opsForValue().get(ROUND_KEY);
             int conL = 0;
             if (StringUtils.isNotBlank(consensus)) {
-                conL = Integer.valueOf(consensus);
+                conL = Integer.parseInt(consensus);
             }
             /**
              * 计算查询开始的区块和结束的区块
@@ -80,7 +81,7 @@ public class RewardExportTask {
             long startNum = this.chainConfig.getConsensusPeriodBlockCount().longValue() * conL;
             long endNum = this.chainConfig.getConsensusPeriodBlockCount().longValue() * (conL + this.limitNum);
             BigInteger blockNumber = this.platOnClient.getLatestBlockNumber();
-            if (StringUtils.isNotBlank(v) && blockNumber.longValue() > endNum) {
+            if (blockNumber.longValue() > endNum) {
                 ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
                 constructor.must(new ESQueryBuilders().range("bNum", startNum, endNum));
                 List<Object> types = new ArrayList<>();
@@ -88,7 +89,7 @@ public class RewardExportTask {
                 types.add(NodeOpt.TypeEnum.MULTI_SIGN.getCode());
                 types.add(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode());
                 constructor.must(new ESQueryBuilders().terms("type", types));
-                ESResult<NodeOpt> nodeOpts = this.nodeOptESRepository.search(constructor, NodeOpt.class, 1, 30000);
+                ESResult<NodeOpt> nodeOpts = this.ESNodeOptRepository.search(constructor, NodeOpt.class, 1, 30000);
                 List<BlockNode> blockNodes = this.customBlockNodeMapper.selectNodeByDis(conL, conL + this.limitNum);
                 List<Object[]> rs = new ArrayList<>();
                 /**
@@ -97,7 +98,7 @@ public class RewardExportTask {
                 blockNodes.forEach(blockNode -> {
                     boolean flag = false;
                     for (NodeOpt nodeOpt : nodeOpts.getRsData()) {
-                        if (nodeOpt.getNodeId().equals(nodeOpt.getNodeId())) {
+                        if (nodeOpt.getNodeId().equals(blockNode.getNodeId())) {
                             nodeOpts.getRsData().remove(nodeOpt);
                             flag = true;
                             break;
@@ -112,12 +113,12 @@ public class RewardExportTask {
                 });
                 String[] headers = new String[] {"nodeId", "nodeName"};
                 this.buildFile(startNum + "_" + endNum + "_reward.csv", rs, headers);
-                this.redisFactory.createRedisCommands().set(ROUND_KEY, String.valueOf(conL + this.limitNum));
+                redisTemplate.opsForValue().set(ROUND_KEY,String.valueOf(conL + this.limitNum));
             }
         } catch (Exception e) {
             log.error("exportRewardNode fail", e);
         } finally {
-            this.redisFactory.createRedisCommands().del(REWARD_KEY);
+            redisTemplate.delete(REWARD_KEY);
         }
 
     }

@@ -3,11 +3,11 @@ package com.platon.browser;
 import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.v0150.bean.AdjustParam;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.bean.*;
@@ -30,8 +30,11 @@ import java.util.concurrent.Executors;
  **/
 @Slf4j
 public class AgentTestData {
-    public static final String testDataDir = AgentTestData.class.getClassLoader().getResource("./").getPath()+"../../../../../testdata/";
-    private static String suffix=".json",encode="UTF8";
+
+    public static final String testDataDir = AgentTestData.class.getClassLoader().getResource("./").getPath() + "../../../../../testdata/";
+
+    private static String suffix = ".json", encode = "UTF8";
+
     private static String[] dataFile = {
             "node",
             "block",
@@ -50,40 +53,55 @@ public class AgentTestData {
             "adjust-data"
     };
 
-    protected List<CustomNode> nodeList= Collections.emptyList();
-    protected List<CollectionBlock> blockList= Collections.emptyList();
-    protected List<PlatonBlock.Block> rawBlockList= new ArrayList<>();
-    protected List<CollectionTransaction> transactionList= Collections.emptyList();
-    protected List<ReceiptResult> receiptResultList= Collections.emptyList();
-    protected List<CustomStaking> stakingList= Collections.emptyList();
-    protected List<CustomDelegation> delegationList= Collections.emptyList();
+    protected List<CustomNode> nodeList = Collections.emptyList();
+
+    protected List<CollectionBlock> blockList = Collections.emptyList();
+
+    protected List<PlatonBlock.Block> rawBlockList = new ArrayList<>();
+
+    protected List<CollectionTransaction> transactionList = Collections.emptyList();
+
+    protected List<ReceiptResult> receiptResultList = Collections.emptyList();
+
+    protected List<CustomStaking> stakingList = Collections.emptyList();
+
+    protected List<CustomDelegation> delegationList = Collections.emptyList();
+
     protected List<CustomProposal> proposalList = Collections.emptyList();
+
     protected List<Node> verifierList = new ArrayList<>();
+
     protected List<Node> validatorList = new ArrayList<>();
+
     protected List<Node> candidateList = new ArrayList<>();
-    protected List<CustomAddress> addressList= Collections.emptyList();
-    protected List<NodeOpt> nodeOptList= new ArrayList<>();
-    protected List<NetworkStat> networkStatList= new ArrayList<>();
+
+    protected List<CustomAddress> addressList = Collections.emptyList();
+
+    protected List<NodeOpt> nodeOptList = new ArrayList<>();
+
+    protected List<NetworkStat> networkStatList = new ArrayList<>();
+
     protected BlockChainConfig blockChainConfig = new BlockChainConfig();
 
-    protected Map<Long,PlatonBlock.Block> rawBlockMap = new HashMap<>();
+    protected Map<Long, PlatonBlock.Block> rawBlockMap = new HashMap<>();
+
     protected Map<Long, ReceiptResult> receiptResultMap = new HashMap<>();
 
     protected List<AdjustParam> adjustParamList = new ArrayList<>();
 
     @Before
-    public void init(){
-        Arrays.asList(dataFile).forEach(fileName->{
+    public void init() {
+        Arrays.asList(dataFile).forEach(fileName -> {
             try {
                 File data = new File(testDataDir + fileName + suffix);
                 String content = FileUtils.readFileToString(data, encode);
-                switch (fileName){
+                switch (fileName) {
                     case "node":
-                        nodeList = JSON.parseArray(content,CustomNode.class);
+                        nodeList = JSON.parseArray(content, CustomNode.class);
                         break;
                     case "block":
-                        blockList = JSON.parseArray(content,CollectionBlock.class);
-                        blockList.forEach(b->{
+                        blockList = JSON.parseArray(content, CollectionBlock.class);
+                        blockList.forEach(b -> {
                             NodeOpt no = ComplementNodeOpt.newInstance().setId(b.getNum())
                                     .setCreTime(new Date())
                                     .setBNum(b.getNum())
@@ -98,29 +116,29 @@ public class AgentTestData {
                         break;
                     case "raw-block":
                         List<BlockBean> blockBeans = JSON.parseArray(content, BlockBean.class);
-                        blockBeans.forEach(b->{
+                        blockBeans.forEach(b -> {
                             PlatonBlock.Block block = new PlatonBlock.Block();
                             block.setTransactions(new ArrayList<>());
-                            BeanUtils.copyProperties(b,block);
+                            BeanUtils.copyProperties(b, block);
                             rawBlockList.add(block);
-                            rawBlockMap.put(block.getNumber().longValue(),block);
+                            rawBlockMap.put(block.getNumber().longValue(), block);
                         });
                         break;
                     case "networkstat":
-                        networkStatList = JSON.parseArray(content,NetworkStat.class);
+                        networkStatList = JSON.parseArray(content, NetworkStat.class);
                         break;
                     case "transaction":
-                        transactionList = JSON.parseArray(content,CollectionTransaction.class);
+                        transactionList = JSON.parseArray(content, CollectionTransaction.class);
                         break;
                     case "receipts":
-                        receiptResultList = JSON.parseArray(content,ReceiptResult.class);
-                        receiptResultList.forEach(rr->{
+                        receiptResultList = JSON.parseArray(content, ReceiptResult.class);
+                        receiptResultList.forEach(rr -> {
                             try {
                                 rr.resolve(rr.getResult().get(0).getBlockNumber(), Executors.newFixedThreadPool(10));
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            receiptResultMap.put(rr.getResult().get(0).getBlockNumber(),rr);
+                            receiptResultMap.put(rr.getResult().get(0).getBlockNumber(), rr);
                         });
                         break;
                     case "staking":
@@ -130,25 +148,25 @@ public class AgentTestData {
                         delegationList = JSON.parseArray(content, CustomDelegation.class);
                         break;
                     case "verifier":
-                        List<NodeBean> verList = JSON.parseArray(content,NodeBean.class);
+                        List<NodeBean> verList = JSON.parseArray(content, NodeBean.class);
                         verifierList.addAll(verList);
                         break;
                     case "validator":
-                        List<NodeBean> valList = JSON.parseArray(content,NodeBean.class);
+                        List<NodeBean> valList = JSON.parseArray(content, NodeBean.class);
                         validatorList.addAll(valList);
                         break;
                     case "candidate":
-                        List<NodeBean> canList = JSON.parseArray(content,NodeBean.class);
+                        List<NodeBean> canList = JSON.parseArray(content, NodeBean.class);
                         candidateList.addAll(canList);
                         break;
                     case "address":
                         addressList = JSON.parseArray(content, CustomAddress.class);
                         break;
                     case "proposal":
-                        proposalList = JSON.parseArray(content,CustomProposal.class);
+                        proposalList = JSON.parseArray(content, CustomProposal.class);
                         break;
                     case "blockChainConfig":
-                        blockChainConfig = JSON.parseObject(content,BlockChainConfig.class);
+                        blockChainConfig = JSON.parseObject(content, BlockChainConfig.class);
                         break;
                     case "adjust-data":
                         adjustParamList = JSON.parseArray(content, AdjustParam.class);

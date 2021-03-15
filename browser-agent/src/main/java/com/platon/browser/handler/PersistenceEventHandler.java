@@ -1,8 +1,9 @@
 package com.platon.browser.handler;
 
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.bean.PersistenceEvent;
+import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
@@ -12,9 +13,7 @@ import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -37,11 +36,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private RedisImportService redisImportService;
     @Resource
     private NetworkStatCache networkStatCache;
-
-    @Setter
-    @Getter
-    @Value("${disruptor.queue.persistence.batch-size}")
-    private volatile int batchSize;
+    @Resource
+    private DisruptorConfig disruptorConfig;
 
     // 处理的最大区块号
     @Getter
@@ -70,7 +66,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             event.getBlock().setTransactions(null);
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
-            if(blockStage.size()<batchSize) {
+            if(blockStage.size()<disruptorConfig.getPersistenceBatchSize()) {
                 maxBlockNumber=event.getBlock().getNum();
                 return;
             }

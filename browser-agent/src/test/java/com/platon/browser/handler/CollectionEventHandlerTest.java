@@ -13,7 +13,7 @@ import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.statistic.StatisticService;
-import com.platon.browser.service.transaction.TransactionService;
+import com.platon.browser.service.ppos.PPOSService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class CollectionEventHandlerTest extends AgentTestBase {
     @Mock
-    private TransactionService transactionService;
+    private PPOSService pposService;
     @Mock
     private BlockService blockService;
     @Mock
@@ -69,7 +69,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
                 .nodeOptList(nodeOptList)
                 .delegationRewardList(new ArrayList<>())
                 .build();
-        when(transactionService.analyze(any())).thenReturn(txAnalyseResult);
+        when(pposService.analyze(any())).thenReturn(txAnalyseResult);
         when(txBakMapper.deleteByExample(any())).thenReturn(100);
         when(nOptBakMapper.deleteByExample(any())).thenReturn(100);
     }

@@ -9,7 +9,6 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -53,11 +52,6 @@ public class StatisticService {
         if (!addressList.isEmpty()) {
             this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
         }
-
-        // 代币统计处理
-        this.statisticsAddressAnalyzer.erc20TokenConvert(event, block, epochMessage);
-
-        this.statisticsAddressAnalyzer.erc20AddressConvert(event, block, epochMessage);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }

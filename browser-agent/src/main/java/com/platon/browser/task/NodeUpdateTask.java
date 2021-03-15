@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.client.NodeVersion;
+import com.platon.browser.bean.NodeVersion;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.utils.AppStatusUtil;
@@ -11,8 +11,8 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.HttpUtil;
-import com.platon.browser.util.KeyBaseAnalysis;
+import com.platon.browser.utils.HttpUtil;
+import com.platon.browser.utils.KeyBaseAnalysis;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;

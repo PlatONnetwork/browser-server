@@ -9,7 +9,7 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.145:3306/platon_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_hrpatp201018?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==))
   #Redis配置
@@ -24,12 +24,17 @@ spring:
       hosts: 192.168.9.145,192.168.9.146,192.168.9.147
       port: 9200
       schema: http
-      delegationIndexName: browser_delegation_${profile}
-      blockIndexName: browser_block_${profile}
-      transactionIndexName: browser_transaction_${profile}
-      nodeOptIndexName: browser_nodeopt_${profile}
-      delegationRewardIndexName: browser_delegation_reward_${profile}
-      innerTxIndexName: browser_inner_tx_${profile}
+      #username: elastic
+      #password: changeme
+    index:
+      blockIndexName: ${platon.es-namespace}_block
+      transactionIndexName: ${platon.es-namespace}_transaction
+      delegationIndexName: ${platon.es-namespace}_delegation
+      nodeOptIndexName: ${platon.es-namespace}_nodeopt
+      delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
+      transferTxIndexName: ${platon.es-namespace}_transfer_tx
+      erc20TxIndexName: ${platon.es-namespace}_erc20_tx
+      erc721TxIndexName: ${platon.es-namespace}_erc721_tx
 #日志配置
 logging:
   file:
@@ -98,6 +103,10 @@ disruptor:
       batch-size: 1024
 #PlatOn相关配置
 platon:
+  #Redis命名空间
+  redis-namespace: browser:${profile}
+  #Es索引命名空间
+  es-namespace: browser_${profile}
   # 地址HRP前缀
   addressPrefix: lat
   # 金额显示单位

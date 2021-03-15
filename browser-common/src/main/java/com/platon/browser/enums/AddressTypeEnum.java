@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum AddressTypeEnum {
-    ACCOUNT(1, "账户"), INNER_CONTRACT(2, "内置合约"), EVM_CONTRACT(3, "EVM合约"), WASM_CONTRACT(4, "WASM合约"),
-    ERC20_EVM_CONTRACT(5, "ERC合约");
+    ACCOUNT(1, "账户"),
+    INNER_CONTRACT(2, "内置合约"),
+    EVM_CONTRACT(3, "EVM合约"),
+    WASM_CONTRACT(4, "WASM合约"),
+    ERC20_EVM_CONTRACT(5, "ERC合约"),
+    ERC721_EVM_CONTRACT(6, "ERC合约");
 
     private int code;
     private String desc;

@@ -13,17 +13,17 @@ import java.math.BigInteger;
  * @author: chendongming@matrixelements.com
  * @create: 2019-11-04 20:13:04
  **/
-class ReportDecoder {
+public class ReportDecoder extends AbstractPPOSDecoder {
     private ReportDecoder(){}
-    static TxParam decode(RlpList rootList) {
+    public static TxParam decode(RlpList rootList) {
         // 举报双签
         //type
-        BigInteger type = InnerContractDecoder.bigIntegerResolver((RlpString) rootList.getValues().get(1));
+        BigInteger type = bigIntegerResolver((RlpString) rootList.getValues().get(1));
         //data
-        String evidence = InnerContractDecoder.stringResolver((RlpString) rootList.getValues().get(2));
+        String evidence = stringResolver((RlpString) rootList.getValues().get(2));
         evidence = new String(Numeric.hexStringToByteArray(evidence));
 
-        evidence= InnerContractDecoder.normalization(evidence);
+        evidence= normalization(evidence);
 
         return ReportParam.builder()
                 .type(type)

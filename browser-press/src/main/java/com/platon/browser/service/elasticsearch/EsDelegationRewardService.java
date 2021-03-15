@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.DelegationRewardESRepository;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +22,11 @@ import java.util.concurrent.CountDownLatch;
 public class EsDelegationRewardService extends EsService<DelegationReward> {
 
     @Autowired
-    private DelegationRewardESRepository delegationRewardESRepository;
+    private EsDelegationRewardRepository esDelegationRewardRepository;
 
     @PostConstruct
     public void init() throws IOException {
-        if (!delegationRewardESRepository.existsIndex()) {
+        if (!esDelegationRewardRepository.existsIndex()) {
             Map<String, Object> setting = new HashMap(3);
             // 查询的返回数量，默认是10000
             setting.put("max_result_window", 2000000000);
@@ -35,11 +34,10 @@ public class EsDelegationRewardService extends EsService<DelegationReward> {
             setting.put("number_of_shards", 5);
             // 副本每个主碎片的数量
             setting.put("number_of_replicas", 1);
-            delegationRewardESRepository.createIndex(setting, null);
+            esDelegationRewardRepository.createIndex(setting, null);
         }
     }
 
-    @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void save(StageCache<DelegationReward> stage) throws IOException, InterruptedException {
         Set<DelegationReward> data = stage.getData();
@@ -65,7 +63,7 @@ public class EsDelegationRewardService extends EsService<DelegationReward> {
             CountDownLatch latch = new CountDownLatch(groups.size());
             for (Map<String, DelegationReward> g : groups) {
                 try {
-                    delegationRewardESRepository.bulkAddOrUpdate(g);
+                    esDelegationRewardRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }
