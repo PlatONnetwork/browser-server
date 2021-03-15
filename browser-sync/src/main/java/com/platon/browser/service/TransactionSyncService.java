@@ -1,9 +1,9 @@
 package com.platon.browser.service;
 
-import com.platon.browser.elasticsearch.bean.ESResult;
-import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +27,7 @@ public class TransactionSyncService {
     @Setter
     private static volatile boolean done =false;
     @Autowired
-    private TransactionESRepository esRepository;
+    private EsTransactionRepository esRepository;
     @Autowired
     private RedisTransactionService redisService;
     @Value("${paging.transaction.page-size}")

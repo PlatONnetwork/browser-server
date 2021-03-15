@@ -52,13 +52,15 @@ public class NetworkStat {
 
     private Long nodeOptSeq;
 
-    private Integer tokenQty;
-
     private Date createTime;
 
     private Date updateTime;
 
     private Long avgPackTime;
+
+    private Integer erc721TxQty;
+
+    private Integer erc20TxQty;
 
     private String issueRates;
 
@@ -246,14 +248,6 @@ public class NetworkStat {
         this.nodeOptSeq = nodeOptSeq;
     }
 
-    public Integer getTokenQty() {
-        return tokenQty;
-    }
-
-    public void setTokenQty(Integer tokenQty) {
-        this.tokenQty = tokenQty;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -276,6 +270,22 @@ public class NetworkStat {
 
     public void setAvgPackTime(Long avgPackTime) {
         this.avgPackTime = avgPackTime;
+    }
+
+    public Integer getErc721TxQty() {
+        return erc721TxQty;
+    }
+
+    public void setErc721TxQty(Integer erc721TxQty) {
+        this.erc721TxQty = erc721TxQty;
+    }
+
+    public Integer getErc20TxQty() {
+        return erc20TxQty;
+    }
+
+    public void setErc20TxQty(Integer erc20TxQty) {
+        this.erc20TxQty = erc20TxQty;
     }
 
     public String getIssueRates() {
@@ -317,10 +327,11 @@ public class NetworkStat {
         addIssueEnd("add_issue_end", "addIssueEnd", "BIGINT", false),
         nextSettle("next_settle", "nextSettle", "BIGINT", false),
         nodeOptSeq("node_opt_seq", "nodeOptSeq", "BIGINT", false),
-        tokenQty("token_qty", "tokenQty", "INTEGER", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),
+        erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
+        erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
         issueRates("issue_rates", "issueRates", "LONGVARCHAR", false);
 
         /**

@@ -44,7 +44,7 @@ public class GracefullyUtil {
 
     public static void updateStatus() {
         String path = CommonUtil.isWin() ? "/browser-press/status.hook" : "status.hook";
-        File statusFile = FileUtils.getFile(System.getProperty("user.dir"), "status.hook");
+        File statusFile = FileUtils.getFile(System.getProperty("user.dir"), path);
         Properties properties = new Properties();
         try (InputStream in = new FileInputStream(statusFile)) {
             properties.load(in);

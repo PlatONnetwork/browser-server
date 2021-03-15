@@ -9,7 +9,7 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +42,7 @@ public class StakeCreateConverterTest extends AgentTestBase {
     @Mock
     private ParameterService parameterService;
     @Mock
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
     @InjectMocks
     @Spy
     private StakeCreateAnalyzer target;
@@ -57,8 +57,8 @@ public class StakeCreateConverterTest extends AgentTestBase {
         when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
-        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
-        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
     }
 
 

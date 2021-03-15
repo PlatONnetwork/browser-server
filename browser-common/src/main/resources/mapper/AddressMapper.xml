@@ -10,7 +10,6 @@
     <result column="delegate_value" jdbcType="DECIMAL" property="delegateValue" />
     <result column="redeemed_value" jdbcType="DECIMAL" property="redeemedValue" />
     <result column="tx_qty" jdbcType="INTEGER" property="txQty" />
-    <result column="token_qty" jdbcType="INTEGER" property="tokenQty" />
     <result column="transfer_qty" jdbcType="INTEGER" property="transferQty" />
     <result column="delegate_qty" jdbcType="INTEGER" property="delegateQty" />
     <result column="staking_qty" jdbcType="INTEGER" property="stakingQty" />
@@ -26,6 +25,8 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="have_reward" jdbcType="DECIMAL" property="haveReward" />
+    <result column="erc721_tx_qty" jdbcType="INTEGER" property="erc721TxQty" />
+    <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Address">
     <result column="contract_bin" jdbcType="LONGVARCHAR" property="contractBin" />
@@ -90,9 +91,9 @@
   </sql>
   <sql id="Base_Column_List">
     address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
-    tx_qty, token_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
-    delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
-    contract_createHash, contract_destroy_hash, create_time, update_time, have_reward
+    tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes, 
+    delegate_locked, delegate_released, contract_name, contract_create, contract_createHash, 
+    contract_destroy_hash, create_time, update_time, have_reward, erc721_tx_qty, erc20_tx_qty
   </sql>
   <sql id="Blob_Column_List">
     contract_bin
@@ -148,22 +149,24 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Address">
     insert into address (address, `type`, balance, 
       restricting_balance, staking_value, delegate_value, 
-      redeemed_value, tx_qty, token_qty, 
-      transfer_qty, delegate_qty, staking_qty, 
-      proposal_qty, candidate_count, delegate_hes, 
-      delegate_locked, delegate_released, contract_name, 
-      contract_create, contract_createHash, contract_destroy_hash, 
+      redeemed_value, tx_qty, transfer_qty, 
+      delegate_qty, staking_qty, proposal_qty, 
+      candidate_count, delegate_hes, delegate_locked, 
+      delegate_released, contract_name, contract_create, 
+      contract_createHash, contract_destroy_hash, 
       create_time, update_time, have_reward, 
-      contract_bin)
+      erc721_tx_qty, erc20_tx_qty, contract_bin
+      )
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
       #{restrictingBalance,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{delegateValue,jdbcType=DECIMAL}, 
-      #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{tokenQty,jdbcType=INTEGER}, 
-      #{transferQty,jdbcType=INTEGER}, #{delegateQty,jdbcType=INTEGER}, #{stakingQty,jdbcType=INTEGER}, 
-      #{proposalQty,jdbcType=INTEGER}, #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, 
-      #{delegateLocked,jdbcType=DECIMAL}, #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, 
-      #{contractCreate,jdbcType=VARCHAR}, #{contractCreatehash,jdbcType=VARCHAR}, #{contractDestroyHash,jdbcType=VARCHAR}, 
+      #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
+      #{delegateQty,jdbcType=INTEGER}, #{stakingQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
+      #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, 
+      #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, #{contractCreate,jdbcType=VARCHAR}, 
+      #{contractCreatehash,jdbcType=VARCHAR}, #{contractDestroyHash,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{haveReward,jdbcType=DECIMAL}, 
-      #{contractBin,jdbcType=LONGVARCHAR})
+      #{erc721TxQty,jdbcType=INTEGER}, #{erc20TxQty,jdbcType=INTEGER}, #{contractBin,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Address">
     insert into address
@@ -191,9 +194,6 @@
       </if>
       <if test="txQty != null">
         tx_qty,
-      </if>
-      <if test="tokenQty != null">
-        token_qty,
       </if>
       <if test="transferQty != null">
         transfer_qty,
@@ -240,6 +240,12 @@
       <if test="haveReward != null">
         have_reward,
       </if>
+      <if test="erc721TxQty != null">
+        erc721_tx_qty,
+      </if>
+      <if test="erc20TxQty != null">
+        erc20_tx_qty,
+      </if>
       <if test="contractBin != null">
         contract_bin,
       </if>
@@ -268,9 +274,6 @@
       </if>
       <if test="txQty != null">
         #{txQty,jdbcType=INTEGER},
-      </if>
-      <if test="tokenQty != null">
-        #{tokenQty,jdbcType=INTEGER},
       </if>
       <if test="transferQty != null">
         #{transferQty,jdbcType=INTEGER},
@@ -317,6 +320,12 @@
       <if test="haveReward != null">
         #{haveReward,jdbcType=DECIMAL},
       </if>
+      <if test="erc721TxQty != null">
+        #{erc721TxQty,jdbcType=INTEGER},
+      </if>
+      <if test="erc20TxQty != null">
+        #{erc20TxQty,jdbcType=INTEGER},
+      </if>
       <if test="contractBin != null">
         #{contractBin,jdbcType=LONGVARCHAR},
       </if>
@@ -354,9 +363,6 @@
       </if>
       <if test="record.txQty != null">
         tx_qty = #{record.txQty,jdbcType=INTEGER},
-      </if>
-      <if test="record.tokenQty != null">
-        token_qty = #{record.tokenQty,jdbcType=INTEGER},
       </if>
       <if test="record.transferQty != null">
         transfer_qty = #{record.transferQty,jdbcType=INTEGER},
@@ -403,6 +409,12 @@
       <if test="record.haveReward != null">
         have_reward = #{record.haveReward,jdbcType=DECIMAL},
       </if>
+      <if test="record.erc721TxQty != null">
+        erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
+      </if>
+      <if test="record.erc20TxQty != null">
+        erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
+      </if>
       <if test="record.contractBin != null">
         contract_bin = #{record.contractBin,jdbcType=LONGVARCHAR},
       </if>
@@ -421,7 +433,6 @@
       delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{record.txQty,jdbcType=INTEGER},
-      token_qty = #{record.tokenQty,jdbcType=INTEGER},
       transfer_qty = #{record.transferQty,jdbcType=INTEGER},
       delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
       staking_qty = #{record.stakingQty,jdbcType=INTEGER},
@@ -437,6 +448,8 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       have_reward = #{record.haveReward,jdbcType=DECIMAL},
+      erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
+      erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
       contract_bin = #{record.contractBin,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -452,7 +465,6 @@
       delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{record.txQty,jdbcType=INTEGER},
-      token_qty = #{record.tokenQty,jdbcType=INTEGER},
       transfer_qty = #{record.transferQty,jdbcType=INTEGER},
       delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
       staking_qty = #{record.stakingQty,jdbcType=INTEGER},
@@ -467,7 +479,9 @@
       contract_destroy_hash = #{record.contractDestroyHash,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      have_reward = #{record.haveReward,jdbcType=DECIMAL}
+      have_reward = #{record.haveReward,jdbcType=DECIMAL},
+      erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
+      erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -495,9 +509,6 @@
       </if>
       <if test="txQty != null">
         tx_qty = #{txQty,jdbcType=INTEGER},
-      </if>
-      <if test="tokenQty != null">
-        token_qty = #{tokenQty,jdbcType=INTEGER},
       </if>
       <if test="transferQty != null">
         transfer_qty = #{transferQty,jdbcType=INTEGER},
@@ -544,6 +555,12 @@
       <if test="haveReward != null">
         have_reward = #{haveReward,jdbcType=DECIMAL},
       </if>
+      <if test="erc721TxQty != null">
+        erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
+      </if>
+      <if test="erc20TxQty != null">
+        erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
+      </if>
       <if test="contractBin != null">
         contract_bin = #{contractBin,jdbcType=LONGVARCHAR},
       </if>
@@ -559,7 +576,6 @@
       delegate_value = #{delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{txQty,jdbcType=INTEGER},
-      token_qty = #{tokenQty,jdbcType=INTEGER},
       transfer_qty = #{transferQty,jdbcType=INTEGER},
       delegate_qty = #{delegateQty,jdbcType=INTEGER},
       staking_qty = #{stakingQty,jdbcType=INTEGER},
@@ -575,6 +591,8 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       have_reward = #{haveReward,jdbcType=DECIMAL},
+      erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
+      erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
       contract_bin = #{contractBin,jdbcType=LONGVARCHAR}
     where address = #{address,jdbcType=VARCHAR}
   </update>
@@ -587,7 +605,6 @@
       delegate_value = #{delegateValue,jdbcType=DECIMAL},
       redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{txQty,jdbcType=INTEGER},
-      token_qty = #{tokenQty,jdbcType=INTEGER},
       transfer_qty = #{transferQty,jdbcType=INTEGER},
       delegate_qty = #{delegateQty,jdbcType=INTEGER},
       staking_qty = #{stakingQty,jdbcType=INTEGER},
@@ -602,7 +619,9 @@
       contract_destroy_hash = #{contractDestroyHash,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      have_reward = #{haveReward,jdbcType=DECIMAL}
+      have_reward = #{haveReward,jdbcType=DECIMAL},
+      erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
+      erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER}
     where address = #{address,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -613,23 +632,23 @@
     -->
     insert into address
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
-      tx_qty, token_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
+      tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
       delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
       contract_createHash, contract_destroy_hash, create_time, update_time, have_reward, 
-      contract_bin)
+      erc721_tx_qty, erc20_tx_qty, contract_bin)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
         #{item.restrictingBalance,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL}, 
         #{item.delegateValue,jdbcType=DECIMAL}, #{item.redeemedValue,jdbcType=DECIMAL}, 
-        #{item.txQty,jdbcType=INTEGER}, #{item.tokenQty,jdbcType=INTEGER}, #{item.transferQty,jdbcType=INTEGER}, 
-        #{item.delegateQty,jdbcType=INTEGER}, #{item.stakingQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, 
-        #{item.candidateCount,jdbcType=INTEGER}, #{item.delegateHes,jdbcType=DECIMAL}, 
-        #{item.delegateLocked,jdbcType=DECIMAL}, #{item.delegateReleased,jdbcType=DECIMAL}, 
-        #{item.contractName,jdbcType=VARCHAR}, #{item.contractCreate,jdbcType=VARCHAR}, 
-        #{item.contractCreatehash,jdbcType=VARCHAR}, #{item.contractDestroyHash,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}, 
-        #{item.contractBin,jdbcType=LONGVARCHAR})
+        #{item.txQty,jdbcType=INTEGER}, #{item.transferQty,jdbcType=INTEGER}, #{item.delegateQty,jdbcType=INTEGER}, 
+        #{item.stakingQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, #{item.candidateCount,jdbcType=INTEGER}, 
+        #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
+        #{item.delegateReleased,jdbcType=DECIMAL}, #{item.contractName,jdbcType=VARCHAR}, 
+        #{item.contractCreate,jdbcType=VARCHAR}, #{item.contractCreatehash,jdbcType=VARCHAR}, 
+        #{item.contractDestroyHash,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.haveReward,jdbcType=DECIMAL}, #{item.erc721TxQty,jdbcType=INTEGER}, 
+        #{item.erc20TxQty,jdbcType=INTEGER}, #{item.contractBin,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -670,9 +689,6 @@
         </if>
         <if test="'tx_qty'.toString() == column.value">
           #{item.txQty,jdbcType=INTEGER}
-        </if>
-        <if test="'token_qty'.toString() == column.value">
-          #{item.tokenQty,jdbcType=INTEGER}
         </if>
         <if test="'transfer_qty'.toString() == column.value">
           #{item.transferQty,jdbcType=INTEGER}
@@ -719,6 +735,12 @@
         <if test="'have_reward'.toString() == column.value">
           #{item.haveReward,jdbcType=DECIMAL}
         </if>
+        <if test="'erc721_tx_qty'.toString() == column.value">
+          #{item.erc721TxQty,jdbcType=INTEGER}
+        </if>
+        <if test="'erc20_tx_qty'.toString() == column.value">
+          #{item.erc20TxQty,jdbcType=INTEGER}
+        </if>
         <if test="'contract_bin'.toString() == column.value">
           #{item.contractBin,jdbcType=LONGVARCHAR}
         </if>
@@ -726,4 +748,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

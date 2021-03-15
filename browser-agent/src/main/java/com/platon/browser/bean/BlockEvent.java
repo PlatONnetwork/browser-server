@@ -1,6 +1,5 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.client.ReceiptResult;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 
 import java.util.concurrent.CompletableFuture;

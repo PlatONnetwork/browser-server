@@ -28,6 +28,12 @@
 - browser-sync：将区块交易同步到redis的工具
 - browser-test：测试类，用于创建合约
 - docs：接口文档
+- estpl：Elastic Search 模板定义
+- scripts：脚本文件
+- testdata：单元测试数据
+- tools：开发工具
+- webconfig：web前端配置项
+
 
 ## 打包
 ### browser-agent的打包

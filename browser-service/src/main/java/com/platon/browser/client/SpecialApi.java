@@ -4,11 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.platon.abi.solidity.datatypes.BytesType;
 import com.platon.abi.solidity.datatypes.Utf8String;
 import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.browser.bean.*;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.utils.HexTool;
-import com.platon.browser.v015.bean.AdjustParam;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.v0150.bean.AdjustParam;
 import com.platon.contracts.ppos.BaseContract;
 import com.platon.contracts.ppos.abi.Function;
 import com.platon.contracts.ppos.dto.CallResponse;
@@ -158,7 +159,7 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
+    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
         CallResponse<String> br = rpc(web3j,function,InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null){
@@ -378,7 +379,7 @@ public class SpecialApi {
             data = data.replace("delete","delegate");
             List<AdjustParam> adjustParams = JSON.parseArray(data, AdjustParam.class);
             adjustParams.forEach(param->{
-                param.setNodeId(HexTool.prefix(param.getNodeId()));
+                param.setNodeId(HexUtil.prefix(param.getNodeId()));
                 param.setCurrBlockNum(blockNumber);
             });
             return adjustParams;

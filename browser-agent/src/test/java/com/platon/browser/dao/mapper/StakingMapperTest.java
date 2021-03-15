@@ -137,10 +137,10 @@
 //        DelegationKey delegationKey = new Delegation();
 //        delegationKey.setNodeId(withdrewStakingParam.getNodeId());
 //        delegationKey.setStakingBlockNum(withdrewStakingParam.getStakingBlockNum().longValue());
-//        Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
-//        assertEquals(0,delegation.getDelegateHes().longValue());
-//        assertEquals(0,delegation.getDelegateLocked().longValue());
-//        assertEquals(0,delegation.getDelegateReleased().longValue());
+//        Delegation delegate.estpl.yml = delegationMapper.selectByPrimaryKey(delegationKey);
+//        assertEquals(0,delegate.estpl.yml.getDelegateHes().longValue());
+//        assertEquals(0,delegate.estpl.yml.getDelegateLocked().longValue());
+//        assertEquals(0,delegate.estpl.yml.getDelegateReleased().longValue());
 //        //node数据更新验证
 //        Node node = nodeMapper.selectByPrimaryKey(withdrewStakingParam.getNodeId());
 //        assertEquals(withdrewStakingParam.getStakingReductionEpoch(), node.getStakingReductionEpoch().intValue());

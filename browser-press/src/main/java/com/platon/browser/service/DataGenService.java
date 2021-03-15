@@ -11,7 +11,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -46,9 +46,9 @@ public class DataGenService {
     private NodeMapper nodeMapper;
 
     static {
-        PROPOSAL_HASH.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
-        NODE_IDS.add(HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
-        ADDRESS.add(HexTool.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
+        PROPOSAL_HASH.add(HexUtil.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
+        NODE_IDS.add(HexUtil.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString())));
+        ADDRESS.add(HexUtil.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString())));
     }
 
     static class Status {
@@ -268,7 +268,6 @@ public class DataGenService {
             tx.setSeq(++PressApplication.currentTransferCount);
             transactionList.add(tx);
         }
-        log.info("当前区块为{}，交易数为{}", blockNumber, PressApplication.currentTransferCount);
         br.setTransactionList(transactionList);
 
         List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr, NodeOpt.class);
@@ -287,7 +286,7 @@ public class DataGenService {
         long num = currentNodeSum;
         String nodeId = BlockResult.createNodeId(++num);
         node.setNodeId(nodeId);
-        String hex = HexTool.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString()));
+        String hex = HexUtil.prefix(DigestUtils.sha512Hex(UUID.randomUUID().toString()));
         node.setNodeIcon(hex.substring(0, 6));
         node.setNodeName(hex.substring(7, 10));
 
@@ -406,60 +405,59 @@ public class DataGenService {
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         return copy;
     }
-
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public Erc20Token getErc20Token(Transaction tx) {
-        Erc20Token copy = JSON.parseObject(erc20TokenStr, Erc20Token.class);
-        copy.setTxHash(tx.getHash());
-        copy.setAddress(rAddress());
-        copy.setName("Token-" + tx.getSeq());
-        copy.setSymbol(tx.getSeq() + "");
-        copy.setDecimal(18);
-        copy.setTotalSupply(new BigDecimal("10000000000000000000000000"));
-        copy.setCreator(tx.getFrom());
-        copy.setType("E");
-        copy.setStatus(1);
-        copy.setTxCount(100);
-        copy.setBlockTimestamp(tx.getTime());
-        copy.setCreateTime(new Date());
-        return copy;
-    }
-
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public ESTokenTransferRecord getESTokenTransferRecord(Transaction tx) {
-        ESTokenTransferRecord transferRecord = JSON.parseObject(esTokenTransferRecordStr, ESTokenTransferRecord.class);
-        transferRecord.setSeq(tx.getSeq());
-        transferRecord.setBTime(tx.getTime());
-        transferRecord.setBn(tx.getNum());
-        transferRecord.setContract(tx.getContractAddress());
-        transferRecord.setCtime(new Date());
-        transferRecord.setDecimal(17);
-        transferRecord.setFrom(tx.getFrom());
-        transferRecord.setHash(tx.getHash());
-        transferRecord.setName("Token-" + tx.getSeq());
-        transferRecord.setSymbol("" + tx.getSeq());
-        transferRecord.setTValue("100000000000000000000");
-        transferRecord.setResult(1);
-        transferRecord.setTto(tx.getTo());
-        transferRecord.setTxFee(tx.getCost());
-        return transferRecord;
-    }
-
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock) {
-        List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
-        for (int i = 0; i < addressCountPerBlock; i++) {
-            Erc20TokenAddressRel rel = Erc20TokenAddressRel.builder()
-                    .contract(token.getAddress())
-                    .address(rMockAddress())
-                    .balance(new BigDecimal("10000000000000000000"))
-                    .name(token.getName()).symbol(token.getSymbol())
-                    .decimal(token.getDecimal()).txCount(i)
-                    .totalSupply(token.getTotalSupply()).updateTime(new Date())
-                    .build();
-            erc20TokenAddressRelList.add(rel);
-        }
-        return erc20TokenAddressRelList;
-    }
-
+//
+//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+//    public Erc20Token getErc20Token(Transaction tx){
+//        Erc20Token copy = JSON.parseObject(erc20TokenStr, Erc20Token.class);
+//        copy.setTxHash(tx.getHash());
+//        copy.setAddress(rAddress());
+//        copy.setName("Token-" + tx.getSeq());
+//        copy.setSymbol(tx.getSeq() + "");
+//        copy.setDecimal(18);
+//        copy.setTotalSupply(new BigDecimal("10000000000000000000000000"));
+//        copy.setCreator(tx.getFrom());
+//        copy.setType("E");
+//        copy.setStatus(1);
+//        copy.setTxCount(100);
+//        copy.setBlockTimestamp(tx.getTime());
+//        copy.setCreateTime(new Date());
+//        return copy;
+//    }
+//
+//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+//    public OldErcTx getESTokenTransferRecord(Transaction tx){
+//        OldErcTx transferRecord = JSON.parseObject(esTokenTransferRecordStr, OldErcTx.class);
+//        transferRecord.setSeq(tx.getSeq());
+//        transferRecord.setBTime(tx.getTime());
+//        transferRecord.setBn(tx.getNum());
+//        transferRecord.setContract(tx.getContractAddress());
+//        transferRecord.setCtime(new Date());
+//        transferRecord.setDecimal(17);
+//        transferRecord.setFrom(tx.getFrom());
+//        transferRecord.setHash(tx.getHash());
+//        transferRecord.setName("Token-" + tx.getSeq());
+//        transferRecord.setSymbol("" + tx.getSeq());
+//        transferRecord.setTValue("100000000000000000000");
+//        transferRecord.setResult(1);
+//        transferRecord.setTto(tx.getTo());
+//        transferRecord.setTxFee(tx.getCost());
+//        return transferRecord;
+//    }
+//
+//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+//    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock){
+//        List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
+//        for (int i = 0; i < addressCountPerBlock; i++) {
+//            Erc20TokenAddressRel rel = Erc20TokenAddressRel.builder()
+//                    .contract(token.getAddress())
+//                    .address(rMockAddress())
+//                    .balance(new BigDecimal("10000000000000000000"))
+//                    .name(token.getName()).symbol(token.getSymbol())
+//                    .decimal(token.getDecimal()).txCount(i)
+//                    .totalSupply(token.getTotalSupply()).updateTime(new Date())
+//                    .build();
+//            erc20TokenAddressRelList.add(rel);
+//        }
+//        return erc20TokenAddressRelList;
+//    }
 }

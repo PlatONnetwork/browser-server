@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-@Mapper
 public interface CustomProposalMapper {
     int updateProposalDetailList( @Param("proposalList") List <Proposal> list );
     int updateProposalInfoList( @Param("proposalList") List <Proposal> list );

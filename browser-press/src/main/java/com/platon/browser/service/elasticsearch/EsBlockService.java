@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +25,11 @@ import java.util.concurrent.CountDownLatch;
 public class EsBlockService extends EsService<Block> {
 
     @Autowired
-    private BlockESRepository blockESRepository;
+    private EsBlockRepository esBlockRepository;
 
     @PostConstruct
     public void init() throws IOException {
-        if (!blockESRepository.existsIndex()) {
+        if (!esBlockRepository.existsIndex()) {
             Map<String, Object> setting = new HashMap(3);
             // 查询的返回数量，默认是10000
             setting.put("max_result_window", 2000000000);
@@ -38,7 +37,7 @@ public class EsBlockService extends EsService<Block> {
             setting.put("number_of_shards", 5);
             // 副本每个主碎片的数量
             setting.put("number_of_replicas", 1);
-            blockESRepository.createIndex(setting, null);
+            esBlockRepository.createIndex(setting, null);
         }
     }
 
@@ -68,7 +67,7 @@ public class EsBlockService extends EsService<Block> {
             CountDownLatch latch = new CountDownLatch(groups.size());
             for (Map<String, Block> g : groups) {
                 try {
-                    blockESRepository.bulkAddOrUpdate(g);
+                    esBlockRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

@@ -5,13 +5,12 @@ import com.lmax.disruptor.EventTranslatorVararg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.bean.PersistenceEvent;
-import com.platon.browser.handler.PersistenceEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.handler.PersistenceEventHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -31,11 +30,9 @@ public class PersistenceEventPublisher extends AbstractPublisher<PersistenceEven
         event.setNodeOpts((List<NodeOpt>) args[2]);
         event.setDelegationRewards((List<DelegationReward>) args[3]);
     };
-    @Value("${disruptor.queue.persistence.buffer-size}")
-    private int ringBufferSize;
     @Override
     public int getRingBufferSize() {
-        return ringBufferSize;
+        return config.getPersistenceBufferSize();
     }
     private EventFactory<PersistenceEvent> eventFactory = PersistenceEvent::new;
     @Resource
@@ -43,7 +40,7 @@ public class PersistenceEventPublisher extends AbstractPublisher<PersistenceEven
 
     @PostConstruct
     private void init(){
-        Disruptor<PersistenceEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
+        Disruptor<PersistenceEvent> disruptor = new Disruptor<>(eventFactory, getRingBufferSize(), DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(persistenceEventHandler);
         disruptor.start();
         ringBuffer = disruptor.getRingBuffer();

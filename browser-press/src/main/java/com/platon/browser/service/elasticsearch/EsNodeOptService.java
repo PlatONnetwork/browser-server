@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +25,11 @@ import java.util.concurrent.CountDownLatch;
 public class EsNodeOptService extends EsService<NodeOpt> {
 
     @Autowired
-    private NodeOptESRepository nodeOptESRepository;
+    private EsNodeOptRepository esNodeOptRepository;
 
     @PostConstruct
     public void init() throws IOException {
-        if (!nodeOptESRepository.existsIndex()) {
+        if (!esNodeOptRepository.existsIndex()) {
             Map<String, Object> setting = new HashMap(3);
             // 查询的返回数量，默认是10000
             setting.put("max_result_window", 2000000000);
@@ -38,7 +37,7 @@ public class EsNodeOptService extends EsService<NodeOpt> {
             setting.put("number_of_shards", 5);
             // 副本每个主碎片的数量
             setting.put("number_of_replicas", 1);
-            nodeOptESRepository.createIndex(setting, null);
+            esNodeOptRepository.createIndex(setting, null);
         }
     }
 
@@ -68,7 +67,7 @@ public class EsNodeOptService extends EsService<NodeOpt> {
             CountDownLatch latch = new CountDownLatch(groups.size());
             for (Map<String, NodeOpt> g : groups) {
                 try {
-                    nodeOptESRepository.bulkAddOrUpdate(g);
+                    esNodeOptRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

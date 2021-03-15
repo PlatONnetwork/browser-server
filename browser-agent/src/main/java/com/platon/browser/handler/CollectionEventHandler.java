@@ -1,13 +1,9 @@
 package com.platon.browser.handler;
 
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.TxAnalyseResult;
 import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.publisher.ComplementEventPublisher;
-import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.statistic.StatisticService;
-import com.platon.browser.service.transaction.TransactionService;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;
@@ -16,9 +12,12 @@ import com.platon.browser.dao.mapper.CustomNOptBakMapper;
 import com.platon.browser.dao.mapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.publisher.ComplementEventPublisher;
+import com.platon.browser.service.block.BlockService;
+import com.platon.browser.service.statistic.StatisticService;
+import com.platon.browser.service.ppos.PPOSService;
 import com.platon.browser.utils.BakDataDeleteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -39,7 +38,7 @@ import java.util.List;
 public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
-    private TransactionService transactionService;
+    private PPOSService pposService;
     @Resource
     private BlockService blockService;
     @Resource
@@ -73,46 +72,40 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             event.getTransactions().size(), sequence, endOfBatch);
 
         // 使用已入库的交易数量初始化交易ID初始值
-        if (this.transactionId == 0)
-            this.transactionId = this.networkStatCache.getNetworkStat().getTxQty();
+        if (transactionId == 0)
+            transactionId = networkStatCache.getNetworkStat().getTxQty();
 
         try {
             List<Transaction> transactions = event.getTransactions();
             // 确保交易从小到大的索引顺序
-            int index = 0;
             transactions.sort(Comparator.comparing(Transaction::getIndex));
             for (Transaction tx : transactions) {
-                tx.setId(++this.transactionId);
-                for (ESTokenTransferRecord esTokenTransferRecord : tx.getEsTokenTransferRecords()) {
-                    // Token交易序号 = 交易所在块号*10000 + 本区块Token交易列表index
-                    esTokenTransferRecord.setSeq(event.getBlock().getNum()*100000+index);
-                    index++;
-                }
+                tx.setId(++transactionId);
             }
-
+            
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockService.analyze(event);
             // 根据交易解析出业务参数
-            TxAnalyseResult txAnalyseResult = this.transactionService.analyze(event);
+            TxAnalyseResult txAnalyseResult = pposService.analyze(event);
             // 统计业务参数
-            this.statisticService.analyze(event);
+            statisticService.analyze(event);
 
             if (!txAnalyseResult.getNodeOptList().isEmpty())
                 nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
-            this.complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1,
+            complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1,
                 txAnalyseResult.getDelegationRewardList());
 
-            this.txDeleteBatchCount++;
-            this.optDeleteBatchCount++;
+            txDeleteBatchCount++;
+            optDeleteBatchCount++;
 
-            if (this.txDeleteBatchCount >= 10) {
+            if (txDeleteBatchCount >= 10) {
                 // 删除小于最高ID的交易备份
                 TxBakExample txBakExample = new TxBakExample();
                 txBakExample.createCriteria().andIdLessThanOrEqualTo(BakDataDeleteUtil.getTxBakMaxId());
-                int txCount = this.txBakMapper.deleteByExample(txBakExample);
+                int txCount = txBakMapper.deleteByExample(txBakExample);
                 log.debug("清除交易备份记录({})条", txCount);
-                this.txDeleteBatchCount = 0;
+                txDeleteBatchCount = 0;
             }
             // 交易入库mysql
             if (!transactions.isEmpty()) {
@@ -122,16 +115,16 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                     BeanUtils.copyProperties(tx, bak);
                     baks.add(bak);
                 });
-                this.customTxBakMapper.batchInsertOrUpdateSelective(baks, TxBak.Column.values());
+                customTxBakMapper.batchInsertOrUpdateSelective(baks, TxBak.Column.values());
             }
 
-            if (this.optDeleteBatchCount >= 10) {
+            if (optDeleteBatchCount >= 10) {
                 // 删除小于最高ID的操作记录备份
                 NOptBakExample nOptBakExample = new NOptBakExample();
                 nOptBakExample.createCriteria().andIdLessThanOrEqualTo(BakDataDeleteUtil.getNOptBakMaxId());
-                int optCount = this.nOptBakMapper.deleteByExample(nOptBakExample);
+                int optCount = nOptBakMapper.deleteByExample(nOptBakExample);
                 log.debug("清除操作备份记录({})条", optCount);
-                this.optDeleteBatchCount = 0;
+                optDeleteBatchCount = 0;
             }
             // 操作日志入库mysql
             if (!nodeOpts1.isEmpty()) {
@@ -141,7 +134,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                     BeanUtils.copyProperties(no, bak);
                     baks.add(bak);
                 });
-                this.customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.values());
+                customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.values());
             }
             // 释放对象引用
             event.releaseRef();

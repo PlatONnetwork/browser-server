@@ -5,6 +5,7 @@ import com.platon.protocol.core.Request;
 import com.platon.protocol.core.Response;
 import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.ReceiptResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

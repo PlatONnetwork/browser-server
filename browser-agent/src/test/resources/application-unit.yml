@@ -24,28 +24,25 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      blockIndexName: browser_block_2
-      transactionIndexName: browser_transaction_2
-      delegationIndexName: browser_delegation_2
-      nodeOptIndexName: browser_nodeopt_2
+      username: elastic
+      password: changeme
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
     # 区块事件环形缓冲区大小
-    block.buffer-size: 1024
+    blockBufferSize: 1024
     # 采集事件环形缓冲区大小
-    collection.buffer-size: 1024
+    collectionBufferSize: 1024
     # 数据补充环形缓冲区大小
-    complement.buffer-size: 1024
-    # 数据持久化
-    persistence:
-      #环形缓冲区大小
-      buffer-size: 1024
-      #每次处理多少个
-      batch-size: 10
+    complementBufferSize: 1024
+    # gas price估算消息环形缓冲区大小
+    gasEstimateBufferSize: 1024
+    # 数据持久化环形缓冲区大小
+    persistenceBufferSize: 1024
+    #每次处理多少个
+    persistenceBatchSize: 10
 #日志配置
 logging:
-  file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
     org.springframework: error
@@ -62,8 +59,12 @@ logging:
     com.platon.browser.persistence.handler: error
     com.platon.browser.persistence.queue.handler: error
     com.platon.browser.task: info
+  file:
+    name: ./logs/${spring.application.name}-${version}-${profile}.log
 #PlatOn相关配置
 platon:
+  # 地址HRP前缀
+  addressPrefix: atp
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
@@ -107,25 +108,22 @@ platon:
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
   #链id
   chainId: 201018
-  #代币专用Event,格式：{事件名称}:{保存的合约地址索引}#{类型}:{是否indexed},{类型}:{是否indexed}...
-  eventDefine: {
-    "TokenCreated": "0#address:indexed,string:non-indexed,string:non-indexed,uint8:non-indexed,uint256:non-indexed"
-  }
-  #锁仓最小释放金额参数生效版本
-  restrictingMinimumReleaseActiveVersion: 3584
   #Redis命名空间
   redis-namespace: browser:${version}:${profile}
-  #调账日志输出文件
-  account.adjust.log.file: E:\Java\browser-server\browser-agent\build\tmp\adjust.log
+  #Es索引命名空间
+  es-namespace: browser_${version}_${profile}
+  #同步时的索引查询分页参数配置
+  paging:
+    erc20-transaction:
+      pageSize: 2000
+      pageCount: 250
 
 task:
-  #地址统计任务
-  address-batch-size: 1000
-  #动态调整参数
-  dynamic-adjust:
-    #agent与实际链上区块号相差多少个块号时触发调整操作
-    threshold: 20
-    #未追上链,批量入ES和Redis的缓存大小
-    cache-batch-max-size: 10
-    #已追上链,批量入ES和Redis的缓存大小
-    cache-batch-min-size: 1
+  #地址统计任务批次大小
+  addressBatchSize: 1000
+  #agent与实际链上区块号相差多少个块号时触发调整操作
+  gapForAdjust: 20
+  #未追上链,批量入ES和Redis的缓存大小
+  esRedisNotCatchupBatchSize: 10
+  #已追上链,批量入ES和Redis的缓存大小
+  esRedisCatchupBatchSize: 1

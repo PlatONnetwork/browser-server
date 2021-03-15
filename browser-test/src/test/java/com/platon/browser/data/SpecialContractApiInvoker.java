@@ -10,7 +10,7 @@ import com.platon.protocol.Web3j;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.websocket.WebSocketService;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.EpochInfo;
+import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.SpecialApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 
 /**
  * 验证人详情请求对象
@@ -25,7 +25,7 @@ public class StakingDetailsReq {
 
 	public void setNodeId(String nodeId) {
 		if(StringUtils.isBlank(nodeId)) return;
-		this.nodeId = HexTool.prefix(nodeId.toLowerCase());
+		this.nodeId = HexUtil.prefix(nodeId.toLowerCase());
 	}
     
 }

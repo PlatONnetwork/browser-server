@@ -23,9 +23,9 @@
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/browser_0.14.0_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
-                        userId="root"
-                        password="root"/>
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/alaya_browser_0.15.2.0?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        userId="platon"
+                        password="platon"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="../browser-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
@@ -40,125 +40,13 @@
         <javaClientGenerator targetPackage="com.platon.browser.dao.mapper"
                              targetProject="../browser-common/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
-        </javaClientGenerator> <!---->
-        <!--      <table tableName="T_FEE_AGTBILL" domainObjectName="FeeAgentBill"
-                       enableCountByExample="false" enableUpdateByExample="false"
-                       enableDeleteByExample="false" enableSelectByExample="false"
-                       selectByExampleQueryId="false"/>&ndash;&gt;-->
-   <!-- <table tableName="address" domainObjectName="Address">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="block" domainObjectName="Block">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-
-        <table tableName="delegation" domainObjectName="Delegation">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
+        </javaClientGenerator>
 
         <table tableName="network_stat" domainObjectName="NetworkStat">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-
-
-        <table tableName="node_opt" domainObjectName="NodeOpt">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="proposal" domainObjectName="Proposal">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="rp_plan" domainObjectName="RpPlan">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-
-
-        <table tableName="slash" domainObjectName="Slash">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="vote" domainObjectName="Vote">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="transaction" domainObjectName="Transaction">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="staking_history" domainObjectName="StakingHistory">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        -->
-
-        <!--<table tableName="proposal" domainObjectName="Proposal">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>-->
-        <!--<table tableName="address" domainObjectName="Address">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
-        <table tableName="node" domainObjectName="Node">
+        <table tableName="address" domainObjectName="Address">
             <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>
-        <table tableName="staking" domainObjectName="Staking">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>-->
-<!--
-        <table tableName="node" domainObjectName="Node">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>-->
-
-<!--        <table tableName="node" domainObjectName="Node"><columnRenamingRule searchString="^D_" replaceString=""/></table>
-        <table tableName="staking" domainObjectName="Staking"><columnRenamingRule searchString="^D_" replaceString=""/></table>-->
-
-<!--        <table tableName="network_stat" domainObjectName="NetworkStat">-->
-<!--            <columnRenamingRule searchString="^D_"-->
-<!--                                replaceString=""/>-->
-<!--        </table>-->
-        <!--
-        <table tableName="block_node" domainObjectName="BlockNode"><columnRenamingRule searchString="^D_" replaceString=""/></table>
-        -->
-        <!--<table tableName="erc20_token" domainObjectName="Erc20Token">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>
-        <table tableName="erc20_token_address_rel" domainObjectName="Erc20TokenAddressRel">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>
-        <table tableName="erc20_token_detail" domainObjectName="Erc20TokenDetail">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>
-        <table tableName="erc20_token_transfer_record" domainObjectName="Erc20TokenTransferRecord">
-            <columnRenamingRule searchString="^D_" replaceString=""/>
-        </table>-->
-        <table tableName="node" domainObjectName="Node">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-        <table tableName="staking" domainObjectName="Staking">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-        <table tableName="staking_history" domainObjectName="StakingHistory">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
         </table>
     </context>
 </generatorConfiguration>

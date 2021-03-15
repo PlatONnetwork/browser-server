@@ -14,7 +14,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +46,7 @@ public class ReportConverterTest extends AgentTestBase {
     @Mock
     private NodeCache nodeCache;
     @Mock
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
     @Mock
     private NodeMapper nodeMapper;
     @InjectMocks
@@ -64,8 +64,8 @@ public class ReportConverterTest extends AgentTestBase {
         when(chainConfig.getDuplicateSignSlashRate()).thenReturn(blockChainConfig.getDuplicateSignSlashRate());
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(blockChainConfig.getConsensusPeriodBlockCount());
         when(chainConfig.getDuplicateSignRewardRate()).thenReturn(blockChainConfig.getDuplicateSignRewardRate());
-        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
-        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
     }
 
     @Test

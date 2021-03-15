@@ -3,9 +3,10 @@ package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.ESTokenTransferRecord;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -81,10 +82,6 @@ public class ApiTestData {
     protected List<Address> addressList = Collections.emptyList();
     protected List<Node> nodeList = new ArrayList<>();
     protected List<Block> blockList = Collections.emptyList();
-    protected List<Erc20Token> erc20Tokens = Collections.emptyList();
-    protected List<Erc20TokenDetailWithBLOBs> erc20TokenDetails = Collections.emptyList();
-    protected List<ESTokenTransferRecord> esTokenTransferRecords = Collections.emptyList();
-    protected List<Erc20TokenAddressRel> erc20TokenAddressRels = Collections.emptyList();
 
     @Before
     public void init() {
@@ -110,18 +107,6 @@ public class ApiTestData {
                         break;
                     case "block":
                         this.blockList = JSON.parseArray(content, Block.class);
-                        break;
-                    case "erc20Token":
-                        this.erc20Tokens = JSON.parseArray(content, Erc20Token.class);
-                        break;
-                    case "erc20TokenDetail":
-                        this.erc20TokenDetails = JSON.parseArray(content, Erc20TokenDetailWithBLOBs.class);
-                        break;
-                    case "erc20TokenAddressRel":
-                        this.erc20TokenAddressRels = JSON.parseArray(content, Erc20TokenAddressRel.class);
-                        break;
-                    case "erc20TokenTransfer":
-                        this.esTokenTransferRecords = JSON.parseArray(content, ESTokenTransferRecord.class);
                         break;
                 }
             } catch (IOException e) {

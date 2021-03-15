@@ -1,19 +1,21 @@
 package com.platon.browser.client;
 
-import com.platon.browser.enums.Web3jProtocolEnum;
-import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.contracts.ppos.*;
+import com.platon.parameters.NetworkParameters;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.Web3jService;
 import com.platon.protocol.http.HttpService;
 import com.platon.protocol.websocket.WebSocketService;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.enums.Web3jProtocolEnum;
+import com.platon.browser.exception.ConfigLoadingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -28,7 +30,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
-@DependsOn("networkParams")
 public class RetryableClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
     @Value("${platon.web3j.protocol}")
@@ -112,7 +113,7 @@ public class RetryableClient {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    private void updateContract(){
+    public void updateContract(){
     	rewardContract = RewardContract.load(currentWeb3jWrapper.getWeb3j());
         delegateContract = DelegateContract.load(currentWeb3jWrapper.getWeb3j());
         nodeContract = NodeContract.load(currentWeb3jWrapper.getWeb3j());

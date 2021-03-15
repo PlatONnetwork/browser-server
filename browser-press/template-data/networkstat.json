@@ -26,5 +26,7 @@
 "issue_rates":"0.025",
 "avg_pack_time":1288,
 "create_time":"2019-12-03 10:28:11",
-"update_time":"2019-12-03 10:28:45"
+"update_time":"2019-12-03 10:28:45",
+  "erc721_tx_qty": 1,
+  "erc20_tx_qty": 2
 }

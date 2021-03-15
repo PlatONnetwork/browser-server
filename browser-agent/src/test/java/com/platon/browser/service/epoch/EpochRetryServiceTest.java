@@ -6,7 +6,7 @@ import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.EpochInfo;
+import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;

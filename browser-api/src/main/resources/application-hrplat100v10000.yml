@@ -5,8 +5,14 @@ profile: hrplat100v10000
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-# 服务器端口号
-server.port: 40010
+#性能配置
+server:
+  port: 40010
+  tomcat:
+    max-connections: 20000
+    threads:
+      max: 2000
+      min-spare: 800
 #Spring框架内部配置
 spring:
   #数据源配置
@@ -14,8 +20,6 @@ spring:
     url: jdbc:mysql://192.168.9.191:3306/platon_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
     #下面为连接池的补充设置，应用到上面所有数据源中
     #初始化大小，最小，最大
     initialSize: 5
@@ -34,6 +38,13 @@ spring:
     # 打开PSCache，并且指定每个连接上PSCache的大小
     poolPreparedStatements: true
     maxPoolPreparedStatementPerConnectionSize: 100
+  #Redis配置
+  redis:
+    password: platscan
+    database: 0
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
   #ES配置
   elasticsearch:
     high-level-client:
@@ -42,39 +53,6 @@ spring:
       schema: http
       username: elastic
       password: changeme
-      blockIndexName: browser_block_${profile}
-      transactionIndexName: browser_transaction_${profile}
-      delegationIndexName: browser_delegation_${profile}
-      nodeOptIndexName: browser_nodeopt_${profile}
-      delegationRewardIndexName: browser_delegation_reward_${profile}
-      innerTxIndexName: browser_inner_tx_${profile}
-#redis配置
-redisCluster:
-  configKey: DEFAULT
-  connectionTimeout: 4000
-  soTimeout: 5000
-  maxRedirections: 3000
-  maxTotal: 10
-  maxIdle: 5
-  minIdle: 2
-  maxWaitMillis: 2000
-  testOnBorrow: false
-  testOnReturn: false
-  testWhileIdle: true
-  masterIPs: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-  password: platscan
-#性能配置
-server:
-  tomcat:
-    max-connections: 20000
-    threads:
-      min-spare: 800
-      max: 2000
-    connection-timeout: 5000
-zuul:
-  FormBodyWrapperFilter:
-    pre:
-      disable: true
 #日志配置
 logging:
   #日志级别
@@ -86,7 +64,7 @@ logging:
     com.platon.browser.client: debug
     com.platon.browser.dao: debug
   file:
-    name: ./logs/${spring.application.name}-${version}-${profile}.log
+    name: ./logs/${spring.application.name}-${profile}.log
 #初始化链相关的配置
 platon:
   # 地址HRP前缀
@@ -136,8 +114,11 @@ platon:
   chainId: 100
   #Redis命名空间
   redis-namespace: browser:${profile}
+  #Es索引命名空间
+  es-namespace: browser_${profile}
 
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
+isRecaptcha: false
 limit:
   num: 10
 output:

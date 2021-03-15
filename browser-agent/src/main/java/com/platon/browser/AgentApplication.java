@@ -5,7 +5,7 @@ import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.service.ConsistencyService;
 import com.platon.browser.bootstrap.service.InitializationService;
-import com.platon.browser.client.ReceiptResult;
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.publisher.BlockEventPublisher;
 import com.platon.browser.service.block.BlockService;
@@ -35,7 +35,8 @@ import java.util.concurrent.CompletableFuture;
 @MapperScan(basePackages = {
 	"com.platon.browser",
 	"com.platon.browser.dao.mapper",
-	"com.platon.browser.v015.dao"
+	"com.platon.browser.v0150.dao",
+	"com.platon.browser.v0151.dao"
 })
 public class AgentApplication implements ApplicationRunner {
 	// 区块服务
@@ -63,13 +64,15 @@ public class AgentApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		if(AppStatusUtil.isStopped()) return;
+		if(AppStatusUtil.isStopped()) {
+			return;
+		}
 		// 把应用置为BOOTING开机状态
 		AppStatusUtil.setStatus(AppStatus.BOOTING);
-        // 进入一致性开机自检子流程
-        consistencyService.post();
 		// 进入应用初始化子流程
 		InitializationResult initialResult = initializationService.init();
+        // 进入一致性开机自检子流程
+        consistencyService.post();
 		// 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
 		AppStatusUtil.setStatus(AppStatus.RUNNING);
 		// 已采最高块号
@@ -90,7 +93,9 @@ public class AgentApplication implements ApplicationRunner {
 				EpochMessage epochMessage = epochService.getEpochMessage(collectedNumber);
 				blockEventPublisher.publish(blockCF, receiptCF,epochMessage);
 
-				if(preBlockNum!=0L&&(collectedNumber-preBlockNum!=1)) throw new AssertionError();
+				if(preBlockNum!=0L&&(collectedNumber-preBlockNum!=1)) {
+					throw new AssertionError();
+				}
 			}catch (Exception e){
 				log.error("程序因错误而停止:",e);
 				break;

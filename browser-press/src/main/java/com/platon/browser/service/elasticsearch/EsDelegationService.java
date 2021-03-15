@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.elasticsearch.DelegationESRepository;
 import com.platon.browser.queue.handler.StageCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +25,11 @@ import java.util.concurrent.CountDownLatch;
 public class EsDelegationService extends EsService<Delegation> {
 
     @Autowired
-    private DelegationESRepository delegationESRepository;
+    private EsDelegationRepository esDelegationRepository;
 
     @PostConstruct
     public void init() throws IOException {
-        if (!delegationESRepository.existsIndex()) {
+        if (!esDelegationRepository.existsIndex()) {
             Map<String, Object> setting = new HashMap(3);
             // 查询的返回数量，默认是10000
             setting.put("max_result_window", 2000000000);
@@ -38,7 +37,7 @@ public class EsDelegationService extends EsService<Delegation> {
             setting.put("number_of_shards", 5);
             // 副本每个主碎片的数量
             setting.put("number_of_replicas", 1);
-            delegationESRepository.createIndex(setting, null);
+            esDelegationRepository.createIndex(setting, null);
         }
     }
 
@@ -68,7 +67,7 @@ public class EsDelegationService extends EsService<Delegation> {
             CountDownLatch latch = new CountDownLatch(groups.size());
             for (Map<String, Delegation> g : groups) {
                 try {
-                    delegationESRepository.bulkAddOrUpdate(g);
+                    esDelegationRepository.bulkAddOrUpdate(g);
                 } finally {
                     latch.countDown();
                 }

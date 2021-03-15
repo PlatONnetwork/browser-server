@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  version: 0.15.0.0
+  version: 'v_VERSION_ Build #_COMMIT_ID_'
   title: 浏览器API文档
   description:
-host: https://scan.alaya.network/
-basePath: /browser-server
+host: localhost:9061
+basePath: "_BASE_PATH_"
 
 schemes:
   - http
@@ -283,13 +283,36 @@ paths:
           description: 返回区块详情
           schema:
             $ref: '#/definitions/BlockDetailResult'
-  #合约相关接口
-  /token/tokenDetail:
+
+  #Token令牌相关接口
+  /token/list:
+    post:
+      operationId: tokenList
+      tags:
+        - Token令牌接口
+      summary: Token令牌列表
+      description: 实现逻辑：|
+        查询mysql中数据<br/>
+        查询可展示的token列表,是否允许展示需要关联token_expand表中is_show_in_scan字段<br/>
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/TokenListParam'
+      responses:
+        '200':
+          description: 返回区块列表
+          schema:
+            $ref: '#/definitions/TokenListResult'
+  /token/detail:
     post:
       operationId: tokenDetail
       tags:
-        - 合约接口
-      summary: 查询令牌详情
+        - Token令牌接口
+      summary: Token令牌详情
       description: 实现逻辑：|
         查询MySQL数据库，同时附加附属信息返回
       produces:
@@ -305,38 +328,18 @@ paths:
           description: 返回令牌详情
           schema:
             $ref: '#/definitions/TokenDetailResult'
-  /token/tokenList:
+  /token/arc20-tx/list:
     post:
-      operationId: tokenList
+      operationId: arc20TxList
       tags:
-        - 合约接口
-      summary: 合约列表
+        - Token令牌接口
+      summary: ARC20交易列表
       description: 实现逻辑：|
-        查询mysql中erc20_contract表，示的合约状态为 1（可见）
-      produces:
-        - application/json
-      parameters:
-        - name: body
-          description: 参数对象
-          in: body
-          schema:
-            $ref: '#/definitions/TokenListParam'
-      responses:
-        '200':
-          description: 返回区块列表
-          schema:
-            $ref: '#/definitions/TokenListResult'
-  /token/tokenTransferList:
-    post:
-      operationId: tokenTransferList
-      tags:
-        - 合约接口
-      summary: 合约内部交易列表
-      description: 实现逻辑：|
-         查询ES中索引数据<br/>
-         如果传入合约地址，则返回当前合约内的所有转账记录<br/>
-         如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
-         如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）<br/>
+        查询ES中索引数据<br/>
+        如果传入合约地址，则返回当前合约内的所有转账记录<br/>
+        如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
+        如果同时存在，则返回地址在当前合约内的转账记录<br/>
+        如果合约地址和用户地址，则返回所有转账记录<br/>
       produces:
         - application/json
       parameters:
@@ -350,17 +353,13 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/TokenTransferListResult'
-  /token/exportTokenTransferList:
+  /token/arc20-tx/export:
     get:
-      operationId: exportTokenTransferList
+      operationId: arc20TxExport
       tags:
-        - 合约接口
-      summary: 导出合约内部交易列表
-      description: 实现逻辑：|
-         查询ES中索引数据<br/>
-         如果传入合约地址，则返回当前合约内的所有转账记录<br/>
-         如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
-         如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）<br/>
+        - Token令牌接口
+      summary: ARC20交易列表导出
+      description:
       produces:
         - application/json
       parameters:
@@ -397,12 +396,89 @@ paths:
       responses:
         '200':
           description: 返回二进制数据流
-  /token/tokenHolderList:
+  /token/arc721-tx/list:
+    post:
+      operationId: arc721TxList
+      tags:
+        - Token令牌接口
+      summary: ARC721交易列表
+      description: 实现逻辑：|
+        查询ES中索引数据<br/>
+        如果传入合约地址，则返回当前合约内的所有转账记录<br/>
+        如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
+        如果传入合约地址和tokenId，则返回当前合约内tokenId的所有转账记录<br/>
+        如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）<br/>
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/721TokenTransferListParam'
+      responses:
+        '200':
+          description: 返回合约列表
+          schema:
+            $ref: '#/definitions/721TokenTransferListResult'
+  /token/arc721-tx/export:
+    get:
+      operationId: arc721TxExport
+      tags:
+        - Token令牌接口
+      summary: ARC721交易列表导出
+      description: 实现逻辑：|
+        查询ES中索引数据<br/>
+        如果传入合约地址，则返回当前合约内的所有转账记录<br/>
+        如果传入用户地址，则返回该地址作为转账扣除这或者接收者的代币转账记录<br/>
+        如果同时存在，则返回地址在当前合约内的转账记录（暂无此场景）<br/>
+      produces:
+        - application/json
+      parameters:
+        - name: address
+          description: 钱包地址
+          in: query
+          type: string
+          required: false
+        - name: contract
+          description: 合约地址
+          in: query
+          type: string
+          required: false
+        - name: date
+          description: 数据结束日期
+          in: query
+          type: string
+          required: true
+        - name: local
+          description: 区域：en或者zh-cn
+          in: query
+          type: string
+          required: true
+        - name: timeZone
+          description: 时区
+          in: query
+          type: string
+          required: true
+        - name: token
+          description: 令牌
+          in: query
+          type: string
+          required: false
+        - name: tokenId
+          description: token id
+          in: query
+          type: string
+          required: false
+      responses:
+        '200':
+          description: 返回二进制数据流
+  /token/holder/list:
     post:
       operationId: tokenHolderList
       tags:
-        - 合约接口
-      summary: ERC20合约持有人信息列表
+        - Token令牌接口
+      summary: Token令牌持有人列表
       description: 实现逻辑：|
         - 查询数据库中数据
       produces:
@@ -418,12 +494,12 @@ paths:
           description: 返回合约列表
           schema:
             $ref: '#/definitions/TokenHolderListResult'
-  /token/exportTokenHolderList:
+  /token/holder/export:
     get:
-      operationId: exportTokenHolderList
+      operationId: tokenHolderExport
       tags:
-        - 合约接口
-      summary: 导出ERC20合约持有人信息列表
+        - Token令牌接口
+      summary: Token令牌持有人列表导出
       description: 实现逻辑：|
          查询ES中索引数据<br/>
          如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -455,12 +531,12 @@ paths:
       responses:
         '200':
           description: 返回二进制数据
-  /token/holderTokenList:
+  /token/holder-token/list:
     post:
       operationId: holderTokenList
       tags:
-        - 合约接口
-      summary: 持有人持有token信息列表
+        - Token令牌接口
+      summary: 持有者的Token令牌列表
       description: 实现逻辑：|
          查询数据库中数据<br/>
          如果传入合约地址，则返回当前合约内的所有持有人记录<br/>
@@ -478,12 +554,12 @@ paths:
           description: 返回持有人token列表
           schema:
             $ref: '#/definitions/HolderTokenListResult'
-  /token/exportHolderTokenList:
+  /token/holder-token/export:
     get:
-      operationId: exportHolderTokenList
+      operationId: holderTokenExport
       tags:
-        - 合约接口
-      summary: 导出持有人对应token列表
+        - Token令牌接口
+      summary: 持有者的Token令牌列表导出
       description: 实现逻辑：|
          查询ES中索引数据<br/>
          如果传入合约地址，则返回当前合约内的所有转账记录<br/>
@@ -512,9 +588,109 @@ paths:
           in: query
           type: string
           required: false
+        - name: type
+          description: 合约类型，取值erc20或erc721
+          in: query
+          type: string
+          required: false
       responses:
         '200':
           description: 返回二进制数据
+  /token/arc721-inventory/list:
+    post:
+      operationId: arc721InventoryList
+      tags:
+        - Token令牌接口
+      summary: ARC721 库存列表
+      description: 实现逻辑：|
+        查询mysql中数据<br/>
+        如果传入合约地址，则返回当前合约内的所有tokenId记录<br/>
+        如果传入合约地址和tokenId，则返回当前合约内tokenId的记录<br/>
+        如果传入用户地址，则返回当前合约内的所有tokenId记录<br/>
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/721TokenIdListParam'
+      responses:
+        '200':
+          description: 返回合约列表
+          schema:
+            $ref: '#/definitions/721TokenIdListResult'
+  /token/arc721-inventory/export:
+    get:
+      operationId: arc721InventoryExport
+      tags:
+        - Token令牌接口
+      summary: ARC721 库存列表导出
+      description: 实现逻辑：|
+        查询mysql中数据<br/>
+        如果传入合约地址，则返回当前合约内的所有tokenId记录<br/>
+        如果传入合约地址和tokenId，则返回当前合约内tokenId的记录<br/>
+        如果传入用户地址，则返回当前合约内的所有tokenId记录<br/>
+      produces:
+        - application/json
+      parameters:
+        - name: contract
+          description: 合约地址
+          in: query
+          type: string
+          required: true
+        - name: address
+          description: 合约地址
+          in: query
+          type: string
+          required: true
+        - name: tokenId
+          description: 合约地址
+          in: query
+          type: string
+          required: true
+        - name: local
+          description: 区域：en或者zh-cn
+          in: query
+          type: string
+          required: true
+        - name: timeZone
+          description: 时区
+          in: query
+          type: string
+          required: true
+        - name: token
+          description: 令牌
+          in: query
+          type: string
+          required: false
+      responses:
+        '200':
+          description: 返回二进制数据
+  /token/arc721-inventory/detail:
+    post:
+      operationId: arc721InventoryDetail
+      tags:
+        - Token令牌接口
+      summary: ARC721 库存详情
+      description: 实现逻辑：|
+        - 查询数据库中数据
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/721TokenIdDetailParam'
+      responses:
+        '200':
+          description: 返回合约列表
+          schema:
+          $ref: '#/definitions/721TokenIdDetailResult'
+
+
+  #治理参数配置
   /extra/queryConfig:
     post:
       operationId: queryConfig
@@ -995,7 +1171,7 @@ definitions:
     description: 地址详情对象
     properties:
       type:
-        description: 地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM 5:EVM-Token
+        description: 地址类型 1：账号 2：内置合约 3：EVM合约 4:WASM合约 5:EVM-Token 6:WASM-Token
         type: string
       balance:
         description: 余额(单位:LAT)
@@ -1027,7 +1203,16 @@ definitions:
       proposalQty:
         description: 治理交易总数
         type: integer
-      tokenQty:
+      hasErc20:
+        description: 是否是erc20
+        type: boolean
+      erc20TxQty:
+        description: erc20交易总数
+        type: integer
+      hasErc721:
+        description: 是否是erc721
+        type: boolean
+      erc721TxQty:
         description: erc20交易总数
         type: integer
       candidateCount:
@@ -1071,6 +1256,12 @@ definitions:
         type: integer
       destroyHash:
         description: 销毁hash
+        type: string
+      tokenSymbol:
+        description: 合约符号
+        type: string
+      tokenName:
+        description: 合约名称
         type: string
   AddressDetailResult:
     type: object
@@ -1331,6 +1522,9 @@ definitions:
     type: object
     description: 令牌详情
     properties:
+      type:
+        description: 合约类型 erc20 erc721
+        type: string
       address:
         description: 合约地址
         type: string
@@ -1394,6 +1588,12 @@ definitions:
     type: object
     description: 合约列表查询参数对象
     properties:
+      type:
+        description: 合约类型 erc20 erc721(必填)
+        type: string
+        enum:
+          - erc20
+          - erc721
       pageNo:
         description: 页数(必填)
         type: integer
@@ -1422,23 +1622,14 @@ definitions:
       icon:
         description: 合约图标（base64编码）
         type: string
-      creator:
-        description: 合约创建者地址
-        type: string
-      txHash:
-        description: 创建合约的交易哈希
-        type: string
       webSite:
         description: 合约对应官方站点
         type: string
-      blockTimestamp:
-        description: 合约创建时间（时间戳）
-        type: integer
+      details:
+        description: 合约描述
+        type: string
       holder:
         description: 持有人数
-        type: integer
-      createTime:
-        description: 合约入库时间（时间戳）
         type: integer
   TokenListResult:
     type: object
@@ -1448,6 +1639,15 @@ definitions:
         type: string
       code:
         description: 成功（0），失败则有相关失败码
+        type: integer
+      totalCount:
+        description: 总记录数
+        type: integer
+      totalPages:
+        description: 总记页数
+        type: integer
+      displayTotalCount:
+        description: 显示可展示记录数
         type: integer
       data:
         type: array
@@ -1474,24 +1674,39 @@ definitions:
   TokenTransferDetail:
     type: object
     properties:
+      txHash:
+        description: 交易hash
+        type: string
+      blockNumber:
+        description: 区块高度
+        type: integer
+      txFrom:
+        description: from地址
+        type: string
       contract:
         description: 合约地址（也是交易to地址）
         type: string
-      address:
-        description: 持有地址
+      transferTo:
+        description: token的接收地址
         type: string
-      balance:
-        description: 余额（精度转换后）
+      transferValue:
+        description: token Id
         type: string
-      decimal:
-        description: 合约精度
-        type: integer
       name:
         description: 合约名称
         type: string
       symbol:
         description: 合约符号
         type: string
+      decimal:
+        description: 合约精度
+        type: string
+      blockTimestamp:
+        description: 区块时间
+        type: integer
+      systemTimestamp:
+        description: 区块时间
+        type: integer
   TokenTransferListResult:
     type: object
     properties:
@@ -1526,8 +1741,8 @@ definitions:
   TokenHolderDetail:
     type: object
     properties:
-      contract:
-        description: 合约地址（也是交易to地址）
+      address:
+        description: 持有者地址
         type: string
       balance:
         description: 交易对应的balance值
@@ -1559,6 +1774,9 @@ definitions:
     properties:
       address:
         description: 合约地址（可选）
+        type: string
+      type:
+        description: 类型，取值：erc20或erc721（可选）
         type: string
       pageNo:
         description: 页数(必填)
@@ -1609,6 +1827,175 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/HolderTokenDetail'
+  721TokenTransferListParam:
+    type: object
+    properties:
+      contract:
+        description: 合约地址（可选）
+        type: string
+      address:
+        description: 用户地址（可选，检索时可能为：from或to）
+        type: string
+      tokenId:
+        description: tokenId（可选，检索为：tValue）
+        type: string
+      txHash:
+        description: 交易哈希（可选，如果存在则根据该哈希强检索）
+        type: string
+      pageNo:
+        description: 页数(必填)
+        type: integer
+      pageSize:
+        description: 页大小(必填)
+        type: integer
+  721TokenTransferListResult:
+    type: object
+    properties:
+      errMsg:
+        description: 描述信息
+        type: string
+      code:
+        description: 成功（0），失败则有相关失败码
+        type: integer
+      totalCount:
+        description: 总记录数
+        type: integer
+      totalPages:
+        description: 总记页数
+        type: integer
+      displayTotalCount:
+        description: 显示可展示记录数
+        type: integer
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/721TokenTransferDetail'
+  721TokenTransferDetail:
+    type: object
+    properties:
+      txHash:
+        description: 交易hash
+        type: string
+      blockNumber:
+        description: 区块高度
+        type: integer
+      txFrom:
+        description: from地址
+        type: string
+      contract:
+        description: 合约地址（也是交易to地址）
+        type: string
+      transferTo:
+        description: token的接收地址
+        type: string
+      tokenId:
+        description: token Id
+        type: string
+      name:
+        description: 合约名称
+        type: string
+      symbol:
+        description: 合约符号
+        type: string
+      blockTimestamp:
+        description: 区块时间
+        type: integer
+      systemTimestamp:
+        description: 区块时间
+        type: integer
+  721TokenIdListParam:
+    type: object
+    properties:
+      contract:
+        description: 合约地址（可选）
+        type: string
+      address:
+        description: 用户地址（可选）
+        type: string
+      tokenId:
+        description: tokenId（可选）
+        type: string
+      pageNo:
+        description: 页数(必填)
+        type: integer
+      pageSize:
+        description: 页大小(必填)
+        type: integer
+  721TokenIdDetail:
+    type: object
+    properties:
+      contract:
+        description: 合约地址
+        type: string
+      address:
+        description: 用户地址
+        type: string
+      tokenId:
+        description: tokenId
+        type: string
+      image:
+        description: token 图标url
+        type: string
+      txCount:
+        description: 合约内部转账交易数
+        type: integer
+
+
+  721TokenIdListResult:
+    type: object
+    properties:
+      errMsg:
+        description: 描述信息
+        type: string
+      code:
+        description: 成功（0），失败则有相关失败码
+        type: integer
+      totalCount:
+        description: 总记录数
+        type: integer
+      totalPages:
+        description: 总页数
+        type: integer
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/721TokenIdDetail'
+  721TokenIdDetailParam:
+    type: object
+    properties:
+      contract:
+        description: 合约地址
+        type: string
+      tokenId:
+        description: tokenId
+        type: string
+  721TokenIdDetailResult:
+    type: object
+    properties:
+      contract:
+        description: 合约地址
+        type: string
+      tokenId:
+        description: tokenId
+        type: string
+      name:
+        description: 合约名称
+        type: string
+      symbol:
+        description: 合约符号
+        type: string
+      creator:
+        description: 合约创建者地址
+        type: string
+      txHash:
+        description: 创建合约的交易哈希
+        type: string
+      webSite:
+        description: 合约对应官方站点
+        type: string
+      txCount:
+        description: 合约内部转账交易数
+        type: integer
   #配置相关
   ConfigDetail:
     type: object
@@ -2730,10 +3117,12 @@ definitions:
           - 0-转账
           - 1-合约发布(合约创建)
           - 2-合约调用(合约执行)
-          - 3-合约销毁(合约销毁)
+          - 4-其他
           - 5-MPC交易
           - 6-erc20合约创建
           - 7-erc20合约执行
+          - 8-erc721合约创建
+          - 9-erc721合约执行
           - 1000-发起质押 (创建验证人)
           - 1001-修改质押信息(修改验证人)
           - 1002-增持质押(增持自由质押)
@@ -2887,10 +3276,12 @@ definitions:
           - 0-转账
           - 1-合约发布(合约创建)
           - 2-合约调用(合约执行)
-          - 3-合约销毁(合约销毁)
+          - 4-其他
           - 5-MPC交易
           - 6-erc20合约创建
           - 7-erc20合约执行
+          - 8-erc721合约创建
+          - 9-erc721合约执行
           - 1000-发起质押 (创建验证人)
           - 1001-修改质押信息(修改验证人)
           - 1002-增持质押(增持自由质押)
@@ -2928,15 +3319,23 @@ definitions:
         description: 下一交易HASH
         type: string
       toType:
-        description: 此字段表示的是to字段存储的账户类型, 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
+        description: 此字段表示的是to字段存储的账户类型, 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情.
         type: string
         enum:
-          - 1-合约地址
-          - 2-钱包地址
-          - 3-erc合约地址
+          - 1-账号
+          - 2-内置合约
+          - 3-EVM合约
+          - 4-WASM合约
+          - 5-EVM-Token
+          - 6-WASM-Token
       contractType:
-        description: 合约类型  0-系统合约，1-evm合约 2-wasm合约 3-evm-token
+        description: 合约类型
         type: integer
+        enum:
+          - 3-EVM合约
+          - 4-WASM合约
+          - 5-EVM-Token
+          - 6-WASM-Token
       contractName:
         description: 合约名称
         type: string
@@ -3046,6 +3445,11 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Erc20Params'
+      erc721Params:
+        description: ERC20参数
+        type: array
+        items:
+          $ref: '#/definitions/Erc721Params'
       rewards:
         description: 领取奖励
         type: array
@@ -3093,6 +3497,30 @@ definitions:
         type: string
       innerSymbol:
         description: 内部交易对应符号
+        type: string
+  Erc721Params:
+    type: object
+    properties:
+      innerTxFrom:
+        description: 内部交易from
+        type: string
+      innerTxTo:
+        description: 内部交易to
+        type: string
+      innerValue:
+        description: 内部交易金额
+        type: string
+      innerContractAddr:
+        description: 内部交易对应地址
+        type: string
+      innerContractName:
+        description: 内部交易对应名称
+        type: string
+      innerSymbol:
+        description: 内部交易对应符号
+        type: string
+      innerImage:
+        description: 内部交易对应的图片
         type: string
   Reward:
     type: object

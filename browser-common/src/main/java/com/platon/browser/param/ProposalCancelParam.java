@@ -1,10 +1,9 @@
 package com.platon.browser.param;
 
-import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.HexUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
@@ -25,7 +24,7 @@ public class ProposalCancelParam extends TxParam {
      */
     private String verifier;
     public void setVerifier(String verifier){
-        this.verifier= HexTool.prefix(verifier);
+        this.verifier= HexUtil.prefix(verifier);
     }
 
     /**

@@ -2,8 +2,8 @@ package com.platon.browser.config;
 
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.util.HttpUtil;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.utils.HttpUtil;
+import com.platon.browser.utils.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

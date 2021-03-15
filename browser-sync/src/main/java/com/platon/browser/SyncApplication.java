@@ -1,9 +1,7 @@
 package com.platon.browser;
 
 import com.platon.browser.service.BlockSyncService;
-import com.platon.browser.service.Erc20TransactionSyncService;
 import com.platon.browser.service.TransactionSyncService;
-import com.platon.browser.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -24,8 +22,7 @@ public class SyncApplication implements ApplicationRunner {
     private BlockSyncService blockSyncService;
     @Autowired
     private TransactionSyncService transactionSyncService;
-    @Autowired
-    private Erc20TransactionSyncService erc20TransactionSyncService;
+
     public static void main ( String[] args ) {
         SpringApplication.run(SyncApplication.class, args);
     }
@@ -33,12 +30,11 @@ public class SyncApplication implements ApplicationRunner {
     public void run ( ApplicationArguments args ) {
 //        EXECUTOR_SERVICE.submit(()->blockSyncService.sync());
 //        EXECUTOR_SERVICE.submit(()->transactionSyncService.sync());
-        EXECUTOR_SERVICE.submit(()-> erc20TransactionSyncService.sync());
-
-        while (!Erc20TransactionSyncService.isDone()){
-            SleepUtil.sleep(1L);
-        }
-        log.info("数据同步完成!");
-        System.exit(0);
+//
+//        while (!Erc20TransactionSyncService.isDone()){
+//            SleepUtil.sleep(1L);
+//        }
+//        log.info("数据同步完成!");
+//        System.exit(0);
     }
 }

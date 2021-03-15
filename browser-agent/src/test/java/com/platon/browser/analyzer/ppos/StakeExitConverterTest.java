@@ -11,7 +11,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +44,7 @@ public class StakeExitConverterTest extends AgentTestBase {
     @Mock
     private BlockChainConfig chainConfig;
     @Mock
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
     @InjectMocks
     @Spy
     private StakeExitAnalyzer target;
@@ -61,8 +61,8 @@ public class StakeExitConverterTest extends AgentTestBase {
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(400));
         when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(BigInteger.valueOf(400));
-        when(stakeMiscService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
-        when(stakeMiscService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeEndBlock(anyString(),any(BigInteger.class),anyBoolean())).thenReturn(BigInteger.TEN);
+        when(stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
     }
 
 

@@ -2,6 +2,7 @@ package com.platon.browser.cache;
 
 import java.math.BigDecimal;
 
+import cn.hutool.core.math.MathUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import lombok.Data;
 @Component
 @Data
 public class NetworkStatCache {
+
     private NetworkStat networkStat = new NetworkStat();
 
     @Autowired
@@ -25,7 +27,7 @@ public class NetworkStatCache {
 
     /**
      * 基于区块维度更新网络统计信息
-     * 
+     *
      * @param block
      * @param proposalQty
      */
@@ -34,7 +36,16 @@ public class NetworkStatCache {
         int tps = this.tpsCalcCache.getTps();
         int maxTps = this.tpsCalcCache.getMaxTps();
         this.networkStat.setTxQty(block.getTransactions().size() + this.networkStat.getTxQty());
-        this.networkStat.setTokenQty(block.getTokenQty() + this.networkStat.getTokenQty());
+        Integer erc20TxQty = 0;
+        if (this.networkStat.getErc20TxQty() != null) {
+            erc20TxQty = this.networkStat.getErc20TxQty();
+        }
+        Integer erc721TxQty = 0;
+        if (this.networkStat.getErc721TxQty() != null) {
+            erc20TxQty = this.networkStat.getErc721TxQty();
+        }
+        this.networkStat.setErc20TxQty(block.getErc20TxQty() + erc20TxQty);
+        this.networkStat.setErc721TxQty(block.getErc721TxQty() + erc721TxQty);
         this.networkStat.setProposalQty(proposalQty + this.networkStat.getProposalQty());
         this.networkStat.setCurTps(tps);
         this.networkStat.setCurBlockHash(block.getHash());
@@ -45,7 +56,7 @@ public class NetworkStatCache {
 
     /**
      * 获得操作日志需要
-     * 
+     *
      * @return
      */
     public long getAndIncrementNodeOptSeq() {
@@ -56,7 +67,7 @@ public class NetworkStatCache {
 
     /**
      * 基于任务更新网络统计信息
-     * 
+     *
      * @param issueValue
      * @param turnValue
      * @param totalValue
@@ -65,8 +76,8 @@ public class NetworkStatCache {
      * @param doingProposalQty
      */
     public void updateByTask(BigDecimal issueValue, BigDecimal turnValue, BigDecimal availableStaking,
-        BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty,
-        BigDecimal stakingReward) {
+                             BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty,
+                             BigDecimal stakingReward) {
         this.networkStat.setIssueValue(issueValue);
         this.networkStat.setTurnValue(turnValue);
         this.networkStat.setAvailableStaking(availableStaking);
@@ -100,4 +111,5 @@ public class NetworkStatCache {
     public void init(NetworkStat networkStat) {
         this.networkStat = networkStat;
     }
+
 }

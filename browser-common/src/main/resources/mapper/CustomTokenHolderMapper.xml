@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomTokenHolderMapper">
+    <select id="selectListByParams" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        select
+        th.token_address as tokenAddress,
+        th.address,
+        t.type,
+        t.symbol,
+        t.name,
+        t.total_supply as totalSupply,
+        th.balance,
+        t.decimal,
+        th.token_tx_qty as txCount
+        from token_holder th left join token t on th.token_address = t.address
+        where th.balance != 0
+        <if test="tokenAddress != null">
+            and th.token_address = #{tokenAddress}
+        </if>
+        <if test="address != null">
+            and th.address = #{address}
+        </if>
+        <if test="type != null">
+            AND t.type = #{type}
+        </if>
+        order by balance desc
+    </select>
+    <insert id="batchInsertOrUpdateSelective" parameterType="map">
+        replace into token_holder (
+        <foreach collection="selective" item="column" separator=",">
+            ${column.escapedColumnName}
+        </foreach>
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            <foreach collection="selective" item="column" separator=",">
+                <if test="'token_address'.toString() == column.value">
+                    #{item.tokenAddress,jdbcType=VARCHAR}
+                </if>
+                <if test="'address'.toString() == column.value">
+                    #{item.address,jdbcType=VARCHAR}
+                </if>
+                <if test="'balance'.toString() == column.value">
+                    #{item.balance,jdbcType=DECIMAL}
+                </if>
+                <if test="'create_time'.toString() == column.value">
+                    #{item.createTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'update_time'.toString() == column.value">
+                    #{item.updateTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'token_tx_qty'.toString() == column.value">
+                    #{item.tokenTxQty,jdbcType=INTEGER}
+                </if>
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate">
+        <foreach collection="list" item="item" separator=";">
+        update token_holder set balance=#{item.balance},update_time=#{item.updateTime} where token_address=#{item.tokenAddress} and address=#{item.address}
+        </foreach>
+    </update>
+
+</mapper>

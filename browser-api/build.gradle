@@ -2,11 +2,16 @@ plugins {
 	id 'org.springframework.boot' version "$springbootVersion"
 }
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'distribution' //打包tar包用到的插件
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+}
+
+bootJar {
+	// 排除指定文件
+	exclude("public")
+	exclude("application-*.yml")
 }
 
 dependencies {
@@ -16,124 +21,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	compile 'io.projectreactor.netty:reactor-netty:0.8.10.RELEASE'
 }
-
-//判断 build命令是否指定属性 profile。
-//例如 gradle buildTar -xtest -Pprofile=online
-
-ext {
-    if (project.hasProperty('profile')) {
-        profile = project['profile']
-    } else {
-        profile = "all"
-    }
-    println "profile:" + profile
-}
-
-// task 用来新建一些目录，目录位于build/package下
-task createDirs() {
-	file('build/lib').mkdirs()
-    file('build/package/browser-api').mkdirs()
-    file('build/package/lib').mkdirs()
-}
-//task 用来复制build出来的主jar包
-task copyLibs(type: Copy) {
-    from('build/libs')
-    into('build/package/browser-api')
-}
-//task 用来复制配置文件
-task copyConf(type: Copy) {
-	if(profile != 'all') {
-	    println 'copy conf from src/main/resources/application-'+profile+'.yml'
-	    from('src/main/resources/application-'+profile+'.yml')
-	    into('build/package/browser-api')
-    } else {
-    	println 'copy conf from src/main/resources all'
-	    from('src/main/resources/application-hrplat100v10000.yml')
-	    into('build/package/browser-api')
-	    from('src/main/resources/application-prod.yml.j2')
-	    into('build/package/browser-api')
-	    from('jasypt.properties')
-	    into('build/package/browser-api')
-    }
-}
-//task 用来复制bin下的脚本。这里的fileMode并没有生效，原因不详
-task copyBin(type: Copy) {
-    from('src/main/resources/bin')
-    into('build/package/browser-api')
-    fileMode 0744
-}
-// task 用来复制启动所依赖的jar包
-task copyDep(type: Copy) {
-    from configurations.runtime
-    into 'build/lib'
-}
-// task 用来复制指定加密包
-task copyJasypt(type: Copy) {
-    from 'build/lib/jasypt-1.9.2.jar'
-    into 'build/package/lib'
-}
-// task 用来删除lib
-task deleteLib(type: Delete) {
-    delete 'build/lib'
-}
-
-// 拷贝接口文档至类路径
-task copyDocsToClasspath(type: Copy) {
-    file('build/resources/main/public').mkdirs()
-    from "${project.parent.projectDir}/docs"
-    into 'build/resources/main/public'
-}
-task copyDocsToDistribute(type: Copy) {
-    file('build/package/browser-api/public').mkdirs()
-    from "${project.parent.projectDir}/docs"
-    into 'build/package/browser-api/public'
-}
-
-// 拷贝网站配置文件至类路径
-task copyWebsiteConfToClasspath(type: Copy){
-    file('build/resources/main/public').mkdirs()
-    from "webconfig"
-    into 'build/resources/main/public'
-}
-task copyWebsiteConfToDistribute(type: Copy){
-    file('build/package/browser-api/public').mkdirs()
-    from "webconfig"
-    into 'build/package/browser-api/public'
-}
-
-//把上述的task串联起来
-task prepareFile(dependsOn: [
-        'createDirs',
-        'copyLibs',
-        'copyConf',
-        'copyBin',
-        'copyDep',
-        'copyJasypt',
-        'deleteLib',
-        'copyWebsiteConfToDistribute',
-        'copyDocsToDistribute'
-]){}
-//指定打包的tar包的名字，以及文件来源目录
-distributions {
-    monitor {
-        baseName = 'browser-api'
-        contents {
-            from { 'build/package' }
-        }
-    }
-
-}
-
-//distribution 插件的特性，以DistTar结尾
-monitorDistTar.dependsOn  'prepareFile'
-monitorDistTar.compression = Compression.GZIP
-monitorDistTar.extension = 'tar.gz'
-
-//定义一个task，先build 然后再打包tar包
-task buildTar(dependsOn: [
-        'build',
-        monitorDistTar
-]){}
 
 //sonar扫描的路径
 sonarqube {

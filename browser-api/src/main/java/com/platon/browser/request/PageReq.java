@@ -57,7 +57,11 @@ public class PageReq {
 	}
 
 	public void setPageSize(Integer pageSize) {
-		this.pageSize = pageSize;
+    	if(pageSize>1000){
+			this.pageSize = 1000;
+		} else {
+			this.pageSize = pageSize;
+		}
 	}
 
 	public Page getPager() {

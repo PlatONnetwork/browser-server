@@ -4,13 +4,12 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.platon.browser.handler.CollectionEventHandler;
-import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.handler.CollectionEventHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,11 +28,9 @@ public class CollectionEventPublisher extends AbstractPublisher<CollectionEvent>
         event.setTransactions(transactions);
         event.setEpochMessage(epochMessage);
     };
-    @Value("${disruptor.queue.collection.buffer-size}")
-    private int ringBufferSize;
     @Override
     public int getRingBufferSize() {
-        return ringBufferSize;
+        return config.getCollectionBufferSize();
     }
     private EventFactory<CollectionEvent> eventFactory = CollectionEvent::new;
     @Resource
@@ -41,7 +38,7 @@ public class CollectionEventPublisher extends AbstractPublisher<CollectionEvent>
 
     @PostConstruct
     private void init(){
-        Disruptor<CollectionEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
+        Disruptor<CollectionEvent> disruptor = new Disruptor<>(eventFactory, getRingBufferSize(), DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(collectionEventHandler);
         disruptor.start();
         ringBuffer = disruptor.getRingBuffer();

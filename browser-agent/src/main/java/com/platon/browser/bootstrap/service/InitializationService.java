@@ -2,29 +2,25 @@ package com.platon.browser.bootstrap.service;
 
 import com.platon.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.*;
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.bean.CollectionNetworkStat;
-import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
-import com.platon.browser.bean.AnnualizedRateInfo;
-import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.bean.CustomNode;
-import com.platon.browser.bean.CustomProposal;
-import com.platon.browser.bean.CustomStaking;
-import com.platon.browser.elasticsearch.*;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.publisher.GasEstimateEventPublisher;
+import com.platon.browser.service.elasticsearch.*;
 import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
+import com.platon.browser.v0152.analyzer.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -65,40 +61,42 @@ public class InitializationService {
     @Resource
     private ParameterService parameterService;
     @Resource
-    private ProposalMapper proposalMapper;
-    @Resource
     private ProposalCache proposalCache;
     @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
     @Resource
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Resource
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
     @Resource
-    private BlockESRepository blockESRepository;
+    private EsBlockRepository ESBlockRepository;
     @Resource
-    private TransactionESRepository transactionESRepository;
+    private EsTransactionRepository ESTransactionRepository;
     @Resource
-    private DelegationRewardESRepository delegationRewardESRepository;
+    private EsDelegationRewardRepository ESDelegationRewardRepository;
     @Resource
-    private TokenTransferRecordESRepository transferRecordESRepository;
+    private EsNodeOptRepository ESNodeOptRepository;
     @Resource
-    private NodeOptESRepository nodeOptESRepository;
+    private EsErc20TxRepository esErc20TxRepository;
+    @Resource
+    private EsErc721TxRepository esErc721TxRepository;
+    @Resource
+    private EsTransferTxRepository esTransferTxRepository;
+    @Resource
+    private ErcCache ercCache;
 
     @Transactional
     public InitializationResult init() throws BlockNumberException {
-        // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
-//        ProposalExample proposalExample = new ProposalExample();
-//        proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
-        List<Proposal> proposalList = this.proposalMapper.selectByExample(null);
-        this.proposalCache.init(proposalList);
+
+        proposalCache.init();
+        ercCache.init();
 
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
-        NetworkStat networkStat = this.networkStatMapper.selectByPrimaryKey(1);
+        NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if (networkStat == null) {
             // 确保chainConfig先就绪
             try {
-                this.parameterService.initConfigTable();
+                parameterService.initConfigTable();
             } catch (Exception e) {
                 log.error("", e);
                 throw new BusinessException("初始化错误:" + e.getMessage());
@@ -109,70 +107,71 @@ public class InitializationService {
             networkStat.setId(1);
             networkStat.setCurNumber(-1L);
             networkStat.setAvgPackTime(0L);
-            networkStat.setIssueRates(this.chainConfig.getAddIssueRate().toPlainString());
-            this.networkStatMapper.insert(networkStat);
+            networkStat.setIssueRates(chainConfig.getAddIssueRate().toPlainString());
+            networkStat.setErc20TxQty(0);
+            networkStat.setErc721TxQty(0);
+            networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(-1L);
             // 删除节点表和质押表、地址表数据
-            this.nodeMapper.deleteByExample(null);
-            this.stakingMapper.deleteByExample(null);
-            this.addressMapper.deleteByExample(null);
+            nodeMapper.deleteByExample(null);
+            stakingMapper.deleteByExample(null);
+            addressMapper.deleteByExample(null);
             // 初始化内置节点
-            List<com.platon.browser.dao.entity.Node> nodeList = this.initInnerStake();
+            List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
-            this.nodeCache.init(nodeList);
+            nodeCache.init(nodeList);
             // 初始化网络缓存
-            this.networkStatCache.init(networkStat);
+            networkStatCache.init(networkStat);
             // 初始化内置地址
-            this.addressCache.initOnFirstStart();
+            addressCache.initOnFirstStart();
 
-            this.initEs();
+            initEs();
 
             return initialResult;
         }
 
         // 确保chainConfig先就绪
-        this.parameterService.overrideBlockChainConfig();
+        parameterService.overrideBlockChainConfig();
 
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
 
         // 初始化节点缓存
-        List<com.platon.browser.dao.entity.Node> nodeList = this.nodeMapper.selectByExample(null);
-        this.nodeCache.init(nodeList);
+        List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
+        nodeCache.init(nodeList);
 
         // 初始化EVM合约地址缓存，用于后续交易的类型判断（调用EVM合约）
         AddressExample addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.EVM_CONTRACT.getCode());
-        List<Address> addressList = this.addressMapper.selectByExample(addressExample);
-        this.addressCache.initEvmContractAddressCache(addressList);
+        List<Address> addressList = addressMapper.selectByExample(addressExample);
+        addressCache.initEvmContractAddressCache(addressList);
 
         // 初始化EVM合约地址缓存，用于后续交易的类型判断（调用EVM合约）
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
-        addressList = this.addressMapper.selectByExample(addressExample);
-        this.addressCache.initEvmErc20ContractAddressCache(addressList);
+        addressList = addressMapper.selectByExample(addressExample);
 
         // 初始化WASM合约地址缓存，用于后续交易的类型判断（调用WASM合约）
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.WASM_CONTRACT.getCode());
-        addressList = this.addressMapper.selectByExample(addressExample);
-        this.addressCache.initWasmContractAddressCache(addressList);
+        addressList = addressMapper.selectByExample(addressExample);
+        addressCache.initWasmContractAddressCache(addressList);
 
         // 初始化网络缓存
-        this.networkStatCache.init(networkStat);
+        networkStatCache.init(networkStat);
 
         // 确保epochRetryService中的各种属性处于当前块状态：当前共识和结算周期验证人、前一共识和结算周期验证人等
-        this.epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
-        this.epochRetryService.settlementChange(BigInteger.valueOf(networkStat.getCurNumber()));
-        this.epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
+        epochRetryService.issueChange(BigInteger.valueOf(networkStat.getCurNumber()));
+        epochRetryService.settlementChange(BigInteger.valueOf(networkStat.getCurNumber()));
+        epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
 
         // 检查gas price估算数据表
         GasEstimateLogExample condition = new GasEstimateLogExample();
         condition.setOrderByClause("seq asc");
-        List<GasEstimateLog> gasEstimateLogs = this.gasEstimateLogMapper.selectByExample(condition);
+        List<GasEstimateLog> gasEstimateLogs = gasEstimateLogMapper.selectByExample(condition);
         gasEstimateLogs.forEach(e -> {
             List<GasEstimate> estimates = JSON.parseArray(e.getJson(), GasEstimate.class);
             if (estimates != null && !estimates.isEmpty()) {
-                this.gasEstimateEventPublisher.publish(e.getSeq(), estimates);
+                gasEstimateEventPublisher.publish(e.getSeq(), estimates);
             }
         });
 
@@ -185,23 +184,23 @@ public class InitializationService {
      * @throws Exception
      */
     private List<com.platon.browser.dao.entity.Node> initInnerStake() throws BlockNumberException {
-        this.epochRetryService.issueChange(BigInteger.ZERO);
-        this.epochRetryService.settlementChange(BigInteger.ZERO);
-        this.epochRetryService.consensusChange(BigInteger.ZERO);
+        epochRetryService.issueChange(BigInteger.ZERO);
+        epochRetryService.settlementChange(BigInteger.ZERO);
+        epochRetryService.consensusChange(BigInteger.ZERO);
 
         List<CustomNode> nodes = new ArrayList<>();
         List<CustomStaking> stakingList = new ArrayList<>();
 
-        List<Node> validators = this.epochRetryService.getPreValidators();
+        List<Node> validators = epochRetryService.getPreValidators();
         Set<String> validatorSet = new HashSet<>();
         validators.forEach(v -> validatorSet.add(v.getNodeId()));
 
         // 配置中的默认内置节点信息
         Map<String, CustomStaking> defaultStakingMap = new HashMap<>();
-        this.chainConfig.getDefaultStakingList()
+        chainConfig.getDefaultStakingList()
             .forEach(staking -> defaultStakingMap.put(staking.getNodeId(), staking));
 
-        List<Node> nodeList = this.epochRetryService.getPreVerifiers();
+        List<Node> nodeList = epochRetryService.getPreVerifiers();
         for (int index = 0; index < nodeList.size(); index++) {
             Node v = nodeList.get(index);
             CustomStaking staking = new CustomStaking();
@@ -210,7 +209,7 @@ public class InitializationService {
             staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
             staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
-            staking.setStakingLocked(this.chainConfig.getDefaultStakingLockedAmount());
+            staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
             if (validatorSet.contains(v.getNodeId()))
                 staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
@@ -238,7 +237,7 @@ public class InitializationService {
             ari.setDelegateCost(delegateCosts);
 
             staking.setAnnualizedRateInfo(ari.toJSONString());
-            staking.setPredictStakingReward(this.epochRetryService.getStakeReward());
+            staking.setPredictStakingReward(epochRetryService.getStakeReward());
 
             staking.setRewardPer(0);
             staking.setNextRewardPer(0); // 下一结算周期委托奖励比例
@@ -250,11 +249,11 @@ public class InitializationService {
             staking.setExceptionStatus(1);
 
             BigInteger curSettleEpochRound =
-                EpochUtil.getEpoch(BigInteger.ONE, this.chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
+                EpochUtil.getEpoch(BigInteger.ONE, chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
             // 更新解质押到账需要经过的结算周期数
-            BigInteger unStakeFreezeDuration = this.stakeMiscService.getUnStakeFreeDuration();
+            BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
             // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-            BigInteger unStakeEndBlock = this.stakeMiscService.getUnStakeEndBlock("", curSettleEpochRound, false);
+            BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock("", curSettleEpochRound, false);
             staking.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
             staking.setUnStakeEndBlock(unStakeEndBlock.longValue());
             staking.setLowRateSlashCount(0);
@@ -267,7 +266,7 @@ public class InitializationService {
             node.setTotalValue(staking.getStakingLocked());
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
             node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
-            node.setStatExpectBlockQty(this.epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
+            node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
             node.setPreTotalDeleReward(BigDecimal.ZERO);
 
             nodes.add(node);
@@ -277,19 +276,21 @@ public class InitializationService {
         // 入库
         List<com.platon.browser.dao.entity.Node> returnData = new ArrayList<>(nodes);
         if (!nodes.isEmpty())
-            this.nodeMapper.batchInsert(returnData);
+            nodeMapper.batchInsert(returnData);
         if (!stakingList.isEmpty())
-            this.stakingMapper.batchInsert(new ArrayList<>(stakingList));
+            stakingMapper.batchInsert(new ArrayList<>(stakingList));
         return returnData;
     }
 
     private void initEs() {
     	try {
-    		blockESRepository.initIndex();
-        	transactionESRepository.initIndex();
-        	delegationRewardESRepository.initIndex();
-        	transferRecordESRepository.initIndex();
-        	nodeOptESRepository.initIndex();
+    		ESBlockRepository.initIndex();
+        	ESTransactionRepository.initIndex();
+        	ESDelegationRewardRepository.initIndex();
+        	ESNodeOptRepository.initIndex();
+        	esTransferTxRepository.initIndex();
+        	esErc20TxRepository.initIndex();
+        	esErc721TxRepository.initIndex();
 		} catch (Exception e) {
 			log.error("init es error",e);
 		}

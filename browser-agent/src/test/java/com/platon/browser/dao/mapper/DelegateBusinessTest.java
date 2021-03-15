@@ -72,8 +72,8 @@
 //        key1.setNodeId("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
 //        key1.setDelegateAddr("0x3b3476d30925f07518d8ef5d939747d10de25bca");
 //        key1.setStakingBlockNum(2159L);
-//        Delegation delegation = delegationMapper.selectByPrimaryKey(key1);
-//        String delegationStr = JSON.toJSONString(delegation,true);
+//        Delegation delegate.estpl.yml = delegationMapper.selectByPrimaryKey(key1);
+//        String delegationStr = JSON.toJSONString(delegate.estpl.yml,true);
 //        System.out.println(delegationStr);
 //
 //        List<Config> configList = configMapper.selectByExample(null);

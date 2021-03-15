@@ -11,7 +11,7 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ReportParam;
-import com.platon.browser.service.misc.StakeMiscService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +39,7 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
     @Resource
     private ReportMultiSignParamCache reportMultiSignParamCache;
     @Resource
-    private StakeMiscService stakeMiscService;
+    private StakeEpochService stakeEpochService;
 
     @Override
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
@@ -72,11 +72,11 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         slashBusinessMapper.setException(txParam.getVerify(),txParam.getStakingBlockNum().longValue());
 
         // 更新解质押到账需要经过的结算周期数
-        BigInteger  unStakeFreezeDuration = stakeMiscService.getUnStakeFreeDuration();
+        BigInteger  unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
         
         Long blockNum= event.getBlock().getNum() - (event.getBlock().getNum()% chainConfig.getConsensusPeriodBlockCount().longValue())+chainConfig.getConsensusPeriodBlockCount().longValue();
         // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-        BigInteger unStakeEndBlock = stakeMiscService.getUnStakeEndBlock(txParam.getVerify(),event.getEpochMessage().getSettleEpochRound(),true);
+        BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getVerify(),event.getEpochMessage().getSettleEpochRound(),true);
         Report businessParam= Report.builder()
         		.slashData(txParam.getData())
                 .nodeId(txParam.getVerify())

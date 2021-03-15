@@ -1,5 +1,6 @@
 package com.platon.browser.config;
 
+import com.platon.browser.constant.Browser;
 import com.platon.browser.request.PageReq;
 import org.apache.commons.lang3.StringUtils;
 /**
@@ -29,15 +30,15 @@ public class MessageDto extends PageReq{
 		if(this.getPageNo() != null) {
 			sb.append(this.getPageNo());
 		}
-		sb.append(BrowserConst.PEAD_SPILT);
+		sb.append(Browser.PEAD_SPILT);
 		if(this.getPageSize() != null) {
 			sb.append(this.getPageSize());
 		}
-		sb.append(BrowserConst.PEAD_SPILT);
+		sb.append(Browser.PEAD_SPILT);
 		if(StringUtils.isNotBlank(this.getKey())) {
 			sb.append(this.getKey());
 		}
-		sb.append(BrowserConst.PEAD_SPILT);
+		sb.append(Browser.PEAD_SPILT);
 		if(StringUtils.isNotBlank(this.getQueryStatus())) {
 			sb.append(this.getQueryStatus());
 		}
@@ -51,7 +52,7 @@ public class MessageDto extends PageReq{
 	 * @return
 	 */
 	public MessageDto analysisKey (String data) {
-		String[] message = data.split(BrowserConst.OPT_SPILT);
+		String[] message = data.split(Browser.OPT_SPILT);
 		/**
 		 * 当key长度大于2才认为合法请求
 		 */
@@ -74,7 +75,7 @@ public class MessageDto extends PageReq{
 		/**
 		 * 根据分隔符设置参数值
 		 */
-		String[] message = data.split(BrowserConst.HTTP_SPILT);
+		String[] message = data.split(Browser.HTTP_SPILT);
 		if(message.length > 0) {
 			this.setUserNo(message[0]);
 		}
