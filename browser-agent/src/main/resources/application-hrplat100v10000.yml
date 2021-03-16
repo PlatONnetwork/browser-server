@@ -111,10 +111,6 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 100
-  #Redis命名空间
-  redis-namespace: browser:${profile}
-  #Es索引命名空间
-  es-namespace: browser_${profile}
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
