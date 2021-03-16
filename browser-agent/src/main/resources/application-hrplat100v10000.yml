@@ -125,7 +125,7 @@ v0150:
   #调账提案ID
   adjustmentPipId: 14
   #调账日志输出文件
-  adjustLogFilePath: ./logs/staking-delegate-adjust.log
+  adjustLogFilePath: ./adjust.log
 
 task:
   #地址统计任务批次大小
