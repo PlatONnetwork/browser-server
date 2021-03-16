@@ -262,6 +262,7 @@ public class ErcTokenUpdateTask {
             ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
             esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("seq").gt(txSeq));
             constructor.must(esQueryBuilders);
+            constructor.setUnmappedType("long");
             queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class,
                     1, 5000);
             List<ErcTx> list = queryResultFromES.getRsData();
