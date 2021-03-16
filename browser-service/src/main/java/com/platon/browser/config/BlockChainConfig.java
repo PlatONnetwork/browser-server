@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -28,45 +29,52 @@ import java.util.*;
 
 /**
  * 链参数统一配置项
+ *
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
  * @Description:
  */
 
 @Slf4j
+@DependsOn("networkParams")
 @Data
 @Configuration
-@ConfigurationProperties(prefix="platon")
+@ConfigurationProperties(prefix = "platon")
 public class BlockChainConfig {
-    private static Set<String> INNER_CONTRACT_ADDR ;
+
+    private static Set<String> INNER_CONTRACT_ADDR;
+
     @Resource
     private ConfigMapper configMapper;
+
     @Resource
     private PlatOnClient client;
 
     static {
         File saltFile = FileUtils.getFile(System.getProperty("user.dir"), "jasypt.properties");
         Properties properties = new Properties();
-        try(InputStream in = new FileInputStream(saltFile)) {
+        try (InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
-            String salt=properties.getProperty("jasypt.encryptor.password");
-            if(StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
-            salt=salt.trim();
-            System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
-            log.info("salt:{}",salt);
+            String salt = properties.getProperty("jasypt.encryptor.password");
+            if (StringUtils.isBlank(salt))
+                throw new ConfigLoadingException("加密盐不能为空!");
+            salt = salt.trim();
+            System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
+            log.info("salt:{}", salt);
         } catch (IOException | ConfigLoadingException e) {
-            log.error("加载解密文件出错",e);
+            log.error("加载解密文件出错", e);
             System.exit(1);
         }
     }
 
-    public Set<String> getInnerContractAddr(){
+    public Set<String> getInnerContractAddr() {
         return Collections.unmodifiableSet(INNER_CONTRACT_ADDR);
     }
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
     @Value("${platon.chainId}")
     private long chainId;
+
     //【通用】默认每个区块的最大Gas
     @Value("${platon.maxBlockGasLimit}")
     private BigDecimal maxBlockGasLimit;
@@ -362,8 +370,8 @@ public class BlockChainConfig {
     @PostConstruct
     public void init() throws ConfigLoadingException {
 
-    	BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
-        defaultStakingLockedAmount= Convert.toVon(defaultStakingLockedAmount, Convert.Unit.KPVON);
+        BlockChainConfig.INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
+        defaultStakingLockedAmount = Convert.toVon(defaultStakingLockedAmount, Convert.Unit.KPVON);
         // 使用经济模型参数接口返回的数据更新配置
         updateWithEconomicConfig(client.getEconomicConfig());
         // 刷新合约
@@ -406,24 +414,24 @@ public class BlockChainConfig {
         //【质押】节点质押退回锁定的结算周期数
         setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
         //【惩罚】双签奖励百分比
-        setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
+        setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //【惩罚】双签处罚万分比
-        setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【惩罚】举报证据有效周期数
         setEvidenceValidEpoch(new BigDecimal(dec.getSlashing().getMaxEvidenceAge()));
         //【惩罚】扣除区块奖励的个数
         setSlashBlockRewardCount(new BigDecimal(dec.getSlashing().getSlashBlocksReward()));
 
         //【治理】文本提案参与率: >
-        setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】文本提案支持率：>=
-        setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】取消提案参与率: >
-        setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】取消提案支持率：>=
-        setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】升级提案通过率
-        setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】文本提案投票周期
         setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
                 .divide(
@@ -431,18 +439,18 @@ public class BlockChainConfig {
                                 BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
                                         .multiply(dec.getCommon().getPerRoundBlocks())
                                         .multiply(consensusValidatorCount)) //每个共识轮验证节点数量
-                        ,0,RoundingMode.FLOOR
+                        , 0, RoundingMode.FLOOR
                 ));
 
         //【治理】参数提案的投票持续最长的时间（单位：s）
         setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
         //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
-        setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
-        setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
 
         //【奖励】激励池分配给出块激励的比例
-        setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
+        setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         setStakeRewardRate(BigDecimal.ONE.subtract(blockRewardRate));
         //【奖励】Platon基金会年限
@@ -461,4 +469,5 @@ public class BlockChainConfig {
         // 此值在alaya版本浏览器需要在ParameterService.initConfigTable()中进行设置
         //setRestrictingMinimumRelease(new BigDecimal(dec.getRestricting().getMinimumRelease()));
     }
+
 }

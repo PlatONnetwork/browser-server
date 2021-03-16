@@ -1,6 +1,7 @@
 {
   "context":"/browser-server",
   "siteName":"AlayaScan",
+  "headerChainName":"Alaya",
   "chainName":"Alaya",
   "copyRight":"Alaya",
   "logo":"/images/logo.svg",
