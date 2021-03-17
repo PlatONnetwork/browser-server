@@ -60,7 +60,7 @@ public class Arc721InventoryController {
         });
     }
 
-    @PostMapping("export")
+    @GetMapping("export")
     public void export(@RequestParam(value = "address", required = false) String address,
                        @RequestParam(value = "contract", required = false) String contract,
                        @RequestParam(value = "tokenId", required = false) String tokenId,

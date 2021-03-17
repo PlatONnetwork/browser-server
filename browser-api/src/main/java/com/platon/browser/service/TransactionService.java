@@ -75,26 +75,37 @@ public class TransactionService {
 
     @Resource
     private EsTransactionRepository ESTransactionRepository;
+
     @Resource
     private EsDelegationRewardRepository ESDelegationRewardRepository;
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private StakingMapper stakingMapper;
+
     @Resource
     private ProposalMapper proposalMapper;
+
     @Resource
     private TokenInventoryMapper tokenInventoryMapper;
+
     @Resource
     private StatisticCacheService statisticCacheService;
+
     @Resource
     private BlockChainConfig blockChainConfig;
+
     @Resource
     private CommonService commonService;
+
     @Resource
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     private static final String ERROR_TIPS = "获取区块错误。";
 
     @Value("${platon.valueUnit}")
@@ -131,7 +142,7 @@ public class TransactionService {
         /** 根据区块号和类型分页查询交易信息 */
         try {
             items =
-                this.ESTransactionRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
+                    this.ESTransactionRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return result;
@@ -161,7 +172,7 @@ public class TransactionService {
                 "cost", "failReason"});
         try {
             items =
-                this.ESTransactionRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
+                    this.ESTransactionRepository.search(constructor, Transaction.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return result;
@@ -214,10 +225,7 @@ public class TransactionService {
         AccountDownload accountDownload = new AccountDownload();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        this.logger.error("now time:{}", format.format(currentServerTime));
-        String msg = dateFormat.format(currentServerTime);
-        this.logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
+        this.logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", dateFormat.format(date), dateFormat.format(currentServerTime));
 
         /** 限制最多导出3万条记录 */
 
@@ -250,7 +258,7 @@ public class TransactionService {
                     DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
                     /**
                      * 枚举类型名称需要对应
-                     */
+                    */
                     this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
                     transaction.getFrom(),
                     transaction.getTo(),
@@ -413,8 +421,8 @@ public class TransactionService {
                         resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 
                         String delegationRatio = null;
-                        if(editValidatorParam.getDelegateRewardPer()!=null){
-                            delegationRatio=new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString();
+                        if (editValidatorParam.getDelegateRewardPer() != null) {
+                            delegationRatio = new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString();
                         }
                         resp.setDelegationRatio(delegationRatio);
                         break;
@@ -561,7 +569,7 @@ public class TransactionService {
                         if (proposal != null) {
                             resp.setPipNum(proposal.getPipNum());
                             resp.setProposalTitle(
-                                Browser.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
+                                    Browser.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
                             resp.setProposalUrl(proposal.getUrl());
                             resp.setProposalOption(String.valueOf(proposal.getType()));
                         }
@@ -690,8 +698,8 @@ public class TransactionService {
                 case ERC20_CONTRACT_EXEC:
                 case ERC721_CONTRACT_EXEC:
                     //获取arc20交易进行转换
-                    List<ErcTx> erc20List = JSONObject.parseArray(transaction.getErc20TxInfo(),ErcTx.class);
-                    if(erc20List != null){
+                    List<ErcTx> erc20List = JSONObject.parseArray(transaction.getErc20TxInfo(), ErcTx.class);
+                    if (erc20List != null) {
                         List<Arc20Param> arc20Params = new ArrayList<>();
                         erc20List.forEach(erc20 -> {
                             Arc20Param arc20Param = Arc20Param.builder().innerContractAddr(erc20.getContract())
@@ -703,8 +711,8 @@ public class TransactionService {
                         resp.setErc20Params(arc20Params);
                     }
                     //获取arc721交易进行转换
-                    List<ErcTx> erc721List = JSONObject.parseArray(transaction.getErc721TxInfo(),ErcTx.class);
-                    if(erc721List != null){
+                    List<ErcTx> erc721List = JSONObject.parseArray(transaction.getErc721TxInfo(), ErcTx.class);
+                    if (erc721List != null) {
                         List<Arc721Param> arc721Params = new ArrayList<>();
                         erc721List.forEach(erc721 -> {
                             Arc721Param arc721Param = Arc721Param.builder().innerContractAddr(erc721.getContract())
@@ -717,7 +725,8 @@ public class TransactionService {
                             tokenInventoryKey.setTokenAddress(erc721.getContract());
                             tokenInventoryKey.setTokenId(new BigInteger(erc721.getValue()));
                             TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
-                            if(tokenInventory!=null) arc721Param.setInnerImage(tokenInventory.getImage());
+                            if (tokenInventory != null)
+                                arc721Param.setInnerImage(tokenInventory.getImage());
                             arc721Params.add(arc721Param);
                         });
                         resp.setErc721Params(arc721Params);
@@ -732,10 +741,10 @@ public class TransactionService {
     /**
      * 提案信息统一转换
      *
-     * @method transferTransaction
      * @param resp
      * @param hash
      * @return
+     * @method transferTransaction
      */
     private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
         Proposal proposal = this.proposalMapper.selectByPrimaryKey(hash);
@@ -755,10 +764,10 @@ public class TransactionService {
     /**
      * 统一设置验证人keybaseurl
      *
-     * @method getStakingUrl
      * @param externalId
      * @param txReceiptStatus
      * @return
+     * @method getStakingUrl
      */
     private String getStakingUrl(String externalId, Integer txReceiptStatus) {
 
@@ -789,7 +798,7 @@ public class TransactionService {
                 userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
             } catch (Exception e) {
                 this.logger.error("getStakingUrl error.externalId:{},txReceiptStatus:{},error:{}", externalId,
-                    txReceiptStatus, e.getMessage());
+                        txReceiptStatus, e.getMessage());
                 return defaultBaseUrl;
             }
             if (StringUtils.isNotBlank(userName)) {
@@ -813,7 +822,7 @@ public class TransactionService {
         ESResult<DelegationReward> delegationRewards = null;
         try {
             delegationRewards = this.ESDelegationRewardRepository.search(constructor, DelegationReward.class,
-                req.getPageNo(), req.getPageSize());
+                    req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
             return result;
@@ -846,7 +855,7 @@ public class TransactionService {
                 if (rewrdsMap.containsKey(extra.getNodeId())) {
                     Extra reward2 = rewrdsMap.get(extra.getNodeId());
                     reward2.setReward(
-                        new BigDecimal(reward2.getReward()).add(new BigDecimal(reward2.getReward())).toString());
+                            new BigDecimal(reward2.getReward()).add(new BigDecimal(reward2.getReward())).toString());
                 } else {
                     rewrdsMap.put(extra.getNodeId(), extra);
                 }
@@ -880,7 +889,7 @@ public class TransactionService {
         ESResult<DelegationReward> delegationRewards = null;
         try {
             delegationRewards = this.ESDelegationRewardRepository.search(constructor, DelegationReward.class,
-                req.getPageNo(), req.getPageSize());
+                    req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
             this.logger.error(ERROR_TIPS, e);
         }
@@ -921,4 +930,5 @@ public class TransactionService {
         result.init(queryClaimByStakingResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
         return result;
     }
+
 }

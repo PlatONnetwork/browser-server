@@ -7,7 +7,6 @@ import com.platon.browser.request.token.QueryTokenListReq;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.token.QueryTokenDetailResp;
-import com.platon.browser.response.token.QueryTokenIdDetailResp;
 import com.platon.browser.response.token.QueryTokenListResp;
 import com.platon.browser.service.TokenService;
 import com.platon.browser.utils.I18nUtil;

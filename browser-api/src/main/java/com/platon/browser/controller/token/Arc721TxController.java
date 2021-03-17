@@ -53,7 +53,7 @@ public class Arc721TxController {
      *
      * @param address  钱包地址
      * @param contract 合约地址
-     * @param date     数据结束日期
+     * @param date     开始日期时间戳
      * @param local    区域：en或者zh-cn
      * @param timeZone 时区
      * @param token    令牌
