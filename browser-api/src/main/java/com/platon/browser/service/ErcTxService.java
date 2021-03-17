@@ -175,15 +175,15 @@ public class ErcTxService {
     }
 
     public AccountDownload exportToken20TransferList(String address, String contract, Long date, String local, String timeZone) {
-        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true, null);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, null);
     }
 
     public AccountDownload exportToken721TransferList(String address, String contract, Long date, String local, String timeZone, String tokenId) {
-        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, true, tokenId);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc721TxRepository, tokenId);
     }
 
     public AccountDownload exportTokenTransferList(String address, String contract, Long date, String local, String timeZone
-            , AbstractEsRepository repository, boolean isErc20, String tokenId) {
+            , AbstractEsRepository repository, String tokenId) {
         AccountDownload accountDownload = new AccountDownload();
         if (StringUtils.isBlank(address) && StringUtils.isBlank(contract)) {
             return accountDownload;
