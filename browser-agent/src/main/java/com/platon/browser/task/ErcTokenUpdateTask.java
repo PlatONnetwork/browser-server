@@ -6,8 +6,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -471,15 +471,15 @@ public class ErcTokenUpdateTask {
                                             newTi.setTokenAddress(inventory.getTokenAddress());
                                             boolean changed = false;
                                             // 只要有一个属性变动就添加到更新列表中
-                                            if (StringUtils.isNotBlank(newTi.getImage()) && !newTi.getImage().equals(inventory.getImage())) {
+                                            if (!newTi.getImage().equals(inventory.getImage())) {
                                                 inventory.setImage(newTi.getImage());
                                                 changed = true;
                                             }
-                                            if (StringUtils.isNotBlank(newTi.getDescription()) && !newTi.getDescription().equals(inventory.getDescription())) {
+                                            if (!newTi.getDescription().equals(inventory.getDescription())) {
                                                 inventory.setDescription(newTi.getDescription());
                                                 changed = true;
                                             }
-                                            if (StringUtils.isNotBlank(newTi.getName()) && !newTi.getName().equals(inventory.getName())) {
+                                            if (!newTi.getName().equals(inventory.getName())) {
                                                 inventory.setName(newTi.getName());
                                                 changed = true;
                                             }
@@ -513,6 +513,7 @@ public class ErcTokenUpdateTask {
                 }
                 if (!updateParams.isEmpty()) {
                     customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
+                    log.info("更新token库存信息{}", JSONUtil.toJsonStr(updateParams));
                 }
             } while (!batch.isEmpty());
             if (isIncrement) {
