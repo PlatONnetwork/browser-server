@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class NetworkStat {
+
     private Integer id;
 
     private Long curNumber;
@@ -58,8 +59,14 @@ public class NetworkStat {
 
     private Long avgPackTime;
 
+    /**
+     * 整个链的erc721交易数
+     */
     private Integer erc721TxQty;
 
+    /**
+     * 整个链的erc20交易数
+     */
     private Integer erc20TxQty;
 
     private String issueRates;
@@ -475,7 +482,7 @@ public class NetworkStat {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column ... excludes) {
+        public static Column[] excludes(Column... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -498,4 +505,5 @@ public class NetworkStat {
             }
         }
     }
+
 }

@@ -22,17 +22,17 @@ spring:
       #最多存储多少条数据
       max-item: 500000
       #区块列表
-      blocks: browser_${profile}:blocks
+      blocks: browser:${profile}:blocks
       #交易列表
-      transactions: browser_${profile}:transactions
+      transactions: browser:${profile}:transactions
       #统计信息
-      networkStat: browser_${profile}:networkStat
+      networkStat: browser:${profile}:networkStat
       #内部转账交易
-      transferTx: browser_${profile}:transferTx
+      transferTx: browser:${profile}:transferTx
       #erc20交易
-      erc20Tx: browser_${profile}:erc20Tx
+      erc20Tx: browser:${profile}:erc20Tx
       #erc721交易
-      erc721Tx: browser_${profile}:erc721Tx
+      erc721Tx: browser:${profile}:erc721Tx
   #ES索引配置
   elasticsearch:
     index:
