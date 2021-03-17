@@ -190,10 +190,7 @@ public class ErcTxService {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        log.error("exportTokenTransferList time:{}", format.format(currentServerTime));
-        String msg = dateFormat.format(currentServerTime);
-        log.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
+        log.info("导出地址交易列表数据起始日期：{},结束日期：{}", dateFormat.format(date), dateFormat.format(currentServerTime));
 
         // construct of params
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();

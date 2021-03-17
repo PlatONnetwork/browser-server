@@ -49,7 +49,7 @@ public class HolderController {
         return Mono.just(ercTxService.tokenHolderList(req));
     }
 
-    @PostMapping("export")
+    @GetMapping("export")
     public void export(@RequestParam(value = "contract", required = true) String contract,
                        @RequestParam(value = "local", required = true) String local,
                        @RequestParam(value = "timeZone", required = true) String timeZone,

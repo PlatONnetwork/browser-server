@@ -26,26 +26,44 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("token/arc20-tx")
 public class Arc20TxController {
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private ErcTxService ercTxService;
+
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private CommonMethod commonMethod;
 
-    @PostMapping( "list")
+    @PostMapping("list")
     public Mono<RespPage<QueryTokenTransferRecordListResp>> token20TransferList(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
         return Mono.just(ercTxService.token20TransferList(req));
     }
 
-    @PostMapping( "export")
-    public void export(@RequestParam(value = "address",required = false) String address,
-                       @RequestParam(value = "contract",required = false) String contract,
+    /**
+     * 导出交易
+     *
+     * @param address  钱包地址
+     * @param contract 合约地址
+     * @param date     开始日期时间戳
+     * @param local    区域：en或者zh-cn
+     * @param timeZone 时区：+8
+     * @param token    令牌
+     * @param response
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/3/17
+     */
+    @GetMapping("export")
+    public void export(@RequestParam(value = "address", required = false) String address,
+                       @RequestParam(value = "contract", required = false) String contract,
                        @RequestParam(value = "date", required = true) Long date,
-                       @RequestParam(value = "local",required = true) String local,
-                       @RequestParam(value = "timeZone",required = true) String timeZone,
+                       @RequestParam(value = "local", required = true) String local,
+                       @RequestParam(value = "timeZone", required = true) String timeZone,
                        @RequestParam(value = "token", required = false) String token,
                        HttpServletResponse response) {
         try {
@@ -61,4 +79,5 @@ public class Arc20TxController {
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
+
 }
