@@ -1,17 +1,14 @@
 package com.platon.browser.cache;
 
-import java.math.BigDecimal;
-
-import cn.hutool.core.math.MathUtil;
+import com.platon.browser.bean.ConfigChange;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.elasticsearch.dto.Block;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.platon.browser.bean.ConfigChange;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.elasticsearch.dto.Block;
-
-import lombok.Data;
+import java.math.BigDecimal;
 
 /**
  * 网络统计缓存
@@ -40,12 +37,14 @@ public class NetworkStatCache {
         if (this.networkStat.getErc20TxQty() != null) {
             erc20TxQty = this.networkStat.getErc20TxQty();
         }
+        erc20TxQty = block.getErc20TxQty() + erc20TxQty;
         Integer erc721TxQty = 0;
         if (this.networkStat.getErc721TxQty() != null) {
-            erc20TxQty = this.networkStat.getErc721TxQty();
+            erc721TxQty = this.networkStat.getErc721TxQty();
         }
-        this.networkStat.setErc20TxQty(block.getErc20TxQty() + erc20TxQty);
-        this.networkStat.setErc721TxQty(block.getErc721TxQty() + erc721TxQty);
+        erc721TxQty = block.getErc721TxQty() + erc721TxQty;
+        this.networkStat.setErc20TxQty(erc20TxQty);
+        this.networkStat.setErc721TxQty(erc721TxQty);
         this.networkStat.setProposalQty(proposalQty + this.networkStat.getProposalQty());
         this.networkStat.setCurTps(tps);
         this.networkStat.setCurBlockHash(block.getHash());
