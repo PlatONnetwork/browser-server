@@ -1,11 +1,7 @@
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`alaya_browser` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-
+CREATE DATABASE IF NOT EXISTS `alaya_browser` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `alaya_browser`;
 
-/*Table structure for table `address` */
-
 DROP TABLE IF EXISTS `address`;
-
 CREATE TABLE `address` (
   `address` varchar(42) NOT NULL COMMENT '地址',
   `type` int(11) NOT NULL COMMENT '地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约',
@@ -15,6 +11,7 @@ CREATE TABLE `address` (
   `delegate_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '委托的金额(von)',
   `redeemed_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '赎回中的质押金额(von)',
   `tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT '交易总数',
+  `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
   `transfer_qty` int(11) NOT NULL DEFAULT '0' COMMENT '转账交易总数',
   `delegate_qty` int(11) NOT NULL DEFAULT '0' COMMENT '委托交易总数',
   `staking_qty` int(11) NOT NULL DEFAULT '0' COMMENT '质押交易总数',
@@ -37,10 +34,7 @@ CREATE TABLE `address` (
   KEY `type` (`type`) USING BTREE
 );
 
-/*Table structure for table `block_node` */
-
 DROP TABLE IF EXISTS `block_node`;
-
 CREATE TABLE `block_node` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -52,10 +46,7 @@ CREATE TABLE `block_node` (
   KEY `staking_consensus_epoch` (`staking_consensus_epoch`) USING BTREE
 );
 
-/*Table structure for table `config` */
-
 DROP TABLE IF EXISTS `config`;
-
 CREATE TABLE `config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `module` varchar(64) NOT NULL COMMENT '参数模块名',
@@ -70,10 +61,7 @@ CREATE TABLE `config` (
   PRIMARY KEY (`id`)
 );
 
-/*Table structure for table `delegation` */
-
 DROP TABLE IF EXISTS `delegation`;
-
 CREATE TABLE `delegation` (
   `delegate_addr` varchar(42) NOT NULL COMMENT '委托交易地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '最新的质押交易块高',
@@ -94,7 +82,6 @@ CREATE TABLE `delegation` (
 /*Table structure for table `gas_estimate` */
 
 DROP TABLE IF EXISTS `gas_estimate`;
-
 CREATE TABLE `gas_estimate` (
   `addr` varchar(42) NOT NULL COMMENT '委托交易地址',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -103,20 +90,14 @@ CREATE TABLE `gas_estimate` (
   PRIMARY KEY (`addr`,`node_id`,`sbn`)
 );
 
-/*Table structure for table `gas_estimate_log` */
-
 DROP TABLE IF EXISTS `gas_estimate_log`;
-
 CREATE TABLE `gas_estimate_log` (
   `seq` bigint(20) NOT NULL COMMENT '序号',
   `json` longtext NOT NULL,
   PRIMARY KEY (`seq`)
 );
 
-/*Table structure for table `n_opt_bak` */
-
 DROP TABLE IF EXISTS `n_opt_bak`;
-
 CREATE TABLE `n_opt_bak` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -133,10 +114,7 @@ CREATE TABLE `n_opt_bak` (
   KEY `block_number` (`b_num`) USING BTREE
 );
 
-/*Table structure for table `network_stat` */
-
 DROP TABLE IF EXISTS `network_stat`;
-
 CREATE TABLE `network_stat` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `cur_number` bigint(20) NOT NULL COMMENT '当前块号',
@@ -170,10 +148,7 @@ CREATE TABLE `network_stat` (
   PRIMARY KEY (`id`)
 );
 
-/*Table structure for table `node` */
-
 DROP TABLE IF EXISTS `node`;
-
 CREATE TABLE `node` (
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
   `stat_slash_multi_qty` int(11) NOT NULL DEFAULT '0' COMMENT '多签举报次数',
@@ -240,10 +215,7 @@ CREATE TABLE `node` (
   KEY `list2` (`big_version`,`total_value`,`staking_block_num`,`staking_tx_index`)
 );
 
-/*Table structure for table `proposal` */
-
 DROP TABLE IF EXISTS `proposal`;
-
 CREATE TABLE `proposal` (
   `hash` varchar(72) NOT NULL COMMENT '提案交易hash',
   `type` int(11) NOT NULL COMMENT '提案类型:1文本提案,2升级提案,3参数提案,4取消提案',
@@ -277,10 +249,7 @@ CREATE TABLE `proposal` (
   KEY `type` (`type`) USING BTREE
 );
 
-/*Table structure for table `rp_plan` */
-
 DROP TABLE IF EXISTS `rp_plan`;
-
 CREATE TABLE `rp_plan` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `address` varchar(42) NOT NULL DEFAULT '0' COMMENT '发布锁仓计划地址',
@@ -293,10 +262,7 @@ CREATE TABLE `rp_plan` (
   KEY `number索引` (`number`) USING BTREE
 );
 
-/*Table structure for table `slash` */
-
 DROP TABLE IF EXISTS `slash`;
-
 CREATE TABLE `slash` (
   `hash` varchar(72) NOT NULL COMMENT '举报交易hash',
   `node_id` varchar(130) NOT NULL COMMENT '节点id',
@@ -312,10 +278,7 @@ CREATE TABLE `slash` (
   KEY `node_id` (`node_id`) USING BTREE
 );
 
-/*Table structure for table `staking` */
-
 DROP TABLE IF EXISTS `staking`;
-
 CREATE TABLE `staking` (
   `node_id` varchar(130) NOT NULL COMMENT '质押节点地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '质押区块高度',
@@ -370,10 +333,7 @@ CREATE TABLE `staking` (
   KEY `staking_addr` (`staking_addr`) USING BTREE
 );
 
-/*Table structure for table `staking_history` */
-
 DROP TABLE IF EXISTS `staking_history`;
-
 CREATE TABLE `staking_history` (
   `node_id` varchar(130) NOT NULL COMMENT '质押节点地址',
   `staking_block_num` bigint(20) NOT NULL COMMENT '质押区块高度',
@@ -422,10 +382,7 @@ CREATE TABLE `staking_history` (
   KEY `staking_addr` (`staking_addr`) USING BTREE
 );
 
-/*Table structure for table `token` */
-
 DROP TABLE IF EXISTS `token`;
-
 CREATE TABLE `token` (
   `address` varchar(64) NOT NULL COMMENT '合约地址',
   `type` varchar(64) NOT NULL COMMENT '合约类型 erc20 erc721',
@@ -446,10 +403,7 @@ CREATE TABLE `token` (
   UNIQUE KEY `token_address` (`address`)
 );
 
-/*Table structure for table `token_expand` */
-
 DROP TABLE IF EXISTS `token_expand`;
-
 CREATE TABLE `token_expand` (
   `address` varchar(64) NOT NULL COMMENT '合约地址',
   `icon` text COMMENT '合约图标',
@@ -467,10 +421,7 @@ CREATE TABLE `token_expand` (
   PRIMARY KEY (`address`)
 );
 
-/*Table structure for table `token_holder` */
-
 DROP TABLE IF EXISTS `token_holder`;
-
 CREATE TABLE `token_holder` (
   `token_address` varchar(64) NOT NULL COMMENT '合约地址',
   `address` varchar(64) NOT NULL COMMENT '用户地址',
@@ -481,10 +432,7 @@ CREATE TABLE `token_holder` (
   PRIMARY KEY (`token_address`,`address`)
 );
 
-/*Table structure for table `token_inventory` */
-
 DROP TABLE IF EXISTS `token_inventory`;
-
 CREATE TABLE `token_inventory` (
   `token_address` varchar(64) NOT NULL COMMENT '合约地址',
   `token_id` bigint(80) NOT NULL COMMENT 'token id',
@@ -498,10 +446,7 @@ CREATE TABLE `token_inventory` (
   PRIMARY KEY (`token_address`,`token_id`)
 );
 
-/*Table structure for table `tx_bak` */
-
 DROP TABLE IF EXISTS `tx_bak`;
-
 CREATE TABLE `tx_bak` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `hash` varchar(72) NOT NULL COMMENT '交易Hash',
@@ -512,10 +457,7 @@ CREATE TABLE `tx_bak` (
   KEY `id` (`id`)
 );
 
-/*Table structure for table `vote` */
-
 DROP TABLE IF EXISTS `vote`;
-
 CREATE TABLE `vote` (
   `hash` varchar(72) NOT NULL COMMENT '投票交易Hash(如果此值带有"-",则表示投票操作是通过普通合约代理执行的,"-"号前面的是合约交易hash)',
   `node_id` varchar(130) NOT NULL COMMENT '投票验证人(节点ID)',
