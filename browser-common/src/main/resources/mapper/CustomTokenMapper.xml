@@ -101,7 +101,5 @@
       )
     </foreach>
   </insert>
-  <update id="updateTokenHolderCount">
-    UPDATE `token` tk SET `holder`=(SELECT COUNT(1) FROM `token_holder` th WHERE th.`token_address`=tk.`address` AND th.balance != 0)
-  </update>
+
 </mapper>
