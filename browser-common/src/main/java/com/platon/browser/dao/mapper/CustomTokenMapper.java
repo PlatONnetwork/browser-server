@@ -16,6 +16,4 @@ public interface CustomTokenMapper {
 
     int batchInsertOrUpdateSelective(@Param("list") List<Token> list, @Param("selective") Token.Column... selective);
 
-    int updateTokenHolderCount();
-
 }

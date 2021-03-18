@@ -8,6 +8,7 @@ import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.TokenHolderCount;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -30,7 +31,6 @@ import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -71,6 +71,9 @@ public class ErcTokenUpdateTask {
 
     @Resource
     private CustomTokenInventoryMapper customTokenInventoryMapper;
+
+    @Resource
+    private TokenMapper tokenMapper;
 
     @Resource
     private ErcCache ercCache;
@@ -225,7 +228,37 @@ public class ErcTokenUpdateTask {
             customTokenMapper.batchInsertOrUpdateSelective(new ArrayList<>(updateParams), Token.Column.values());
             updateParams.forEach(token -> token.setDirty(false));
         }
-        customTokenMapper.updateTokenHolderCount();
+        updateTokenHolderCount();
+    }
+
+    /**
+     * 更新token对应的持有人的数量
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/3/17
+     */
+    private void updateTokenHolderCount() {
+        List<Token> updateTokenList = new ArrayList<>();
+        List<TokenHolderCount> list = customTokenHolderMapper.findTokenHolderCount();
+        List<Token> tokenList = tokenMapper.selectByExample(null);
+        if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(tokenList)) {
+            list.forEach(tokenHolderCount -> {
+                tokenList.forEach(token -> {
+                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress())
+                            && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())
+                    ) {
+                        token.setHolder(tokenHolderCount.getTokenHolderCount());
+                        updateTokenList.add(token);
+                    }
+                });
+            });
+        }
+        if (CollUtil.isNotEmpty(updateTokenList)) {
+            customTokenMapper.batchInsertOrUpdateSelective(updateTokenList, Token.Column.values());
+            log.info("更新token对应的持有人的数量{}", JSONUtil.toJsonStr(updateTokenList));
+        }
     }
 
     /**
@@ -381,7 +414,7 @@ public class ErcTokenUpdateTask {
                     }
                 }
                 if (!updateParams.isEmpty()) {
-                    customTokenHolderMapper.batchInsertOrUpdateSelective(updateParams, TokenHolder.Column.values());
+                    customTokenHolderMapper.batchUpdate(updateParams);
                 }
                 page++;
             } while (!batch.isEmpty());

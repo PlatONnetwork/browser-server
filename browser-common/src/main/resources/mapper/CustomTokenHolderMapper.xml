@@ -65,4 +65,8 @@
         </foreach>
     </update>
 
+    <select id="findTokenHolderCount" resultType="com.platon.browser.bean.TokenHolderCount">
+        select t.token_address as tokenAddress,count(1) as tokenHolderCount from token_holder t  where t.balance != 0 group by t.token_address
+    </select>
+
 </mapper>
