@@ -118,11 +118,11 @@ public class ErcTokenUpdateTask {
     private volatile long tokenCreateTime = 0L;
 
     /**
-     * tokenInventory更新标识位
+     * tokenInventory更新标识位，默认最小时间是2000/01/01
      */
     @Getter
     @Setter
-    private volatile int tokenInventoryPage = 0;
+    private volatile long tokenInventoryCreateTime = DateUtil.parse("2000/01/01").getTime();
 
     /**
      * TokenHolderERC20更新标识
@@ -432,7 +432,7 @@ public class ErcTokenUpdateTask {
     public void updateTokenInventory() {
         tokenInventoryLock.lock();
         try {
-            updateTokenInventory(INVENTORY_UPDATE_POOL, 0, false);
+            updateTokenInventory(INVENTORY_UPDATE_POOL, DateUtil.parse("2000/01/01").getTime(), false);
         } catch (Exception e) {
             log.error("更新token库存信息", e);
         } finally {
@@ -452,14 +452,14 @@ public class ErcTokenUpdateTask {
     public void cronIncrementUpdateTokenInventory() {
         if (tokenInventoryLock.tryLock()) {
             try {
-                updateTokenInventory(INCREMENT_INVENTORY_UPDATE_POOL, this.getTokenInventoryPage(), true);
+                updateTokenInventory(INCREMENT_INVENTORY_UPDATE_POOL, this.getTokenInventoryCreateTime(), true);
             } catch (Exception e) {
                 log.error("增量更新token库存信息异常", e);
             } finally {
                 tokenInventoryLock.unlock();
             }
         } else {
-            log.error("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
+            log.error("该次token库存增量更新抢不到锁，增量更新的标记为{}", this.getTokenInventoryCreateTime());
         }
     }
 
@@ -467,13 +467,13 @@ public class ErcTokenUpdateTask {
      * 更新token库存信息
      *
      * @param pool        线程池
-     * @param pageNum     当前页码
+     * @param createTime  时间戳
      * @param isIncrement 是否增量更新
      * @return void
      * @author huangyongpeng@matrixelements.com
      * @date 2021/2/2
      */
-    public void updateTokenInventory(ExecutorService pool, int pageNum, boolean isIncrement) {
+    public void updateTokenInventory(ExecutorService pool, long createTime, boolean isIncrement) {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -481,11 +481,12 @@ public class ErcTokenUpdateTask {
         try {
             // 分页更新token库存相关信息
             List<TokenInventory> batch;
-            int page = pageNum;
+            long date = createTime;
             do {
                 TokenInventoryExample condition = new TokenInventoryExample();
-                condition.setOrderByClause(" token_address asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+                condition.createCriteria().andCreateTimeGreaterThanOrEqualTo(DateUtil.date(date));
                 batch = tokenInventoryMapper.selectByExample(condition);
+                batch.sort((v1, v2) -> DateUtil.compare(v1.getCreateTime(), v2.getCreateTime()));
                 List<TokenInventory> updateParams = new ArrayList<>();
                 if (!batch.isEmpty()) {
                     CountDownLatch latch = new CountDownLatch(batch.size());
@@ -542,18 +543,19 @@ public class ErcTokenUpdateTask {
                     } catch (InterruptedException e) {
                         log.error("", e);
                     }
-                    page++;
+                    // 每次增加30秒
+                    date = batch.get(batch.size() - 1).getCreateTime().getTime() + 30 * 1000;
                 }
                 if (!updateParams.isEmpty()) {
                     customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
-                    log.info("更新token库存信息{}", JSONUtil.toJsonStr(updateParams));
+                    log.info("更新token库存信息{}，标识为{}", JSONUtil.toJsonStr(updateParams), date);
                 }
             } while (!batch.isEmpty());
             if (isIncrement) {
-                this.setTokenInventoryPage(page);
+                this.setTokenInventoryCreateTime(date);
             }
         } catch (Exception e) {
-            log.error("更新token库存信息", e);
+            log.error("更新token库存信息异常", e);
         }
     }
 
