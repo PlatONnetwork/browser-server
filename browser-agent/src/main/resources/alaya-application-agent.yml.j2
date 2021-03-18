@@ -1,4 +1,4 @@
-profile: hrpatp201018v10000
+profile: {{ app_env }}
 # 密码加密配置
 jasypt:
   encryptor:
@@ -7,24 +7,24 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    url: jdbc:mysql://{{ mysql.one.url }}/{{ mysql.one.scan_agent.db }}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: {{ mysql.one.scan_agent.user }}
+    password: {{ mysql.one.scan_agent.pass }}
   #Redis配置
   redis:
     cluster:
       max-redirects: 3
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-    password: platscan
-    ssl: false
+      nodes: {{ redis.url }}
+    password: {{ redis.password }}
+    ssl: {{ ssl_status }}
   #ES配置
   elasticsearch:
     high-level-client:
-      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
-      port: 9200
+      hosts: {{ es.url }}
+      port: {{ es.port }}
       schema: http
-      username: elastic
-      password: changeme
+      username: {{ es.username }}
+      password: {{ es.password }}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -44,22 +44,22 @@ disruptor:
 logging:
   #日志级别
   level:
-    org.springframework: error
-    org.springframework.retry: error
-    com.platon.browser: error
-    com.platon.browser.bootstrap: error
-    com.platon.browser.collection: error
-    com.platon.browser.collection.queue.handler: error
-    com.platon.browser.common: error
-    com.platon.browser.complement: error
-    com.platon.browser.complement.handler: error
-    com.platon.browser.complement.converter: error
-    com.platon.browser.persistence: error
-    com.platon.browser.persistence.handler: error
-    com.platon.browser.persistence.queue.handler: error
-    com.platon.browser.task: error
+    org.springframework: {{ log_level }}
+    org.springframework.retry: {{ log_level }}
+    com.platon.browser: {{ log_level }}
+    com.platon.browser.bootstrap: warn
+    com.platon.browser.collection: {{ log_level }}
+    com.platon.browser.collection.queue.handler: {{ log_level }}
+    com.platon.browser.common: {{ log_level }}
+    com.platon.browser.complement: {{ log_level }}
+    com.platon.browser.complement.handler: {{ log_level }}
+    com.platon.browser.complement.converter: {{ log_level }}
+    com.platon.browser.persistence: {{ log_level }}
+    com.platon.browser.persistence.handler: {{ log_level }}
+    com.platon.browser.persistence.queue.handler: {{ log_level }}
+    com.platon.browser.task: {{ log_level }}
   file:
-    name: ./logs/${spring.application.name}-${profile}.log
+    name: ./logs/${spring.application.name}-{{ app_env }}.log
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -70,9 +70,12 @@ platon:
   txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
-    #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.112.141:6789,192.168.112.141:6790
+    protocol: ws
+{% if spec_node_info.ip |length == 2 %}
+    addresses: {{ spec_node_info.ip[0] }}:{{ spec_node_info.web3j_port }},{{ spec_node_info.ip[1] }}:{{ spec_node_info.web3j_port }}
+{% else %}
+    addresses: {{ spec_node_info.ip[0] }}:{{ spec_node_info.web3j_port }}
+{% endif %}
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -108,16 +111,16 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201018
+  chainId: {{ chainid }}
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
       pageSize: 2000
       pageCount: 250
   #Redis命名空间
-  redis-namespace: browser:${profile}
+  redis-namespace: browser:{{ app_env }}
   #Es索引命名空间
-  es-namespace: browser_${profile}
+  es-namespace: browser_{{ app_env }}
 # v0.15.0.0版本新增功能涉及的配置
 v0150:
   #锁仓最小释放金额参数生效版本
