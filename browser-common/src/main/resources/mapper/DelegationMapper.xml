@@ -373,4 +373,13 @@
       )
     </foreach>
   </insert>
+  <delete id="batchDeleteIsHistory">
+    <foreach collection="list" item="item" separator=";">
+      delete from delegation
+      where delegate_addr = #{item.delegateAddr,jdbcType=VARCHAR}
+      and staking_block_num = #{item.stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{item.nodeId,jdbcType=VARCHAR}
+      and is_history = 1
+    </foreach>
+  </delete>
 </mapper>
