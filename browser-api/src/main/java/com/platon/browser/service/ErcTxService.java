@@ -344,9 +344,9 @@ public class ErcTxService {
         List<Object[]> rows = new ArrayList<>();
         rs.stream().forEach(customTokenHolder -> {
             BigDecimal balance = this.getAddressBalance(customTokenHolder);
-            Object[] row = {customTokenHolder.getAddress(), HexUtil.append(ConvertUtil.convertByFactor(balance,
-                    customTokenHolder.getDecimal()).toString()),
-                    balance.divide(customTokenHolder.getTotalSupply())
+            Object[] row = {customTokenHolder.getAddress(),
+                    HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()),
+                    balance.divide(customTokenHolder.getTotalSupply(), 4)
                             .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
             };
             rows.add(row);
