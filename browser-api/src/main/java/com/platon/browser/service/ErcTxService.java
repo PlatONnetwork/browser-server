@@ -250,7 +250,13 @@ public class ErcTxService {
                     this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
         }
-        return this.downFileCommon.writeDate("InnerTransaction-" + address + "-" + date + ".CSV", rows, headers);
+        String fileName = "";
+        if (StrUtil.isNotBlank(address)) {
+            fileName = address;
+        } else if (StrUtil.isNotBlank(contract)) {
+            fileName = contract;
+        }
+        return this.downFileCommon.writeDate("InnerTransaction-" + fileName + "-" + date + ".CSV", rows, headers);
     }
 
     public RespPage<QueryTokenHolderListResp> tokenHolderList(QueryTokenHolderListReq req) {
