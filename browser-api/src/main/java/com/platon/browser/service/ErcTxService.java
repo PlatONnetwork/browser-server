@@ -1,8 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -11,8 +8,8 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
@@ -46,7 +43,10 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -158,16 +158,6 @@ public class ErcTxService {
                 .filter(p -> p != null && p.getDecimal() != null)
                 .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p)).collect(Collectors.toList());
         result.init(recordListResp, totalCount, displayTotalCount, totalCount / req.getPageSize() + 1);
-        if (StrUtil.isEmpty(req.getContract())) {
-            // 从数据库查询网络表取最新的token交易数
-            List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
-            if (networkStatList != null && !networkStatList.isEmpty()) {
-                NetworkStat networkStat = networkStatList.get(0);
-                totalCount = typeEnum == ErcTypeEnum.ERC20 ? networkStat.getErc20TxQty() : networkStat.getErc721TxQty();
-                result.setTotalCount(totalCount);
-                result.setDisplayTotalCount(totalCount);
-            }
-        }
         return result;
     }
 
@@ -333,20 +323,6 @@ public class ErcTxService {
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
             queryHolderTokenListResp.setContract(tokenHolder.getTokenAddress());
 
-            QueryTokenTransferRecordListReq queryTokenTransferRecordListReq = new QueryTokenTransferRecordListReq();
-            queryTokenTransferRecordListReq.setPageNo(1);
-            queryTokenTransferRecordListReq.setPageSize(30000);
-            queryTokenTransferRecordListReq.setContract(tokenHolder.getTokenAddress());
-            queryTokenTransferRecordListReq.setAddress(req.getAddress());
-            RespPage<QueryTokenTransferRecordListResp> list = new RespPage<>();
-            if ("erc20".equalsIgnoreCase(req.getType())) {
-                list = token20TransferList(queryTokenTransferRecordListReq);
-            }
-            if ("erc721".equalsIgnoreCase(req.getType())) {
-                list = token721TransferList(queryTokenTransferRecordListReq);
-
-            }
-            queryHolderTokenListResp.setTxCount(Convert.toInt(list.getTotalCount()));
 
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值

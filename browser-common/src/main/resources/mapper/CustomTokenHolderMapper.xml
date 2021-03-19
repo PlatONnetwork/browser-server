@@ -80,7 +80,7 @@
             t.total_supply AS totalSupply,
             th.balance,
             t.DECIMAL,
-            th.token_tx_qty AS txCount,
+            ti.token_tx_qty AS txCount,
             ti.token_id as tokenId
         FROM
             token_holder th
