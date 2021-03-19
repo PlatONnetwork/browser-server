@@ -28,6 +28,7 @@ public class QueryHolderTokenListReq extends PageReq {
     /**
      * type取值:erc20 | erc721 | 为空
      */
+    @NotBlank(message = "{type required}")
     private String type;
 
 }

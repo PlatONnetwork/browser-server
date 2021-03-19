@@ -20,11 +20,21 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class QueryHolderTokenListResp {
+
     private String address;
+
     private String contract;
+
     private BigDecimal balance;
+
     private Integer decimal;
+
     private String symbol;
+
     private String name;
+
     private Integer txCount;
+
+    private String tokenId;
+
 }

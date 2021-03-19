@@ -50,4 +50,23 @@
         </foreach>
     </delete>
 
+    <select id="selectTokenInventory" resultType="com.platon.browser.bean.CustomTokenInventory">
+        SELECT
+            ti.token_address AS tokenAddress,
+            ti.token_id AS tokenId,
+            ti.OWNER AS OWNER,
+            ti.NAME AS NAME,
+            ti.description,
+            ti.image,
+            ti.create_time AS createTime,
+            ti.update_time AS updateTime,
+            ti.token_tx_qty AS tokenTxQty,
+            t.NAME AS tokenName,
+            t.symbol AS symbol
+        FROM
+            token_inventory ti
+                LEFT JOIN token t ON ti.token_address = t.address
+        where ti.token_address = #{tokenAddress,jdbcType=VARCHAR}
+          and ti.token_id = #{tokenId,jdbcType=BIGINT}
+    </select>
 </mapper>

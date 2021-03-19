@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomToken;
 import com.platon.browser.bean.CustomTokenDetail;
+import com.platon.browser.bean.CustomTokenInventory;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
@@ -113,8 +114,9 @@ public class TokenService {
         TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
         tokenInventoryKey.setTokenAddress(req.getContract());
         tokenInventoryKey.setTokenId(tokenId);
-        TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
-        return QueryTokenIdDetailResp.fromTokenIdDetail(tokenInventory);
+        CustomTokenInventory customTokenInventory = customTokenInventoryMapper.selectTokenInventory(tokenInventoryKey);
+        QueryTokenIdDetailResp.copy(customTokenInventory);
+        return QueryTokenIdDetailResp.copy(customTokenInventory);
     }
 
     public AccountDownload exportTokenId(String address, String contract, String tokenId, String local, String timeZone) {

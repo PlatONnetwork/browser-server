@@ -174,22 +174,32 @@ public class ErcTokenAnalyzer {
 
         // 以上所有操作无误，最后更新地址表erc交易数缓存
         txList.forEach(ercTx -> {
-            if (!AddressUtil.isAddrZero(ercTx.getFrom(), ercTx.getTo())) {
+            if (!AddressUtil.isAddrZero(ercTx.getFrom())) {
                 switch (typeEnum) {
                     case ERC20:
                         addressCache.updateErc20TxQty(ercTx.getFrom());
-                        addressCache.updateErc20TxQty(ercTx.getTo());
                         break;
                     case ERC721:
                         addressCache.updateErc721TxQty(ercTx.getFrom());
+                        break;
+                }
+            }
+            if (!AddressUtil.isAddrZero(ercTx.getTo())) {
+                switch (typeEnum) {
+                    case ERC20:
+                        addressCache.updateErc20TxQty(ercTx.getTo());
+                        break;
+                    case ERC721:
                         addressCache.updateErc721TxQty(ercTx.getTo());
                         break;
                 }
-            } else {
-                log.error("其中有地址是0地址,不加载到地址缓存中,from:{},to:{}", ercTx.getFrom(), ercTx.getTo());
             }
         });
         return typeEnum;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("打印结果为：" + AddressUtil.isAddrZero("lat1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq542u6a"));
     }
 
 }
