@@ -157,19 +157,16 @@ public class ErcTxService {
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
                 .filter(p -> p != null && p.getDecimal() != null)
                 .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p)).collect(Collectors.toList());
-
-        Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-        result.init(page, recordListResp);
-
-        result.setTotalCount(totalCount);
-        result.setDisplayTotalCount(displayTotalCount);
-        // 从数据库查询网络表取最新的token交易数
-        List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
-        if (networkStatList != null && !networkStatList.isEmpty()) {
-            NetworkStat networkStat = networkStatList.get(0);
-            totalCount = typeEnum == ErcTypeEnum.ERC20 ? networkStat.getErc20TxQty() : networkStat.getErc721TxQty();
-            result.setTotalCount(totalCount);
-            result.setDisplayTotalCount(totalCount);
+        result.init(recordListResp, totalCount, displayTotalCount, totalCount / req.getPageSize() + 1);
+        if (StrUtil.isEmpty(req.getContract())) {
+            // 从数据库查询网络表取最新的token交易数
+            List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
+            if (networkStatList != null && !networkStatList.isEmpty()) {
+                NetworkStat networkStat = networkStatList.get(0);
+                totalCount = typeEnum == ErcTypeEnum.ERC20 ? networkStat.getErc20TxQty() : networkStat.getErc721TxQty();
+                result.setTotalCount(totalCount);
+                result.setDisplayTotalCount(totalCount);
+            }
         }
         return result;
     }
@@ -318,13 +315,15 @@ public class ErcTxService {
         if (log.isDebugEnabled()) {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
-        String[] tokenType = {"erc20", "erc721"};
-        if (!ArrayUtil.contains(tokenType, req.getType())) {
-            req.setType(null);
-        }
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         RespPage<QueryHolderTokenListResp> result = new RespPage<>();
-        Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(null, req.getAddress(), req.getType());
+        Page<CustomTokenHolder> ids = new Page<>();
+        if ("erc20".equalsIgnoreCase(req.getType())) {
+            ids = this.customTokenHolderMapper.selectListByParams(null, req.getAddress(), req.getType());
+        }
+        if ("erc721".equalsIgnoreCase(req.getType())) {
+            ids = customTokenHolderMapper.selectListByERC721(null, req.getAddress());
+        }
         if (ids == null || ids.isEmpty()) {
             return result;
         }
@@ -333,6 +332,22 @@ public class ErcTxService {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
             queryHolderTokenListResp.setContract(tokenHolder.getTokenAddress());
+
+            QueryTokenTransferRecordListReq queryTokenTransferRecordListReq = new QueryTokenTransferRecordListReq();
+            queryTokenTransferRecordListReq.setPageNo(1);
+            queryTokenTransferRecordListReq.setPageSize(30000);
+            queryTokenTransferRecordListReq.setContract(tokenHolder.getTokenAddress());
+            queryTokenTransferRecordListReq.setAddress(req.getAddress());
+            RespPage<QueryTokenTransferRecordListResp> list = new RespPage<>();
+            if ("erc20".equalsIgnoreCase(req.getType())) {
+                list = token20TransferList(queryTokenTransferRecordListReq);
+            }
+            if ("erc721".equalsIgnoreCase(req.getType())) {
+                list = token721TransferList(queryTokenTransferRecordListReq);
+
+            }
+            queryHolderTokenListResp.setTxCount(Convert.toInt(list.getTotalCount()));
+
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
             if (null != balance) {

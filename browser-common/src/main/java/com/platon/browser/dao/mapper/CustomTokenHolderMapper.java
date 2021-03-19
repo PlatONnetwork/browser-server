@@ -34,4 +34,16 @@ public interface CustomTokenHolderMapper {
      */
     List<TokenHolderCount> findTokenHolderCount();
 
+    /**
+     * 查询erc721的TokenHolderList
+     *
+     * @param tokenAddress
+     * @param address
+     * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/3/19
+     */
+    Page<CustomTokenHolder> selectListByERC721(@Param("tokenAddress") String tokenAddress, @Param("address") String address);
+
+
 }

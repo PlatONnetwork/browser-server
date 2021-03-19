@@ -69,4 +69,34 @@
         select t.token_address as tokenAddress,count(1) as tokenHolderCount from token_holder t  where t.balance != 0 group by t.token_address
     </select>
 
+    <select id="selectListByERC721" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        SELECT
+            th.token_address AS tokenAddress,
+            th.address,
+            t.type,
+            t.symbol,
+            t.NAME,
+            t.total_supply AS totalSupply,
+            th.balance,
+            t.DECIMAL,
+            th.token_tx_qty AS txCount,
+            ti.token_id as tokenId
+        FROM
+            token_holder th
+                LEFT JOIN token t ON th.token_address = t.address
+                LEFT JOIN token_inventory ti ON th.address = ti.`owner`
+                AND th.token_address = ti.token_address
+        WHERE
+            th.balance != 0
+        <if test="tokenAddress != null">
+            and th.token_address = #{tokenAddress}
+        </if>
+        <if test="address != null">
+            and th.address = #{address}
+        </if>
+        AND t.type = "erc721"
+        ORDER BY
+            balance DESC
+    </select>
 </mapper>
