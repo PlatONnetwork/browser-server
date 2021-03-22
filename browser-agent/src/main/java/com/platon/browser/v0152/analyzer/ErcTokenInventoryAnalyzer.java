@@ -56,6 +56,12 @@ public class ErcTokenInventoryAnalyzer {
                 } else {
                     tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty() + 1);
                 }
+                if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {
+                    int tokenOwnerTxQty = tokenInventory.getTokenOwnerTxQty() == null ? 0 : tokenInventory.getTokenOwnerTxQty();
+                    tokenInventory.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
+                } else {
+                    tokenInventory.setTokenOwnerTxQty(1);
+                }
                 tokenInventory.setOwner(tx.getTo());
                 tokenInventory.setUpdateTime(date);
                 insertOrUpdate.add(tokenInventory);

@@ -38,6 +38,9 @@
                 <if test="'token_tx_qty'.toString() == column.value">
                     #{item.tokenTxQty,jdbcType=INTEGER}
                 </if>
+                <if test="'token_owner_tx_qty'.toString() == column.value">
+                    #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+                </if>
             </foreach>
             )
         </foreach>
