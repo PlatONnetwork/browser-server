@@ -69,10 +69,6 @@ public class PressApplication implements ApplicationRunner {
 
     @Autowired
     private DelegationPublisher delegationPublisher;
-//    @Autowired
-//    private Erc20TokenPublisher erc20TokenPublisher;
-//    @Autowired
-//    private ESTokenTransferRecordPublisher esTokenTransferRecordPublisher;
 
     @Autowired
     private ProposalPublisher proposalPublisher;
@@ -91,8 +87,6 @@ public class PressApplication implements ApplicationRunner {
 
     @Autowired
     private SlashPublisher slashPublisher;
-//    @Autowired
-//    private Erc20TokenAddressRelPublisher erc20TokenAddressRelPublisher;
 
     @Autowired
     private DataGenService dataGenService;
@@ -210,11 +204,6 @@ public class PressApplication implements ApplicationRunner {
             // 构造【gas】数据
             makeEstimate(blockResult);
 
-//            // 构造【代币】数据
-//            makeErc20Token(blockResult);
-//            // 构造【代币转账】数据
-//            makeTokenTransferRecord(blockResult);
-
             // 区块号累加
             blockNumber = blockNumber.add(BigInteger.ONE);
             log.info("当前块高：" + blockNumber);
@@ -223,12 +212,6 @@ public class PressApplication implements ApplicationRunner {
                 flushCount(blockNumber, startTime);
             }
 
-            /*// 更新网络统计表
-            dataGenService.getNetworkStat().setCurNumber(blockNumber.longValue());
-            EXECUTOR_SERVICE.submit(()->{
-                NetworkStat networkStat=dataGenService.getNetworkStat();
-                networkStatMapper.updateByExample(networkStat,networkStatExample);
-            });*/
         }
     }
 
@@ -537,6 +520,13 @@ public class PressApplication implements ApplicationRunner {
             estimatePublisher.publish(gasEstimates);
         }
     }
+
+    private void makeErcToken(BlockResult blockResult) {
+        if (currentTokenCount < tokenMaxCount) {
+
+        }
+    }
+
 
 //    /**
 //     * 构造代币合约
