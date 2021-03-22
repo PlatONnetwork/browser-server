@@ -443,6 +443,7 @@ CREATE TABLE `token_inventory` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的交易数',
+  `token_owner_tx_qty` int(11) DEFAULT '0' COMMENT 'owner对该tokenaddress和tokenid的对应交易数',
   PRIMARY KEY (`token_address`,`token_id`)
 );
 
