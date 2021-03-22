@@ -97,12 +97,14 @@ public class ErcTxService {
         if (log.isDebugEnabled()) {
             log.debug("~ queryTokenRecordList, params: " + JSON.toJSONString(req));
         }
-
         // logic:
         // 1、合约内部交易列表中，数据存储于ES，列表的获取走ES获取
         // 2、所有查询直接走ES，不进行DB检索
         RespPage<QueryTokenTransferRecordListResp> result = new RespPage<>();
-
+        // 如果查询0地址，直接返回
+        if (StrUtil.isNotBlank(req.getAddress()) && com.platon.browser.utils.AddressUtil.isAddrZero(req.getAddress())) {
+            return result;
+        }
         List<ErcTx> records;
         long totalCount = 0;
         long displayTotalCount = 0;
@@ -328,7 +330,7 @@ public class ErcTxService {
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
             queryHolderTokenListResp.setContract(tokenHolder.getTokenAddress());
-            
+
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
             if (null != balance) {

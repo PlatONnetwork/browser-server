@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomAddressDetail;
@@ -84,9 +85,13 @@ public class AddressService {
     private StatisticCacheService statisticCacheService;
 
     public QueryDetailResp getDetails(QueryDetailRequest req) {
+        QueryDetailResp resp = new QueryDetailResp();
+        // 如果查询0地址，直接返回
+        if (StrUtil.isNotBlank(req.getAddress()) && com.platon.browser.utils.AddressUtil.isAddrZero(req.getAddress())) {
+            return resp;
+        }
         /** 根据主键查询地址信息 */
         CustomAddressDetail item = customAddressMapper.findAddressDetail(req.getAddress());
-        QueryDetailResp resp = new QueryDetailResp();
         if (TokenTypeEnum.ERC20.getType().equalsIgnoreCase(item.getTokenType())) {
             resp.setHasErc20(true);
         } else {
