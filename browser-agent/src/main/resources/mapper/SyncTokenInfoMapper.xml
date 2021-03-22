@@ -3,8 +3,6 @@
 <mapper namespace="com.platon.browser.dao.mapper.SyncTokenInfoMapper">
     <!--在agent端启动时，如果network_stat表有数据，则会执行以下语句，把ES中的Token交易数统计后更新至相关表-->
     <update id="syncTokenTxCount">
-        /*1、更新网络表*/
-        update `network_stat`set `token_qty` = #{networkParam.tokenQty};
         /*2、更新地址表*/
         <foreach collection="addressParams" item="item" index="index">
             update `address` set `token_qty` = #{item.tokenQty} where `address` = #{item.address};

@@ -27,28 +27,32 @@ public class DelegateMigrateTask {
 
     @Resource
     private DelegationMapper delegationMapper;
+
     @Resource
     private EsDelegationService esDelegationService;
 
     @Transactional
     @Scheduled(cron = "0/30  * * * * ?")
-    public void cron () {
+    public void cron() {
         // 只有程序正常运行才执行任务
-        if(AppStatusUtil.isRunning()) start();
+        if (AppStatusUtil.isRunning())
+            start();
     }
 
-    protected void start () {
+    protected void start() {
         try {
             DelegationExample delegationExample = new DelegationExample();
             delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
             List<Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
-            if(delegationList.isEmpty()) return;
+            if (delegationList.isEmpty())
+                return;
             Set<Delegation> delegationSet = new HashSet<>(delegationList);
             esDelegationService.save(delegationSet);
-            delegationMapper.deleteByExample(delegationExample);
-            log.debug("Migrate delegate history to ElasticSearch finished!");
+            delegationMapper.batchDeleteIsHistory(delegationList);
+            log.debug("委托历史迁移到ES完成");
         } catch (Exception e) {
-            log.error("",e);
+            log.error("委托历史迁移到ES异常", e);
         }
     }
+
 }

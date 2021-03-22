@@ -10,7 +10,6 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
-import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomAddressMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
@@ -58,9 +57,6 @@ public class AddressService {
     private final Logger logger = LoggerFactory.getLogger(AddressService.class);
 
     @Resource
-    private AddressMapper addressMapper;
-
-    @Resource
     private CustomAddressMapper customAddressMapper;
 
     @Resource
@@ -98,7 +94,6 @@ public class AddressService {
         }
         if (item != null) {
             BeanUtils.copyProperties(item, resp);
-            resp.setErc721TxQty(item.getTokenTxQty());
             resp.setDelegateUnlock(item.getDelegateHes());
             /** 预先设置是否展示锁仓 */
             resp.setIsRestricting(0);

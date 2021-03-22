@@ -6,7 +6,6 @@ import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.bootstrap.ShutdownCallback;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dao.mapper.SyncTokenInfoMapper;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
@@ -31,20 +30,24 @@ import static org.mockito.Mockito.*;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ConsistencyServiceTest extends AgentTestBase {
+
     @Mock
     private NetworkStatMapper networkStatMapper;
+
     @Mock
     private EsBlockRepository ESBlockRepository;
+
     @Mock
     private BlockService blockService;
+
     @Mock
     private ReceiptService receiptService;
+
     @Mock
     private BootstrapEventPublisher bootstrapEventPublisher;
+
     @Mock
     private ShutdownCallback shutdownCallback;
-    @Mock
-    private SyncTokenInfoMapper syncTokenInfoMapper;
 
     @InjectMocks
     @Spy
