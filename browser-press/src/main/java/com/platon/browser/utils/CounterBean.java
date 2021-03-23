@@ -39,6 +39,10 @@ public class CounterBean {
 
     private long tokenCount;
 
+    private long tokenHolderCount;
+
+    private long tokenInventoryCount;
+
     private long tokenTransferCount;
 
     /**

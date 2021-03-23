@@ -1,17 +1,18 @@
 package com.platon.browser.service;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.bech32.Bech32;
 import com.platon.browser.PressApplication;
-import com.platon.browser.utils.CommonUtil;
-import com.platon.crypto.Keys;
-import com.platon.parameters.NetworkParameters;
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexUtil;
+import com.platon.crypto.Keys;
+import com.platon.parameters.NetworkParameters;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -146,6 +147,8 @@ public class DataGenService {
 
     private String erc20TokenStr;
 
+    private String erc721TokenStr;
+
     private String esTokenTransferRecordStr;
 
     private NetworkStat networkStat;
@@ -222,6 +225,9 @@ public class DataGenService {
                     case "erc20Token.json":
                         erc20TokenStr = content;
                         break;
+                    case "erc721Token.json":
+                        erc721TokenStr = content;
+                        break;
                     case "tokenTransfer.json":
                         esTokenTransferRecordStr = content;
                         break;
@@ -248,12 +254,25 @@ public class DataGenService {
 
         Block block = JSON.parseObject(blockListStr, Block.class);
         br.setBlock(block);
-        //List<Transaction> transactionList = JSON.parseArray(transactionListStr, Transaction.class);
         List<Transaction> transactionList = new ArrayList<>();
         for (int i = 1; i <= txCountPerBlock; i++) {
             Transaction tx = JSON.parseObject(tokenTransferTxStr, Transaction.class);
             tx.setHash(BlockResult.createNum("0x", 64, i));
-            if (i <= 180) {
+            if (i <= 10) {
+                tx.setType(Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+                tx.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
+            } else if (10 < i && i <= 20) {
+                tx.setType(Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+            } else if (20 < i && i <= 30) {
+                tx.setType(Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+                tx.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
+            } else if (30 < i && i <= 40) {
+                tx.setType(Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+            } else if (40 < i && i <= 180) {
                 //转账
                 tx.setType(0);
             } else if (180 < i && i <= 182) {
@@ -265,6 +284,7 @@ public class DataGenService {
             } else if (190 < i && i <= 200) {
                 tx.setType(1005);
             }
+            tx.setContractAddress(CommonUtil.getRandomAddress());
             tx.setSeq(++PressApplication.currentTransferCount);
             transactionList.add(tx);
         }
@@ -324,6 +344,9 @@ public class DataGenService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public Delegation getDelegation(Transaction tx) {
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
+        if (copy == null) {
+            System.out.println("打印结果为：" + 1111);
+        }
         copy.setStakingBlockNum(tx.getNum());
         //copy.setNodeId(randomNodeId());
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
@@ -405,59 +428,96 @@ public class DataGenService {
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         return copy;
     }
-//
-//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-//    public Erc20Token getErc20Token(Transaction tx){
-//        Erc20Token copy = JSON.parseObject(erc20TokenStr, Erc20Token.class);
-//        copy.setTxHash(tx.getHash());
-//        copy.setAddress(rAddress());
-//        copy.setName("Token-" + tx.getSeq());
-//        copy.setSymbol(tx.getSeq() + "");
-//        copy.setDecimal(18);
-//        copy.setTotalSupply(new BigDecimal("10000000000000000000000000"));
-//        copy.setCreator(tx.getFrom());
-//        copy.setType("E");
-//        copy.setStatus(1);
-//        copy.setTxCount(100);
-//        copy.setBlockTimestamp(tx.getTime());
-//        copy.setCreateTime(new Date());
-//        return copy;
-//    }
-//
-//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-//    public OldErcTx getESTokenTransferRecord(Transaction tx){
-//        OldErcTx transferRecord = JSON.parseObject(esTokenTransferRecordStr, OldErcTx.class);
-//        transferRecord.setSeq(tx.getSeq());
-//        transferRecord.setBTime(tx.getTime());
-//        transferRecord.setBn(tx.getNum());
-//        transferRecord.setContract(tx.getContractAddress());
-//        transferRecord.setCtime(new Date());
-//        transferRecord.setDecimal(17);
-//        transferRecord.setFrom(tx.getFrom());
-//        transferRecord.setHash(tx.getHash());
-//        transferRecord.setName("Token-" + tx.getSeq());
-//        transferRecord.setSymbol("" + tx.getSeq());
-//        transferRecord.setTValue("100000000000000000000");
-//        transferRecord.setResult(1);
-//        transferRecord.setTto(tx.getTo());
-//        transferRecord.setTxFee(tx.getCost());
-//        return transferRecord;
-//    }
-//
-//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-//    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock){
-//        List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
-//        for (int i = 0; i < addressCountPerBlock; i++) {
-//            Erc20TokenAddressRel rel = Erc20TokenAddressRel.builder()
-//                    .contract(token.getAddress())
-//                    .address(rMockAddress())
-//                    .balance(new BigDecimal("10000000000000000000"))
-//                    .name(token.getName()).symbol(token.getSymbol())
-//                    .decimal(token.getDecimal()).txCount(i)
-//                    .totalSupply(token.getTotalSupply()).updateTime(new Date())
-//                    .build();
-//            erc20TokenAddressRelList.add(rel);
-//        }
-//        return erc20TokenAddressRelList;
-//    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Token getToken(Transaction tx) {
+        Token token = new Token();
+        token.setAddress(tx.getContractAddress());
+        if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode()) {
+            token.setType("erc20");
+            token.setIsSupportErc165(false);
+            token.setIsSupportErc20(true);
+            token.setIsSupportErc721(false);
+            token.setIsSupportErc721Enumeration(false);
+            token.setIsSupportErc721Metadata(false);
+            token.setName("erc20Test");
+        } else if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()) {
+            token.setType("erc721");
+            token.setIsSupportErc165(false);
+            token.setIsSupportErc20(false);
+            token.setIsSupportErc721(true);
+            token.setIsSupportErc721Enumeration(true);
+            token.setIsSupportErc721Metadata(true);
+            token.setName("erc721Test");
+        }
+        token.setTokenTxQty(1);
+        token.setHolder(1);
+        token.setSymbol("aLAT");
+        token.setTotalSupply(new BigDecimal("100000000000000000000"));
+        token.setDecimal(18);
+        return token;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public TokenHolder getTokenHolder(Transaction tx) {
+        TokenHolder tokenHolder = new TokenHolder();
+        tokenHolder.setTokenAddress(tx.getContractAddress());
+        tokenHolder.setAddress(tx.getTo());
+        tokenHolder.setBalance(new BigDecimal("0"));
+        tokenHolder.setCreateTime(new Date());
+        tokenHolder.setUpdateTime(new Date());
+        tokenHolder.setTokenTxQty(1);
+        return tokenHolder;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public TokenInventory getTokenInventory(Transaction tx) {
+        TokenInventory tokenInventory = new TokenInventory();
+        tokenInventory.setName("");
+        tokenInventory.setDescription("");
+        tokenInventory.setImage("");
+        tokenInventory.setCreateTime(new Date());
+        tokenInventory.setUpdateTime(new Date());
+        tokenInventory.setTokenTxQty(1);
+        tokenInventory.setTokenOwnerTxQty(1);
+        tokenInventory.setTokenAddress(tx.getContractAddress());
+        List<BigInteger> list = new ArrayList() {{
+            add(new BigInteger("1000000"));
+            add(new BigInteger("1000001"));
+            add(new BigInteger("1000002"));
+            add(new BigInteger("1000003"));
+            add(new BigInteger("1000004"));
+            add(new BigInteger("1000005"));
+        }};
+        BigInteger tokenId = list.get((int) (Math.random() * list.size()));
+        tokenInventory.setTokenId(tokenId);
+        tokenInventory.setOwner(tx.getTo());
+        return tokenInventory;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public ErcTx getTokenTX(Transaction tx) {
+        ErcTx ercTx = new ErcTx();
+        if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode()) {
+            ercTx.setName("erc20Test");
+        } else if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode()) {
+            ercTx.setName("erc721Test");
+        }
+        ercTx.setSeq(new Random().nextLong());
+        ercTx.setSymbol("aLAT");
+        ercTx.setDecimal(18);
+        ercTx.setContract(tx.getContractAddress());
+        ercTx.setHash(tx.getHash());
+        ercTx.setFrom(tx.getFrom());
+        ercTx.setTo(tx.getTo());
+        ercTx.setValue("100");
+        ercTx.setBn(tx.getNum());
+        ercTx.setBTime(new Date());
+        ercTx.setToType(tx.getToType());
+        ercTx.setFromType(1);
+        ercTx.setRemark("");
+        ercTx.setTxFee("9744300");
+        return ercTx;
+    }
+
 }

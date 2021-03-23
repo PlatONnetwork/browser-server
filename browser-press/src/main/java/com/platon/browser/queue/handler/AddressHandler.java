@@ -1,23 +1,20 @@
 package com.platon.browser.queue.handler;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.queue.event.AddressEvent;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.queue.event.AddressEvent;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * @Auther: dongqile
@@ -30,8 +27,11 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
 
     @Autowired
     private AddressMapper addressMapper;
+
     @PostConstruct
-    private void init(){this.setLogger(log);}
+    private void init() {
+        this.setLogger(log);
+    }
 
     @Setter
     @Getter
@@ -43,20 +43,21 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
 
     private Set<Address> stage = new HashSet<>();
 
+
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent ( AddressEvent event, long sequence, boolean endOfBatch ) {
+    public void onEvent(AddressEvent event, long sequence, boolean endOfBatch) {
         long startTime = System.currentTimeMillis();
         this.stage.addAll(event.getAddressList());
         log.info("stat:{},batchSize:{},getTotalCount():{},addressMaxCount:{}", this.stage.size(), this.batchSize, this.getTotalCount(), this.addressMaxCount);
-        if(this.stage.size()< this.batchSize){
+        if (this.stage.size() < this.batchSize) {
             // 如果暂存数量小于批次
-            if(this.getTotalCount()> this.addressMaxCount){
+            if (this.getTotalCount() > this.addressMaxCount) {
                 // 且当前地址数未达到指定数量
                 return;
             }
         }
-        Map<String,Address> addressMap = new HashMap<>();
-        this.stage.forEach(address -> addressMap.put(address.getAddress(),address));
+        Map<String, Address> addressMap = new HashMap<>();
+        this.stage.forEach(address -> addressMap.put(address.getAddress(), address));
         addressMap.values().forEach(address -> {
             address.setBalance(BigDecimal.ZERO);
             address.setCandidateCount(0);
@@ -76,7 +77,6 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
             address.setErc20TxQty(0);
             address.setErc721TxQty(0);
             address.setUpdateTime(new Date());
-            address.setType(1);
             address.setContractName("");
             address.setContractCreate("");
             address.setContractCreatehash("");
@@ -93,15 +93,16 @@ public class AddressHandler extends AbstractHandler<AddressEvent> {
         List<Address> addressList = new ArrayList<>(addressMap.values());
 
         try {
-        	if(this.getTotalCount()< this.addressMaxCount){
-                if(!addressList.isEmpty()) this.addressMapper.batchInsert(addressList);
+            if (this.getTotalCount() < this.addressMaxCount) {
+                if (!addressList.isEmpty())
+                    this.addressMapper.batchInsert(addressList);
                 long endTime = System.currentTimeMillis();
-                this.printTps("地址",addressList.size(),startTime,endTime);
+                this.printTps("地址", addressList.size(), startTime, endTime);
             }
-		} catch (Exception e) {
-			log.error("insert address error", e);
-		}
-
+        } catch (Exception e) {
+            log.error("insert address error", e);
+        }
         this.stage.clear();
     }
+
 }

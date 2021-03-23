@@ -80,10 +80,24 @@ public class TransactionHandler extends AbstractHandler<TransactionEvent> {
             cache.forEach(tx -> {
                 Address address = new Address();
                 address.setAddress(tx.getFrom());
+                address.setType(1);
                 addressList.add(address);
                 address = new Address();
                 address.setAddress(tx.getTo());
+                address.setType(1);
                 addressList.add(address);
+                if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode()) {
+                    address = new Address();
+                    address.setAddress(tx.getContractAddress());
+                    address.setType(5);
+                    addressList.add(address);
+                }
+                if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()) {
+                    address = new Address();
+                    address.setAddress(tx.getContractAddress());
+                    address.setType(6);
+                    addressList.add(address);
+                }
 
                 if (
                         tx.getTypeEnum() == Transaction.TypeEnum.DELEGATE_CREATE ||
