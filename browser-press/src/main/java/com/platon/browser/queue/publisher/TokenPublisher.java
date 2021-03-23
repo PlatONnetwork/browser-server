@@ -2,9 +2,6 @@ package com.platon.browser.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.platon.browser.dao.entity.Slash;
-import com.platon.browser.dao.entity.Token;
-import com.platon.browser.queue.event.SlashEvent;
 import com.platon.browser.queue.event.TokenEvent;
 import com.platon.browser.queue.handler.AbstractHandler;
 import com.platon.browser.queue.handler.TokenHandler;
@@ -13,13 +10,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @Slf4j
 @Component
 public class TokenPublisher extends AbstractPublisher {
 
-    private static final EventTranslatorOneArg<TokenEvent, List<Token>> TRANSLATOR = (event, sequence, msg) -> event.setTokenList(msg);
+    private static final EventTranslatorOneArg<TokenEvent, TokenEvent> TRANSLATOR = (event, sequence, arg0) -> {
+        event.setTokenList(arg0.getTokenList());
+        event.setErc20TxList(arg0.getErc20TxList());
+        event.setErc721TxList(arg0.getErc721TxList());
+    };
 
     @Resource
     private TokenHandler tokenHandler;

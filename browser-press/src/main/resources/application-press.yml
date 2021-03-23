@@ -106,7 +106,7 @@ disruptor:
       batch-size: 5000
     token-transfer:
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 20
 #PlatOn相关配置
 platon:
   #Redis命名空间

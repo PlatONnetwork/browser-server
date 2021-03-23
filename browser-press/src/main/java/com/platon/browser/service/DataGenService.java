@@ -5,10 +5,8 @@ import com.platon.bech32.Bech32;
 import com.platon.browser.PressApplication;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -255,19 +254,24 @@ public class DataGenService {
 
         Block block = JSON.parseObject(blockListStr, Block.class);
         br.setBlock(block);
-        //List<Transaction> transactionList = JSON.parseArray(transactionListStr, Transaction.class);
         List<Transaction> transactionList = new ArrayList<>();
         for (int i = 1; i <= txCountPerBlock; i++) {
             Transaction tx = JSON.parseObject(tokenTransferTxStr, Transaction.class);
             tx.setHash(BlockResult.createNum("0x", 64, i));
             if (i <= 10) {
-                tx.setType(6);
+                tx.setType(Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
+                tx.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
             } else if (10 < i && i <= 20) {
-                tx.setType(7);
+                tx.setType(Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
             } else if (20 < i && i <= 30) {
-                tx.setType(8);
+                tx.setType(Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+                tx.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
             } else if (30 < i && i <= 40) {
-                tx.setType(9);
+                tx.setType(Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode());
+                tx.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             } else if (40 < i && i <= 180) {
                 //转账
                 tx.setType(0);
@@ -280,7 +284,7 @@ public class DataGenService {
             } else if (190 < i && i <= 200) {
                 tx.setType(1005);
             }
-            tx.setContractAddress(randomAddress());
+            tx.setContractAddress(CommonUtil.getRandomAddress());
             tx.setSeq(++PressApplication.currentTransferCount);
             transactionList.add(tx);
         }
@@ -423,6 +427,97 @@ public class DataGenService {
         copy.setBenefitAddr(randomAddress());
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         return copy;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public Token getToken(Transaction tx) {
+        Token token = new Token();
+        token.setAddress(tx.getContractAddress());
+        if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode()) {
+            token.setType("erc20");
+            token.setIsSupportErc165(false);
+            token.setIsSupportErc20(true);
+            token.setIsSupportErc721(false);
+            token.setIsSupportErc721Enumeration(false);
+            token.setIsSupportErc721Metadata(false);
+            token.setName("erc20Test");
+        } else if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()) {
+            token.setType("erc721");
+            token.setIsSupportErc165(false);
+            token.setIsSupportErc20(false);
+            token.setIsSupportErc721(true);
+            token.setIsSupportErc721Enumeration(true);
+            token.setIsSupportErc721Metadata(true);
+            token.setName("erc721Test");
+        }
+        token.setTokenTxQty(1);
+        token.setHolder(1);
+        token.setSymbol("aLAT");
+        token.setTotalSupply(new BigDecimal("100000000000000000000"));
+        token.setDecimal(18);
+        return token;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public TokenHolder getTokenHolder(Transaction tx) {
+        TokenHolder tokenHolder = new TokenHolder();
+        tokenHolder.setTokenAddress(tx.getContractAddress());
+        tokenHolder.setAddress(tx.getTo());
+        tokenHolder.setBalance(new BigDecimal("0"));
+        tokenHolder.setCreateTime(new Date());
+        tokenHolder.setUpdateTime(new Date());
+        tokenHolder.setTokenTxQty(1);
+        return tokenHolder;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public TokenInventory getTokenInventory(Transaction tx) {
+        TokenInventory tokenInventory = new TokenInventory();
+        tokenInventory.setName("");
+        tokenInventory.setDescription("");
+        tokenInventory.setImage("");
+        tokenInventory.setCreateTime(new Date());
+        tokenInventory.setUpdateTime(new Date());
+        tokenInventory.setTokenTxQty(1);
+        tokenInventory.setTokenOwnerTxQty(1);
+        tokenInventory.setTokenAddress(tx.getContractAddress());
+        List<BigInteger> list = new ArrayList() {{
+            add(new BigInteger("1000000"));
+            add(new BigInteger("1000001"));
+            add(new BigInteger("1000002"));
+            add(new BigInteger("1000003"));
+            add(new BigInteger("1000004"));
+            add(new BigInteger("1000005"));
+        }};
+        BigInteger tokenId = list.get((int) (Math.random() * list.size()));
+        tokenInventory.setTokenId(tokenId);
+        tokenInventory.setOwner(tx.getTo());
+        return tokenInventory;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public ErcTx getTokenTX(Transaction tx) {
+        ErcTx ercTx = new ErcTx();
+        if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode()) {
+            ercTx.setName("erc20Test");
+        } else if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode()) {
+            ercTx.setName("erc721Test");
+        }
+        ercTx.setSeq(new Random().nextLong());
+        ercTx.setSymbol("aLAT");
+        ercTx.setDecimal(18);
+        ercTx.setContract(tx.getContractAddress());
+        ercTx.setHash(tx.getHash());
+        ercTx.setFrom(tx.getFrom());
+        ercTx.setTo(tx.getTo());
+        ercTx.setValue("100");
+        ercTx.setBn(tx.getNum());
+        ercTx.setBTime(new Date());
+        ercTx.setToType(tx.getToType());
+        ercTx.setFromType(1);
+        ercTx.setRemark("");
+        ercTx.setTxFee("9744300");
+        return ercTx;
     }
 
 }

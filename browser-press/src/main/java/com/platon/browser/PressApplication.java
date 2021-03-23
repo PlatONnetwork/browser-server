@@ -8,6 +8,7 @@ import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.GracefullyShutdownException;
+import com.platon.browser.queue.event.TokenEvent;
 import com.platon.browser.queue.publisher.*;
 import com.platon.browser.service.BlockResult;
 import com.platon.browser.service.DataGenService;
@@ -224,6 +225,8 @@ public class PressApplication implements ApplicationRunner {
             makeReward(blockResult);
             // 构造【gas】数据
             makeEstimate(blockResult);
+            // 构造【token】数据
+            makeToken(blockResult);
             // 区块号累加
             blockNumber = blockNumber.add(BigInteger.ONE);
             log.info("当前块高：" + blockNumber);
@@ -540,6 +543,38 @@ public class PressApplication implements ApplicationRunner {
                 }
             }
             estimatePublisher.publish(gasEstimates);
+        }
+    }
+
+    private void makeToken(BlockResult blockResult) {
+        if (currentTokenCount < tokenMaxCount) {
+            TokenEvent tokenEvent = new TokenEvent();
+            List<TokenHolder> tokenHolderList = new ArrayList<>();
+            List<TokenInventory> tokenInventoryList = new ArrayList<>();
+            for (Transaction tx : blockResult.getTransactionList()) {
+                // erc20和erc721创建，入库mysql
+                if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode()) {
+                    tokenEvent.getTokenList().add(dataGenService.getToken(tx));
+                    tokenHolderList.add(dataGenService.getTokenHolder(tx));
+                    currentTokenCount++;
+                }
+                if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()) {
+                    tokenEvent.getTokenList().add(dataGenService.getToken(tx));
+                    tokenHolderList.add(dataGenService.getTokenHolder(tx));
+                    tokenInventoryList.add(dataGenService.getTokenInventory(tx));
+                    currentTokenCount++;
+                }
+                // erc20和erc721创建，入库Redis和es
+                if (tx.getType() == Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode()) {
+                    tokenEvent.getErc20TxList().add(dataGenService.getTokenTX(tx));
+                }
+                if (tx.getType() == Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode()) {
+                    tokenEvent.getErc721TxList().add(dataGenService.getTokenTX(tx));
+                }
+            }
+            tokenPublisher.publish(tokenEvent);
+            tokenHolderPublisher.publish(tokenHolderList);
+            tokenInventoryPublisher.publish(tokenInventoryList);
         }
     }
 

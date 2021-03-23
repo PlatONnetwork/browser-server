@@ -1,6 +1,7 @@
 package com.platon.browser.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -8,6 +9,7 @@ import org.jasypt.util.text.BasicTextEncryptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.UUID;
 
 @Slf4j
 public class CommonUtil {
@@ -96,6 +98,18 @@ public class CommonUtil {
             log.error("加密异常", e);
             return "";
         }
+    }
+
+    /**
+     * 创建随机地址
+     *
+     * @param
+     * @return java.lang.String
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/3/23
+     */
+    public static String getRandomAddress() {
+        return HexUtil.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString()));
     }
 
     public static void main(String[] args) {
