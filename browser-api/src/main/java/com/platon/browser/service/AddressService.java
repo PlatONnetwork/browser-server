@@ -92,12 +92,12 @@ public class AddressService {
         }
         /** 根据主键查询地址信息 */
         CustomAddressDetail item = customAddressMapper.findAddressDetail(req.getAddress());
-        if (TokenTypeEnum.ERC20.getType().equalsIgnoreCase(item.getTokenType())) {
-            resp.setHasErc20(true);
-        } else {
-            resp.setHasErc721(true);
-        }
         if (item != null) {
+            if (TokenTypeEnum.ERC20.getType().equalsIgnoreCase(item.getTokenType())) {
+                resp.setHasErc20(true);
+            } else {
+                resp.setHasErc721(true);
+            }
             BeanUtils.copyProperties(item, resp);
             resp.setDelegateUnlock(item.getDelegateHes());
             /** 预先设置是否展示锁仓 */

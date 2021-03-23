@@ -1,17 +1,20 @@
 package com.platon.browser.service;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.bech32.Bech32;
 import com.platon.browser.PressApplication;
-import com.platon.browser.utils.CommonUtil;
-import com.platon.crypto.Keys;
-import com.platon.parameters.NetworkParameters;
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexUtil;
+import com.platon.crypto.Keys;
+import com.platon.parameters.NetworkParameters;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -25,7 +28,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -146,6 +148,8 @@ public class DataGenService {
 
     private String erc20TokenStr;
 
+    private String erc721TokenStr;
+
     private String esTokenTransferRecordStr;
 
     private NetworkStat networkStat;
@@ -222,6 +226,9 @@ public class DataGenService {
                     case "erc20Token.json":
                         erc20TokenStr = content;
                         break;
+                    case "erc721Token.json":
+                        erc721TokenStr = content;
+                        break;
                     case "tokenTransfer.json":
                         esTokenTransferRecordStr = content;
                         break;
@@ -253,7 +260,15 @@ public class DataGenService {
         for (int i = 1; i <= txCountPerBlock; i++) {
             Transaction tx = JSON.parseObject(tokenTransferTxStr, Transaction.class);
             tx.setHash(BlockResult.createNum("0x", 64, i));
-            if (i <= 180) {
+            if (i <= 10) {
+                tx.setType(6);
+            } else if (10 < i && i <= 20) {
+                tx.setType(7);
+            } else if (20 < i && i <= 30) {
+                tx.setType(8);
+            } else if (30 < i && i <= 40) {
+                tx.setType(9);
+            } else if (40 < i && i <= 180) {
                 //转账
                 tx.setType(0);
             } else if (180 < i && i <= 182) {
@@ -265,6 +280,7 @@ public class DataGenService {
             } else if (190 < i && i <= 200) {
                 tx.setType(1005);
             }
+            tx.setContractAddress(randomAddress());
             tx.setSeq(++PressApplication.currentTransferCount);
             transactionList.add(tx);
         }
@@ -324,6 +340,9 @@ public class DataGenService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public Delegation getDelegation(Transaction tx) {
         Delegation copy = JSON.parseObject(delegationStr, Delegation.class);
+        if (copy == null) {
+            System.out.println("打印结果为：" + 1111);
+        }
         copy.setStakingBlockNum(tx.getNum());
         //copy.setNodeId(randomNodeId());
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
@@ -405,59 +424,5 @@ public class DataGenService {
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         return copy;
     }
-//
-//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-//    public Erc20Token getErc20Token(Transaction tx){
-//        Erc20Token copy = JSON.parseObject(erc20TokenStr, Erc20Token.class);
-//        copy.setTxHash(tx.getHash());
-//        copy.setAddress(rAddress());
-//        copy.setName("Token-" + tx.getSeq());
-//        copy.setSymbol(tx.getSeq() + "");
-//        copy.setDecimal(18);
-//        copy.setTotalSupply(new BigDecimal("10000000000000000000000000"));
-//        copy.setCreator(tx.getFrom());
-//        copy.setType("E");
-//        copy.setStatus(1);
-//        copy.setTxCount(100);
-//        copy.setBlockTimestamp(tx.getTime());
-//        copy.setCreateTime(new Date());
-//        return copy;
-//    }
-//
-//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-//    public OldErcTx getESTokenTransferRecord(Transaction tx){
-//        OldErcTx transferRecord = JSON.parseObject(esTokenTransferRecordStr, OldErcTx.class);
-//        transferRecord.setSeq(tx.getSeq());
-//        transferRecord.setBTime(tx.getTime());
-//        transferRecord.setBn(tx.getNum());
-//        transferRecord.setContract(tx.getContractAddress());
-//        transferRecord.setCtime(new Date());
-//        transferRecord.setDecimal(17);
-//        transferRecord.setFrom(tx.getFrom());
-//        transferRecord.setHash(tx.getHash());
-//        transferRecord.setName("Token-" + tx.getSeq());
-//        transferRecord.setSymbol("" + tx.getSeq());
-//        transferRecord.setTValue("100000000000000000000");
-//        transferRecord.setResult(1);
-//        transferRecord.setTto(tx.getTo());
-//        transferRecord.setTxFee(tx.getCost());
-//        return transferRecord;
-//    }
-//
-//    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-//    public List<Erc20TokenAddressRel> getErc20TokenAddressRel(Erc20Token token, int addressCountPerBlock){
-//        List<Erc20TokenAddressRel> erc20TokenAddressRelList = new ArrayList<>();
-//        for (int i = 0; i < addressCountPerBlock; i++) {
-//            Erc20TokenAddressRel rel = Erc20TokenAddressRel.builder()
-//                    .contract(token.getAddress())
-//                    .address(rMockAddress())
-//                    .balance(new BigDecimal("10000000000000000000"))
-//                    .name(token.getName()).symbol(token.getSymbol())
-//                    .decimal(token.getDecimal()).txCount(i)
-//                    .totalSupply(token.getTotalSupply()).updateTime(new Date())
-//                    .build();
-//            erc20TokenAddressRelList.add(rel);
-//        }
-//        return erc20TokenAddressRelList;
-//    }
+
 }

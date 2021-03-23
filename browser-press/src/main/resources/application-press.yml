@@ -9,9 +9,9 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_hrpatp201018?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_hrpatp201018v10000hyp?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==))
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #Redis配置
   redis:
     cluster:
@@ -58,10 +58,10 @@ disruptor:
       batch-size: 256
     transaction:
       buffer-size: 1024
-      batch-size: 51200
+      batch-size: 1024
     nodeopt:
       buffer-size: 1024
-      batch-size: 1024
+      batch-size: 512
     node:
       buffer-size: 1024
       batch-size: 2
@@ -70,7 +70,7 @@ disruptor:
       batch-size: 3
     delegation:
       buffer-size: 1024
-      batch-size: 1000
+      batch-size: 256
     proposal:
       buffer-size: 1024
       batch-size: 3
@@ -92,9 +92,15 @@ disruptor:
     address:
       buffer-size: 1024
       batch-size: 1024
-    erc20-token:
+    token:
       buffer-size: 1024
-      batch-size: 100
+      batch-size: 50
+    token-holder:
+      buffer-size: 1024
+      batch-size: 50
+    token-inventory:
+      buffer-size: 1024
+      batch-size: 50
     token-address:
       buffer-size: 1024
       batch-size: 5000
@@ -178,6 +184,10 @@ platon:
   nodeoptMaxCount: 1788000
   #代币合约最大条数
   tokenMaxCount: 100000
+  #代币合约最大条数
+  tokenERC20MaxCount: 50000
+  #代币合约最大条数
+  tokenERC721MaxCount: 50000
   #每个代币与地址建立关系的数量
   #addressCountPerToken: 1000000000
   addressCountPerToken: 100000
