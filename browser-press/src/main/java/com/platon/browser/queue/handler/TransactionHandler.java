@@ -118,6 +118,7 @@ public class TransactionHandler extends AbstractHandler<TransactionEvent> {
                 }
 
             });
+            dataGenService.getNetworkStat().setCurNumber(event.getBlockNum().longValue());
             dataGenService.getNetworkStat().setTxQty(Convert.toInt(this.getTotalCount()));
             redisStatisticService.save(Collections.singleton(dataGenService.getNetworkStat()), true);
             addressPublisher.publish(addressList);
