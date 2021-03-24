@@ -19,7 +19,7 @@ import java.util.*;
 public class BlockResult {
 
 
-    static class AddressCount {
+    public static class AddressCount {
 
         private String address;
 
