@@ -247,7 +247,6 @@ public class DataGenService {
     @Value("${platon.addressReusedTimes}")
     private int addressReusedTimes;
 
-
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public BlockResult getBlockResult(BigInteger blockNumber, long nodeMaxCount) {
         BlockResult br = new BlockResult();
@@ -284,12 +283,11 @@ public class DataGenService {
             } else if (190 < i && i <= 200) {
                 tx.setType(1005);
             }
-            tx.setContractAddress(CommonUtil.getRandomAddress());
+            tx.setContractAddress(CommonUtil.getRandomAddress(1));
             tx.setSeq(++PressApplication.currentTransferCount);
             transactionList.add(tx);
         }
         br.setTransactionList(transactionList);
-
         List<NodeOpt> nodeOptList = JSON.parseArray(nodeOptListStr, NodeOpt.class);
         br.setNodeOptList(nodeOptList);
 

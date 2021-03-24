@@ -1,5 +1,8 @@
 package com.platon.browser.utils;
 
+import com.platon.bech32.Bech32;
+import com.platon.browser.service.BlockResult;
+import com.platon.parameters.NetworkParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -100,22 +103,30 @@ public class CommonUtil {
         }
     }
 
+    private static final BlockResult.AddressCount ADDRESS = new BlockResult.AddressCount();
+
     /**
      * 创建随机地址
      *
-     * @param
+     * @param addressReusedTimes 地址可重复次数
      * @return java.lang.String
      * @author huangyongpeng@matrixelements.com
-     * @date 2021/3/23
+     * @date 2021/3/24
      */
-    public static String getRandomAddress() {
-        return HexUtil.prefix(DigestUtils.sha1Hex(UUID.randomUUID().toString()));
+    public static String getRandomAddress(int addressReusedTimes) {
+        String txHash = HexUtil.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
+        String hexAddr = HexUtil.prefix(DigestUtils.sha1Hex(txHash));
+        return ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), hexAddr), addressReusedTimes);
     }
 
     public static void main(String[] args) {
+        BlockResult.AddressCount FROM_ADDRESS = new BlockResult.AddressCount();
+        String txHash = HexUtil.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
+        String from = HexUtil.prefix(DigestUtils.sha1Hex(txHash));
+        FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), from), 50);
         System.out.println("打印结果为：" + System.getProperties().getProperty("os.name").toLowerCase());
         System.out.println("打印结果为：" + getEncrypt("root"));
-        System.out.println("打印结果为：" + getEncrypt("Juzix123!"));
+        System.out.println("打印结果为：" + FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), from), 50));
     }
 
 }
