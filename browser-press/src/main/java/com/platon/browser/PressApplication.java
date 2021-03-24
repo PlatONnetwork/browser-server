@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
@@ -334,8 +335,12 @@ public class PressApplication implements ApplicationRunner {
      */
     private BlockResult makeBlock(BigInteger blockNumber) {
         BlockResult blockResult = dataGenService.getBlockResult(blockNumber, nodeMaxCount);
+        dataGenService.getNetworkStat().setCurNumber(blockNumber.longValue());
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
-        transactionPublisher.publish(blockResult.getTransactionList());
+        TransactionBean transactionBean = new TransactionBean();
+        transactionBean.setBlockNum(blockNumber);
+        transactionBean.setTransactionList(blockResult.getTransactionList());
+        transactionPublisher.publish(transactionBean);
         if (nodeOptPublisher.getTotalCount() <= nodeoptMaxCount) {
             //如果日志记录达到指定数量则停止入库ES
             nodeOptPublisher.publish(blockResult.getNodeOptList());

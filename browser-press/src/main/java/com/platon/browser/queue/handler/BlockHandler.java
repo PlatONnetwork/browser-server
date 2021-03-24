@@ -2,10 +2,8 @@ package com.platon.browser.queue.handler;
 
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.queue.event.BlockEvent;
-import com.platon.browser.service.DataGenService;
 import com.platon.browser.service.elasticsearch.EsBlockService;
 import com.platon.browser.service.redis.RedisBlockService;
-import com.platon.browser.service.redis.RedisStatisticService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -28,12 +25,9 @@ public class BlockHandler extends AbstractHandler<BlockEvent> {
 
     @Autowired
     private EsBlockService esBlockService;
+
     @Autowired
     private RedisBlockService redisBlockService;
-    @Autowired
-    private RedisStatisticService redisStatisticService;
-    @Autowired
-    private DataGenService dataGenService;
 
     @Setter
     @Getter
@@ -41,8 +35,9 @@ public class BlockHandler extends AbstractHandler<BlockEvent> {
     private volatile int batchSize;
 
     private StageCache<Block> stage = new StageCache<>();
+
     @PostConstruct
-    private void init(){
+    private void init() {
         stage.setBatchSize(batchSize);
         this.setLogger(log);
     }
@@ -53,16 +48,17 @@ public class BlockHandler extends AbstractHandler<BlockEvent> {
         Set<Block> cache = stage.getData();
         try {
             cache.addAll(event.getBlockList());
-            if(cache.size()<batchSize) return;
+            if (cache.size() < batchSize)
+                return;
             esBlockService.save(stage);
-            redisBlockService.save(stage.getData(),false);
-            redisStatisticService.save(Collections.singleton(dataGenService.getNetworkStat()),true);
+            redisBlockService.save(stage.getData(), false);
             long endTime = System.currentTimeMillis();
-            printTps("区块",cache.size(),startTime,endTime);
+            printTps("区块", cache.size(), startTime, endTime);
             cache.clear();
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw e;
         }
     }
+
 }
