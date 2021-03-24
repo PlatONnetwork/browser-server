@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import com.platon.browser.utils.*;
 import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
 import com.platon.browser.constant.Browser;
@@ -19,10 +20,6 @@ import com.platon.browser.request.newblock.BlockListByNodeIdReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
-import com.platon.browser.utils.DateUtil;
-import com.platon.browser.utils.EnergonUtil;
-import com.platon.browser.utils.I18nUtil;
-import com.platon.browser.utils.HexUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -332,6 +329,13 @@ public class BlockService {
             }
 
             blockDetailResp.setTimestamp(block.getTime().getTime());
+
+            // 只有第0个区块有postscript
+            if (0 == blockNumber) {
+                blockDetailResp.setPostscript(BlockUtil.getPostscriptFromExtraData(blockDetailResp.getExtraData()));
+            } else {
+                blockDetailResp.setPostscript("");
+            }
         }
         return blockDetailResp;
     }

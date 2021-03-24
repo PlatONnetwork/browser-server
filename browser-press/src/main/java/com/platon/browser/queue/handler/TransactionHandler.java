@@ -1,5 +1,6 @@
 package com.platon.browser.queue.handler;
 
+import cn.hutool.core.convert.Convert;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -9,6 +10,7 @@ import com.platon.browser.queue.publisher.DelegationPublisher;
 import com.platon.browser.service.BlockResult;
 import com.platon.browser.service.DataGenService;
 import com.platon.browser.service.elasticsearch.EsTransactionService;
+import com.platon.browser.service.redis.RedisStatisticService;
 import com.platon.browser.service.redis.RedisTransactionService;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -50,6 +53,9 @@ public class TransactionHandler extends AbstractHandler<TransactionEvent> {
     @Getter
     @Value("${disruptor.queue.transaction.batch-size}")
     private volatile int batchSize;
+
+    @Autowired
+    private RedisStatisticService redisStatisticService;
 
     private StageCache<Transaction> stage = new StageCache<>();
 
@@ -112,6 +118,8 @@ public class TransactionHandler extends AbstractHandler<TransactionEvent> {
                 }
 
             });
+            dataGenService.getNetworkStat().setTxQty(Convert.toInt(this.getTotalCount()));
+            redisStatisticService.save(Collections.singleton(dataGenService.getNetworkStat()), true);
             addressPublisher.publish(addressList);
             delegationPublisher.publish(delegationList);
             cache.clear();

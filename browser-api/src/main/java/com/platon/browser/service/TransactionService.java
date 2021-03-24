@@ -395,287 +395,346 @@ public class TransactionService {
                 switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
                     /** 创建验证人 */
                     case STAKE_CREATE:
-                        StakeCreateParam createValidatorParam = JSON.parseObject(txInfo, StakeCreateParam.class);
-                        resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
-                        resp.setNodeId(createValidatorParam.getNodeId());
-                        resp.setNodeName(createValidatorParam.getNodeName());
-                        resp.setExternalId(createValidatorParam.getExternalId());
-                        resp.setWebsite(createValidatorParam.getWebsite());
-                        resp.setDetails(createValidatorParam.getDetails());
-                        resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
-                        resp.setTxAmount(createValidatorParam.getAmount());
-                        resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-                        resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString());
+                        try {
+                            StakeCreateParam createValidatorParam = JSON.parseObject(txInfo, StakeCreateParam.class);
+                            resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
+                            resp.setNodeId(createValidatorParam.getNodeId());
+                            resp.setNodeName(createValidatorParam.getNodeName());
+                            resp.setExternalId(createValidatorParam.getExternalId());
+                            resp.setWebsite(createValidatorParam.getWebsite());
+                            resp.setDetails(createValidatorParam.getDetails());
+                            resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
+                            resp.setTxAmount(createValidatorParam.getAmount());
+                            resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
+                            resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString());
+                        } catch (Exception e) {
+                            logger.error("创建验证人交易信息解析异常", e);
+                        }
                         break;
                     /**
                      * 编辑验证人
                      */
                     case STAKE_MODIFY:
-                        StakeModifyParam editValidatorParam = JSON.parseObject(txInfo, StakeModifyParam.class);
-                        resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
-                        resp.setNodeId(editValidatorParam.getNodeId());
-                        resp.setExternalId(editValidatorParam.getExternalId());
-                        resp.setWebsite(editValidatorParam.getWebsite());
-                        resp.setDetails(editValidatorParam.getDetails());
-                        resp.setNodeName(this.commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
-                        resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-
-                        String delegationRatio = null;
-                        if (editValidatorParam.getDelegateRewardPer() != null) {
-                            delegationRatio = new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString();
+                        try {
+                            StakeModifyParam editValidatorParam = JSON.parseObject(txInfo, StakeModifyParam.class);
+                            resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
+                            resp.setNodeId(editValidatorParam.getNodeId());
+                            resp.setExternalId(editValidatorParam.getExternalId());
+                            resp.setWebsite(editValidatorParam.getWebsite());
+                            resp.setDetails(editValidatorParam.getDetails());
+                            resp.setNodeName(this.commonService.getNodeName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
+                            resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
+                            String delegationRatio = null;
+                            if (editValidatorParam.getDelegateRewardPer() != null) {
+                                delegationRatio = new BigDecimal(editValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString();
+                            }
+                            resp.setDelegationRatio(delegationRatio);
+                        } catch (Exception e) {
+                            logger.error("编辑验证人交易信息解析异常", e);
                         }
-                        resp.setDelegationRatio(delegationRatio);
                         break;
                     /**
                      * 增加质押
                      */
                     case STAKE_INCREASE:
-                        StakeIncreaseParam increaseStakingParam = JSON.parseObject(txInfo, StakeIncreaseParam.class);
-                        resp.setNodeId(increaseStakingParam.getNodeId());
-                        resp.setTxAmount(increaseStakingParam.getAmount());
-                        /**
-                         * 节点名称设置
-                         */
-                        resp.setNodeName(this.commonService.getNodeName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
+                        try {
+                            StakeIncreaseParam increaseStakingParam = JSON.parseObject(txInfo, StakeIncreaseParam.class);
+                            resp.setNodeId(increaseStakingParam.getNodeId());
+                            resp.setTxAmount(increaseStakingParam.getAmount());
+                            /**
+                             * 节点名称设置
+                             */
+                            resp.setNodeName(this.commonService.getNodeName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
+                        } catch (Exception e) {
+                            logger.error("增加质押交易信息解析异常", e);
+                        }
                         break;
                     /**
                      * 退出验证人
                      */
                     case STAKE_EXIT:
-                        // nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
-                        StakeExitParam exitValidatorParam = JSON.parseObject(txInfo, StakeExitParam.class);
-                        resp.setNodeId(exitValidatorParam.getNodeId());
-                        resp.setNodeName(this.commonService.getNodeName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
-                        resp.setApplyAmount(exitValidatorParam.getAmount());
-                        StakingKey stakingKeyE = new StakingKey();
-                        stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
-                        stakingKeyE.setStakingBlockNum(exitValidatorParam.getStakingBlockNum().longValue());
-                        Staking staking = this.stakingMapper.selectByPrimaryKey(stakingKeyE);
-                        if (staking != null) {
-                            resp.setRedeemLocked(staking.getStakingReduction());
-                            // 只有已退出，则金额才会退回到账户
-                            if (staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
-                                resp.setRedeemStatus(RedeemStatusEnum.EXITED.getCode());
-                            } else {
-                                resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
+                        try {
+                            // nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
+                            StakeExitParam exitValidatorParam = JSON.parseObject(txInfo, StakeExitParam.class);
+                            resp.setNodeId(exitValidatorParam.getNodeId());
+                            resp.setNodeName(this.commonService.getNodeName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
+                            resp.setApplyAmount(exitValidatorParam.getAmount());
+                            StakingKey stakingKeyE = new StakingKey();
+                            stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
+                            stakingKeyE.setStakingBlockNum(exitValidatorParam.getStakingBlockNum().longValue());
+                            Staking staking = this.stakingMapper.selectByPrimaryKey(stakingKeyE);
+                            if (staking != null) {
+                                resp.setRedeemLocked(staking.getStakingReduction());
+                                // 只有已退出，则金额才会退回到账户
+                                if (staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+                                    resp.setRedeemStatus(RedeemStatusEnum.EXITED.getCode());
+                                } else {
+                                    resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
+                                }
+                                resp.setRedeemUnLockedBlock(exitValidatorParam.getWithdrawBlockNum().toString());
                             }
-                            resp.setRedeemUnLockedBlock(exitValidatorParam.getWithdrawBlockNum().toString());
+                        } catch (Exception e) {
+                            logger.error("退出验证人交易信息解析异常", e);
                         }
                         break;
                     /**
                      * 委托
                      */
                     case DELEGATE_CREATE:
-                        DelegateCreateParam delegateParam = JSON.parseObject(txInfo, DelegateCreateParam.class);
-                        resp.setNodeId(delegateParam.getNodeId());
-                        resp.setTxAmount(delegateParam.getAmount());
-                        resp.setNodeName(this.commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
+                        try {
+                            DelegateCreateParam delegateParam = JSON.parseObject(txInfo, DelegateCreateParam.class);
+                            resp.setNodeId(delegateParam.getNodeId());
+                            resp.setTxAmount(delegateParam.getAmount());
+                            resp.setNodeName(this.commonService.getNodeName(delegateParam.getNodeId(), delegateParam.getNodeName()));
+                        } catch (Exception e) {
+                            logger.error("委托交易信息解析异常", e);
+                        }
                         break;
                     /**
                      * 委托赎回
                      */
                     case DELEGATE_EXIT:
-                        // nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
-                        // 通过txHash关联un_delegation表
-                        DelegateExitParam unDelegateParam = JSON.parseObject(txInfo, DelegateExitParam.class);
-                        resp.setNodeId(unDelegateParam.getNodeId());
-                        resp.setApplyAmount(unDelegateParam.getRealAmount());
-                        resp.setTxAmount(unDelegateParam.getReward());
-                        resp.setNodeName(this.commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
+                        try {
+                            // nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
+                            // 通过txHash关联un_delegation表
+                            DelegateExitParam unDelegateParam = JSON.parseObject(txInfo, DelegateExitParam.class);
+                            resp.setNodeId(unDelegateParam.getNodeId());
+                            resp.setApplyAmount(unDelegateParam.getRealAmount());
+                            resp.setTxAmount(unDelegateParam.getReward());
+                            resp.setNodeName(this.commonService.getNodeName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
+                        } catch (Exception e) {
+                            logger.error("委托赎回交易信息解析异常", e);
+                        }
                         break;
                     /**
                      * 文本提案
                      */
                     case PROPOSAL_TEXT:
-                        ProposalTextParam createProposalTextParam = JSON.parseObject(txInfo, ProposalTextParam.class);
-                        if (StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
-                            resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
+                        try {
+                            ProposalTextParam createProposalTextParam = JSON.parseObject(txInfo, ProposalTextParam.class);
+                            if (StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
+                                resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
+                            }
+                            resp.setNodeId(createProposalTextParam.getVerifier());
+                            resp.setProposalHash(req.getTxHash());
+                            resp.setNodeName(this.commonService.getNodeName(createProposalTextParam.getVerifier(),
+                                    createProposalTextParam.getNodeName()));
+                            /** 如果数据库有值，以数据库为准 */
+                            this.transferTransaction(resp, req.getTxHash());
+                        } catch (Exception e) {
+                            logger.error("文本提案交易信息解析异常", e);
                         }
-                        resp.setNodeId(createProposalTextParam.getVerifier());
-                        resp.setProposalHash(req.getTxHash());
-                        resp.setNodeName(this.commonService.getNodeName(createProposalTextParam.getVerifier(),
-                                createProposalTextParam.getNodeName()));
-                        /** 如果数据库有值，以数据库为准 */
-                        this.transferTransaction(resp, req.getTxHash());
                         break;
                     /**
                      * 升级提案
                      */
                     case PROPOSAL_UPGRADE:
-                        ProposalUpgradeParam createProposalUpgradeParam =
-                                JSON.parseObject(txInfo, ProposalUpgradeParam.class);
-                        resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
-                        if (StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
-                            resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
+                        try {
+                            ProposalUpgradeParam createProposalUpgradeParam =
+                                    JSON.parseObject(txInfo, ProposalUpgradeParam.class);
+                            resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
+                            if (StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
+                                resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
+                            }
+                            resp.setNodeId(createProposalUpgradeParam.getVerifier());
+                            resp.setProposalHash(req.getTxHash());
+                            resp.setNodeName(this.commonService.getNodeName(createProposalUpgradeParam.getVerifier(),
+                                    createProposalUpgradeParam.getNodeName()));
+                            /** 如果数据库有值，以数据库为准 */
+                            this.transferTransaction(resp, req.getTxHash());
+                        } catch (Exception e) {
+                            logger.error("升级提案交易信息解析异常", e);
                         }
-                        resp.setNodeId(createProposalUpgradeParam.getVerifier());
-                        resp.setProposalHash(req.getTxHash());
-                        resp.setNodeName(this.commonService.getNodeName(createProposalUpgradeParam.getVerifier(),
-                                createProposalUpgradeParam.getNodeName()));
-                        /** 如果数据库有值，以数据库为准 */
-                        this.transferTransaction(resp, req.getTxHash());
                         break;
                     /**
                      * 参数提案
                      */
                     case PROPOSAL_PARAMETER:
-                        ProposalParameterParam proposalParameterParam =
-                                JSON.parseObject(txInfo, ProposalParameterParam.class);
-                        if (StringUtils.isNotBlank(proposalParameterParam.getPIDID())) {
-                            resp.setPipNum("PIP-" + proposalParameterParam.getPIDID());
+                        try {
+                            ProposalParameterParam proposalParameterParam =
+                                    JSON.parseObject(txInfo, ProposalParameterParam.class);
+                            if (StringUtils.isNotBlank(proposalParameterParam.getPIDID())) {
+                                resp.setPipNum("PIP-" + proposalParameterParam.getPIDID());
+                            }
+                            resp.setNodeId(proposalParameterParam.getVerifier());
+                            resp.setProposalHash(req.getTxHash());
+                            resp.setNodeName(this.commonService.getNodeName(proposalParameterParam.getVerifier(),
+                                    proposalParameterParam.getNodeName()));
+                            /** 如果数据库有值，以数据库为准 */
+                            this.transferTransaction(resp, req.getTxHash());
+                        } catch (Exception e) {
+                            logger.error("参数提案交易信息解析异常", e);
                         }
-                        resp.setNodeId(proposalParameterParam.getVerifier());
-                        resp.setProposalHash(req.getTxHash());
-                        resp.setNodeName(this.commonService.getNodeName(proposalParameterParam.getVerifier(),
-                                proposalParameterParam.getNodeName()));
-                        /** 如果数据库有值，以数据库为准 */
-                        this.transferTransaction(resp, req.getTxHash());
                         break;
                     /**
                      * 取消提案
                      */
                     case PROPOSAL_CANCEL:
-                        ProposalCancelParam cancelProposalParam = JSON.parseObject(txInfo, ProposalCancelParam.class);
-                        if (StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
-                            resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
+                        try {
+                            ProposalCancelParam cancelProposalParam = JSON.parseObject(txInfo, ProposalCancelParam.class);
+                            if (StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
+                                resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
+                            }
+                            resp.setNodeId(cancelProposalParam.getVerifier());
+                            resp.setProposalHash(req.getTxHash());
+                            resp.setNodeName(this.commonService.getNodeName(cancelProposalParam.getVerifier(),
+                                    cancelProposalParam.getNodeName()));
+                            /** 如果数据库有值，以数据库为准 */
+                            this.transferTransaction(resp, req.getTxHash());
+                        } catch (Exception e) {
+                            logger.error("取消提案交易信息解析异常", e);
                         }
-                        resp.setNodeId(cancelProposalParam.getVerifier());
-                        resp.setProposalHash(req.getTxHash());
-                        resp.setNodeName(this.commonService.getNodeName(cancelProposalParam.getVerifier(),
-                                cancelProposalParam.getNodeName()));
-                        /** 如果数据库有值，以数据库为准 */
-                        this.transferTransaction(resp, req.getTxHash());
                         break;
                     /**
                      * 提案投票
                      */
                     case PROPOSAL_VOTE:
-                        // nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion + proposalOption
-                        ProposalVoteParam votingProposalParam = JSON.parseObject(txInfo, ProposalVoteParam.class);
-                        resp.setNodeId(votingProposalParam.getVerifier());
-                        resp.setProposalOption(votingProposalParam.getProposalType());
-                        resp.setProposalHash(votingProposalParam.getProposalId());
-                        resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
-                        resp.setNodeName(this.commonService.getNodeName(votingProposalParam.getVerifier(),
-                                votingProposalParam.getNodeName()));
-                        if (StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
-                            resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
-                        }
-                        resp.setVoteStatus(votingProposalParam.getOption());
-                        /**
-                         * 获取提案信息
-                         */
-                        Proposal proposal = this.proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
-                        if (proposal != null) {
-                            resp.setPipNum(proposal.getPipNum());
-                            resp.setProposalTitle(
-                                    Browser.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
-                            resp.setProposalUrl(proposal.getUrl());
-                            resp.setProposalOption(String.valueOf(proposal.getType()));
+                        try {
+                            // nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion + proposalOption
+                            ProposalVoteParam votingProposalParam = JSON.parseObject(txInfo, ProposalVoteParam.class);
+                            resp.setNodeId(votingProposalParam.getVerifier());
+                            resp.setProposalOption(votingProposalParam.getProposalType());
+                            resp.setProposalHash(votingProposalParam.getProposalId());
+                            resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
+                            resp.setNodeName(this.commonService.getNodeName(votingProposalParam.getVerifier(),
+                                    votingProposalParam.getNodeName()));
+                            if (StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
+                                resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
+                            }
+                            resp.setVoteStatus(votingProposalParam.getOption());
+                            /**
+                             * 获取提案信息
+                             */
+                            Proposal proposal = this.proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
+                            if (proposal != null) {
+                                resp.setPipNum(proposal.getPipNum());
+                                resp.setProposalTitle(
+                                        Browser.INQUIRY.equals(proposal.getTopic()) ? "" : proposal.getTopic());
+                                resp.setProposalUrl(proposal.getUrl());
+                                resp.setProposalOption(String.valueOf(proposal.getType()));
+                            }
+                        } catch (Exception e) {
+                            logger.error("提案投票交易信息解析异常", e);
                         }
                         break;
                     /**
                      * 版本申明
                      */
                     case VERSION_DECLARE:
-                        VersionDeclareParam declareVersionParam = JSON.parseObject(txInfo, VersionDeclareParam.class);
-                        resp.setNodeId(declareVersionParam.getActiveNode());
-                        resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
-                        resp.setNodeName(this.commonService.getNodeName(declareVersionParam.getActiveNode(),
-                                declareVersionParam.getNodeName()));
+                        try {
+                            VersionDeclareParam declareVersionParam = JSON.parseObject(txInfo, VersionDeclareParam.class);
+                            resp.setNodeId(declareVersionParam.getActiveNode());
+                            resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
+                            resp.setNodeName(this.commonService.getNodeName(declareVersionParam.getActiveNode(),
+                                    declareVersionParam.getNodeName()));
+                        } catch (Exception e) {
+                            logger.error("版本申明交易信息解析异常", e);
+                        }
                         break;
                     /**
                      * 举报双签
                      */
                     case REPORT:
-                        ReportParam reportValidatorParam = JSON.parseObject(txInfo, ReportParam.class);
-                        List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
-                        TransactionDetailsEvidencesResp transactionDetailsEvidencesResp =
-                                new TransactionDetailsEvidencesResp();
-                        transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
-                        transactionDetailsEvidencesResp.setNodeName(this.commonService
-                                .getNodeName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
-                        resp.setEvidence(reportValidatorParam.getData());
-                        transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
-                        /**
-                         * 查看举报之后是否退出来判断是否交易正确
-                         */
-                        resp.setReportStatus(transaction.getStatus() == 1 ? 2 : 1);
-                        resp.setReportRewards(transaction.getStatus() == StatusEnum.SUCCESS.getCode()
-                                ? reportValidatorParam.getReward() : BigDecimal.ZERO);
-                        resp.setReportType(reportValidatorParam.getType().intValue());
-                        resp.setEvidences(transactionDetailsEvidencesResps);
+                        try {
+                            ReportParam reportValidatorParam = JSON.parseObject(txInfo, ReportParam.class);
+                            List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
+                            TransactionDetailsEvidencesResp transactionDetailsEvidencesResp =
+                                    new TransactionDetailsEvidencesResp();
+                            transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
+                            transactionDetailsEvidencesResp.setNodeName(this.commonService
+                                    .getNodeName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
+                            resp.setEvidence(reportValidatorParam.getData());
+                            transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
+                            /**
+                             * 查看举报之后是否退出来判断是否交易正确
+                             */
+                            resp.setReportStatus(transaction.getStatus() == 1 ? 2 : 1);
+                            resp.setReportRewards(transaction.getStatus() == StatusEnum.SUCCESS.getCode()
+                                    ? reportValidatorParam.getReward() : BigDecimal.ZERO);
+                            resp.setReportType(reportValidatorParam.getType().intValue());
+                            resp.setEvidences(transactionDetailsEvidencesResps);
+                        } catch (Exception e) {
+                            logger.error("举报双签交易信息解析异常", e);
+                        }
                         break;
                     /**
                      * 创建锁仓
                      */
                     case RESTRICTING_CREATE:
-                        // RPAccount + value + RPPlan
-                        RestrictingCreateParam createRestrictingParam =
-                                JSON.parseObject(txInfo, RestrictingCreateParam.class);
-                        List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<>();
-                        resp.setRPAccount(createRestrictingParam.getAccount());
-                        BigDecimal amountSum = new BigDecimal(0);
-                        for (RestrictingCreateParam.RestrictingPlan p : createRestrictingParam.getPlans()) {
-                            TransactionDetailsRPPlanResp transactionDetailsRPPlanResp =
-                                    new TransactionDetailsRPPlanResp();
-                            amountSum = amountSum.add(p.getAmount());
-                            transactionDetailsRPPlanResp.setAmount(p.getAmount());
-                            transactionDetailsRPPlanResp.setEpoch(String.valueOf(p.getEpoch()));
-                            /**
-                             * 锁仓周期对应快高 结算周期数 * epoch + number,如果不是整数倍则为：结算周期 * （epoch-1） + 多余的数目
-                             */
-                            BigInteger number;
-                            long remainder =
-                                    transaction.getNum() % this.blockChainConfig.getSettlePeriodBlockCount().longValue();
-                            if (remainder == 0l) {
-                                number = this.blockChainConfig.getSettlePeriodBlockCount().multiply(p.getEpoch())
-                                        .add(BigInteger.valueOf(transaction.getNum()));
-                            } else {
-                                number = this.blockChainConfig.getSettlePeriodBlockCount()
-                                        .multiply(p.getEpoch().subtract(BigInteger.ONE))
-                                        .add(BigInteger.valueOf(transaction.getNum())).add(this.blockChainConfig
-                                                .getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
+                        try {
+                            // RPAccount + value + RPPlan
+                            RestrictingCreateParam createRestrictingParam =
+                                    JSON.parseObject(txInfo, RestrictingCreateParam.class);
+                            List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<>();
+                            resp.setRPAccount(createRestrictingParam.getAccount());
+                            BigDecimal amountSum = new BigDecimal(0);
+                            for (RestrictingCreateParam.RestrictingPlan p : createRestrictingParam.getPlans()) {
+                                TransactionDetailsRPPlanResp transactionDetailsRPPlanResp =
+                                        new TransactionDetailsRPPlanResp();
+                                amountSum = amountSum.add(p.getAmount());
+                                transactionDetailsRPPlanResp.setAmount(p.getAmount());
+                                transactionDetailsRPPlanResp.setEpoch(String.valueOf(p.getEpoch()));
+                                /**
+                                 * 锁仓周期对应快高 结算周期数 * epoch + number,如果不是整数倍则为：结算周期 * （epoch-1） + 多余的数目
+                                 */
+                                BigInteger number;
+                                long remainder =
+                                        transaction.getNum() % this.blockChainConfig.getSettlePeriodBlockCount().longValue();
+                                if (remainder == 0l) {
+                                    number = this.blockChainConfig.getSettlePeriodBlockCount().multiply(p.getEpoch())
+                                            .add(BigInteger.valueOf(transaction.getNum()));
+                                } else {
+                                    number = this.blockChainConfig.getSettlePeriodBlockCount()
+                                            .multiply(p.getEpoch().subtract(BigInteger.ONE))
+                                            .add(BigInteger.valueOf(transaction.getNum())).add(this.blockChainConfig
+                                                    .getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
+                                }
+                                transactionDetailsRPPlanResp.setBlockNumber(String.valueOf(number));
+                                rpPlanResps.add(transactionDetailsRPPlanResp);
                             }
-                            transactionDetailsRPPlanResp.setBlockNumber(String.valueOf(number));
-                            rpPlanResps.add(transactionDetailsRPPlanResp);
+                            // 累加
+                            resp.setRPNum(amountSum);
+                            resp.setRPPlan(rpPlanResps);
+                        } catch (Exception e) {
+                            logger.error("创建锁仓交易信息解析异常", e);
                         }
-                        // 累加
-                        resp.setRPNum(amountSum);
-                        resp.setRPPlan(rpPlanResps);
                         break;
                     /**
                      * 领取奖励
                      */
                     case CLAIM_REWARDS:
-                        DelegateRewardClaimParam delegateRewardClaimParam =
-                                JSON.parseObject(txInfo, DelegateRewardClaimParam.class);
-                        List<TransactionDetailsRewardsResp> rewards = new ArrayList<>();
-                        BigDecimal rewardSum = BigDecimal.ZERO;
-                        Map<String, Reward> rewrdsMap = new HashMap<String, Reward>();
-                        /**
-                         * 对相同的nodeId的奖励需要进行累加，不同的可以直接设置返回
-                         */
-                        for (Reward reward : delegateRewardClaimParam.getRewardList()) {
-                            if (rewrdsMap.containsKey(reward.getNodeId())) {
-                                Reward reward2 = rewrdsMap.get(reward.getNodeId());
-                                reward2.setReward(reward2.getReward().add(reward.getReward()));
-                            } else {
-                                rewrdsMap.put(reward.getNodeId(), reward);
+                        try {
+                            DelegateRewardClaimParam delegateRewardClaimParam =
+                                    JSON.parseObject(txInfo, DelegateRewardClaimParam.class);
+                            List<TransactionDetailsRewardsResp> rewards = new ArrayList<>();
+                            BigDecimal rewardSum = BigDecimal.ZERO;
+                            Map<String, Reward> rewrdsMap = new HashMap<String, Reward>();
+                            /**
+                             * 对相同的nodeId的奖励需要进行累加，不同的可以直接设置返回
+                             */
+                            for (Reward reward : delegateRewardClaimParam.getRewardList()) {
+                                if (rewrdsMap.containsKey(reward.getNodeId())) {
+                                    Reward reward2 = rewrdsMap.get(reward.getNodeId());
+                                    reward2.setReward(reward2.getReward().add(reward.getReward()));
+                                } else {
+                                    rewrdsMap.put(reward.getNodeId(), reward);
+                                }
                             }
+                            for (String nodeId : rewrdsMap.keySet()) {
+                                Reward reward = rewrdsMap.get(nodeId);
+                                TransactionDetailsRewardsResp transactionDetailsRewardsResp =
+                                        new TransactionDetailsRewardsResp();
+                                transactionDetailsRewardsResp.setVerify(reward.getNodeId());
+                                transactionDetailsRewardsResp.setNodeName(reward.getNodeName());
+                                transactionDetailsRewardsResp.setReward(reward.getReward());
+                                rewardSum = rewardSum.add(reward.getReward());
+                                rewards.add(transactionDetailsRewardsResp);
+                            }
+                            resp.setTxAmount(rewardSum);
+                            resp.setRewards(rewards);
+                        } catch (Exception e) {
+                            logger.error("领取奖励交易信息解析异常", e);
                         }
-                        for (String nodeId : rewrdsMap.keySet()) {
-                            Reward reward = rewrdsMap.get(nodeId);
-                            TransactionDetailsRewardsResp transactionDetailsRewardsResp =
-                                    new TransactionDetailsRewardsResp();
-                            transactionDetailsRewardsResp.setVerify(reward.getNodeId());
-                            transactionDetailsRewardsResp.setNodeName(reward.getNodeName());
-                            transactionDetailsRewardsResp.setReward(reward.getReward());
-                            rewardSum = rewardSum.add(reward.getReward());
-                            rewards.add(transactionDetailsRewardsResp);
-                        }
-                        resp.setTxAmount(rewardSum);
-                        resp.setRewards(rewards);
                         break;
                 }
             }

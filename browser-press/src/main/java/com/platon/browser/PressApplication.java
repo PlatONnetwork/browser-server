@@ -334,6 +334,7 @@ public class PressApplication implements ApplicationRunner {
      */
     private BlockResult makeBlock(BigInteger blockNumber) {
         BlockResult blockResult = dataGenService.getBlockResult(blockNumber, nodeMaxCount);
+        dataGenService.getNetworkStat().setCurNumber(blockNumber.longValue());
         blockPublisher.publish(Arrays.asList(blockResult.getBlock()));
         transactionPublisher.publish(blockResult.getTransactionList());
         if (nodeOptPublisher.getTotalCount() <= nodeoptMaxCount) {
