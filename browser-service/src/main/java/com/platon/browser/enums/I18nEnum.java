@@ -250,7 +250,8 @@ public enum I18nEnum {
     CODE304012,
     CODE304013,
     
-    CODE305001
+    CODE305001,
+    DELETEGATE_CODE304013
     ;
 	
 	private static final Map <String, I18nEnum> ENUMS = new HashMap <>();

@@ -323,7 +323,12 @@ public class TransactionService {
             /**
              * 失败信息国际化
              */
-            I18nEnum i18nEnum = I18nEnum.getEnum("CODE" + transaction.getFailReason());
+            String name = "CODE" + transaction.getFailReason();
+            // 针对304013特殊处理
+            if ("304013".equalsIgnoreCase(transaction.getFailReason()) && TypeEnum.DELEGATE_CREATE.getCode() == transaction.getType()) {
+                name = "DELETEGATE_CODE304013";
+            }
+            I18nEnum i18nEnum = I18nEnum.getEnum(name);
             if (i18nEnum != null) {
                 resp.setFailReason(this.i18n.i(i18nEnum));
             }
