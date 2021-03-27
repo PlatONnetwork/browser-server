@@ -297,6 +297,10 @@ public class ErcTokenUpdateTask {
     }
 
     private void incrementUpdateTokenHolderBalance(AbstractEsRepository abstractEsRepository, ErcTypeEnum typeEnum, Long txSeq) {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
         try {
             List<TokenHolder> updateParams = new ArrayList<>();
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
