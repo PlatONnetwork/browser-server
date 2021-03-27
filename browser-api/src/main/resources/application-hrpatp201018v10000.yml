@@ -115,6 +115,9 @@ platon:
   redis-namespace: browser:${profile}
   #Es索引命名空间
   es-namespace: browser_${profile}
+  #0出块等待的循环访问时间(秒)
+  zeroBlockNumber:
+    wait-time: 60
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
 limit:
   num: 10

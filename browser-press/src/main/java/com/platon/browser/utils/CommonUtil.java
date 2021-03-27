@@ -121,7 +121,7 @@ public class CommonUtil {
     }
 
     public static void main(String[] args) {
-        long time = DateUtil.parse("2021-03-27 16:00:00", "yyyy-MM-dd HH:mm:ss").getTime();
+        long time = DateUtil.parse("2021-03-27 18:30:00", "yyyy-MM-dd HH:mm:ss").getTime();
         System.out.println("打印结果为：" + time);
         System.out.println("打印结果为：" + cn.hutool.core.util.HexUtil.toHex(time));
         //DateTime t = DateUtil.date(cn.hutool.core.util.HexUtil.toBigInteger("5bc94a8a").longValue());

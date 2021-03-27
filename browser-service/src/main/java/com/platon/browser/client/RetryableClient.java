@@ -205,7 +205,7 @@ public class RetryableClient {
     }
 
     /**
-     * 0区块循环等待
+     * 0出块循环等待
      *
      * @param
      * @return void
