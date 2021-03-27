@@ -9,6 +9,7 @@ import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
+import com.platon.browser.utils.AppStatusUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +41,16 @@ public class RewardExportTask {
 
     @Resource
     private EsNodeOptRepository ESNodeOptRepository;
+
     @Resource
     private PlatOnClient platOnClient;
+
     @Resource
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private CustomBlockNodeMapper customBlockNodeMapper;
 
@@ -64,9 +69,13 @@ public class RewardExportTask {
 
     @Scheduled(cron = "0/5 * * * * ?")
     public void exportRewardNode() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
         try {
             Boolean v = redisTemplate.opsForValue().setIfAbsent(REWARD_KEY, "30000");
-            if (v==null||!v) {
+            if (v == null || !v) {
                 return;
             }
 //            String consensus = jedisClient.get(ROUND_KEY);
@@ -111,9 +120,9 @@ public class RewardExportTask {
                         rs.add(row);
                     }
                 });
-                String[] headers = new String[] {"nodeId", "nodeName"};
+                String[] headers = new String[]{"nodeId", "nodeName"};
                 this.buildFile(startNum + "_" + endNum + "_reward.csv", rs, headers);
-                redisTemplate.opsForValue().set(ROUND_KEY,String.valueOf(conL + this.limitNum));
+                redisTemplate.opsForValue().set(ROUND_KEY, String.valueOf(conL + this.limitNum));
             }
         } catch (Exception e) {
             log.error("exportRewardNode fail", e);
@@ -125,13 +134,15 @@ public class RewardExportTask {
 
     private void buildFile(String fileName, List<Object[]> rows, String[] headers) {
         File file = new File(this.fileUrl);
-        if (!file.exists()) file.mkdir();
-        try(FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName)) {
+        if (!file.exists())
+            file.mkdir();
+        try (FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName)) {
             /* 设置返回的头，防止csv乱码 */
-            fis.write(new byte[] {(byte)0xEF, (byte)0xBB, (byte)0xBF});
-            try (OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8)){
+            fis.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+            try (OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8)) {
                 CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-                if (headers != null) writer.writeHeaders(headers);
+                if (headers != null)
+                    writer.writeHeaders(headers);
                 writer.writeRowsAndClose(rows);
                 log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
             } catch (IOException e) {
@@ -141,4 +152,5 @@ public class RewardExportTask {
             log.error("数据输出错误:", e);
         }
     }
+
 }

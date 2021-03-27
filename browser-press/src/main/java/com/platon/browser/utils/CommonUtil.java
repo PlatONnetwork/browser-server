@@ -1,5 +1,6 @@
 package com.platon.browser.utils;
 
+import cn.hutool.core.date.DateUtil;
 import com.platon.bech32.Bech32;
 import com.platon.browser.service.BlockResult;
 import com.platon.parameters.NetworkParameters;
@@ -120,13 +121,11 @@ public class CommonUtil {
     }
 
     public static void main(String[] args) {
-        BlockResult.AddressCount FROM_ADDRESS = new BlockResult.AddressCount();
-        String txHash = HexUtil.prefix(DigestUtils.sha256Hex(UUID.randomUUID().toString()));
-        String from = HexUtil.prefix(DigestUtils.sha1Hex(txHash));
-        FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), from), 50);
-        System.out.println("打印结果为：" + System.getProperties().getProperty("os.name").toLowerCase());
-        System.out.println("打印结果为：" + getEncrypt("root"));
-        System.out.println("打印结果为：" + FROM_ADDRESS.get(Bech32.addressEncode(NetworkParameters.getHrp(), from), 50));
+        long time = DateUtil.parse("2021-03-27 16:00:00", "yyyy-MM-dd HH:mm:ss").getTime();
+        System.out.println("打印结果为：" + time);
+        System.out.println("打印结果为：" + cn.hutool.core.util.HexUtil.toHex(time));
+        //DateTime t = DateUtil.date(cn.hutool.core.util.HexUtil.toBigInteger("5bc94a8a").longValue());
+        //System.out.println("打印结果为：" + DateUtil.format(t, "yyyy-MM-dd HH:mm:ss"));
     }
 
 }

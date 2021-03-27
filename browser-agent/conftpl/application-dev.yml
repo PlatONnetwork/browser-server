@@ -111,15 +111,18 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
   chainId: 201018
-  #Redis命名空间
-  redis-namespace: browser:${version}:${profile}
-  #Es索引命名空间
-  es-namespace: browser_${version}_${profile}
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
       pageSize: 2000
       pageCount: 250
+  #Redis命名空间
+  redis-namespace: browser:${profile}
+  #Es索引命名空间
+  es-namespace: browser_${profile}
+  #0区块等待的循环访问时间(秒)
+  zeroBlockNumber:
+    wait-time: 60
 # v0.15.0.0版本新增功能涉及的配置
 v0150:
   #锁仓最小释放金额参数生效版本

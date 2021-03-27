@@ -21,6 +21,7 @@ import com.platon.browser.response.staking.AliveStakingListResp;
 import com.platon.browser.response.staking.StakingStatisticNewResp;
 import com.platon.browser.service.*;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +36,10 @@ import java.util.Map.Entry;
 
 /**
  * 推送任务
- * 
+ *
+ * @author zhangrj
  * @file StompPushJob.java
  * @description
- * @author zhangrj
  * @data 2019年8月31日
  */
 @Component
@@ -48,20 +49,28 @@ public class StompPushTask {
 
     @Resource
     private SimpMessagingTemplate messagingTemplate;
+
     @Resource
     private I18nUtil i18n;
+
     @Resource
     private HomeService homeService;
+
     @Resource
     private StakingService stakingService;
+
     @Resource
     private BlockService blockService;
+
     @Resource
     private TransactionService transactionService;
+
     @Resource
     private ParameterService parameterService;
+
     @Resource
     private StatisticCacheService statisticCacheService;
+
     @Resource
     private TokenService tokenService;
 
@@ -78,10 +87,14 @@ public class StompPushTask {
      */
     @Scheduled(cron = "0/3 * * * * ?")
     public void pushChainStatisticNew() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
         if (this.checkData()) {
             ChainStatisticNewResp chainStatisticNewResp = this.homeService.chainStatisticNew();
             BaseResp<ChainStatisticNewResp> resp =
-                BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), chainStatisticNewResp);
+                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), chainStatisticNewResp);
             this.messagingTemplate.convertAndSend("/topic/chain/statistic/new", resp);
         }
     }
@@ -94,7 +107,7 @@ public class StompPushTask {
         if (this.checkData()) {
             BlockStatisticNewResp blockStatisticNewResp = this.homeService.blockStatisticNew();
             BaseResp<BlockStatisticNewResp> resp =
-                BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), blockStatisticNewResp);
+                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), blockStatisticNewResp);
             this.messagingTemplate.convertAndSend("/topic/block/statistic/new", resp);
         }
     }
@@ -107,7 +120,7 @@ public class StompPushTask {
         if (this.checkData()) {
             StakingListNewResp stakingListNewResp = this.homeService.stakingListNew();
             BaseResp<StakingListNewResp> resp =
-                BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingListNewResp);
+                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingListNewResp);
             this.messagingTemplate.convertAndSend("/topic/staking/list/new", resp);
         }
     }
@@ -120,14 +133,14 @@ public class StompPushTask {
         if (this.checkData()) {
             StakingStatisticNewResp stakingStatisticNewResp = this.stakingService.stakingStatisticNew();
             BaseResp<StakingStatisticNewResp> resp =
-                BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingStatisticNewResp);
+                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingStatisticNewResp);
             this.messagingTemplate.convertAndSend("/topic/staking/statistic/new", resp);
         }
     }
 
     /**
      * 推送验证人列表相关信息
-     * 
+     *
      * @throws JsonProcessingException
      */
     @Scheduled(cron = "0/5 * * * * ?")
@@ -204,4 +217,5 @@ public class StompPushTask {
             this.parameterService.overrideBlockChainConfig();
         }
     }
+
 }
