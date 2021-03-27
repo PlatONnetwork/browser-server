@@ -79,7 +79,7 @@ public class AgentApplication implements ApplicationRunner {
         }
         // 把应用置为BOOTING开机状态
         AppStatusUtil.setStatus(AppStatus.BOOTING);
-        // 0区块循环等待
+        // 0出块循环等待
         retryableClient.zeroBlockNumberWait();
         // 进入应用初始化子流程
         InitializationResult initialResult = initializationService.init();
