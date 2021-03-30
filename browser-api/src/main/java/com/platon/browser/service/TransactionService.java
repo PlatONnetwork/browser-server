@@ -1,9 +1,5 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.TokenInventoryMapper;
-import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.utils.Convert;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -13,20 +9,18 @@ import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.service.elasticsearch.EsDelegationRewardRepository;
-import com.platon.browser.service.elasticsearch.EsTransactionRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.DelegationReward.Extra;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
@@ -41,16 +35,21 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.staking.QueryClaimByStakingResp;
 import com.platon.browser.response.transaction.*;
+import com.platon.browser.service.elasticsearch.EsDelegationRewardRepository;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.utils.*;
+import com.platon.utils.Convert;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.SortBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -766,10 +765,17 @@ public class TransactionService {
                     if (erc20List != null) {
                         List<Arc20Param> arc20Params = new ArrayList<>();
                         erc20List.forEach(erc20 -> {
-                            Arc20Param arc20Param = Arc20Param.builder().innerContractAddr(erc20.getContract())
-                                    .innerContractName(erc20.getName()).innerDecimal(String.valueOf(erc20.getDecimal()))
-                                    .innerFrom(erc20.getFrom()).innerSymbol(erc20.getSymbol())
-                                    .innerTo(erc20.getTo()).innerValue(erc20.getValue()).build();
+                            // 精度转换
+                            int decimal = Integer.parseInt(String.valueOf(erc20.getDecimal()));
+                            BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc20.getValue()), decimal);
+                            Arc20Param arc20Param = Arc20Param.builder()
+                                    .innerContractAddr(erc20.getContract())
+                                    .innerContractName(erc20.getName())
+                                    .innerDecimal(String.valueOf(erc20.getDecimal()))
+                                    .innerFrom(erc20.getFrom())
+                                    .innerSymbol(erc20.getSymbol())
+                                    .innerTo(erc20.getTo())
+                                    .innerValue(afterConverValue.toString()).build();
                             arc20Params.add(arc20Param);
                         });
                         resp.setErc20Params(arc20Params);
@@ -779,10 +785,17 @@ public class TransactionService {
                     if (erc721List != null) {
                         List<Arc721Param> arc721Params = new ArrayList<>();
                         erc721List.forEach(erc721 -> {
-                            Arc721Param arc721Param = Arc721Param.builder().innerContractAddr(erc721.getContract())
-                                    .innerContractName(erc721.getName()).innerDecimal(String.valueOf(erc721.getDecimal()))
-                                    .innerFrom(erc721.getFrom()).innerSymbol(erc721.getSymbol())
-                                    .innerTo(erc721.getTo()).innerValue(erc721.getValue())
+                            // 精度转换
+                            int decimal = Integer.parseInt(String.valueOf(erc721.getDecimal()));
+                            BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc721.getValue()), decimal);
+                            Arc721Param arc721Param = Arc721Param.builder()
+                                    .innerContractAddr(erc721.getContract())
+                                    .innerContractName(erc721.getName())
+                                    .innerDecimal(String.valueOf(erc721.getDecimal()))
+                                    .innerFrom(erc721.getFrom())
+                                    .innerSymbol(erc721.getSymbol())
+                                    .innerTo(erc721.getTo())
+                                    .innerValue(afterConverValue.toString())
                                     .build();
                             //查询对应的图片进行回填
                             TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
