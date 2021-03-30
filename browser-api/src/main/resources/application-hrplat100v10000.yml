@@ -11,20 +11,23 @@ server:
   tomcat:
     max-connections: 20000
     threads:
+      # 最大工作线程数，默认200。4核8g内存，线程数800，一般是核数*200
       max: 2000
+      # 最小工作空闲线程数
       min-spare: 800
 #Spring框架内部配置
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/platon_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:p6spy:mysql://192.168.9.191:3306/platon_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     #下面为连接池的补充设置，应用到上面所有数据源中
     #初始化大小，最小，最大
     initialSize: 5
     minIdle: 10
-    maxActive: 100
+    # 最大连接数据库连接数
+    maxActive: 1500
     # 配置获取连接等待超时的时间
     maxWait: 60000
     # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒

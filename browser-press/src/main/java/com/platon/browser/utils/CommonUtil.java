@@ -12,6 +12,7 @@ import org.jasypt.util.text.BasicTextEncryptor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -124,8 +125,9 @@ public class CommonUtil {
         long time = DateUtil.parse("2021-03-27 18:30:00", "yyyy-MM-dd HH:mm:ss").getTime();
         System.out.println("打印结果为：" + time);
         System.out.println("打印结果为：" + cn.hutool.core.util.HexUtil.toHex(time));
-        //DateTime t = DateUtil.date(cn.hutool.core.util.HexUtil.toBigInteger("5bc94a8a").longValue());
-        //System.out.println("打印结果为：" + DateUtil.format(t, "yyyy-MM-dd HH:mm:ss"));
+        int decimal = Integer.parseInt(String.valueOf(2));
+        BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal("1000"), decimal);
+        System.out.println("打印结果为：" + afterConverValue.toString());
     }
 
 }
