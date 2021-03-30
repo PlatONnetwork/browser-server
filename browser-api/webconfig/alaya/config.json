@@ -55,13 +55,13 @@
       "order": 4,
       "name": "medium",
       "logo": "",
-      "url": {"cn": "https://medium.com/@PlatON_Network","en": "https://medium.com/@PlatON_Network"}
+      "url": {"cn": "https://platon-network.medium.com","en": "https://platon-network.medium.com"}
     },
     {
       "order": 5,
       "name": "github",
       "logo": "",
-      "url": {"cn": "https://github.com/PlatONnetwork","en": "https://github.com/PlatONnetwork"}
+      "url": {"cn": "https://github.com/AlayaNetwork","en": "https://github.com/AlayaNetwork"}
     },
     {
       "order": 6,
