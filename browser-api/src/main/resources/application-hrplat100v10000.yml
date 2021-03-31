@@ -60,12 +60,12 @@ spring:
 logging:
   #日志级别
   level:
-    org.springframework: debug
-    com.platon.browser: debug
-    com.platon.browser.service: debug
-    com.platon.browser.task: debug
-    com.platon.browser.client: debug
-    com.platon.browser.dao: debug
+    org.springframework: info
+    com.platon.browser: info
+    com.platon.browser.service: info
+    com.platon.browser.task: info
+    com.platon.browser.client: info
+    com.platon.browser.dao: info
   file:
     name: ./logs/${spring.application.name}-${profile}.log
 #初始化链相关的配置
