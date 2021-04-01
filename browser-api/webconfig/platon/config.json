@@ -17,8 +17,8 @@
       "name": {"cn":"PlatON白皮书","en":"PlatON White Paper"},
       "logo": "",
       "url": {
-        "cn":"https://www.platon.network/static/pdf/zh/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_ZH.pdf",
-        "en": "https://www.platon.network/static/pdf/en/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_EN.pdf"
+        "cn": "https://www.platon.network/pdf/zh/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_ZH.pdf",
+        "en": "https://www.platon.network/pdf/en/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_EN.pdf"
       }
     },
     {
@@ -64,7 +64,7 @@
       "order": 4,
       "name": "medium",
       "logo": "",
-      "url": {"cn": "https://platon-network.medium.com/","en": "https://platon-network.medium.com/"}
+      "url": {"cn": "https://platon-network.medium.com","en": "https://platon-network.medium.com"}
     },
     {
       "order": 5,
