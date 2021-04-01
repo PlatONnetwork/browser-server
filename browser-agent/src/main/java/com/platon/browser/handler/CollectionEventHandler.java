@@ -3,6 +3,7 @@ package com.platon.browser.handler;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.TxAnalyseResult;
+import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
@@ -55,6 +56,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private TxBakMapper txBakMapper;
     @Resource
     private CustomTxBakMapper customTxBakMapper;
+    @Resource
+    private AddressCache addressCache;
 
     // 交易序号id
     private long transactionId = 0;
@@ -141,6 +144,13 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         } catch (Exception e) {
             log.error("", e);
             throw e;
+        } finally {
+            log.info("清除地址缓存【addressCache】数据【{}】条",addressCache.getAll().size());
+            // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
+            // 因为地址缓存是当前事务处理的增量缓存，在 StatisticsAddressAnalyzer 进行数据合并入库时：
+            // 1、如果出现异常，由于事务保证，当前事务统计的地址数据不会入库mysql，此时应该清空增量缓存，等待下次重试时重新生成缓存
+            // 2、如果正常结束，当前事务统计的地址数据会入库mysql，此时应该清空增量缓存
+            addressCache.cleanAll();
         }
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);

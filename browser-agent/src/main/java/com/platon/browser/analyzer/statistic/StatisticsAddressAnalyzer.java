@@ -71,8 +71,8 @@ public class StatisticsAddressAnalyzer {
             itemFromCache.add(item);
             addresses.add(cache.getAddress());
         });
-        // 清空地址缓存
-        this.addressCache.cleanAll();
+        // 清空地址缓存 ******************缓存清空操作在CollectionEventHandler的finally语句块执行，防止中间出错出现脏缓存*********************
+        // this.addressCache.cleanAll();
         // 从数据库中查询出与缓存中对应的地址信息
         AddressExample condition = new AddressExample();
         condition.createCriteria().andAddressIn(addresses);

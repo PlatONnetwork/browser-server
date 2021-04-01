@@ -49,6 +49,7 @@ public class StatisticService {
 
         // 地址统计
         Collection<Address> addressList = this.addressCache.getAll();
+        // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行地址入库操作
         if (!addressList.isEmpty()) {
             this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
         }
