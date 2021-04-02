@@ -58,11 +58,11 @@ public class BrowserApiApplication implements ApplicationRunner {
         while (true) {
             long count = networkStatMapper.countByExample(null);
             if (count > 0) {
-                log.error("开始出块");
+                log.info("开始出块");
                 break;
             }
             Thread.sleep(1000L * zeroBlockNumberWaitTime);
-            log.error("正在等待出块...");
+            log.info("正在等待出块...");
         }
         // 把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
@@ -78,7 +78,7 @@ public class BrowserApiApplication implements ApplicationRunner {
      */
     private void dataSourceLog() {
         DruidDataSource druidDataSource = (DruidDataSource) dataSource;
-        log.error("数据源:{},数据源最大连接数:{},数据源初始化连接数:{}",
+        log.info("数据源:{},数据源最大连接数:{},数据源初始化连接数:{}",
                 dataSource.getClass(),
                 druidDataSource.getMaxActive(),
                 druidDataSource.getInitialSize());
