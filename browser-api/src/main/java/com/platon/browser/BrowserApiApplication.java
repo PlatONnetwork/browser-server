@@ -53,12 +53,7 @@ public class BrowserApiApplication implements ApplicationRunner {
         if (AppStatusUtil.isStopped()) {
             return;
         }
-
-        log.error("dataSource:{}", dataSource.getClass());
-        DruidDataSource druidDataSource = (DruidDataSource) dataSource;
-        log.error("druidDataSource 数据源最大连接数：{}", druidDataSource.getMaxActive());
-        log.error("druidDataSource 数据源初始化连接数：{}", druidDataSource.getInitialSize());
-
+        dataSourceLog();
         // 0出块等待
         while (true) {
             long count = networkStatMapper.countByExample(null);
@@ -71,6 +66,22 @@ public class BrowserApiApplication implements ApplicationRunner {
         }
         // 把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
+    }
+
+    /**
+     * 打印连接池信息
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/2
+     */
+    private void dataSourceLog() {
+        DruidDataSource druidDataSource = (DruidDataSource) dataSource;
+        log.error("数据源:{},数据源最大连接数:{},数据源初始化连接数:{}",
+                dataSource.getClass(),
+                druidDataSource.getMaxActive(),
+                druidDataSource.getInitialSize());
     }
 
 }

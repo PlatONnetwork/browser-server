@@ -115,10 +115,7 @@ public class BlockService {
             } else {
                 items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
             }
-            long bb = System.currentTimeMillis();
-            logger.error("2====={}", bb - startTime);
             lists.addAll(this.transferBlockListResp(items));
-            logger.error("4====={}", System.currentTimeMillis() - bb);
         } else {
             /** 查询超过五十万条数据，根据区块号倒序 */
             ESResult<Block> blocks = new ESResult<>();
@@ -141,7 +138,7 @@ public class BlockService {
         page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
         respPage.init(page, lists);
         if (System.currentTimeMillis() - startTime > 100) {
-            logger.error("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
+            logger.error("perform-blockList,time:{}", System.currentTimeMillis() - startTime);
         }
         return respPage;
     }
@@ -153,17 +150,12 @@ public class BlockService {
      * @method transferBlockListResp
      */
     private List<BlockListResp> transferBlockListResp(List<Block> blocks) {
-        long aa = System.currentTimeMillis();
         List<BlockListResp> blockListResps = new ArrayList<>();
         Set<String> nodeIdList = blocks.stream().map(Block::getNodeId).collect(Collectors.toSet());
-        logger.error("set转换耗时========{}", System.currentTimeMillis() - aa);
-        long bb = System.currentTimeMillis();
         List<Node> nodeNames = new ArrayList<>();
         if (CollUtil.isNotEmpty(nodeIdList)) {
             nodeNames = customNodeMapper.batchFindNodeNameByNodeId(nodeIdList);
         }
-        logger.error("查询耗时========{}", System.currentTimeMillis() - bb);
-        long cc = System.currentTimeMillis();
         for (Block block : blocks) {
             BlockListResp blockListResp = new BlockListResp();
             BeanUtils.copyProperties(block, blockListResp);
@@ -184,7 +176,6 @@ public class BlockService {
             blockListResps.add(blockListResp);
         }
         nodeNames.clear();
-        logger.error("for耗时========{}", System.currentTimeMillis() - cc);
         return blockListResps;
     }
 
