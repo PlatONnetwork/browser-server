@@ -58,7 +58,7 @@ public class BrowserApiApplication implements ApplicationRunner {
         while (true) {
             long count = networkStatMapper.countByExample(null);
             if (count > 0) {
-                log.info("开始出块");
+                log.info("开始出块...");
                 break;
             }
             Thread.sleep(1000L * zeroBlockNumberWaitTime);
@@ -78,10 +78,14 @@ public class BrowserApiApplication implements ApplicationRunner {
      */
     private void dataSourceLog() {
         DruidDataSource druidDataSource = (DruidDataSource) dataSource;
-        log.info("数据源:{},数据源最大连接数:{},数据源初始化连接数:{}",
+        log.info("数据源:{},最大连接数:{},最小连接池数量:{},初始化连接数:{},获取连接时最大等待时间:{},启用公平锁:{}",
                 dataSource.getClass(),
                 druidDataSource.getMaxActive(),
-                druidDataSource.getInitialSize());
+                druidDataSource.getMinIdle(),
+                druidDataSource.getInitialSize(),
+                // 配置了maxWait之后，缺省启用公平锁，并发效率会有所下降，如果需要可以通过配置useUnfairLock属性为true使用非公平锁
+                druidDataSource.getMaxWait(),
+                druidDataSource.isUseUnfairLock());
     }
 
 }
