@@ -61,4 +61,80 @@
   	SELECT count(*)
 	FROM node WHERE (`status` = 1) or (`status` = 2 and `is_settle` = 1)
   </select>
+
+  <select id="batchFindNodeNameByNodeId" parameterType="java.util.Set" resultMap="BaseResultMap">
+    SELECT
+    node_id,
+    node_name
+    FROM
+    node
+    WHERE
+    node_id IN (
+    <foreach collection="nodeIds" item="nodeId" separator=",">
+        #{nodeId}
+    </foreach>
+    );
+  </select>
+
+  <sql id="Base_Column_List">
+    node_id,
+	stat_slash_multi_qty,
+	stat_slash_low_qty,
+	stat_block_qty,
+	is_recommend,
+	total_value,
+	node_name,
+	node_icon,
+	annualized_rate,
+	leave_time,
+	`status`,
+	is_consensus,
+	is_settle,
+	is_init,
+	stat_delegate_value,
+	stat_valid_addrs,
+	dele_annualized_rate,
+	stat_delegate_released,
+	un_stake_freeze_duration,
+	un_stake_end_block,
+	staking_reduction,
+	zero_produce_freeze_duration,
+	zero_produce_freeze_epoch,
+	low_rate_slash_count,
+	big_version,
+	staking_block_num,
+	staking_tx_index
+  </sql>
+  <select id="findAliveStakingList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from node
+    <where>
+      1=1
+      <if test="status1 != null">
+        and  status = #{status1}
+      </if>
+      <if test="isSettle1 != null">
+        and is_settle = #{isSettle1}
+      </if>
+    </where>
+    <choose>
+      <when test="isUnion">
+        union
+        select <include refid="Base_Column_List" /> from node
+        <where>
+          1=1
+          <if test="status2 != null">
+            and  status = #{status2}
+          </if>
+          <if test="isSettle2 != null">
+            and is_settle = #{isSettle2}
+          </if>
+        </where>
+      </when>
+    </choose>
+    ORDER BY
+    big_version DESC,
+    total_value DESC,
+    staking_block_num ASC,
+    staking_tx_index ASC
+  </select>
 </mapper>

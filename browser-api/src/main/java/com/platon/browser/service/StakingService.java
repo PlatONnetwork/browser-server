@@ -60,31 +60,39 @@ import java.util.List;
 public class StakingService {
 
 	private final Logger logger = LoggerFactory.getLogger(StakingService.class);
-	
+
 	@Resource
 	private StatisticCacheService statisticCacheService;
+
 	@Resource
 	private CustomStakingMapper customStakingMapper;
+
 	@Resource
 	private CustomDelegationMapper customDelegationMapper;
+
 	@Resource
 	private CustomNodeMapper customNodeMapper;
+
 	@Resource
 	private NodeMapper nodeMapper;
+
 	@Resource
 	private EsNodeOptRepository ESNodeOptRepository;
+
 	@Resource
 	private I18nUtil i18n;
+
 	@Resource
-    private BlockChainConfig blockChainConfig;
+	private BlockChainConfig blockChainConfig;
+
 	@Resource
-    private PlatOnClient platonClient;
-	
+	private PlatOnClient platonClient;
+
 	public StakingStatisticNewResp stakingStatisticNew() {
 		/** 获取统计信息 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		StakingStatisticNewResp stakingStatisticNewResp = new StakingStatisticNewResp();
-		if(networkStatRedis != null) {
+		if (networkStatRedis != null) {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
@@ -92,10 +100,10 @@ public class StakingService {
 			stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue()
 					.subtract(networkStatRedis.getStakingValue()));
 			//实时除以现有的结算周期人数
-			Integer count= customStakingMapper.selectCountByActive();
-            // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
+			Integer count = customStakingMapper.selectCountByActive();
+			// 质押奖励 = 当前结算周期总质押奖励转成LAT单位
 			stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
-			
+
 		}
 		return stakingStatisticNewResp;
 	}
@@ -107,67 +115,81 @@ public class StakingService {
 
 		// 是否需要把退出中状态的节点当做活跃中处理，默认不需要，只有在查询全部或活跃中时需要把退出中状态当作活跃中
 		boolean exitingAsActive = false;
+		Page<Node> stakingPage = new Page<>();
 		/**
 		 *  对前端传的参数进行转换查询条件
 		 */
+		NodeExample nodeExample = new NodeExample();
 		switch (StakingStatusEnum.valueOf(req.getQueryStatus().toUpperCase())) {
 			case ALL:
 				/** 查询候选人 */
-				status = StakingStatusEnum.CANDIDATE.getCode();
-				exitingAsActive = true;
+//				status = StakingStatusEnum.CANDIDATE.getCode();
+//				isSettle = CustomStaking.YesNoEnum.YES.getCode();
+//				NodeExample.Criteria allCriteria1 = nodeExample.createCriteria();
+//				allCriteria1.andStatusEqualTo(status);
+//				long aa = System.currentTimeMillis();
+//				Page<Node> allStakingPage1 = customNodeMapper.selectListByExample(nodeExample);
+//				logger.error("all1======={}", System.currentTimeMillis() - aa);
+//				stakingPage.addAll(allStakingPage1);
+//				nodeExample.clear();
+//				status = CustomStaking.StatusEnum.EXITING.getCode();
+//				NodeExample.Criteria allCriteria2 = nodeExample.createCriteria();
+//				allCriteria2.andStatusEqualTo(status);
+//				allCriteria2.andIsConsensusEqualTo(isSettle);
+//				long bb = System.currentTimeMillis();
+//				Page<Node> allStakingPage2 = customNodeMapper.selectListByExample(nodeExample);
+//				logger.error("all2======={}", System.currentTimeMillis() - bb);
+//				stakingPage.addAll(allStakingPage2);
+//				nodeExample.clear();
+				stakingPage = customNodeMapper.findAliveStakingList(1, null, true, 2, 1);
 				break;
 			case ACTIVE:
 				/** 活跃中代表即使后续同时也是结算周期验证人 */
-				status = StakingStatusEnum.CANDIDATE.getCode();
-				isSettle = CustomStaking.YesNoEnum.YES.getCode();
-				exitingAsActive = true;
+//				status = StakingStatusEnum.CANDIDATE.getCode();
+//				isSettle = CustomStaking.YesNoEnum.YES.getCode();
+//				NodeExample.Criteria activeCriteria1 = nodeExample.createCriteria();
+//				activeCriteria1.andStatusEqualTo(status);
+//				activeCriteria1.andIsSettleEqualTo(isSettle);
+//				long cc = System.currentTimeMillis();
+//				Page<Node> activeStakingPage1 = customNodeMapper.selectListByExample(nodeExample);
+//				logger.error("ACTIVE1======={}", System.currentTimeMillis() - cc);
+//				stakingPage.addAll(activeStakingPage1);
+//				nodeExample.clear();
+//				status = CustomStaking.StatusEnum.EXITING.getCode();
+//				NodeExample.Criteria activeCriteria2 = nodeExample.createCriteria();
+//				activeCriteria2.andStatusEqualTo(status);
+//				activeCriteria2.andIsSettleEqualTo(isSettle);
+//				long dd = System.currentTimeMillis();
+//				Page<Node> activeStakingPage2 = customNodeMapper.selectListByExample(nodeExample);
+//				logger.error("ACTIVE2======={}", System.currentTimeMillis() - dd);
+//				stakingPage.addAll(activeStakingPage2);
+//				nodeExample.clear();
+				stakingPage = customNodeMapper.findAliveStakingList(1, 1, true, 2, 1);
 				break;
 			case CANDIDATE:
 				/** 查询候选人 */
-				status = StakingStatusEnum.CANDIDATE.getCode();
-				isSettle = CustomStaking.YesNoEnum.NO.getCode();
+//				status = StakingStatusEnum.CANDIDATE.getCode();
+//				isSettle = CustomStaking.YesNoEnum.NO.getCode();
+//				NodeExample.Criteria candidateCriteria1 = nodeExample.createCriteria();
+//				candidateCriteria1.andStatusEqualTo(status);
+//				candidateCriteria1.andIsSettleEqualTo(isSettle);
+//				long ee = System.currentTimeMillis();
+//				Page<Node> candidateStakingPage1 = customNodeMapper.selectListByExample(nodeExample);
+//				logger.error("CANDIDATE======={}", System.currentTimeMillis() - ee);
+//				stakingPage.addAll(candidateStakingPage1);
+//				nodeExample.clear();
+				stakingPage = customNodeMapper.findAliveStakingList(1, 2, false, null, null);
 				break;
 			default:
 				break;
 		}
-
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<>();
-		/** 根据条件和状态进行查询列表 */
-		NodeExample nodeExample = new NodeExample();
-		nodeExample.setOrderByClause(" big_version desc, total_value desc,staking_block_num asc, staking_tx_index asc");
-		NodeExample.Criteria criteria1 = nodeExample.createCriteria();
-		criteria1.andStatusEqualTo(status);
-		if(StringUtils.isNotBlank(req.getKey())){
-			criteria1.andNodeNameLike("%" + req.getKey() + "%");
-		}
-		if(isSettle != null) {
-			criteria1.andIsSettleEqualTo(isSettle);
-		}
-		nodeExample.or(criteria1);
-
-		if(exitingAsActive){
-			/**
-			 * 如果节点状态为退出中且为结算周期则认为在活跃中
-			 */
-			NodeExample.Criteria criteria2 = nodeExample.createCriteria();
-			criteria2.andStatusEqualTo(CustomStaking.StatusEnum.EXITING.getCode());
-			if(StringUtils.isNotBlank(req.getKey())){
-				criteria2.andNodeNameLike("%" + req.getKey() + "%");
-			}
-			criteria2.andIsSettleEqualTo(CustomStaking.YesNoEnum.YES.getCode());
-			if(isSettle != null) {
-				criteria1.andIsSettleEqualTo(isSettle);
-			}
-			nodeExample.or(criteria2);
-		}
-
-		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
 		List<Node> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-		int i=(req.getPageNo()-1)*req.getPageSize();
-		for (Node staking:stakings) {
+		int i = (req.getPageNo() - 1) * req.getPageSize();
+		for (Node staking : stakings) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			BeanUtils.copyProperties(staking, aliveStakingListResp);
 			aliveStakingListResp.setBlockQty(staking.getStatBlockQty());
@@ -178,7 +200,7 @@ public class StakingService {
 			aliveStakingListResp.setDelegateValue(sumAmount);
 			aliveStakingListResp.setIsInit(staking.getIsInit() == 1);
 			aliveStakingListResp.setStakingIcon(staking.getNodeIcon());
-			if(staking.getIsRecommend() != null) {
+			if (staking.getIsRecommend() != null) {
 				aliveStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == staking.getIsRecommend());
 			}
 			/** 设置排行 */
@@ -186,7 +208,7 @@ public class StakingService {
 			aliveStakingListResp.setSlashLowQty(staking.getStatSlashLowQty());
 			aliveStakingListResp.setSlashMultiQty(staking.getStatSlashMultiQty());
 			/** 如果是对应的出块节点则置为出块中，否则为活跃中或者退出 */
-			if(staking.getNodeId().equals(networkStatRedis.getNodeId())) {
+			if (staking.getNodeId().equals(networkStatRedis.getNodeId())) {
 				aliveStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
 			} else {
 				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(staking.getStatus(), staking.getIsConsensus(), staking.getIsSettle()));
@@ -220,16 +242,16 @@ public class StakingService {
 		 * 防止直接退出的节点出现在历史表中
 		 */
 		criteria.andIsSettleEqualTo(CustomStaking.YesNoEnum.NO.getCode());
-		
-		if(StringUtils.isNotBlank(req.getKey())) {
+
+		if (StringUtils.isNotBlank(req.getKey())) {
 			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
 		Page<Node> stakings = customNodeMapper.selectListByExample(nodeExample);
-		
-		for (Node stakingNode:stakings.getResult()) {
+
+		for (Node stakingNode : stakings.getResult()) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			BeanUtils.copyProperties(stakingNode, historyStakingListResp);
-			if(stakingNode.getLeaveTime()!=null) {
+			if (stakingNode.getLeaveTime() != null) {
 				historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 			}
 			historyStakingListResp.setNodeName(stakingNode.getNodeName());
@@ -321,7 +343,7 @@ public class StakingService {
 			 * 如果判断为true则表示为查历史数据
 			 * 没有值则标识查询活跃账户
 			 */
-			if(stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()) {
+			if (stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()) {
 				// 候选中的节点设置有效委托地址数
 				resp.setDelegateQty(stakingNode.getStatValidAddrs());
 				/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
@@ -333,15 +355,15 @@ public class StakingService {
 				/**
 				 * 如果在结算中则直接设置为0
 				 */
-				if(stakingNode.getIsSettle().intValue() == YesNoEnum.YES.getCode()) {
+				if (stakingNode.getIsSettle().intValue() == YesNoEnum.YES.getCode()) {
 					resp.setTotalValue(BigDecimal.ZERO);
 					resp.setStakingValue(BigDecimal.ZERO);
 				} else {
-                    if (stakingNode.getStatus().intValue() == StatusEnum.LOCKED.getCode()) {
-                        resp.setStakingValue(stakingNode.getStakingLocked());
-                    } else {
-                        resp.setStakingValue(stakingNode.getStakingReduction());
-                    }
+					if (stakingNode.getStatus().intValue() == StatusEnum.LOCKED.getCode()) {
+						resp.setStakingValue(stakingNode.getStakingLocked());
+					} else {
+						resp.setStakingValue(stakingNode.getStakingReduction());
+					}
 				}
 				// 待提取的委托金额(von)
 				resp.setStatDelegateReduction(resp.getDelegateValue().add(stakingNode.getStatDelegateReleased()));
@@ -357,20 +379,20 @@ public class StakingService {
 		ESResult<NodeOpt> items = new ESResult<>();
 		constructor.setDesc("id");
 		try {
-			items = ESNodeOptRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
+			items = ESNodeOptRepository.search(constructor, NodeOpt.class, req.getPageNo(), req.getPageSize());
 		} catch (Exception e) {
 			logger.error("获取节点操作错误。", e);
 			return respPage;
 		}
 		List<NodeOpt> nodeOpts = items.getRsData();
 		List<StakingOptRecordListResp> lists = new LinkedList<>();
-		for (NodeOpt nodeOpt: nodeOpts) {
+		for (NodeOpt nodeOpt : nodeOpts) {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
 			BeanUtils.copyProperties(nodeOpt, stakingOptRecordListResp);
 			stakingOptRecordListResp.setType(String.valueOf(nodeOpt.getType()));
 			stakingOptRecordListResp.setTimestamp(nodeOpt.getTime().getTime());
 			stakingOptRecordListResp.setBlockNumber(nodeOpt.getBNum());
-			if(StringUtils.isNotBlank(nodeOpt.getDesc())) {
+			if (StringUtils.isNotBlank(nodeOpt.getDesc())) {
 				String[] desces = nodeOpt.getDesc().split(Browser.OPT_SPILT);
 				/** 根据不同类型组合返回 */
 				switch (NodeOpt.TypeEnum.getEnum(String.valueOf(nodeOpt.getType()))) {
@@ -378,7 +400,7 @@ public class StakingService {
 					 *修改验证人
 					 */
 					case MODIFY:
-						if(desces.length > 1) {
+						if (desces.length > 1) {
 							stakingOptRecordListResp.setBeforeRate(new BigDecimal(desces[0]).divide(Browser.PERCENTAGE).toString());
 							stakingOptRecordListResp.setAfterRate(new BigDecimal(desces[1]).divide(Browser.PERCENTAGE).toString());
 						}
@@ -386,19 +408,19 @@ public class StakingService {
 					/** 提案类型 */
 					case PROPOSALS:
 						stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1]) ? "" : desces[1]);
 						stakingOptRecordListResp.setProposalType(desces[2]);
-						if(desces.length > 3) {
+						if (desces.length > 3) {
 							stakingOptRecordListResp.setVersion(desces[3]);
 						}
 						break;
 					/** 投票类型 */
 					case VOTE:
 						stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1]) ? "" : desces[1]);
 						stakingOptRecordListResp.setOption(desces[2]);
 						stakingOptRecordListResp.setProposalType(desces[3]);
-						if(desces.length > 4) {
+						if (desces.length > 4) {
 							stakingOptRecordListResp.setVersion(desces[4]);
 						}
 						break;
@@ -413,12 +435,12 @@ public class StakingService {
 						stakingOptRecordListResp.setAmount(new BigDecimal(desces[2]));
 						stakingOptRecordListResp.setIsFire(Integer.parseInt(desces[3]));
 						break;
-						/**
-						 * 参数提案
-						 */
+					/**
+					 * 参数提案
+					 */
 					case PARAMETER:
 						stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1])?"":desces[1]);
+						stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1]) ? "" : desces[1]);
 						stakingOptRecordListResp.setProposalType(desces[2]);
 						stakingOptRecordListResp.setType("4");
 						break;
@@ -436,17 +458,17 @@ public class StakingService {
 		return respPage;
 	}
 
-	public RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req) {
+	public RespPage<DelegationListByStakingResp> delegationListByStaking(DelegationListByStakingReq req) {
 		Node node = nodeMapper.selectByPrimaryKey(req.getNodeId());
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		List<DelegationListByStakingResp> lists = new LinkedList<>();
 		/** 根据节点id和区块查询验证委托信息 */
 		Page<DelegationStaking> delegationStakings = customDelegationMapper.selectStakingByNodeId(req.getNodeId());
-		for (DelegationStaking delegationStaking: delegationStakings.getResult()) {
+		for (DelegationStaking delegationStaking : delegationStakings.getResult()) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			BeanUtils.copyProperties(delegationStaking, byStakingResp);
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
-		   /**已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
+			/**已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
 			byStakingResp.setDelegateTotalValue(node.getStatDelegateValue());
 			/**
 			 * 委托金额等于has加上实际lock金额
@@ -464,7 +486,7 @@ public class StakingService {
 		return respPage;
 	}
 
-	public RespPage<DelegationListByAddressResp> delegationListByAddress( DelegationListByAddressReq req) {
+	public RespPage<DelegationListByAddressResp> delegationListByAddress(DelegationListByAddressReq req) {
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		List<DelegationListByAddressResp> lists = new LinkedList<>();
 		/** 根据地址分页查询委托列表 */
@@ -474,7 +496,7 @@ public class StakingService {
 		 * 初始化奖励节点id列表，用来后续查询对应的待领取奖励使用
 		 */
 		List<String> nodes = new ArrayList<>();
-		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
+		for (DelegationAddress delegationAddress : delegationAddresses.getResult()) {
 			nodes.add(delegationAddress.getNodeId());
 		}
 		/**
@@ -484,10 +506,10 @@ public class StakingService {
 		try {
 			rewards = platonClient.getRewardContract().getDelegateReward(req.getAddress(), nodes).send().getData();
 		} catch (Exception e) {
-			logger.error("获取奖励数据错误：{}",e.getMessage());
+			logger.error("获取奖励数据错误：{}", e.getMessage());
 			rewards = new ArrayList<>();
 		}
-		for (DelegationAddress delegationAddress:  delegationAddresses.getResult()) {
+		for (DelegationAddress delegationAddress : delegationAddresses.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationAddress, byAddressResp);
 			byAddressResp.setDelegateHas(delegationAddress.getDelegateHes());
@@ -499,12 +521,12 @@ public class StakingService {
 			/**
 			 * 循环获取奖励
 			 */
-			if(rewards != null) {
-				for(Reward reward: rewards) {
+			if (rewards != null) {
+				for (Reward reward : rewards) {
 					/**
 					 * 匹配成功之后设置金额
 					 */
-					if(delegationAddress.getNodeId().equals(HexUtil.prefix(reward.getNodeId()))) {
+					if (delegationAddress.getNodeId().equals(HexUtil.prefix(reward.getNodeId()))) {
 						byAddressResp.setDelegateClaim(new BigDecimal(reward.getReward()));
 					}
 				}
@@ -528,15 +550,15 @@ public class StakingService {
 		NodeExample.Criteria criteria = nodeExample.createCriteria();
 		criteria.andStatusEqualTo(StatusEnum.LOCKED.getCode());
 
-		if(StringUtils.isNotBlank(req.getKey())) {
+		if (StringUtils.isNotBlank(req.getKey())) {
 			criteria.andNodeNameLike("%" + req.getKey() + "%");
 		}
 		Page<Node> stakingPage = customNodeMapper.selectListByExample(nodeExample);
 
 		/** 查询出块节点 */
-        //NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
-		int i=(req.getPageNo()-1)*req.getPageSize();
-		for (Node node:stakingPage) {
+		//NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
+		int i = (req.getPageNo() - 1) * req.getPageSize();
+		for (Node node : stakingPage) {
 			LockedStakingListResp lockedStakingListResp = new LockedStakingListResp();
 			BeanUtils.copyProperties(node, lockedStakingListResp);
 			lockedStakingListResp.setBlockQty(node.getStatBlockQty());
@@ -547,7 +569,7 @@ public class StakingService {
 			lockedStakingListResp.setDelegateValue(sumAmount);
 			lockedStakingListResp.setIsInit(node.getIsInit() == 1);
 			lockedStakingListResp.setStakingIcon(node.getNodeIcon());
-			if(node.getIsRecommend() != null) {
+			if (node.getIsRecommend() != null) {
 				lockedStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == node.getIsRecommend());
 			}
 			/** 设置排行 */
@@ -556,13 +578,13 @@ public class StakingService {
 			lockedStakingListResp.setSlashMultiQty(node.getStatSlashMultiQty());
 			lockedStakingListResp.setStatus(StakingStatusEnum.LOCKED.getCode());
 			Date leaveTime = node.getLeaveTime();
-			lockedStakingListResp.setLeaveTime(leaveTime==null?null:leaveTime.getTime());
+			lockedStakingListResp.setLeaveTime(leaveTime == null ? null : leaveTime.getTime());
 			/** 质押总数=有效的质押+委托 */
 			lockedStakingListResp.setTotalValue(node.getTotalValue().toString());
 			lockedStakingListResp.setDeleAnnualizedRate(node.getDeleAnnualizedRate().toString());
 
 			// 锁定节占预估解锁块高 = （节点锁定时所在结算周期+锁定结算周期数）x 每个结算周期区块数量
-			int epoches = node.getZeroProduceFreezeEpoch()+ node.getZeroProduceFreezeDuration();
+			int epoches = node.getZeroProduceFreezeEpoch() + node.getZeroProduceFreezeDuration();
 			BigInteger unlockBlockNum = blockChainConfig.getSettlePeriodBlockCount().multiply(BigInteger.valueOf(epoches));
 			lockedStakingListResp.setUnlockBlockNum(unlockBlockNum.longValue());
 
@@ -574,4 +596,5 @@ public class StakingService {
 		respPage.init(page, lists);
 		return respPage;
 	}
+
 }
