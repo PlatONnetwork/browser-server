@@ -12,6 +12,18 @@ public interface CustomTokenHolderMapper {
 
     Page<CustomTokenHolder> selectListByParams(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
 
+    /**
+     * 查询erc721令牌数量
+     *
+     * @param tokenAddress
+     * @param address
+     * @param type
+     * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/3
+     */
+    Page<CustomTokenHolder> findErc721TokenHolder(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
+
     int batchInsertOrUpdateSelective(@Param("list") List<TokenHolder> list, @Param("selective") TokenHolder.Column... selective);
 
     /**

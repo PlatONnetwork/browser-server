@@ -372,25 +372,45 @@ public class ErcTxService {
         if (!ArrayUtil.contains(tokenType, type)) {
             type = null;
         }
-        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null, address, type);
-
         List<Object[]> rows = new ArrayList<>();
-        rs.stream().forEach(customTokenHolder -> {
-            BigDecimal balance = this.getAddressBalance(customTokenHolder);
-            Object[] row = {customTokenHolder.getName(), customTokenHolder.getSymbol(),
-                    HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()),
-                    customTokenHolder.getDecimal(), customTokenHolder.getTxCount(), customTokenHolder.getTokenAddress()
+        String[] headers = {};
+        if ("erc721".equalsIgnoreCase(type)) {
+            Page<CustomTokenHolder> rs = this.customTokenHolderMapper.findErc721TokenHolder(null, address, type);
+            rs.stream().forEach(customTokenHolder -> {
+                Object[] row = {customTokenHolder.getName(),
+                        customTokenHolder.getSymbol(),
+                        customTokenHolder.getTokenId(),
+                        customTokenHolder.getTxCount(),
+                        customTokenHolder.getTokenAddress()
+                };
+                rows.add(row);
+            });
+            headers = new String[]{
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local)
             };
-            rows.add(row);
-        });
-        String[] headers = {
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local)
-        };
+        } else {
+            Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null, address, type);
+            rs.stream().forEach(customTokenHolder -> {
+                BigDecimal balance = this.getAddressBalance(customTokenHolder);
+                Object[] row = {customTokenHolder.getName(), customTokenHolder.getSymbol(),
+                        HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()),
+                        customTokenHolder.getDecimal(), customTokenHolder.getTxCount(), customTokenHolder.getTokenAddress()
+                };
+                rows.add(row);
+            });
+            headers = new String[]{
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT, local),
+                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local)
+            };
+        }
         return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
