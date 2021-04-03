@@ -327,6 +327,7 @@ subprojects {
         compile 'cn.hutool:hutool-all:5.5.7'
 
         implementation 'javax.mail:mail:1.4.7'
+        implementation group: 'p6spy', name: 'p6spy', version: '3.9.0'
 
     }
 }

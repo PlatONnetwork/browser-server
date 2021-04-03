@@ -1,5 +1,10 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.utils.*;
 import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
@@ -41,6 +46,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 区块方法逻辑具体实现
@@ -67,6 +74,9 @@ public class BlockService {
     @Resource
     private CommonService commonService;
 
+    @Resource
+    private CustomNodeMapper customNodeMapper;
+
     private Lock lock = new ReentrantLock();
 
     @Value("${platon.valueUnit}")
@@ -87,6 +97,7 @@ public class BlockService {
              * 当页号等于1，重新获取数据，与首页保持一致
              */
             List<Block> items;
+            long aa = System.currentTimeMillis();
             if (req.getPageNo() == 1) {
                 /** 查询缓存最新的八条区块信息 */
                 items = statisticCacheService.getBlockCache(0, 1);
@@ -127,7 +138,7 @@ public class BlockService {
         page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
         respPage.init(page, lists);
         if (System.currentTimeMillis() - startTime > 100) {
-            logger.error("perform-blockList,time6:{}", System.currentTimeMillis() - startTime);
+            logger.error("perform-blockList,time:{}", System.currentTimeMillis() - startTime);
         }
         return respPage;
     }
@@ -140,10 +151,11 @@ public class BlockService {
      */
     private List<BlockListResp> transferBlockListResp(List<Block> blocks) {
         List<BlockListResp> blockListResps = new ArrayList<>();
-        /**
-         * 申明节点列表，减少整体查询次数
-         */
-        Map<String, String> nodes = new HashMap<>();
+        Set<String> nodeIdList = blocks.stream().map(Block::getNodeId).collect(Collectors.toSet());
+        List<Node> nodeNames = new ArrayList<>();
+        if (CollUtil.isNotEmpty(nodeIdList)) {
+            nodeNames = customNodeMapper.batchFindNodeNameByNodeId(nodeIdList);
+        }
         for (Block block : blocks) {
             BlockListResp blockListResp = new BlockListResp();
             BeanUtils.copyProperties(block, blockListResp);
@@ -153,19 +165,17 @@ public class BlockService {
             blockListResp.setStatTxQty(block.getTxQty());
             blockListResp.setServerTime(System.currentTimeMillis());
             blockListResp.setTimestamp(block.getTime().getTime());
-            String nodeName = nodes.get(block.getNodeId());
-            /**
-             * 判断节点名称是否需要重复查询
-             */
-            if (StringUtils.isNotBlank(nodeName)) {
-                blockListResp.setNodeName(nodeName);
-            } else {
-                blockListResp.setNodeName(commonService.getNodeName(block.getNodeId(), null));
-                nodes.put(block.getNodeId(), blockListResp.getNodeName());
+            for (Node node : nodeNames) {
+                if (node.getNodeId().equalsIgnoreCase(block.getNodeId())) {
+                    blockListResp.setNodeName(node.getNodeName());
+                }
+            }
+            if (StrUtil.isEmpty(blockListResp.getNodeName())) {
+                logger.error("该nodeId:{}未查询到nodeName", block.getNodeId());
             }
             blockListResps.add(blockListResp);
         }
-        nodes.clear();
+        nodeNames.clear();
         return blockListResps;
     }
 

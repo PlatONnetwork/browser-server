@@ -327,16 +327,20 @@ public class ErcTokenUpdateTask {
             list.forEach(v -> {
                 if (map.containsKey(v.getContract())) {
                     // 判断是否是0地址
-                    if (!AddressUtil.isAddrZero(v.getFrom(), v.getTo())) {
-                        map.get(v.getContract()).add(v.getFrom());
+                    if (!AddressUtil.isAddrZero(v.getTo())) {
                         map.get(v.getContract()).add(v.getTo());
+                    }
+                    if (!AddressUtil.isAddrZero(v.getFrom())) {
+                        map.get(v.getContract()).add(v.getFrom());
                     }
                 } else {
                     HashSet<String> addressSet = new HashSet<String>();
                     // 判断是否是0地址
-                    if (!AddressUtil.isAddrZero(v.getFrom(), v.getTo())) {
-                        addressSet.add(v.getFrom());
+                    if (!AddressUtil.isAddrZero(v.getTo())) {
                         addressSet.add(v.getTo());
+                    }
+                    if (!AddressUtil.isAddrZero(v.getFrom())) {
+                        addressSet.add(v.getFrom());
                     }
                     map.put(v.getContract(), addressSet);
                 }
