@@ -29,14 +29,12 @@ public class WebAccessFilter implements Filter {
         String traceId = StrUtil.removeAll(UUID.randomUUID().toString(), "-");
         MDC.put(TRACE_ID, traceId);
         long start = System.currentTimeMillis();
-        log.info("[请求接口开始] 请求ID:{}, 路径URL:{}, 请求方式:{}, 起始时间:{}",
-                traceId,
+        log.info("[请求接口开始] 路径URL:{}, 请求方式:{}, 起始时间:{}",
                 request.getRequestURL(),
                 request.getMethod(),
                 start);
         chain.doFilter(servletRequest, servletResponse);
-        log.info("[请求接口结束] 请求ID:{}, 路径URL:{}, 请求方式:{}, 耗时:{}",
-                traceId,
+        log.info("[请求接口结束] 路径URL:{}, 请求方式:{}, 耗时:{}ms",
                 request.getRequestURL(),
                 request.getMethod(),
                 System.currentTimeMillis() - start);
