@@ -195,7 +195,7 @@ public class ErcTxService {
         if (StringUtils.isNotBlank(address)) {
             constructor.buildMust(new BoolQueryBuilder()
                     .should(QueryBuilders.termQuery("from", address))
-                    .should(QueryBuilders.termQuery("tto", address)));
+                    .should(QueryBuilders.termQuery("to", address)));
         }
         // Set sort field
         constructor.setDesc("seq");
