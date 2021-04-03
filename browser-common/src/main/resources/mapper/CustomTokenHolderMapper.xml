@@ -26,6 +26,35 @@
         </if>
         order by balance desc
     </select>
+    <select id="findErc721TokenHolder" parameterType="java.lang.String" resultType="com.platon.browser.bean.CustomTokenHolder">
+        SELECT
+            th.token_address AS tokenAddress,
+            th.address,
+            ti.token_id AS tokenId,
+            t.type,
+            t.symbol,
+            t.NAME,
+            t.total_supply AS totalSupply,
+            ti.token_owner_tx_qty AS txCount
+        FROM
+            token_inventory ti
+                LEFT JOIN token_holder th ON th.token_address = ti.token_address
+                LEFT JOIN token t ON th.token_address = t.address
+        WHERE
+            th.balance != 0
+        <if test="tokenAddress != null">
+            and th.token_address = #{tokenAddress}
+        </if>
+        <if test="address != null">
+            AND th.address = #{address}
+            AND ti.`owner` = #{address}
+        </if>
+        <if test="type != null">
+            AND t.type = #{type}
+        </if>
+        ORDER BY
+            balance DESC
+    </select>
     <insert id="batchInsertOrUpdateSelective" parameterType="map">
         replace into token_holder (
         <foreach collection="selective" item="column" separator=",">
