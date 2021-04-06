@@ -40,7 +40,8 @@ public class BlockServiceTest extends ApiTestMockBase {
 		ReflectionTestUtils.setField(target,"i18n",i18n);
 		ReflectionTestUtils.setField(target,"statisticCacheService",statisticCacheService);
 		ReflectionTestUtils.setField(target,"commonService",commonService);
-		ReflectionTestUtils.setField(target,"ESBlockRepository", ESBlockRepository);
+		ReflectionTestUtils.setField(target,"esBlockRepository", ESBlockRepository);
+		ReflectionTestUtils.setField(target,"customNodeMapper", customNodeMapper);
 	}
 
 	@Test

@@ -53,7 +53,7 @@ public class HolderControllerTest extends ApiTestBase {
     @Test
     public void tokenExport() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.post("/token/holder/export")
+                .perform(MockMvcRequestBuilders.get("/token/holder/export")
                         .param("contract", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
                         .param("token", "")
                         .param("local", "en")

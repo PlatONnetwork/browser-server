@@ -30,7 +30,7 @@ public class SpringUtilsTest {
         SpringUtils targe = PowerMockito.spy(new SpringUtils());
         EsClusterConfig esClusterConfig = mock(EsClusterConfig.class);
         DefaultListableBeanFactory defaultListableBeanFactory = mock(DefaultListableBeanFactory.class);
-        ReflectionTestUtils.setField(targe, "elasticsearchConfig", esClusterConfig);
+        ReflectionTestUtils.setField(targe, "esClusterConfig", esClusterConfig);
         ReflectionTestUtils.setField(targe, "defaultListableBeanFactory", defaultListableBeanFactory);
         EsClusterConfig es = mock(EsClusterConfig.class);
         PowerMockito.whenNew(EsClusterConfig.class)

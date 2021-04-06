@@ -17,7 +17,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=testdelete")
+@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=test")
 public class RedisBlockServiceTest {
 
 	@Autowired
