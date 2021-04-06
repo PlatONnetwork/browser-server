@@ -172,7 +172,7 @@ public class RetryableClient {
         try {
             Web3jWrapper preWeb3j = currentWeb3jWrapper;
             // 检查所有Web3j的连通性, 取块高最高的作为当前web3j
-            long maxBlockNumber = 0;
+            long maxBlockNumber = -1;
             for (Web3jWrapper wrapper : web3jWrappers) {
                 try {
                     BigInteger blockNumber = wrapper.getWeb3j().platonBlockNumber().send().getBlockNumber();
@@ -187,6 +187,17 @@ public class RetryableClient {
             if (preWeb3j == null || preWeb3j != currentWeb3jWrapper) {
                 // 前任web3j为空或Web3j有变动,则更新合约变量
                 updateContract();
+            }
+            if (maxBlockNumber == -1) {
+                log.info("当前所有候选Web3j实例均无法连通!");
+                if (protocol == Web3jProtocolEnum.WS) {
+                    log.info("重新初始化websocket连接!");
+                    try {
+                        init();
+                    } catch (ConfigLoadingException e) {
+                        log.error("重新初始化失败!");
+                    }
+                }
             }
         } finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
