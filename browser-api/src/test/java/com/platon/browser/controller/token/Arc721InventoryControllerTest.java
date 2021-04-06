@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestBase;
 import com.platon.browser.request.token.QueryTokenIdDetailReq;
 import com.platon.browser.request.token.QueryTokenIdListReq;
-import com.platon.browser.request.token.QueryTokenTransferRecordListReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,8 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 public class Arc721InventoryControllerTest extends ApiTestBase {
+
     @Autowired
     private WebApplicationContext wac;
+
     private MockMvc mockMvc;
 
     @Before
@@ -62,7 +63,7 @@ public class Arc721InventoryControllerTest extends ApiTestBase {
     @Test
     public void tokenIdExport() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.post("/token/arc721-inventory/export")
+                .perform(MockMvcRequestBuilders.get("/token/arc721-inventory/export")
                         .param("address", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
                         .param("contract", "")
                         .param("tokenId", "")
@@ -76,7 +77,7 @@ public class Arc721InventoryControllerTest extends ApiTestBase {
                     InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
                     FileOutputStream fos = new FileOutputStream(new File("build/bbb.csv"));
                     byte[] byteBuf = new byte[1024];
-                    while(in.read(byteBuf)!=-1) {
+                    while (in.read(byteBuf) != -1) {
                         fos.write(byteBuf);
                     }
                     fos.close();

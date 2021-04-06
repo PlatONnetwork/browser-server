@@ -1,5 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
+import com.platon.browser.config.EsIndexConfig;
 import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
@@ -41,7 +42,8 @@ public class EsNodeOptRepositoryTest {
     @Before
     public void setup()throws Exception{
         ReflectionTestUtils.setField(target,"client",client);
-        ReflectionTestUtils.setField(target,"indexName","client");
+        target.config = new EsIndexConfig();
+        target.config.setNodeOptIndexName("alaya_browser_hrpatp201018v10000_nodeopt");
         IndicesClient indicesClient = mock(IndicesClient.class);
         when(client.indices()).thenReturn(indicesClient);
         CreateIndexResponse createIndexResponse = mock(CreateIndexResponse.class);

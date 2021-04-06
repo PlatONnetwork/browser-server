@@ -1,6 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
-import com.platon.browser.service.elasticsearch.EsTransactionRepository;
+import com.platon.browser.config.EsIndexConfig;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -39,39 +39,40 @@ public class EsTransactionRepositoryTest {
     private EsTransactionRepository target;
 
     @Before
-    public void setup()throws Exception{
-        ReflectionTestUtils.setField(target,"client",client);
-        ReflectionTestUtils.setField(target,"indexName","client");
+    public void setup() throws Exception {
+        ReflectionTestUtils.setField(target, "client", client);
+        target.config = new EsIndexConfig();
+        target.config.setTransactionIndexName("alaya_browser_hrpatp201018v10000_transaction");
         IndicesClient indicesClient = mock(IndicesClient.class);
         when(client.indices()).thenReturn(indicesClient);
         CreateIndexResponse createIndexResponse = mock(CreateIndexResponse.class);
-        when(indicesClient.create(any(CreateIndexRequest.class),any(RequestOptions.class))).thenReturn(createIndexResponse);
+        when(indicesClient.create(any(CreateIndexRequest.class), any(RequestOptions.class))).thenReturn(createIndexResponse);
     }
 
     @Test
-    public void createIndexTest()throws Exception{
-        Map <String,String> map = new HashMap <>();
-        map.put("123","123");
+    public void createIndexTest() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("123", "123");
         target.createIndex(map);
     }
 
     @Test
-    public void existsIndexTest()throws Exception{
+    public void existsIndexTest() throws Exception {
         target.existsIndex();
     }
 
     @Test
-    public void deleteIndexTest()throws Exception{
+    public void deleteIndexTest() throws Exception {
         target.deleteIndex();
     }
 
     @Test
-    public void addTest()throws Exception{
-        target.add("Test","test");
+    public void addTest() throws Exception {
+        target.add("Test", "test");
     }
 
     @Test
-    public void existsTest()throws Exception{
+    public void existsTest() throws Exception {
         target.exists("1");
     }
 /*
@@ -81,26 +82,26 @@ public class EsTransactionRepositoryTest {
     }*/
 
     @Test
-    public void updateTest()throws Exception{
-        target.update("Test","test1");
+    public void updateTest() throws Exception {
+        target.update("Test", "test1");
     }
 
     @Test
-    public void deleteTest()throws Exception{
+    public void deleteTest() throws Exception {
         target.delete("Test");
     }
 
     @Test
-    public void bulkDeleteTest()throws Exception{
-        List <String> list = new ArrayList <>();
+    public void bulkDeleteTest() throws Exception {
+        List<String> list = new ArrayList<>();
         list.add("Test");
         target.bulkDelete(list);
     }
 
     @Test
-    public void bulkAddOrUpdateTest()throws Exception{
-        Map<String,String> map = new HashMap <>();
-        map.put("Test","aaaa");
+    public void bulkAddOrUpdateTest() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("Test", "aaaa");
         target.bulkAddOrUpdate(map);
     }
 

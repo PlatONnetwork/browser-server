@@ -24,15 +24,14 @@ public class AddressUtil {
      * @date 2021/2/9
      */
     public static boolean isAddrZero(String addr) {
-        boolean addrZero = false;
         if (TO_ADDR_ZERO.equalsIgnoreCase(addr)) {
-            addrZero = true;
+            return true;
         }
         String address = Bech32.addressDecodeHex(addr);
         if (TO_ADDR_ZERO.equalsIgnoreCase(address)) {
-            addrZero = true;
+            return true;
         }
-        return addrZero;
+        return false;
     }
 
     /**

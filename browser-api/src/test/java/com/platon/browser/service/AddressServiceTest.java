@@ -67,7 +67,7 @@ public class AddressServiceTest extends ApiTestMockBase {
     @SuppressWarnings("unchecked")
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
+        //ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
         ReflectionTestUtils.setField(target, "customAddressMapper", customAddressMapper);
         ReflectionTestUtils.setField(target, "rpPlanMapper", rpPlanMapper);
         ReflectionTestUtils.setField(target, "customRpPlanMapper", customRpPlanMapper);
@@ -96,11 +96,11 @@ public class AddressServiceTest extends ApiTestMockBase {
     @Test
     public void getDetails() throws Exception {
         QueryDetailRequest req = new QueryDetailRequest();
-        req.setAddress("0x1000000000000000000000000000000000000001");
+        req.setAddress("0x0000000000000000000000000000000000000000");
 //		assertNotNull(addressService.getDetails(req));
 
         CustomAddressDetail address = new CustomAddressDetail();
-        address.setAddress("0x1000000000000000000000000000000000000001");
+        address.setAddress("0x0000000000000000000000000000000000000000");
         address.setBalance(BigDecimal.ZERO);
         address.setDelegateHes(BigDecimal.ZERO);
         address.setStakingValue(BigDecimal.ZERO);
@@ -110,7 +110,7 @@ public class AddressServiceTest extends ApiTestMockBase {
         when(addressMapper.selectByPrimaryKey(req.getAddress())).thenReturn(address);
         List<RestrictingBalance> restrictingBalances = new ArrayList<RestrictingBalance>();
         RestrictingBalance restrictingBalance = new RestrictingBalance();
-        restrictingBalance.setAccount("0x1000000000000000000000000000000000000001");
+        restrictingBalance.setAccount("0x0000000000000000000000000000000000000000");
         restrictingBalance.setFreeBalance("0x10");
         restrictingBalance.setLockBalance("0x10");
         restrictingBalance.setPledgeBalance("0x10");
