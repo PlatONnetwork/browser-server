@@ -1,19 +1,20 @@
 package com.platon.browser.handler;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.TxAnalyseResult;
+import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.CustomNOptBakMapper;
 import com.platon.browser.dao.mapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
+import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.statistic.StatisticService;
 import com.platon.browser.service.ppos.PPOSService;
+import com.platon.browser.service.statistic.StatisticService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,27 +36,40 @@ import static org.mockito.Mockito.*;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class CollectionEventHandlerTest extends AgentTestBase {
+
     @Mock
     private PPOSService pposService;
+
     @Mock
     private BlockService blockService;
+
     @Mock
     private StatisticService statisticService;
+
     @Mock
     private ComplementEventPublisher complementEventPublisher;
+
     @Mock
     private NetworkStatCache networkStatCache;
+
     @Mock
     private NOptBakMapper nOptBakMapper;
+
     @Mock
     private TxBakMapper txBakMapper;
+
     @Mock
     private CustomTxBakMapper customTxBakMapper;
+
     @Mock
     private CustomNOptBakMapper customNOptBakMapper;
+
     @InjectMocks
     @Spy
     private CollectionEventHandler target;
+
+    @Mock
+    private AddressCache addressCache;
 
     @Before
     public void setup() throws Exception {
@@ -79,15 +93,16 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
-        event.setTransactions(new ArrayList <>(transactionList));
-        when(customTxBakMapper.batchInsertOrUpdateSelective(any(),any())).thenReturn(100);
-        target.onEvent(event,33,false);
-        verify(target, times(1)).onEvent(any(),anyLong(),anyBoolean());
+        event.setTransactions(new ArrayList<>(transactionList));
+        when(customTxBakMapper.batchInsertOrUpdateSelective(any(), any())).thenReturn(100);
+        target.onEvent(event, 33, false);
+        verify(target, times(1)).onEvent(any(), anyLong(), anyBoolean());
 
         doThrow(new RuntimeException("")).when(blockService).analyze(any());
         try {
-        	target.onEvent(event,33,false);
-		} catch (Exception e) {
-		}
+            target.onEvent(event, 33, false);
+        } catch (Exception e) {
+        }
     }
+
 }
