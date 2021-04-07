@@ -73,9 +73,10 @@ public class DruidConfig {
         Map<String, String> initParams = new HashMap<>();
         initParams.put(ResourceServlet.PARAM_NAME_USERNAME, monitorUsername);
         initParams.put(ResourceServlet.PARAM_NAME_PASSWORD, monitorPassword);
+        // 白名单，默认就是允许所有访问
         initParams.put(ResourceServlet.PARAM_NAME_ALLOW, ""); //默认就是允许所有访问
-        // deny：Druid 后台拒绝谁访问，表示禁止此ip访问
-        // initParams.put("deny","192.168.10.132");
+        // 黑名单
+        // initParams.put(ResourceServlet.PARAM_NAME_DENY, "192.168.10.132");
         bean.setInitParameters(initParams);
         // 是否可以重置数据
         bean.addInitParameter("resetEnable", "false");
