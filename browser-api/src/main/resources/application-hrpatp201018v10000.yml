@@ -46,6 +46,8 @@ spring:
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
     monitor:
+      # 开启druid monitor，默认为false
+      enabled: true
       username: platon
       password: platon
   #Redis配置

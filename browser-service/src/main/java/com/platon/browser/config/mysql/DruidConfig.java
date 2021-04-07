@@ -27,6 +27,11 @@ import java.util.Map;
 @Configuration
 public class DruidConfig {
 
+    @Value("${spring.datasource.monitor.enabled:false}")
+    @Getter
+    @Setter
+    private boolean monitorEnabled;
+
     @Value("${spring.datasource.monitor.username:platon}")
     @Getter
     @Setter
@@ -74,6 +79,8 @@ public class DruidConfig {
         bean.setInitParameters(initParams);
         // 是否可以重置数据
         bean.addInitParameter("resetEnable", "false");
+        // 是否开启druid monitor
+        bean.setEnabled(monitorEnabled);
         return bean;
     }
 
