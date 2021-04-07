@@ -1,8 +1,12 @@
 package com.platon.browser.config.mysql;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.support.http.ResourceServlet;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -23,6 +27,24 @@ import java.util.Map;
 @Configuration
 public class DruidConfig {
 
+    @Value("${spring.datasource.monitor.username:platon}")
+    @Getter
+    @Setter
+    private String monitorUsername;
+
+    @Value("${spring.datasource.monitor.password:platon}")
+    @Getter
+    @Setter
+    private String monitorPassword;
+
+    /**
+     * 配置数据源
+     *
+     * @param
+     * @return javax.sql.DataSource
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/7
+     */
     @ConfigurationProperties(prefix = "spring.datasource")
     @Bean
     public DataSource druid() {
@@ -32,6 +54,7 @@ public class DruidConfig {
     /**
      * 配置 Druid 监控管理后台的Servlet
      * 内置 Servlet 容器时没有web.xml文件，所以使用 Spring Boot 的注册 Servlet 方式
+     * 访问URL：http://{ip}:{port}/browser-server/druid/login.html
      *
      * @param
      * @return org.springframework.boot.web.servlet.ServletRegistrationBean
@@ -43,12 +66,14 @@ public class DruidConfig {
         ServletRegistrationBean bean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
         // 这些参数可以在 com.alibaba.druid.support.http.StatViewServlet 的父类 com.alibaba.druid.support.http.ResourceServlet 中找到
         Map<String, String> initParams = new HashMap<>();
-        initParams.put("loginUsername", "admin");
-        initParams.put("loginPassword", "123456");
-        initParams.put("allow", ""); //默认就是允许所有访问
+        initParams.put(ResourceServlet.PARAM_NAME_USERNAME, monitorUsername);
+        initParams.put(ResourceServlet.PARAM_NAME_PASSWORD, monitorPassword);
+        initParams.put(ResourceServlet.PARAM_NAME_ALLOW, ""); //默认就是允许所有访问
         // deny：Druid 后台拒绝谁访问，表示禁止此ip访问
         // initParams.put("deny","192.168.10.132");
         bean.setInitParameters(initParams);
+        // 是否可以重置数据
+        bean.addInitParameter("resetEnable", "false");
         return bean;
     }
 

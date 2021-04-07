@@ -19,7 +19,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://_DB_HOST_:_DB_PORT_/alaya_browser_0.15.2.0_hyp?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    # 使用p6spy监控SQL
+    # 使用p6spy监控SQL,注意：druid monitor的wall防火墙会把paspy屏蔽，开启p6spy时要把druid monitor的wall防火墙关闭，默认已关闭
     # driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     # url: jdbc:p6spy:mysql://_DB_HOST_:_DB_PORT_/alaya_browser_0.15.2.0_hyp?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: _DB_USER_
@@ -42,6 +42,14 @@ spring:
     # 打开PSCache，并且指定每个连接上PSCache的大小
     poolPreparedStatements: true
     maxPoolPreparedStatementPerConnectionSize: 100
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，wall用于防火墙,注意：wall会把p6spy屏蔽
+    filters: stat,log4j
+    # filters: stat,wall,log4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    monitor:
+      username: platon
+      password: platon
   #Redis配置
   redis:
     password: _REDIS_PWD_
