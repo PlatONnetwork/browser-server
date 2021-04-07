@@ -27,8 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 public class Arc721TxControllerTest extends ApiTestBase {
+
     @Autowired
     private WebApplicationContext wac;
+
     private MockMvc mockMvc;
 
     @Before
@@ -64,7 +66,7 @@ public class Arc721TxControllerTest extends ApiTestBase {
                     InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
                     FileOutputStream fos = new FileOutputStream(new File("build/bbb.csv"));
                     byte[] byteBuf = new byte[1024];
-                    while(in.read(byteBuf)!=-1) {
+                    while (in.read(byteBuf) != -1) {
                         fos.write(byteBuf);
                     }
                     fos.close();
