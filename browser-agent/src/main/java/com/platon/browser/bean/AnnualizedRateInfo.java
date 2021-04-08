@@ -5,17 +5,39 @@ import com.alibaba.fastjson.JSON;
 import java.util.List;
 
 /**
+ * maxSettlePeriodCount4AnnualizedRateStat+1个结算周期收益和质押信息
+ *
  * @Auther: Chendongming
  * @Date: 2019/8/21 15:09
  * @Description: 年化率信息bean
  */
 public class AnnualizedRateInfo {
+
+    /**
+     * 质押奖励列表，存放maxSettlePeriodCount4AnnualizedRateStat+1个周期的质押奖励列表
+     */
     private List<PeriodValueElement> stakeProfit;
+
+    /**
+     * 质押成本列表
+     */
     private List<PeriodValueElement> stakeCost;
+
+    /**
+     * 委托奖励列表
+     */
     private List<PeriodValueElement> delegateProfit;
+
+    /**
+     * 委托成本列表
+     */
     private List<PeriodValueElement> delegateCost;
+
     private List<SlashInfo> slash;
-    public String toJSONString(){return JSON.toJSONString(this);}
+
+    public String toJSONString() {
+        return JSON.toJSONString(this);
+    }
 
     public List<PeriodValueElement> getStakeProfit() {
         return stakeProfit;
@@ -56,4 +78,5 @@ public class AnnualizedRateInfo {
     public void setSlash(List<SlashInfo> slash) {
         this.slash = slash;
     }
+
 }

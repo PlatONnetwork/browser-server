@@ -8,7 +8,15 @@ import java.math.BigDecimal;
  * @Description: 利润和成本bean
  */
 public class PeriodValueElement {
+
+    /**
+     * 结算周期
+     */
     private Long period;
+
+    /**
+     * 利润或成本
+     */
     private BigDecimal value;
 
     public Long getPeriod() {
@@ -28,4 +36,5 @@ public class PeriodValueElement {
         this.value = value;
         return this;
     }
+
 }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Staking extends StakingKey {
+
     private Integer stakingTxIndex;
 
     private BigDecimal stakingHes;
@@ -60,6 +61,9 @@ public class Staking extends StakingKey {
 
     private BigDecimal predictStakingReward;
 
+    /**
+     * 质押奖励(激励池)(von)
+     */
     private BigDecimal stakingRewardValue;
 
     private BigDecimal feeRewardValue;
@@ -675,7 +679,7 @@ public class Staking extends StakingKey {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column ... excludes) {
+        public static Column[] excludes(Column... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -698,4 +702,5 @@ public class Staking extends StakingKey {
             }
         }
     }
+
 }
