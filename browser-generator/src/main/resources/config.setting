@@ -1,0 +1,33 @@
+#数据库驱动名，如果不指定，则会根据url自动判定
+driverClass = com.mysql.jdbc.Driver
+#JDBC url，必须
+url = jdbc:mysql://192.168.9.191:3306/alaya_browser_hrpatp201018v10000hyp?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+#用户名，必须
+username = platon
+#密码，必须，如果密码为空，请填写 pass =
+password = platon
+
+#src路径
+SrcUrl=/src/main/resources
+#模板路径，放在src下，.ftl文件放在该路径下
+TemplateUrl=template
+
+#文件生成路径= ${filrUrl}/${baseURL}/packagePath包路径/${modelName}/${*URL}/*.[java|xml]
+#如果filrUrl为空，则filrUrl=当前项目路径
+filrUrl=
+baseURL=temp
+mapperURL=mapper
+xmlURL=xml
+entityURL=entity
+serviceURL=service
+serviceImplURL=service/impl
+controllerURL=controller
+dtoURL=dto
+
+#只需修改以下参数和数据源即可
+#包名，不要为空
+packagePath=com.platon
+#模块名，可为空
+modelName=browser
+#作者名
+author=huangyongpeng@csiisz.com

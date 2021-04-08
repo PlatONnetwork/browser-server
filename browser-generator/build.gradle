@@ -38,6 +38,9 @@ dependencies {
     compile mybatisGeneratorCore
     compile itfswMybatisGeneratorPlugin
     testCompile 'junit:junit:4.12'
+    compile 'cn.hutool:hutool-all:5.5.7'
+    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.28'
+    testCompile "mysql:mysql-connector-java:8.0.15"
 }
 
 def defaultEncoding = 'UTF-8'
