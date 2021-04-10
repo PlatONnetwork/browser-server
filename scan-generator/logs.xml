@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE generatorConfiguration
+                PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+                "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+<context id="default" targetRuntime="MyBatis3">
+    <property name="autoDelimitKeywords" value="true"/>
+    <property name="beginningDelimiter" value="`"/>
+    <property name="endingDelimiter" value="`"/>
+    <!-- 批量插入插件 -->
+    <plugin type="com.itfsw.mybatis.generator.plugins.BatchInsertPlugin">
+        <!--
+        开启后可以实现官方插件根据属性是否为空决定是否插入该字段功能
+        ！需开启allowMultiQueries=true多条sql提交操作，所以不建议使用！插件默认不开启
+        -->
+        <property name="allowMultiQueries" value="false"/>
+    </plugin>
+    <!-- 数据Model属性对应Column获取插件 -->
+    <plugin type="com.itfsw.mybatis.generator.plugins.ModelColumnPlugin"/>
+    <commentGenerator>
+        <property name="suppressDate" value="false"/>
+        <property name="suppressAllComments" value="true"/>
+    </commentGenerator>
+
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                    connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_cdm?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                    userId="platon"
+                    password="platon"/>
+
+    <javaModelGenerator targetPackage="com.platon.browser.dao.entity"
+                        targetProject="../logs">
+        <property name="enableSubPackages" value="true"/>
+        <property name="trimStrings" value="true"/>
+    </javaModelGenerator>
+
+    <sqlMapGenerator targetPackage="mapper"
+                     targetProject="../logs">
+        <property name="enableSubPackages" value="true"/>
+    </sqlMapGenerator>
+
+    <javaClientGenerator targetPackage="com.platon.browser.dao.mapper"
+                         targetProject="../logs" type="XMLMAPPER">
+        <property name="enableSubPackages" value="true"/>
+    </javaClientGenerator>
+    <!--      <table tableName="T_FEE_AGTBILL" domainObjectName="FeeAgentBill"
+                   enableCountByExample="false" enableUpdateByExample="false"
+                   enableDeleteByExample="false" enableSelectByExample="false"
+                   selectByExampleQueryId="false"/>&ndash;&gt;-->
+<!--
+    <table tableName="block" domainObjectName="Block">
+        <columnRenamingRule searchString="^D_"
+                            replaceString=""/>
+    </table>-->
+
+    <table tableName="staking" domainObjectName="Staking">
+        <columnRenamingRule searchString="^D_"
+                            replaceString=""/>
+    </table>
+
+    <!--      <table tableName="pending_tx" domainObjectName="PendingTx">
+                <columnRenamingRule searchString="^D_" replaceString=""/>
+          </table>-->
+    <!-- <table tableName="node" domainObjectName="Node">
+         <columnRenamingRule searchString="^D_"
+                             replaceString=""/>
+     </table>
+
+             <table tableName="node" domainObjectName="Node">
+         <columnRenamingRule searchString="^D_"
+                             replaceString=""/>
+     </table>
+     <table tableName="statistics" domainObjectName="Statistics">
+     <columnRenamingRule searchString="^D_"
+                         replaceString=""/>
+ </table>
+
+     <table tableName="node_ranking" domainObjectName="NodeRanking">
+    <columnRenamingRule searchString="^D_"
+                        replaceString=""/>
+</table>-->
+
+
+
+
+    <!--       <table tableName="transaction" domainObjectName="Transaction">
+                 <columnRenamingRule searchString="^D_"
+                                     replaceString=""/>
+             </table>-->
+
+    <!--  <table tableName="address_count" domainObjectName="AddressCount"
+           enableUpdateByExample="false"
+           enableDeleteByExample="false" enableInsert="false"
+           enableSelectByPrimaryKey="false" enableDeleteByPrimaryKey="false"
+           enableUpdateByPrimaryKey="false" enableSelectByExample="false"
+           selectByExampleQueryId="false">
+        &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                            replaceString=""/>&ndash;&gt;
+    </table>-->
+</context>
+</generatorConfiguration>
