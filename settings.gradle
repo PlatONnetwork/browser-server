@@ -4,13 +4,13 @@ pluginManagement {
 	}
 }
 rootProject.name = 'browser-server'
-include 'browser-agent'
-include 'browser-api'
-include 'browser-common'
-include 'browser-generator'
-include 'browser-service'
-include 'browser-sync'
-include 'browser-press'
-include 'browser-export'
-include 'browser-test'
+include 'scan-agent'
+include 'scan-api'
+include 'scan-common'
+include 'scan-generator'
+include 'scan-service'
+include 'scan-sync'
+include 'scan-press'
+include 'scan-export'
+include 'scan-test'
 
