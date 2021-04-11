@@ -800,7 +800,7 @@ public class TransactionService {
                             //查询对应的图片进行回填
                             TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
                             tokenInventoryKey.setTokenAddress(erc721.getContract());
-                            tokenInventoryKey.setTokenId(new BigInteger(erc721.getValue()));
+                            tokenInventoryKey.setTokenId(erc721.getValue());
                             TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
                             if (tokenInventory != null)
                                 arc721Param.setInnerImage(tokenInventory.getImage());

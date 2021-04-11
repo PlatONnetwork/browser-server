@@ -519,7 +519,7 @@ public class ErcTokenUpdateTask {
                     batch.forEach(inventory -> {
                         pool.submit(() -> {
                             try {
-                                String tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), inventory.getTokenId());
+                                String tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
                                 if (StrUtil.isNotBlank(tokenURI)) {
                                     Request request = new Request.Builder().url(tokenURI).build();
                                     try (Response response = client.newCall(request).execute()) {

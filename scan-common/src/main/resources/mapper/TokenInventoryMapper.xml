@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.dao.mapper.TokenInventoryMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TokenInventory">
     <id column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
-    <id column="token_id" jdbcType="BIGINT" property="tokenId" />
+    <id column="token_id" jdbcType="VARCHAR" property="tokenId" />
     <result column="owner" jdbcType="VARCHAR" property="owner" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="description" jdbcType="VARCHAR" property="description" />
@@ -99,7 +99,7 @@
   <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenInventoryKey">
     delete from token_inventory
     where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=BIGINT}
+      and token_id = #{tokenId,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TokenInventoryExample">
     delete from token_inventory
@@ -112,7 +112,7 @@
       `name`, description, image, 
       create_time, update_time, token_tx_qty,token_owner_tx_qty
       )
-    values (#{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=BIGINT}, #{owner,jdbcType=VARCHAR}, 
+    values (#{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, #{owner,jdbcType=VARCHAR},
       #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, #{tokenOwnerTxQty,jdbcType=INTEGER}
       )
@@ -156,7 +156,7 @@
         #{tokenAddress,jdbcType=VARCHAR},
       </if>
       <if test="tokenId != null">
-        #{tokenId,jdbcType=BIGINT},
+        #{tokenId,jdbcType=VARCHAR},
       </if>
       <if test="owner != null">
         #{owner,jdbcType=VARCHAR},
@@ -197,7 +197,7 @@
         token_address = #{record.tokenAddress,jdbcType=VARCHAR},
       </if>
       <if test="record.tokenId != null">
-        token_id = #{record.tokenId,jdbcType=BIGINT},
+        token_id = #{record.tokenId,jdbcType=VARCHAR},
       </if>
       <if test="record.owner != null">
         `owner` = #{record.owner,jdbcType=VARCHAR},
@@ -231,7 +231,7 @@
   <update id="updateByExample" parameterType="map">
     update token_inventory
     set token_address = #{record.tokenAddress,jdbcType=VARCHAR},
-      token_id = #{record.tokenId,jdbcType=BIGINT},
+      token_id = #{record.tokenId,jdbcType=VARCHAR},
       `owner` = #{record.owner,jdbcType=VARCHAR},
       `name` = #{record.name,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=VARCHAR},
@@ -273,7 +273,7 @@
       </if>
     </set>
     where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=BIGINT}
+      and token_id = #{tokenId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenInventory">
     update token_inventory
@@ -286,7 +286,7 @@
       token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
       token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER}
     where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=BIGINT}
+      and token_id = #{tokenId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -299,7 +299,7 @@
       token_tx_qty,token_owner_tx_qty)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=BIGINT}, #{item.owner,jdbcType=VARCHAR}, 
+      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, #{item.owner,jdbcType=VARCHAR},
         #{item.name,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, #{item.tokenOwnerTxQty,jdbcType=INTEGER}
         )
@@ -324,7 +324,7 @@
           #{item.tokenAddress,jdbcType=VARCHAR}
         </if>
         <if test="'token_id'.toString() == column.value">
-          #{item.tokenId,jdbcType=BIGINT}
+          #{item.tokenId,jdbcType=VARCHAR}
         </if>
         <if test="'owner'.toString() == column.value">
           #{item.owner,jdbcType=VARCHAR}
