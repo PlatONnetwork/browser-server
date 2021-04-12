@@ -185,52 +185,52 @@ public class TokenInventoryExample {
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdEqualTo(Long value) {
+        public Criteria andTokenIdEqualTo(String value) {
             addCriterion("token_id =", value, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdNotEqualTo(Long value) {
+        public Criteria andTokenIdNotEqualTo(String value) {
             addCriterion("token_id <>", value, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdGreaterThan(Long value) {
+        public Criteria andTokenIdGreaterThan(String value) {
             addCriterion("token_id >", value, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdGreaterThanOrEqualTo(Long value) {
+        public Criteria andTokenIdGreaterThanOrEqualTo(String value) {
             addCriterion("token_id >=", value, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdLessThan(Long value) {
+        public Criteria andTokenIdLessThan(String value) {
             addCriterion("token_id <", value, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdLessThanOrEqualTo(Long value) {
+        public Criteria andTokenIdLessThanOrEqualTo(String value) {
             addCriterion("token_id <=", value, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdIn(List<Long> values) {
+        public Criteria andTokenIdIn(List<String> values) {
             addCriterion("token_id in", values, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdNotIn(List<Long> values) {
+        public Criteria andTokenIdNotIn(List<String> values) {
             addCriterion("token_id not in", values, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdBetween(Long value1, Long value2) {
+        public Criteria andTokenIdBetween(String value1, String value2) {
             addCriterion("token_id between", value1, value2, "tokenId");
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdNotBetween(Long value1, Long value2) {
+        public Criteria andTokenIdNotBetween(String value1, String value2) {
             addCriterion("token_id not between", value1, value2, "tokenId");
             return (Criteria) this;
         }
