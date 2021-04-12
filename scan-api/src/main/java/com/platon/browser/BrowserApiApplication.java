@@ -36,7 +36,7 @@ public class BrowserApiApplication implements ApplicationRunner {
     @Value("${platon.zeroBlockNumber.wait-time:1}")
     private Integer zeroBlockNumberWaitTime;
 
-    @Autowired
+    @Resource
     DataSource dataSource;
 
     /**
@@ -49,23 +49,38 @@ public class BrowserApiApplication implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         if (AppStatusUtil.isStopped()) {
             return;
         }
         dataSourceLog();
-        // 0出块等待
-        while (true) {
-            long count = networkStatMapper.countByExample(null);
-            if (count > 0) {
-                log.info("开始出块...");
-                break;
-            }
-            Thread.sleep(1000L * zeroBlockNumberWaitTime);
-            log.info("正在等待出块...");
-        }
+        zeroBlockNumberWait();
         // 把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
+    }
+
+    /**
+     * 0出块等待
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/7
+     */
+    private void zeroBlockNumberWait() {
+        try {
+            while (true) {
+                long count = networkStatMapper.countByExample(null);
+                if (count > 0) {
+                    log.info("开始出块...");
+                    break;
+                }
+                Thread.sleep(1000L * zeroBlockNumberWaitTime);
+                log.info("正在等待出块...");
+            }
+        } catch (Exception e) {
+            log.error("0出块等待异常", e);
+        }
     }
 
     /**

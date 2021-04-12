@@ -28,8 +28,8 @@ HELP.md
 /.nb-gradle/
 
 ### TMP Files ###
-/browser-agent/logs
-/browser-api/logs
+/scan-agent/logs
+/scan-api/logs
 /logs/*
 /apidoc/
 /out/*
@@ -39,7 +39,10 @@ HELP.md
 
 apidoc.zip
 
-browser-agent/out
-browser-api/out
-browser-common/out
-browser-service/out
+scan-agent/out
+scan-api/out
+scan-common/out
+scan-service/out
+/apolloCache/
+/adjust.log
+*info.md

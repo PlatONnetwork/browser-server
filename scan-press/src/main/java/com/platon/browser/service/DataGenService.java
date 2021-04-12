@@ -488,7 +488,7 @@ public class DataGenService {
             add(new BigInteger("1000005"));
         }};
         BigInteger tokenId = list.get((int) (Math.random() * list.size()));
-        tokenInventory.setTokenId(tokenId);
+        tokenInventory.setTokenId(tokenId.toString());
         tokenInventory.setOwner(tx.getTo());
         return tokenInventory;
     }

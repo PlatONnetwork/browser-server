@@ -212,15 +212,19 @@ public class RetryableClient {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/3/27
      */
-    public void zeroBlockNumberWait() throws Exception {
-        while (true) {
-            BigInteger nowBlockNumber = getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
-            if (nowBlockNumber.compareTo(zeroBlockNumber) > 0) {
-                log.debug("开始出块，当前块高为{}", nowBlockNumber.longValue());
-                break;
+    public void zeroBlockNumberWait() {
+        try {
+            while (true) {
+                BigInteger nowBlockNumber = getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
+                if (nowBlockNumber.compareTo(zeroBlockNumber) > 0) {
+                    log.debug("开始出块，当前块高为{}", nowBlockNumber.longValue());
+                    break;
+                }
+                Thread.sleep(1000L * zeroBlockNumberWaitTime);
+                log.error("正在等待出块...");
             }
-            Thread.sleep(1000L * zeroBlockNumberWaitTime);
-            log.error("正在等待出块...");
+        } catch (Exception e) {
+            log.error("0出块等待异常", e);
         }
     }
 

@@ -29,7 +29,7 @@ public class QueryTokenIdListResp {
     public static QueryTokenIdListResp fromToken(TokenInventory token) {
         return QueryTokenIdListResp.builder()
                 .address(token.getOwner()).contract(token.getTokenAddress())
-                .tokenId(token.getTokenId().toString()).image(token.getImage())
+                .tokenId(token.getTokenId()).image(token.getImage())
                 .txCount(token.getTokenTxQty())
                 .build();
     }

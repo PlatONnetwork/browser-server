@@ -15,7 +15,7 @@
                     #{item.tokenAddress,jdbcType=VARCHAR}
                 </if>
                 <if test="'token_id'.toString() == column.value">
-                    #{item.tokenId,jdbcType=BIGINT}
+                    #{item.tokenId,jdbcType=VARCHAR}
                 </if>
                 <if test="'owner'.toString() == column.value">
                     #{item.owner,jdbcType=VARCHAR}
@@ -70,6 +70,6 @@
             token_inventory ti
                 LEFT JOIN token t ON ti.token_address = t.address
         where ti.token_address = #{tokenAddress,jdbcType=VARCHAR}
-          and ti.token_id = #{tokenId,jdbcType=BIGINT}
+          and ti.token_id = #{tokenId,jdbcType=VARCHAR}
     </select>
 </mapper>

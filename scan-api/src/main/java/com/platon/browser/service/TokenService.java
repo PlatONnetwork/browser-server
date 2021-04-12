@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomToken;
@@ -29,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +97,7 @@ public class TokenService {
             criteria.andTokenAddressEqualTo(req.getContract());
         }
         if (StringUtils.isNotBlank(req.getTokenId())) {
-            criteria.andTokenIdEqualTo(Long.valueOf(req.getTokenId()));
+            criteria.andTokenIdEqualTo(req.getTokenId());
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
         List<QueryTokenIdListResp> resps = new ArrayList<>();
@@ -110,10 +110,9 @@ public class TokenService {
     }
 
     public QueryTokenIdDetailResp queryTokenIdDetail(QueryTokenIdDetailReq req) {
-        BigInteger tokenId = StringUtils.isNotBlank(req.getTokenId()) ? new BigInteger(req.getTokenId()) : BigInteger.ZERO;
         TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
         tokenInventoryKey.setTokenAddress(req.getContract());
-        tokenInventoryKey.setTokenId(tokenId);
+        tokenInventoryKey.setTokenId(StrUtil.emptyToDefault(req.getTokenId(), "0"));
         CustomTokenInventory customTokenInventory = customTokenInventoryMapper.selectTokenInventory(tokenInventoryKey);
         QueryTokenIdDetailResp.copy(customTokenInventory);
         return QueryTokenIdDetailResp.copy(customTokenInventory);
@@ -131,7 +130,7 @@ public class TokenService {
             criteria.andTokenAddressEqualTo(contract);
         }
         if (StringUtils.isNotBlank(tokenId)) {
-            criteria.andTokenIdEqualTo(Long.valueOf(tokenId));
+            criteria.andTokenIdEqualTo(tokenId);
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
         String[] headers = {

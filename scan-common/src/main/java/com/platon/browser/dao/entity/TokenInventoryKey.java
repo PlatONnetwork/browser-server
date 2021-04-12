@@ -2,7 +2,6 @@ package com.platon.browser.dao.entity;
 
 import lombok.Data;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,7 +10,7 @@ public class TokenInventoryKey {
 
     private String tokenAddress;
 
-    private BigInteger tokenId;
+    private String tokenId;
 
     private String owner;
 
@@ -24,7 +23,7 @@ public class TokenInventoryKey {
      */
     public enum Column {
         tokenAddress("token_address", "tokenAddress", "VARCHAR", false),
-        tokenId("token_id", "tokenId", "BIGINT", false),
+        tokenId("token_id", "tokenId", "VARCHAR", false),
         owner("owner", "owner", "VARCHAR", true),
         name("name", "name", "VARCHAR", true),
         description("description", "description", "VARCHAR", false),

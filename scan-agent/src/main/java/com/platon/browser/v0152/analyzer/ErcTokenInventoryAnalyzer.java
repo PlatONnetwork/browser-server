@@ -45,7 +45,7 @@ public class ErcTokenInventoryAnalyzer {
             txList.forEach(tx -> {
                 TokenInventoryKey key = new TokenInventory();
                 key.setTokenAddress(tx.getContract());
-                key.setTokenId(new BigInteger(tx.getValue()));
+                key.setTokenId(tx.getValue());
                 TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(key);
                 if (tokenInventory == null) {
                     tokenInventory = new TokenInventory();
@@ -68,7 +68,7 @@ public class ErcTokenInventoryAnalyzer {
                 // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
                 if (StrUtil.isNotBlank(tx.getTo()) && TO_ADDR_ZERO.equalsIgnoreCase(tx.getTo())) {
                     TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
-                    tokenInventoryKey.setTokenId(new BigInteger(tx.getValue()));
+                    tokenInventoryKey.setTokenId(tx.getValue());
                     tokenInventoryKey.setTokenAddress(tx.getContract());
                     delTokenInventory.add(tokenInventoryKey);
                 }
