@@ -26,10 +26,7 @@ import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
-import com.platon.browser.utils.ConvertUtil;
-import com.platon.browser.utils.DateUtil;
-import com.platon.browser.utils.HexUtil;
-import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.*;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -351,10 +348,17 @@ public class ErcTxService {
         List<Object[]> rows = new ArrayList<>();
         rs.stream().forEach(customTokenHolder -> {
             BigDecimal balance = this.getAddressBalance(customTokenHolder);
+            // 总供应量作为分母，为0的话，则百分比为0
+            BigDecimal percentage;
+            if (MathUtil.isZeroOrNull(customTokenHolder.getTotalSupply())) {
+                percentage = BigDecimal.ZERO;
+            } else {
+                percentage = balance.divide(customTokenHolder.getTotalSupply(), 4)
+                        .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+            }
             Object[] row = {customTokenHolder.getAddress(),
                     HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()),
-                    balance.divide(customTokenHolder.getTotalSupply(), 4)
-                            .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
+                    percentage.toString() + "%"
             };
             rows.add(row);
         });
