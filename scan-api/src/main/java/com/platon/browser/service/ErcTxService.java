@@ -353,7 +353,7 @@ public class ErcTxService {
             if (MathUtil.isZeroOrNull(customTokenHolder.getTotalSupply())) {
                 percentage = BigDecimal.ZERO;
             } else {
-                percentage = balance.divide(customTokenHolder.getTotalSupply(), 4)
+                percentage = balance.divide(customTokenHolder.getTotalSupply(), 4, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
             }
             Object[] row = {customTokenHolder.getAddress(),
