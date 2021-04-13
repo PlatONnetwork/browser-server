@@ -12,6 +12,7 @@ import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.TokenTypeEnum;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
 import com.platon.browser.request.token.QueryTokenHolderListReq;
 import com.platon.browser.request.token.QueryTokenTransferRecordListReq;
@@ -161,15 +162,15 @@ public class ErcTxService {
     }
 
     public AccountDownload exportToken20TransferList(String address, String contract, Long date, String local, String timeZone) {
-        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, null);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc20TxRepository, null, TokenTypeEnum.ERC20);
     }
 
     public AccountDownload exportToken721TransferList(String address, String contract, Long date, String local, String timeZone, String tokenId) {
-        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc721TxRepository, tokenId);
+        return this.exportTokenTransferList(address, contract, date, local, timeZone, esErc721TxRepository, tokenId, TokenTypeEnum.ERC721);
     }
 
     public AccountDownload exportTokenTransferList(String address, String contract, Long date, String local, String timeZone
-            , AbstractEsRepository repository, String tokenId) {
+            , AbstractEsRepository repository, String tokenId, TokenTypeEnum tokenTypeEnum) {
         AccountDownload accountDownload = new AccountDownload();
         if (StringUtils.isBlank(address) && StringUtils.isBlank(contract)) {
             return accountDownload;
@@ -222,12 +223,19 @@ public class ErcTxService {
                 };
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
+                String symbol = "";
+                if (tokenTypeEnum.equals(TokenTypeEnum.ERC20)) {
+                    symbol = esTokenTransferRecord.getSymbol();
+                }
+                if (tokenTypeEnum.equals(TokenTypeEnum.ERC721)) {
+                    symbol = StrUtil.format("{}({})", esTokenTransferRecord.getName(), esTokenTransferRecord.getSymbol());
+                }
                 Object[] row = {esTokenTransferRecord.getHash(),
                         DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone),
                         esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
                         HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getValue()), esTokenTransferRecord.getDecimal()).toString()),
-                        esTokenTransferRecord.getSymbol()
+                        symbol
                 };
                 rows.add(row);
             }
@@ -242,12 +250,22 @@ public class ErcTxService {
                     this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_OUT, local),
                     this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
         } else if (StringUtils.isNotBlank(contract)) {
-            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE, local),
-                    this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
+            if (tokenTypeEnum.equals(TokenTypeEnum.ERC20)) {
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
+            }
+            if (tokenTypeEnum.equals(TokenTypeEnum.ERC721)) {
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TOKEN_ID, local),
+                        this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TOKEN, local)};
+            }
         }
         String fileName = "";
         if (StrUtil.isNotBlank(address)) {

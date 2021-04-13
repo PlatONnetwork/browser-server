@@ -7,10 +7,11 @@ import java.util.Map;
 
 /**
  * 国际化枚举
- *  @file I18nEnum.java
- *  @description 
- *	@author zhangrj
- *  @data 2019年8月31日
+ *
+ * @author zhangrj
+ * @file I18nEnum.java
+ * @description
+ * @data 2019年8月31日
  */
 public enum I18nEnum {
 
@@ -49,7 +50,8 @@ public enum I18nEnum {
     DOWNLOAD_CONTRACT_CSV_DECIMALS,
     DOWNLOAD_CONTRACT_CSV_TXCOUNT,
     DOWNLOAD_CONTRACT_CSV_CONTRACT,
-
+    DOWNLOAD_CONTRACT_CSV_TOKEN_ID,
+    DOWNLOAD_CONTRACT_CSV_TOKEN,
     // token id
     DOWNLOAD_TOKEN_CSV_NAME,
     DOWNLOAD_TOKEN_CSV_ADDRESS,
@@ -115,13 +117,12 @@ public enum I18nEnum {
     TRANSACTION_ERROR_NOT_EXIST,
 
 
-
     PENDING_ERROR_DUPLICATE,
     PENDING_ERROR_NOT_EXIST,
 
     //proposal error
     PROPOSAL_PARAM_ERROR,
-    
+
     TRANSFER,
     CONTRACT_CREATE,
     CONTRACT_EXEC,
@@ -224,7 +225,7 @@ public enum I18nEnum {
     CODE302032,
     CODE302033,
     CODE302034,
-    
+
     CODE303000,
     CODE303001,
     CODE303002,
@@ -249,16 +250,17 @@ public enum I18nEnum {
     CODE304011,
     CODE304012,
     CODE304013,
-    
+
     CODE305001,
-    DELETEGATE_CODE304013
-    ;
-	
-	private static final Map <String, I18nEnum> ENUMS = new HashMap <>();
+    DELETEGATE_CODE304013;
+
+    private static final Map<String, I18nEnum> ENUMS = new HashMap<>();
+
     static {
         Arrays.asList(I18nEnum.values()).forEach(en -> ENUMS.put(en.name(), en));
     }
-    public static I18nEnum getEnum ( String code ) {
+
+    public static I18nEnum getEnum(String code) {
         return ENUMS.get(code);
     }
 }
