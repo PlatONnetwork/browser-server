@@ -40,7 +40,10 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -350,9 +353,6 @@ public class ErcTokenUpdateTask {
                     size.addAndGet(v.size());
                 });
 
-                // 存放查询失败的<合约-地址>
-                Queue<String> retryQueue = new LinkedList<>();
-
                 CountDownLatch latch = new CountDownLatch(size.get());
                 map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
@@ -366,9 +366,7 @@ public class ErcTokenUpdateTask {
                                 holder.setUpdateTime(DateUtil.date());
                                 updateParams.add(holder);
                             } catch (Exception e) {
-                                // 查询失败放入重试队列
-                                retryQueue.offer(contract+"-"+address+0);
-                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{},放入重试队列,重试队列大小:{}", contract, address, retryQueue.size()), e);
+                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
                             } finally {
                                 latch.countDown();
                             }
@@ -379,30 +377,6 @@ public class ErcTokenUpdateTask {
                     latch.await();
                 } catch (InterruptedException e) {
                     log.error("", e);
-                }
-
-                String contractAddress=null;
-                while ((contractAddress=retryQueue.poll())!=null){
-                    log.error("执行重试查询逻辑,重试列表大小：{}",retryQueue.size());
-                    String [] arr = contractAddress.split("-");
-                    String contract = arr[0];
-                    String address = arr[1];
-                    int retryTime = Integer.parseInt(arr[2]);
-                    try {
-                        BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
-                        TokenHolder holder = new TokenHolder();
-                        holder.setTokenAddress(contract);
-                        holder.setAddress(address);
-                        holder.setBalance(new BigDecimal(balance));
-                        holder.setUpdateTime(DateUtil.date());
-                        updateParams.add(holder);
-                    } catch (Exception e) {
-                        // 查询失败，如果重试次数小于<3，则进行重试
-                        if(retryTime<3){
-                            retryQueue.offer(contract+"-"+address+"-"+retryTime);
-                            log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{},放入重试队列,重试队列大小:{}", contract, address, retryQueue.size()), e);
-                        }
-                    }
                 }
             }
             if (!updateParams.isEmpty()) {

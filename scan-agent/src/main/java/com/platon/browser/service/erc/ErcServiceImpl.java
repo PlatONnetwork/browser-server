@@ -11,6 +11,7 @@ import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.browser.v0152.service.ErcDetectService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -39,6 +40,7 @@ public class ErcServiceImpl {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/20
      */
+    @Retryable(value = Exception.class)
     public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account) {
         BigInteger balance = BigInteger.ZERO;
         try {
