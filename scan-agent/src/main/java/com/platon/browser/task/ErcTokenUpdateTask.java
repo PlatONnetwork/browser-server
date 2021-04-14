@@ -353,31 +353,48 @@ public class ErcTokenUpdateTask {
                     size.addAndGet(v.size());
                 });
 
-                CountDownLatch latch = new CountDownLatch(size.get());
+//                CountDownLatch latch = new CountDownLatch(size.get());
+//                map.forEach((contract, addressSet) -> {
+//                    addressSet.forEach(address -> {
+//                        INCREMENT_HOLDER_UPDATE_POOL.submit(() -> {
+//                            try {
+//                                BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
+//                                TokenHolder holder = new TokenHolder();
+//                                holder.setTokenAddress(contract);
+//                                holder.setAddress(address);
+//                                holder.setBalance(new BigDecimal(balance));
+//                                holder.setUpdateTime(DateUtil.date());
+//                                updateParams.add(holder);
+//                            } catch (Exception e) {
+//                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
+//                            } finally {
+//                                latch.countDown();
+//                            }
+//                        });
+//                    });
+//                });
+//                try {
+//                    latch.await();
+//                } catch (InterruptedException e) {
+//                    log.error("", e);
+//                }
+
+                // 串行查询余额
                 map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
-                        INCREMENT_HOLDER_UPDATE_POOL.submit(() -> {
-                            try {
-                                BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
-                                TokenHolder holder = new TokenHolder();
-                                holder.setTokenAddress(contract);
-                                holder.setAddress(address);
-                                holder.setBalance(new BigDecimal(balance));
-                                holder.setUpdateTime(DateUtil.date());
-                                updateParams.add(holder);
-                            } catch (Exception e) {
-                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
-                            } finally {
-                                latch.countDown();
-                            }
-                        });
+                        try {
+                            BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
+                            TokenHolder holder = new TokenHolder();
+                            holder.setTokenAddress(contract);
+                            holder.setAddress(address);
+                            holder.setBalance(new BigDecimal(balance));
+                            holder.setUpdateTime(DateUtil.date());
+                            updateParams.add(holder);
+                        } catch (Exception e) {
+                            log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
+                        }
                     });
                 });
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    log.error("", e);
-                }
             }
             if (!updateParams.isEmpty()) {
                 customTokenHolderMapper.batchUpdate(updateParams);
