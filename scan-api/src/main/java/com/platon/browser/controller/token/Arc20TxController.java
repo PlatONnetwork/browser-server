@@ -1,14 +1,10 @@
-package com.platon.browser.controller.token;//package com.platon.browser.controller;
+package com.platon.browser.controller.token;
 
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.request.token.QueryTokenDetailReq;
-import com.platon.browser.request.token.QueryTokenListReq;
 import com.platon.browser.request.token.QueryTokenTransferRecordListReq;
-import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.token.QueryTokenTransferRecordListResp;

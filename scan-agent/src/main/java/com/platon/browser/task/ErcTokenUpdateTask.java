@@ -348,27 +348,6 @@ public class ErcTokenUpdateTask {
                 }
             });
 
-
-
-            // 从数据库随机获取50条余额为0的token holder记录，和当前es记录一起更新
-            String[] orderFields = {"type","name"};
-            String[] orderDirect = {"ASC","DESC"};
-            int min = 0,max = 1;
-            int index = (int) (Math.random() * (max - min + 1) + min);
-            List<TokenHolder> dbdata = customTokenHolderMapper.getZeroBalanceTokenHolderList(
-                    typeEnum.getDesc(),
-                    0,
-                    50,
-                    orderFields[index]+" "+orderDirect[index]
-            );
-            // 数据库查出来的余额为0的token holder与es中的交易查出来的合并
-            dbdata.forEach(th->{
-                Set<String> set = map.computeIfAbsent(th.getTokenAddress(), k -> new HashSet<>());
-                set.add(th.getAddress());
-            });
-
-
-
             if (MapUtil.isNotEmpty(map)) {
 //                AtomicInteger size = new AtomicInteger();
 //                map.forEach((k, v) -> {
@@ -435,9 +414,9 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新token持有者余额===》全量更新
-     * 每隔7天，在00:00:00运行一次
+     * 每天00:00:00运行一次
      */
-    @Scheduled(cron = "0 0 0 1/7 * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void updateTokenHolderBalance() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {

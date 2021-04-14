@@ -1,5 +1,6 @@
 package com.platon.browser.analyzer;
 
+import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
@@ -85,7 +86,7 @@ public class TransactionAnalyzer {
                 .updateWithRawTransaction(rawTransaction);
         // 使用地址缓存初始化普通合约缓存信息
         initGeneralContractCache();
-
+        
         // ============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
 
