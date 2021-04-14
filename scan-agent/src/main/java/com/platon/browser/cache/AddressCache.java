@@ -23,8 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class AddressCache {
+
     @Resource
     private ErcCache ercCache;
+
     // 当前地址缓存，此缓存会在StatisticsAddressConverter执行完业务逻辑后被清除，
     // 所以这是上一次执行StatisticsAddressConverter业务时到当前的累计地址缓存，并不是全部的
     private Map<String, Address> addressMap = new ConcurrentHashMap<>();
@@ -43,6 +45,7 @@ public class AddressCache {
     public boolean isErc20ContractAddress(String address) {
         return ercCache.getErc20AddressCache().contains(address);
     }
+
     public boolean isErc721ContractAddress(String address) {
         return ercCache.getErc721AddressCache().contains(address);
     }
@@ -59,11 +62,16 @@ public class AddressCache {
     }
 
     public Integer getTypeData(String address) {
-        if (InnerContractAddrEnum.getAddresses().contains(address)) return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
-        if (this.isEvmContractAddress(address)) return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
-        if (this.isWasmContractAddress(address)) return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
-        if (isErc20ContractAddress(address)) return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
-        if (isErc721ContractAddress(address)) return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
+        if (InnerContractAddrEnum.getAddresses().contains(address))
+            return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
+        if (this.isEvmContractAddress(address))
+            return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
+        if (this.isWasmContractAddress(address))
+            return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
+        if (isErc20ContractAddress(address))
+            return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
+        if (isErc721ContractAddress(address))
+            return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
         return Transaction.ToTypeEnum.ACCOUNT.getCode();
     }
 
@@ -229,6 +237,14 @@ public class AddressCache {
         address.setTxQty(address.getTxQty() + 1);
     }
 
+    /**
+     * 把地址加入到缓存，并且交易数+1
+     *
+     * @param addr
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/14
+     */
     public void updateErc20TxQty(String addr) {
         if (addr == null)
             return;
@@ -240,6 +256,14 @@ public class AddressCache {
         address.setErc20TxQty(address.getErc20TxQty() + 1);
     }
 
+    /**
+     * 把地址加入到缓存，并且交易数+1
+     *
+     * @param addr
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/14
+     */
     public void updateErc721TxQty(String addr) {
         if (addr == null)
             return;
@@ -303,9 +327,8 @@ public class AddressCache {
 
     /**
      * 初始化WASM地址缓存
-     * 
-     * @param addressList
-     *            地址实体列表
+     *
+     * @param addressList 地址实体列表
      */
     public void initWasmContractAddressCache(List<Address> addressList) {
         if (addressList.isEmpty())
@@ -324,13 +347,13 @@ public class AddressCache {
     public void initOnFirstStart() {
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
             this.addressMap.put(contractDescEnum.getAddress(),
-                this.createDefaultAddress(contractDescEnum.getAddress()));
+                    this.createDefaultAddress(contractDescEnum.getAddress()));
         }
     }
 
     /**
      * 领取奖励交易更新已领取的委托奖励字段
-     * 
+     *
      * @param drc
      */
     public void update(DelegateRewardClaim drc) {
@@ -344,7 +367,7 @@ public class AddressCache {
 
     /**
      * 撤销委托交易更新已领取的委托奖励字段
-     * 
+     *
      * @param de
      */
     public void update(DelegateExit de) {
@@ -359,4 +382,5 @@ public class AddressCache {
         }
         cache.setHaveReward(cache.getHaveReward().add(amount));
     }
+
 }

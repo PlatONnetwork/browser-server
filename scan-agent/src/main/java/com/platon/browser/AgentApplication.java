@@ -104,7 +104,6 @@ public class AgentApplication implements ApplicationRunner {
                 // 获取周期切换消息
                 EpochMessage epochMessage = epochService.getEpochMessage(collectedNumber);
                 blockEventPublisher.publish(blockCF, receiptCF, epochMessage);
-
                 if (preBlockNum != 0L && (collectedNumber - preBlockNum != 1)) {
                     throw new AssertionError();
                 }
