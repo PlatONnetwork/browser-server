@@ -4,6 +4,7 @@ import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
@@ -11,10 +12,12 @@ import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.browser.v0152.service.ErcDetectService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -39,6 +42,7 @@ public class ErcServiceImpl {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/20
      */
+    @Retryable(value = Exception.class)
     public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account) {
         BigInteger balance = BigInteger.ZERO;
         try {
@@ -48,6 +52,12 @@ public class ErcServiceImpl {
             }
         } catch (Exception e) {
             log.error(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+            throw new BusinessException("查询Token余额失败！");
         }
         return balance;
     }

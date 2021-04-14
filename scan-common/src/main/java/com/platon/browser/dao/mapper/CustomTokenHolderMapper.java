@@ -57,5 +57,15 @@ public interface CustomTokenHolderMapper {
      */
     Page<CustomTokenHolder> selectListByERC721(@Param("tokenAddress") String tokenAddress, @Param("address") String address);
 
-
+    /**
+     * 取余额为0的token holder
+     * @param type
+     * @return
+     */
+    List<TokenHolder> getZeroBalanceTokenHolderList(
+        @Param("type")String type,
+        @Param("offset")int offset,
+        @Param("limit")int limit,
+        @Param("orderby")String orderby
+    );
 }

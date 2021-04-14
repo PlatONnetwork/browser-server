@@ -275,6 +275,8 @@ public class ErcTokenUpdateTask {
     /**
      * 更新token持有者余额===》增量更新
      *
+     * 每30秒运行一次
+     *
      * @param
      * @return void
      * @author huangyongpeng@matrixelements.com
@@ -345,36 +347,62 @@ public class ErcTokenUpdateTask {
                     map.put(v.getContract(), addressSet);
                 }
             });
+
             if (MapUtil.isNotEmpty(map)) {
-                AtomicInteger size = new AtomicInteger();
-                map.forEach((k, v) -> {
-                    size.addAndGet(v.size());
-                });
-                CountDownLatch latch = new CountDownLatch(size.get());
+//                AtomicInteger size = new AtomicInteger();
+//                map.forEach((k, v) -> {
+//                    size.addAndGet(v.size());
+//                });
+//
+//                CountDownLatch latch = new CountDownLatch(size.get());
+//                map.forEach((contract, addressSet) -> {
+//                    addressSet.forEach(address -> {
+//                        INCREMENT_HOLDER_UPDATE_POOL.submit(() -> {
+//                            try {
+//                                BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
+//                                TokenHolder holder = new TokenHolder();
+//                                holder.setTokenAddress(contract);
+//                                holder.setAddress(address);
+//                                holder.setBalance(new BigDecimal(balance));
+//                                holder.setUpdateTime(DateUtil.date());
+//                                updateParams.add(holder);
+//                            } catch (Exception e) {
+//                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
+//                            } finally {
+//                                latch.countDown();
+//                            }
+//                        });
+//                    });
+//                });
+//                try {
+//                    latch.await();
+//                } catch (InterruptedException e) {
+//                    log.error("", e);
+//                }
+
+
+
+                // 串行查余额
                 map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
-                        INCREMENT_HOLDER_UPDATE_POOL.submit(() -> {
+                        try {
+                            BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
+                            TokenHolder holder = new TokenHolder();
+                            holder.setTokenAddress(contract);
+                            holder.setAddress(address);
+                            holder.setBalance(new BigDecimal(balance));
+                            holder.setUpdateTime(DateUtil.date());
+                            updateParams.add(holder);
                             try {
-                                BigInteger balance = ercServiceImpl.getBalance(contract, typeEnum, address);
-                                TokenHolder holder = new TokenHolder();
-                                holder.setTokenAddress(contract);
-                                holder.setAddress(address);
-                                holder.setBalance(new BigDecimal(balance));
-                                holder.setUpdateTime(DateUtil.date());
-                                updateParams.add(holder);
-                            } catch (Exception e) {
-                                log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
-                            } finally {
-                                latch.countDown();
+                                TimeUnit.MILLISECONDS.sleep(100);
+                            } catch (InterruptedException interruptedException) {
+                                interruptedException.printStackTrace();
                             }
-                        });
+                        } catch (Exception e) {
+                            log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
+                        }
                     });
                 });
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    log.error("", e);
-                }
             }
             if (!updateParams.isEmpty()) {
                 customTokenHolderMapper.batchUpdate(updateParams);
@@ -386,15 +414,17 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新token持有者余额===》全量更新
+     * 每天00:00:00运行一次
      */
-    @Scheduled(cron = "0 0 0 1/7 * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void updateTokenHolderBalance() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
         }
-        tokenHolderLock.lock();
+
         try {
+            tokenHolderLock.lock();
             // 分页更新holder的balance
             List<TokenHolder> batch;
             int page = 0;
