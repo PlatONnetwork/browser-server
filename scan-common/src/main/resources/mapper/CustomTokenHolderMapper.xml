@@ -128,4 +128,14 @@
         ORDER BY
             balance DESC
     </select>
+
+    <select id="getZeroBalanceTokenHolderList" resultType="com.platon.browser.dao.entity.TokenHolder">
+        SELECT
+        th.token_address AS tokenAddress,
+        th.address
+        FROM token_holder th JOIN token t ON th.token_address = t.address
+        WHERE th.balance = 0 AND t.type = #{type}
+        ORDER BY #{orderby}
+        LIMIT #{offset}, #{limit}
+    </select>
 </mapper>

@@ -347,12 +347,34 @@ public class ErcTokenUpdateTask {
                     map.put(v.getContract(), addressSet);
                 }
             });
-            if (MapUtil.isNotEmpty(map)) {
-                AtomicInteger size = new AtomicInteger();
-                map.forEach((k, v) -> {
-                    size.addAndGet(v.size());
-                });
 
+
+
+            // 从数据库随机获取50条余额为0的token holder记录，和当前es记录一起更新
+            String[] orderFields = {"type","name"};
+            String[] orderDirect = {"ASC","DESC"};
+            int min = 0,max = 1;
+            int index = (int) (Math.random() * (max - min + 1) + min);
+            List<TokenHolder> dbdata = customTokenHolderMapper.getZeroBalanceTokenHolderList(
+                    typeEnum.getDesc(),
+                    0,
+                    50,
+                    orderFields[index]+" "+orderDirect[index]
+            );
+            // 数据库查出来的余额为0的token holder与es中的交易查出来的合并
+            dbdata.forEach(th->{
+                Set<String> set = map.computeIfAbsent(th.getTokenAddress(), k -> new HashSet<>());
+                set.add(th.getAddress());
+            });
+
+
+
+            if (MapUtil.isNotEmpty(map)) {
+//                AtomicInteger size = new AtomicInteger();
+//                map.forEach((k, v) -> {
+//                    size.addAndGet(v.size());
+//                });
+//
 //                CountDownLatch latch = new CountDownLatch(size.get());
 //                map.forEach((contract, addressSet) -> {
 //                    addressSet.forEach(address -> {
@@ -379,7 +401,9 @@ public class ErcTokenUpdateTask {
 //                    log.error("", e);
 //                }
 
-                // 串行查询余额
+
+
+                // 串行查余额
                 map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
                         try {
@@ -390,6 +414,11 @@ public class ErcTokenUpdateTask {
                             holder.setBalance(new BigDecimal(balance));
                             holder.setUpdateTime(DateUtil.date());
                             updateParams.add(holder);
+                            try {
+                                TimeUnit.MILLISECONDS.sleep(100);
+                            } catch (InterruptedException interruptedException) {
+                                interruptedException.printStackTrace();
+                            }
                         } catch (Exception e) {
                             log.error(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
                         }

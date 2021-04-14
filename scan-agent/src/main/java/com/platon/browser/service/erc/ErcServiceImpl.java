@@ -53,7 +53,7 @@ public class ErcServiceImpl {
         } catch (Exception e) {
             log.error(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
             try {
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException interruptedException) {
                 interruptedException.printStackTrace();
             }
