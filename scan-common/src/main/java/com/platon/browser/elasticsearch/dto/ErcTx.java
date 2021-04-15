@@ -18,19 +18,74 @@ import java.util.Date;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class ErcTx {
-    private Long seq;                   // 序号ID
-    private String name;                // 合约名称
+
+    /**
+     * 序号ID
+     */
+    private Long seq;
+
+    /**
+     * 合约名称
+     */
+    private String name;
+
+    /**
+     * 单位
+     */
     private String symbol;
-    private Integer decimal;            // 精度
-    private String contract;            // 合约地址（也是交易to地址）
-    private String hash;                // 交易哈希
-    private String from;                // 交易发起者（也是代币扣除方）
+
+    /**
+     * 精度
+     */
+    private Integer decimal;
+
+    /**
+     * 合约地址（也是交易to地址）
+     */
+    private String contract;
+
+    /**
+     * 交易哈希
+     */
+    private String hash;
+
+    /**
+     * 交易发起者（也是代币扣除方）
+     */
+    private String from;
+
     private String to;
-    private String value;               // 交易value
-    private Long bn;                    // 区块高度
-    private Date bTime;                 // 区块时间
-    private Integer toType;             // 接收方类型
-    private Integer fromType;           // 发送方类型
+
+    /**
+     * 交易value
+     */
+    private String value;
+
+    /**
+     * 区块高度
+     */
+    private Long bn;
+
+    /**
+     * 区块时间
+     */
+    private Date bTime;
+
+    /**
+     * 接收方类型
+     */
+    private Integer toType;
+
+    /**
+     * 发送方类型
+     */
+    private Integer fromType;
+
     private String remark;
-    private String txFee;               // 手续费
+
+    /**
+     * 手续费
+     */
+    private String txFee;
+
 }
