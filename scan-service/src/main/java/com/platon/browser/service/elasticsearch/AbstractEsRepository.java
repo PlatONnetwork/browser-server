@@ -318,8 +318,8 @@ public abstract class AbstractEsRepository {
         long startTime = System.currentTimeMillis();
 
         if (pageNo <= 0) {
-			pageNo = 1;
-		}
+            pageNo = 1;
+        }
         SearchRequest searchRequest = new SearchRequest(getIndexName());
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
@@ -354,8 +354,8 @@ public abstract class AbstractEsRepository {
         long startTime = System.currentTimeMillis();
 
         if (pageNo <= 0) {
-			pageNo = 1;
-		}
+            pageNo = 1;
+        }
         SearchRequest searchRequest = new SearchRequest(getIndexName());
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //排序
@@ -407,13 +407,6 @@ public abstract class AbstractEsRepository {
 
         CountRequest searchRequest = new CountRequest(getIndexName());
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //排序
-        if (StringUtils.isNotEmpty(constructor.getAsc())) {
-            searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
-        }
-        if (StringUtils.isNotEmpty(constructor.getDesc())) {
-            searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
-        }
         //设置查询体
         searchSourceBuilder.query(constructor.listBuilders());
         // 设置SearchSourceBuilder查询属性

@@ -137,11 +137,16 @@ public class ErcTxService {
             // response filed to show.
             constructor.setResult(new String[]{"seq", "hash", "bn", "from", "contract",
                     "to", "value", "decimal", "name", "symbol", "result", "bTime"});
+            ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
+            count.buildMust(new BoolQueryBuilder()
+                    .should(QueryBuilders.termQuery("from", req.getAddress()))
+                    .should(QueryBuilders.termQuery("to", req.getAddress())));
             try {
                 queryResultFromES = repository.search(constructor, ErcTx.class,
                         req.getPageNo(), req.getPageSize());
-                totalCount = queryResultFromES.getTotal();
-                displayTotalCount = queryResultFromES.getTotal();
+                ESResult<?> res = repository.Count(count);
+                totalCount = res.getTotal();
+                displayTotalCount = res.getTotal();
             } catch (Exception e) {
                 log.error("检索代币交易列表失败", e);
                 return result;
