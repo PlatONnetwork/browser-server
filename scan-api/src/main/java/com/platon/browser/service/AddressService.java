@@ -138,12 +138,12 @@ public class AddressService {
             resp.setContractCreateHash(item.getContractCreatehash());
             resp.setDestroyHash(item.getContractDestroyHash());
             resp.setContractName(ConvertUtil.captureName(item.getContractName()));
-            updateErcTxQtyFromES(item, esErc20TxRepository, ErcTypeEnum.ERC20);
-            updateErcTxQtyFromES(item, esErc721TxRepository, ErcTypeEnum.ERC721);
         }
         /** 特殊账户余额直接查询链  */
         try {
             this.getAddressInfo(req, resp);
+            updateErcTxQtyFromES(req.getAddress(), resp, esErc20TxRepository, ErcTypeEnum.ERC20);
+            updateErcTxQtyFromES(req.getAddress(), resp, esErc721TxRepository, ErcTypeEnum.ERC721);
         } catch (Exception e) {
             logger.error("getBalance error", e);
             platonClient.updateCurrentWeb3jWrapper();
@@ -167,52 +167,54 @@ public class AddressService {
     /**
      * 从ES查询最新的erc20/erc721交易数，如果值对不上，则更新数据库
      *
+     * @param address
      * @param item
      * @param esRepository
+     * @param ercTypeEnum
      * @return void
      * @author huangyongpeng@matrixelements.com
      * @date 2021/4/15
      */
-    private void updateErcTxQtyFromES(CustomAddressDetail item, AbstractEsRepository esRepository, ErcTypeEnum ercTypeEnum) {
+    private void updateErcTxQtyFromES(String address, QueryDetailResp item, AbstractEsRepository esRepository, ErcTypeEnum ercTypeEnum) {
         try {
             ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
             count.buildMust(new BoolQueryBuilder()
-                    .should(QueryBuilders.termQuery("from", item.getAddress()))
-                    .should(QueryBuilders.termQuery("to", item.getAddress())));
+                    .should(QueryBuilders.termQuery("from", address))
+                    .should(QueryBuilders.termQuery("to", address)));
             ESResult<?> res = esRepository.Count(count);
             if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
-                if (ObjectUtil.isNotNull(item.getErc20TxQty()) && item.getErc20TxQty().compareTo(res.getTotal().intValue()) != 0) {
-                    int oldErc20TxQty = item.getErc20TxQty();
+                if (ObjectUtil.isNull(item.getErc20TxQty()) || item.getErc20TxQty().compareTo(res.getTotal().intValue()) != 0) {
+                    int oldErc20TxQty = Convert.toInt(item.getErc20TxQty(), 0);
                     int newErc20TxQty = Convert.toInt(res.getTotal(), 0);
                     item.setErc20TxQty(newErc20TxQty);
-                    Address address = new Address();
-                    address.setAddress(item.getAddress());
-                    address.setErc20TxQty(Convert.toInt(res.getTotal(), 0));
-                    int updateRes = addressMapper.updateByPrimaryKeySelective(address);
+                    Address addr = new Address();
+                    addr.setAddress(address);
+                    addr.setErc20TxQty(Convert.toInt(res.getTotal(), 0));
+                    int updateRes = addressMapper.updateByPrimaryKeySelective(addr);
                     if (updateRes > 0) {
-                        logger.info("地址{}的erc20交易数,旧值{},新值{}成功", item.getAddress(), oldErc20TxQty, newErc20TxQty);
+                        logger.info("地址{}的erc20交易数,旧值{},新值{}成功", address, oldErc20TxQty, newErc20TxQty);
                     } else {
-                        logger.error("地址{}的erc20交易数,旧值{},新值{}失败", item.getAddress(), oldErc20TxQty, newErc20TxQty);
+                        logger.error("地址{}的erc20交易数,旧值{},新值{}失败", address, oldErc20TxQty, newErc20TxQty);
                     }
                 }
             } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
-                if (ObjectUtil.isNotNull(item.getErc721TxQty()) && item.getErc721TxQty().compareTo(res.getTotal().intValue()) != 0) {
-                    int oldErc721TxQty = item.getErc721TxQty();
+                if (ObjectUtil.isNull(item.getErc721TxQty()) || item.getErc721TxQty().compareTo(res.getTotal().intValue()) != 0) {
+                    int oldErc721TxQty = Convert.toInt(item.getErc721TxQty(), 0);
                     int newErc721TxQty = Convert.toInt(res.getTotal(), 0);
                     item.setErc721TxQty(newErc721TxQty);
-                    Address address = new Address();
-                    address.setAddress(item.getAddress());
-                    address.setErc20TxQty(Convert.toInt(res.getTotal(), 0));
-                    int updateRes = addressMapper.updateByPrimaryKeySelective(address);
+                    Address addr = new Address();
+                    addr.setAddress(address);
+                    addr.setErc20TxQty(Convert.toInt(res.getTotal(), 0));
+                    int updateRes = addressMapper.updateByPrimaryKeySelective(addr);
                     if (updateRes > 0) {
-                        logger.info("地址{}的erc721交易数,旧值{},新值{}成功", item.getAddress(), oldErc721TxQty, newErc721TxQty);
+                        logger.info("地址{}的erc721交易数,旧值{},新值{}成功", address, oldErc721TxQty, newErc721TxQty);
                     } else {
-                        logger.error("地址{}的erc721交易数,旧值{},新值{}失败", item.getAddress(), oldErc721TxQty, newErc721TxQty);
+                        logger.error("地址{}的erc721交易数,旧值{},新值{}失败", address, oldErc721TxQty, newErc721TxQty);
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error(StrFormatter.format("查询地址{}的erc交易数异常", item.getAddress()), e);
+            logger.error(StrFormatter.format("查询地址{}的erc交易数异常", address), e);
         }
     }
 
