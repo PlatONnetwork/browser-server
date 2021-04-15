@@ -86,7 +86,7 @@ public class TransactionAnalyzer {
                 .updateWithRawTransaction(rawTransaction);
         // 使用地址缓存初始化普通合约缓存信息
         initGeneralContractCache();
-        
+
         // ============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
 
@@ -182,7 +182,7 @@ public class TransactionAnalyzer {
                 .setBin(ci.getBinCode())
                 .setMethod(ci.getMethod());
 
-        ercTokenAnalyzer.resolveTx(result, receipt);
+        ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);

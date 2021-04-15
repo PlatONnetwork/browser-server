@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -106,13 +106,12 @@ public class ErcTokenAnalyzer {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/4/14
      */
-    private List<ErcTx> resolveErcTxFromEvent(Token token, CollectionTransaction tx, List<ErcContract.ErcTxEvent> eventList) {
+    private List<ErcTx> resolveErcTxFromEvent(Token token, CollectionTransaction tx, List<ErcContract.ErcTxEvent> eventList, Long seq) {
         List<ErcTx> txList = new ArrayList<>();
-        AtomicLong seq = new AtomicLong(tx.getNum() * 100000);
         eventList.forEach(event -> {
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
-                    .seq(seq.longValue())
+                    .seq(seq)
                     .bn(tx.getNum())
                     .hash(tx.getHash())
                     .bTime(tx.getTime())
@@ -127,7 +126,6 @@ public class ErcTokenAnalyzer {
                     .decimal(token.getDecimal())
                     .contract(token.getAddress())
                     .build();
-            seq.getAndIncrement();
             txList.add(ercTx);
         });
         return txList;
@@ -154,13 +152,14 @@ public class ErcTokenAnalyzer {
     /**
      * 解析ERC交易, 在合约调用时调用
      *
-     * @param tx      交易对象
-     * @param receipt 交易回执：一笔交易可能包含多个事件，故可能有多条交易
+     * @param collectionBlock 当前区块
+     * @param tx              交易对象
+     * @param receipt         交易回执：一笔交易可能包含多个事件，故可能有多条交易
      * @return void
      * @author huangyongpeng@matrixelements.com
-     * @date 2021/4/14
+     * @date 2021/4/15
      */
-    public void resolveTx(CollectionTransaction tx, Receipt receipt) {
+    public void resolveTx(CollectionBlock collectionBlock, CollectionTransaction tx, Receipt receipt) {
 
         // 过滤交易回执日志，地址不能为空且在token缓存里的
         List<Log> tokenLogs = receipt.getLogs().stream()
@@ -190,7 +189,7 @@ public class ErcTokenAnalyzer {
                             log.error("erc20交易回执日志解析异常{}", tokenLog);
                             break;
                         }
-                        txList = resolveErcTxFromEvent(token, tx, erc20TxEventList);
+                        txList = resolveErcTxFromEvent(token, tx, erc20TxEventList, collectionBlock.getSeq().incrementAndGet());
                         tx.getErc20TxList().addAll(txList);
                         break;
                     case ERC721:
@@ -200,7 +199,7 @@ public class ErcTokenAnalyzer {
                             log.error("erc721交易回执日志解析异常{}", tokenLog);
                             break;
                         }
-                        txList = resolveErcTxFromEvent(token, tx, erc721TxEventList);
+                        txList = resolveErcTxFromEvent(token, tx, erc721TxEventList, collectionBlock.getSeq().incrementAndGet());
                         tx.getErc721TxList().addAll(txList);
                         ercTokenInventoryAnalyzer.analyze(txList);
                         break;
