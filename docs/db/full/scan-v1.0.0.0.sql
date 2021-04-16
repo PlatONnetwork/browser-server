@@ -435,18 +435,20 @@ CREATE TABLE `token_holder` (
 
 DROP TABLE IF EXISTS `token_inventory`;
 CREATE TABLE `token_inventory` (
-                                   `token_address` varchar(64) NOT NULL COMMENT '合约地址',
-                                   `token_id` varchar(128) NOT NULL COMMENT 'token id',
-                                   `owner` varchar(64) NOT NULL COMMENT 'token id 对应持有者地址',
-                                   `name` varchar(256) DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
-                                   `description` longtext COMMENT 'Describes the asset to which this NFT represents',
-                                   `image` varchar(256) DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
+                                   `token_address` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '合约地址',
+                                   `token_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'token id',
+                                   `owner` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'token id 对应持有者地址',
+                                   `name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
+                                   `description` longtext COLLATE utf8mb4_unicode_ci COMMENT 'Describes the asset to which this NFT represents',
+                                   `image` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
                                    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                   `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的交易数',
+                                   `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'tokenaddress和tokenid的对应交易数',
                                    `token_owner_tx_qty` int(11) DEFAULT '0' COMMENT 'owner对该tokenaddress和tokenid的对应交易数',
-                                   PRIMARY KEY (`token_address`,`token_id`)
-);
+                                   `small_image` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '缩略图',
+                                   `medium_image` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '中等缩略图',
+                                   PRIMARY KEY (`token_address`,`token_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 DROP TABLE IF EXISTS `tx_bak`;
 CREATE TABLE `tx_bak` (

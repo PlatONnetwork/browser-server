@@ -79,3 +79,7 @@ CREATE TABLE `token_inventory` (
 ALTER TABLE token_inventory MODIFY COLUMN token_id VARCHAR ( 128 );
 
 ALTER TABLE token_inventory MODIFY COLUMN description longtext COMMENT 'Describes the asset to which this NFT represents';
+
+ALTER TABLE token_inventory ADD COLUMN small_image varchar(256) DEFAULT NULL COMMENT '缩略图';
+
+ALTER TABLE token_inventory ADD COLUMN medium_image varchar(256) DEFAULT NULL COMMENT '中等缩略图';

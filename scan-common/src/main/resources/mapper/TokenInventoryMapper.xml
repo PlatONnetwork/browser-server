@@ -12,6 +12,8 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
     <result column="token_owner_tx_qty" jdbcType="INTEGER" property="tokenOwnerTxQty" />
+    <result column="small_image" jdbcType="INTEGER" property="smallImage" />
+    <result column="medium_image" jdbcType="INTEGER" property="mediumImage" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -73,7 +75,7 @@
   </sql>
   <sql id="Base_Column_List">
     token_address, token_id, `owner`, `name`, description, image, create_time, update_time, 
-    token_tx_qty,token_owner_tx_qty
+    token_tx_qty,token_owner_tx_qty,small_image,medium_image
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenInventoryExample" resultMap="BaseResultMap">
     select
@@ -110,11 +112,12 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.TokenInventory">
     insert into token_inventory (token_address, token_id, `owner`, 
       `name`, description, image, 
-      create_time, update_time, token_tx_qty,token_owner_tx_qty
+      create_time, update_time, token_tx_qty,token_owner_tx_qty,small_image,medium_image
       )
     values (#{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, #{owner,jdbcType=VARCHAR},
       #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, #{tokenOwnerTxQty,jdbcType=INTEGER}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER},
+      #{tokenOwnerTxQty,jdbcType=INTEGER},#{smallImage},#{mediumImage}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TokenInventory">
@@ -150,6 +153,12 @@
       <if test="tokenOwnerTxQty != null">
         token_owner_tx_qty,
       </if>
+      <if test="small_image != null">
+        small_image,
+      </if>
+      <if test="medium_image != null">
+        medium_image,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="tokenAddress != null">
@@ -181,6 +190,12 @@
       </if>
       <if test="tokenOwnerTxQty != null">
         #{tokenOwnerTxQty,jdbcType=INTEGER},
+      </if>
+      <if test="smallImage != null">
+        #{smallImage},
+      </if>
+      <if test="mediumImage != null">
+        #{mediumImage},
       </if>
     </trim>
   </insert>
@@ -223,6 +238,12 @@
       <if test="record.tokenOwnerTxQty != null">
         token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
+      <if test="record.smallImage != null">
+        small_image = #{record.smallImage},
+      </if>
+      <if test="record.mediumImage != null">
+        medium_image = #{record.mediumImage},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -239,7 +260,9 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
-      token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER}
+      token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
+      small_image=#{smallImage},
+      medium_image=#{mediumImage}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -271,6 +294,12 @@
       <if test="tokenOwnerTxQty != null">
         token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
+      <if test="smallImage != null">
+        small_image = #{smallImage},
+      </if>
+      <if test="mediumImage != null">
+        medium_image = #{mediumImage},
+      </if>
     </set>
     where token_address = #{tokenAddress,jdbcType=VARCHAR}
       and token_id = #{tokenId,jdbcType=VARCHAR}
@@ -285,6 +314,8 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
       token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER}
+      small_image=#{smallImage},
+      medium_image=#{mediumImage}
     where token_address = #{tokenAddress,jdbcType=VARCHAR}
       and token_id = #{tokenId,jdbcType=VARCHAR}
   </update>
@@ -296,12 +327,13 @@
     -->
     insert into token_inventory
     (token_address, token_id, `owner`, `name`, description, image, create_time, update_time, 
-      token_tx_qty,token_owner_tx_qty)
+      token_tx_qty,token_owner_tx_qty,small_image,medium_image)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, #{item.owner,jdbcType=VARCHAR},
         #{item.name,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER},
+       #{item.tokenOwnerTxQty,jdbcType=INTEGER},#{item.smallImage},#{item.mediumImage}
         )
     </foreach>
   </insert>
@@ -349,6 +381,12 @@
         </if>
         <if test="'token_owner_tx_qty'.toString() == column.value">
           #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+        </if>
+        <if test="'small_image'.toString() == column.value">
+          #{item.smallImage}
+        </if>
+        <if test="'medium_image'.toString() == column.value">
+          #{item.mediumImage}
         </if>
       </foreach>
       )
