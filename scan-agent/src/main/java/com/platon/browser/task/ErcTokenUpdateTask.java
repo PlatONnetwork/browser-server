@@ -622,6 +622,9 @@ public class ErcTokenUpdateTask {
             } while (!batch.isEmpty() && !isUpdate);
             if (isIncrement) {
                 this.setTokenInventoryPage(page);
+                if (batch.size() != INVENTORY_BATCH_SIZE) {
+                    incrementTokenInventoryUpdate.update(pageNum, false, batch.size());
+                }
             }
         } catch (Exception e) {
             log.error("更新token库存信息异常", e);
