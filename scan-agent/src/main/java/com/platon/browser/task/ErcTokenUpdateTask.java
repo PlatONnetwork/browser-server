@@ -44,7 +44,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -381,7 +380,6 @@ public class ErcTokenUpdateTask {
 //                }
 
 
-
                 // 串行查余额
                 map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
@@ -477,7 +475,7 @@ public class ErcTokenUpdateTask {
     /**
      * 更新token库存信息=>全量更新
      */
-    @Scheduled(cron = "0 0 0 1/7 * ?")
+    @Scheduled(cron = "0 0 0 */1 * ?")
     public void updateTokenInventory() {
         tokenInventoryLock.lock();
         try {
@@ -498,7 +496,7 @@ public class ErcTokenUpdateTask {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/2/1
      */
-    @Scheduled(cron = "0/30  * * * * ?")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void cronIncrementUpdateTokenInventory() {
         if (tokenInventoryLock.tryLock()) {
             try {
@@ -545,60 +543,50 @@ public class ErcTokenUpdateTask {
                 }
                 List<TokenInventory> updateParams = new ArrayList<>();
                 if (!batch.isEmpty() && !isUpdate) {
-                    CountDownLatch latch = new CountDownLatch(batch.size());
                     batch.forEach(inventory -> {
-                        pool.submit(() -> {
-                            try {
-                                String tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
-                                if (StrUtil.isNotBlank(tokenURI)) {
-                                    Request request = new Request.Builder().url(tokenURI).build();
-                                    try (Response response = client.newCall(request).execute()) {
-                                        if (response.code() == 200) {
-                                            String resp = response.body().string();
-                                            TokenInventory newTi = JSON.parseObject(resp, TokenInventory.class);
-                                            newTi.setUpdateTime(DateUtil.date());
-                                            newTi.setTokenId(inventory.getTokenId());
-                                            newTi.setTokenAddress(inventory.getTokenAddress());
-                                            boolean changed = false;
-                                            // 只要有一个属性变动就添加到更新列表中
-                                            if (!newTi.getImage().equals(inventory.getImage())) {
-                                                inventory.setImage(newTi.getImage());
-                                                changed = true;
-                                            }
-                                            if (!newTi.getDescription().equals(inventory.getDescription())) {
-                                                inventory.setDescription(newTi.getDescription());
-                                                changed = true;
-                                            }
-                                            if (!newTi.getName().equals(inventory.getName())) {
-                                                inventory.setName(newTi.getName());
-                                                changed = true;
-                                            }
-                                            if (changed) {
-                                                inventory.setUpdateTime(new Date());
-                                                updateParams.add(inventory);
-                                            }
+                        try {
+                            String tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
+                            if (StrUtil.isNotBlank(tokenURI)) {
+                                Request request = new Request.Builder().url(tokenURI).build();
+                                try (Response response = client.newCall(request).execute()) {
+                                    if (response.code() == 200) {
+                                        String resp = response.body().string();
+                                        TokenInventory newTi = JSON.parseObject(resp, TokenInventory.class);
+                                        newTi.setUpdateTime(DateUtil.date());
+                                        newTi.setTokenId(inventory.getTokenId());
+                                        newTi.setTokenAddress(inventory.getTokenAddress());
+                                        boolean changed = false;
+                                        // 只要有一个属性变动就添加到更新列表中
+                                        if (!newTi.getImage().equals(inventory.getImage())) {
+                                            inventory.setImage(newTi.getImage());
+                                            changed = true;
                                         }
-                                        if (response.code() == 404) {
-                                            log.error("token[{}] resource [{}] does not exist", inventory.getTokenAddress(), tokenURI);
+                                        if (!newTi.getDescription().equals(inventory.getDescription())) {
+                                            inventory.setDescription(newTi.getDescription());
+                                            changed = true;
                                         }
-                                    } catch (Exception e) {
-                                        log.error(StrFormatter.format("请求TokenURI异常，token_address：{},token_id:{}", inventory.getTokenAddress(), inventory.getTokenId()), e);
+                                        if (!newTi.getName().equals(inventory.getName())) {
+                                            inventory.setName(newTi.getName());
+                                            changed = true;
+                                        }
+                                        if (changed) {
+                                            inventory.setUpdateTime(new Date());
+                                            updateParams.add(inventory);
+                                        }
                                     }
-                                } else {
-                                    log.error("请求TokenURI为空，token_address：{},token_id:{}", inventory.getTokenAddress(), inventory.getTokenId());
+                                    if (response.code() == 404) {
+                                        log.error("token_address[{}] token_id[{}] tokenURI [{}] 不存在", inventory.getTokenAddress(), inventory.getTokenId(), tokenURI);
+                                    }
+                                } catch (Exception e) {
+                                    log.error(StrFormatter.format("请求TokenURI异常，token_address：{},token_id:{}", inventory.getTokenAddress(), inventory.getTokenId()), e);
                                 }
-                            } catch (Exception e) {
-                                log.error("更新token库存信息异常", e);
-                            } finally {
-                                latch.countDown();
+                            } else {
+                                log.error("请求TokenURI为空，token_address：{},token_id:{}", inventory.getTokenAddress(), inventory.getTokenId());
                             }
-                        });
+                        } catch (Exception e) {
+                            log.error("更新token库存信息异常", e);
+                        }
                     });
-                    try {
-                        latch.await();
-                    } catch (InterruptedException e) {
-                        log.error("", e);
-                    }
                     // 每次满INVENTORY_BATCH_SIZE条数，才跳到下一页
                     if (batch.size() == INVENTORY_BATCH_SIZE) {
                         num = page;

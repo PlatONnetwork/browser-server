@@ -77,3 +77,5 @@ CREATE TABLE `token_inventory` (
 );
 
 ALTER TABLE token_inventory MODIFY COLUMN token_id VARCHAR ( 128 );
+
+ALTER TABLE token_inventory MODIFY COLUMN description longtext COMMENT 'Describes the asset to which this NFT represents';

@@ -62,6 +62,9 @@ logging:
     com.platon.browser.task: error
   file:
     name: ./logs/${spring.application.name}-${profile}.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{50}[%L] | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{50}[%L] | %msg%n"
 #PlatOn相关配置
 platon:
   # 地址HRP前缀

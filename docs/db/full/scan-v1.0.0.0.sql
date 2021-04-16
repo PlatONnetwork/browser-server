@@ -439,7 +439,7 @@ CREATE TABLE `token_inventory` (
                                    `token_id` varchar(128) NOT NULL COMMENT 'token id',
                                    `owner` varchar(64) NOT NULL COMMENT 'token id 对应持有者地址',
                                    `name` varchar(256) DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
-                                   `description` varchar(256) DEFAULT NULL COMMENT 'Describes the asset to which this NFT represents',
+                                   `description` longtext COMMENT 'Describes the asset to which this NFT represents',
                                    `image` varchar(256) DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
                                    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
