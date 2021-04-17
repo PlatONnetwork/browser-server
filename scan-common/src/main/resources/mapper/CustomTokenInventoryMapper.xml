@@ -41,6 +41,12 @@
                 <if test="'token_owner_tx_qty'.toString() == column.value">
                     #{item.tokenOwnerTxQty,jdbcType=INTEGER}
                 </if>
+                <if test="'small_image'.toString() == column.value">
+                    #{item.smallImage}
+                </if>
+                <if test="'medium_image'.toString() == column.value">
+                    #{item.mediumImage}
+                </if>
             </foreach>
             )
         </foreach>
