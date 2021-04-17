@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -802,8 +803,16 @@ public class TransactionService {
                             tokenInventoryKey.setTokenAddress(erc721.getContract());
                             tokenInventoryKey.setTokenId(erc721.getValue());
                             TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
-                            if (tokenInventory != null)
-                                arc721Param.setInnerImage(tokenInventory.getImage());
+                            if (tokenInventory != null) {
+                                // 默认取中等缩略图
+                                String image = "";
+                                if (StrUtil.isNotEmpty(tokenInventory.getMediumImage())) {
+                                    image = tokenInventory.getMediumImage();
+                                } else {
+                                    image = tokenInventory.getImage();
+                                }
+                                arc721Param.setInnerImage(image);
+                            }
                             arc721Params.add(arc721Param);
                         });
                         resp.setErc721Params(arc721Params);
