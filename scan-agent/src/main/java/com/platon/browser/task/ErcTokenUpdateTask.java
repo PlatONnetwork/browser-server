@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.ssl.TrustAnyHostnameVerifier;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.TokenHolderCount;
@@ -109,6 +110,7 @@ public class ErcTokenUpdateTask {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
+            .hostnameVerifier(new TrustAnyHostnameVerifier())
             .build();
 
     /**
