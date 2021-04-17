@@ -167,7 +167,9 @@ public class ErcTokenUpdateTask {
     public void cronUpdateTokenTotalSupply() {
         lock.lock();
         try {
+            log.error("=======token的总供应量全量更新开始===========");
             this.updateTokenTotalSupply();
+            log.error("=======token的总供应量全量更新结束===========");
         } catch (Exception e) {
             log.error("全量更新token的总供应量异常", e);
         } finally {
@@ -286,8 +288,10 @@ public class ErcTokenUpdateTask {
     public void cronIncrementUpdateTokenHolderBalance() {
         if (tokenHolderLock.tryLock()) {
             try {
+                log.error("=======更新token持有者余额增量更新开始===========");
                 incrementUpdateTokenHolderBalance(esErc20TxRepository, ErcTypeEnum.ERC20, this.getErc20TxSeq());
                 incrementUpdateTokenHolderBalance(esErc721TxRepository, ErcTypeEnum.ERC721, this.getErc721TxSeq());
+                log.error("=======更新token持有者余额增量更新结束===========");
             } catch (Exception e) {
                 log.error("增量更新token持有者余额异常", e);
             } finally {
@@ -421,7 +425,7 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
-
+        log.error("=======更新token持有者余额全量更新开始===========");
         try {
             tokenHolderLock.lock();
             // 分页更新holder的balance
@@ -471,6 +475,7 @@ public class ErcTokenUpdateTask {
         } finally {
             tokenHolderLock.unlock();
         }
+        log.error("=======更新token持有者余额全量更新结束===========");
     }
 
     /**
@@ -486,8 +491,10 @@ public class ErcTokenUpdateTask {
     public void updateTokenInventory() {
         tokenInventoryLock.lock();
         try {
+            log.error("=======更新token库存信息全量更新开始===========");
             updateTokenInventory(INVENTORY_UPDATE_POOL, 0, false);
             tokenInventoryUpdate.update(0, false, 0);
+            log.error("=======更新token库存信息全量更新结束===========");
         } catch (Exception e) {
             log.error("更新token库存信息", e);
         } finally {
@@ -508,7 +515,9 @@ public class ErcTokenUpdateTask {
     public void cronIncrementUpdateTokenInventory() {
         if (tokenInventoryLock.tryLock()) {
             try {
+                log.error("=======更新token库存信息增量更新开始===========");
                 updateTokenInventory(INCREMENT_INVENTORY_UPDATE_POOL, this.getTokenInventoryPage(), true);
+                log.error("=======更新token库存信息增量更新结束===========");
             } catch (Exception e) {
                 log.error("增量更新token库存信息异常", e);
             } finally {
