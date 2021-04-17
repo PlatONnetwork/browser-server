@@ -33,9 +33,6 @@ public class TokenInventoryUpdate {
      */
     public boolean getPageUpdate(Integer page, Integer size) {
         if (page == this.getPage()) {
-            if (num != size) {
-                return false;
-            }
             return this.isUpdate;
         } else {
             return false;

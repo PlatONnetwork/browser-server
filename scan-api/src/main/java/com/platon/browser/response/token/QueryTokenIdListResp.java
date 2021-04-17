@@ -1,5 +1,6 @@
 package com.platon.browser.response.token;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.entity.TokenInventory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,16 +22,28 @@ import lombok.experimental.Accessors;
 public class QueryTokenIdListResp {
 
     private String address;
+
     private String contract;
+
     private String tokenId;
+
     private String image;
+
     private Integer txCount;
 
     public static QueryTokenIdListResp fromToken(TokenInventory token) {
+        // 默认取中等缩略图
+        String image = "";
+        if (StrUtil.isNotEmpty(token.getMediumImage())) {
+            image = token.getMediumImage();
+        } else {
+            image = token.getImage();
+        }
         return QueryTokenIdListResp.builder()
                 .address(token.getOwner()).contract(token.getTokenAddress())
-                .tokenId(token.getTokenId()).image(token.getImage())
+                .tokenId(token.getTokenId()).image(image)
                 .txCount(token.getTokenTxQty())
                 .build();
     }
+
 }
