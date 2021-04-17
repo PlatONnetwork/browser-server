@@ -49,6 +49,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * token定时器
+ * 全量更新的时间需要错开
  *
  * @author huangyongpeng@matrixelements.com
  * @date 2021/1/22
@@ -156,12 +157,13 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新ERC20和Erc721Enumeration token的总供应量===》全量更新
+     * 每5分钟更新
      *
      * @return void
      * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Scheduled(cron = "0/30  * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void cronUpdateTokenTotalSupply() {
         lock.lock();
         try {
@@ -273,15 +275,14 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新token持有者余额===》增量更新
-     *
-     * 每30秒运行一次
+     * 每1分钟运行一次
      *
      * @param
      * @return void
      * @author huangyongpeng@matrixelements.com
      * @date 2021/2/1
      */
-    @Scheduled(cron = "0/30  * * * * ?")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void cronIncrementUpdateTokenHolderBalance() {
         if (tokenHolderLock.tryLock()) {
             try {
@@ -474,8 +475,14 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新token库存信息=>全量更新
+     * 每天凌晨1点更新
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/17
      */
-    @Scheduled(cron = "0 0 0 */1 * ?")
+    @Scheduled(cron = "0 0 1 */1 * ?")
     public void updateTokenInventory() {
         tokenInventoryLock.lock();
         try {
@@ -490,6 +497,7 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新token库存信息=>增量更新
+     * 每1分钟更新
      *
      * @param
      * @return void
