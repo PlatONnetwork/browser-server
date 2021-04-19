@@ -36,13 +36,13 @@
 
 
 ## build
-### scan-agent的打包
+### scan-agent build
 
 ```bash
 gradlew clean buildTar -x test -b scan-agent/build.gradle
 ```
 
-### scan-api的打包
+### scan-api build
 
 ```bash
 gradlew clean buildTar -x test -b scan-api/build.gradle

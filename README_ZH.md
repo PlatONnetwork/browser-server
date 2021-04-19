@@ -42,7 +42,7 @@
 gradlew clean buildTar -x test -b scan-agent/build.gradle
 ```
 
-### browser-api的打包
+### scan-api的打包
 
 ```bash
 gradlew clean buildTar -x test -b scan-api/build.gradle
