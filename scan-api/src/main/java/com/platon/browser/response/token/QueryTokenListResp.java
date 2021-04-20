@@ -69,7 +69,7 @@ public class QueryTokenListResp {
         return QueryTokenListResp.builder()
                 .address(token.getAddress()).name(token.getName()).type(token.getType())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal()))
+                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply() == null? BigDecimal.ZERO : token.getTotalSupply(), token.getDecimal() == null ? 0 : token.getDecimal()))
                 .createTime(token.getCreateTime())
                 .details(token.getDetails()).holder(token.getHolder())
                 .build();
