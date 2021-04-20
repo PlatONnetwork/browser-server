@@ -187,30 +187,14 @@ public class AddressService {
                     int oldErc20TxQty = Convert.toInt(item.getErc20TxQty(), 0);
                     int newErc20TxQty = Convert.toInt(res.getTotal(), 0);
                     item.setErc20TxQty(newErc20TxQty);
-                    Address addr = new Address();
-                    addr.setAddress(address);
-                    addr.setErc20TxQty(Convert.toInt(res.getTotal(), 0));
-                    int updateRes = addressMapper.updateByPrimaryKeySelective(addr);
-                    if (updateRes > 0) {
-                        logger.info("地址{}的erc20交易数,旧值{},新值{}成功", address, oldErc20TxQty, newErc20TxQty);
-                    } else {
-                        logger.error("地址{}的erc20交易数,旧值{},新值{}失败", address, oldErc20TxQty, newErc20TxQty);
-                    }
+                    logger.info("地址{}的erc20交易数,旧值{},新值{}成功", address, oldErc20TxQty, newErc20TxQty);
                 }
             } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
                 if (ObjectUtil.isNull(item.getErc721TxQty()) || item.getErc721TxQty().compareTo(res.getTotal().intValue()) != 0) {
                     int oldErc721TxQty = Convert.toInt(item.getErc721TxQty(), 0);
                     int newErc721TxQty = Convert.toInt(res.getTotal(), 0);
                     item.setErc721TxQty(newErc721TxQty);
-                    Address addr = new Address();
-                    addr.setAddress(address);
-                    addr.setErc20TxQty(Convert.toInt(res.getTotal(), 0));
-                    int updateRes = addressMapper.updateByPrimaryKeySelective(addr);
-                    if (updateRes > 0) {
-                        logger.info("地址{}的erc721交易数,旧值{},新值{}成功", address, oldErc721TxQty, newErc721TxQty);
-                    } else {
-                        logger.error("地址{}的erc721交易数,旧值{},新值{}失败", address, oldErc721TxQty, newErc721TxQty);
-                    }
+                    logger.info("地址{}的erc721交易数,旧值{},新值{}成功", address, oldErc721TxQty, newErc721TxQty);
                 }
             }
         } catch (Exception e) {
