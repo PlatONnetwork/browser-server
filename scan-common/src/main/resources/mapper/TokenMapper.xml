@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.TokenMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Token">
+    <id column="address" jdbcType="VARCHAR" property="address" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="symbol" jdbcType="VARCHAR" property="symbol" />
+    <result column="total_supply" jdbcType="DECIMAL" property="totalSupply" />
+    <result column="decimal" jdbcType="INTEGER" property="decimal" />
+    <result column="is_support_erc165" jdbcType="BIT" property="isSupportErc165" />
+    <result column="is_support_erc20" jdbcType="BIT" property="isSupportErc20" />
+    <result column="is_support_erc721" jdbcType="BIT" property="isSupportErc721" />
+    <result column="is_support_erc721_enumeration" jdbcType="BIT" property="isSupportErc721Enumeration" />
+    <result column="is_support_erc721_metadata" jdbcType="BIT" property="isSupportErc721Metadata" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
+    <result column="holder" jdbcType="INTEGER" property="holder" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
+    is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, create_time, 
+    update_time, token_tx_qty, holder
+  </sql>
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from token
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from token
+    where address = #{address,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from token
+    where address = #{address,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TokenExample">
+    delete from token
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.Token">
+    insert into token (address, `type`, `name`, 
+      symbol, total_supply, `decimal`, 
+      is_support_erc165, is_support_erc20, is_support_erc721, 
+      is_support_erc721_enumeration, is_support_erc721_metadata, 
+      create_time, update_time, token_tx_qty, 
+      holder)
+    values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{symbol,jdbcType=VARCHAR}, #{totalSupply,jdbcType=DECIMAL}, #{decimal,jdbcType=INTEGER}, 
+      #{isSupportErc165,jdbcType=BIT}, #{isSupportErc20,jdbcType=BIT}, #{isSupportErc721,jdbcType=BIT}, 
+      #{isSupportErc721Enumeration,jdbcType=BIT}, #{isSupportErc721Metadata,jdbcType=BIT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
+      #{holder,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Token">
+    insert into token
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="address != null">
+        address,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="symbol != null">
+        symbol,
+      </if>
+      <if test="totalSupply != null">
+        total_supply,
+      </if>
+      <if test="decimal != null">
+        `decimal`,
+      </if>
+      <if test="isSupportErc165 != null">
+        is_support_erc165,
+      </if>
+      <if test="isSupportErc20 != null">
+        is_support_erc20,
+      </if>
+      <if test="isSupportErc721 != null">
+        is_support_erc721,
+      </if>
+      <if test="isSupportErc721Enumeration != null">
+        is_support_erc721_enumeration,
+      </if>
+      <if test="isSupportErc721Metadata != null">
+        is_support_erc721_metadata,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="tokenTxQty != null">
+        token_tx_qty,
+      </if>
+      <if test="holder != null">
+        holder,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="symbol != null">
+        #{symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="totalSupply != null">
+        #{totalSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="decimal != null">
+        #{decimal,jdbcType=INTEGER},
+      </if>
+      <if test="isSupportErc165 != null">
+        #{isSupportErc165,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc20 != null">
+        #{isSupportErc20,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc721 != null">
+        #{isSupportErc721,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc721Enumeration != null">
+        #{isSupportErc721Enumeration,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc721Metadata != null">
+        #{isSupportErc721Metadata,jdbcType=BIT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tokenTxQty != null">
+        #{tokenTxQty,jdbcType=INTEGER},
+      </if>
+      <if test="holder != null">
+        #{holder,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.TokenExample" resultType="java.lang.Long">
+    select count(*) from token
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update token
+    <set>
+      <if test="record.address != null">
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null">
+        `name` = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.symbol != null">
+        symbol = #{record.symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="record.totalSupply != null">
+        total_supply = #{record.totalSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="record.decimal != null">
+        `decimal` = #{record.decimal,jdbcType=INTEGER},
+      </if>
+      <if test="record.isSupportErc165 != null">
+        is_support_erc165 = #{record.isSupportErc165,jdbcType=BIT},
+      </if>
+      <if test="record.isSupportErc20 != null">
+        is_support_erc20 = #{record.isSupportErc20,jdbcType=BIT},
+      </if>
+      <if test="record.isSupportErc721 != null">
+        is_support_erc721 = #{record.isSupportErc721,jdbcType=BIT},
+      </if>
+      <if test="record.isSupportErc721Enumeration != null">
+        is_support_erc721_enumeration = #{record.isSupportErc721Enumeration,jdbcType=BIT},
+      </if>
+      <if test="record.isSupportErc721Metadata != null">
+        is_support_erc721_metadata = #{record.isSupportErc721Metadata,jdbcType=BIT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.tokenTxQty != null">
+        token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
+      </if>
+      <if test="record.holder != null">
+        holder = #{record.holder,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update token
+    set address = #{record.address,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=VARCHAR},
+      `name` = #{record.name,jdbcType=VARCHAR},
+      symbol = #{record.symbol,jdbcType=VARCHAR},
+      total_supply = #{record.totalSupply,jdbcType=DECIMAL},
+      `decimal` = #{record.decimal,jdbcType=INTEGER},
+      is_support_erc165 = #{record.isSupportErc165,jdbcType=BIT},
+      is_support_erc20 = #{record.isSupportErc20,jdbcType=BIT},
+      is_support_erc721 = #{record.isSupportErc721,jdbcType=BIT},
+      is_support_erc721_enumeration = #{record.isSupportErc721Enumeration,jdbcType=BIT},
+      is_support_erc721_metadata = #{record.isSupportErc721Metadata,jdbcType=BIT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
+      holder = #{record.holder,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Token">
+    update token
+    <set>
+      <if test="type != null">
+        `type` = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="symbol != null">
+        symbol = #{symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="totalSupply != null">
+        total_supply = #{totalSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="decimal != null">
+        `decimal` = #{decimal,jdbcType=INTEGER},
+      </if>
+      <if test="isSupportErc165 != null">
+        is_support_erc165 = #{isSupportErc165,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc20 != null">
+        is_support_erc20 = #{isSupportErc20,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc721 != null">
+        is_support_erc721 = #{isSupportErc721,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc721Enumeration != null">
+        is_support_erc721_enumeration = #{isSupportErc721Enumeration,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc721Metadata != null">
+        is_support_erc721_metadata = #{isSupportErc721Metadata,jdbcType=BIT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tokenTxQty != null">
+        token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
+      </if>
+      <if test="holder != null">
+        holder = #{holder,jdbcType=INTEGER},
+      </if>
+    </set>
+    where address = #{address,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Token">
+    update token
+    set `type` = #{type,jdbcType=VARCHAR},
+      `name` = #{name,jdbcType=VARCHAR},
+      symbol = #{symbol,jdbcType=VARCHAR},
+      total_supply = #{totalSupply,jdbcType=DECIMAL},
+      `decimal` = #{decimal,jdbcType=INTEGER},
+      is_support_erc165 = #{isSupportErc165,jdbcType=BIT},
+      is_support_erc20 = #{isSupportErc20,jdbcType=BIT},
+      is_support_erc721 = #{isSupportErc721,jdbcType=BIT},
+      is_support_erc721_enumeration = #{isSupportErc721Enumeration,jdbcType=BIT},
+      is_support_erc721_metadata = #{isSupportErc721Metadata,jdbcType=BIT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
+      holder = #{holder,jdbcType=INTEGER}
+    where address = #{address,jdbcType=VARCHAR}
+  </update>
+  <insert id="batchInsert" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into token
+    (address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
+      is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, create_time, 
+      update_time, token_tx_qty, holder)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
+        #{item.symbol,jdbcType=VARCHAR}, #{item.totalSupply,jdbcType=DECIMAL}, #{item.decimal,jdbcType=INTEGER}, 
+        #{item.isSupportErc165,jdbcType=BIT}, #{item.isSupportErc20,jdbcType=BIT}, #{item.isSupportErc721,jdbcType=BIT}, 
+        #{item.isSupportErc721Enumeration,jdbcType=BIT}, #{item.isSupportErc721Metadata,jdbcType=BIT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
+        #{item.holder,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  <insert id="batchInsertSelective" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into token (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'address'.toString() == column.value">
+          #{item.address,jdbcType=VARCHAR}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
+        </if>
+        <if test="'name'.toString() == column.value">
+          #{item.name,jdbcType=VARCHAR}
+        </if>
+        <if test="'symbol'.toString() == column.value">
+          #{item.symbol,jdbcType=VARCHAR}
+        </if>
+        <if test="'total_supply'.toString() == column.value">
+          #{item.totalSupply,jdbcType=DECIMAL}
+        </if>
+        <if test="'decimal'.toString() == column.value">
+          #{item.decimal,jdbcType=INTEGER}
+        </if>
+        <if test="'is_support_erc165'.toString() == column.value">
+          #{item.isSupportErc165,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc20'.toString() == column.value">
+          #{item.isSupportErc20,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc721'.toString() == column.value">
+          #{item.isSupportErc721,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc721_enumeration'.toString() == column.value">
+          #{item.isSupportErc721Enumeration,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc721_metadata'.toString() == column.value">
+          #{item.isSupportErc721Metadata,jdbcType=BIT}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'token_tx_qty'.toString() == column.value">
+          #{item.tokenTxQty,jdbcType=INTEGER}
+        </if>
+        <if test="'holder'.toString() == column.value">
+          #{item.holder,jdbcType=INTEGER}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

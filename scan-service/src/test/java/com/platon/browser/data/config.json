@@ -1,0 +1,110 @@
+[
+  {
+    "ParamItem":{
+      "Desc":"minimum amount of stake, range：[1000000000000000000000000, 10000000000000000000000000) ",
+      "Module":"staking",
+      "Name":"stakeThreshold"
+    },
+    "ParamValue":{
+      "ActiveBlock":"29601",
+      "StaleValue":"1000000000000000000000000",
+      "Value":"1500000000000000000000000"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"minimum amount of stake increasing funds, delegation funds, or delegation withdrawing funds, range：[10000000000000000000, 10000000000000000000000) ",
+      "Module":"staking",
+      "Name":"operatingThreshold"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"10000000000000000000"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"maximum amount of validator, range：[4, 201]",
+      "Module":"staking",
+      "Name":"maxValidators"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"30"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"quantity of epoch for skake withdrawal, range：(MaxEvidenceAge, 112]",
+      "Module":"staking",
+      "Name":"unStakeFreezeDuration"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"5"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"quantity of base point(1BP=1?). Node's stake will be deducted(BPs*staking amount*1?) it the node sign block duplicatlly, range：(0, 10000]",
+      "Module":"slashing",
+      "Name":"slashFractionDuplicateSign"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"100"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"quantity of base point(1bp=1%). Bonus(BPs*deduction amount for sign block duplicatlly*%) to the node who reported another's duplicated-signature, range：(0, 80]",
+      "Module":"slashing",
+      "Name":"duplicateSignReportReward"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"50"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"quantity of epoch. During these epochs after a node duplicated-sign, others can report it, range：(0, UnStakeFreezeDuration)",
+      "Module":"slashing",
+      "Name":"maxEvidenceAge"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"1"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"quantity of block, the total bonus amount for these blocks will be deducted from a inefficient node's stake, range：[0, 60101)",
+      "Module":"slashing",
+      "Name":"slashBlocksReward"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"20"
+    }
+  },
+  {
+    "ParamItem":{
+      "Desc":"maximum gas limit per block, range：[4712388, 210000000]",
+      "Module":"block",
+      "Name":"maxBlockGasLimit"
+    },
+    "ParamValue":{
+      "ActiveBlock":"0",
+      "StaleValue":"",
+      "Value":"100800000"
+    }
+  }
+]

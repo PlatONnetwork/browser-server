@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.v0150.dao.StakingDelegateBalanceAdjustmentMapper">
+    <!--委托相关表调账-->
+    <update id="adjustDelegateData">
+        update `delegation` set
+            `delegate_hes`=#{adjustParam.delegateHes},
+            `delegate_locked`=#{adjustParam.delegateLocked},
+            `delegate_released`=#{adjustParam.delegateReleased},
+            `is_history`=#{adjustParam.isHistory}
+        where `node_id`=#{adjustParam.nodeId}
+          and `staking_block_num`=#{adjustParam.stakingBlockNum}
+          and `delegate_addr`=#{adjustParam.addr};
+
+        update `node` set
+            `total_value`=#{adjustParam.nodeTotalValue},
+            `stat_delegate_value`=#{adjustParam.nodeStatDelegateValue},
+            `stat_delegate_released`=#{adjustParam.nodeStatDelegateReleased},
+            `have_dele_reward`=#{adjustParam.nodeHaveDeleReward}
+        where `node_id` = #{adjustParam.nodeId};
+
+        update `staking` set
+             `stat_delegate_hes`=#{adjustParam.stakeStatDelegateHes},
+             `stat_delegate_locked`=#{adjustParam.stakeStatDelegateLocked},
+             `stat_delegate_released`=#{adjustParam.stakeStatDelegateReleased},
+             `have_dele_reward`=#{adjustParam.stakeHaveDeleReward}
+        where `node_id` = #{adjustParam.nodeId}
+          and `staking_block_num` = #{adjustParam.stakingBlockNum};
+    </update>
+
+    <!--质押相关表调账-->
+    <update id="adjustStakingData">
+        update `node` set
+            `total_value`=#{adjustParam.nodeTotalValue},
+            `status`=#{adjustParam.status},
+            `is_consensus`=#{adjustParam.isConsensus},
+            `is_settle`=#{adjustParam.isSettle},
+            `staking_hes`=#{adjustParam.stakingHes},
+            `staking_locked`=#{adjustParam.stakingLocked},
+            `staking_reduction`=#{adjustParam.stakingReduction},
+            `staking_reduction_epoch`=#{adjustParam.stakingReductionEpoch},
+            `un_stake_freeze_duration`=#{adjustParam.unStakeFreezeDuration},
+            `un_stake_end_block`=#{adjustParam.unStakeEndBlock},
+            `leave_time`=#{adjustParam.leaveTime}
+        where `node_id` = #{adjustParam.nodeId};
+        update `staking` set
+             `status`=#{adjustParam.status},
+             `is_consensus`=#{adjustParam.isConsensus},
+             `is_settle`=#{adjustParam.isSettle},
+             `staking_hes`=#{adjustParam.stakingHes},
+             `staking_locked`=#{adjustParam.stakingLocked},
+             `staking_reduction`=#{adjustParam.stakingReduction},
+             `staking_reduction_epoch`=#{adjustParam.stakingReductionEpoch},
+             `un_stake_freeze_duration`=#{adjustParam.unStakeFreezeDuration},
+             `un_stake_end_block`=#{adjustParam.unStakeEndBlock},
+             `leave_time`=#{adjustParam.leaveTime}
+        where `node_id` = #{adjustParam.nodeId}
+          and `staking_block_num` = #{adjustParam.stakingBlockNum};
+    </update>
+</mapper>

@@ -1,0 +1,30 @@
+[
+  {
+    "BenefitAddress": "lax1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmscn5j",
+    "Details": "",
+    "ExternalId": "",
+    "NodeId": "75143a7d588c5db985711c7dd5cd322d5b8177a4a4fd4f112873b014a2e660c1b45ce5bbaec5448b5c6654c565d9377a4950922a864c1b6feb0126be968f4b28",
+    "NodeName": "",
+    "ProgramVersion": 0,
+    "Shares": 0,
+    "StakingAddress": "lax1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmscn5j",
+    "StakingBlockNum": 0,
+    "StakingTxIndex": 0,
+    "ValidatorTerm": 0,
+    "Website": ""
+  },
+  {
+    "BenefitAddress": "lax1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmscn5j",
+    "Details": "",
+    "ExternalId": "",
+    "NodeId": "f515e5a5e2b00d39530c15e50718129f50930c91068e2cf206e390728d009a61a7e58976ab569d97486622cd6491a242efe2a2a65424b2ef7751a65d12762c50",
+    "NodeName": "",
+    "ProgramVersion": 0,
+    "Shares": 0,
+    "StakingAddress": "lax1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmscn5j",
+    "StakingBlockNum": 0,
+    "StakingTxIndex": 0,
+    "ValidatorTerm": 0,
+    "Website": ""
+  }
+]

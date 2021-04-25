@@ -1,0 +1,40 @@
+index_patterns:
+  - "*_delegation"
+settings:
+  index:
+    max_result_window: '10000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    sequence:
+      type: long
+    delegate_addr:
+      type: keyword
+    delegate_hes:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    update_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    is_history:
+      type: integer
+    delegate_released:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    create_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    staking_block_num:
+      type: long
+    delegate_locked:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    node_id:
+      type: keyword
