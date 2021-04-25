@@ -142,6 +142,7 @@ public class StakingService {
         List<AliveStakingListResp> lists = new LinkedList<>();
         /** 根据条件和状态进行查询列表 */
         NodeExample nodeExample = new NodeExample();
+        nodeExample.setOrderByClause(" big_version desc, total_value desc,staking_block_num asc, staking_tx_index asc");
         NodeExample.Criteria criteria1 = nodeExample.createCriteria();
         criteria1.andStatusEqualTo(status);
         if (StringUtils.isNotBlank(req.getKey())) {
