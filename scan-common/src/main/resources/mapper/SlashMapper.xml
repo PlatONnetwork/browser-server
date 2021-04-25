@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.SlashMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Slash">
+    <id column="hash" jdbcType="VARCHAR" property="hash" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="slash_rate" jdbcType="VARCHAR" property="slashRate" />
+    <result column="slash_value" jdbcType="DECIMAL" property="slashValue" />
+    <result column="reward" jdbcType="DECIMAL" property="reward" />
+    <result column="benefit_addr" jdbcType="VARCHAR" property="benefitAddr" />
+    <result column="is_quit" jdbcType="INTEGER" property="isQuit" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Slash">
+    <result column="data" jdbcType="LONGVARCHAR" property="data" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    hash, node_id, slash_rate, slash_value, reward, benefit_addr, is_quit, create_time, 
+    update_time
+  </sql>
+  <sql id="Blob_Column_List">
+    `data`
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.SlashExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from slash
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.SlashExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from slash
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from slash
+    where hash = #{hash,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from slash
+    where hash = #{hash,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.SlashExample">
+    delete from slash
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.Slash">
+    insert into slash (hash, node_id, slash_rate, 
+      slash_value, reward, benefit_addr, 
+      is_quit, create_time, update_time, 
+      `data`)
+    values (#{hash,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{slashRate,jdbcType=VARCHAR}, 
+      #{slashValue,jdbcType=DECIMAL}, #{reward,jdbcType=DECIMAL}, #{benefitAddr,jdbcType=VARCHAR}, 
+      #{isQuit,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{data,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Slash">
+    insert into slash
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="hash != null">
+        hash,
+      </if>
+      <if test="nodeId != null">
+        node_id,
+      </if>
+      <if test="slashRate != null">
+        slash_rate,
+      </if>
+      <if test="slashValue != null">
+        slash_value,
+      </if>
+      <if test="reward != null">
+        reward,
+      </if>
+      <if test="benefitAddr != null">
+        benefit_addr,
+      </if>
+      <if test="isQuit != null">
+        is_quit,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="data != null">
+        `data`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="hash != null">
+        #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="slashRate != null">
+        #{slashRate,jdbcType=VARCHAR},
+      </if>
+      <if test="slashValue != null">
+        #{slashValue,jdbcType=DECIMAL},
+      </if>
+      <if test="reward != null">
+        #{reward,jdbcType=DECIMAL},
+      </if>
+      <if test="benefitAddr != null">
+        #{benefitAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="isQuit != null">
+        #{isQuit,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="data != null">
+        #{data,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.SlashExample" resultType="java.lang.Long">
+    select count(*) from slash
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update slash
+    <set>
+      <if test="record.hash != null">
+        hash = #{record.hash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.slashRate != null">
+        slash_rate = #{record.slashRate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.slashValue != null">
+        slash_value = #{record.slashValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.reward != null">
+        reward = #{record.reward,jdbcType=DECIMAL},
+      </if>
+      <if test="record.benefitAddr != null">
+        benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isQuit != null">
+        is_quit = #{record.isQuit,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.data != null">
+        `data` = #{record.data,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update slash
+    set hash = #{record.hash,jdbcType=VARCHAR},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      slash_rate = #{record.slashRate,jdbcType=VARCHAR},
+      slash_value = #{record.slashValue,jdbcType=DECIMAL},
+      reward = #{record.reward,jdbcType=DECIMAL},
+      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      is_quit = #{record.isQuit,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      `data` = #{record.data,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update slash
+    set hash = #{record.hash,jdbcType=VARCHAR},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      slash_rate = #{record.slashRate,jdbcType=VARCHAR},
+      slash_value = #{record.slashValue,jdbcType=DECIMAL},
+      reward = #{record.reward,jdbcType=DECIMAL},
+      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      is_quit = #{record.isQuit,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Slash">
+    update slash
+    <set>
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="slashRate != null">
+        slash_rate = #{slashRate,jdbcType=VARCHAR},
+      </if>
+      <if test="slashValue != null">
+        slash_value = #{slashValue,jdbcType=DECIMAL},
+      </if>
+      <if test="reward != null">
+        reward = #{reward,jdbcType=DECIMAL},
+      </if>
+      <if test="benefitAddr != null">
+        benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="isQuit != null">
+        is_quit = #{isQuit,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="data != null">
+        `data` = #{data,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where hash = #{hash,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.Slash">
+    update slash
+    set node_id = #{nodeId,jdbcType=VARCHAR},
+      slash_rate = #{slashRate,jdbcType=VARCHAR},
+      slash_value = #{slashValue,jdbcType=DECIMAL},
+      reward = #{reward,jdbcType=DECIMAL},
+      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      is_quit = #{isQuit,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      `data` = #{data,jdbcType=LONGVARCHAR}
+    where hash = #{hash,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Slash">
+    update slash
+    set node_id = #{nodeId,jdbcType=VARCHAR},
+      slash_rate = #{slashRate,jdbcType=VARCHAR},
+      slash_value = #{slashValue,jdbcType=DECIMAL},
+      reward = #{reward,jdbcType=DECIMAL},
+      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      is_quit = #{isQuit,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where hash = #{hash,jdbcType=VARCHAR}
+  </update>
+  <insert id="batchInsert" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into slash
+    (hash, node_id, slash_rate, slash_value, reward, benefit_addr, is_quit, create_time, 
+      update_time, `data`)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.hash,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, #{item.slashRate,jdbcType=VARCHAR}, 
+        #{item.slashValue,jdbcType=DECIMAL}, #{item.reward,jdbcType=DECIMAL}, #{item.benefitAddr,jdbcType=VARCHAR}, 
+        #{item.isQuit,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.data,jdbcType=LONGVARCHAR})
+    </foreach>
+  </insert>
+  <insert id="batchInsertSelective" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into slash (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'hash'.toString() == column.value">
+          #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'slash_rate'.toString() == column.value">
+          #{item.slashRate,jdbcType=VARCHAR}
+        </if>
+        <if test="'slash_value'.toString() == column.value">
+          #{item.slashValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'reward'.toString() == column.value">
+          #{item.reward,jdbcType=DECIMAL}
+        </if>
+        <if test="'benefit_addr'.toString() == column.value">
+          #{item.benefitAddr,jdbcType=VARCHAR}
+        </if>
+        <if test="'is_quit'.toString() == column.value">
+          #{item.isQuit,jdbcType=INTEGER}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'data'.toString() == column.value">
+          #{item.data,jdbcType=LONGVARCHAR}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

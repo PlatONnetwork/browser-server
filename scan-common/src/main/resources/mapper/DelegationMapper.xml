@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.DelegationMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Delegation">
+    <id column="delegate_addr" jdbcType="VARCHAR" property="delegateAddr" />
+    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
+    <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes" />
+    <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked" />
+    <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased" />
+    <result column="is_history" jdbcType="INTEGER" property="isHistory" />
+    <result column="sequence" jdbcType="BIGINT" property="sequence" />
+    <result column="cur_delegation_block_num" jdbcType="BIGINT" property="curDelegationBlockNum" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released, 
+    is_history, `sequence`, cur_delegation_block_num, create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.DelegationExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from delegation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.DelegationKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from delegation
+    where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.DelegationKey">
+    delete from delegation
+    where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{nodeId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.DelegationExample">
+    delete from delegation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.Delegation">
+    insert into delegation (delegate_addr, staking_block_num, node_id, 
+      delegate_hes, delegate_locked, delegate_released, 
+      is_history, `sequence`, cur_delegation_block_num, 
+      create_time, update_time)
+    values (#{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, 
+      #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, #{delegateReleased,jdbcType=DECIMAL}, 
+      #{isHistory,jdbcType=INTEGER}, #{sequence,jdbcType=BIGINT}, #{curDelegationBlockNum,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Delegation">
+    insert into delegation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="delegateAddr != null">
+        delegate_addr,
+      </if>
+      <if test="stakingBlockNum != null">
+        staking_block_num,
+      </if>
+      <if test="nodeId != null">
+        node_id,
+      </if>
+      <if test="delegateHes != null">
+        delegate_hes,
+      </if>
+      <if test="delegateLocked != null">
+        delegate_locked,
+      </if>
+      <if test="delegateReleased != null">
+        delegate_released,
+      </if>
+      <if test="isHistory != null">
+        is_history,
+      </if>
+      <if test="sequence != null">
+        `sequence`,
+      </if>
+      <if test="curDelegationBlockNum != null">
+        cur_delegation_block_num,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="delegateAddr != null">
+        #{delegateAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="stakingBlockNum != null">
+        #{stakingBlockNum,jdbcType=BIGINT},
+      </if>
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="delegateHes != null">
+        #{delegateHes,jdbcType=DECIMAL},
+      </if>
+      <if test="delegateLocked != null">
+        #{delegateLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="delegateReleased != null">
+        #{delegateReleased,jdbcType=DECIMAL},
+      </if>
+      <if test="isHistory != null">
+        #{isHistory,jdbcType=INTEGER},
+      </if>
+      <if test="sequence != null">
+        #{sequence,jdbcType=BIGINT},
+      </if>
+      <if test="curDelegationBlockNum != null">
+        #{curDelegationBlockNum,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.DelegationExample" resultType="java.lang.Long">
+    select count(*) from delegation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update delegation
+    <set>
+      <if test="record.delegateAddr != null">
+        delegate_addr = #{record.delegateAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stakingBlockNum != null">
+        staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      </if>
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.delegateHes != null">
+        delegate_hes = #{record.delegateHes,jdbcType=DECIMAL},
+      </if>
+      <if test="record.delegateLocked != null">
+        delegate_locked = #{record.delegateLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="record.delegateReleased != null">
+        delegate_released = #{record.delegateReleased,jdbcType=DECIMAL},
+      </if>
+      <if test="record.isHistory != null">
+        is_history = #{record.isHistory,jdbcType=INTEGER},
+      </if>
+      <if test="record.sequence != null">
+        `sequence` = #{record.sequence,jdbcType=BIGINT},
+      </if>
+      <if test="record.curDelegationBlockNum != null">
+        cur_delegation_block_num = #{record.curDelegationBlockNum,jdbcType=BIGINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update delegation
+    set delegate_addr = #{record.delegateAddr,jdbcType=VARCHAR},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      delegate_hes = #{record.delegateHes,jdbcType=DECIMAL},
+      delegate_locked = #{record.delegateLocked,jdbcType=DECIMAL},
+      delegate_released = #{record.delegateReleased,jdbcType=DECIMAL},
+      is_history = #{record.isHistory,jdbcType=INTEGER},
+      `sequence` = #{record.sequence,jdbcType=BIGINT},
+      cur_delegation_block_num = #{record.curDelegationBlockNum,jdbcType=BIGINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Delegation">
+    update delegation
+    <set>
+      <if test="delegateHes != null">
+        delegate_hes = #{delegateHes,jdbcType=DECIMAL},
+      </if>
+      <if test="delegateLocked != null">
+        delegate_locked = #{delegateLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="delegateReleased != null">
+        delegate_released = #{delegateReleased,jdbcType=DECIMAL},
+      </if>
+      <if test="isHistory != null">
+        is_history = #{isHistory,jdbcType=INTEGER},
+      </if>
+      <if test="sequence != null">
+        `sequence` = #{sequence,jdbcType=BIGINT},
+      </if>
+      <if test="curDelegationBlockNum != null">
+        cur_delegation_block_num = #{curDelegationBlockNum,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{nodeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Delegation">
+    update delegation
+    set delegate_hes = #{delegateHes,jdbcType=DECIMAL},
+      delegate_locked = #{delegateLocked,jdbcType=DECIMAL},
+      delegate_released = #{delegateReleased,jdbcType=DECIMAL},
+      is_history = #{isHistory,jdbcType=INTEGER},
+      `sequence` = #{sequence,jdbcType=BIGINT},
+      cur_delegation_block_num = #{curDelegationBlockNum,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{nodeId,jdbcType=VARCHAR}
+  </update>
+  <insert id="batchInsert" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into delegation
+    (delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released, 
+      is_history, `sequence`, cur_delegation_block_num, create_time, update_time)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
+        #{item.nodeId,jdbcType=VARCHAR}, #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
+        #{item.delegateReleased,jdbcType=DECIMAL}, #{item.isHistory,jdbcType=INTEGER}, 
+        #{item.sequence,jdbcType=BIGINT}, #{item.curDelegationBlockNum,jdbcType=BIGINT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+  <insert id="batchInsertSelective" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into delegation (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'delegate_addr'.toString() == column.value">
+          #{item.delegateAddr,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_block_num'.toString() == column.value">
+          #{item.stakingBlockNum,jdbcType=BIGINT}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_hes'.toString() == column.value">
+          #{item.delegateHes,jdbcType=DECIMAL}
+        </if>
+        <if test="'delegate_locked'.toString() == column.value">
+          #{item.delegateLocked,jdbcType=DECIMAL}
+        </if>
+        <if test="'delegate_released'.toString() == column.value">
+          #{item.delegateReleased,jdbcType=DECIMAL}
+        </if>
+        <if test="'is_history'.toString() == column.value">
+          #{item.isHistory,jdbcType=INTEGER}
+        </if>
+        <if test="'sequence'.toString() == column.value">
+          #{item.sequence,jdbcType=BIGINT}
+        </if>
+        <if test="'cur_delegation_block_num'.toString() == column.value">
+          #{item.curDelegationBlockNum,jdbcType=BIGINT}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+  <delete id="batchDeleteIsHistory">
+    <foreach collection="list" item="item" separator=";">
+      delete from delegation
+      where delegate_addr = #{item.delegateAddr,jdbcType=VARCHAR}
+      and staking_block_num = #{item.stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{item.nodeId,jdbcType=VARCHAR}
+      and is_history = 1
+    </foreach>
+  </delete>
+</mapper>

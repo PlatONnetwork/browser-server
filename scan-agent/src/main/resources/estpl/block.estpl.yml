@@ -1,0 +1,82 @@
+index_patterns:
+  - "*_block"
+settings:
+  index:
+    max_result_window: '1000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    tx_gas_limit:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    reward:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    tx_qty:
+      type: short
+    num:
+      type: long
+    gas_used:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    node_name:
+      type: text
+    s_qty:
+      type: short
+    tran_qty:
+      type: short
+    miner:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    p_qty:
+      type: short
+    tx_fee:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    gas_limit:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    cre_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    size:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    d_qty:
+      type: short
+    p_hash:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    extra:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    upd_time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    time:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    hash:
+      type: keyword
+    node_id:
+      type: keyword
+

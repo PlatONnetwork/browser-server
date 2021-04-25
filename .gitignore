@@ -1,0 +1,48 @@
+*/build
+HELP.md
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### TMP Files ###
+/scan-agent/logs
+/scan-api/logs
+/logs/*
+/apidoc/
+/out/*
+/build/*
+/out/ 
+/bin/
+
+apidoc.zip
+
+scan-agent/out
+scan-api/out
+scan-common/out
+scan-service/out
+/apolloCache/
+/adjust.log
+*info.md

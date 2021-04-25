@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>STOMP OVER SOCKJS</title>
+    <script src="https://cdn.bootcss.com/angular.js/1.5.6/angular.min.js"></script>
+    <script src="https://cdn.bootcss.com/sockjs-client/1.0.0/sockjs.min.js"></script>
+    <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        // websocket连接地址
+        var serverAddress = 'http://127.0.0.1:9061/browser-server/platon-websocket';
+        // 链ID
+        var chainId = '1';
+
+        var stompClient = null;
+        var app = angular.module('app', []);
+        app.controller('MainController', function ($rootScope, $scope, $http) {
+            $scope.data = {
+                //连接状态
+                connected: false,
+                //消息
+                message: '',
+                rows: []
+            };
+
+            //连接websocket
+            $scope.connect = function () {
+                var socket = new SockJS(serverAddress);
+                stompClient = Stomp.over(socket);
+                stompClient.heartbeat.outgoing = 10000;
+                stompClient.heartbeat.incoming = 10000;
+                stompClient.connect({}, function (frame) {
+                        $scope.data.connected = true;
+                        $scope.$apply();
+
+                    },
+                    function errorCallBack(error) {
+                        // 连接失败时（服务器响应 ERROR 帧）的回调方法
+                        console.log('连接失败【' + error + '】');
+                    });
+            };
+            // 关闭websocket
+            $scope.disconnect = function () {
+                if (stompClient != null) {
+                    stompClient.disconnect();
+                }
+                $scope.data.connected = false;
+            }
+
+            // ***************趋势图消息***************
+            // 初始数据
+             $scope.nodeInit = function () {
+                 stompClient.subscribe('/topic/block/statistic/new', function (msg) {
+                     console.log(JSON.stringify(msg.body));
+                 }, {'message': '434343434'});
+            }
+
+            var nodeSubHandle;
+            // 订阅消息
+            $scope.nodeSub = function () {
+                nodeSubHandle = stompClient.subscribe('/topic/block/statistic/new', function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                });
+            }
+            // 取消订阅
+            $scope.nodeUnsub = function () {
+                nodeSubHandle.unsubscribe();
+            }
+
+            // **************指标消息***************
+            // 初始数据
+            $scope.indexInit = function () {
+                stompClient.subscribe('/app/index/init?cid='+chainId, function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                }, {'message': '434343434'});
+            }
+
+            var indexSubHandle;
+            // 订阅消息
+            $scope.indexSub = function () {
+                indexSubHandle = stompClient.subscribe('/topic/index/new?cid='+chainId, function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                });
+            }
+            // 取消订阅
+            $scope.indexUnsub = function () {
+                indexSubHandle.unsubscribe();
+            }
+
+            // **************统计消息***************
+            // 初始数据
+            $scope.statisticInit = function () {
+                stompClient.subscribe('/topic/chain/statistic/new', function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                }, {'message': '434343434'});
+            }
+
+            var statisticSubHandle;
+            // 订阅消息
+            $scope.statisticSub = function () {
+                statisticSubHandle = stompClient.subscribe('/topic/chain/statistic/new', function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                });
+            }
+            // 取消订阅
+            $scope.statisticUnsub = function () {
+                statisticSubHandle.unsubscribe();
+            }
+
+            // **************区块消息***************
+            // 初始数据
+            $scope.blockInit = function () {
+                stompClient.subscribe('/app/block/init?cid='+chainId, function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                }, {'message': '434343434'});
+            }
+
+            var blockSubHandle;
+            // 订阅消息
+            $scope.blockSub = function () {
+                blockSubHandle = stompClient.subscribe('/topic/block/new?cid='+chainId, function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                });
+            }
+            // 取消订阅
+            $scope.blockUnsub = function () {
+                blockSubHandle.unsubscribe();
+            }
+
+            // **************交易消息***************
+            // 初始数据
+            $scope.tradeInit = function () {
+                stompClient.subscribe('/app/transaction/init?cid='+chainId, function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                }, {'message': '434343434'});
+            }
+
+            var tradeSubHandle;
+            // 订阅消息
+            $scope.tradeSub = function () {
+                tradeSubHandle = stompClient.subscribe('/topic/transaction/new?cid='+chainId, function (msg) {
+                    console.log(JSON.stringify(msg.body));
+                });
+            }
+            // 取消订阅
+            $scope.tradeUnsub = function () {
+                tradeSubHandle.unsubscribe();
+            }
+
+        });
+    </script>
+</head>
+<body ng-app="app" ng-controller="MainController">
+<br/>Websock连接<br/>
+<button type="button" ng-disabled="data.connected" ng-click="connect()">连接</button>
+<button type="button" ng-click="disconnect()" ng-disabled="!data.connected">断开</button>
+
+<br/>趋势图信息<br/>
+<button type="button" ng-click="nodeInit()">初始数据</button>
+<button type="button" ng-click="nodeSub()">订阅</button>
+<button type="button" ng-click="nodeUnsub()">取消订阅</button>
+
+<br/>指标信息<br/>
+<button type="button" ng-click="indexInit()">初始数据</button>
+<button type="button" ng-click="indexSub()">订阅</button>
+<button type="button" ng-click="indexUnsub()">取消订阅</button>
+
+<br/>统计信息<br/>
+<button type="button" ng-click="statisticInit()">初始数据</button>
+<button type="button" ng-click="statisticSub()">订阅</button>
+<button type="button" ng-click="statisticUnsub()">取消订阅</button>
+
+<br/>区块信息<br/>
+<button type="button" ng-click="blockInit()">初始数据</button>
+<button type="button" ng-click="blockSub()">订阅</button>
+<button type="button" ng-click="blockUnsub()">取消订阅</button>
+
+<br/>交易信息<br/>
+<button type="button" ng-click="tradeInit()">初始数据</button>
+<button type="button" ng-click="tradeSub()">订阅</button>
+<button type="button" ng-click="tradeUnsub()">取消订阅</button>
+</body>
+</html>
