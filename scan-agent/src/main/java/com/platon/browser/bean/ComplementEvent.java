@@ -4,16 +4,27 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class ComplementEvent {
+
+    /**
+     * 链路ID
+     */
+    private String traceId;
+
     // 区块信息
     private Block block;
+
     // 交易列表
     private List<Transaction> transactions;
+
     // 日志列表
     private List<NodeOpt> nodeOpts;
+
     // 奖励列表
     private List<DelegationReward> delegationRewards;
 
@@ -52,10 +63,11 @@ public class ComplementEvent {
     /**
      * 释放对象引用
      */
-    public void releaseRef(){
-        block=null;
-        transactions=null;
-        nodeOpts=null;
-        delegationRewards=null;
+    public void releaseRef() {
+        block = null;
+        transactions = null;
+        nodeOpts = null;
+        delegationRewards = null;
     }
+
 }

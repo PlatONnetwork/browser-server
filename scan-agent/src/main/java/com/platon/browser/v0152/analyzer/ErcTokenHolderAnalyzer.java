@@ -1,11 +1,11 @@
 package com.platon.browser.v0152.analyzer;
 
-import com.platon.bech32.Bech32;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
 import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +33,11 @@ public class ErcTokenHolderAnalyzer {
             String userAddress,
             List<TokenHolder> insertOrUpdate
     ) {
-        String hex = Bech32.addressDecodeHex(userAddress);
         // 零地址不需要創建holder
-        if ("0x0000000000000000000000000000000000000000".equals(hex))
+        if (AddressUtil.isAddrZero(userAddress)) {
+            log.warn("该地址[{}]为0地址，不创建token holder",userAddress);
             return;
+        }
         Date date = new Date();
         TokenHolderKey key = new TokenHolderKey();
         key.setTokenAddress(tokenAddress);
@@ -52,6 +53,8 @@ public class ErcTokenHolderAnalyzer {
         } else {
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }
+        //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721所有tokenId的交易总数
+        log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]",tokenHolder.getTokenAddress(),tokenHolder.getAddress(),tokenHolder.getTokenTxQty());
         tokenHolder.setUpdateTime(date);
         insertOrUpdate.add(tokenHolder);
     }

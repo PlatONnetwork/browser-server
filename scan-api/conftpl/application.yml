@@ -8,7 +8,7 @@ server:
 #Spring应用配置
 spring:
   profiles.active: test
-  application.name: browser-api
+  application.name: scan-api
   session.timeout: 1800  #以秒为单位
   #国际化配置
   messages.basename: messages

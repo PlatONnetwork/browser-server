@@ -7,11 +7,11 @@ import com.platon.browser.dao.entity.TokenInventoryKey;
 import com.platon.browser.dao.mapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,11 +28,6 @@ public class ErcTokenInventoryAnalyzer {
 
     @Resource
     private CustomTokenInventoryMapper customTokenInventoryMapper;
-
-    /**
-     * 0地址
-     */
-    private static final String TO_ADDR_ZERO = "0x0000000000000000000000000000000000000000";
 
     /**
      * 解析Token库存
@@ -66,7 +61,7 @@ public class ErcTokenInventoryAnalyzer {
                 tokenInventory.setUpdateTime(date);
                 insertOrUpdate.add(tokenInventory);
                 // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
-                if (StrUtil.isNotBlank(tx.getTo()) && TO_ADDR_ZERO.equalsIgnoreCase(tx.getTo())) {
+                if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {
                     TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
                     tokenInventoryKey.setTokenId(tx.getValue());
                     tokenInventoryKey.setTokenAddress(tx.getContract());

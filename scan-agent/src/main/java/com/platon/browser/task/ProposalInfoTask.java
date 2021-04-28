@@ -48,7 +48,7 @@ public class ProposalInfoTask {
      *
      */
     @Scheduled(cron = "0/15  * * * * ?")
-    public void cron () {
+    public void proposalInfo () {
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }

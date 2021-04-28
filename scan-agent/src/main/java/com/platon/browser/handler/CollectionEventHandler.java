@@ -23,6 +23,7 @@ import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.statistic.StatisticService;
 import com.platon.browser.service.ppos.PPOSService;
 import com.platon.browser.utils.BakDataDeleteUtil;
+import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.retry.annotation.Retryable;
@@ -44,22 +45,31 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
     private PPOSService pposService;
+
     @Resource
     private BlockService blockService;
+
     @Resource
     private StatisticService statisticService;
+
     @Resource
     private ComplementEventPublisher complementEventPublisher;
+
     @Resource
     private NetworkStatCache networkStatCache;
+
     @Resource
     private NOptBakMapper nOptBakMapper;
+
     @Resource
     private CustomNOptBakMapper customNOptBakMapper;
+
     @Resource
     private TxBakMapper txBakMapper;
+
     @Resource
     private CustomTxBakMapper customTxBakMapper;
+
     @Resource
     private AddressCache addressCache;
 
@@ -70,16 +80,24 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private long transactionId = 0;
 
     private long txDeleteBatchCount = 0;
+
     private long optDeleteBatchCount = 0;
 
     @Transactional
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
-        long startTime = System.currentTimeMillis();
+        surroundExec(event, sequence, endOfBatch);
+    }
 
-        log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
-            Thread.currentThread().getStackTrace()[1].getMethodName(), event.getBlock().getNum(),
-            event.getTransactions().size(), sequence, endOfBatch);
+    private void surroundExec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
+        CommonUtil.putTraceId(event.getTraceId());
+        long startTime = System.currentTimeMillis();
+        exec(event, sequence, endOfBatch);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        CommonUtil.removeTraceId();
+    }
+
+    private void exec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
 
         // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 START
         Map<String, Receipt> receiptMap = event.getBlock().getReceiptMap();
@@ -95,7 +113,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 END
 
 
-
         // 使用已入库的交易数量初始化交易ID初始值
         if (transactionId == 0)
             transactionId = networkStatCache.getNetworkStat().getTxQty();
@@ -107,7 +124,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             for (Transaction tx : transactions) {
                 tx.setId(++transactionId);
             }
-            
+
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockService.analyze(event);
             // 根据交易解析出业务参数
@@ -119,7 +136,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
             complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1,
-                txAnalyseResult.getDelegationRewardList());
+                    txAnalyseResult.getDelegationRewardList(), event.getTraceId());
 
             txDeleteBatchCount++;
             optDeleteBatchCount++;
@@ -167,14 +184,13 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             log.error("", e);
             throw e;
         } finally {
-            log.info("清除地址缓存【addressCache】数据【{}】条",addressCache.getAll().size());
+            log.info("清除地址缓存【addressCache】数据【{}】条", addressCache.getAll().size());
             // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
             // 因为地址缓存是当前事务处理的增量缓存，在 StatisticsAddressAnalyzer 进行数据合并入库时：
             // 1、如果出现异常，由于事务保证，当前事务统计的地址数据不会入库mysql，此时应该清空增量缓存，等待下次重试时重新生成缓存
             // 2、如果正常结束，当前事务统计的地址数据会入库mysql，此时应该清空增量缓存
             addressCache.cleanAll();
         }
-
-        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
+
 }
