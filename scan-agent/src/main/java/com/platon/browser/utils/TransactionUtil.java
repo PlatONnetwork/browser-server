@@ -138,7 +138,7 @@ public class TransactionUtil {
      * @throws ContractInvokeException
      * @throws BlankResponseException
      */
-    public static List<Transaction> processVirtualTx(CollectionBlock block, SpecialApi specialApi,
+    public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi,
         PlatOnClient platOnClient, CollectionTransaction contractInvokeTx, Receipt contractInvokeTxReceipt,
         Logger logger) throws ContractInvokeException, BlankResponseException {
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {

@@ -1,11 +1,11 @@
 package com.platon.browser.bootstrap;
 
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;

@@ -1,11 +1,11 @@
 package com.platon.browser.bootstrap;
 
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.publisher.AbstractPublisher;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

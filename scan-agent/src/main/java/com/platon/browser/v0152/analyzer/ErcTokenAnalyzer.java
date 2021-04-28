@@ -10,6 +10,7 @@ import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.CustomTokenMapper;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.v0152.bean.ErcContractId;
@@ -159,7 +160,7 @@ public class ErcTokenAnalyzer {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/4/15
      */
-    public void resolveTx(CollectionBlock collectionBlock, CollectionTransaction tx, Receipt receipt) {
+    public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
 
         // 过滤交易回执日志，地址不能为空且在token缓存里的
         List<Log> tokenLogs = receipt.getLogs().stream()

@@ -1,11 +1,11 @@
 package com.platon.browser.handler;
 
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.BlockEvent;
 import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;

@@ -1,7 +1,5 @@
 package com.platon.browser.analyzer;
 
-import cn.hutool.json.JSONUtil;
-import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.bean.Receipt;
@@ -10,6 +8,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.decoder.TxInputDecodeResult;
 import com.platon.browser.decoder.TxInputDecodeUtil;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -80,7 +79,7 @@ public class TransactionAnalyzer {
         }
     }
 
-    public CollectionTransaction analyze(CollectionBlock collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
+    public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         CollectionTransaction result = CollectionTransaction.newInstance()
                 .updateWithBlock(collectionBlock)
                 .updateWithRawTransaction(rawTransaction);

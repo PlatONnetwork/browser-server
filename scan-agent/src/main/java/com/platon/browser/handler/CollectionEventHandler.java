@@ -1,7 +1,10 @@
 package com.platon.browser.handler;
 
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.CollectionTransaction;
+import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.TxAnalyseResult;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
@@ -30,6 +33,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 区块事件处理器
@@ -59,6 +63,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     @Resource
     private AddressCache addressCache;
 
+    @Resource
+    private TransactionAnalyzer transactionAnalyzer;
+
     // 交易序号id
     private long transactionId = 0;
 
@@ -73,6 +80,21 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
             Thread.currentThread().getStackTrace()[1].getMethodName(), event.getBlock().getNum(),
             event.getTransactions().size(), sequence, endOfBatch);
+
+        // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 START
+        Map<String, Receipt> receiptMap = event.getBlock().getReceiptMap();
+        List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = event.getBlock().getOriginTransactions();
+        for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
+            CollectionTransaction transaction = transactionAnalyzer.analyze(event.getBlock(), tr, receiptMap.get(tr.getHash()));
+            // 把解析好的交易添加到当前区块的交易列表
+            event.getBlock().getTransactions().add(transaction);
+            // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
+            event.getBlock().setErc20TxQty(event.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
+            event.getBlock().setErc721TxQty(event.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
+        }
+        // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 END
+
+
 
         // 使用已入库的交易数量初始化交易ID初始值
         if (transactionId == 0)

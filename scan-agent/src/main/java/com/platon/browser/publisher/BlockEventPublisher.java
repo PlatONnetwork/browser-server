@@ -1,5 +1,6 @@
 package com.platon.browser.publisher;
 
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
@@ -7,7 +8,6 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.bean.BlockEvent;
 import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.handler.BlockEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 区块事件生产者
