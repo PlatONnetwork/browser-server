@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
@@ -13,7 +12,9 @@ import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.CustomTokenMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.exception.TokenException;
 import com.platon.browser.utils.AddressUtil;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.bean.ErcTxInfo;
@@ -65,6 +66,7 @@ public class ErcTokenAnalyzer {
      */
     public ErcToken resolveToken(String contractAddress) {
         ErcToken token = new ErcToken();
+        token.setTypeEnum(ErcTypeEnum.UNKNOWN);
         try {
             token.setAddress(contractAddress);
             ErcContractId contractId = ercDetectService.getContractId(contractAddress);
@@ -93,6 +95,8 @@ public class ErcTokenAnalyzer {
             if (token.getTypeEnum() != ErcTypeEnum.UNKNOWN) {
                 // 入库ERC721或ERC20 Token记录
                 token.setTokenTxQty(0);
+                // 检查token是否合法
+                checkToken(token);
                 customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token), Token.Column.values());
                 ercCache.tokenCache.put(token.getAddress(), token);
                 log.info("创建token[{}]入库，并加入到地址缓存", JSONUtil.toJsonStr(token));
@@ -100,10 +104,61 @@ public class ErcTokenAnalyzer {
                 log.error("该token地址[{}]无法识别该类型[{}]", token.getAddress(), token.getTypeEnum());
             }
         } catch (Exception e) {
-            token.setTypeEnum(ErcTypeEnum.UNKNOWN);
-            log.error("解析Token异常", e);
+            log.error("合约创建,解析Token异常", e);
         }
         return token;
+    }
+
+    /**
+     * token校验---根据mysql定义字段来约束校验
+     *
+     * @param token 合约
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/29
+     */
+    private void checkToken(ErcToken token) {
+        // 1.校验地址长度，约束为64位
+        int tokenAddressLength = CommonUtil.ofNullable(() -> token.getAddress().length()).orElse(0);
+        if (tokenAddressLength > 64) {
+            throw new TokenException("token地址长度过长", token);
+        }
+        // 2.校验合约名称，可以为null，约束为64
+        if (StrUtil.isNotEmpty(token.getName())) {
+            // 校验合约名称长度，默认为64
+            if (CommonUtil.ofNullable(() -> token.getName().length()).orElse(0) > 64) {
+                String name = StrUtil.fillAfter(StrUtil.sub(token.getName(), 0, 61), '.', 64);
+                log.warn("该token[{}]的名称过长（默认64位）,将自动截取,旧值[{}],新值[{}]", token.getAddress(), token.getName(), name);
+                token.setName(name);
+            }
+        }
+        // 3.校验合约符号，可以为nul，约束为64位
+        if (StrUtil.isNotEmpty(token.getSymbol())) {
+            if (CommonUtil.ofNullable(() -> token.getSymbol().length()).orElse(0) > 64) {
+                throw new TokenException("token合约符号过长", token);
+            }
+        }
+        // 4.校验供应总量，可以为nul，约束为decimal(64,0)
+        if (ObjectUtil.isNotNull(token.getTotalSupply())) {
+            // 转成字符串在处理
+            String[] totalSupply = StrUtil.split(CommonUtil.ofNullable(() -> token.getTotalSupply().toString()).orElse(""), ".");
+            // 整数部分不能超过64位
+            if (CommonUtil.ofNullable(() -> totalSupply[0].length()).orElse(0) > 64) {
+                throw new TokenException("token供应总量过大,仅支持整数位数64位", token);
+            }
+            if (totalSupply.length > 1) {
+                // 不能有小数
+                if (CommonUtil.ofNullable(() -> totalSupply[1].length()).orElse(0) > 0) {
+                    throw new TokenException("token供应总量不支持小数", token);
+                }
+            }
+        }
+        // 5.校验合约精度，可以为null，约束为11位
+        if (ObjectUtil.isNotNull(token.getDecimal())) {
+            if (CommonUtil.ofNullable(() -> token.getDecimal().toString().length()).orElse(0) > 11) {
+                throw new TokenException("token合约精度过长，仅支持11位", token);
+            }
+        }
     }
 
     /**

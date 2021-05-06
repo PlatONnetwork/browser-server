@@ -1,5 +1,6 @@
 package com.platon.browser.analyzer;
 
+import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.bean.Receipt;
@@ -108,33 +109,35 @@ public class TransactionAnalyzer {
         ComplementInfo ci = new ComplementInfo();
 
         //新创建合约处理
-        receipt.getContractCreated().forEach(contract -> {
-            // solidity 类型 erc20 或 721 token检测及入口
-            ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress());
-            // solidity or wasm
-            TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
-            // 内存中更新地址类型
-            ContractTypeEnum contractTypeEnum;
-            if (ercToken.getTypeEnum() == ErcTypeEnum.ERC20
-                    && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
-                contractTypeEnum = ContractTypeEnum.ERC20_EVM;
-            } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC721
-                    && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
-                contractTypeEnum = ContractTypeEnum.ERC721_EVM;
-            } else if (txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
-                contractTypeEnum = ContractTypeEnum.WASM;
-            } else {
-                contractTypeEnum = ContractTypeEnum.EVM;
-            }
-            GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
-            log.info("当前合约[{}]的合约类型为[{}]", contract.getAddress(), contractTypeEnum);
-            if (!AddressUtil.isAddrZero(contract.getAddress())) {
-                // 补充address
-                addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
-            } else {
-                log.error("该地址{}是0地址,不加载到地址缓存中", contract.getAddress());
-            }
-        });
+        if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
+            receipt.getContractCreated().forEach(contract -> {
+                // solidity 类型 erc20 或 721 token检测及入口
+                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress());
+                // solidity or wasm
+                TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
+                // 内存中更新地址类型
+                ContractTypeEnum contractTypeEnum;
+                if (ercToken.getTypeEnum() == ErcTypeEnum.ERC20
+                        && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
+                    contractTypeEnum = ContractTypeEnum.ERC20_EVM;
+                } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC721
+                        && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
+                    contractTypeEnum = ContractTypeEnum.ERC721_EVM;
+                } else if (txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
+                    contractTypeEnum = ContractTypeEnum.WASM;
+                } else {
+                    contractTypeEnum = ContractTypeEnum.EVM;
+                }
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
+                log.info("当前合约[{}]的合约类型为[{}]", contract.getAddress(), contractTypeEnum);
+                if (!AddressUtil.isAddrZero(contract.getAddress())) {
+                    // 补充address
+                    addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
+                } else {
+                    log.error("该地址{}是0地址,不加载到地址缓存中", contract.getAddress());
+                }
+            });
+        }
 
         // 处理交易信息
         String inputWithoutPrefix = StringUtils.isNotBlank(result.getInput()) ? result.getInput().replace("0x", "") : "";

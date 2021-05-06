@@ -119,8 +119,7 @@ public class ErcServiceImpl {
     public String getTokenURI(String contractAddress, BigInteger tokenId) {
         String tokenURI = "";
         try {
-            ErcContractId ercContractId = ercDetectService.getContractId(contractAddress);
-            ErcContract ercContract = getErcContract(contractAddress, ercContractId.getTypeEnum());
+            ErcContract ercContract = getErcContract(contractAddress, ErcTypeEnum.ERC721);
             if (ObjectUtil.isNotNull(ercContract)) {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }

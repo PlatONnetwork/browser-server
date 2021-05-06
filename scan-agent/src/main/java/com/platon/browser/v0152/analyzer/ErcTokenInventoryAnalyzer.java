@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
+import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,34 +39,42 @@ public class ErcTokenInventoryAnalyzer {
         Date date = new Date();
         if (CollUtil.isNotEmpty(txList)) {
             txList.forEach(tx -> {
-                TokenInventoryKey key = new TokenInventory();
-                key.setTokenAddress(tx.getContract());
-                key.setTokenId(tx.getValue());
-                TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(key);
-                if (tokenInventory == null) {
-                    tokenInventory = new TokenInventory();
-                    tokenInventory.setTokenAddress(key.getTokenAddress());
-                    tokenInventory.setTokenId(key.getTokenId());
-                    tokenInventory.setCreateTime(date);
-                    tokenInventory.setTokenTxQty(1);
+                String tokenAddress = tx.getContract();
+                String tokenId = tx.getValue();
+                // 校验tokenid长度是否符合入库标准
+                if (CommonUtil.ofNullable(() -> tokenId.length()).orElse(0) > 128) {
+                    // 仅打印日志而不能抛出异常来阻塞流程
+                    log.error("该token[{}]不符合合约标准，tokenId[{}]过长，仅支持128位", tokenAddress, tokenId);
                 } else {
-                    tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty() + 1);
-                }
-                if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {
-                    int tokenOwnerTxQty = tokenInventory.getTokenOwnerTxQty() == null ? 0 : tokenInventory.getTokenOwnerTxQty();
-                    tokenInventory.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
-                } else {
-                    tokenInventory.setTokenOwnerTxQty(1);
-                }
-                tokenInventory.setOwner(tx.getTo());
-                tokenInventory.setUpdateTime(date);
-                insertOrUpdate.add(tokenInventory);
-                // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
-                if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {
-                    TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
-                    tokenInventoryKey.setTokenId(tx.getValue());
-                    tokenInventoryKey.setTokenAddress(tx.getContract());
-                    delTokenInventory.add(tokenInventoryKey);
+                    TokenInventoryKey key = new TokenInventory();
+                    key.setTokenAddress(tokenAddress);
+                    key.setTokenId(tokenId);
+                    TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(key);
+                    if (tokenInventory == null) {
+                        tokenInventory = new TokenInventory();
+                        tokenInventory.setTokenAddress(key.getTokenAddress());
+                        tokenInventory.setTokenId(key.getTokenId());
+                        tokenInventory.setCreateTime(date);
+                        tokenInventory.setTokenTxQty(1);
+                    } else {
+                        tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty() + 1);
+                    }
+                    if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {
+                        int tokenOwnerTxQty = tokenInventory.getTokenOwnerTxQty() == null ? 0 : tokenInventory.getTokenOwnerTxQty();
+                        tokenInventory.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
+                    } else {
+                        tokenInventory.setTokenOwnerTxQty(1);
+                    }
+                    tokenInventory.setOwner(tx.getTo());
+                    tokenInventory.setUpdateTime(date);
+                    insertOrUpdate.add(tokenInventory);
+                    // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
+                    if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {
+                        TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
+                        tokenInventoryKey.setTokenId(tx.getValue());
+                        tokenInventoryKey.setTokenAddress(tx.getContract());
+                        delTokenInventory.add(tokenInventoryKey);
+                    }
                 }
             });
             if (!insertOrUpdate.isEmpty()) {

@@ -156,23 +156,19 @@ public class ErcDetectService {
     }
 
     public ErcContractId getContractId(String contractAddress) {
-        ErcContractId contractId = new ErcContractId();
-        try {
-            // 先检测是否支持ERC721
-            boolean isErc721 = isSupportErc721(contractAddress);
-            if (isErc721) {
-                // 取ERC721合约信息
-                contractId = getErc721ContractId(contractAddress);
-            } else {
-                // 不是ERC721，则检测是否是ERC20
-                contractId = getErc20ContractId(contractAddress);
-                if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
-                    // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
-                    contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
-                }
+        // 先检测是否支持ERC721
+        boolean isErc721 = isSupportErc721(contractAddress);
+        ErcContractId contractId;
+        if (isErc721) {
+            // 取ERC721合约信息
+            contractId = getErc721ContractId(contractAddress);
+        } else {
+            // 不是ERC721，则检测是否是ERC20
+            contractId = getErc20ContractId(contractAddress);
+            if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
+                // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
+                contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
             }
-        } catch (Exception e) {
-            log.error("获取ContractId异常", e);
         }
         return contractId;
     }

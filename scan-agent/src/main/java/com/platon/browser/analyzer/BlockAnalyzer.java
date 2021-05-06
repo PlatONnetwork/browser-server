@@ -1,22 +1,20 @@
 package com.platon.browser.analyzer;
 
+import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.ReceiptResult;
-import com.platon.protocol.core.methods.response.PlatonBlock;
-import com.platon.protocol.core.methods.response.Transaction;
-import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.NodeUtil;
+import com.platon.protocol.core.methods.response.PlatonBlock;
+import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -74,20 +72,6 @@ public class BlockAnalyzer {
         }
         result.setOriginTransactions(originTransactions);
 
-// 把分析交易的操作延后到CollectionEventHandler中处理
-//        if (receipt.getResult() != null && !receipt.getResult().isEmpty()) {
-//            Map<String, Receipt> receiptMap = receipt.getMap();
-//            for (PlatonBlock.TransactionResult tr : transactionResults) {
-//                PlatonBlock.TransactionObject to = (PlatonBlock.TransactionObject) tr.get();
-//                Transaction rawTransaction = to.get();
-//                CollectionTransaction transaction = transactionAnalyzer.analyze(result, rawTransaction, receiptMap.get(rawTransaction.getHash()));
-//                // 把解析好的交易添加到当前区块的交易列表
-//                result.getTransactions().add(transaction);
-//                // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
-//                result.setErc20TxQty(result.getErc20TxQty() + transaction.getErc20TxList().size());
-//                result.setErc721TxQty(result.getErc721TxQty() + transaction.getErc721TxList().size());
-//            }
-//        }
         return result;
     }
 

@@ -597,7 +597,6 @@ public class ErcTokenUpdateTask {
                                 if (response.code() == 200) {
                                     resp = response.body().string();
                                     TokenInventory newTi = JSONUtil.toBean(resp, TokenInventory.class);
-                                    newTi.setUpdateTime(DateUtil.date());
                                     newTi.setTokenId(inventory.getTokenId());
                                     newTi.setTokenAddress(inventory.getTokenAddress());
                                     boolean changed = false;
@@ -615,7 +614,6 @@ public class ErcTokenUpdateTask {
                                         changed = true;
                                     }
                                     if (changed) {
-                                        inventory.setUpdateTime(new Date());
                                         updateParams.add(inventory);
                                     }
                                 }

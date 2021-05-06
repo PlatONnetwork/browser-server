@@ -41,10 +41,7 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -299,6 +296,7 @@ public class ErcTxService {
             return result;
         }
         List<QueryTokenHolderListResp> respList = new ArrayList<>();
+        Map<String, Long> map = ids.getResult().stream().collect(Collectors.groupingBy(CustomTokenHolder::getAddress, Collectors.counting()));
         ids.getResult().forEach(tokenHolder -> {
             QueryTokenHolderListResp resp = new QueryTokenHolderListResp();
             resp.setAddress(tokenHolder.getAddress());
@@ -323,8 +321,16 @@ public class ErcTxService {
                                     .toPlainString() + "%"
                     );
                 } else {
-                    // 总供应量小于等于0，则占比设置为0%
-                    resp.setPercent("0.0000%");
+                    // 总供应量小于等于0,则计算每个持有者数占总数的比例
+                    int holderNum = map.get(tokenHolder.getAddress()).intValue();
+                    int total = ids.getResult().size();
+                    String percent = new BigDecimal(holderNum)
+                            .divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100))
+                            .setScale(decimal, RoundingMode.HALF_UP)
+                            .stripTrailingZeros()
+                            .toPlainString() + "%";
+                    resp.setPercent(percent);
                 }
             } else {
                 resp.setBalance(originBalance);

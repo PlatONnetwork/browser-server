@@ -53,7 +53,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
             log.info("当前区块[{}]有[{}]笔交易", rawBlock.getNumber(), CommonUtil.ofNullable(() -> rawBlock.getTransactions().size()).orElse(0));
-            // 分析区块 & 区块内的交易
+            // 分析区块
             CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
             collectionEventPublisher.publish(block, block.getTransactions(), event.getEpochMessage(), event.getTraceId());
