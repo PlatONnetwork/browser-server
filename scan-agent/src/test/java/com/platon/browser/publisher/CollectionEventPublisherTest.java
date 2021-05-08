@@ -5,6 +5,7 @@ import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.utils.CommonUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,13 +48,13 @@ public class CollectionEventPublisherTest extends AgentTestBase {
         EpochMessage epochMessage = EpochMessage.newInstance();
         Block block = blockList.get(0);
         List<Transaction> transactions = new ArrayList<>(transactionList);
-        target.publish(block, transactions, epochMessage);
+        target.publish(block, transactions, epochMessage, CommonUtil.createTraceId());
         target.getRingBufferSize();
         target.info();
         target.getPublisherMap();
         target.register(target.getClass().getSimpleName(), target);
         target.unregister(target.getClass().getSimpleName());
-        verify(target, times(1)).publish(any(), any(), any());
+        verify(target, times(1)).publish(any(), any(), any(),CommonUtil.createTraceId());
     }
 
 }

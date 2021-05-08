@@ -47,10 +47,10 @@ public class ProposalDetailTaskTest extends AgentTestData {
         Proposal proposal = proposalList.get(0);
         proposal.setType(CustomProposal.TypeEnum.CANCEL.getCode());
         when(proposalMapper.selectByPrimaryKey(any())).thenReturn(proposal);
-        target.cron();
-        verify(target, times(1)).cron();
+        target.proposalDetail();
+        verify(target, times(1)).proposalDetail();
 
         doThrow(new RuntimeException("")).when(proposalMapper).selectByPrimaryKey(any());
-        target.cron();
+        target.proposalDetail();
     }
 }

@@ -50,10 +50,10 @@ public class NodeUpdateTaskTest extends AgentTestData {
     @Test
     public void test() {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
-        target.cron();
-        verify(target, times(1)).cron();
+        target.nodeUpdate();
+        verify(target, times(1)).nodeUpdate();
 
         doThrow(new RuntimeException("")).when(chainConfig).getKeyBase();
-        target.cron();
+        target.nodeUpdate();
     }
 }

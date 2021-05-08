@@ -41,10 +41,10 @@ public class VersionUpdateTaskTest extends AgentTestData {
     @Test
     public void test() {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
-        target.cron();
-        verify(target, times(1)).cron();
+        target.stakingMigrate();
+        verify(target, times(1)).stakingMigrate();
 
         doThrow(new RuntimeException("")).when(stakingMapper).selectByExample(any());
-        target.cron();
+        target.stakingMigrate();
     }
 }

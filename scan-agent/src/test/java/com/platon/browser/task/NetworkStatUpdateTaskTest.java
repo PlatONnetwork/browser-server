@@ -71,15 +71,15 @@ public class NetworkStatUpdateTaskTest extends AgentTestData {
         networkStatistics.setStakingValue(BigDecimal.TEN);
         networkStatistics.setTotalValue(BigDecimal.TEN);
         when(statisticBusinessMapper.getNetworkStatisticsFromNode()).thenReturn(networkStatistics);
-        target.cron();
+        target.networkStatUpdate();
         networkStatistics.setStakingValue(null);
         networkStatistics.setTotalValue(null);
         when(statisticBusinessMapper.getNetworkStatisticsFromNode()).thenReturn(networkStatistics);
-        target.cron();
+        target.networkStatUpdate();
 
-        verify(target, times(2)).cron();
+        verify(target, times(2)).networkStatUpdate();
 
         doThrow(new RuntimeException("")).when(networkStatCache).getNetworkStat();
-        target.cron();
+        target.networkStatUpdate();
     }
 }

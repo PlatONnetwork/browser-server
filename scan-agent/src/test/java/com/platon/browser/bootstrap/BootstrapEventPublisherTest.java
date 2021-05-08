@@ -5,6 +5,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.config.DisruptorConfig;
+import com.platon.browser.utils.CommonUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +49,7 @@ public class BootstrapEventPublisherTest extends AgentTestBase {
         target.init();
         ShutdownCallback shutdownCallback = new ShutdownCallback();
         shutdownCallback.setEndBlockNum(7000L);
-        target.publish(getBlockAsync(7000L), getReceiptAsync(7000L), shutdownCallback);
+        target.publish(getBlockAsync(7000L), getReceiptAsync(7000L), shutdownCallback, CommonUtil.createTraceId());
 
         target.shutdown();
         Disruptor<BootstrapEvent> disruptor = target.getDisruptor();

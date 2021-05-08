@@ -160,9 +160,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                             CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
                             erc20Size.getSum(),
                             erc721Size.getSum(),
-                            transferTxSize,
-                            pposTxSize,
-                            virtualTransactionSize
+                            transferTxSize.getSum(),
+                            pposTxSize.getSum(),
+                            virtualTransactionSize.getSum()
                     );
                 });
             }

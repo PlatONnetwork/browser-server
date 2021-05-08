@@ -32,7 +32,7 @@ public class RingBufferMonitorTaskTest extends AgentTestData {
     @Test
     public void test() {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
-        target.cron();
-        verify(target, times(1)).cron();
+        target.ringBufferMonitor();
+        verify(target, times(1)).ringBufferMonitor();
     }
 }

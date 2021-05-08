@@ -6,6 +6,7 @@ import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.handler.GasEstimateEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.utils.CommonUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,13 +54,13 @@ public class GasEstimateEventPublisherTest extends AgentTestBase {
         Block block = blockList.get(0);
         List<Transaction> transactions = new ArrayList<>(transactionList);
 
-        target.publish(1l, Collections.emptyList());
+        target.publish(1l, Collections.emptyList(), CommonUtil.createTraceId());
         target.getRingBufferSize();
         target.info();
         target.getPublisherMap();
         target.register(target.getClass().getSimpleName(), target);
         target.unregister(target.getClass().getSimpleName());
-        verify(target, times(1)).publish(any(), any());
+        verify(target, times(1)).publish(any(), any(),CommonUtil.createTraceId());
     }
 
 }
