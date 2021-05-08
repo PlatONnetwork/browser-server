@@ -44,7 +44,7 @@ public class NodeUpdateTask {
 	private SpecialApi specialApi;
 	
     @Scheduled(cron = "0/5  * * * * ?")
-    public void cron () {
+    public void nodeUpdate () {
     	// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
 		try {

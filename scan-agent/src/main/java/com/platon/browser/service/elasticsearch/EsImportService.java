@@ -22,16 +22,22 @@ import java.util.concurrent.Executors;
 @Slf4j
 @Service
 public class EsImportService {
+
     @Resource
     private EsBlockService esBlockService;
+
     @Resource
     private EsTransactionService esTransactionService;
+
     @Resource
     private EsNodeOptService esNodeOptService;
+
     @Resource
     private EsDelegateRewardService esDelegateRewardService;
+
     @Resource
     private EsErc20TxService esErc20TxService;
+
     @Resource
     private EsErc721TxService esErc721TxService;
 
@@ -61,7 +67,7 @@ public class EsImportService {
                     Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size(),
                     nodeOpts.size(), delegationRewards.size(), erc20TxList.size(), erc721TxList.size());
         }
-        try{
+        try {
             long startTime = System.currentTimeMillis();
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
 
@@ -73,9 +79,9 @@ public class EsImportService {
             submit(esErc721TxService, erc721TxList, latch);
             latch.await();
 
-            log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
-        }catch (Exception e){
-            log.error("",e);
+            log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        } catch (Exception e) {
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
     }
@@ -83,11 +89,12 @@ public class EsImportService {
     /**
      * 取erc20交易列表
      */
-    public Set<ErcTx> getErc20TxList(Set<Transaction> transactions){
+    public Set<ErcTx> getErc20TxList(Set<Transaction> transactions) {
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if(tx.getErc20TxList().isEmpty())continue;
+                if (tx.getErc20TxList().isEmpty())
+                    continue;
                 result.addAll(tx.getErc20TxList());
             }
         }
@@ -97,14 +104,16 @@ public class EsImportService {
     /**
      * 取erc721交易列表
      */
-    public Set<ErcTx> getErc721TxList(Set<Transaction> transactions){
+    public Set<ErcTx> getErc721TxList(Set<Transaction> transactions) {
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (tx.getErc721TxList().isEmpty()) continue;
+                if (tx.getErc721TxList().isEmpty())
+                    continue;
                 result.addAll(tx.getErc721TxList());
             }
         }
         return result;
     }
+
 }

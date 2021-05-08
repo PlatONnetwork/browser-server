@@ -42,7 +42,7 @@ public class NetworkStatUpdateTask {
 	private NodeMapper nodeMapper;
 	
     @Scheduled(cron = "0/1  * * * * ?")
-    public void cron() {
+    public void networkStatUpdate() {
 		// 只有程序正常运行才执行任务
 		if(AppStatusUtil.isRunning()) start();
     }

@@ -27,32 +27,35 @@ public class StakingMigrateTask {
 
     @Resource
     private StakingMapper stakingMapper;
+
     @Resource
     private CustomStakingHistoryMapper customStakingHistoryMapper;
 
     @Scheduled(cron = "0/30  * * * * ?")
-    void cron(){
+    void stakingMigrate() {
         // 只有程序正常运行才执行任务
-        if(AppStatusUtil.isRunning()) start();
+        if (AppStatusUtil.isRunning())
+            start();
     }
 
-    protected void start () {
+    protected void start() {
         try {
             StakingExample stakingExample = new StakingExample();
             stakingExample.createCriteria().andStatusEqualTo(3);
-            List <Staking> stakingList = stakingMapper.selectByExample(stakingExample);
-            Set <StakingHistory> stakingHistoryList = new HashSet <>();
-            if(!stakingList.isEmpty()){
+            List<Staking> stakingList = stakingMapper.selectByExample(stakingExample);
+            Set<StakingHistory> stakingHistoryList = new HashSet<>();
+            if (!stakingList.isEmpty()) {
                 stakingList.forEach(staking -> {
-                   StakingHistory stakingHistory = new StakingHistory();
-                   BeanUtils.copyProperties(staking,stakingHistory);
+                    StakingHistory stakingHistory = new StakingHistory();
+                    BeanUtils.copyProperties(staking, stakingHistory);
                     stakingHistoryList.add(stakingHistory);
                 });
                 customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
             log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
         }
     }
+
 }

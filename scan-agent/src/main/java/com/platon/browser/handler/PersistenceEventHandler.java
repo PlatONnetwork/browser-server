@@ -1,5 +1,6 @@
 package com.platon.browser.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bean.PersistenceEvent;
 import com.platon.browser.cache.NetworkStatCache;
@@ -12,6 +13,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.utils.BakDataDeleteUtil;
+import com.platon.browser.utils.CommonUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
@@ -19,9 +21,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 区块事件处理器
@@ -32,10 +33,13 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     @Resource
     private EsImportService esImportService;
+
     @Resource
     private RedisImportService redisImportService;
+
     @Resource
     private NetworkStatCache networkStatCache;
+
     @Resource
     private DisruptorConfig disruptorConfig;
 
@@ -44,19 +48,34 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private volatile long maxBlockNumber;
 
     private Set<Block> blockStage = new HashSet<>();
+
     private Set<Transaction> transactionStage = new HashSet<>();
+
     private Set<NodeOpt> nodeOptStage = new HashSet<>();
+
     private Set<DelegationReward> delegationRewardStage = new HashSet<>();
 
     @Override
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "PersistenceEventHandler")
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "PersistenceEventHandler")
     public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
-        long startTime = System.currentTimeMillis();
+        surroundExec(event, sequence, endOfBatch);
+    }
 
-        log.debug("PersistenceEvent处理:{}(event(block({}),transactions({}),nodeOpts({}),delegateRewards({})),sequence({}),endOfBatch({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(), event.getBlock().getNum(), event.getTransactions().size(),
-                event.getNodeOpts().size(), event.getDelegationRewards().size(), sequence, endOfBatch);
+    private void surroundExec(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+        CommonUtil.putTraceId(event.getTraceId());
+        long startTime = System.currentTimeMillis();
+        exec(event, sequence, endOfBatch);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        CommonUtil.removeTraceId();
+    }
+
+    private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
         try {
+            log.info("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
+                    event.getBlock().getNum(),
+                    CommonUtil.ofNullable(() -> event.getTransactions().size()).orElse(0),
+                    CommonUtil.ofNullable(() -> event.getNodeOpts().size()).orElse(0),
+                    CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
             nodeOptStage.addAll(event.getNodeOpts());
@@ -66,10 +85,12 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             event.getBlock().setTransactions(null);
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
-            if(blockStage.size()<disruptorConfig.getPersistenceBatchSize()) {
-                maxBlockNumber=event.getBlock().getNum();
+            if (blockStage.size() < disruptorConfig.getPersistenceBatchSize()) {
+                maxBlockNumber = event.getBlock().getNum();
                 return;
             }
+
+            statisticsLog();
 
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(blockStage, transactionStage, nodeOptStage, delegationRewardStage);
@@ -77,7 +98,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             statistics.add(networkStatCache.getNetworkStat());
-            redisImportService.batchImport(blockStage,transactionStage,statistics);
+            redisImportService.batchImport(blockStage, transactionStage, statistics);
             blockStage.clear();
             transactionStage.clear();
             nodeOptStage.clear();
@@ -86,9 +107,10 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
             Long txMaxId = 0L;
             List<Transaction> transactions = event.getTransactions();
-            if(!transactions.isEmpty()) {
+            if (!transactions.isEmpty()) {
                 for (Transaction tx : transactions) {
-                    if(tx.getId()>txMaxId) txMaxId=tx.getId();
+                    if (tx.getId() > txMaxId)
+                        txMaxId = tx.getId();
                 }
             }
             BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
@@ -96,22 +118,57 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
             List<NodeOpt> nOptBaks = event.getNodeOpts();
             Long nOptMaxId = 0L;
-            if(!nOptBaks.isEmpty()) {
+            if (!nOptBaks.isEmpty()) {
                 for (NodeOpt no : nOptBaks) {
-                    if(no.getId()>nOptMaxId) nOptMaxId=no.getId();
+                    if (no.getId() > nOptMaxId)
+                        nOptMaxId = no.getId();
                 }
-                nOptMaxId=nOptBaks.get(0).getId();
+                nOptMaxId = nOptBaks.get(0).getId();
             }
             BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
-            maxBlockNumber=event.getBlock().getNum();
+            maxBlockNumber = event.getBlock().getNum();
             // 释放对象引用
             event.releaseRef();
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw e;
         }
 
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
+
+    /**
+     * 打印统计信息
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/24
+     */
+    private void statisticsLog() {
+        try {
+            Map<Object, List<Transaction>> map = transactionStage.stream().collect(Collectors.groupingBy(Transaction::getNum));
+            if (CollUtil.isNotEmpty(transactionStage)) {
+                map.forEach((blockNum, transactions) -> {
+                    IntSummaryStatistics erc20Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc20TxList().size()));
+                    IntSummaryStatistics erc721Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc721TxList().size()));
+                    IntSummaryStatistics transferTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getTransferTxList().size()));
+                    IntSummaryStatistics pposTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getPposTxList().size()));
+                    IntSummaryStatistics virtualTransactionSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getVirtualTransactions().size()));
+                    log.info("入库redis和ES统计:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
+                            blockNum,
+                            CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
+                            erc20Size.getSum(),
+                            erc721Size.getSum(),
+                            transferTxSize,
+                            pposTxSize,
+                            virtualTransactionSize
+                    );
+                });
+            }
+        } catch (Exception e) {
+            log.error("打印统计信息异常", e);
+        }
+    }
+
 }

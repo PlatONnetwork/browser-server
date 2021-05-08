@@ -36,69 +36,83 @@ import java.util.List;
 @Slf4j
 @Service
 public class ErcDetectService {
+
     public static final Credentials CREDENTIALS = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
+
     private static final BigInteger GAS_LIMIT = BigInteger.valueOf(2104836);
+
     private static final BigInteger GAS_PRICE = BigInteger.valueOf(100000000000L);
+
     public static final GasProvider GAS_PROVIDER = new ContractGasProvider(GAS_PRICE, GAS_LIMIT);
+
     @Resource
     private PlatOnClient platOnClient;
+
     @Resource
     private BlockChainConfig chainConfig;
+
     // 检测输入数据
-    private String detectInputData(String contractAddress,String inputData) {
+    private String detectInputData(String contractAddress, String inputData) {
         Transaction transaction = null;
         try {
-            transaction = Transaction.createEthCallTransaction(Credentials.create(Keys.createEcKeyPair()).getAddress(), contractAddress,inputData);
+            transaction = Transaction.createEthCallTransaction(Credentials.create(Keys.createEcKeyPair()).getAddress(), contractAddress, inputData);
         } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
-            log.error("",e);
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
         PlatonCall platonCall = null;
         try {
             platonCall = platOnClient.getWeb3jWrapper().getWeb3j().platonCall(transaction, DefaultBlockParameterName.LATEST).send();
         } catch (IOException e) {
-            log.error("",e);
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
         return platonCall.getResult();
     }
+
     // 是否支持Erc165标准
     private boolean isSupportErc165(String contractAddress) {
-        String result = detectInputData(contractAddress,"0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000");
-        if(!"0x0000000000000000000000000000000000000000000000000000000000000001".equals(result)){
+        String result = detectInputData(contractAddress, "0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000");
+        if (!"0x0000000000000000000000000000000000000000000000000000000000000001".equals(result)) {
             return false;
         }
-        result = detectInputData(contractAddress,"0x01ffc9a7ffffffff00000000000000000000000000000000000000000000000000000000");
+        result = detectInputData(contractAddress, "0x01ffc9a7ffffffff00000000000000000000000000000000000000000000000000000000");
         return "0x0000000000000000000000000000000000000000000000000000000000000000".equals(result);
     }
+
     public boolean isSupportErc721Metadata(String contractAddress) {
         // 支持erc721，则必定要支持erc165
-        if(!isSupportErc165(contractAddress)) return false;
-        String result = detectInputData(contractAddress,"0x01ffc9a75b5e139f00000000000000000000000000000000000000000000000000000000");
-        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
-    }
-    public boolean isSupportErc721Enumerable(String contractAddress) {
-        // 支持erc721，则必定要支持erc165
-        if(!isSupportErc165(contractAddress)) return false;
-        String result = detectInputData(contractAddress,"0x01ffc9a7780e9d6300000000000000000000000000000000000000000000000000000000");
-        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
-    }
-    // 是否Erc721合约
-    private boolean isSupportErc721(String contractAddress){
-        // 支持erc721，则必定要支持erc165
-        if(!isSupportErc165(contractAddress)) return false;
-        String result = detectInputData(contractAddress,"0x01ffc9a780ac58cd00000000000000000000000000000000000000000000000000000000");
+        if (!isSupportErc165(contractAddress))
+            return false;
+        String result = detectInputData(contractAddress, "0x01ffc9a75b5e139f00000000000000000000000000000000000000000000000000000000");
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
-    private ErcContractId getErc20ContractId(String contractAddress){
-        ErcContract ercContract = Erc20Contract.load(contractAddress,platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS,GAS_PROVIDER);
+    public boolean isSupportErc721Enumerable(String contractAddress) {
+        // 支持erc721，则必定要支持erc165
+        if (!isSupportErc165(contractAddress))
+            return false;
+        String result = detectInputData(contractAddress, "0x01ffc9a7780e9d6300000000000000000000000000000000000000000000000000000000");
+        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
+    }
+
+    // 是否Erc721合约
+    private boolean isSupportErc721(String contractAddress) {
+        // 支持erc721，则必定要支持erc165
+        if (!isSupportErc165(contractAddress))
+            return false;
+        String result = detectInputData(contractAddress, "0x01ffc9a780ac58cd00000000000000000000000000000000000000000000000000000000");
+        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
+    }
+
+    private ErcContractId getErc20ContractId(String contractAddress) {
+        ErcContract ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER);
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC20);
         return contractId;
     }
 
-    private ErcContractId getErc721ContractId(String contractAddress){
+    private ErcContractId getErc721ContractId(String contractAddress) {
         ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                 CREDENTIALS,
                 GAS_PROVIDER);
@@ -108,7 +122,7 @@ public class ErcDetectService {
     }
 
     // 检测Erc20合约标识
-    private ErcContractId resolveContractId(ErcContract ercContract){
+    private ErcContractId resolveContractId(ErcContract ercContract) {
         ErcContractId contractId = new ErcContractId();
         try {
             try {
@@ -141,17 +155,17 @@ public class ErcDetectService {
         return contractId;
     }
 
-    public ErcContractId getContractId(String contractAddress){
+    public ErcContractId getContractId(String contractAddress) {
         // 先检测是否支持ERC721
         boolean isErc721 = isSupportErc721(contractAddress);
         ErcContractId contractId;
-        if(isErc721){
+        if (isErc721) {
             // 取ERC721合约信息
             contractId = getErc721ContractId(contractAddress);
-        }else{
+        } else {
             // 不是ERC721，则检测是否是ERC20
             contractId = getErc20ContractId(contractAddress);
-            if(StringUtils.isBlank(contractId.getName())||StringUtils.isBlank(contractId.getSymbol())|contractId.getDecimal()==null||contractId.getTotalSupply()==null){
+            if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
                 // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
                 contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
             }
@@ -160,7 +174,7 @@ public class ErcDetectService {
     }
 
     public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt) {
-        ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(),platOnClient.getWeb3jWrapper().getWeb3j(),
+        ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(),
                 CREDENTIALS,
                 GAS_PROVIDER);
         return ercContract.getTxEvents(receipt);
@@ -172,4 +186,5 @@ public class ErcDetectService {
                 GAS_PROVIDER);
         return ercContract.getTxEvents(receipt);
     }
+
 }

@@ -38,7 +38,7 @@ public class ProposalDetailTask {
      * 3.查询到的信息更新并修改数据库
      */
     @Scheduled(cron = "0/15  * * * * ?")
-    public void cron() {
+    public void proposalDetail() {
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }

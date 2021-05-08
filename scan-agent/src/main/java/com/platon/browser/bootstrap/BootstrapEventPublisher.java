@@ -1,12 +1,12 @@
 package com.platon.browser.bootstrap;
 
-import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.lmax.disruptor.EventFactory;
-import com.lmax.disruptor.EventTranslatorThreeArg;
+import com.lmax.disruptor.EventTranslatorVararg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.publisher.AbstractPublisher;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,11 +21,13 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Component
 public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
-    private static final EventTranslatorThreeArg<BootstrapEvent,CompletableFuture<PlatonBlock>,CompletableFuture<ReceiptResult>, Callback>
-    TRANSLATOR = (event, sequence, blockCF,receiptCF,callback)->{
-        event.setBlockCF(blockCF);
-        event.setReceiptCF(receiptCF);
-        event.setCallback(callback);
+
+    private static final EventTranslatorVararg<BootstrapEvent>
+            TRANSLATOR = (event, sequence, args) -> {
+        event.setBlockCF((CompletableFuture<PlatonBlock>) args[0]);
+        event.setReceiptCF((CompletableFuture<ReceiptResult>) args[1]);
+        event.setCallback((Callback) args[2]);
+        event.setTraceId((String) args[3]);
     };
 
     @Override
@@ -34,6 +36,7 @@ public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
     }
 
     private EventFactory<BootstrapEvent> eventFactory = BootstrapEvent::new;
+
     @Resource
     private BootstrapEventHandler handler;
 
@@ -41,20 +44,21 @@ public class BootstrapEventPublisher extends AbstractPublisher<BootstrapEvent> {
     private Disruptor<BootstrapEvent> disruptor;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         disruptor = new Disruptor<>(eventFactory, getRingBufferSize(), DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(handler);
         disruptor.start();
         ringBuffer = disruptor.getRingBuffer();
-        register(BootstrapEventPublisher.class.getSimpleName(),this);
+        register(BootstrapEventPublisher.class.getSimpleName(), this);
     }
 
-    public void publish(CompletableFuture<PlatonBlock> blockCF, CompletableFuture<ReceiptResult> receiptCF, Callback callback){
-        ringBuffer.publishEvent(TRANSLATOR, blockCF,receiptCF,callback);
+    public void publish(CompletableFuture<PlatonBlock> blockCF, CompletableFuture<ReceiptResult> receiptCF, Callback callback, String traceId) {
+        ringBuffer.publishEvent(TRANSLATOR, blockCF, receiptCF, callback, traceId);
     }
 
     public void shutdown() {
         disruptor.shutdown();
         unregister(BootstrapEventPublisher.class.getSimpleName());
     }
+
 }

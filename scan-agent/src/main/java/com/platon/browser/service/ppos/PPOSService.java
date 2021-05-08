@@ -37,38 +37,55 @@ import javax.annotation.Resource;
 @Slf4j
 @Service
 public class PPOSService {
+
     @Resource
     private StakeCreateAnalyzer stakeCreateAnalyzer;
+
     @Resource
     private StakeModifyAnalyzer stakeModifyAnalyzer;
+
     @Resource
     private StakeIncreaseAnalyzer stakeIncreaseAnalyzer;
+
     @Resource
     private StakeExitAnalyzer stakeExitAnalyzer;
+
     @Resource
     private ReportAnalyzer reportAnalyzer;
+
     @Resource
     private DelegateCreateAnalyzer delegateCreateAnalyzer;
+
     @Resource
     private DelegateExitAnalyzer delegateExitAnalyzer;
+
     @Resource
     private ProposalTextAnalyzer proposalTextAnalyzer;
+
     @Resource
     private ProposalUpgradeAnalyzer proposalUpgradeAnalyzer;
+
     @Resource
     private ProposalParameterAnalyzer proposalParameterAnalyzer;
+
     @Resource
     private ProposalCancelAnalyzer proposalCancelAnalyzer;
+
     @Resource
     private ProposalVoteAnalyzer proposalVoteAnalyzer;
+
     @Resource
     private VersionDeclareAnalyzer proposalVersionAnalyzer;
+
     @Resource
     private RestrictingCreateAnalyzer restrictingCreateAnalyzer;
+
     @Resource
     private DelegateRewardClaimAnalyzer delegateRewardClaimAnalyzer;
+
     @Resource
     private NetworkStatCache networkStatCache;
+
     @Resource
     private AddressCache addressCache;
 
@@ -77,7 +94,7 @@ public class PPOSService {
 
     /**
      * 解析交易, 构造业务入库参数信息
-     * 
+     *
      * @param event
      * @return
      */
@@ -85,7 +102,7 @@ public class PPOSService {
         long startTime = System.currentTimeMillis();
 
         TxAnalyseResult tar =
-            TxAnalyseResult.builder().nodeOptList(new ArrayList<>()).delegationRewardList(new ArrayList<>()).build();
+                TxAnalyseResult.builder().nodeOptList(new ArrayList<>()).delegationRewardList(new ArrayList<>()).build();
 
         List<Transaction> transactions = event.getTransactions();
 
@@ -96,7 +113,7 @@ public class PPOSService {
         int allTxCount = 0;
         for (Transaction tx : transactions) {
             // 设置普通交易的交易序号
-            tx.setSeq(event.getBlock().getNum()*100000+allTxCount);
+            tx.setSeq(event.getBlock().getNum() * 100000 + allTxCount);
             this.addressCache.update(tx);
             // 自增
             allTxCount++;
@@ -106,7 +123,7 @@ public class PPOSService {
             List<Transaction> virtualTxes = tx.getVirtualTransactions();
             for (Transaction vt : virtualTxes) {
                 // 设置合约调用ppos交易的交易序号
-                vt.setSeq(event.getBlock().getNum()*100000+allTxCount);
+                vt.setSeq(event.getBlock().getNum() * 100000 + allTxCount);
                 switch (vt.getTypeEnum()) {
                     // 如果是提案交易，且交易是由普通合约内部调用触发的，则
                     // 所构造的虚拟交易HASH的格式是：<普通合约调用hash>-<合约内部ppos交易索引>
@@ -219,4 +236,5 @@ public class PPOSService {
             log.debug("", e);
         }
     }
+
 }

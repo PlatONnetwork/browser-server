@@ -114,7 +114,6 @@ public class TokenService {
         tokenInventoryKey.setTokenAddress(req.getContract());
         tokenInventoryKey.setTokenId(StrUtil.emptyToDefault(req.getTokenId(), "0"));
         CustomTokenInventory customTokenInventory = customTokenInventoryMapper.selectTokenInventory(tokenInventoryKey);
-        QueryTokenIdDetailResp.copy(customTokenInventory);
         return QueryTokenIdDetailResp.copy(customTokenInventory);
     }
 
