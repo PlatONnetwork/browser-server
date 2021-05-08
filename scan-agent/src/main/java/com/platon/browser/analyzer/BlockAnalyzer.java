@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer;
 
 import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -63,7 +61,6 @@ public class BlockAnalyzer {
 
         List<Transaction> originTransactions = new ArrayList<>();
         if (receipt.getResult() != null && !receipt.getResult().isEmpty()) {
-            Map<String, Receipt> receiptMap = receipt.getMap();
             for (PlatonBlock.TransactionResult tr : transactionResults) {
                 PlatonBlock.TransactionObject to = (PlatonBlock.TransactionObject) tr.get();
                 Transaction rawTransaction = to.get();
