@@ -3,7 +3,6 @@ package com.platon.browser.v0152.analyzer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
@@ -99,9 +98,9 @@ public class ErcTokenAnalyzer {
                 checkToken(token);
                 customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token), Token.Column.values());
                 ercCache.tokenCache.put(token.getAddress(), token);
-                log.info("创建token[{}]入库，并加入到地址缓存", JSONUtil.toJsonStr(token));
+                log.info("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
             } else {
-                log.error("该token地址[{}]无法识别该类型[{}]", token.getAddress(), token.getTypeEnum());
+                log.error("该合约地址[{}]无法识别该类型[{}]", token.getAddress(), token.getTypeEnum());
             }
         } catch (Exception e) {
             log.error("合约创建,解析Token异常", e);
@@ -114,7 +113,6 @@ public class ErcTokenAnalyzer {
      *
      * @param token 合约
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/29
      */
     private void checkToken(ErcToken token) {
@@ -168,7 +166,6 @@ public class ErcTokenAnalyzer {
      * @param tx        交易
      * @param eventList 事件列表
      * @return java.util.List<com.platon.browser.elasticsearch.dto.ErcTx> erc交易列表
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/14
      */
     private List<ErcTx> resolveErcTxFromEvent(Token token, CollectionTransaction tx, List<ErcContract.ErcTxEvent> eventList, Long seq) {
@@ -201,7 +198,6 @@ public class ErcTokenAnalyzer {
      *
      * @param txList 交易列表
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/14
      */
     private String getErcTxInfo(List<ErcTx> txList) {
@@ -221,7 +217,6 @@ public class ErcTokenAnalyzer {
      * @param tx              交易对象
      * @param receipt         交易回执：一笔交易可能包含多个事件，故可能有多条交易
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/15
      */
     public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
@@ -251,7 +246,7 @@ public class ErcTokenAnalyzer {
                             eventList = ercDetectService.getErc20TxEvents(transactionReceipt);
                             List<ErcContract.ErcTxEvent> erc20TxEventList = eventList.stream().filter(v -> ObjectUtil.equal(v.getLog(), tokenLog)).collect(Collectors.toList());
                             if (erc20TxEventList.size() > 1) {
-                                log.error("erc20交易回执日志解析异常{}", tokenLog);
+                                log.error("当前交易[{}]erc20交易回执日志解析异常{}", tx.getHash(), tokenLog);
                                 break;
                             }
                             txList = resolveErcTxFromEvent(token, tx, erc20TxEventList, collectionBlock.getSeq().incrementAndGet());
@@ -261,12 +256,12 @@ public class ErcTokenAnalyzer {
                             eventList = ercDetectService.getErc721TxEvents(transactionReceipt);
                             List<ErcContract.ErcTxEvent> erc721TxEventList = eventList.stream().filter(v -> v.getLog().equals(tokenLog)).collect(Collectors.toList());
                             if (erc721TxEventList.size() > 1) {
-                                log.error("erc721交易回执日志解析异常{}", tokenLog);
+                                log.error("当前交易[{}]erc721交易回执日志解析异常{}", tx.getHash(), tokenLog);
                                 break;
                             }
                             txList = resolveErcTxFromEvent(token, tx, erc721TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc721TxList().addAll(txList);
-                            ercTokenInventoryAnalyzer.analyze(txList);
+                            ercTokenInventoryAnalyzer.analyze(tx.getHash(), txList);
                             break;
                     }
                     token.setTokenTxQty(token.getTokenTxQty() + txList.size());
@@ -297,14 +292,19 @@ public class ErcTokenAnalyzer {
                         }
                     });
                 } else {
-                    log.error("缓存中未找到合约地址[{}]对应的Erc Token", tokenLog.getAddress());
+                    log.error("当前交易[{}]缓存中未找到合约地址[{}]对应的Erc Token", tx.getHash(), tokenLog.getAddress());
                 }
             });
             tx.setErc20TxInfo(getErcTxInfo(tx.getErc20TxList()));
             tx.setErc721TxInfo(getErcTxInfo(tx.getErc721TxList()));
-            log.info("当前交易[{}]有[{}]笔log,其中token交易有[{}]笔，其中erc20有[{}]笔,其中erc721有[{}]笔", tx.getHash(), receipt.getLogs().size(), tokenLogs.size(), tx.getErc20TxList().size(), tx.getErc721TxList().size());
+            log.info("当前交易[{}]有[{}]笔log,其中token交易有[{}]笔，其中erc20有[{}]笔,其中erc721有[{}]笔",
+                    tx.getHash(),
+                    CommonUtil.ofNullable(() -> receipt.getLogs().size()).orElse(0),
+                    CommonUtil.ofNullable(() -> tokenLogs.size()).orElse(0),
+                    CommonUtil.ofNullable(() -> tx.getErc20TxList().size()).orElse(0),
+                    CommonUtil.ofNullable(() -> tx.getErc721TxList().size()).orElse(0));
         } catch (Exception e) {
-            log.error("解析ERC交易异常", e);
+            log.error(StrUtil.format("当前交易[{}]解析ERC交易异常", tx.getHash()), e);
         }
     }
 

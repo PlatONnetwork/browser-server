@@ -102,13 +102,14 @@ public class TransactionAnalyzer {
         CollectionTransaction result = CollectionTransaction.newInstance()
                 .updateWithBlock(collectionBlock)
                 .updateWithRawTransaction(rawTransaction);
+        log.info("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());
         // 使用地址缓存初始化普通合约缓存信息
         initGeneralContractCache();
 
         // ============需要通过解码补充的交易信息============
         ComplementInfo ci = new ComplementInfo();
 
-        //新创建合约处理
+        // 新创建合约处理
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             receipt.getContractCreated().forEach(contract -> {
                 // solidity 类型 erc20 或 721 token检测及入口
@@ -129,7 +130,7 @@ public class TransactionAnalyzer {
                     contractTypeEnum = ContractTypeEnum.EVM;
                 }
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
-                log.info("当前合约[{}]的合约类型为[{}]", contract.getAddress(), contractTypeEnum);
+                log.info("当前交易[{}]合约地址[{}]的合约类型为[{}]", result.getHash(), contract.getAddress(), contractTypeEnum);
                 if (!AddressUtil.isAddrZero(contract.getAddress())) {
                     // 补充address
                     addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
@@ -257,7 +258,9 @@ public class TransactionAnalyzer {
             default:
         }
         // 累加当前交易的手续费到当前区块的txFee
-        collectionBlock.setTxFee(collectionBlock.decimalTxFee().add(result.decimalCost()).toString());
+        String txFee = collectionBlock.decimalTxFee().add(result.decimalCost()).toString();
+        log.info("当前区块[{}]交易[{}]:区块累计手续费[{}]=累计手续费[{}]+交易成本[{}](gas燃料[{}] * gas价格[{}])", collectionBlock.getNum(), result.getHash(), txFee, collectionBlock.decimalTxFee(), result.decimalCost(), result.decimalGasUsed(), result.decimalGasPrice());
+        collectionBlock.setTxFee(txFee);
         // 累加当前交易的能量限制到当前区块的txGasLimit
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(result.decimalGasLimit()).toString());
         return result;

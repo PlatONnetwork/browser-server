@@ -33,7 +33,7 @@ public class ErcTokenInventoryAnalyzer {
     /**
      * 解析Token库存
      */
-    public void analyze(List<ErcTx> txList) {
+    public void analyze(String txHash, List<ErcTx> txList) {
         List<TokenInventory> insertOrUpdate = new ArrayList<>();
         List<TokenInventoryKey> delTokenInventory = new ArrayList<>();
         Date date = new Date();
@@ -44,7 +44,7 @@ public class ErcTokenInventoryAnalyzer {
                 // 校验tokenid长度是否符合入库标准
                 if (CommonUtil.ofNullable(() -> tokenId.length()).orElse(0) > 128) {
                     // 仅打印日志而不能抛出异常来阻塞流程
-                    log.error("该token[{}]不符合合约标准，tokenId[{}]过长，仅支持128位", tokenAddress, tokenId);
+                    log.warn("当前交易[{}]token[{}]不符合合约标准，tokenId[{}]过长，仅支持128位", txHash, tokenAddress, tokenId);
                 } else {
                     TokenInventoryKey key = new TokenInventory();
                     key.setTokenAddress(tokenAddress);
@@ -77,11 +77,13 @@ public class ErcTokenInventoryAnalyzer {
                     }
                 }
             });
-            if (!insertOrUpdate.isEmpty()) {
+            if (CollUtil.isNotEmpty(insertOrUpdate)) {
                 customTokenInventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenInventory.Column.values());
+                log.info("当前交易[{}]添加erc721库存[{}]笔成功", txHash, insertOrUpdate.size());
             }
             if (CollUtil.isNotEmpty(delTokenInventory)) {
                 customTokenInventoryMapper.burnAndDelTokenInventory(delTokenInventory);
+                log.info("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delTokenInventory.size());
             }
         }
     }

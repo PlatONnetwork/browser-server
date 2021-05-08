@@ -1,5 +1,6 @@
 package com.platon.browser.v0152.analyzer;
 
+import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
 import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
@@ -35,7 +36,7 @@ public class ErcTokenHolderAnalyzer {
     ) {
         // 零地址不需要創建holder
         if (AddressUtil.isAddrZero(userAddress)) {
-            log.warn("该地址[{}]为0地址，不创建token holder",userAddress);
+            log.warn("该地址[{}]为0地址，不创建token holder", userAddress);
             return;
         }
         Date date = new Date();
@@ -54,7 +55,7 @@ public class ErcTokenHolderAnalyzer {
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }
         //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721所有tokenId的交易总数
-        log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]",tokenHolder.getTokenAddress(),tokenHolder.getAddress(),tokenHolder.getTokenTxQty());
+        log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
         tokenHolder.setUpdateTime(date);
         insertOrUpdate.add(tokenHolder);
     }
@@ -68,8 +69,9 @@ public class ErcTokenHolderAnalyzer {
             resolveTokenHolder(tx.getContract(), tx.getFrom(), insertOrUpdate);
             resolveTokenHolder(tx.getContract(), tx.getTo(), insertOrUpdate);
         });
-        if (!insertOrUpdate.isEmpty())
+        if (CollUtil.isNotEmpty(insertOrUpdate)) {
             customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
+        }
     }
 
 }
