@@ -33,7 +33,8 @@ public class ErcRetryPolicy {
                 log.warn("超时异常，即将无限重试");
                 return new AlwaysRetryPolicy();
             } else {
-                log.warn("调用异常，即将重试3次");
+                log.warn("调用异常，即将重试");
+                // 默认执行3次
                 return new SimpleRetryPolicy();
             }
         });

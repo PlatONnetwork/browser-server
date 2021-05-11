@@ -72,7 +72,7 @@ public class ErcDetectService {
     private String detectInputData(String contractAddress, String inputData) {
         String res = "";
         try {
-            AtomicLong inputMark = new AtomicLong(1);
+            AtomicLong inputMark = new AtomicLong(0);
             RetryTemplate retryTemplate = new RetryTemplate();
             retryTemplate.setRetryPolicy(ErcRetryPolicy.factory());
             retryTemplate.setBackOffPolicy(ErcBackOffPolicy.factory());
@@ -80,9 +80,10 @@ public class ErcDetectService {
                         // 需要重试的逻辑代码
                         String data = "";
                         try {
-                            // 重试次数从0开始算，加1方便查看
-                            log.warn("当前重试次数为{}，重试标识为{}", context.getRetryCount() + 1, inputMark);
-                            if (inputMark.get() <= retryMaxNum) {
+                            if (inputMark.intValue() <= retryMaxNum) {
+                                if (context.getRetryCount() > 0) {
+                                    log.warn("当前重试次数为{},标识为{}", context.getRetryCount(), inputMark.intValue());
+                                }
                                 data = detectInputDataWithNotRetry(contractAddress, inputData);
                             } else {
                                 log.warn("合约地址[{}]检测输入，重试超过3次，将不再重试", contractAddress);
@@ -234,7 +235,7 @@ public class ErcDetectService {
     public ErcContractId getContractId(String contractAddress) {
         ErcContractId res = null;
         try {
-            AtomicLong contractIdMark = new AtomicLong(1);
+            AtomicLong contractIdMark = new AtomicLong(0);
             RetryTemplate retryTemplate = new RetryTemplate();
             retryTemplate.setRetryPolicy(ErcRetryPolicy.factory());
             retryTemplate.setBackOffPolicy(ErcBackOffPolicy.factory());
@@ -242,9 +243,10 @@ public class ErcDetectService {
                         // 需要重试的逻辑代码
                         ErcContractId ercContractId = null;
                         try {
-                            // 重试次数从0开始算，加1方便查看
-                            log.warn("当前重试次数为{}，重试标识为{}", context.getRetryCount() + 1, contractIdMark);
-                            if (contractIdMark.get() <= retryMaxNum) {
+                            if (contractIdMark.intValue() <= retryMaxNum) {
+                                if (context.getRetryCount() > 0) {
+                                    log.warn("当前重试次数为{}，标识为[{}]", context.getRetryCount(), contractIdMark.intValue());
+                                }
                                 ercContractId = getContractIdWithNotRetry(contractAddress);
                             } else {
                                 log.warn("合约地址[{}]获取合约id，重试超过3次，将不再重试", contractAddress);
