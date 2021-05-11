@@ -117,6 +117,7 @@ public class ErcDetectService {
      * @date 2021/4/30
      */
     private String detectInputDataWithNotRetry(String contractAddress, String inputData) throws SocketTimeoutException {
+        log.info("合约地址[{}]检测输入数据[{}]", contractAddress, inputData);
         Transaction transaction = null;
         PlatonCall platonCall = null;
         try {
@@ -275,6 +276,7 @@ public class ErcDetectService {
     }
 
     public ErcContractId getContractIdWithNotRetry(String contractAddress) throws SocketTimeoutException {
+        log.info("获取合约地址[{}]id", contractAddress);
         ErcContractId contractId = null;
         try {
             // 先检测是否支持ERC721
