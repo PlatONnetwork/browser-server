@@ -21,13 +21,9 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class QueryHolderTokenListReq extends PageReq {
 
+    @NotBlank(message = "{address required}")
     @Size(min = 42, max = 42)
     private String address;
-
-    /**
-     * 合约地址
-     */
-    private String contract;
 
     /**
      * type取值:erc20 | erc721 | 为空

@@ -1,5 +1,15 @@
 package com.platon.browser.v0152.service;
 
+import cn.hutool.core.util.StrUtil;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.v0152.bean.ErcContractId;
+import com.platon.browser.v0152.contract.Erc20Contract;
+import com.platon.browser.v0152.contract.Erc721Contract;
+import com.platon.browser.v0152.contract.ErcContract;
+import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.platon.browser.v0152.retry.ErcBackOffPolicy;
+import com.platon.browser.v0152.retry.ErcRetryPolicy;
 import com.platon.crypto.Credentials;
 import com.platon.crypto.Keys;
 import com.platon.protocol.core.DefaultBlockParameterName;
@@ -9,26 +19,22 @@ import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.tx.exceptions.ContractCallException;
 import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.v0152.bean.ErcContractId;
-import com.platon.browser.v0152.contract.Erc20Contract;
-import com.platon.browser.v0152.contract.Erc721Contract;
-import com.platon.browser.v0152.contract.ErcContract;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.SocketTimeoutException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Erc探测服务
@@ -48,23 +54,83 @@ public class ErcDetectService {
     @Resource
     private PlatOnClient platOnClient;
 
-    @Resource
-    private BlockChainConfig chainConfig;
+    /**
+     * 最大重试次数
+     */
+    private static final int retryMaxNum = 3;
 
-    // 检测输入数据
+    /**
+     * 检测输入数据---带重试机制
+     * 超时异常--无限重试，业务异常--重试3次
+     *
+     * @param contractAddress 合约地址
+     * @param inputData       input数据
+     * @return java.lang.String
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/28
+     */
     private String detectInputData(String contractAddress, String inputData) {
+        String res = "";
+        try {
+            AtomicLong inputMark = new AtomicLong(1);
+            RetryTemplate retryTemplate = new RetryTemplate();
+            retryTemplate.setRetryPolicy(ErcRetryPolicy.factory());
+            retryTemplate.setBackOffPolicy(ErcBackOffPolicy.factory());
+            res = retryTemplate.execute((RetryCallback<String, Throwable>) context -> {
+                        // 需要重试的逻辑代码
+                        String data = "";
+                        try {
+                            // 重试次数从0开始算，加1方便查看
+                            log.warn("当前重试次数为{}，重试标识为{}", context.getRetryCount() + 1, inputMark);
+                            if (inputMark.get() <= retryMaxNum) {
+                                data = detectInputDataWithNotRetry(contractAddress, inputData);
+                            } else {
+                                log.warn("合约地址[{}]检测输入，重试超过3次，将不再重试", contractAddress);
+                            }
+                        } catch (SocketTimeoutException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            inputMark.incrementAndGet();
+                            throw e;
+                        }
+                        return data;
+                    }, context -> {
+                        // 重试失败后执行的代码
+                        log.error("第[{}]次重试失败", context.getRetryCount() + 1);
+                        return "";
+                    }
+            );
+        } catch (Throwable throwable) {
+            log.error("重试异常", throwable);
+        }
+        return res;
+    }
+
+    /**
+     * 检测输入数据--不带重试机制
+     *
+     * @param contractAddress
+     * @param inputData
+     * @return java.lang.String
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/30
+     */
+    private String detectInputDataWithNotRetry(String contractAddress, String inputData) throws SocketTimeoutException {
         Transaction transaction = null;
+        PlatonCall platonCall = null;
         try {
             transaction = Transaction.createEthCallTransaction(Credentials.create(Keys.createEcKeyPair()).getAddress(), contractAddress, inputData);
         } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
-            log.error("", e);
+            log.error(StrUtil.format("合约地址[{}]检测输入数据异常", contractAddress), e);
             throw new BusinessException(e.getMessage());
         }
-        PlatonCall platonCall = null;
         try {
             platonCall = platOnClient.getWeb3jWrapper().getWeb3j().platonCall(transaction, DefaultBlockParameterName.LATEST).send();
+        } catch (SocketTimeoutException e) {
+            log.error(StrUtil.format("合约地址[{}]检测输入数据异常", contractAddress), e);
+            throw e;
         } catch (IOException e) {
-            log.error("", e);
+            log.error(StrUtil.format("合约地址[{}]检测输入数据异常", contractAddress), e);
             throw new BusinessException(e.getMessage());
         }
         return platonCall.getResult();
@@ -105,14 +171,14 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
-    private ErcContractId getErc20ContractId(String contractAddress) {
+    private ErcContractId getErc20ContractId(String contractAddress) throws SocketTimeoutException {
         ErcContract ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER);
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC20);
         return contractId;
     }
 
-    private ErcContractId getErc721ContractId(String contractAddress) {
+    private ErcContractId getErc721ContractId(String contractAddress) throws SocketTimeoutException {
         ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                 CREDENTIALS,
                 GAS_PROVIDER);
@@ -122,33 +188,43 @@ public class ErcDetectService {
     }
 
     // 检测Erc20合约标识
-    private ErcContractId resolveContractId(ErcContract ercContract) {
+    private ErcContractId resolveContractId(ErcContract ercContract) throws SocketTimeoutException {
         ErcContractId contractId = new ErcContractId();
         try {
             try {
                 contractId.setName(ercContract.name().send());
+            } catch (SocketTimeoutException e) {
+                throw e;
             } catch (Exception e) {
                 log.warn("erc get name error");
                 log.debug("", e);
             }
             try {
                 contractId.setSymbol(ercContract.symbol().send());
+            } catch (SocketTimeoutException e) {
+                throw e;
             } catch (Exception e) {
                 log.warn("erc get symbol error");
                 log.debug("", e);
             }
             try {
                 contractId.setDecimal(ercContract.decimals().send().intValue());
+            } catch (SocketTimeoutException e) {
+                throw e;
             } catch (Exception e) {
                 log.warn("erc get decimal error");
                 log.debug("", e);
             }
             try {
                 contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
+            } catch (SocketTimeoutException e) {
+                throw e;
             } catch (Exception e) {
                 log.warn("erc get totalSupply error");
                 log.debug("", e);
             }
+        } catch (SocketTimeoutException e) {
+            throw e;
         } catch (ContractCallException e) {
             log.error(" not erc contract,{}", ercContract, e);
         }
@@ -156,19 +232,66 @@ public class ErcDetectService {
     }
 
     public ErcContractId getContractId(String contractAddress) {
-        // 先检测是否支持ERC721
-        boolean isErc721 = isSupportErc721(contractAddress);
-        ErcContractId contractId;
-        if (isErc721) {
-            // 取ERC721合约信息
-            contractId = getErc721ContractId(contractAddress);
-        } else {
-            // 不是ERC721，则检测是否是ERC20
-            contractId = getErc20ContractId(contractAddress);
-            if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
-                // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
-                contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+        ErcContractId res = null;
+        try {
+            AtomicLong contractIdMark = new AtomicLong(1);
+            RetryTemplate retryTemplate = new RetryTemplate();
+            retryTemplate.setRetryPolicy(ErcRetryPolicy.factory());
+            retryTemplate.setBackOffPolicy(ErcBackOffPolicy.factory());
+            res = retryTemplate.execute((RetryCallback<ErcContractId, Throwable>) context -> {
+                        // 需要重试的逻辑代码
+                        ErcContractId ercContractId = null;
+                        try {
+                            // 重试次数从0开始算，加1方便查看
+                            log.warn("当前重试次数为{}，重试标识为{}", context.getRetryCount() + 1, contractIdMark);
+                            if (contractIdMark.get() <= retryMaxNum) {
+                                ercContractId = getContractIdWithNotRetry(contractAddress);
+                            } else {
+                                log.warn("合约地址[{}]获取合约id，重试超过3次，将不再重试", contractAddress);
+                                ercContractId = new ErcContractId();
+                                ercContractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+                            }
+                        } catch (SocketTimeoutException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            contractIdMark.incrementAndGet();
+                            throw e;
+                        }
+                        return ercContractId;
+                    }, context -> {
+                        // 重试失败后执行的代码
+                        log.error("第[{}]次重试失败，重试标识为{}", context.getRetryCount() + 1, contractIdMark);
+                        ErcContractId contractId = new ErcContractId();
+                        contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+                        return contractId;
+                    }
+            );
+        } catch (Throwable throwable) {
+            log.error("重试异常", throwable);
+        }
+        return res;
+    }
+
+    public ErcContractId getContractIdWithNotRetry(String contractAddress) throws SocketTimeoutException {
+        ErcContractId contractId = null;
+        try {
+            // 先检测是否支持ERC721
+            boolean isErc721 = isSupportErc721(contractAddress);
+            if (isErc721) {
+                // 取ERC721合约信息
+                contractId = getErc721ContractId(contractAddress);
+            } else {
+                // 不是ERC721，则检测是否是ERC20
+                contractId = getErc20ContractId(contractAddress);
+                if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
+                    // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
+                    contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+                }
             }
+        } catch (SocketTimeoutException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
         }
         return contractId;
     }

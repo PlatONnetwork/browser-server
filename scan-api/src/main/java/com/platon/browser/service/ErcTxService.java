@@ -350,10 +350,10 @@ public class ErcTxService {
         RespPage<QueryHolderTokenListResp> result = new RespPage<>();
         Page<CustomTokenHolder> ids = new Page<>();
         if ("erc20".equalsIgnoreCase(req.getType())) {
-            ids = this.customTokenHolderMapper.selectListByParams(req.getContract(), req.getAddress(), req.getType());
+            ids = this.customTokenHolderMapper.selectListByParams(null, req.getAddress(), req.getType());
         }
         if ("erc721".equalsIgnoreCase(req.getType())) {
-            ids = customTokenHolderMapper.selectListByERC721(req.getContract(), req.getAddress());
+            ids = customTokenHolderMapper.selectListByERC721(null, req.getAddress());
         }
         if (ids == null || ids.isEmpty()) {
             return result;
