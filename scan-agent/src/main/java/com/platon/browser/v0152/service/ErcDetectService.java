@@ -13,10 +13,13 @@ import com.platon.browser.v0152.retry.ErcRetryPolicy;
 import com.platon.crypto.Credentials;
 import com.platon.crypto.Keys;
 import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.Response;
 import com.platon.protocol.core.methods.request.Transaction;
 import com.platon.protocol.core.methods.response.PlatonCall;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.tx.exceptions.ContractCallException;
+import com.platon.tx.exceptions.PlatonCallException;
+import com.platon.tx.exceptions.PlatonCallTimeoutException;
 import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +29,8 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.SocketTimeoutException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -88,7 +89,7 @@ public class ErcDetectService {
                             } else {
                                 log.warn("合约地址[{}]检测输入，重试超过3次，将不再重试", contractAddress);
                             }
-                        } catch (SocketTimeoutException e) {
+                        } catch (PlatonCallTimeoutException e) {
                             throw e;
                         } catch (Exception e) {
                             inputMark.incrementAndGet();
@@ -116,7 +117,7 @@ public class ErcDetectService {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/4/30
      */
-    private String detectInputDataWithNotRetry(String contractAddress, String inputData) throws SocketTimeoutException {
+    private String detectInputDataWithNotRetry(String contractAddress, String inputData) throws PlatonCallTimeoutException {
         log.info("合约地址[{}]检测输入数据[{}]", contractAddress, inputData);
         Transaction transaction = null;
         PlatonCall platonCall = null;
@@ -128,11 +129,22 @@ public class ErcDetectService {
         }
         try {
             platonCall = platOnClient.getWeb3jWrapper().getWeb3j().platonCall(transaction, DefaultBlockParameterName.LATEST).send();
-        } catch (SocketTimeoutException e) {
-            log.error(StrUtil.format("合约地址[{}]检测输入数据异常", contractAddress), e);
+            if (platonCall.hasError()) {
+                Response.Error error = platonCall.getError();
+                String message = error.getMessage();
+                String lowMessage = !StrUtil.isBlank(message) ? message.toLowerCase() : null;
+                // 包含timeout则抛超时异常，其他错误则直接抛出runtime异常
+                if (!StrUtil.isBlank(lowMessage) && lowMessage.contains("timeout")) {
+                    log.error("合约地址[{}]检测输入数据异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
+                    throw new PlatonCallTimeoutException(error.getCode(), error.getMessage(), platonCall);
+                } else {
+                    log.error("合约地址[{}]检测输入数据异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
+                    throw new PlatonCallException(error.getCode(), error.getMessage(), platonCall);
+                }
+            }
+        } catch (PlatonCallTimeoutException e) {
             throw e;
-        } catch (IOException e) {
-            log.error(StrUtil.format("合约地址[{}]检测输入数据异常", contractAddress), e);
+        } catch (Exception e) {
             throw new BusinessException(e.getMessage());
         }
         return platonCall.getResult();
@@ -173,14 +185,14 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
-    private ErcContractId getErc20ContractId(String contractAddress) throws SocketTimeoutException {
+    private ErcContractId getErc20ContractId(String contractAddress) throws PlatonCallTimeoutException {
         ErcContract ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER);
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC20);
         return contractId;
     }
 
-    private ErcContractId getErc721ContractId(String contractAddress) throws SocketTimeoutException {
+    private ErcContractId getErc721ContractId(String contractAddress) throws PlatonCallTimeoutException {
         ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
                 CREDENTIALS,
                 GAS_PROVIDER);
@@ -190,12 +202,13 @@ public class ErcDetectService {
     }
 
     // 检测Erc20合约标识
-    private ErcContractId resolveContractId(ErcContract ercContract) throws SocketTimeoutException {
+    private ErcContractId resolveContractId(ErcContract ercContract) throws PlatonCallTimeoutException {
         ErcContractId contractId = new ErcContractId();
         try {
             try {
                 contractId.setName(ercContract.name().send());
-            } catch (SocketTimeoutException e) {
+            } catch (PlatonCallTimeoutException e) {
+                log.error("ERC获取name超时异常", e);
                 throw e;
             } catch (Exception e) {
                 log.warn("erc get name error");
@@ -203,7 +216,8 @@ public class ErcDetectService {
             }
             try {
                 contractId.setSymbol(ercContract.symbol().send());
-            } catch (SocketTimeoutException e) {
+            } catch (PlatonCallTimeoutException e) {
+                log.error("ERC获取symbol超时异常", e);
                 throw e;
             } catch (Exception e) {
                 log.warn("erc get symbol error");
@@ -211,7 +225,8 @@ public class ErcDetectService {
             }
             try {
                 contractId.setDecimal(ercContract.decimals().send().intValue());
-            } catch (SocketTimeoutException e) {
+            } catch (PlatonCallTimeoutException e) {
+                log.error("ERC获取decimal超时异常", e);
                 throw e;
             } catch (Exception e) {
                 log.warn("erc get decimal error");
@@ -219,13 +234,14 @@ public class ErcDetectService {
             }
             try {
                 contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
-            } catch (SocketTimeoutException e) {
+            } catch (PlatonCallTimeoutException e) {
+                log.error("ERC获取totalSupply超时异常", e);
                 throw e;
             } catch (Exception e) {
                 log.warn("erc get totalSupply error");
                 log.debug("", e);
             }
-        } catch (SocketTimeoutException e) {
+        } catch (PlatonCallTimeoutException e) {
             throw e;
         } catch (ContractCallException e) {
             log.error(" not erc contract,{}", ercContract, e);
@@ -254,7 +270,7 @@ public class ErcDetectService {
                                 ercContractId = new ErcContractId();
                                 ercContractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
                             }
-                        } catch (SocketTimeoutException e) {
+                        } catch (PlatonCallTimeoutException e) {
                             throw e;
                         } catch (Exception e) {
                             contractIdMark.incrementAndGet();
@@ -275,7 +291,7 @@ public class ErcDetectService {
         return res;
     }
 
-    public ErcContractId getContractIdWithNotRetry(String contractAddress) throws SocketTimeoutException {
+    public ErcContractId getContractIdWithNotRetry(String contractAddress) throws PlatonCallTimeoutException {
         log.info("获取合约地址[{}]id", contractAddress);
         ErcContractId contractId = null;
         try {
@@ -292,7 +308,7 @@ public class ErcDetectService {
                     contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
                 }
             }
-        } catch (SocketTimeoutException e) {
+        } catch (PlatonCallTimeoutException e) {
             throw e;
         } catch (Exception e) {
             throw e;
