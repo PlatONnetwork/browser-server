@@ -527,7 +527,7 @@ public class StakingService {
         RespPage<LockedStakingListResp> respPage = new RespPage<>();
         List<LockedStakingListResp> lists = new LinkedList<>();
         NodeExample nodeExample = new NodeExample();
-        nodeExample.setOrderByClause(" update_time desc");
+        nodeExample.setOrderByClause(" leave_time desc");
         NodeExample.Criteria criteria = nodeExample.createCriteria();
         criteria.andStatusEqualTo(StatusEnum.LOCKED.getCode());
 
