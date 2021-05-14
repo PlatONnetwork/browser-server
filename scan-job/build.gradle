@@ -14,11 +14,17 @@ bootJar {
 }
 
 dependencies {
-    compile project(":scan-service")
+    compile project(":scan-common")
+
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    compile "com.google.guava:guava:$guavaVersion"
-    compile group: 'com.lmax', name: 'disruptor', version: '3.4.2'
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
-    testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
+
+    compile "com.alibaba:druid:$druidVersion"
+    runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
+
+    testCompile "org.springframework:spring-test:$springbootVersion"
+    testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
+    compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2"
 }
