@@ -18,19 +18,7 @@ logging:
   #日志级别
   level:
     org.springframework: error
-    org.springframework.retry: error
-    com.platon.browser: error
-    com.platon.browser.bootstrap: error
-    com.platon.browser.collection: error
-    com.platon.browser.collection.queue.handler: error
-    com.platon.browser.common: error
-    com.platon.browser.complement: error
-    com.platon.browser.complement.handler: error
-    com.platon.browser.complement.converter: error
-    com.platon.browser.persistence: error
-    com.platon.browser.persistence.handler: error
-    com.platon.browser.persistence.queue.handler: error
-    com.platon.browser.task: error
+    com.platon.browser.task: debug
   file:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
 #PlatOn相关配置
@@ -51,10 +39,10 @@ platon:
 
 task:
   #查询总记录数
-  addressLimit: 5000
+  addressLimit: 5004
   #批量查询锁仓合约大小
-  queryBatchSize: 2
+  queryBatchSize: 100
   #基金会地址统计cron表达式
-  fundAddressCron: 0/5  * * * * ?
+  fundAddressCron: 0/10  * * * * ?
   #内置合约地址统计cron表达式
-  innerContractCron: 0/10  * * * * ?
+  innerContractCron: 0/5  * * * * ?
