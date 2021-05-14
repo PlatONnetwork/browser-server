@@ -1,0 +1,24 @@
+plugins {
+    id 'org.springframework.boot' version "$springbootVersion"
+}
+apply plugin: 'io.spring.dependency-management'
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+bootJar {
+    // 排除指定文件
+    exclude("application-*.yml")
+}
+
+dependencies {
+    compile project(":scan-service")
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compile "com.google.guava:guava:$guavaVersion"
+    compile group: 'com.lmax', name: 'disruptor', version: '3.4.2'
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
+    testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
+}
