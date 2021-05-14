@@ -101,14 +101,13 @@ public class AddressUpdateTask {
                 balanceList.forEach(balance->{
                     InternalAddress address = addressMap.get(balance.getAccount());
                     address.setBalance(new BigDecimal(balance.getFreeBalance()));
-                    address.setRestrictingBalance(new BigDecimal(balance.getLockBalance()));
+                    address.setRestrictingBalance(new BigDecimal(balance.getLockBalance().subtract(balance.getPledgeBalance())));
                 });
                 // 批量更新余额
                 customInternalAddressMapper.batchInsertOrUpdateSelective(
                         addressMap.values(),
                         InternalAddress.Column.excludes(
-                            InternalAddress.Column.updateTime,
-                            InternalAddress.Column.type
+                            InternalAddress.Column.updateTime
                         )
                 );
 
