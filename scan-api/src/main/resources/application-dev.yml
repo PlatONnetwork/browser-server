@@ -68,7 +68,7 @@ logging:
     com.platon.browser.client: info
     com.platon.browser.dao: info
   file:
-    name: ./logs/${spring.application.name}-${version}-${profile}.log
+    name: ./logs/${spring.application.name}-${profile}.log
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50} | %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50} | %msg%n"
@@ -83,7 +83,6 @@ logging:
       # 是否在应用启动时进行归档管理
       clean-history-on-start: true
 #初始化链相关的配置
-#初始化链相关的配置
 platon:
   # 地址HRP前缀
   addressPrefix: atp
@@ -94,8 +93,8 @@ platon:
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    protocol: WS
+    addresses: 192.168.112.141:7789,192.168.112.141:7790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -121,10 +120,9 @@ platon:
   # 初始内置节点默认质押金额(ATP)
   defaultStakingLockedAmount: 10500
   #区块最大Gas限制
-  maxBlockGasLimit: 100800000
+  maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/GalaxyRally/blob/master/PIPs/PIP-%s.md
-  #proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/master/Alaya/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -132,14 +130,13 @@ platon:
   #链id
   chainId: 201018
   #Redis命名空间
-  redis-namespace: browser:${version}:${profile}
+  redis-namespace: browser:${profile}
   #Es索引命名空间
-  es-namespace: browser_${version}_${profile}
+  es-namespace: browser_${profile}
   #0出块等待的循环访问时间(秒)
   zeroBlockNumber:
     wait-time: 60
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
-isRecaptcha: false
 limit:
   num: 10
 output:
