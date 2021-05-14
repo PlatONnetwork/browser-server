@@ -1,4 +1,6 @@
-# ***************************开发配置**************************** #
+#######################
+#      Alaya配置       #
+#######################
 # 当前激活的配置名称(请不要修改)
 profile: dev
 # 密码加密配置
@@ -14,11 +16,11 @@ spring:
     password: _DB_PASS_
   #Redis配置
   redis:
-    password: _REDIS_PWD_
-    database: 0
     cluster:
       max-redirects: 3
       nodes: _REDIS_IPS_
+    password: _REDIS_PWD_
+    ssl: false
   #ES配置
   elasticsearch:
     high-level-client:

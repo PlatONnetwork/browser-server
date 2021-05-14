@@ -47,3 +47,10 @@ gradlew clean buildTar -x test -b scan-agent/build.gradle
 ```bash
 gradlew clean buildTar -x test -b scan-api/build.gradle
 ```
+## Component Version
+
+```bash
+MySQL 5.7  
+redis 4.0 
+elasticsearch 7.4 
+```
