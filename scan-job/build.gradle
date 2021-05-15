@@ -36,6 +36,38 @@ monitorDistTar.dependsOn 'copyConf'
 monitorDistTar.compression = Compression.GZIP
 monitorDistTar.archiveExtension.set('tar.gz')
 
+remotes {
+    platonEnv {
+        host = "$deployServerHost"
+        user = "$deployServerUser"
+        port = Integer.parseInt("$deployServerPort")
+        password = "$deployServerPassword"
+    }
+}
+
+task deployToTestEnv(dependsOn:['build'],group: 'deploy') {
+    def deployDir = "$deployRootDir"
+    def activeProfile = "$deployProfile"
+    doLast {
+        ssh.settings {
+            knownHosts = allowAnyHosts
+            pty = true
+        }
+        ssh.run {
+            session(remotes.platonEnv) {
+                execute "mkdir -p $deployDir && rm -rf $deployDir/${project.name}*.jar"
+                put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
+                put from: "${projectDir}/src/main/resources/application-prod.yml", into: "$deployDir"
+                put from: "${projectDir}/release/start.sh", into: "$deployDir"
+                put from: "${projectDir}/release/stop.sh", into: "$deployDir"
+                execute "cd $deployDir && ${deployFixScript} && chmod a+x *.sh"
+                execute "cd $deployDir && ./start.sh $activeProfile"
+            }
+        }
+    }
+}
+
+
 dependencies {
     compile project(":scan-common")
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
