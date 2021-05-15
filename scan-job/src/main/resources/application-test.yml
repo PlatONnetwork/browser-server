@@ -33,7 +33,7 @@ task:
   #内置合约地址统计cron表达式：
   #    生产：每1分钟执行一次：0 0/1 * * * ?
   #    测试：每5秒钟执行一次：0/5 * * * * ?
-  innerContractCron: 0 0/1 * * * ?
+  innerContractCron: 0/5 * * * * ?
 #日志配置
 logging:
   #日志级别
