@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 /**
  * 公共工具类
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/17
  */
 public class CommonUtil {
@@ -21,7 +20,6 @@ public class CommonUtil {
      *
      * @param resolver
      * @return java.util.Optional<T>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     public static <T> Optional<T> ofNullable(Supplier<T> resolver) {
@@ -38,7 +36,6 @@ public class CommonUtil {
      *
      * @param
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/17
      */
     public static String getTraceId() {
