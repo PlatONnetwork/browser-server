@@ -38,9 +38,9 @@ public class BalanceUpdateTask {
      */
     @Scheduled(cron = "${task.fundAddressCron}")
     public void updateFundAccount() {
-        log.info("开始更新基金会地址余额... ");
+        log.info("更新基金会地址余额 START...");
        updateBalance(InternalAddressType.FUND_ACCOUNT);
-        log.info("更新基金会地址余额结束... ");
+        log.info("更新基金会地址余额 END。");
     }
 
     /**
@@ -48,9 +48,9 @@ public class BalanceUpdateTask {
      */
     @Scheduled(cron = "${task.innerContractCron}")
     public void updateContractAccount() {
-        log.info("开始更新内置合约地址余额... ");
+        log.info("更新内置合约地址余额 START...");
         updateBalance(InternalAddressType.OTHER);
-        log.info("更新内置合约地址余额结束... ");
+        log.info("更新内置合约地址余额 END。");
     }
 
     private void updateBalance(InternalAddressType type){
@@ -66,9 +66,9 @@ public class BalanceUpdateTask {
         example.setOrderByClause(" address LIMIT "+config.getMaxAddressCount());
         List<InternalAddress> addressList = internalAddressMapper.selectByExample(example);
         if(!addressList.isEmpty()) {
-            log.info("更新地址数：{} ", addressList.size());
-            log.debug("更新地址：{} ", addressList);
             updateBalance(addressList);
+        }else{
+            log.info("地址数为0,不做操作！");
         }
     }
 
@@ -85,6 +85,7 @@ public class BalanceUpdateTask {
             // <地址-内部地址> 映射
             batch.put(address.getAddress(),address);
         }
+        log.info("地址总数{},分成{}批,每批最多{}个地址", addressList.size(),batchList.size(),config.getMaxBatchSize());
 
         // 按批次查询并更新余额
         batchList.forEach(addressMap->{
@@ -92,7 +93,9 @@ public class BalanceUpdateTask {
                 Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
                 Set<String> addressSet = addressMap.keySet();
                 String addresses = String.join(";", addressSet);
+                log.info("锁仓余额查询参数：{}", addresses);
                 List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(web3j,addresses);
+                log.debug("锁仓余额查询结果：{}", JSON.toJSONString(balanceList));
                 // 设置余额
                 balanceList.forEach(balance->{
                     InternalAddress address = addressMap.get(balance.getAccount());
@@ -105,16 +108,12 @@ public class BalanceUpdateTask {
                     // 批量更新余额
                     customInternalAddressMapper.batchInsertOrUpdateSelective(
                         addressMap.values(),
-                        InternalAddress.Column.excludes(
-                                InternalAddress.Column.updateTime
-                        )
+                        InternalAddress.Column.excludes(InternalAddress.Column.updateTime)
                     );
+                    log.info("地址余额批量更新成功！");
                 }
-
-                log.debug("查询结果：{}", JSON.toJSONString(balanceList));
             }catch (Exception e){
-                log.error("查询余额失败！",e);
-                log.error("更新地址：{} ", JSON.toJSONString(addressList));
+                log.error("地址余额批量更新失败！",e);
             }
         });
     }
