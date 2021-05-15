@@ -108,10 +108,10 @@ public class StakingService {
         }
         BigDecimal issueValue = commonService.getIssueValue();
         stakingStatisticNewResp.setIssueValue(issueValue);
-        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
-        stakingStatisticNewResp.setStakingValue(totalStakingValue);
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
+        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
+        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue );
         return stakingStatisticNewResp;
     }
 

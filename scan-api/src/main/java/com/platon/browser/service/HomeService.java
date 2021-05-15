@@ -312,6 +312,8 @@ public class HomeService {
         chainStatisticNewResp.setTurnValue(circulationValue);
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         chainStatisticNewResp.setStakingDenominator(stakingDenominator);
+        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
+        chainStatisticNewResp.setStakingDelegationValue(totalStakingValue);
         return chainStatisticNewResp;
     }
 
