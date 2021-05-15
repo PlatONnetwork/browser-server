@@ -317,7 +317,6 @@ public class HomeService {
 
 
     public StakingListNewResp stakingListNew() {
-
         StakingListNewResp stakingListNewResp = new StakingListNewResp();
         stakingListNewResp.setIsRefresh(false);
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();

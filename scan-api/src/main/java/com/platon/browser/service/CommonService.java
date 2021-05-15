@@ -12,6 +12,7 @@ import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -63,6 +64,7 @@ public class CommonService {
      * @return java.math.BigDecimal
      * @date 2021/5/14
      */
+    @Cacheable(value = "getIssueValue")
     public BigDecimal getIssueValue() {
         BigDecimal issueValue = new BigDecimal(0);
         try {
@@ -111,6 +113,7 @@ public class CommonService {
      * @return void
      * @date 2021/5/14
      */
+    @Cacheable(value = "getCirculationValue")
     public BigDecimal getCirculationValue() {
         List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
@@ -171,6 +174,7 @@ public class CommonService {
      * @return void
      * @date 2021/5/14
      */
+    @Cacheable(value = "getStakingDenominator")
     public BigDecimal getStakingDenominator() {
         List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
