@@ -19,9 +19,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -105,7 +103,7 @@ public class BalanceUpdateTask {
                 Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
                 Set<String> addressSet = addressMap.keySet();
                 String addresses = String.join(";", addressSet);
-                log.info("锁仓余额查询参数：{}", addresses);
+                log.debug("锁仓余额查询参数：{}", addresses);
 
                 Instant start = Instant.now();
                 List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(web3j,addresses);
