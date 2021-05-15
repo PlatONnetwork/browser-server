@@ -13,6 +13,9 @@ def packageName = "${project.name}-${version}"
 // 复制配置文件
 task copyConf(type: Copy) {
     from('src/main/resources/application-prod.yml')
+    from('release/start.sh')
+    from('release/stop.sh')
+    from('release/update.sql')
     from('jasypt.properties')
     from("build/libs/${packageName}.jar")
     into('build/package')
@@ -60,6 +63,7 @@ task deployToTestEnv(dependsOn:['build'],group: 'deploy') {
                 put from: "${projectDir}/src/main/resources/application-prod.yml", into: "$deployDir"
                 put from: "${projectDir}/release/start.sh", into: "$deployDir"
                 put from: "${projectDir}/release/stop.sh", into: "$deployDir"
+                put from: "${projectDir}/jasypt.properties", into: "$deployDir"
                 execute "cd $deployDir && ${deployFixScript} && chmod a+x *.sh"
                 execute "cd $deployDir && ./start.sh $activeProfile"
             }
