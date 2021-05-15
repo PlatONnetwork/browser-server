@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 @Component
@@ -64,9 +66,17 @@ public class BalanceUpdateTask {
                 break;
         }
         example.setOrderByClause(" address LIMIT "+config.getMaxAddressCount());
+        Instant start = Instant.now();
         List<InternalAddress> addressList = internalAddressMapper.selectByExample(example);
+        Instant end = Instant.now();
+        Duration duration = Duration.between(start,end);
+        log.debug("查询地址耗时：{} ms",duration.toMillis());
         if(!addressList.isEmpty()) {
+            Instant start1 = Instant.now();
             updateBalance(addressList);
+            Instant end1 = Instant.now();
+            Duration duration1 = Duration.between(start1,end1);
+            log.debug("总更新地址耗时：{} ms",duration1.toMillis());
         }else{
             log.info("地址数为0,不做操作！");
         }
@@ -93,8 +103,14 @@ public class BalanceUpdateTask {
                 Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
                 Set<String> addressSet = addressMap.keySet();
                 String addresses = String.join(";", addressSet);
-                log.info("锁仓余额查询参数：{}", addresses);
+                log.debug("锁仓余额查询参数：{}", addresses);
+
+                Instant start = Instant.now();
                 List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(web3j,addresses);
+                Instant end = Instant.now();
+                Duration duration = Duration.between(start,end);
+                log.debug("本批次查询地址锁仓余额耗时：{} ms",duration.toMillis());
+
                 log.debug("锁仓余额查询结果：{}", JSON.toJSONString(balanceList));
                 // 设置余额
                 balanceList.forEach(balance->{
@@ -106,10 +122,14 @@ public class BalanceUpdateTask {
                 // 同步更新，防止表锁争用导致的死锁
                 synchronized (BalanceUpdateTask.class){
                     // 批量更新余额
+                    Instant start1 = Instant.now();
                     customInternalAddressMapper.batchInsertOrUpdateSelective(
-                        addressMap.values(),
-                        InternalAddress.Column.excludes(InternalAddress.Column.updateTime)
+                            addressMap.values(),
+                            InternalAddress.Column.excludes(InternalAddress.Column.updateTime)
                     );
+                    Instant end1 = Instant.now();
+                    Duration duration1 = Duration.between(start1,end1);
+                    log.debug("本批次更新地址余额耗时：{} ms",duration1.toMillis());
                     log.info("地址余额批量更新成功！");
                 }
             }catch (Exception e){
