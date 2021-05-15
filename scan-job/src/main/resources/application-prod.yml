@@ -12,7 +12,24 @@ spring:
     url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: platon
     password: platon
-
+#PlatOn相关配置
+platon:
+  #链id
+  chainId: 100
+  # Web3j访问地址
+  web3j:
+    #HTTP或WS
+    protocol: HTTP
+    addresses: 192.168.120.151:6789,192.168.120.151:6790
+task:
+  #允许更新的最大地址数量
+  maxAddressCount: 5004
+  #每次批量查询锁仓余额的最大数量
+  maxBatchSize: 100
+  #基金会地址统计cron表达式
+  fundAddressCron: 0/10  * * * * ?
+  #内置合约地址统计cron表达式
+  innerContractCron: 0/5  * * * * ?
 #日志配置
 logging:
   #日志级别
@@ -21,28 +38,3 @@ logging:
     com.platon.browser.task: debug
   file:
     name: ./logs/${spring.application.name}-${version}-${profile}.log
-#PlatOn相关配置
-platon:
-  # 地址HRP前缀
-  addressPrefix: lat
-  # 金额显示单位
-  valueUnit: LAT
-  # 交易输入参数并行解码线程数
-  txLogDecodeThreadNum: 200
-  # Web3j访问地址
-  web3j:
-    #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
-  #链id
-  chainId: 100
-
-task:
-  #查询总记录数
-  addressLimit: 5004
-  #批量查询锁仓合约大小
-  queryBatchSize: 100
-  #基金会地址统计cron表达式
-  fundAddressCron: 0/10  * * * * ?
-  #内置合约地址统计cron表达式
-  innerContractCron: 0/5  * * * * ?

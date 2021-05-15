@@ -1,17 +1,17 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.enums.InternalAddressType;
 import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.config.TaskConfig;
 import com.platon.browser.dao.entity.InternalAddress;
 import com.platon.browser.dao.entity.InternalAddressExample;
 import com.platon.browser.dao.mapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.mapper.InternalAddressMapper;
+import com.platon.browser.enums.InternalAddressType;
 import com.platon.protocol.Web3j;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +21,7 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class AddressUpdateTask {
-
+public class BalanceUpdateTask {
     @Resource
     private InternalAddressMapper internalAddressMapper;
     @Resource
@@ -31,11 +30,8 @@ public class AddressUpdateTask {
     private SpecialApi specialApi;
     @Resource
     private PlatOnClient platOnClient;
-
-    @Value("${task.addressLimit}")
-    private int addressLimit;
-    @Value("${task.queryBatchSize}")
-    private int queryBatchSize;
+    @Resource
+    private TaskConfig config;
 
     /**
      * 更新基金会账户余额
@@ -46,14 +42,15 @@ public class AddressUpdateTask {
        updateBalance(InternalAddressType.FUND_ACCOUNT);
         log.info("更新基金会地址余额结束... ");
     }
+
     /**
      * 更新内置合约账户余额
      */
     @Scheduled(cron = "${task.innerContractCron}")
     public void updateContractAccount() {
-        log.info("开始内置合约账户余额... ");
+        log.info("开始更新内置合约地址余额... ");
         updateBalance(InternalAddressType.OTHER);
-        log.info("更新内置合约账户余额结束... ");
+        log.info("更新内置合约地址余额结束... ");
     }
 
     private void updateBalance(InternalAddressType type){
@@ -66,7 +63,7 @@ public class AddressUpdateTask {
                 example.createCriteria().andTypeNotEqualTo(InternalAddressType.FUND_ACCOUNT.getCode());
                 break;
         }
-        example.setOrderByClause(" address LIMIT "+addressLimit);
+        example.setOrderByClause(" address LIMIT "+config.getMaxAddressCount());
         List<InternalAddress> addressList = internalAddressMapper.selectByExample(example);
         if(!addressList.isEmpty()) {
             log.info("更新地址数：{} ", addressList.size());
@@ -76,12 +73,11 @@ public class AddressUpdateTask {
     }
 
     private void updateBalance(List<InternalAddress> addressList) {
-
         List<Map<String,InternalAddress>> batchList = new ArrayList<>();
         Map<String,InternalAddress> batch = new HashMap<>();
         batchList.add(batch);
         for (InternalAddress address : addressList) {
-            if(batch.size()>=queryBatchSize){
+            if(batch.size()>=config.getMaxBatchSize()){
                 // 如果当前批次大小达到批次大小，则新建一个批次
                 batch = new HashMap<>();
                 batchList.add(batch);
@@ -103,13 +99,17 @@ public class AddressUpdateTask {
                     address.setBalance(new BigDecimal(balance.getFreeBalance()));
                     address.setRestrictingBalance(new BigDecimal(balance.getLockBalance().subtract(balance.getPledgeBalance())));
                 });
-                // 批量更新余额
-                customInternalAddressMapper.batchInsertOrUpdateSelective(
+
+                // 同步更新，防止表锁争用导致的死锁
+                synchronized (BalanceUpdateTask.class){
+                    // 批量更新余额
+                    customInternalAddressMapper.batchInsertOrUpdateSelective(
                         addressMap.values(),
                         InternalAddress.Column.excludes(
-                            InternalAddress.Column.updateTime
+                                InternalAddress.Column.updateTime
                         )
-                );
+                    );
+                }
 
                 log.debug("查询结果：{}", JSON.toJSONString(balanceList));
             }catch (Exception e){
