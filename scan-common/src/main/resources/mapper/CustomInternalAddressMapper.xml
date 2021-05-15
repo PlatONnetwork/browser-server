@@ -33,4 +33,16 @@
       )
     </foreach>
   </insert>
+
+  <select id="countBalance" resultType="com.platon.browser.bean.CountBalance">
+    SELECT
+      `type`,
+      SUM( `balance` ) AS free,
+      SUM( `restricting_balance` ) AS locked
+    FROM
+      `internal_address`
+    GROUP BY
+      `type`
+  </select>
+
 </mapper>

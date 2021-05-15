@@ -1,22 +1,17 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import com.platon.browser.bean.CountBalance;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.InternalAddress;
-import com.platon.browser.dao.entity.InternalAddressExample;
-import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
-import com.platon.browser.dao.mapper.InternalAddressMapper;
-import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,9 +32,6 @@ import java.util.List;
 public class CommonService {
 
     @Resource
-    private StatisticCacheService statisticCacheService;
-
-    @Resource
     private CustomNodeMapper customNodeMapper;
 
     @Resource
@@ -52,7 +44,7 @@ public class CommonService {
     private PlatOnClient platOnClient;
 
     @Resource
-    private InternalAddressMapper internalAddressMapper;
+    private CustomInternalAddressMapper customInternalAddressMapper;
 
     public String getNodeName(String nodeId, String nodeName) {
         /**
@@ -71,7 +63,6 @@ public class CommonService {
      * @return java.math.BigDecimal
      * @date 2021/5/14
      */
-    //@Cacheable(value = "getIssueValue")
     public BigDecimal getIssueValue() {
         BigDecimal issueValue = new BigDecimal(0);
         try {
@@ -92,7 +83,7 @@ public class CommonService {
         } catch (Exception e) {
             log.error("获取取总发行量异常", e);
         }
-        return issueValue.abs();
+        return issueValue;
     }
 
     /**
@@ -103,29 +94,13 @@ public class CommonService {
      * @date 2021/5/14
      */
     public Long getBlockCurrentNumber() {
-        Long currentNumber = 0L;
-        NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-        if (networkStatRedis == null) {
-            return currentNumber;
-        } else {
-            currentNumber = networkStatRedis.getCurNumber();
-            Long bNumber = networkStatRedis.getCurNumber();
-            /* 查询缓存最新的八条区块信息 */
-            List<Block> items = statisticCacheService.getBlockCache(0, 8);
-            if (!items.isEmpty()) {
-                /*
-                 * 如果统计区块小于区块交易则重新查询新的区块
-                 */
-                Long dValue = items.get(0).getNum() - bNumber;
-                if (dValue > 0) {
-                    items = statisticCacheService.getBlockCacheByStartEnd(dValue, dValue + 8);
-                }
-                if (dValue < 0) {
-                    currentNumber = items.get(0).getNum();
-                }
-            }
+        BigInteger nowBlockNumber = new BigInteger("0");
+        try {
+            nowBlockNumber = platOnClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
+        } catch (Exception e) {
+            log.error("获取当前块高异常", e);
         }
-        return currentNumber;
+        return Convert.toLong(nowBlockNumber, 0L);
     }
 
     /**
@@ -137,143 +112,40 @@ public class CommonService {
      * @date 2021/5/14
      */
     public BigDecimal getCirculationValue() {
+        List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
-        BigDecimal lockUpValue = getLockUpValue();
-        BigDecimal stakingValue = getStakingValue();
-        BigDecimal delegationValue = getDelegationValue();
-        BigDecimal incentivePoolValue = getIncentivePoolValue();
-        BigDecimal foundationValue = getFoundationValue();
-        BigDecimal circulationValue = issueValue.subtract(lockUpValue).subtract(stakingValue).subtract(delegationValue).subtract(incentivePoolValue).subtract(foundationValue);
+        // 获取实时锁仓合约余额
+        CountBalance lockUpValue = list.stream().filter(v -> v.getType() == 1).findFirst().orElseGet(CountBalance::new);
+        // 获取实时质押合约余额
+        CountBalance stakingValue = list.stream().filter(v -> v.getType() == 2).findFirst().orElseGet(CountBalance::new);
+        // 获取实时委托奖励池合约余额
+        CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
+        // 实时激励池余额
+        CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
+        // 获取实时所有基金会账户余额
+        CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
+        BigDecimal circulationValue = issueValue
+                .subtract(lockUpValue.getFree())
+                .subtract(stakingValue.getFree())
+                .subtract(delegationValue.getFree())
+                .subtract(incentivePoolValue.getFree())
+                .subtract(foundationValue.getFree());
         if (circulationValue.signum() == -1) {
             log.error("获取流通量[{}]错误,不能为负数", issueValue.toString());
         }
-        return circulationValue.abs();
+        return circulationValue;
     }
 
     /**
-     * 获取实时锁仓合约余额
+     * 查询统计的余额
      *
      * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
+     * @return java.util.List<com.platon.browser.bean.CountBalance>
+     * @date 2021/5/15
      */
-    private BigDecimal getLockUpValue() {
-        BigDecimal lockUpValue = new BigDecimal(0);
-        InternalAddressExample example = new InternalAddressExample();
-        InternalAddressExample.Criteria criteria = example.createCriteria();
-        criteria.andTypeEqualTo(1);
-        List<InternalAddress> lockUpLists = internalAddressMapper.selectByExample(example);
-        if (CollUtil.isNotEmpty(lockUpLists)) {
-            for (InternalAddress internalAddress : lockUpLists) {
-                lockUpValue = lockUpValue.add(internalAddress.getBalance());
-            }
-        }
-        return lockUpValue;
-    }
-
-    /**
-     * 获取实时质押合约余额
-     *
-     * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
-     */
-    private BigDecimal getStakingValue() {
-        BigDecimal stakingValue = new BigDecimal(0);
-        InternalAddressExample example = new InternalAddressExample();
-        InternalAddressExample.Criteria criteria = example.createCriteria();
-        criteria.andTypeEqualTo(2);
-        List<InternalAddress> stakingLists = internalAddressMapper.selectByExample(example);
-        if (CollUtil.isNotEmpty(stakingLists)) {
-            for (InternalAddress internalAddress : stakingLists) {
-                stakingValue = stakingValue.add(internalAddress.getBalance());
-            }
-        }
-        return stakingValue;
-    }
-
-    /**
-     * 获取实时委托奖励池合约余额
-     *
-     * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
-     */
-    private BigDecimal getDelegationValue() {
-        BigDecimal delegationValue = new BigDecimal(0);
-        InternalAddressExample example = new InternalAddressExample();
-        InternalAddressExample.Criteria criteria = example.createCriteria();
-        criteria.andTypeEqualTo(6);
-        List<InternalAddress> delegationLists = internalAddressMapper.selectByExample(example);
-        if (CollUtil.isNotEmpty(delegationLists)) {
-            for (InternalAddress internalAddress : delegationLists) {
-                delegationValue = delegationValue.add(internalAddress.getBalance());
-            }
-        }
-        return delegationValue;
-    }
-
-    /**
-     * 实时激励池余额
-     *
-     * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
-     */
-    private BigDecimal getIncentivePoolValue() {
-        BigDecimal incentivePoolValue = new BigDecimal(0);
-        InternalAddressExample example = new InternalAddressExample();
-        InternalAddressExample.Criteria criteria = example.createCriteria();
-        criteria.andTypeEqualTo(3);
-        List<InternalAddress> incentivePoolLists = internalAddressMapper.selectByExample(example);
-        if (CollUtil.isNotEmpty(incentivePoolLists)) {
-            for (InternalAddress internalAddress : incentivePoolLists) {
-                incentivePoolValue = incentivePoolValue.add(internalAddress.getBalance());
-            }
-        }
-        return incentivePoolValue;
-    }
-
-    /**
-     * 获取实时所有基金会账户余额
-     *
-     * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
-     */
-    private BigDecimal getFoundationValue() {
-        BigDecimal foundationValue = new BigDecimal(0);
-        InternalAddressExample example = new InternalAddressExample();
-        InternalAddressExample.Criteria criteria = example.createCriteria();
-        criteria.andTypeEqualTo(0);
-        List<InternalAddress> foundationLists = internalAddressMapper.selectByExample(example);
-        if (CollUtil.isNotEmpty(foundationLists)) {
-            for (InternalAddress internalAddress : foundationLists) {
-                foundationValue = foundationValue.add(internalAddress.getBalance());
-            }
-        }
-        return foundationValue;
-    }
-
-    /**
-     * 获取实时所有基金会账户锁仓余额
-     *
-     * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
-     */
-    private BigDecimal getFoundationLockUpValue() {
-        BigDecimal foundationLockUpValue = new BigDecimal(0);
-        InternalAddressExample example = new InternalAddressExample();
-        InternalAddressExample.Criteria criteria = example.createCriteria();
-        criteria.andTypeEqualTo(0);
-        List<InternalAddress> foundationLockUpLists = internalAddressMapper.selectByExample(example);
-        if (CollUtil.isNotEmpty(foundationLockUpLists)) {
-            for (InternalAddress internalAddress : foundationLockUpLists) {
-                foundationLockUpValue = foundationLockUpValue.add(internalAddress.getRestrictingBalance());
-            }
-        }
-        return foundationLockUpValue;
+    private List<CountBalance> countBalance() {
+        List<CountBalance> list = customInternalAddressMapper.countBalance();
+        return list;
     }
 
     /**
@@ -285,7 +157,10 @@ public class CommonService {
      * @date 2021/5/14
      */
     public BigDecimal getTotalStakingValue() {
-        return getStakingValue();
+        List<CountBalance> list = countBalance();
+        // 获取实时质押合约余额
+        CountBalance stakingValue = list.stream().filter(v -> v.getType() == 2).findFirst().orElseGet(CountBalance::new);
+        return stakingValue.getFree();
     }
 
     /**
@@ -297,16 +172,23 @@ public class CommonService {
      * @date 2021/5/14
      */
     public BigDecimal getStakingDenominator() {
+        List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
-        BigDecimal delegationValue = getDelegationValue();
-        BigDecimal incentivePoolValue = getIncentivePoolValue();
-        BigDecimal foundationValue = getFoundationValue();
-        BigDecimal foundationLockUpValue = getFoundationLockUpValue();
-        BigDecimal stakingDenominator = issueValue.subtract(incentivePoolValue).subtract(delegationValue).subtract(foundationValue).subtract(foundationLockUpValue);
+        // 获取实时委托奖励池合约余额
+        CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
+        // 实时激励池余额
+        CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
+        // 获取实时所有基金会账户余额
+        CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
+        BigDecimal stakingDenominator = issueValue
+                .subtract(incentivePoolValue.getFree())
+                .subtract(delegationValue.getFree())
+                .subtract(foundationValue.getFree())
+                .subtract(foundationValue.getLocked());
         if (stakingDenominator.signum() == -1) {
             log.error("获取质押率分母[{}]错误,不能为负数", stakingDenominator.toString());
         }
-        return stakingDenominator.abs();
+        return stakingDenominator;
     }
 
 }
