@@ -11,7 +11,13 @@ CREATE TABLE `internal_address` (
 
 -- 初始化数据
 INSERT INTO `internal_address` (`address`,`type`)
-VALUES ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep', 1),
-       ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7', 2),
-       ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrdyjj2v', 3),
-       ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxlcypcy', 6);
+VALUES ('atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp8h9fxw', 1),
+       ('atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzfyslg3', 2),
+       ('atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr5jy24r', 3),
+       ('atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxxwje8t', 6);
+
+
+-- 激励池合约地址: atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr5jy24r
+-- 委托奖励合约地址: atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxxwje8t
+-- 质押合约地址: atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzfyslg3
+-- 锁仓合约地址: atp1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp8h9fxw

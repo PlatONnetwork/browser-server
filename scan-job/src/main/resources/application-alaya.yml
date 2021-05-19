@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: prod
+profile: alaya
 # 密码加密配置
 jasypt:
   encryptor:
@@ -9,18 +9,18 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_hrpatp201018v10000?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
 #PlatOn相关配置
 platon:
   #链id
-  chainId: 100
+  chainId: 201018
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    protocol: WS
+    addresses: 192.168.120.151:7789,192.168.120.151:7790
 task:
   #允许更新的最大地址数量
   maxAddressCount: 5004

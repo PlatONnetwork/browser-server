@@ -1,5 +1,5 @@
-# Platon blockchain browser server
-> Provides browsing functions of the Platon chain, including functions such as blocks, transactions, verification nodes, governance parameters, tokens, etc.
+# Alaya blockchain browser server
+> Provides browsing functions of the Alaya chain, including functions such as blocks, transactions, verification nodes, governance parameters, tokens, etc.
 
 ## Software Architecture
 
