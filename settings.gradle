@@ -13,4 +13,5 @@ include 'scan-sync'
 include 'scan-press'
 include 'scan-export'
 include 'scan-test'
+include 'scan-job'
 

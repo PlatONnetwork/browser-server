@@ -1,7 +1,5 @@
 package com.platon.browser.service;
 
-import com.platon.browser.utils.TransactionUtil;
-import com.platon.contracts.ppos.dto.resp.Reward;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
@@ -19,11 +17,7 @@ import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
@@ -31,8 +25,13 @@ import com.platon.browser.request.staking.*;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.*;
-import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.I18nUtil;
+import com.platon.contracts.ppos.dto.resp.Reward;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +87,9 @@ public class StakingService {
     @Resource
     private PlatOnClient platonClient;
 
+    @Resource
+    private CommonService commonService;
+
     public StakingStatisticNewResp stakingStatisticNew() {
         /** 获取统计信息 */
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
@@ -103,8 +105,13 @@ public class StakingService {
             Integer count = customStakingMapper.selectCountByActive();
             // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
             stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
-
         }
+        BigDecimal issueValue = commonService.getIssueValue();
+        stakingStatisticNewResp.setIssueValue(issueValue);
+        BigDecimal stakingDenominator = commonService.getStakingDenominator();
+        stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
+        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
+        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue );
         return stakingStatisticNewResp;
     }
 
