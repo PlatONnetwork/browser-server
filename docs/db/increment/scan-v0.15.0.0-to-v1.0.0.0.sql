@@ -1,3 +1,4 @@
+USE `scan_platon`;
 -- 增量脚本
 alter table address add erc721_tx_qty int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数';
 alter table address add erc20_tx_qty int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数';

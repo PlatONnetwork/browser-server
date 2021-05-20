@@ -1,3 +1,5 @@
+USE `scan_platon`;
+DROP TABLE IF EXISTS `internal_address`;
 CREATE TABLE `internal_address` (
                                     `address` VARCHAR(42) NOT NULL COMMENT '地址',
                                     `type` INT(11) NOT NULL DEFAULT '0' COMMENT '地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约 ',

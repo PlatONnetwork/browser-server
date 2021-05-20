@@ -46,3 +46,4 @@ scan-service/out
 /apolloCache/
 /adjust.log
 *info.md
+/docs/db/
