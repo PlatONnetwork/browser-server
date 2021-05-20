@@ -20,7 +20,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.120.151:7789,192.168.120.151:7790
+    addresses: 192.168.112.141:7789,192.168.112.141:7790
 task:
   #允许更新的最大地址数量
   maxAddressCount: 5004
