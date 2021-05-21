@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LongSummaryStatistics;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * @Auther: Chendongming
@@ -45,12 +47,13 @@ public class EsImportService {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
-    private <T> void submit(EsService<T> service, Set<T> data, CountDownLatch latch) {
+    private <T> void submit(EsService<T> service, Set<T> data, CountDownLatch latch, ESKeyEnum eSKeyEnum) {
         EXECUTOR.submit(() -> {
             try {
                 service.save(data);
+                statisticsLog(data, eSKeyEnum);
             } catch (IOException e) {
-                log.error("", e);
+                log.error("ES批量入库", e);
             } finally {
                 latch.countDown();
             }
@@ -71,17 +74,16 @@ public class EsImportService {
             long startTime = System.currentTimeMillis();
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
 
-            submit(esBlockService, blocks, latch);
-            submit(esTransactionService, transactions, latch);
-            submit(esNodeOptService, nodeOpts, latch);
-            submit(esDelegateRewardService, delegationRewards, latch);
-            submit(esErc20TxService, erc20TxList, latch);
-            submit(esErc721TxService, erc721TxList, latch);
+            submit(esBlockService, blocks, latch, ESKeyEnum.Block);
+            submit(esTransactionService, transactions, latch, ESKeyEnum.Transaction);
+            submit(esNodeOptService, nodeOpts, latch, ESKeyEnum.NodeOpt);
+            submit(esDelegateRewardService, delegationRewards, latch, ESKeyEnum.DelegateReward);
+            submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx);
+            submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx);
             latch.await();
-
             log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
-            log.error("", e);
+            log.error("入库ES异常", e);
             throw new BusinessException(e.getMessage());
         }
     }
@@ -114,6 +116,35 @@ public class EsImportService {
             }
         }
         return result;
+    }
+
+    /**
+     * 打印统计信息
+     *
+     * @param data
+     * @param eSKeyEnum
+     * @return void
+     * @date 2021/5/21
+     */
+    private <T> void statisticsLog(Set<T> data, ESKeyEnum eSKeyEnum) {
+        try {
+            if (eSKeyEnum.compareTo(ESKeyEnum.Block) == 0) {
+                LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
+                log.info("ES批量入库成功统计:区块[{}]-[{}]",
+                        blockSum.getMin(),
+                        blockSum.getMax());
+            } else if (eSKeyEnum.compareTo(ESKeyEnum.Transaction) == 0) {
+                log.info("ES批量入库成功统计:交易数[{}]", data.size());
+            } else if (eSKeyEnum.compareTo(ESKeyEnum.NodeOpt) == 0) {
+                log.info("ES批量入库成功统计:节点操作数[{}]", data.size());
+            } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc20Tx) == 0) {
+                log.info("ES批量入库成功统计:erc20交易数[{}]", data.size());
+            } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc721Tx) == 0) {
+                log.info("ES批量入库成功统计:erc721交易数[{}]", data.size());
+            }
+        } catch (Exception e) {
+            log.error("ES批量入库成功统计打印异常", e);
+        }
     }
 
 }

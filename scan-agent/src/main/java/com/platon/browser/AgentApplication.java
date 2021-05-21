@@ -108,6 +108,7 @@ public class AgentApplication implements ApplicationRunner {
                 EpochMessage epochMessage = epochService.getEpochMessage(collectedNumber);
                 blockEventPublisher.publish(blockCF, receiptCF, epochMessage, traceId);
                 if (preBlockNum != 0L && (collectedNumber - preBlockNum != 1)) {
+                    log.error("采集数据异常,当前区块{},前一个区块{}", collectedNumber, preBlockNum);
                     throw new AssertionError();
                 }
                 CommonUtil.removeTraceId();

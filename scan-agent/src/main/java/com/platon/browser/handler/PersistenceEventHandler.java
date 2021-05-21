@@ -142,7 +142,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/24
      */
     private void statisticsLog() {
@@ -155,7 +154,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                     IntSummaryStatistics transferTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getTransferTxList().size()));
                     IntSummaryStatistics pposTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getPposTxList().size()));
                     IntSummaryStatistics virtualTransactionSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getVirtualTransactions().size()));
-                    log.info("入库redis和ES统计:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
+                    log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
                             blockNum,
                             CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
                             erc20Size.getSum(),
