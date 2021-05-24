@@ -12,3 +12,6 @@ mybatis:
   mapper-locations: classpath*:mapper/*.xml
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
+#PlatOn相关配置
+platon:
+  addressPrefix: lat
