@@ -113,7 +113,6 @@ public class InitializationService {
      *
      * @param traceId
      * @return com.platon.browser.bootstrap.bean.InitializationResult
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     @Transactional
