@@ -320,6 +320,8 @@ subprojects {
         compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.12'
         compile group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
         compile group: 'org.apache.httpcomponents', name: 'httpcore-nio', version: '4.4.12'
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.4.5'
+        implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.9.0'
 
         compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
         testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
