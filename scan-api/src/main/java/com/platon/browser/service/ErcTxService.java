@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
@@ -28,7 +28,10 @@ import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
-import com.platon.browser.utils.*;
+import com.platon.browser.utils.ConvertUtil;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.utils.HexUtil;
+import com.platon.browser.utils.I18nUtil;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -312,7 +315,7 @@ public class ErcTxService {
                 originTotalSupply = (originTotalSupply == null) ? BigDecimal.ZERO : originTotalSupply;
                 BigDecimal totalSupply = ConvertUtil.convertByFactor(originTotalSupply, tokenHolder.getDecimal());
                 int holderNum = map.get(tokenHolder.getAddress()).intValue();
-                int total = ids.getResult().size();
+                int total = Convert.toInt(ids.getTotal());
                 String percent = new BigDecimal(holderNum)
                         .divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100))
@@ -369,20 +372,21 @@ public class ErcTxService {
     public AccountDownload exportTokenHolderList(String contract, String local, String timeZone) {
         PageHelper.startPage(1, 30000);
         Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(contract, null, null);
+        Map<String, Long> map = rs.getResult().stream().collect(Collectors.groupingBy(CustomTokenHolder::getAddress, Collectors.counting()));
         List<Object[]> rows = new ArrayList<>();
         rs.stream().forEach(customTokenHolder -> {
             BigDecimal balance = this.getAddressBalance(customTokenHolder);
-            // 总供应量作为分母，为0的话，则百分比为0
-            BigDecimal percentage;
-            if (ObjectUtil.isNull(customTokenHolder.getTotalSupply()) || "0".equalsIgnoreCase(customTokenHolder.getTotalSupply())) {
-                percentage = BigDecimal.ZERO;
-            } else {
-                percentage = balance.divide(new BigDecimal(customTokenHolder.getTotalSupply()), 4, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
-            }
+            int holderNum = map.get(customTokenHolder.getAddress()).intValue();
+            int total = Convert.toInt(rs.getTotal());
+            String percent = new BigDecimal(holderNum)
+                    .divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(decimal, RoundingMode.HALF_UP)
+                    .stripTrailingZeros()
+                    .toPlainString() + "%";
             Object[] row = {customTokenHolder.getAddress(),
                     HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()),
-                    percentage.toString() + "%"
+                    percent
             };
             rows.add(row);
         });
