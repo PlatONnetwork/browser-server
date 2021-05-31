@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -51,6 +52,13 @@ public class CommonUtilTest {
 
         log.info("===={}", erc20Size);
         log.info("===={}", virtualTransactionSize);
+    }
+
+    @Test
+    public void unit256MaxNumTest1() {
+        // unit8的最大值就是2的8次方，然后取值范围[0-2^8-1]
+        log.info("unit256的最大值为======{}", new BigDecimal("2").pow(256).subtract(BigDecimal.ONE));
+        log.info("unit8的最大值为======{}", new BigDecimal("2").pow(31).subtract(BigDecimal.ONE));
     }
 
 }

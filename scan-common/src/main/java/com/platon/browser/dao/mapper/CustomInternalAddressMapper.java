@@ -1,7 +1,9 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.dao.entity.InternalAddress;
+import com.platon.browser.dao.entity.InternalAddressExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -19,5 +21,14 @@ public interface CustomInternalAddressMapper {
      * @date 2021/5/15
      */
     List<CountBalance> countBalance();
+
+    /**
+     * 根据条件查询列表
+     *
+     * @param example
+     * @return
+     * @method selectByExample
+     */
+    Page<InternalAddress> selectListByExample(InternalAddressExample example);
 
 }

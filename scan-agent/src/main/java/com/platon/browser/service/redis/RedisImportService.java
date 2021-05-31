@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -47,15 +48,17 @@ public class RedisImportService {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
-    private <T> void submit(AbstractRedisService<T> service, Set<T> data, boolean serialOverride, CountDownLatch latch, RedisKeyEnum redisKeyEnum) {
+    private <T> void submit(AbstractRedisService<T> service, Set<T> data, boolean serialOverride, CountDownLatch latch, RedisKeyEnum redisKeyEnum, String traceId) {
         EXECUTOR.submit(() -> {
             try {
+                CommonUtil.putTraceId(traceId);
                 service.save(data, serialOverride);
                 statisticsLog(data, redisKeyEnum);
             } catch (Exception e) {
                 log.error("redis批量入库异常", e);
             } finally {
                 latch.countDown();
+                CommonUtil.removeTraceId();
             }
         });
     }
@@ -68,11 +71,11 @@ public class RedisImportService {
             Set<ErcTx> erc20TxList = getErc20TxList(transactions);
             Set<ErcTx> erc721TxList = getErc721TxList(transactions);
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
-            submit(redisBlockService, blocks, false, latch, RedisKeyEnum.Block);
-            submit(redisTransactionService, transactions, false, latch, RedisKeyEnum.Transaction);
-            submit(redisStatisticService, statistics, true, latch, RedisKeyEnum.Statistic);
-            submit(redisErc20TxService, erc20TxList, false, latch, RedisKeyEnum.Erc20Tx);
-            submit(redisErc721TxService, erc721TxList, false, latch, RedisKeyEnum.Erc721Tx);
+            submit(redisBlockService, blocks, false, latch, RedisKeyEnum.Block, CommonUtil.getTraceId());
+            submit(redisTransactionService, transactions, false, latch, RedisKeyEnum.Transaction, CommonUtil.getTraceId());
+            submit(redisStatisticService, statistics, true, latch, RedisKeyEnum.Statistic, CommonUtil.getTraceId());
+            submit(redisErc20TxService, erc20TxList, false, latch, RedisKeyEnum.Erc20Tx, CommonUtil.getTraceId());
+            submit(redisErc721TxService, erc721TxList, false, latch, RedisKeyEnum.Erc721Tx, CommonUtil.getTraceId());
             latch.await();
             log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         } catch (Exception e) {

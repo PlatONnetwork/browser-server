@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 /**
  * 公共工具类
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/17
  */
 @Slf4j
@@ -25,7 +24,6 @@ public class CommonUtil {
      *
      * @param resolver
      * @return java.util.Optional<T>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     public static <T> Optional<T> ofNullable(Supplier<T> resolver) {
@@ -42,7 +40,6 @@ public class CommonUtil {
      *
      * @param
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/17
      */
     public static String createTraceId() {
@@ -54,7 +51,6 @@ public class CommonUtil {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/22
      */
     public static void putTraceId() {
@@ -66,11 +62,25 @@ public class CommonUtil {
     }
 
     /**
+     * 添加全局链路ID--默认生成的链路ID
+     *
+     * @param customKey 自定义key
+     * @return void
+     * @date 2021/5/31
+     */
+    public static void putCustomTraceId(String customKey) {
+        try {
+            MDC.put(customKey, createTraceId());
+        } catch (Exception e) {
+            log.error("添加链路ID异常", e);
+        }
+    }
+
+    /**
      * 添加全局链路ID
      *
      * @param traceId 链路ID
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/22
      */
     public static void putTraceId(String traceId) {
@@ -90,7 +100,6 @@ public class CommonUtil {
      *
      * @param
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/23
      */
     public static String getTraceId() {
@@ -108,12 +117,26 @@ public class CommonUtil {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/22
      */
     public static void removeTraceId() {
         try {
             MDC.remove(CommonConstant.TRACE_ID);
+        } catch (Exception e) {
+            log.error("删除链路ID异常", e);
+        }
+    }
+
+    /**
+     * 删除全局链路ID
+     *
+     * @param customKey 自定义key
+     * @return void
+     * @date 2021/5/31
+     */
+    public static void removeCustomTraceId(String customKey) {
+        try {
+            MDC.remove(customKey);
         } catch (Exception e) {
             log.error("删除链路ID异常", e);
         }

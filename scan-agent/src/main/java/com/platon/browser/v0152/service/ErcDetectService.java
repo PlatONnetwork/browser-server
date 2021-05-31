@@ -8,8 +8,6 @@ import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
-import com.platon.browser.v0152.retry.ErcBackOffPolicy;
-import com.platon.browser.v0152.retry.ErcRetryPolicy;
 import com.platon.crypto.Credentials;
 import com.platon.crypto.Keys;
 import com.platon.protocol.core.DefaultBlockParameterName;
@@ -24,8 +22,7 @@ import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,7 +32,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Erc探测服务
@@ -56,59 +52,6 @@ public class ErcDetectService {
     private PlatOnClient platOnClient;
 
     /**
-     * 最大重试次数
-     */
-    private static final int retryMaxNum = 3;
-
-    /**
-     * 检测输入数据---带重试机制
-     * 超时异常--无限重试，业务异常--重试3次
-     *
-     * @param contractAddress 合约地址
-     * @param inputData       input数据
-     * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/4/28
-     */
-    private String detectInputData(String contractAddress, String inputData) {
-        String res = "";
-        try {
-            AtomicLong inputMark = new AtomicLong(0);
-            RetryTemplate retryTemplate = new RetryTemplate();
-            retryTemplate.setRetryPolicy(ErcRetryPolicy.factory());
-            retryTemplate.setBackOffPolicy(ErcBackOffPolicy.factory());
-            res = retryTemplate.execute((RetryCallback<String, Throwable>) context -> {
-                        // 需要重试的逻辑代码
-                        String data = "";
-                        try {
-                            if (inputMark.intValue() <= retryMaxNum) {
-                                if (context.getRetryCount() > 0) {
-                                    log.warn("当前重试次数为{},标识为{}", context.getRetryCount(), inputMark.intValue());
-                                }
-                                data = detectInputDataWithNotRetry(contractAddress, inputData);
-                            } else {
-                                log.warn("合约地址[{}]检测输入，重试超过3次，将不再重试", contractAddress);
-                            }
-                        } catch (PlatonCallTimeoutException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            inputMark.incrementAndGet();
-                            throw e;
-                        }
-                        return data;
-                    }, context -> {
-                        // 重试失败后执行的代码
-                        log.error("第[{}]次重试失败", context.getRetryCount() + 1);
-                        return "";
-                    }
-            );
-        } catch (Throwable throwable) {
-            log.error("重试异常", throwable);
-        }
-        return res;
-    }
-
-    /**
      * 检测输入数据--不带重试机制
      *
      * @param contractAddress
@@ -117,7 +60,8 @@ public class ErcDetectService {
      * @author huangyongpeng@matrixelements.com
      * @date 2021/4/30
      */
-    private String detectInputDataWithNotRetry(String contractAddress, String inputData) throws PlatonCallTimeoutException {
+    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)
+    private String detectInputData(String contractAddress, String inputData) throws PlatonCallTimeoutException {
         log.info("合约地址[{}]检测输入数据[{}]", contractAddress, inputData);
         Transaction transaction = null;
         PlatonCall platonCall = null;
@@ -135,7 +79,7 @@ public class ErcDetectService {
                 String lowMessage = !StrUtil.isBlank(message) ? message.toLowerCase() : null;
                 // 包含timeout则抛超时异常，其他错误则直接抛出runtime异常
                 if (!StrUtil.isBlank(lowMessage) && lowMessage.contains("timeout")) {
-                    log.error("合约地址[{}]检测输入数据异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
+                    log.error("合约地址[{}]检测输入数据超时异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
                     throw new PlatonCallTimeoutException(error.getCode(), error.getMessage(), platonCall);
                 } else {
                     log.error("合约地址[{}]检测输入数据异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
@@ -151,7 +95,7 @@ public class ErcDetectService {
     }
 
     // 是否支持Erc165标准
-    private boolean isSupportErc165(String contractAddress) {
+    private boolean isSupportErc165(String contractAddress) throws PlatonCallTimeoutException {
         String result = detectInputData(contractAddress, "0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000");
         if (!"0x0000000000000000000000000000000000000000000000000000000000000001".equals(result)) {
             return false;
@@ -160,7 +104,7 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000000".equals(result);
     }
 
-    public boolean isSupportErc721Metadata(String contractAddress) {
+    public boolean isSupportErc721Metadata(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress))
             return false;
@@ -168,7 +112,7 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
-    public boolean isSupportErc721Enumerable(String contractAddress) {
+    public boolean isSupportErc721Enumerable(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress))
             return false;
@@ -177,7 +121,7 @@ public class ErcDetectService {
     }
 
     // 是否Erc721合约
-    private boolean isSupportErc721(String contractAddress) {
+    private boolean isSupportErc721(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress))
             return false;
@@ -249,49 +193,8 @@ public class ErcDetectService {
         return contractId;
     }
 
-    public ErcContractId getContractId(String contractAddress) {
-        ErcContractId res = null;
-        try {
-            AtomicLong contractIdMark = new AtomicLong(0);
-            RetryTemplate retryTemplate = new RetryTemplate();
-            retryTemplate.setRetryPolicy(ErcRetryPolicy.factory());
-            retryTemplate.setBackOffPolicy(ErcBackOffPolicy.factory());
-            res = retryTemplate.execute((RetryCallback<ErcContractId, Throwable>) context -> {
-                        // 需要重试的逻辑代码
-                        ErcContractId ercContractId = null;
-                        try {
-                            if (contractIdMark.intValue() <= retryMaxNum) {
-                                if (context.getRetryCount() > 0) {
-                                    log.warn("当前重试次数为{}，标识为[{}]", context.getRetryCount(), contractIdMark.intValue());
-                                }
-                                ercContractId = getContractIdWithNotRetry(contractAddress);
-                            } else {
-                                log.warn("合约地址[{}]获取合约id，重试超过3次，将不再重试", contractAddress);
-                                ercContractId = new ErcContractId();
-                                ercContractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
-                            }
-                        } catch (PlatonCallTimeoutException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            contractIdMark.incrementAndGet();
-                            throw e;
-                        }
-                        return ercContractId;
-                    }, context -> {
-                        // 重试失败后执行的代码
-                        log.error("第[{}]次重试失败，重试标识为{}", context.getRetryCount() + 1, contractIdMark);
-                        ErcContractId contractId = new ErcContractId();
-                        contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
-                        return contractId;
-                    }
-            );
-        } catch (Throwable throwable) {
-            log.error("重试异常", throwable);
-        }
-        return res;
-    }
-
-    public ErcContractId getContractIdWithNotRetry(String contractAddress) throws PlatonCallTimeoutException {
+    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)
+    public ErcContractId getContractId(String contractAddress) throws PlatonCallTimeoutException {
         log.info("获取合约地址[{}]id", contractAddress);
         ErcContractId contractId = null;
         try {
@@ -309,8 +212,10 @@ public class ErcDetectService {
                 }
             }
         } catch (PlatonCallTimeoutException e) {
+            log.error("获取合约[{}]id超时异常", contractAddress);
             throw e;
         } catch (Exception e) {
+            log.error(StrUtil.format("获取合约[{}]id异常", contractAddress), e);
             throw e;
         }
         return contractId;

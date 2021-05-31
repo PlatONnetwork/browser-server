@@ -6,7 +6,7 @@
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="symbol" jdbcType="VARCHAR" property="symbol" />
-    <result column="total_supply" jdbcType="DECIMAL" property="totalSupply" />
+    <result column="total_supply" jdbcType="VARCHAR" property="totalSupply" />
     <result column="decimal" jdbcType="INTEGER" property="decimal" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
@@ -65,7 +65,7 @@
           #{item.symbol,jdbcType=VARCHAR}
         </if>
         <if test="'total_supply'.toString() == column.value">
-          #{item.totalSupply,jdbcType=DECIMAL}
+          #{item.totalSupply,jdbcType=VARCHAR}
         </if>
         <if test="'decimal'.toString() == column.value">
           #{item.decimal,jdbcType=INTEGER}

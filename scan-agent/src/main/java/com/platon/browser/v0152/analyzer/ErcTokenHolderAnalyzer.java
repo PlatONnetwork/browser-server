@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +49,7 @@ public class ErcTokenHolderAnalyzer {
             tokenHolder.setAddress(key.getAddress());
             tokenHolder.setCreateTime(date);
             tokenHolder.setTokenTxQty(1);
-            tokenHolder.setBalance(BigDecimal.ZERO);
+            tokenHolder.setBalance("0");
         } else {
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }

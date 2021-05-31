@@ -774,8 +774,10 @@ public class TransactionService {
                                     .innerContractName(erc20.getName())
                                     .innerDecimal(String.valueOf(erc20.getDecimal()))
                                     .innerFrom(erc20.getFrom())
+                                    .fromType(erc20.getFromType())
                                     .innerSymbol(erc20.getSymbol())
                                     .innerTo(erc20.getTo())
+                                    .toType(erc20.getToType())
                                     .innerValue(afterConverValue.toString()).build();
                             arc20Params.add(arc20Param);
                         });
@@ -794,8 +796,10 @@ public class TransactionService {
                                     .innerContractName(erc721.getName())
                                     .innerDecimal(String.valueOf(erc721.getDecimal()))
                                     .innerFrom(erc721.getFrom())
+                                    .fromType(erc721.getFromType())
                                     .innerSymbol(erc721.getSymbol())
                                     .innerTo(erc721.getTo())
+                                    .toType(erc721.getToType())
                                     .innerValue(afterConverValue.toString())
                                     .build();
                             //查询对应的图片进行回填

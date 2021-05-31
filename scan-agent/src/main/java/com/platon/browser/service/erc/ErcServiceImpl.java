@@ -39,7 +39,6 @@ public class ErcServiceImpl {
      * @param type         合约类型
      * @param account      用户地址
      * @return java.math.BigInteger
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/20
      */
     @Retryable(value = Exception.class)
@@ -67,7 +66,6 @@ public class ErcServiceImpl {
      *
      * @param contractAddress 合约地址
      * @return java.math.BigInteger
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
     public BigInteger getTotalSupply(String contractAddress) {
@@ -90,7 +88,6 @@ public class ErcServiceImpl {
      * @param contractAddress 合约地址
      * @param ercTypeEnum     合约类型
      * @return com.platon.browser.v0151.contract.ErcContract
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
     private ErcContract getErcContract(String contractAddress, ErcTypeEnum ercTypeEnum) {
@@ -113,7 +110,6 @@ public class ErcServiceImpl {
      * @param contractAddress 合约地址
      * @param tokenId         token id
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
     public String getTokenURI(String contractAddress, BigInteger tokenId) {

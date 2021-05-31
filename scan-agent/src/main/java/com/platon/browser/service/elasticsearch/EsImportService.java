@@ -2,6 +2,7 @@ package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -47,15 +48,17 @@ public class EsImportService {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
-    private <T> void submit(EsService<T> service, Set<T> data, CountDownLatch latch, ESKeyEnum eSKeyEnum) {
+    private <T> void submit(EsService<T> service, Set<T> data, CountDownLatch latch, ESKeyEnum eSKeyEnum, String traceId) {
         EXECUTOR.submit(() -> {
             try {
+                CommonUtil.putTraceId(traceId);
                 service.save(data);
                 statisticsLog(data, eSKeyEnum);
             } catch (IOException e) {
                 log.error("ES批量入库", e);
             } finally {
                 latch.countDown();
+                CommonUtil.removeTraceId();
             }
         });
     }
@@ -74,12 +77,12 @@ public class EsImportService {
             long startTime = System.currentTimeMillis();
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
 
-            submit(esBlockService, blocks, latch, ESKeyEnum.Block);
-            submit(esTransactionService, transactions, latch, ESKeyEnum.Transaction);
-            submit(esNodeOptService, nodeOpts, latch, ESKeyEnum.NodeOpt);
-            submit(esDelegateRewardService, delegationRewards, latch, ESKeyEnum.DelegateReward);
-            submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx);
-            submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx);
+            submit(esBlockService, blocks, latch, ESKeyEnum.Block, CommonUtil.getTraceId());
+            submit(esTransactionService, transactions, latch, ESKeyEnum.Transaction, CommonUtil.getTraceId());
+            submit(esNodeOptService, nodeOpts, latch, ESKeyEnum.NodeOpt, CommonUtil.getTraceId());
+            submit(esDelegateRewardService, delegationRewards, latch, ESKeyEnum.DelegateReward, CommonUtil.getTraceId());
+            submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx, CommonUtil.getTraceId());
+            submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx, CommonUtil.getTraceId());
             latch.await();
             log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
