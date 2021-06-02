@@ -36,11 +36,19 @@ public interface CustomNodeMapper {
      *
      * @param nodeIds
      * @return java.util.List<java.lang.String>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/1
      */
     List<Node> batchFindNodeNameByNodeId(@Param("nodeIds") Set<String> nodeIds);
 
     Page<Node> findAliveStakingList(Integer status1, Integer isSettle1, boolean isUnion, Integer status2, Integer isSettle2);
+
+    /**
+     * 批量更新节点区块数统计信息
+     *
+     * @param nodeList
+     * @return int
+     * @date 2021/6/2
+     */
+    int updateNodeSettleStatis(@Param("list") List<Node> nodeList);
 
 }

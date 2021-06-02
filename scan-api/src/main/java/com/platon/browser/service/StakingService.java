@@ -7,6 +7,7 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
+import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
@@ -29,8 +30,7 @@ import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
-import com.platon.browser.utils.HexUtil;
-import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.*;
 import com.platon.contracts.ppos.dto.resp.Reward;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -111,7 +111,7 @@ public class StakingService {
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
         BigDecimal totalStakingValue = commonService.getTotalStakingValue();
-        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue );
+        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue);
         return stakingStatisticNewResp;
     }
 
@@ -204,6 +204,16 @@ public class StakingService {
             /** 质押总数=有效的质押+委托 */
             aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
             aliveStakingListResp.setDeleAnnualizedRate(staking.getDeleAnnualizedRate().toString());
+            try {
+                String nodeSettleStatisInfo = staking.getNodeSettleStatisInfo();
+                NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+            } catch (Exception e) {
+                logger.error("获取节点24小时出块率异常", e);
+            }
+            aliveStakingListResp.setDelegatedRewardRatio(new BigDecimal(staking.getRewardPer()).divide(Browser.PERCENTAGE).toString() + "%");
+            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
             lists.add(aliveStakingListResp);
             i++;
         }
