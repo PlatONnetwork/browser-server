@@ -467,7 +467,7 @@ public class ErcTokenUpdateTask {
             AtomicInteger errorNum = new AtomicInteger(0);
             try {
                 TokenInventoryExample condition = new TokenInventoryExample();
-                condition.setOrderByClause(" create_time asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+                condition.setOrderByClause(" id asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
                 batch = tokenInventoryMapper.selectByExample(condition);
                 List<TokenInventory> updateParams = new ArrayList<>();
                 if (!batch.isEmpty()) {
@@ -573,7 +573,7 @@ public class ErcTokenUpdateTask {
         AtomicInteger errorNum = new AtomicInteger(0);
         try {
             TokenInventoryExample condition = new TokenInventoryExample();
-            condition.setOrderByClause(" create_time asc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+            condition.setOrderByClause(" id asc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
             // 分页更新token库存相关信息
             List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
             batchNum = CommonUtil.ofNullable(() -> batch.size()).orElse(0);
