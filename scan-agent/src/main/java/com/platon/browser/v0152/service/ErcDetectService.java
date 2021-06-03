@@ -57,7 +57,6 @@ public class ErcDetectService {
      * @param contractAddress
      * @param inputData
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/30
      */
     @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)

@@ -19,7 +19,7 @@
         #{timestamp}
     );
     /*更新对应提案的字段*/
-    /*投票选项:1支持,2反对,3弃权*/
+    /*投票选项:1支持,2反对,3弃权,其余的枚举也按照3弃权处理*/
     update `proposal`
     <set>
         <if test="voteOption == 1">
@@ -28,7 +28,7 @@
         <if test="voteOption == 2">
             `nays` = `nays`+1,
         </if>
-        <if test="voteOption == 3">
+        <if test="voteOption != 1 and voteOption != 2">
             `abstentions` = `abstentions`+1,
         </if>
     </set>

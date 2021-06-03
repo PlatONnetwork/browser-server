@@ -6,11 +6,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer;
 import com.platon.browser.analyzer.statistic.StatisticsNetworkAnalyzer;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.bean.NodeSettleStatis;
-import com.platon.browser.bean.NodeSettleStatisBase;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
@@ -50,6 +48,9 @@ public class StatisticService {
     @Resource
     private CustomNodeMapper customNodeMapper;
 
+    @Resource
+    protected NodeCache nodeCache;
+
     /**
      * 解析区块, 构造业务入库参数信息
      *
@@ -86,7 +87,7 @@ public class StatisticService {
     public void nodeSettleStatisElected(CollectionEvent event) {
         try {
             // 为所有的节点的当选节点次数初始化
-            List<Node> nodeList = nodeMapper.selectByExample(null);
+            List<Node> nodeList = nodeCache.toNodeSettleStatisInfoList();
             List<Node> updateNodeList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(nodeList)) {
                 nodeList.forEach(node -> {
@@ -115,6 +116,7 @@ public class StatisticService {
                     updateNode.setNodeId(node.getNodeId());
                     updateNode.setNodeSettleStatisInfo(JSONUtil.toJsonStr(nodeSettleStatis));
                     updateNodeList.add(updateNode);
+                    updateNodeCacheSettleStatis(node.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));
                 });
                 int res = customNodeMapper.updateNodeSettleStatis(updateNodeList);
                 if (res > 0) {
@@ -125,6 +127,23 @@ public class StatisticService {
             }
         } catch (Exception e) {
             log.error(StrUtil.format("节点在共识轮数[{}]块高[{}]当选出块节点更新异常", event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber()), e);
+        }
+    }
+
+    /**
+     * 更新缓存中的统计信息
+     *
+     * @param nodeId
+     * @param json
+     * @return void
+     * @date 2021/6/2
+     */
+    private void updateNodeCacheSettleStatis(String nodeId, String json) {
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            nodeItem.setNodeSettleStatisInfo(json);
+        } catch (Exception e) {
+            log.error("更新node缓存统计信息异常", e);
         }
     }
 
@@ -177,15 +196,15 @@ public class StatisticService {
      */
     public void nodeSettleStatisBlockNum(CollectionEvent event) {
         try {
-            Node node = nodeMapper.selectByPrimaryKey(event.getBlock().getNodeId());
-            if (ObjectUtil.isNull(node)) {
+            NodeItem nodeItem = nodeCache.getNode(event.getBlock().getNodeId());
+            if (ObjectUtil.isNull(nodeItem)) {
                 return;
             }
-            String info = node.getNodeSettleStatisInfo();
+            String info = nodeItem.getNodeSettleStatisInfo();
             NodeSettleStatis nodeSettleStatis;
             if (StrUtil.isEmpty(info)) {
                 nodeSettleStatis = new NodeSettleStatis();
-                nodeSettleStatis.setNodeId(node.getNodeId());
+                nodeSettleStatis.setNodeId(nodeItem.getNodeId());
                 nodeSettleStatis.setBlockNum(event.getEpochMessage().getCurrentBlockNumber().longValue());
                 NodeSettleStatisBase nodeSettleStatisBase = new NodeSettleStatisBase();
                 nodeSettleStatisBase.setSettleEpochRound(event.getEpochMessage().getSettleEpochRound());
@@ -198,7 +217,8 @@ public class StatisticService {
                     addNodeSettleStatisBlockNum(event.getEpochMessage().getCurrentBlockNumber().longValue(), event.getBlock().getNodeId(), event.getEpochMessage().getSettleEpochRound(), nodeSettleStatis);
                 }
             }
-            updateNodeSettleStatis(node.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));
+            updateNodeCacheSettleStatis(nodeItem.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));
+            updateNodeSettleStatis(nodeItem.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));
         } catch (Exception e) {
             log.error(StrUtil.format("节点[{}]结算周期的出块统计异常", event.getBlock().getNodeId()), e);
         }

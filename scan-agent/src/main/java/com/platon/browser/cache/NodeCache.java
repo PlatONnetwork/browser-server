@@ -1,5 +1,6 @@
 package com.platon.browser.cache;
 
+import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.bean.NodeItem;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -48,7 +49,6 @@ public class NodeCache {
      *
      * @param nodeList
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     public void init(List<Node> nodeList) {
@@ -60,9 +60,28 @@ public class NodeCache {
                     .nodeId(s.getNodeId())
                     .nodeName(s.getNodeName())
                     .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
+                    .nodeSettleStatisInfo(s.getNodeSettleStatisInfo())
                     .build();
             addNode(node);
         });
+    }
+
+    /**
+     * 转成list---节点周期出块信息统计
+     *
+     * @param
+     * @return java.util.List<com.platon.browser.dao.entity.Node>
+     * @date 2021/6/2
+     */
+    public List<Node> toNodeSettleStatisInfoList() {
+        List<Node> list = CollUtil.newArrayList();
+        cache.forEach((k, v) -> {
+            Node node = new Node();
+            node.setNodeId(k);
+            node.setNodeSettleStatisInfo(v.getNodeSettleStatisInfo());
+            list.add(node);
+        });
+        return list;
     }
 
 }
