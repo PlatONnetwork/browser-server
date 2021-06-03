@@ -105,7 +105,7 @@ public class NodeSettleStatis {
                             .multiply(BigDecimal.valueOf(100))
                             .setScale(6, RoundingMode.HALF_UP)
                             .stripTrailingZeros();
-                    log.info("节点[{}]在[{}]结算周期计算24小时出块率为[{}%]=[{}]/([{}]*10)", this.getNodeId(), curSettleEpochRound, percent.toPlainString(), molecular, blockNumElected.getSum());
+                    log.info("节点[{}]在第[{}]结算周期计算最近[{}]结算周期({})的出块率为[{}%]=[{}]/([{}]*10)", this.getNodeId(), curSettleEpochRound, CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, last.stream().map(v -> v.getSettleEpochRound()).collect(Collectors.toList()), percent.toPlainString(), molecular, blockNumElected.getSum());
                     return percent.toPlainString() + "%";
                 } else {
                     return "0%";

@@ -298,6 +298,16 @@ public class StakingService {
             resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(Browser.PERCENTAGE).toString());
             resp.setNextRewardPer(new BigDecimal(stakingNode.getNextRewardPer()).divide(Browser.PERCENTAGE).toString());
             resp.setTotalDeleReward(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()));
+            try {
+                String nodeSettleStatisInfo = stakingNode.getNodeSettleStatisInfo();
+                NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
+                NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                resp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+            } catch (Exception e) {
+                logger.error("获取节点24小时出块率异常", e);
+            }
+            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getBigVersion())));
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
