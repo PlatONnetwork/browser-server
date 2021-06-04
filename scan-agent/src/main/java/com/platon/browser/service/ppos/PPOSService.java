@@ -171,7 +171,7 @@ public class PPOSService {
      */
     private void analyzePPosTx(CollectionEvent event, Transaction tx, TxAnalyseResult tar) {
         try {
-            log.info("解析真实交易[{}]类型为enum:[{}]code:[{}]desc:[{}]", tx.getHash(), tx.getTypeEnum(), tx.getTypeEnum().getCode(), tx.getTypeEnum().getDesc());
+            log.info("解析真实交易[{}]类型为enum:[{}] code:[{}] desc:[{}]", tx.getHash(), tx.getTypeEnum(), tx.getTypeEnum().getCode(), tx.getTypeEnum().getDesc());
             // 调用交易分析引擎分析交易，以补充相关数据
             NodeOpt nodeOpt = null;
             DelegationReward delegationReward = null;

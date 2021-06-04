@@ -310,10 +310,6 @@ public class ErcTxService {
                 //金额转换成对应的值
                 BigDecimal balance = ConvertUtil.convertByFactor(originBalance, tokenHolder.getDecimal());
                 resp.setBalance(balance);
-                //计算总供应量
-                BigDecimal originTotalSupply = new BigDecimal(tokenHolder.getTotalSupply());
-                originTotalSupply = (originTotalSupply == null) ? BigDecimal.ZERO : originTotalSupply;
-                BigDecimal totalSupply = ConvertUtil.convertByFactor(originTotalSupply, tokenHolder.getDecimal());
                 int holderNum = map.get(tokenHolder.getAddress()).intValue();
                 int total = Convert.toInt(ids.getTotal());
                 String percent = new BigDecimal(holderNum)
