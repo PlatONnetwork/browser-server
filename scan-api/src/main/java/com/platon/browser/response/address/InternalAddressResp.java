@@ -22,6 +22,6 @@ public class InternalAddressResp {
     /**
      * 基金会账户
      */
-    List<InternalAddress> InternalAddressBaseResp;
+    List<InternalAddress> internalAddressBaseResp;
 
 }
