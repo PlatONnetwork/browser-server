@@ -66,7 +66,7 @@ public class HttpUtil {
      */
     public static  <T> T post(String url,String param,Class<T> clazz) throws HttpRequestException {
         MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
-        Request request = new Request.Builder().post(RequestBody.create(param,mediaType)).url(url).build();
+        Request request = new Request.Builder().post(RequestBody.create(mediaType, param)).url(url).build();
         return resolve(request,url,clazz);
     }
 
