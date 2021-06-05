@@ -9,7 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
-import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
+import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.I18nEnum;

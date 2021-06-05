@@ -5,7 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.dao.entity.InternalAddress;
 import com.platon.browser.dao.entity.InternalAddressExample;
-import com.platon.browser.dao.mapper.CustomInternalAddressMapper;
+import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.address.InternalAddressResp;

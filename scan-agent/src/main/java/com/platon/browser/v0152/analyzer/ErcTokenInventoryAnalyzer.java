@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryKey;
-import com.platon.browser.dao.mapper.CustomTokenInventoryMapper;
+import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;

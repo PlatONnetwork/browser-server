@@ -3,7 +3,7 @@ package com.platon.browser.analyzer.ppos;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.param.ppos.ProposalText;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.bean.CustomProposal;

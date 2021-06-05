@@ -3,7 +3,7 @@ package com.platon.browser.handler;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bean.GasEstimateEvent;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;

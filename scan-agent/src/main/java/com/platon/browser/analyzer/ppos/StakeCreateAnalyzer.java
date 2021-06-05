@@ -3,7 +3,7 @@ package com.platon.browser.analyzer.ppos;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.param.ppos.StakeCreate;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;

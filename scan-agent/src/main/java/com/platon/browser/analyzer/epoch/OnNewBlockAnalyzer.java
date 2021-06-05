@@ -15,7 +15,7 @@ import com.platon.browser.v0150.V0150Config;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
-import com.platon.browser.dao.mapper.NewBlockMapper;
+import com.platon.browser.dao.custommapper.NewBlockMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.param.epoch.NewBlock;
 import com.platon.browser.elasticsearch.dto.Block;

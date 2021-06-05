@@ -1,7 +1,7 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.RestrictingBusinessMapper;
+import com.platon.browser.dao.custommapper.RestrictingBusinessMapper;
 import com.platon.browser.dao.param.ppos.RestrictingCreate;
 import com.platon.browser.dao.param.ppos.RestrictingItem;
 import com.platon.browser.elasticsearch.dto.Transaction;

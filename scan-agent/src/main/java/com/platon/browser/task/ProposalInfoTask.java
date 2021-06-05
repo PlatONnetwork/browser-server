@@ -8,7 +8,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
-import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.custommapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.bean.CustomProposal;

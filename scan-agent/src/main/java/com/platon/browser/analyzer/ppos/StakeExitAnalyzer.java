@@ -6,7 +6,7 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.ppos.StakeExit;
 import com.platon.browser.bean.CustomStaking;

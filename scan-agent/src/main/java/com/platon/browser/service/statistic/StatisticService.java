@@ -11,7 +11,7 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.mapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.NoSuchBeanException;

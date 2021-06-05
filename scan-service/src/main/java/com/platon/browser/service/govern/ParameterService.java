@@ -5,7 +5,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.bean.govern.ModifiableParam;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
-import com.platon.browser.dao.mapper.CustomConfigMapper;
+import com.platon.browser.dao.custommapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import lombok.extern.slf4j.Slf4j;

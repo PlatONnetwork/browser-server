@@ -3,7 +3,7 @@ package com.platon.browser.v0152.analyzer;
 import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
-import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
+import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;

@@ -8,7 +8,7 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.param.statistic.AddressStatChange;
 import com.platon.browser.dao.param.statistic.AddressStatItem;
 import com.platon.browser.elasticsearch.dto.Block;

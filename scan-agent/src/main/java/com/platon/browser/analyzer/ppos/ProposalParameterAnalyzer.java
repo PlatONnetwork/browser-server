@@ -5,7 +5,7 @@ import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.param.ppos.ProposalParameter;
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;

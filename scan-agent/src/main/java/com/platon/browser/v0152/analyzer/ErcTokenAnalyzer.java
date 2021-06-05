@@ -8,7 +8,7 @@ import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.entity.Token;
-import com.platon.browser.dao.mapper.CustomTokenMapper;
+import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;

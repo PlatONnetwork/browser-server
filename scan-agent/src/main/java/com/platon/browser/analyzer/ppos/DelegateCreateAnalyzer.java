@@ -2,8 +2,8 @@ package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
-import com.platon.browser.dao.mapper.DelegateBusinessMapper;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
 import com.platon.browser.dao.param.ppos.DelegateCreate;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateCreateParam;

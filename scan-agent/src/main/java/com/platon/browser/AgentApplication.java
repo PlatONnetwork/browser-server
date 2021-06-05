@@ -37,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 @MapperScan(basePackages = {
         "com.platon.browser",
         "com.platon.browser.dao.mapper",
+        "com.platon.browser.dao.custommapper",
         "com.platon.browser.v0150.dao",
         "com.platon.browser.v0151.dao"
 })
