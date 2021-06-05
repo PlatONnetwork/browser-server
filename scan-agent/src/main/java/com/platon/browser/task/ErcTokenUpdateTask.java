@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ssl.TrustAnyHostnameVerifier;
 import cn.hutool.json.JSONUtil;
@@ -169,7 +170,7 @@ public class ErcTokenUpdateTask {
      * @return void
      * @date 2021/1/18
      */
-    public void updateTokenTotalSupply() {
+    private void updateTokenTotalSupply() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -203,7 +204,8 @@ public class ErcTokenUpdateTask {
                         // 查询总供应量
                         BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
                         totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
-                        if (!token.getTotalSupply().equalsIgnoreCase(totalSupply.toString())) {
+                        if (ObjectUtil.isNull(token.getTotalSupply()) || !token.getTotalSupply().equalsIgnoreCase(totalSupply.toString())) {
+                            log.info("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply.toString());
                             // 有变动添加到更新列表中
                             token.setTotalSupply(totalSupply.toString());
                             token.setUpdateTime(new Date());
@@ -345,6 +347,7 @@ public class ErcTokenUpdateTask {
                             holder.setBalance(balance.toString());
                             holder.setUpdateTime(DateUtil.date());
                             updateParams.add(holder);
+                            log.info("token[{}]address[{}]查询到余额[{}]", contract, address, balance.toString());
                             try {
                                 TimeUnit.MILLISECONDS.sleep(100);
                             } catch (InterruptedException interruptedException) {
@@ -374,8 +377,8 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
+        tokenHolderLock.lock();
         try {
-            tokenHolderLock.lock();
             // 分页更新holder的balance
             List<TokenHolder> batch;
             int page = 0;
@@ -393,7 +396,8 @@ public class ErcTokenUpdateTask {
                                 ErcToken token = ercCache.getTokenCache().get(holder.getTokenAddress());
                                 if (token != null) {
                                     BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress());
-                                    if (new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
+                                    if (ObjectUtil.isNull(holder.getBalance()) || new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
+                                        log.info("token[{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]", holder.getTokenAddress(), holder.getAddress(), holder.getBalance(), balance.toString());
                                         // 余额有变动才加入更新列表，避免频繁访问表
                                         holder.setBalance(balance.toString());
                                         holder.setUpdateTime(DateUtil.date());
@@ -491,19 +495,20 @@ public class ErcTokenUpdateTask {
                                     newTi.setTokenAddress(inventory.getTokenAddress());
                                     boolean changed = false;
                                     // 只要有一个属性变动就添加到更新列表中
-                                    if (!newTi.getImage().equals(inventory.getImage())) {
+                                    if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
                                         inventory.setImage(newTi.getImage());
                                         changed = true;
                                     }
-                                    if (!newTi.getDescription().equals(inventory.getDescription())) {
+                                    if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
                                         inventory.setDescription(newTi.getDescription());
                                         changed = true;
                                     }
-                                    if (!newTi.getName().equals(inventory.getName())) {
+                                    if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
                                         inventory.setName(newTi.getName());
                                         changed = true;
                                     }
                                     if (changed) {
+                                        log.info("token[{}]库存有属性变动需要更新,tokenURL[{}],tokenName[{}],tokenDesc[{}],tokenImage[{}]", inventory.getTokenAddress(), tokenURI, inventory.getName(), inventory.getDescription(), inventory.getImage());
                                         updateParams.add(inventory);
                                     }
                                 } else {
@@ -597,19 +602,20 @@ public class ErcTokenUpdateTask {
                                 newTi.setTokenAddress(inventory.getTokenAddress());
                                 boolean changed = false;
                                 // 只要有一个属性变动就添加到更新列表中
-                                if (!newTi.getImage().equals(inventory.getImage())) {
+                                if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
                                     inventory.setImage(newTi.getImage());
                                     changed = true;
                                 }
-                                if (!newTi.getDescription().equals(inventory.getDescription())) {
+                                if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
                                     inventory.setDescription(newTi.getDescription());
                                     changed = true;
                                 }
-                                if (!newTi.getName().equals(inventory.getName())) {
+                                if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
                                     inventory.setName(newTi.getName());
                                     changed = true;
                                 }
                                 if (changed) {
+                                    log.info("token[{}]库存有属性变动需要更新,tokenURL[{}],tokenName[{}],tokenDesc[{}],tokenImage[{}]", inventory.getTokenAddress(), tokenURI, inventory.getName(), inventory.getDescription(), inventory.getImage());
                                     updateParams.add(inventory);
                                 }
                             } else {
