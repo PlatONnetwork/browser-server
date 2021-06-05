@@ -18,7 +18,7 @@ spring:
   #数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/alaya_browser_0.15.2.0_hyp?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://_DB_HOST_:_DB_PORT_/_DB_NAME_?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     # 使用p6spy监控SQL
     # driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     # url: jdbc:p6spy:mysql://_DB_HOST_:_DB_PORT_/alaya_browser_0.15.2.0_hyp?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
