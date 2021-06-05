@@ -9,7 +9,7 @@ import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;

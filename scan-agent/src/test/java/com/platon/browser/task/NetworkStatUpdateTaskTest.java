@@ -7,7 +7,7 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.service.account.AccountService;
 import com.platon.browser.utils.AppStatusUtil;
-import com.platon.browser.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.exception.BlockNumberException;

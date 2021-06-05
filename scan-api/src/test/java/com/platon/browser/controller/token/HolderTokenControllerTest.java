@@ -44,6 +44,7 @@ public class HolderTokenControllerTest extends ApiTestBase {
         req.setPageNo(1);
         req.setPageSize(10);
         req.setAddress("atp100nalg9dlhd88y8rwvejwlrdyvkx0zdyrquu9u");
+        req.setType("erc721");
         this.mockMvc.perform(MockMvcRequestBuilders.post("/token/holder-token/list")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content((JSONObject.toJSONString(req)).getBytes()))

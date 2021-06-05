@@ -8,7 +8,7 @@ import com.platon.browser.enums.AppStatus;
 import com.platon.browser.service.proposal.ProposalService;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.custommapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;

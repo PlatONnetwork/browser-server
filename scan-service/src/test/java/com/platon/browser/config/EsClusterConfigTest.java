@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class EsClusterConfigTest {
 
     @Value("${spring.elasticsearch.high-level-client.hosts}")
-    private List<String> addresses; // 集群地址，多个用,隔开
+    private List<String> hosts; // 集群地址，多个用,隔开
 
     @Value("${spring.elasticsearch.high-level-client.port}")
     private int port; // 使用的端口号
@@ -33,7 +33,7 @@ public class EsClusterConfigTest {
     public void setup() {
         List<String> addresses = new ArrayList<>();
         addresses.add("12.12.12.12");
-        //ReflectionTestUtils.setField(target,"addresses",addresses);
+        ReflectionTestUtils.setField(target,"hosts",addresses);
         ReflectionTestUtils.setField(target, "port", 3365);
         ReflectionTestUtils.setField(target, "schema", "ws");
         ReflectionTestUtils.setField(target, "username", "u");

@@ -52,7 +52,7 @@ public class BlockEventPublisherTest extends AgentTestBase {
 
         target.publish(getBlockAsync(7000L), getReceiptAsync(7000L), ep, CommonUtil.createTraceId());
 
-        verify(target, times(1)).publish(any(), any(), any(),CommonUtil.createTraceId());
+        verify(target, times(1)).publish(any(), any(), any(),any());
     }
 
     /**

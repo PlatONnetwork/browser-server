@@ -6,7 +6,7 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
 import org.junit.Before;

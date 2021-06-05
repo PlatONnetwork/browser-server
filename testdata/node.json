@@ -48,7 +48,8 @@
     "zero_produce_freeze_epoch": 10,
     "low_rate_slash_count": 10,
     "dele_annualized_rate":120.9,
-    "have_dele_reward":0
+    "have_dele_reward":0,
+    "reward_per": 12
   },
   {
     "node_id": "0x459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",
@@ -73,7 +74,7 @@
     "benefit_addr": "lax1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrzpqayr",
     "annualized_rate": "8149.51",
     "program_version": 0,
-    "big_version": 0,
+    "big_version": 1792,
     "web_site": "www.platon.network",
     "details": "The PlatON Node",
     "join_time": "2019-11-13 19:00:06",
@@ -99,7 +100,8 @@
     "zero_produce_freeze_epoch": 10,
     "low_rate_slash_count": 10,
     "dele_annualized_rate":120.9,
-    "have_dele_reward":0
+    "have_dele_reward":0,
+    "reward_per": 12
   },
   {
     "node_id": "0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208",
@@ -150,7 +152,8 @@
     "zero_produce_freeze_epoch": 10,
     "low_rate_slash_count": 10,
     "dele_annualized_rate":120.9,
-    "have_dele_reward":0
+    "have_dele_reward":0,
+    "reward_per": 12
   },
   {
     "node_id": "0x4fcc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba4150f",
@@ -175,7 +178,7 @@
     "benefit_addr": "lax1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrzpqayr",
     "annualized_rate": "7244.01",
     "program_version": 0,
-    "big_version": 0,
+    "big_version": 1792,
     "web_site": "www.platon.network",
     "details": "The PlatON Node",
     "join_time": "2019-11-13 19:00:06",
@@ -201,7 +204,8 @@
     "zero_produce_freeze_epoch": 10,
     "low_rate_slash_count": 10,
     "dele_annualized_rate":120.9,
-    "have_dele_reward":0
+    "have_dele_reward":0,
+    "reward_per": 12
   },
   {
     "node_id": "0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3",
@@ -226,7 +230,7 @@
     "benefit_addr": "lax1hgektqdu2qxc8r7fxd5fs6cxhwg32t0nfnnat2",
     "annualized_rate": "8149.51",
     "program_version": 0,
-    "big_version": 0,
+    "big_version": 1792,
     "web_site": "www.platon.network",
     "details": "The PlatON Node",
     "join_time": "2019-11-13 19:00:06",
@@ -252,7 +256,8 @@
     "zero_produce_freeze_epoch": 10,
     "low_rate_slash_count": 10,
     "dele_annualized_rate":120.9,
-    "have_dele_reward":0
+    "have_dele_reward":0,
+    "reward_per": 12
   },
   {
     "node_id": "0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc",
@@ -277,7 +282,7 @@
     "benefit_addr": "lax1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrzpqayr",
     "annualized_rate": "6791.26",
     "program_version": 0,
-    "big_version": 0,
+    "big_version": 1792,
     "web_site": "www.platon.network",
     "details": "The PlatON Node",
     "join_time": "2019-11-13 19:00:06",
@@ -303,6 +308,7 @@
     "zero_produce_freeze_epoch": 10,
     "low_rate_slash_count": 10,
     "dele_annualized_rate":120.9,
-    "have_dele_reward":0
+    "have_dele_reward":0,
+    "reward_per": 12
   }
 ]

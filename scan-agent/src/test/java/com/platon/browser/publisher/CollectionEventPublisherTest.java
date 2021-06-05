@@ -54,7 +54,7 @@ public class CollectionEventPublisherTest extends AgentTestBase {
         target.getPublisherMap();
         target.register(target.getClass().getSimpleName(), target);
         target.unregister(target.getClass().getSimpleName());
-        verify(target, times(1)).publish(any(), any(), any(),CommonUtil.createTraceId());
+        verify(target, times(1)).publish(any(), any(), any(),any());
     }
 
 }

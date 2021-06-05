@@ -3,6 +3,7 @@ package com.platon.browser.v0152.service;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.protocol.Web3j;
@@ -11,10 +12,12 @@ import com.platon.protocol.core.RemoteCall;
 import com.platon.protocol.core.Request;
 import com.platon.protocol.core.Response;
 import com.platon.protocol.core.methods.request.Transaction;
+import com.platon.tx.exceptions.PlatonCallException;
 import com.platon.tx.exceptions.PlatonCallTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -63,10 +66,10 @@ public class ErcDetectServiceTest extends AgentTestBase {
         when(web3jWrapper.getWeb3j()).thenReturn(web3j);
         when(platOnClient.getWeb3jWrapper().getWeb3j().platonCall(any(Transaction.class), any(DefaultBlockParameterName.class))).thenReturn(request);
         // 测试超时异常
-        when(request.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
+        //when(request.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
         // 测试业务异常
-        //when(request.send()).thenThrow(new IOException());
-         ercDetectService.isSupportErc721Enumerable(contractAddress);
+        when(request.send()).thenThrow(new BusinessException("1"));
+        Assertions.assertThrows(BusinessException.class, () -> ercDetectService.isSupportErc721Enumerable(contractAddress));
     }
 
     @Test
@@ -77,10 +80,11 @@ public class ErcDetectServiceTest extends AgentTestBase {
         // 测试超时异常
         //when(request.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
         // 测试业务异常
-        //when(request.send()).thenThrow(new IOException());
-        when(ercContract.name()).thenReturn(remoteCall);
-        when(remoteCall.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
-        ercDetectService.getContractId(contractAddress);
+        when(request.send()).thenThrow(new BusinessException("1"));
+        //when(ercContract.name()).thenReturn(remoteCall);
+        //when(remoteCall.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
+        //ercDetectService.getContractId(contractAddress);
+        Assertions.assertThrows(BusinessException.class, () -> ercDetectService.getContractId(contractAddress));
     }
 
 }

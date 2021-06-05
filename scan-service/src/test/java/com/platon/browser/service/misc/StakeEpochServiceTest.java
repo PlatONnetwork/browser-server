@@ -17,7 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.custommapper.CustomProposalMapper;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 

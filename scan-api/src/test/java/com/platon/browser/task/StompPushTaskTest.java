@@ -19,7 +19,7 @@ import com.platon.browser.response.home.ChainStatisticNewResp;
 import com.platon.browser.serializer.CustomBeanSerializerModifier;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = BrowserApiApplication.class,value = "spring.profiles.active=dev",webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StompPushTaskTest {
 
 	@Autowired
