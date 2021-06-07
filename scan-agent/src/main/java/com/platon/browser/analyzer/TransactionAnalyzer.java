@@ -72,7 +72,6 @@ public class TransactionAnalyzer {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/20
      */
     private void initGeneralContractCache() {
@@ -95,7 +94,6 @@ public class TransactionAnalyzer {
      * @param rawTransaction  交易
      * @param receipt         交易回执
      * @return com.platon.browser.bean.CollectionTransaction
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/20
      */
     public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
@@ -206,7 +204,6 @@ public class TransactionAnalyzer {
                 .setContractType(ci.getContractType())
                 .setBin(ci.getBinCode())
                 .setMethod(ci.getMethod());
-
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 累加总交易数

@@ -246,7 +246,8 @@ public class ErcTokenAnalyzer {
                     ercTokenHolderAnalyzer.analyze(txList);
                     // 以上所有操作无误，最后更新地址表erc交易数缓存
                     txList.forEach(ercTx -> {
-                        if (!AddressUtil.isAddrZero(ercTx.getFrom())) {
+                        // 如果from和to的地址一样，则erc交易数算一次
+                        if (!AddressUtil.isAddrZero(ercTx.getFrom()) && !AddressUtil.isAddrZero(ercTx.getTo()) && ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
                             switch (typeEnum) {
                                 case ERC20:
                                     addressCache.updateErc20TxQty(ercTx.getFrom());
@@ -255,15 +256,27 @@ public class ErcTokenAnalyzer {
                                     addressCache.updateErc721TxQty(ercTx.getFrom());
                                     break;
                             }
-                        }
-                        if (!AddressUtil.isAddrZero(ercTx.getTo())) {
-                            switch (typeEnum) {
-                                case ERC20:
-                                    addressCache.updateErc20TxQty(ercTx.getTo());
-                                    break;
-                                case ERC721:
-                                    addressCache.updateErc721TxQty(ercTx.getTo());
-                                    break;
+                            log.info("该erc(seq[{}])交易的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getSeq(), ercTx.getFrom(), ercTx.getTo());
+                        } else {
+                            if (!AddressUtil.isAddrZero(ercTx.getFrom())) {
+                                switch (typeEnum) {
+                                    case ERC20:
+                                        addressCache.updateErc20TxQty(ercTx.getFrom());
+                                        break;
+                                    case ERC721:
+                                        addressCache.updateErc721TxQty(ercTx.getFrom());
+                                        break;
+                                }
+                            }
+                            if (!AddressUtil.isAddrZero(ercTx.getTo())) {
+                                switch (typeEnum) {
+                                    case ERC20:
+                                        addressCache.updateErc20TxQty(ercTx.getTo());
+                                        break;
+                                    case ERC721:
+                                        addressCache.updateErc721TxQty(ercTx.getTo());
+                                        break;
+                                }
                             }
                         }
                     });
