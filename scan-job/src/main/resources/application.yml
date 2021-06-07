@@ -2,7 +2,7 @@
 # 应用版本
 version: 1.0.2
 spring:
-  application.name: scan-task
+  application.name: scan-job
   #数据源配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
