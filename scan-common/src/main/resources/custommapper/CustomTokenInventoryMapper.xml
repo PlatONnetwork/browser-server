@@ -47,6 +47,9 @@
                 <if test="'medium_image'.toString() == column.value">
                     #{item.mediumImage}
                 </if>
+                <if test="'id'.toString() == column.value">
+                    #{item.id}
+                </if>
             </foreach>
             )
         </foreach>
