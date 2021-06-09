@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ssl.TrustAnyHostnameVerifier;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.TokenHolderCount;
+import com.platon.browser.bean.http.CustomHttpClient;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
@@ -102,14 +103,6 @@ public class ErcTokenUpdateTask {
     private static final ExecutorService HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
 
     private static final int INVENTORY_BATCH_SIZE = 100;
-
-    private final static OkHttpClient client = new OkHttpClient.Builder()
-            .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .hostnameVerifier(new TrustAnyHostnameVerifier())
-            .build();
 
     /**
      * token更新标识位
@@ -487,7 +480,7 @@ public class ErcTokenUpdateTask {
                             if (StrUtil.isNotBlank(tokenURI)) {
                                 Request request = new Request.Builder().url(tokenURI).build();
                                 String resp = "";
-                                Response response = client.newCall(request).execute();
+                                Response response = CustomHttpClient.client.newCall(request).execute();
                                 if (response.code() == 200) {
                                     resp = response.body().string();
                                     TokenInventory newTi = JSONUtil.toBean(resp, TokenInventory.class);
@@ -594,7 +587,7 @@ public class ErcTokenUpdateTask {
                         if (StrUtil.isNotBlank(tokenURI)) {
                             Request request = new Request.Builder().url(tokenURI).build();
                             String resp = "";
-                            Response response = client.newCall(request).execute();
+                            Response response = CustomHttpClient.client.newCall(request).execute();
                             if (response.code() == 200) {
                                 resp = response.body().string();
                                 TokenInventory newTi = JSONUtil.toBean(resp, TokenInventory.class);

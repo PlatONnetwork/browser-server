@@ -79,9 +79,6 @@ public class ErcDetectService {
                 if (!StrUtil.isBlank(lowMessage) && lowMessage.contains("timeout")) {
                     log.error("合约地址[{}]检测输入数据超时异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
                     throw new PlatonCallTimeoutException(error.getCode(), error.getMessage(), platonCall);
-                } else {
-                    log.error("合约地址[{}]检测输入数据异常.error_code[{}],error_msg[{}]", contractAddress, error.getCode(), error.getMessage());
-                    throw new PlatonCallException(error.getCode(), error.getMessage(), platonCall);
                 }
             }
         } catch (PlatonCallTimeoutException e) {

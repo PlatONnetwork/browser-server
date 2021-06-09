@@ -8,6 +8,8 @@ alter table token_inventory drop primary key;
 
 alter table token_inventory add id bigint(20) primary key AUTO_INCREMENT COMMENT '自增id';
 
+ALTER TABLE token_inventory AUTO_INCREMENT=1;
+
 ALTER TABLE token_inventory ADD UNIQUE (`token_address`,`token_id`);
 
 alter table node add node_settle_statis_info text DEFAULT NULL COMMENT '节点结算周期的出块统计信息';
