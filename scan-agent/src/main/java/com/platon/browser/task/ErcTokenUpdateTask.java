@@ -7,7 +7,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.ssl.TrustAnyHostnameVerifier;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.TokenHolderCount;
 import com.platon.browser.bean.http.CustomHttpClient;
@@ -15,7 +14,9 @@ import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.TokenHolderMapper;
+import com.platon.browser.dao.mapper.TokenInventoryMapper;
+import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.service.elasticsearch.AbstractEsRepository;
 import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
@@ -33,8 +34,6 @@ import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.ConnectionPool;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -449,7 +448,7 @@ public class ErcTokenUpdateTask {
      * @return void
      * @date 2021/2/2
      */
-    public void updateTokenInventory(int pageNum) {
+    private void updateTokenInventory(int pageNum) {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
