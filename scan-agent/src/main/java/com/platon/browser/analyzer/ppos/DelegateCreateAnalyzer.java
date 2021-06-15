@@ -23,30 +23,40 @@ import java.util.List;
 @Slf4j
 @Service
 public class DelegateCreateAnalyzer extends PPOSAnalyzer<DelegateCreate> {
-	
+
     @Resource
     private DelegateBusinessMapper delegateBusinessMapper;
+
     @Resource
     private CustomGasEstimateMapper customGasEstimateMapper;
 
+    /**
+     * 发起委托(委托)
+     *
+     * @param event
+     * @param tx
+     * @return com.platon.browser.dao.param.ppos.DelegateCreate
+     * @date 2021/6/15
+     */
     @Override
     public DelegateCreate analyze(CollectionEvent event, Transaction tx) {
         // 发起委托
         DelegateCreateParam txParam = tx.getTxParam(DelegateCreateParam.class);
         // 补充节点名称
-        updateTxInfo(txParam,tx);
+        updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
+            return null;
 
         long startTime = System.currentTimeMillis();
 
-        DelegateCreate businessParam= DelegateCreate.builder()
-        		.nodeId(txParam.getNodeId())
-        		.amount(txParam.getAmount())
-        		.blockNumber(BigInteger.valueOf(tx.getNum()))
-        		.txFrom(tx.getFrom())
-        		.sequence(BigInteger.valueOf(tx.getSeq()))
-        		.stakingBlockNumber(txParam.getStakingBlockNum())
+        DelegateCreate businessParam = DelegateCreate.builder()
+                .nodeId(txParam.getNodeId())
+                .amount(txParam.getAmount())
+                .blockNumber(BigInteger.valueOf(tx.getNum()))
+                .txFrom(tx.getFrom())
+                .sequence(BigInteger.valueOf(tx.getSeq()))
+                .stakingBlockNumber(txParam.getStakingBlockNum())
                 .build();
 
         delegateBusinessMapper.create(businessParam);
@@ -61,7 +71,8 @@ public class DelegateCreateAnalyzer extends PPOSAnalyzer<DelegateCreate> {
         estimates.add(estimate);
         customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
 
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         return businessParam;
     }
+
 }

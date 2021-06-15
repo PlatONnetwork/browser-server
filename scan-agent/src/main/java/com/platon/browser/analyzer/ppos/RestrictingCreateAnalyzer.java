@@ -22,36 +22,46 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class RestrictingCreateAnalyzer extends PPOSAnalyzer<RestrictingCreate> {
-	
-	@Resource
-	private RestrictingBusinessMapper restrictingBusinessMapper;
-	
+
+    @Resource
+    private RestrictingBusinessMapper restrictingBusinessMapper;
+
+    /**
+     * 创建锁仓计划(创建锁仓)
+     *
+     * @param event
+     * @param tx
+     * @return com.platon.browser.dao.param.ppos.RestrictingCreate
+     * @date 2021/6/15
+     */
     @Override
     public RestrictingCreate analyze(CollectionEvent event, Transaction tx) {
-		// 失败的交易不分析业务数据
-		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        // 失败的交易不分析业务数据
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
+            return null;
 
-		long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-    	RestrictingCreateParam txParam = tx.getTxParam(RestrictingCreateParam.class);
-    	String account = txParam.getAccount();
-    	
-    	List<RestrictingItem> restrictingItems = txParam.getPlans().stream().map(plan -> RestrictingItem.builder()
-				.address(account)
-				.amount(plan.getAmount())
-				.epoch(plan.getEpoch())
-				.number(BigInteger.valueOf(tx.getNum()))
-				.build()).collect(Collectors.toList());
-    	
-    	RestrictingCreate businessParam= RestrictingCreate.builder()
-    			.itemList(restrictingItems)
+        RestrictingCreateParam txParam = tx.getTxParam(RestrictingCreateParam.class);
+        String account = txParam.getAccount();
+
+        List<RestrictingItem> restrictingItems = txParam.getPlans().stream().map(plan -> RestrictingItem.builder()
+                .address(account)
+                .amount(plan.getAmount())
+                .epoch(plan.getEpoch())
+                .number(BigInteger.valueOf(tx.getNum()))
+                .build()).collect(Collectors.toList());
+
+        RestrictingCreate businessParam = RestrictingCreate.builder()
+                .itemList(restrictingItems)
                 .build();
-    	
-    	// 锁仓记录入库
-    	restrictingBusinessMapper.create(businessParam);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        // 锁仓记录入库
+        restrictingBusinessMapper.create(businessParam);
+
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return businessParam;
     }
+
 }

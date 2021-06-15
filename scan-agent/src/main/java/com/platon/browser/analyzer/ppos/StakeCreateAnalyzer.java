@@ -32,72 +32,85 @@ import java.util.Date;
 @Slf4j
 @Service
 public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
-	
+
     @Resource
     private StakeBusinessMapper stakeBusinessMapper;
+
     @Resource
     private NetworkStatCache networkStatCache;
-    @Resource
-	private ParameterService parameterService;
-    @Resource
-	private StakeEpochService stakeEpochService;
 
+    @Resource
+    private ParameterService parameterService;
+
+    @Resource
+    private StakeEpochService stakeEpochService;
+
+    /**
+     * 发起质押(创建验证人)
+     *
+     * @param event
+     * @param tx
+     * @return com.platon.browser.elasticsearch.dto.NodeOpt
+     * @date 2021/6/15
+     */
     @Override
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
-		// 失败的交易不分析业务数据
-		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        // 失败的交易不分析业务数据
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
+            return null;
 
-		long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
         BigInteger bigVersion = ChainVersionUtil.toBigVersion(txParam.getProgramVersion());
         BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
 
         String configVal = parameterService.getValueInBlockChainConfig(ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
-        if(StringUtils.isBlank(configVal)){
-        	throw new BusinessException("参数表参数缺失："+ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
-		}
+        if (StringUtils.isBlank(configVal)) {
+            throw new BusinessException("参数表参数缺失：" + ModifiableGovernParamEnum.UN_STAKE_FREEZE_DURATION.getName());
+        }
         Date txTime = DateUtil.covertTime(tx.getTime());
-		// 更新解质押到账需要经过的结算周期数
-		BigInteger  unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
-		// 理论上的退出区块号
-		BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getNodeId(),event.getEpochMessage().getSettleEpochRound(),false);
-        StakeCreate businessParam= StakeCreate.builder()
-        		.nodeId(txParam.getNodeId())
-        		.stakingHes(txParam.getAmount())
-        		.nodeName(txParam.getNodeName())
-        		.externalId(txParam.getExternalId())
-        		.benefitAddr(txParam.getBenefitAddress())
-        		.programVersion(txParam.getProgramVersion().toString())
-        		.bigVersion(bigVersion.toString())
-        		.webSite(txParam.getWebsite())
-        		.details(txParam.getDetails())
-        		.isInit(isInit(txParam.getBenefitAddress())) 
-        		.stakingBlockNum(stakingBlockNum)
-        		.stakingTxIndex(tx.getIndex())
-        		.stakingAddr(tx.getFrom())
-        		.joinTime(txTime)
-        		.txHash(tx.getHash())
-				.delegateRewardPer(txParam.getDelegateRewardPer())
-				.unStakeFreezeDuration(unStakeFreezeDuration.intValue())
-				.unStakeEndBlock(unStakeEndBlock)
-				.settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+        // 更新解质押到账需要经过的结算周期数
+        BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
+        // 理论上的退出区块号
+        BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getNodeId(), event.getEpochMessage().getSettleEpochRound(), false);
+        StakeCreate businessParam = StakeCreate.builder()
+                .nodeId(txParam.getNodeId())
+                .stakingHes(txParam.getAmount())
+                .nodeName(txParam.getNodeName())
+                .externalId(txParam.getExternalId())
+                .benefitAddr(txParam.getBenefitAddress())
+                .programVersion(txParam.getProgramVersion().toString())
+                .bigVersion(bigVersion.toString())
+                .webSite(txParam.getWebsite())
+                .details(txParam.getDetails())
+                .isInit(isInit(txParam.getBenefitAddress()))
+                .stakingBlockNum(stakingBlockNum)
+                .stakingTxIndex(tx.getIndex())
+                .stakingAddr(tx.getFrom())
+                .joinTime(txTime)
+                .txHash(tx.getHash())
+                .delegateRewardPer(txParam.getDelegateRewardPer())
+                .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
+                .unStakeEndBlock(unStakeEndBlock)
+                .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
 
         stakeBusinessMapper.create(businessParam);
-        
-        updateNodeCache(HexUtil.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
-        
+
+        updateNodeCache(HexUtil.prefix(txParam.getNodeId()), txParam.getNodeName(), stakingBlockNum);
+
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-		nodeOpt.setNodeId(txParam.getNodeId());
-		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.CREATE.getCode()));
-		nodeOpt.setTxHash(tx.getHash());
-		nodeOpt.setBNum(tx.getNum());
-		nodeOpt.setTime(txTime);
+        nodeOpt.setNodeId(txParam.getNodeId());
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.CREATE.getCode()));
+        nodeOpt.setTxHash(tx.getHash());
+        nodeOpt.setBNum(tx.getNum());
+        nodeOpt.setTime(txTime);
 
-		log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return nodeOpt;
     }
+
 }

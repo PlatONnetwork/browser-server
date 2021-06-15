@@ -29,56 +29,70 @@ import java.util.List;
 @Slf4j
 @Service
 public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
-	
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private SlashBusinessMapper slashBusinessMapper;
+
     @Resource
     private NodeMapper nodeMapper;
+
     @Resource
     private ReportMultiSignParamCache reportMultiSignParamCache;
+
     @Resource
     private StakeEpochService stakeEpochService;
 
+    /**
+     * 举报多签(举报验证人)
+     *
+     * @param event
+     * @param tx
+     * @return com.platon.browser.elasticsearch.dto.NodeOpt
+     * @date 2021/6/15
+     */
     @Override
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
-        if(null==txParam) return null;
+        if (null == txParam)
+            return null;
         Node staking = nodeMapper.selectByPrimaryKey(txParam.getVerify());
-        if(staking != null) {
+        if (staking != null) {
             // 回填设置参数中的惩罚奖励信息
-        	//惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
+            //惩罚的金额  假设锁定的金额为0，则获取待赎回的金额
             BigDecimal stakingAmount = staking.getStakingLocked();
-            if(stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
-            	stakingAmount = staking.getStakingReduction();
+            if (stakingAmount.compareTo(BigDecimal.ZERO) == 0) {
+                stakingAmount = staking.getStakingReduction();
             }
             //奖励的金额
             BigDecimal codeRewardValue = stakingAmount.multiply(chainConfig.getDuplicateSignSlashRate())
-            		.multiply(chainConfig.getDuplicateSignRewardRate());
+                    .multiply(chainConfig.getDuplicateSignRewardRate());
             txParam.setReward(codeRewardValue);
         }
-        
-        updateTxInfo(txParam,tx);
+
+        updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
+            return null;
 
         long startTime = System.currentTimeMillis();
 
         // 举报成功，先把节点设置为异常，后续处罚操作在共识周期切换时执行
         List<String> nodeIdList = new ArrayList<>();
         nodeIdList.add(txParam.getVerify());
-        slashBusinessMapper.setException(txParam.getVerify(),txParam.getStakingBlockNum().longValue());
+        slashBusinessMapper.setException(txParam.getVerify(), txParam.getStakingBlockNum().longValue());
 
         // 更新解质押到账需要经过的结算周期数
-        BigInteger  unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
-        
-        Long blockNum= event.getBlock().getNum() - (event.getBlock().getNum()% chainConfig.getConsensusPeriodBlockCount().longValue())+chainConfig.getConsensusPeriodBlockCount().longValue();
+        BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
+
+        Long blockNum = event.getBlock().getNum() - (event.getBlock().getNum() % chainConfig.getConsensusPeriodBlockCount().longValue()) + chainConfig.getConsensusPeriodBlockCount().longValue();
         // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
-        BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getVerify(),event.getEpochMessage().getSettleEpochRound(),true);
-        Report businessParam= Report.builder()
-        		.slashData(txParam.getData())
+        BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getVerify(), event.getEpochMessage().getSettleEpochRound(), true);
+        Report businessParam = Report.builder()
+                .slashData(txParam.getData())
                 .nodeId(txParam.getVerify())
                 .txHash(tx.getHash())
                 .time(tx.getTime())
@@ -95,16 +109,17 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         /**
          * 只有第一次候选中惩罚的时候才需要更新质押锁定周期数
          */
-        if(staking != null && staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
-        	//更新节点提取质押需要经过的周期数
+        if (staking != null && staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
+            //更新节点提取质押需要经过的周期数
             slashBusinessMapper.updateUnStakeFreezeDuration(businessParam);
         }
 
         // 把举报参数暂时缓存，待共识周期切换时处理
         reportMultiSignParamCache.addReport(businessParam);
 
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return null;
     }
+
 }
