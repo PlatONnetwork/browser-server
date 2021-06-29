@@ -5,11 +5,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.RecoveredDelegationAmount;
+import com.platon.browser.cache.AddressCache;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomAddressMapper;
-import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.v0160.bean.FixIssue1583;
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,9 +36,11 @@ public class DelegateBalanceAdjustmentService {
     @Resource
     private StakingMapper stakingMapper;
     @Resource
-    private CustomDelegationMapper customDelegationMapper;
+    private AddressMapper addressMapper;
     @Resource
     private CustomAddressMapper customAddressMapper;
+    @Resource
+    private AddressCache addressCache;
 
     /**
      * 调账
@@ -92,20 +95,14 @@ public class DelegateBalanceAdjustmentService {
         } else {
             Node newNode = new Node();
             newNode.setNodeId(nodeInfo.getNodeId());
-            // stat_delegate_released 待提取的委托金额
-            BigDecimal oldStatDelegateReleased = nodeInfo.getStatDelegateReleased();
-            BigDecimal newStatDelegateReleased = oldStatDelegateReleased.subtract(new BigDecimal(totalDeleReward));
-            newNode.setStatDelegateReleased(newStatDelegateReleased);
             // have_dele_reward 所有质押已领取委托奖励
             BigDecimal oldHaveDeleReward = nodeInfo.getHaveDeleReward();
             BigDecimal newHaveDeleReward = oldHaveDeleReward.add(new BigDecimal(totalDeleReward));
             newNode.setHaveDeleReward(newHaveDeleReward);
             int res = nodeMapper.updateByPrimaryKeySelective(newNode);
             if (res > 0) {
-                log.info("issue1583调账：更新node表成功,nodeId:[{}]：待提取的委托金额新值[{}]=待提取的委托金额旧值[{}]-总共被领取的委托奖励[{}];" +
-                                "所有质押已领取委托奖励新值[{}]=所有质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];",
+                log.info("issue1583调账：更新node表成功,nodeId:[{}]：所有质押已领取委托奖励新值[{}]=所有质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];",
                         nodeInfo.getNodeId(),
-                        newStatDelegateReleased, oldStatDelegateReleased, totalDeleReward,
                         newHaveDeleReward, oldHaveDeleReward, totalDeleReward);
             } else {
                 log.error("issue1583调账：更新node表失败,nodeId:[{}]", nodeInfo.getNodeId());
@@ -129,20 +126,14 @@ public class DelegateBalanceAdjustmentService {
             Staking newStaking = new Staking();
             newStaking.setNodeId(staking.getNodeId());
             newStaking.setStakingBlockNum(staking.getStakingBlockNum());
-            // stat_delegate_released 待提取的委托
-            BigDecimal oldStatDelegateReleased = staking.getStatDelegateReleased();
-            BigDecimal newStatDelegateReleased = oldStatDelegateReleased.subtract(new BigDecimal(totalDeleReward));
-            newStaking.setStatDelegateReleased(newStatDelegateReleased);
             // have_dele_reward 节点当前质押已领取委托奖励
             BigDecimal oldHaveDeleReward = staking.getHaveDeleReward();
             BigDecimal newHaveDeleReward = staking.getHaveDeleReward().add(new BigDecimal(totalDeleReward));
             newStaking.setHaveDeleReward(newHaveDeleReward);
             int res = stakingMapper.updateByPrimaryKeySelective(newStaking);
             if (res > 0) {
-                log.info("issue1583调账：更新staking表成功,stakingKey:[{}]：待提取的委托新值[{}]=待提取的委托旧值[{}]-总共被领取的委托奖励[{}];" +
-                                "节点当前质押已领取委托奖励新值[{}]=节点当前质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];",
+                log.info("issue1583调账：更新staking表成功,stakingKey:[{}]：节点当前质押已领取委托奖励新值[{}]=节点当前质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];",
                         JSONUtil.toJsonStr(stakingKey),
-                        newStatDelegateReleased, oldStatDelegateReleased, totalDeleReward,
                         newHaveDeleReward, oldHaveDeleReward, totalDeleReward);
             } else {
                 log.error("issue1583调账：更新staking表失败,,stakingKey:[{}]", JSONUtil.toJsonStr(stakingKey));
@@ -159,13 +150,44 @@ public class DelegateBalanceAdjustmentService {
      */
     private void updateAddressAndDelegation(List<RecoveredDelegationAmount> list) {
         try {
-            customDelegationMapper.batchUpdateByDelegationKey(list);
-            customAddressMapper.batchUpdateByAddress(list);
-            log.info("issue1583调账：更新delegation表和address表成功,数据为:[{}]", JSONUtil.toJsonStr(list));
+            List<RecoveredDelegationAmount> updateDBlist = updateAddressCache(list);
+            if (CollUtil.isNotEmpty(updateDBlist)) {
+                customAddressMapper.batchUpdateByAddress(updateDBlist);
+            }
+            log.info("issue1583调账：更新address表成功,数据为:[{}]", JSONUtil.toJsonStr(list));
         } catch (Exception e) {
-            log.error("issue1583调账：更新delegation表和address表失败,数据为:[{}]", JSONUtil.toJsonStr(list));
+            log.error("issue1583调账：更新address表失败,数据为:[{}]", JSONUtil.toJsonStr(list));
             throw e;
         }
+    }
+
+    /**
+     * 更新缓存地址中的已领取委托奖励，并筛选出缓存中不存在的地址
+     *
+     * @param list
+     * @return: java.util.List<com.platon.browser.bean.RecoveredDelegationAmount>
+     * @date: 2021/6/29
+     */
+    private List<RecoveredDelegationAmount> updateAddressCache(List<RecoveredDelegationAmount> list) {
+        List<RecoveredDelegationAmount> updateDBlist = CollUtil.newArrayList();
+        for (RecoveredDelegationAmount recoveredDelegationAmount : list) {
+            Address addrCache = addressCache.getAddress(recoveredDelegationAmount.getDelegateAddr());
+            if (ObjectUtil.isNull(addrCache)) {
+                // 缓存不存在，则去查找db
+                Address addressInfo = addressMapper.selectByPrimaryKey(recoveredDelegationAmount.getDelegateAddr());
+                if (ObjectUtil.isNull(addressInfo)) {
+                    // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
+                    addressCache.update(recoveredDelegationAmount.getDelegateAddr(), recoveredDelegationAmount.getRecoveredDelegationAmount());
+                } else {
+                    // db存在，则存放到updateDBlist，走db的更新方式
+                    updateDBlist.add(recoveredDelegationAmount);
+                }
+            } else {
+                // 缓存存在则直接更新已领取委托奖励
+                addressCache.update(recoveredDelegationAmount.getDelegateAddr(), recoveredDelegationAmount.getRecoveredDelegationAmount());
+            }
+        }
+        return updateDBlist;
     }
 
 }

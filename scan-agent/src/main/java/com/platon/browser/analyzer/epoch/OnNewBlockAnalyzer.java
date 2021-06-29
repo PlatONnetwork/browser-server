@@ -136,7 +136,7 @@ public class OnNewBlockAnalyzer {
                             }
                             // 兼容底层升级到0.16.0的调账功能，对应底层issue1583
                             BigInteger v0160Version = ChainVersionUtil.toBigIntegerVersion(CommonConstant.v0160Version);
-                            if (proposalVersion.compareTo(v0160Version) >= 0) {
+                            if (proposalVersion.compareTo(v0160Version) == 0) {
                                 delegateBalanceAdjustmentService.adjust();
                             }
                         }
