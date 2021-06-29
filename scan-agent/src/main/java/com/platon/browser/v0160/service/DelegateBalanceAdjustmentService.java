@@ -1,11 +1,15 @@
 package com.platon.browser.v0160.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.bean.RecoveredDelegationAmount;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.CustomAddressMapper;
+import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.v0160.bean.FixIssue1583;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,13 +31,13 @@ import java.util.List;
 public class DelegateBalanceAdjustmentService {
 
     @Resource
-    private AddressMapper addressMapper;
-    @Resource
-    private DelegationMapper delegationMapper;
-    @Resource
     private NodeMapper nodeMapper;
     @Resource
     private StakingMapper stakingMapper;
+    @Resource
+    private CustomDelegationMapper customDelegationMapper;
+    @Resource
+    private CustomAddressMapper customAddressMapper;
 
     /**
      * 调账
@@ -42,6 +47,7 @@ public class DelegateBalanceAdjustmentService {
      */
     public void adjust() throws Exception {
         List<FixIssue1583> list = FixIssue1583.getRecoveredDelegationInfo();
+        List<RecoveredDelegationAmount> recoveredDelegationAmountList = CollUtil.newArrayList();
         for (FixIssue1583 node : list) {
             // 总共被领取的委托奖励
             BigInteger totalDeleReward = BigInteger.valueOf(0);
@@ -53,18 +59,21 @@ public class DelegateBalanceAdjustmentService {
                 // 计算用户可以找回的委托奖励(算法和底层保持一致，注意：要保证和底层结果一样)
                 BigInteger recoveredDelegationAmount = recoveredDelegation.getDelegationAmount().multiply(totalDelegationRewardAmount).divide(totalDelegationAmount);
                 totalDeleReward = totalDeleReward.add(recoveredDelegationAmount);
-                DelegationKey delegationKey = new DelegationKey();
-                delegationKey.setDelegateAddr(recoveredDelegation.getAddress());
-                delegationKey.setNodeId(node.getNodeId());
-                delegationKey.setStakingBlockNum(node.getStakingBlockNumber());
-                updateDelegation(delegationKey, recoveredDelegationAmount);
-                updateAddress(recoveredDelegation.getAddress(), recoveredDelegationAmount);
+                RecoveredDelegationAmount recovered = new RecoveredDelegationAmount();
+                recovered.setDelegateAddr(recoveredDelegation.getAddress());
+                recovered.setStakingBlockNum(node.getStakingBlockNumber());
+                recovered.setNodeId(node.getNodeId());
+                recovered.setRecoveredDelegationAmount(new BigDecimal(recoveredDelegationAmount));
+                recoveredDelegationAmountList.add(recovered);
             }
             updateNode(node.getNodeId(), totalDeleReward);
             StakingKey stakingKey = new Staking();
             stakingKey.setNodeId(node.getNodeId());
             stakingKey.setStakingBlockNum(node.getStakingBlockNumber());
             updateStaking(stakingKey, totalDeleReward);
+        }
+        if (CollUtil.isNotEmpty(recoveredDelegationAmountList)) {
+            updateAddressAndDelegation(recoveredDelegationAmountList);
         }
     }
 
@@ -142,70 +151,20 @@ public class DelegateBalanceAdjustmentService {
     }
 
     /**
-     * 更新address表
+     * 更新delegation表和address表
      *
-     * @param address                   地址
-     * @param recoveredDelegationAmount 找回的委托奖励
+     * @param list
      * @return: void
-     * @date: 2021/6/25
+     * @date: 2021/6/29
      */
-    private void updateAddress(String address, BigInteger recoveredDelegationAmount) throws Exception {
-        Address addressInfo = addressMapper.selectByPrimaryKey(address);
-        if (ObjectUtil.isNull(addressInfo)) {
-            throw new Exception(StrUtil.format("找不到对应的地址信息,address:[{}]", address));
-        } else {
-            Address newAddress = new Address();
-            newAddress.setAddress(addressInfo.getAddress());
-            // balance 余额
-            BigDecimal oldBalance = addressInfo.getBalance();
-            BigDecimal newBalance = oldBalance.add(new BigDecimal(recoveredDelegationAmount));
-            newAddress.setBalance(newBalance);
-            // have_reward 已领取委托奖励
-            BigDecimal oldHaveReward = addressInfo.getHaveReward();
-            BigDecimal newHaveReward = oldHaveReward.add(new BigDecimal(recoveredDelegationAmount));
-            newAddress.setHaveReward(newHaveReward);
-            int res = addressMapper.updateByPrimaryKeySelective(newAddress);
-            if (res > 0) {
-                log.info("issue1583调账：更新address表成功,address:[{}]：余额新值[{}]=余额旧值[{}]+找回的委托奖励[{}];" +
-                                "已领取委托奖励新值[{}]=已领取委托奖励旧值[{}]+找回的委托奖励[{}];",
-                        address,
-                        newBalance, oldBalance, recoveredDelegationAmount,
-                        newHaveReward, oldHaveReward, recoveredDelegationAmount);
-            } else {
-                log.error("issue1583调账：更新address表失败,,address:[{}]", address);
-            }
-        }
-    }
-
-    /**
-     * 更新delegation表
-     *
-     * @param delegationKey             委托key
-     * @param recoveredDelegationAmount 找回的委托奖励
-     * @return: void
-     * @date: 2021/6/28
-     */
-    private void updateDelegation(DelegationKey delegationKey, BigInteger recoveredDelegationAmount) throws Exception {
-        Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
-        if (ObjectUtil.isNull(delegation)) {
-            throw new Exception(StrUtil.format("找不到对应的委托信息,delegationKey:[{}]", JSONUtil.toJsonStr(delegationKey)));
-        } else {
-            Delegation newDelegation = new Delegation();
-            newDelegation.setDelegateAddr(delegation.getDelegateAddr());
-            newDelegation.setStakingBlockNum(delegation.getStakingBlockNum());
-            newDelegation.setNodeId(delegation.getNodeId());
-            // delegate_released 待提取的金额
-            BigDecimal oldDelegateReleased = delegation.getDelegateReleased();
-            BigDecimal newDelegateReleased = oldDelegateReleased.subtract(new BigDecimal(recoveredDelegationAmount));
-            newDelegation.setDelegateReleased(newDelegateReleased);
-            int res = delegationMapper.updateByPrimaryKeySelective(newDelegation);
-            if (res > 0) {
-                log.info("issue1583调账：更新delegation表成功,delegationKey:[{}]：待提取的金额新值[{}]=待提取的金额旧值[{}]-找回的委托奖励[{}];",
-                        JSONUtil.toJsonStr(delegationKey),
-                        newDelegateReleased, oldDelegateReleased, recoveredDelegationAmount);
-            } else {
-                log.error("issue1583调账：更新delegation表失败,,delegationKey:[{}]", JSONUtil.toJsonStr(delegationKey));
-            }
+    private void updateAddressAndDelegation(List<RecoveredDelegationAmount> list) {
+        try {
+            customDelegationMapper.batchUpdateByDelegationKey(list);
+            customAddressMapper.batchUpdateByAddress(list);
+            log.info("issue1583调账：更新delegation表和address表成功,数据为:[{}]", JSONUtil.toJsonStr(list));
+        } catch (Exception e) {
+            log.error("issue1583调账：更新delegation表和address表失败,数据为:[{}]", JSONUtil.toJsonStr(list));
+            throw e;
         }
     }
 

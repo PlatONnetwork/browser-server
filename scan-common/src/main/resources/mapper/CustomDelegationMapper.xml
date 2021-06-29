@@ -70,5 +70,16 @@
 	</where>
 	group by d.`node_id` order by d.`cur_delegation_block_num` desc
   </select>
-  
+
+  <update id="batchUpdateByDelegationKey">
+      <foreach collection="list" item="item" separator=";">
+          UPDATE delegation
+          SET delegate_released = delegate_released - #{item.recoveredDelegationAmount}
+          WHERE
+          delegate_addr = #{item.delegateAddr}
+          AND staking_block_num = #{item.stakingBlockNum}
+          AND node_id = #{item.nodeId}
+      </foreach>
+  </update>
+
 </mapper>
