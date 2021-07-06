@@ -41,28 +41,40 @@ public class OnNewBlockAnalyzer {
 
     @Resource
     private NodeCache nodeCache;
+
     @Resource
     private NewBlockMapper newBlockMapper;
+
     @Resource
     private NetworkStatCache networkStatCache;
+
     @Resource
     private ProposalCache proposalCache;
+
     @Resource
     private ProposalService proposalService;
+
     @Resource
     private ProposalMapper proposalMapper;
+
     @Resource
     private ParameterService parameterService;
+
     @Resource
     private PlatOnClient platOnClient;
+
     @Resource
     private V0150Config v0150Config;
+
     @Resource
     private StakingDelegateBalanceAdjustmentService stakingDelegateBalanceAdjustmentService;
+
     @Resource
     private SpecialApi specialApi;
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private DelegateBalanceAdjustmentService delegateBalanceAdjustmentService;
 
@@ -93,7 +105,9 @@ public class OnNewBlockAnalyzer {
             for (String hash : proposalTxHashSet) {
                 try {
                     TallyResult tr = proposalService.getTallyResult(hash);
-                    if (tr == null) continue;
+                    if (tr == null) {
+                        continue;
+                    }
                     if (tr.getStatus() == CustomProposal.StatusEnum.PASS.getCode() || tr.getStatus() == CustomProposal.StatusEnum.FINISH.getCode()) {
                         // 提案通过（参数提案，status=2）||提案生效（升级提案,status=5）：
                         // 把提案表中的参数覆盖到Config表中对应的参数
@@ -134,9 +148,9 @@ public class OnNewBlockAnalyzer {
                                 });
                                 stakingDelegateBalanceAdjustmentService.adjust(adjustParams);
                             }
-                            // 兼容底层升级到0.16.0的调账功能，对应底层issue1583
-                            BigInteger v0160Version = ChainVersionUtil.toBigIntegerVersion(CommonConstant.v0160Version);
-                            if (proposalVersion.compareTo(v0160Version) == 0) {
+                            // alaya主网兼容底层升级到0.16.0的调账功能，对应底层issue1583
+                            BigInteger v0160Version = ChainVersionUtil.toBigIntegerVersion(CommonConstant.V0160_VERSION);
+                            if (proposalVersion.compareTo(v0160Version) == 0 && CommonConstant.ALAYA_CHAIN_ID == chainConfig.getChainId()) {
                                 delegateBalanceAdjustmentService.adjust();
                             }
                         }
