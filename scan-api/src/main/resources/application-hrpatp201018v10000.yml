@@ -109,7 +109,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/master/Alaya/PIP-%s.md
+  proposalUrlTemplate: https://github.com/AlayaNetwork/AIPs/tree/master/Alaya/AIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
