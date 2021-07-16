@@ -2,7 +2,7 @@
 # 应用版本
 version: 1.0.1.2
 spring:
-  application.name: browser-agent
+  application.name: scan-agent
   #数据源配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

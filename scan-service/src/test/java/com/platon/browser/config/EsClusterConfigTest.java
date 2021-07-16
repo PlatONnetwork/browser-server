@@ -33,7 +33,7 @@ public class EsClusterConfigTest {
     public void setup() {
         List<String> addresses = new ArrayList<>();
         addresses.add("12.12.12.12");
-        //ReflectionTestUtils.setField(target,"addresses",addresses);
+        ReflectionTestUtils.setField(target,"hosts",addresses);
         ReflectionTestUtils.setField(target, "port", 3365);
         ReflectionTestUtils.setField(target, "schema", "ws");
         ReflectionTestUtils.setField(target, "username", "u");

@@ -38,7 +38,7 @@ public class KeyBaseTest {
                 &&!clazz.getName().endsWith("GeneratedCriteria")
         ).forEach(target::add);
     }
-    @Test
+    //@Test
     public void test() {
         for (Class<?> clazz:target){
             Method[] methods = clazz.getDeclaredMethods();

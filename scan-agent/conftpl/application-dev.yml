@@ -14,11 +14,11 @@ spring:
     password: _DB_PASS_
   #Redis配置
   redis:
-    password: _REDIS_PWD_
-    database: 0
     cluster:
       max-redirects: 3
       nodes: _REDIS_IPS_
+    password: _REDIS_PWD_
+    ssl: false
   #ES配置
   elasticsearch:
     high-level-client:
@@ -61,7 +61,10 @@ logging:
     com.platon.browser.persistence.queue.handler: error
     com.platon.browser.task: error
   file:
-    name: ./logs/${spring.application.name}-${version}-${profile}.log
+    name: ./logs/${spring.application.name}-${profile}.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{50}[%L] | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{50}[%L] | %msg%n"
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -73,8 +76,8 @@ platon:
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
+    protocol: WS
+    addresses: 192.168.112.141:7789,192.168.112.141:7790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -100,11 +103,11 @@ platon:
   # 初始内置节点默认质押金额(ATP)
   defaultStakingLockedAmount: 10500
   #区块最大Gas限制
-  maxBlockGasLimit: 100800000
+  maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-%s.md
+  proposalUrlTemplate: https://github.com/AlayaNetwork/AIPs/tree/master/Alaya/AIP-%s.md
   #提案pip_num参数模板
-  proposalPipNumTemplate: PIP-%s
+  proposalPipNumTemplate: AIP-%s
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -130,10 +133,9 @@ v0150:
   #调账生效版本
   adjustmentActiveVersion: 3840
   #调账提案ID
-  adjustmentPipId: '1609410836.4141252'
+  adjustmentPipId: 14
   #调账日志输出文件
-  adjustLogFilePath: ./adjust.log
-
+  adjustLogFilePath: ./logs/staking-delegate-adjust.log
 task:
   #地址统计任务批次大小
   addressBatchSize: 1000
@@ -142,4 +144,4 @@ task:
   #未追上链,批量入ES和Redis的缓存大小
   esRedisNotCatchupBatchSize: 10
   #已追上链,批量入ES和Redis的缓存大小
-  esRedisCatchupBatchSize: 10
+  esRedisCatchupBatchSize: 1
