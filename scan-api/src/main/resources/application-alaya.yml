@@ -1,13 +1,11 @@
-# ***************************开发配置**************************** #
-# 当前激活的配置名称(请不要修改)
-profile: dev
+profile: alaya
 # 密码加密配置
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #性能配置
 server:
-  port: 9061
+  port: 50010
   tomcat:
     max-connections: 20000
     threads:
@@ -18,12 +16,12 @@ spring:
   #数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_dev?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     # 使用p6spy监控SQL
     # driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    # url: jdbc:p6spy:mysql://192.168.9.191:3306/alaya_browser_0.15.2.0_hyp?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: platon
-    password: platon
+    # url: jdbc:p6spy:mysql://192.168.9.191:3306/alaya_browser_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     #下面为连接池的补充设置，应用到上面所有数据源中
     #初始化大小，最小，最大
     initialSize: 5
@@ -67,11 +65,10 @@ logging:
     com.platon.browser.client: info
     com.platon.browser.dao: info
   file:
-    name: ./logs/${spring.application.name}-${version}-${profile}.log
+    name: ./logs/${spring.application.name}-${profile}.log
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50} | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50} | %msg%n"
-#初始化链相关的配置
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
 #初始化链相关的配置
 platon:
   # 地址HRP前缀
@@ -112,7 +109,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/master/Alaya/PIP-%s.md
+  proposalUrlTemplate: https://github.com/AlayaNetwork/AIPs/tree/master/Alaya/AIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api

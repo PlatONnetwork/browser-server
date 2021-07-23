@@ -65,7 +65,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(this.target,"blockChainConfig", this.blockChainConfig);
         ReflectionTestUtils.setField(this.target,"platonClient", this.platonClient);
         ReflectionTestUtils.setField(this.target,"customNodeMapper", this.customNodeMapper);
-
+        ReflectionTestUtils.setField(this.target,"commonService", this.commonService);
     }
 
     @Test
@@ -156,6 +156,9 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
     @Test
 	public void testStakingStatisticNew() {
 		when(this.customStakingMapper.selectCountByActive()).thenReturn(10);
+        when(commonService.getIssueValue()).thenReturn(new BigDecimal(100));
+        when(commonService.getStakingDenominator()).thenReturn(new BigDecimal(200));
+        when(commonService.getTotalStakingValue()).thenReturn(new BigDecimal(300));
 		StakingStatisticNewResp resp = this.target.stakingStatisticNew();
 		assertNotNull(resp);
 	}
