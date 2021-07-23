@@ -54,5 +54,5 @@
 	</where>
 	group by d.`node_id` order by d.`cur_delegation_block_num` desc
   </select>
-  
+
 </mapper>

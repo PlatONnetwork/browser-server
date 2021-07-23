@@ -70,4 +70,13 @@
         WHERE a.address = #{address};
     </select>
 
+    <update id="batchUpdateByAddress">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE address
+            SET have_reward = have_reward + #{item.recoveredDelegationAmount}
+            WHERE
+            address = #{item.delegateAddr}
+        </foreach>
+    </update>
+
 </mapper>

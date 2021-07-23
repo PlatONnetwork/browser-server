@@ -383,13 +383,33 @@ public class AddressCache {
         this.update(de.getTxFrom(), de.getDelegateReward());
     }
 
-    private void update(String address, BigDecimal amount) {
+    /**
+     * 更新地址已领取委托奖励
+     *
+     * @param address 地址
+     * @param amount  已领取委托奖励
+     * @return: void
+     * @date: 2021/6/29
+     */
+    public void update(String address, BigDecimal amount) {
         Address cache = this.addressMap.get(address);
         if (cache == null) {
             cache = this.createDefaultAddress(address);
             this.addressMap.put(address, cache);
         }
         cache.setHaveReward(cache.getHaveReward().add(amount));
+    }
+
+    /**
+     * 获取缓存地址对象
+     *
+     * @param address 地址
+     * @return: com.platon.browser.dao.entity.Address
+     * @date: 2021/6/29
+     */
+    public Address getAddress(String address) {
+        Address cache = this.addressMap.get(address);
+        return cache;
     }
 
 }

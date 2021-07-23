@@ -3,8 +3,6 @@ package com.platon.browser.controller.token;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestBase;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
-import com.platon.browser.request.token.QueryTokenIdDetailReq;
-import com.platon.browser.request.token.QueryTokenIdListReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +41,8 @@ public class HolderTokenControllerTest extends ApiTestBase {
         QueryHolderTokenListReq req = new QueryHolderTokenListReq();
         req.setPageNo(1);
         req.setPageSize(10);
-        req.setAddress("atp100nalg9dlhd88y8rwvejwlrdyvkx0zdyrquu9u");
-        req.setType("erc721");
+        req.setType("erc20");
+        req.setAddress("atp1jcy9sl0t7yfklwg27pgd8ppae0qf9l0g7ujdw7");
         this.mockMvc.perform(MockMvcRequestBuilders.post("/token/holder-token/list")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content((JSONObject.toJSONString(req)).getBytes()))
@@ -67,7 +65,7 @@ public class HolderTokenControllerTest extends ApiTestBase {
                     InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
                     FileOutputStream fos = new FileOutputStream(new File("build/bbb.csv"));
                     byte[] byteBuf = new byte[1024];
-                    while(in.read(byteBuf)!=-1) {
+                    while (in.read(byteBuf) != -1) {
                         fos.write(byteBuf);
                     }
                     fos.close();

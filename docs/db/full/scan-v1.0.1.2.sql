@@ -29,6 +29,8 @@ CREATE TABLE `address` (
                            `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                            `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                            `have_reward` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '已领取委托奖励',
+                           `erc721_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数',
+                           `erc20_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
                            PRIMARY KEY (`address`),
                            KEY `type` (`type`) USING BTREE
 );
@@ -78,81 +80,7 @@ CREATE TABLE `delegation` (
                               KEY `staking_block_num` (`staking_block_num`) USING BTREE
 );
 
-DROP TABLE IF EXISTS `erc20_token`;
-CREATE TABLE `erc20_token` (
-                               `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-                               `address` varchar(64) DEFAULT NULL COMMENT '合约地址',
-                               `name` varchar(32) DEFAULT NULL COMMENT '合约名称',
-                               `symbol` varchar(32) DEFAULT NULL COMMENT '合约符号',
-                               `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
-                               `total_supply` decimal(64,0) DEFAULT NULL COMMENT '供应总量',
-                               `creator` varchar(64) DEFAULT NULL COMMENT '合约创建者',
-                               `tx_hash` varchar(128) DEFAULT NULL COMMENT '合约创建所在交易哈希',
-                               `type` char(1) DEFAULT NULL COMMENT '合约类型 E，evm的代币合约，W，wasm的代币合约',
-                               `status` int(11) DEFAULT '0' COMMENT '合约状态 1 可见，0 隐藏',
-                               `block_timestamp` datetime DEFAULT NULL COMMENT '上链时间',
-                               `tx_count` int(11) DEFAULT NULL COMMENT '合约内交易数',
-                               `holder` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的持有人',
-                               `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-                               `scan_show` int(11) NOT NULL DEFAULT '0' COMMENT '是否在浏览器中显示: 0-不显示,1-显示',
-                               PRIMARY KEY (`id`),
-                               UNIQUE KEY `uni_address` (`address`),
-                               KEY `idx_name` (`name`),
-                               KEY `idx_holder` (`holder`)
-);
-
-DROP TABLE IF EXISTS `erc20_token_address_rel`;
-CREATE TABLE `erc20_token_address_rel` (
-                                           `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-                                           `contract` varchar(64) DEFAULT NULL COMMENT '合约地址',
-                                           `address` varchar(64) DEFAULT NULL COMMENT '用户地址',
-                                           `balance` decimal(64,0) DEFAULT NULL COMMENT '地址代币余额',
-                                           `name` varchar(32) DEFAULT NULL COMMENT '合约名称',
-                                           `symbol` varchar(32) DEFAULT NULL COMMENT '合约符号',
-                                           `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
-                                           `tx_count` int(11) NOT NULL DEFAULT '0' COMMENT '地址token交易数',
-                                           `total_supply` decimal(64,0) NOT NULL DEFAULT '0' COMMENT 'token 总发行量',
-                                           `update_time` datetime DEFAULT NULL COMMENT '最后更新时间',
-                                           PRIMARY KEY (`id`),
-                                           KEY `idx_address` (`address`),
-                                           KEY `idx_contract` (`contract`)
-);
-
-DROP TABLE IF EXISTS `erc20_token_detail`;
-CREATE TABLE `erc20_token_detail` (
-                                      `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-                                      `contract` varchar(64) DEFAULT NULL COMMENT '合约地址',
-                                      `icon` text COMMENT '合约图标',
-                                      `web_site` varchar(32) DEFAULT NULL COMMENT '官网地址',
-                                      `abi` text COMMENT '合约的ABI',
-                                      `bin_code` text COMMENT '合约bincode',
-                                      `source_code` text COMMENT '合约源码',
-                                      `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-                                      PRIMARY KEY (`id`),
-                                      UNIQUE KEY `uni_contract` (`contract`)
-);
-
-DROP TABLE IF EXISTS `erc20_token_transfer_record`;
-CREATE TABLE `erc20_token_transfer_record` (
-                                               `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '序号',
-                                               `tx_hash` varchar(128) DEFAULT NULL COMMENT '交易哈希',
-                                               `block_number` bigint(20) DEFAULT NULL COMMENT '区块高度',
-                                               `tx_from` varchar(64) DEFAULT NULL COMMENT '交易发起者from',
-                                               `contract` varchar(64) DEFAULT NULL COMMENT 'Token合约地址',
-                                               `transfer_to` varchar(64) DEFAULT NULL COMMENT '代币接收者',
-                                               `transfer_value` decimal(64,0) DEFAULT NULL COMMENT '转账金额',
-                                               `decimal` int(11) DEFAULT NULL COMMENT '代币精度',
-                                               `name` varchar(32) DEFAULT NULL COMMENT '代币名称',
-                                               `symbol` varchar(32) DEFAULT NULL COMMENT '代币符号',
-                                               `method_sign` varchar(32) DEFAULT NULL COMMENT '函数方法签名',
-                                               `result` int(11) DEFAULT '1' COMMENT '转账结果 1成功，0失败',
-                                               `block_timestamp` datetime DEFAULT NULL COMMENT '转账时间',
-                                               `value` decimal(64,0) DEFAULT NULL COMMENT '交易value金额',
-                                               `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-                                               PRIMARY KEY (`id`),
-                                               KEY `idx_contract` (`contract`),
-                                               KEY `idx_from_to_contract` (`tx_from`,`transfer_to`)
-);
+/*Table structure for table `gas_estimate` */
 
 DROP TABLE IF EXISTS `gas_estimate`;
 CREATE TABLE `gas_estimate` (
@@ -213,10 +141,11 @@ CREATE TABLE `network_stat` (
                                 `next_settle` bigint(20) NOT NULL COMMENT '离下个结算周期的剩余块数',
                                 `node_opt_seq` bigint(20) NOT NULL COMMENT '节点操作记录最新序号',
                                 `issue_rates` text COMMENT '增发比例',
-                                `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
                                 `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                 `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                                 `avg_pack_time` bigint(20) NOT NULL DEFAULT '0' COMMENT '平均区块打包时间',
+                                `erc721_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数',
+                                `erc20_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
                                 PRIMARY KEY (`id`)
 );
 
@@ -454,6 +383,73 @@ CREATE TABLE `staking_history` (
   KEY `staking_addr` (`staking_addr`) USING BTREE
 );
 
+DROP TABLE IF EXISTS `token`;
+CREATE TABLE `token` (
+                         `address` varchar(64) NOT NULL COMMENT '合约地址',
+                         `type` varchar(64) NOT NULL COMMENT '合约类型 erc20 erc721',
+                         `name` varchar(64) DEFAULT NULL COMMENT '合约名称',
+                         `symbol` varchar(64) DEFAULT NULL COMMENT '合约符号',
+                         `total_supply` decimal(64,0) DEFAULT NULL COMMENT '供应总量',
+                         `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
+                         `is_support_erc165` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否支持erc165接口： 0-不支持 1-支持',
+                         `is_support_erc20` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否支持erc20接口： 0-不支持 1-支持',
+                         `is_support_erc721` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否支持erc721接口： 0-不支持 1-支持',
+                         `is_support_erc721_enumeration` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否支持erc721 enumeration接口： 0-不支持 1-支持',
+                         `is_support_erc721_metadata` tinyint(1) NOT NULL COMMENT '是否支持metadata接口： 0-不支持 1-支持',
+                         `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                         `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                         `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的交易数',
+                         `holder` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的持有人的数量',
+                         PRIMARY KEY (`address`),
+                         UNIQUE KEY `token_address` (`address`)
+);
+
+DROP TABLE IF EXISTS `token_expand`;
+CREATE TABLE `token_expand` (
+                                `address` varchar(64) NOT NULL COMMENT '合约地址',
+                                `icon` text COMMENT '合约图标',
+                                `web_site` varchar(256) DEFAULT NULL COMMENT '合约地址',
+                                `details` varchar(256) DEFAULT NULL COMMENT '合约官网',
+                                `is_show_in_aton` tinyint(1) DEFAULT '0' COMMENT 'aton中是否显示，0-隐藏 1-展示',
+                                `is_show_in_scan` tinyint(1) DEFAULT '0' COMMENT 'scan中是否显示，0-隐藏 1-展示',
+                                `is_can_transfer` tinyint(1) DEFAULT '0' COMMENT '是否可转账 0-不可转账 1-可转账',
+                                `create_id` bigint(20) NOT NULL COMMENT '创建者',
+                                `create_name` varchar(50) NOT NULL COMMENT '创建者名称',
+                                `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                `update_id` bigint(20) NOT NULL COMMENT '更新者',
+                                `update_name` varchar(50) NOT NULL COMMENT '更新者名称',
+                                `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                PRIMARY KEY (`address`)
+);
+
+DROP TABLE IF EXISTS `token_holder`;
+CREATE TABLE `token_holder` (
+                                `token_address` varchar(64) NOT NULL COMMENT '合约地址',
+                                `address` varchar(64) NOT NULL COMMENT '用户地址',
+                                `balance` decimal(64,0) DEFAULT NULL COMMENT '地址代币余额, ERC20为金额，ERC721为tokenId数',
+                                `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数',
+                                PRIMARY KEY (`token_address`,`address`)
+);
+
+DROP TABLE IF EXISTS `token_inventory`;
+CREATE TABLE `token_inventory` (
+                                   `token_address` varchar(64)  NOT NULL COMMENT '合约地址',
+                                   `token_id` varchar(128)  NOT NULL COMMENT 'token id',
+                                   `owner` varchar(64)  NOT NULL COMMENT 'token id 对应持有者地址',
+                                   `name` varchar(256)  DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
+                                   `description` longtext  COMMENT 'Describes the asset to which this NFT represents',
+                                   `image` varchar(256)  DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
+                                   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                   `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'tokenaddress和tokenid的对应交易数',
+                                   `token_owner_tx_qty` int(11) DEFAULT '0' COMMENT 'owner对该tokenaddress和tokenid的对应交易数',
+                                   `small_image` varchar(256)  DEFAULT NULL COMMENT '缩略图',
+                                   `medium_image` varchar(256)  DEFAULT NULL COMMENT '中等缩略图',
+                                   PRIMARY KEY (`token_address`,`token_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
 DROP TABLE IF EXISTS `tx_bak`;
 CREATE TABLE `tx_bak` (
                           `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
@@ -479,9 +475,22 @@ CREATE TABLE `vote` (
                         KEY `verifier` (`node_id`) USING BTREE
 );
 
+DROP TABLE IF EXISTS `internal_address`;
+CREATE TABLE `internal_address` (
+                                    `address` VARCHAR(42) NOT NULL COMMENT '地址',
+                                    `type` INT(11) NOT NULL DEFAULT '0' COMMENT '地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约 ',
+                                    `balance` DECIMAL(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
+                                    `restricting_balance` DECIMAL(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
+                                    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    PRIMARY KEY (`address`),
+                                    KEY `type` (`type`) USING BTREE
+);
+
 -- 初始化数据
-INSERT INTO `token_expand` ( `address`, `is_show_in_aton`, `is_show_in_scan`, `is_can_transfer`, `create_id`, `create_name`, `update_id`, `update_name` )
-VALUES
-( 'atp1w4vvn96ll9w0rmyeh77ku2tlvyz545mam8rldk', 1, 1, 0, '1', 'admin', '1', 'admin' ),
-( 'atp16lellpkrv894hmg8am7ns3p2qny2vqj85ud8s6', 1, 1, 1, '1', 'admin', '1', 'admin' ),
-( 'atp1h3y5wt82z09amcd4mrhpz4jt543t5r9td9v49s', 1, 1, 1, '1', 'admin', '1', 'admin' );
+
+INSERT INTO `internal_address` (`address`,`type`)
+VALUES ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep', 1),
+       ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7', 2),
+       ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrdyjj2v', 3),
+       ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxlcypcy', 6);

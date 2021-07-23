@@ -54,7 +54,7 @@ public class ErcServiceImpl {
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
+                log.error("InterruptedException异常", interruptedException);
             }
             throw new BusinessException("查询Token余额失败！");
         }

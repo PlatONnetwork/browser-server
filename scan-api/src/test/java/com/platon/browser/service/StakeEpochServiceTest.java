@@ -41,22 +41,16 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StakeEpochServiceTest extends ApiTestMockBase {
-
     @Mock
     private CustomStakingMapper customStakingMapper;
-
     @Mock
     private CustomDelegationMapper customDelegationMapper;
-
     @Mock
     private CustomNodeMapper customNodeMapper;
-
     @Mock
     private EsNodeOptRepository ESNodeOptRepository;
-
     @Mock
     private PlatOnClient platonClient;
-
     @Spy
     private StakingService target;
 

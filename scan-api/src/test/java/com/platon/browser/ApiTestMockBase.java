@@ -17,7 +17,7 @@ import org.mockito.Mock;
 
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;

@@ -35,11 +35,11 @@ task:
   #基金会地址统计cron表达式：
   #    生产：每10分钟执行一次：0 0/10 * * * ?
   #    测试：每10秒钟执行一次：0/10 * * * * ?
-  fundAddressCron: 0/10 * * * * ?
+  fundAddressCron: 0 0/6 * * * ?
   #内置合约地址统计cron表达式：
   #    生产：每1分钟执行一次：0 0/1 * * * ?
   #    测试：每5秒钟执行一次：0/5 * * * * ?
-  innerContractCron: 0/5 * * * * ?
+  innerContractCron: 0/10 * * * * ?
   #地址统计任务批次大小
   addressBatchSize: 1000
 #日志配置
