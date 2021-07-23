@@ -9,7 +9,7 @@ import com.platon.browser.client.PlatOnClient;
 import org.springframework.test.context.junit4.SpringRunner;
 
 //@RunWith(SpringRunner.class)
-@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=hrpatp201018",webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=dev",webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiTestBase extends ApiTestData {
 
 //    @Autowired

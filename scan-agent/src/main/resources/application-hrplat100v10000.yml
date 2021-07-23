@@ -105,7 +105,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
   #提案pip_num参数模板
   proposalPipNumTemplate: PIP-%s
   #keysBase网址
@@ -135,8 +135,7 @@ v0150:
   #调账提案ID
   adjustmentPipId: 14
   #调账日志输出文件
-  adjustLogFilePath: ./adjust.log
-
+  adjustLogFilePath: ./logs/staking-delegate-adjust.log
 task:
   #地址统计任务批次大小
   addressBatchSize: 1000

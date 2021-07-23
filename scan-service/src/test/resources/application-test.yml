@@ -17,7 +17,7 @@ server:
 spring:
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_hrpatp201018v10000?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_dev?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     #下面为连接池的补充设置，应用到上面所有数据源中
@@ -41,10 +41,9 @@ spring:
   #Redis配置
   redis:
     password: platscan
-    database: 0
     cluster:
       max-redirects: 3
-      nodes: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
   #ES配置
   elasticsearch:
     high-level-client:
@@ -74,41 +73,41 @@ platon:
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.9.144:6789
+    protocol: WS
+    addresses: 192.168.112.141:7789,192.168.112.141:7790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
   initIssueAmount: 10000000000
   #区块最大Gas限制
-  maxBlockGasLimit: 100800000
+  maxBlockGasLimit: 201600000
   #每年固定增发比例
-  addIssueRate: 0.025
+  addIssueRate: 0.05
   #每年增发分配给激励池的比例
-  incentiveRateFromIssue: 0.8
+  incentiveRateFromIssue: 0.4
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #10年内基金会向激励池填充额度: <第几年-补贴金额(ATP)>
   foundationSubsidies: {
-    '1':62215742.4869165,
-    '2':55965742.4869165,
-    '3':49559492.4869165,
-    '4':42993086.2369165,
-    '5':36262519.8306666,
-    '6':29363689.2642633,
-    '7':22292387.9336939,
-    '8':15044304.0698633,
-    '9':7615018.1094369
+    '1':0,
+    '2':0,
+    '3':0,
+    '4':0,
+    '5':0,
+    '6':0,
+    '7':0,
+    '8':0,
+    '9':0
   }
   # 初始内置节点默认质押金额(ATP)
-  defaultStakingLockedAmount: 10000000
+  defaultStakingLockedAmount: 10500
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/autocomplete.json?q=
-  chainId: 108
+  chainId: 201018
   #锁仓最小释放金额参数生效版本
   restrictingMinimumReleaseActiveVersion: 3584
   #Redis命名空间

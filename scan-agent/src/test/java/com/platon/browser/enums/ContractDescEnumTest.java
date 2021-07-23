@@ -1,8 +1,8 @@
 package com.platon.browser.enums;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class ContractDescEnumTest {
 
