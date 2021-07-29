@@ -49,7 +49,7 @@ public class InternalAddressService {
         lists.add(internalAddressResp);
         InternalAddressExample internalAddressExample = new InternalAddressExample();
         internalAddressExample.createCriteria().andTypeEqualTo(0);
-        internalAddressExample.setOrderByClause(" balance,restricting_balance desc");
+        internalAddressExample.setOrderByClause(" balance desc,restricting_balance desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<InternalAddress> internalAddressList = customInternalAddressMapper.selectListByExample(
                 internalAddressExample);
