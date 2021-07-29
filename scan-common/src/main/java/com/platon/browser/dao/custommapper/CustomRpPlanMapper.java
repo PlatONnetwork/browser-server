@@ -9,11 +9,16 @@ import java.util.List;
 import java.util.Set;
 
 public interface CustomRpPlanMapper {
-    List<CustomRpPlan> selectAll ();
-    int batchInsertOrUpdateSelective (@Param("list") Set <RpPlan> list, @Param("selective") RpPlan.Column... selective );
+
+    List<CustomRpPlan> selectAll();
+
+    int batchInsertOrUpdateSelective(@Param("list") Set<RpPlan> list, @Param("selective") RpPlan.Column... selective);
+
     /**
      * 查询金额总数
      */
-    BigDecimal selectSumByAddress ( String address );
-    BigDecimal sumAmountByAddressAndBlockNumber ( @Param("address")String address,@Param("blockNumber") Long blockNumber);
+    BigDecimal selectSumByAddress(String address);
+
+    BigDecimal sumAmountByAddressAndBlockNumber(@Param("address") String address, @Param("blockNumber") Long blockNumber);
+
 }
