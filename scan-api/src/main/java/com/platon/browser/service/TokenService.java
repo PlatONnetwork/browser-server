@@ -7,15 +7,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomToken;
 import com.platon.browser.bean.CustomTokenDetail;
-import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.bean.CustomTokenInventory;
 import com.platon.browser.config.DownFileCommon;
+import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
+import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryKey;
-import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
-import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
-import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.request.token.QueryTokenDetailReq;
@@ -35,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,9 +63,6 @@ public class TokenService {
     @Resource
     private TokenInventoryMapper tokenInventoryMapper;
 
-    @Resource
-    private CustomTokenHolderMapper customTokenHolderMapper;
-
     public RespPage<QueryTokenListResp> queryTokenList(QueryTokenListReq req) {
         // page params: #{offset}, #{size}
         RespPage<QueryTokenListResp> result = new RespPage<>();
@@ -84,8 +78,10 @@ public class TokenService {
         // 总供应量为0，则取值总库存量
         int total = 0;
         if (ObjectUtil.isNotNull(customTokenDetail) && CommonUtil.ofNullable(() -> customTokenDetail.getTotalSupply()).orElse("0").equalsIgnoreCase("0")) {
-            Page<CustomTokenHolder> ids = customTokenHolderMapper.selectListByParams(req.getAddress(), null, null);
-            total = ids.getResult().size();
+            TokenInventoryExample example = new TokenInventoryExample();
+            example.createCriteria().andTokenAddressEqualTo(req.getAddress());
+            Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
+            total = totalTokenInventory.size();
             customTokenDetail.setTotalSupply(Convert.toStr(total));
         }
         return QueryTokenDetailResp.fromTokenDetail(customTokenDetail);
@@ -147,18 +143,12 @@ public class TokenService {
             criteria.andTokenIdEqualTo(tokenId);
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
-        String[] headers = {
-                this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID, local),
-                this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT, local)
-        };
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
+                                                                                                                                                                                                              local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
+                                                                                                                                                                                                                                  local)};
         List<Object[]> rows = new ArrayList<>();
         tokenInventorys.forEach(tokenInventory -> {
-            Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getOwner()
-                    , tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()
-            };
+            Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getOwner(), tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()};
             rows.add(row);
         });
         return this.downFileCommon.writeDate("Token-Id-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
