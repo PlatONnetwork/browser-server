@@ -49,7 +49,17 @@ public class StakingDetailsResp {
 
     private String stakingAddr;         //发起质押的账户地址
 
+    /**
+     * 发起质押的账户地址类型
+     */
+    private Integer stakingAddrType;
+
     private String denefitAddr;         //收益地址
+
+    /**
+     * 收益地址类型
+     */
+    private Integer denefitAddrType;
 
     private String website;             //节点的第三方主页
 
@@ -367,6 +377,22 @@ public class StakingDetailsResp {
 
     public void setVersion(String version) {
         Version = version;
+    }
+
+    public Integer getStakingAddrType() {
+        return stakingAddrType;
+    }
+
+    public void setStakingAddrType(Integer stakingAddrType) {
+        this.stakingAddrType = stakingAddrType;
+    }
+
+    public Integer getDenefitAddrType() {
+        return denefitAddrType;
+    }
+
+    public void setDenefitAddrType(Integer denefitAddrType) {
+        this.denefitAddrType = denefitAddrType;
     }
 
 }
