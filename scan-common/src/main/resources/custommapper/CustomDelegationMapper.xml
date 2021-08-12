@@ -35,7 +35,7 @@
   <select id="selectStakingByNodeId" resultMap="StakingListResultMap">
       SELECT
       a.delegate_addr,
-      b.type AS delegate_addr_type,
+      IFNULL( b.type, 1 ) AS delegate_addr_type,
       a.delegate_hes,
       a.delegate_locked,
       a.delegate_released

@@ -22,6 +22,7 @@ import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
@@ -299,13 +300,9 @@ public class StakingService {
             resp.setJoinTime(stakingNode.getJoinTime().getTime());
             resp.setDenefitAddr(stakingNode.getBenefitAddr());
             Address denefitAddr = addressMapper.selectByPrimaryKey(stakingNode.getBenefitAddr());
-            if (ObjectUtil.isNotNull(denefitAddr)) {
-                resp.setDenefitAddrType(denefitAddr.getType());
-            }
+            resp.setDenefitAddrType(CommonUtil.ofNullable(() -> denefitAddr.getType()).orElse(AddressTypeEnum.ACCOUNT.getCode()));
             Address stakingAddr = addressMapper.selectByPrimaryKey(stakingNode.getStakingAddr());
-            if (ObjectUtil.isNotNull(stakingAddr)) {
-                resp.setStakingAddrType(stakingAddr.getType());
-            }
+            resp.setStakingAddrType(CommonUtil.ofNullable(() -> stakingAddr.getType()).orElse(AddressTypeEnum.ACCOUNT.getCode()));
             resp.setStakingIcon(stakingNode.getNodeIcon());
             resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
             resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(Browser.PERCENTAGE).toString());

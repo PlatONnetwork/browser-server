@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -24,6 +23,7 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.dto.Transaction.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum;
 import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
+import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
@@ -963,9 +963,7 @@ public class TransactionService {
             QueryClaimByStakingResp queryClaimByStakingResp = new QueryClaimByStakingResp();
             BeanUtils.copyProperties(delegationReward, queryClaimByStakingResp);
             Address address = addressMapper.selectByPrimaryKey(queryClaimByStakingResp.getAddr());
-            if (ObjectUtil.isNotNull(address)) {
-                queryClaimByStakingResp.setAddrType(address.getType());
-            }
+            queryClaimByStakingResp.setAddrType(CommonUtil.ofNullable(() -> address.getType()).orElse(AddressTypeEnum.ACCOUNT.getCode()));
             queryClaimByStakingResp.setTime(delegationReward.getTime().getTime());
             /**
              * 解析json获取具体提取奖励的数据
