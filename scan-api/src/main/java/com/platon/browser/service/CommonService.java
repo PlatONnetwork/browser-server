@@ -87,35 +87,6 @@ public class CommonService {
     }
 
     /**
-     * 获取总发行量
-     * 总发行量=初始发行量*(1+增发比例)^第几年
-     *
-     * @param
-     * @return java.math.BigDecimal
-     * @date 2021/5/14
-     */
-    @Cacheable(value = "getIntegrationIssueValue")
-    public BigDecimal getIntegrationIssueValue() {
-        BigDecimal issueValue = new BigDecimal(0);
-        try {
-            // 获取初始发行金额
-            BigDecimal initIssueAmount = blockChainConfig.getInitIssueAmount();
-            // 每年固定增发比例
-            BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
-            // 第几年
-            int yearNum = getYearNum();
-            issueValue = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON).multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(8, BigDecimal.ROUND_HALF_UP);
-            log.debug("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toString(), initIssueAmount.toString(), addIssueRate.toString(), yearNum);
-            if (issueValue.signum() == -1) {
-                log.error("获取总发行量[{}]错误,不能为负数", issueValue.toString());
-            }
-        } catch (Exception e) {
-            log.error("获取取总发行量异常", e);
-        }
-        return issueValue;
-    }
-
-    /**
      * 获取年份(第几年)--从第1年开始算，而不是0
      *
      * @param
@@ -179,48 +150,6 @@ public class CommonService {
         // 获取实时所有基金会账户余额
         CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
         BigDecimal circulationValue = issueValue.subtract(lockUpValue.getFree()).subtract(stakingValue.getFree()).subtract(delegationValue.getFree()).subtract(incentivePoolValue.getFree()).subtract(foundationValue.getFree());
-        log.debug("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
-                  circulationValue.toString(),
-                  issueValue.toString(),
-                  lockUpValue.getFree().toString(),
-                  stakingValue.getFree().toString(),
-                  delegationValue.getFree().toString(),
-                  incentivePoolValue.getFree().toString(),
-                  foundationValue.getFree().toString());
-        if (circulationValue.signum() == -1) {
-            log.error("获取流通量[{}]错误,不能为负数", issueValue.toString());
-        }
-        return circulationValue;
-    }
-
-    /**
-     * 获取流通量
-     * 流通量 = 本增发周期总发行量 - 实时锁仓合约余额 -  实时质押合约余额 - 实时委托奖励池合约余额 - 实时激励池余额 - 实时所有基金会账户余额
-     *
-     * @param
-     * @return void
-     * @date 2021/5/14
-     */
-    @Cacheable(value = "getIntegrationCirculationValue")
-    public BigDecimal getIntegrationCirculationValue() {
-        List<CountBalance> list = countBalance();
-        BigDecimal issueValue = getIssueValue();
-        // 获取实时锁仓合约余额
-        CountBalance lockUpValue = list.stream().filter(v -> v.getType() == 1).findFirst().orElseGet(CountBalance::new);
-        // 获取实时质押合约余额
-        CountBalance stakingValue = list.stream().filter(v -> v.getType() == 2).findFirst().orElseGet(CountBalance::new);
-        // 获取实时委托奖励池合约余额
-        CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
-        // 实时激励池余额
-        CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
-        // 获取实时所有基金会账户余额
-        CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
-        BigDecimal circulationValue = issueValue.subtract(lockUpValue.getFree())
-                                                .subtract(stakingValue.getFree())
-                                                .subtract(delegationValue.getFree())
-                                                .subtract(incentivePoolValue.getFree())
-                                                .subtract(foundationValue.getFree())
-                                                .setScale(8, BigDecimal.ROUND_HALF_UP);
         log.debug("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
                   circulationValue.toString(),
                   issueValue.toString(),

@@ -11,6 +11,7 @@ import com.platon.browser.response.home.StakingListNewResp;
 import com.platon.browser.service.CommonService;
 import com.platon.browser.service.HomeService;
 import com.platon.browser.utils.I18nUtil;
+import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 首页模块Contract。定义使用方法
@@ -84,7 +86,7 @@ public class HomeController {
     }
 
     /**
-     * 获取总发行量
+     * 获取总发行量(lat)
      *
      * @return: reactor.core.publisher.Mono<java.lang.String>
      * @date: 2021/8/17
@@ -92,13 +94,14 @@ public class HomeController {
     @GetMapping("home/issueValue")
     public Mono<String> getIssueValue() {
         return Mono.create(sink -> {
-            BigDecimal issueValue = commonService.getIntegrationIssueValue();
+            BigDecimal issueValue = commonService.getIssueValue();
+            issueValue = Convert.fromVon(issueValue, Convert.Unit.KPVON).setScale(8, RoundingMode.DOWN);
             sink.success(issueValue.toPlainString());
         });
     }
 
     /**
-     * 获取流通量
+     * 获取流通量(lat)
      *
      * @return: reactor.core.publisher.Mono<java.lang.String>
      * @date: 2021/8/17
@@ -106,7 +109,8 @@ public class HomeController {
     @GetMapping("home/circulationValue")
     public Mono<String> getCirculationValue() {
         return Mono.create(sink -> {
-            BigDecimal circulationValue = commonService.getIntegrationCirculationValue();
+            BigDecimal circulationValue = commonService.getCirculationValue();
+            circulationValue = Convert.fromVon(circulationValue, Convert.Unit.KPVON).setScale(8, RoundingMode.DOWN);
             sink.success(circulationValue.toPlainString());
         });
     }
