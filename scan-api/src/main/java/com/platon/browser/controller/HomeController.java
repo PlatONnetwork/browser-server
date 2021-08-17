@@ -92,7 +92,7 @@ public class HomeController {
     @GetMapping("home/issueValue")
     public Mono<String> getIssueValue() {
         return Mono.create(sink -> {
-            BigDecimal issueValue = commonService.getIssueValue();
+            BigDecimal issueValue = commonService.getIntegrationIssueValue();
             sink.success(issueValue.toPlainString());
         });
     }
@@ -106,7 +106,7 @@ public class HomeController {
     @GetMapping("home/circulationValue")
     public Mono<String> getCirculationValue() {
         return Mono.create(sink -> {
-            BigDecimal circulationValue = commonService.getCirculationValue();
+            BigDecimal circulationValue = commonService.getIntegrationCirculationValue();
             sink.success(circulationValue.toPlainString());
         });
     }
