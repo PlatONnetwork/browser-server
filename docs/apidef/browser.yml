@@ -1567,6 +1567,9 @@ definitions:
       binCode:
         description: 合约的二进制码
         type: string
+      isDestroy:
+        description: 合约是否已销毁 0-否，1-是
+        type: integer
       holder:
         description: 持有人数
         type: integer

@@ -37,4 +37,9 @@ public class QueryHolderTokenListResp {
 
     private String tokenId;
 
+    /**
+     * token所属合约是否已销毁：0-否，1-是
+     */
+    private int isContractDestroy;
+
 }

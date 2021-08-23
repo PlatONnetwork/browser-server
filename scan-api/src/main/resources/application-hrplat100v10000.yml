@@ -7,7 +7,7 @@ jasypt:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #性能配置
 server:
-  port: 40010
+  port:
   tomcat:
     max-connections: 20000
     threads:
