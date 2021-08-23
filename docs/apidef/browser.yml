@@ -1567,7 +1567,7 @@ definitions:
       binCode:
         description: 合约的二进制码
         type: string
-      isDestroy:
+      isContractDestroy:
         description: 合约是否已销毁 0-否，1-是
         type: integer
       holder:
@@ -1810,6 +1810,9 @@ definitions:
         type: string
       txCount:
         description: 交易数
+        type: integer
+      isContractDestroy:
+        description: token所属合约是否已销毁：0-否，1-是
         type: integer
   HolderTokenListResult:
     type: object
