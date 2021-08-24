@@ -39,10 +39,10 @@ HELP.md
 
 apidoc.zip
 
-scan-agent/out
-scan-api/out
-scan-common/out
-scan-service/out
+/scan-agent/out
+/scan-api/out
+/scan-common/out
+/scan-service/out
 /apolloCache/
 /adjust.log
 *info.md
