@@ -76,11 +76,7 @@ public class CommonService {
             // 第几年
             int yearNum = getYearNum();
             issueValue = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON).multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
-            log.debug("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];",
-                    issueValue.toString(),
-                    initIssueAmount.toString(),
-                    addIssueRate.toString(),
-                    yearNum);
+            log.debug("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toString(), initIssueAmount.toString(), addIssueRate.toString(), yearNum);
             if (issueValue.signum() == -1) {
                 log.error("获取总发行量[{}]错误,不能为负数", issueValue.toString());
             }
@@ -153,21 +149,15 @@ public class CommonService {
         CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
         // 获取实时所有基金会账户余额
         CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
-        BigDecimal circulationValue = issueValue
-                .subtract(lockUpValue.getFree())
-                .subtract(stakingValue.getFree())
-                .subtract(delegationValue.getFree())
-                .subtract(incentivePoolValue.getFree())
-                .subtract(foundationValue.getFree());
+        BigDecimal circulationValue = issueValue.subtract(lockUpValue.getFree()).subtract(stakingValue.getFree()).subtract(delegationValue.getFree()).subtract(incentivePoolValue.getFree()).subtract(foundationValue.getFree());
         log.debug("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
-                circulationValue.toString(),
-                issueValue.toString(),
-                lockUpValue.getFree().toString(),
-                stakingValue.getFree().toString(),
-                delegationValue.getFree().toString(),
-                incentivePoolValue.getFree().toString(),
-                foundationValue.getFree().toString()
-        );
+                  circulationValue.toString(),
+                  issueValue.toString(),
+                  lockUpValue.getFree().toString(),
+                  stakingValue.getFree().toString(),
+                  delegationValue.getFree().toString(),
+                  incentivePoolValue.getFree().toString(),
+                  foundationValue.getFree().toString());
         if (circulationValue.signum() == -1) {
             log.error("获取流通量[{}]错误,不能为负数", issueValue.toString());
         }
@@ -219,18 +209,14 @@ public class CommonService {
         CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
         // 获取实时所有基金会账户余额
         CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
-        BigDecimal stakingDenominator = issueValue
-                .subtract(incentivePoolValue.getFree())
-                .subtract(delegationValue.getFree())
-                .subtract(foundationValue.getFree())
-                .subtract(foundationValue.getLocked());
+        BigDecimal stakingDenominator = issueValue.subtract(incentivePoolValue.getFree()).subtract(delegationValue.getFree()).subtract(foundationValue.getFree()).subtract(foundationValue.getLocked());
         log.debug("质押率分母[{}]=总发行量[{}]-实时激励池余额[{}]-实时委托奖励池合约余额[{}]-实时所有基金会账户余额[{}]-实时所有基金会账户锁仓余额[{}];",
-                stakingDenominator.toString(),
-                issueValue.toString(),
-                incentivePoolValue.getFree().toString(),
-                delegationValue.getFree().toString(),
-                foundationValue.getFree().toString(),
-                foundationValue.getLocked().toString());
+                  stakingDenominator.toString(),
+                  issueValue.toString(),
+                  incentivePoolValue.getFree().toString(),
+                  delegationValue.getFree().toString(),
+                  foundationValue.getFree().toString(),
+                  foundationValue.getLocked().toString());
         if (stakingDenominator.signum() == -1) {
             log.error("获取质押率分母[{}]错误,不能为负数", stakingDenominator.toString());
         }
