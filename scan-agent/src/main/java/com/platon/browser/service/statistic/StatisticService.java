@@ -9,9 +9,9 @@ import com.platon.browser.analyzer.statistic.StatisticsNetworkAnalyzer;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -100,7 +100,7 @@ public class StatisticService {
                         NodeSettleStatisBase nodeSettleStatisBase = new NodeSettleStatisBase();
                         nodeSettleStatisBase.setSettleEpochRound(event.getEpochMessage().getSettleEpochRound());
                         nodeSettleStatisBase.setBlockNumGrandTotal(BigInteger.ZERO);
-                        if (inCurValidator(event.getEpochMessage().getCurValidatorList(), event.getBlock().getNodeId())) {
+                        if (inCurValidator(event.getEpochMessage().getPreValidatorList(), node.getNodeId())) {
                             nodeSettleStatisBase.setBlockNumElected(BigInteger.ONE);
                         } else {
                             nodeSettleStatisBase.setBlockNumElected(BigInteger.ZERO);
@@ -109,7 +109,7 @@ public class StatisticService {
                     } else {
                         nodeSettleStatis = NodeSettleStatis.jsonToBean(info);
                         if (event.getEpochMessage().getCurrentBlockNumber().compareTo(BigInteger.valueOf(nodeSettleStatis.getBlockNum())) > 0) {
-                            addNodeSettleStatisElected(event.getEpochMessage().getCurValidatorList(), event.getBlock().getNodeId(), event.getEpochMessage().getSettleEpochRound(), nodeSettleStatis);
+                            addNodeSettleStatisElected(event.getEpochMessage().getPreValidatorList(), node.getNodeId(), event.getEpochMessage().getSettleEpochRound(), nodeSettleStatis);
                         }
                     }
                     Node updateNode = new Node();
@@ -121,9 +121,9 @@ public class StatisticService {
                 if (CollUtil.isNotEmpty(updateNodeList)) {
                     int res = customNodeMapper.updateNodeSettleStatis(updateNodeList);
                     if (res > 0) {
-                        log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功", updateNodeList.stream().map(v -> v.getNodeId()).collect(Collectors.toList()), event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber());
+                        log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功", updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()), event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber());
                     } else {
-                        log.error("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据失败", updateNodeList.stream().map(v -> v.getNodeId()).collect(Collectors.toList()), event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber());
+                        log.error("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据失败", updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()), event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber());
                     }
                 }
             }
@@ -290,9 +290,7 @@ public class StatisticService {
      */
     private boolean inCurValidator(List<com.platon.contracts.ppos.dto.resp.Node> curValidatorList, String nodeId) {
         if (CollUtil.isNotEmpty(curValidatorList)) {
-            List<com.platon.contracts.ppos.dto.resp.Node> curValidator = curValidatorList.stream().filter(v -> {
-                return v.getNodeId().equalsIgnoreCase(nodeId);
-            }).collect(Collectors.toList());
+            List<com.platon.contracts.ppos.dto.resp.Node> curValidator = curValidatorList.stream().filter(v -> v.getNodeId().equalsIgnoreCase(nodeId)).collect(Collectors.toList());
             if (curValidator.size() > 0) {
                 return true;
             } else {
