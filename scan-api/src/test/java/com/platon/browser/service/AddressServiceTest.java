@@ -74,7 +74,7 @@ public class AddressServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target, "platonClient", platonClient);
         ReflectionTestUtils.setField(target, "i18n", i18n);
         ReflectionTestUtils.setField(target, "blockChainConfig", blockChainConfig);
-        ReflectionTestUtils.setField(target, "ESBlockRepository", ESBlockRepository);
+        ReflectionTestUtils.setField(target, "esBlockRepository", ESBlockRepository);
         ReflectionTestUtils.setField(target, "specialApi", specialApi);
         ReflectionTestUtils.setField(target, "statisticCacheService", statisticCacheService);
         RestrictingPlanContract restrictingPlanContract = mock(RestrictingPlanContract.class);

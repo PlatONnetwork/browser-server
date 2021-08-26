@@ -7,10 +7,14 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.custommapper.CustomDelegationMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -27,6 +31,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,18 +46,27 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StakeEpochServiceTest extends ApiTestMockBase {
+
     @Mock
     private CustomStakingMapper customStakingMapper;
+
     @Mock
     private CustomDelegationMapper customDelegationMapper;
+
     @Mock
     private CustomNodeMapper customNodeMapper;
+
     @Mock
     private EsNodeOptRepository ESNodeOptRepository;
+
     @Mock
     private PlatOnClient platonClient;
+
     @Spy
     private StakingService target;
+
+    @Mock
+    private AddressMapper addressMapper;
 
     @Before
     public void setup() {
@@ -66,6 +80,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(this.target, "platonClient", this.platonClient);
         ReflectionTestUtils.setField(this.target, "customNodeMapper", this.customNodeMapper);
         ReflectionTestUtils.setField(target, "commonService", commonService);
+        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
     }
 
     @Test
@@ -112,7 +127,14 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setJoinTime(new Date());
         staking.setDeleAnnualizedRate(120.00);
         staking.setBigVersion(1792);
-        when(this.nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
+        when(nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
+        Address address = new Address();
+        address.setType(1);
+        when(addressMapper.selectByPrimaryKey(any())).thenReturn(address);
+        NetworkStat networkStatRedis =new NetworkStat();
+        networkStatRedis.setCurNumber(1000L);
+        networkStatRedis.setNodeId("sfadafw55");
+        when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatRedis);
         this.target.stakingDetails(stakingDetailsReq);
 
         staking.setStakingHes(BigDecimal.ONE);
