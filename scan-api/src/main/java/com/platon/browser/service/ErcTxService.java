@@ -8,6 +8,9 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -34,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,10 +45,7 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +75,8 @@ public class ErcTxService {
 
     @Resource
     private DownFileCommon downFileCommon;
+    @Resource
+    private AddressMapper addressMapper;
 
     @Resource
     private NetworkStatMapper networkStatMapper;
@@ -353,10 +356,13 @@ public class ErcTxService {
             return result;
         }
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
+        List<String> contractAddressList = new ArrayList<>();
+        Map<String,List<QueryHolderTokenListResp>> respMap = new HashMap<>();
         ids.stream().forEach(tokenHolder -> {
+            String contractAddress = tokenHolder.getTokenAddress();
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
-            queryHolderTokenListResp.setContract(tokenHolder.getTokenAddress());
+            queryHolderTokenListResp.setContract(contractAddress);
 
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
@@ -367,7 +373,26 @@ public class ErcTxService {
                 queryHolderTokenListResp.setBalance(BigDecimal.ZERO);
             }
             listResps.add(queryHolderTokenListResp);
+            contractAddressList.add(contractAddress);
+
+            List<QueryHolderTokenListResp> respList = respMap.computeIfAbsent(contractAddress, k -> new ArrayList<>());
+            respList.add(queryHolderTokenListResp);
         });
+
+        // 批量查询地址表,并设置响应结果中的合约状态
+        AddressExample condition = new AddressExample();
+        condition.createCriteria().andAddressIn(contractAddressList);
+        List<Address> contractList = addressMapper.selectByExample(condition);
+        if(!contractList.isEmpty()){
+            contractList.forEach(e->{
+                int isDestroy = StringUtils.isBlank(e.getContractDestroyHash())?0:1;
+                List<QueryHolderTokenListResp> respList = respMap.get(e.getAddress());
+                if(respList!=null){
+                    respList.forEach(r->r.setIsContractDestroy(isDestroy));
+                }
+            });
+        }
+
         result.init(ids, listResps);
         return result;
     }

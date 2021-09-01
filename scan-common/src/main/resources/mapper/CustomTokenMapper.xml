@@ -17,6 +17,7 @@
   <resultMap id="DetailResultMap" type="com.platon.browser.bean.CustomTokenDetail" extends="BaseResultMap">
     <result column="contract_create" jdbcType="VARCHAR" property="creator" />
     <result column="contract_createHash" jdbcType="VARCHAR" property="txHash" />
+    <result column="is_contract_destroy" jdbcType="VARCHAR" property="isContractDestroy" />
     <result column="contract_bin" jdbcType="LONGVARCHAR" property="binCode" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="txCount" />
   </resultMap>
@@ -34,6 +35,7 @@
   <select id="selectDetailByAddress" parameterType="java.lang.String" resultMap="DetailResultMap">
     select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
     t.holder,te.web_site,te.details,a.contract_create,a.contract_createHash,a.contract_bin,
+    CASE WHEN a.`contract_destroy_hash` IS NOT NULL AND a.`contract_destroy_hash`!='' THEN 1 ELSE 0 END is_contract_destroy,
     a.tx_qty
     from token t left join  token_expand te on t.address = te.address
     left join address a on t.address = a.address

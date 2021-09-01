@@ -84,6 +84,7 @@ public class Transaction {
 
     public enum TypeEnum {
         TRANSFER(0, "转账"), EVM_CONTRACT_CREATE(1, "EVM合约发布(合约创建)"), CONTRACT_EXEC(2, "合约调用(合约执行)"),
+        CONTRACT_EXEC_DESTROY(21, "合约销毁"),
         WASM_CONTRACT_CREATE(3, "WASM合约发布(合约创建)"), OTHERS(4, "其他"), MPC(5, "MPC交易"),
         ERC20_CONTRACT_CREATE(6, "ERC20合约发布(合约创建)"), ERC20_CONTRACT_EXEC(7, "ERC20合约调用(合约执行)"),
         ERC721_CONTRACT_CREATE(8, "ERC721合约发布(合约创建)"), ERC721_CONTRACT_EXEC(9, "ERC721合约调用(合约执行)"),

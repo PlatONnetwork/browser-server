@@ -148,7 +148,7 @@ subprojects {
                                     new Yaml().load(api.text
                                             .replace("_VERSION_", "$projectVersion")
                                             .replace("_COMMIT_ID_", shortCommitId)
-                                            .replace("_BASE_PATH_", "/scan-api")
+                                            .replace("_BASE_PATH_", "/browser-server")
                                     )
                             ).toString(), "utf-8"
                     )
