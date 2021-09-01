@@ -363,17 +363,38 @@ public class ErcTxService {
     public AccountDownload exportTokenHolderList(String contract, String local, String timeZone) {
         PageHelper.startPage(1, 30000);
         Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(contract, null, null);
-        Map<String, Long> map = rs.getResult().stream().collect(Collectors.groupingBy(CustomTokenHolder::getAddress, Collectors.counting()));
         List<Object[]> rows = new ArrayList<>();
-        rs.stream().forEach(customTokenHolder -> {
+        TokenInventoryExample example = new TokenInventoryExample();
+        example.createCriteria().andTokenAddressEqualTo(contract);
+        Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
+        Map<String, Long> maps = totalTokenInventory.getResult().stream().collect(Collectors.groupingBy(TokenInventory::getOwner, Collectors.counting()));
+        String[] headers = new String[0];
+        for (CustomTokenHolder customTokenHolder : rs) {
             BigDecimal balance = this.getAddressBalance(customTokenHolder);
-            int holderNum = map.get(customTokenHolder.getAddress()).intValue();
-            int total = Convert.toInt(rs.getTotal());
-            String percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(decimal, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "%";
+            BigDecimal originBalance = ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal());
+            String percent = "";
+            if (ErcTypeEnum.ERC20.getDesc().equalsIgnoreCase(customTokenHolder.getType())) {
+                //计算总供应量
+                String originTotalSupply = customTokenHolder.getTotalSupply();
+                if (StrUtil.isBlank(originTotalSupply) || Convert.toLong(originTotalSupply, 0L).compareTo(0L) <= 0) {
+                    // 总供应量小于等于0，则占比设置为0%
+                    percent = "0.0000%";
+                } else {
+                    BigDecimal totalSupply = ConvertUtil.convertByFactor(new BigDecimal(originTotalSupply), customTokenHolder.getDecimal());
+                    // 总供应量大于0, 使用实际的余额除以总供应量
+                    percent = originBalance.divide(totalSupply, decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
+                }
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+            } else {
+                //erc721
+                int holderNum = maps.get(customTokenHolder.getAddress()).intValue();
+                long total = totalTokenInventory.size();
+                percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_AMOUNT, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+            }
             Object[] row = {customTokenHolder.getAddress(), HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()), percent};
             rows.add(row);
-        });
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+        }
         return this.downFileCommon.writeDate("TokenHolder-" + contract + "-" + new Date().getTime() + ".CSV", rows, headers);
     }
 
