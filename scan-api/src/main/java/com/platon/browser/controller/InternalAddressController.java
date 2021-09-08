@@ -2,7 +2,6 @@ package com.platon.browser.controller;
 
 import com.platon.browser.request.PageReq;
 import com.platon.browser.response.RespPage;
-import com.platon.browser.response.address.InternalAddrResp;
 import com.platon.browser.response.address.InternalAddressResp;
 import com.platon.browser.service.InternalAddressService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +45,7 @@ public class InternalAddressController {
      * @date: 2021/9/8
      */
     @PostMapping("internalAddress/list")
-    public Mono<RespPage<InternalAddrResp>> getInternalAddressList(@Valid @RequestBody PageReq req) {
+    public Mono<RespPage<String>> getInternalAddressList(@Valid @RequestBody PageReq req) {
         return Mono.just(internalAddressService.getInternalAddressList(req));
     }
 

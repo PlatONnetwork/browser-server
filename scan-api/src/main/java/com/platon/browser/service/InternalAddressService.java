@@ -9,7 +9,6 @@ import com.platon.browser.dao.entity.InternalAddress;
 import com.platon.browser.dao.entity.InternalAddressExample;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.response.RespPage;
-import com.platon.browser.response.address.InternalAddrResp;
 import com.platon.browser.response.address.InternalAddressResp;
 import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
@@ -71,19 +70,15 @@ public class InternalAddressService {
      * @return: com.platon.browser.response.RespPage<com.platon.browser.response.address.InternalAddrResp>
      * @date: 2021/9/8
      */
-    public RespPage<InternalAddrResp> getInternalAddressList(PageReq req) {
-        RespPage<InternalAddrResp> respPage = new RespPage<>();
-        List<InternalAddrResp> lists = new ArrayList<>();
+    public RespPage<String> getInternalAddressList(PageReq req) {
+        RespPage<String> respPage = new RespPage<>();
         InternalAddressExample internalAddressExample = new InternalAddressExample();
         internalAddressExample.createCriteria().andTypeEqualTo(0);
         internalAddressExample.setOrderByClause(" address desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<InternalAddress> internalAddressList = customInternalAddressMapper.selectListByExample(internalAddressExample);
         List<String> internalAddrList = internalAddressList.stream().map(internalAddress -> internalAddress.getAddress()).collect(Collectors.toList());
-        InternalAddrResp internalAddrResp = new InternalAddrResp();
-        internalAddrResp.setInternalAddrList(internalAddrList);
-        lists.add(internalAddrResp);
-        respPage.init(internalAddressList, lists);
+        respPage.init(internalAddressList, internalAddrList);
         return respPage;
     }
 
