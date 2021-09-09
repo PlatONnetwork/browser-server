@@ -489,9 +489,13 @@ CREATE TABLE `internal_address` (
                                     PRIMARY KEY (`address`),
                                     KEY `type` (`type`) USING BTREE
 );
-
+-- 初始化数据
+-- 还有部分基金会地址由运维手工导入
 INSERT INTO `internal_address` (`address`,`type`)
 VALUES ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep', 1),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7', 2),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrdyjj2v', 3),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxlcypcy', 6);
+
+update token_expand set `is_show_in_aton_admin` = 1 where `is_show_in_aton` = 1;
+update token_expand set `is_show_in_scan_admin` = 1 where `is_show_in_scan` = 1;
