@@ -74,7 +74,7 @@ public class InternalAddressService {
         RespPage<String> respPage = new RespPage<>();
         InternalAddressExample internalAddressExample = new InternalAddressExample();
         internalAddressExample.createCriteria().andTypeEqualTo(0);
-        internalAddressExample.setOrderByClause(" address desc");
+        internalAddressExample.setOrderByClause(" address asc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<InternalAddress> internalAddressList = customInternalAddressMapper.selectListByExample(internalAddressExample);
         List<String> internalAddrList = internalAddressList.stream().map(internalAddress -> internalAddress.getAddress()).collect(Collectors.toList());
