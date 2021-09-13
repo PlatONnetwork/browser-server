@@ -1,4 +1,4 @@
-package com.platon.browser.controller.token;//package com.platon.browser.controller;
+package com.platon.browser.controller.token;
 
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -36,7 +36,6 @@ public class TokenController {
      *
      * @param req
      * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenListResp>>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/28
      */
     @PostMapping("list")
@@ -52,7 +51,6 @@ public class TokenController {
      *
      * @param req
      * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.token.QueryTokenDetailResp>>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/28
      */
     @PostMapping("detail")

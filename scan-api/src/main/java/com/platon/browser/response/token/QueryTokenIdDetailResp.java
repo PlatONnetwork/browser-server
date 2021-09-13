@@ -1,7 +1,7 @@
 package com.platon.browser.response.token;
 
 import com.platon.browser.bean.CustomTokenInventory;
-import com.platon.browser.dao.entity.TokenInventory;
+import com.platon.browser.utils.CommonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,24 +43,16 @@ public class QueryTokenIdDetailResp {
      */
     private String symbol;
 
-    public static QueryTokenIdDetailResp fromTokenIdDetail(TokenInventory token) {
-        return QueryTokenIdDetailResp.builder()
-                .address(token.getOwner()).contract(token.getTokenAddress())
-                .tokenId(token.getTokenAddress()).image(token.getImage())
-                .txCount(token.getTokenTxQty()).name(token.getName())
-                .build();
-    }
-
     public static QueryTokenIdDetailResp copy(CustomTokenInventory source) {
         return QueryTokenIdDetailResp.builder()
-                .address(source.getOwner())
-                .contract(source.getTokenAddress())
-                .tokenId(source.getTokenAddress())
-                .image(source.getImage())
-                .txCount(source.getTokenTxQty())
-                .name(source.getName())
-                .tokenName(source.getTokenName())
-                .symbol(source.getSymbol())
+                .address(CommonUtil.ofNullable(() -> source.getOwner()).orElse(""))
+                .contract(CommonUtil.ofNullable(() -> source.getTokenAddress()).orElse(""))
+                .tokenId(CommonUtil.ofNullable(() -> source.getTokenAddress()).orElse(""))
+                .image(CommonUtil.ofNullable(() -> source.getImage()).orElse(""))
+                .txCount(CommonUtil.ofNullable(() -> source.getTokenTxQty()).orElse(0))
+                .name(CommonUtil.ofNullable(() -> source.getName()).orElse(""))
+                .tokenName(CommonUtil.ofNullable(() -> source.getTokenName()).orElse(""))
+                .symbol(CommonUtil.ofNullable(() -> source.getSymbol()).orElse(""))
                 .build();
     }
 

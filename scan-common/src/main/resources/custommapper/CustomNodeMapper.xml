@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.CustomNodeMapper" >
+
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Node" extends="com.platon.browser.dao.mapper.NodeMapper.BaseResultMap"/>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+<sql id="Column_List">
+    node_id, stat_slash_multi_qty, stat_slash_low_qty, stat_block_qty, is_recommend, total_value, 
+    node_name,  node_icon, annualized_rate, leave_time, `status`, 
+    is_consensus, is_settle, is_init, stat_delegate_value, stat_valid_addrs,  dele_annualized_rate ,stat_delegate_released,un_stake_freeze_duration,un_stake_end_block,
+    stat_delegate_released,staking_reduction,zero_produce_freeze_duration, zero_produce_freeze_epoch,
+    low_rate_slash_count,reward_per,node_settle_statis_info,big_version
+  </sql>
+  <select id="findNameById" resultType="java.lang.String">
+    select node_name from node where node_id = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectListByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Column_List" />
+    from node
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  <select id="selectCountByActive" resultType="java.lang.Integer">
+  	SELECT count(*)
+	FROM node WHERE (`status` = 1) or (`status` = 2 and `is_settle` = 1)
+  </select>
+
+  <select id="batchFindNodeNameByNodeId" parameterType="java.util.Set" resultMap="BaseResultMap">
+    SELECT
+    node_id,
+    node_name
+    FROM
+    node
+    WHERE
+    node_id IN (
+    <foreach collection="nodeIds" item="nodeId" separator=",">
+        #{nodeId}
+    </foreach>
+    );
+  </select>
+
+  <sql id="Base_Column_List">
+    node_id,
+	stat_slash_multi_qty,
+	stat_slash_low_qty,
+	stat_block_qty,
+	is_recommend,
+	total_value,
+	node_name,
+	node_icon,
+	annualized_rate,
+	leave_time,
+	`status`,
+	is_consensus,
+	is_settle,
+	is_init,
+	stat_delegate_value,
+	stat_valid_addrs,
+	dele_annualized_rate,
+	stat_delegate_released,
+	un_stake_freeze_duration,
+	un_stake_end_block,
+	staking_reduction,
+	zero_produce_freeze_duration,
+	zero_produce_freeze_epoch,
+	low_rate_slash_count,
+	big_version,
+	staking_block_num,
+	staking_tx_index
+  </sql>
+  <select id="findAliveStakingList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from node
+    <where>
+      1=1
+      <if test="status1 != null">
+        and  status = #{status1}
+      </if>
+      <if test="isSettle1 != null">
+        and is_settle = #{isSettle1}
+      </if>
+    </where>
+    <choose>
+      <when test="isUnion">
+        union
+        select <include refid="Base_Column_List" /> from node
+        <where>
+          1=1
+          <if test="status2 != null">
+            and  status = #{status2}
+          </if>
+          <if test="isSettle2 != null">
+            and is_settle = #{isSettle2}
+          </if>
+        </where>
+      </when>
+    </choose>
+    ORDER BY
+    big_version DESC,
+    total_value DESC,
+    staking_block_num ASC,
+    staking_tx_index ASC
+  </select>
+
+    <update id="updateNodeSettleStatis">
+        <foreach collection="list" item="item" separator=";">
+         update node set node_settle_statis_info=#{item.nodeSettleStatisInfo} where node_id=#{item.nodeId}
+        </foreach>
+    </update>
+
+</mapper>

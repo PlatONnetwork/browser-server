@@ -1,5 +1,6 @@
 package com.platon.browser.bean;
 
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +21,7 @@ public class CollectionTransaction extends Transaction {
         return transaction;
     }
 
-    public CollectionTransaction updateWithBlock(CollectionBlock block) {
+    public CollectionTransaction updateWithBlock(Block block) {
         this.setTime(block.getTime());
         return this;
     }

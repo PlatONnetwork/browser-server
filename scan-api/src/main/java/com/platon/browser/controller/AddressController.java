@@ -41,7 +41,6 @@ public class AddressController {
      *
      * @param req
      * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.address.QueryDetailResp>>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/29
      */
     @PostMapping("address/details")
@@ -52,6 +51,13 @@ public class AddressController {
         });
     }
 
+    /**
+     * 地址锁仓详情
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.address.QueryRPPlanDetailResp>>
+     * @date 2021/5/25
+     */
     @PostMapping("address/rpplanDetail")
     public Mono<BaseResp<QueryRPPlanDetailResp>> rpplanDetail(@Valid @RequestBody QueryRPPlanDetailRequest req) {
         return Mono.create(sink -> {

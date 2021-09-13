@@ -44,25 +44,35 @@ disruptor:
 logging:
   #日志级别
   level:
-    org.springframework: error
-    org.springframework.retry: error
-    com.platon.browser: error
-    com.platon.browser.bootstrap: error
-    com.platon.browser.collection: error
-    com.platon.browser.collection.queue.handler: error
-    com.platon.browser.common: error
-    com.platon.browser.complement: error
-    com.platon.browser.complement.handler: error
-    com.platon.browser.complement.converter: error
-    com.platon.browser.persistence: error
-    com.platon.browser.persistence.handler: error
-    com.platon.browser.persistence.queue.handler: error
-    com.platon.browser.task: error
+    org.springframework: info
+    org.springframework.retry: info
+    com.platon.browser: info
+    com.platon.browser.bootstrap: info
+    com.platon.browser.collection: info
+    com.platon.browser.collection.queue.handler: info
+    com.platon.browser.common: info
+    com.platon.browser.complement: info
+    com.platon.browser.complement.handler: info
+    com.platon.browser.complement.converter: info
+    com.platon.browser.persistence: info
+    com.platon.browser.persistence.handler: info
+    com.platon.browser.persistence.queue.handler: info
+    com.platon.browser.task: info
   file:
     name: ./logs/${spring.application.name}-${profile}.log
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{50}[%L] | %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+  logback:
+    rollingpolicy:
+      # 日志文件大小上限，达到该上限后，会自动压缩
+      max-file-size: 200MB
+      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
+      file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
+      # 日志文件保存的天数
+      max-history: 90
+      # 是否在应用启动时进行归档管理
+      clean-history-on-start: true
 #PlatOn相关配置
 platon:
   # 地址HRP前缀

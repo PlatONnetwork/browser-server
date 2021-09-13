@@ -48,7 +48,6 @@ spring:
   #Redis配置
   redis:
     password: platscan
-    database: 0
     cluster:
       max-redirects: 3
       nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
@@ -115,7 +114,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -130,7 +129,6 @@ platon:
   zeroBlockNumber:
     wait-time: 60
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
-isRecaptcha: false
 limit:
   num: 10
 output:

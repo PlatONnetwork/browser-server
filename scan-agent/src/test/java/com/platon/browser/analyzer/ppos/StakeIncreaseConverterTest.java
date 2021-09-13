@@ -6,7 +6,7 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;

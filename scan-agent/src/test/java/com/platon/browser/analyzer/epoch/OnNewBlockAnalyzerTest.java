@@ -9,12 +9,13 @@ import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.service.proposal.ProposalService;
-import com.platon.browser.dao.mapper.NewBlockMapper;
+import com.platon.browser.dao.custommapper.NewBlockMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.statistic.StatisticService;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.contracts.ppos.dto.resp.ParamItem;
 import com.platon.contracts.ppos.dto.resp.ParamValue;
@@ -40,31 +41,43 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class OnNewBlockAnalyzerTest extends AgentTestBase {
-	
+
     @Mock
     private NodeCache nodeCache;
+
     @Mock
     private NewBlockMapper newBlockMapper;
+
     @Mock
     private NetworkStatCache networkStatCache;
+
     @Mock
     private ProposalCache proposalCache;
+
     @Mock
     private ProposalService proposalService;
+
     @Mock
     private ProposalMapper proposalMapper;
+
     @Mock
     private ParameterService parameterService;
+
     @Mock
     private PlatOnClient platOnClient;
+
     @Mock
     private V0150Config v0150Config;
+
+    @Mock
+    private StatisticService statisticService;
+
     @InjectMocks
     @Spy
     private OnNewBlockAnalyzer target;
 
     @Before
-    public void setup()throws Exception{
+    public void setup() throws Exception {
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
                 .nodeName("integration-node1")
@@ -101,13 +114,14 @@ public class OnNewBlockAnalyzerTest extends AgentTestBase {
 
 
     @Test
-    public void convert()throws Exception{
+    public void convert() throws Exception {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();
         epochMessage.setBlockReward(new BigDecimal("200000"));
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
-        target.analyze(collectionEvent,block);
+        target.analyze(collectionEvent, block);
     }
+
 }

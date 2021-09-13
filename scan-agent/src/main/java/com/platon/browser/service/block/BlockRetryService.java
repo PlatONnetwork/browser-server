@@ -23,9 +23,12 @@ public class BlockRetryService {
 
     @Resource
     private PlatOnClient platOnClient;
+
     private BigInteger latestBlockNumber;
+
     /**
      * 根据区块号获取区块信息
+     *
      * @param blockNumber
      * @return 带有交易信息的区块信息
      * @throws
@@ -34,37 +37,40 @@ public class BlockRetryService {
     PlatonBlock getBlock(Long blockNumber) throws IOException {
         long startTime = System.currentTimeMillis();
         try {
-            log.debug("获取区块:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
+            log.debug("获取区块:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), blockNumber);
             DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
-            PlatonBlock block = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBlockByNumber(dp,true).send();
-            log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+            PlatonBlock block = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBlockByNumber(dp, true).send();
+            log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
             return block;
-        }catch (Exception e){
+        } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
-            log.error("",e);
+            log.error("", e);
             throw e;
         }
     }
 
     /**
      * 检查当前区块号是否合法
+     *
      * @param currentBlockNumber
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     void checkBlockNumber(Long currentBlockNumber) throws IOException, CollectionBlockException {
         try {
-            if(latestBlockNumber==null||currentBlockNumber>latestBlockNumber.longValue()) {
+            if (latestBlockNumber == null || currentBlockNumber > latestBlockNumber.longValue()) {
                 // 如果记录的链上最新区块号为空,或当前区块号大于记录的链上最新区块号,则更新链上最新区块号
                 latestBlockNumber = platOnClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
             }
-            if(currentBlockNumber>latestBlockNumber.longValue()){
+            if (currentBlockNumber > latestBlockNumber.longValue()) {
+                log.warn("准备采集区块[{}],链上最高区块[{}],即将等待重试...", currentBlockNumber, latestBlockNumber);
                 // 如果当前区块号仍然大于更新后的链上最新区块号
-                throw new CollectionBlockException("currentBlockNumber("+currentBlockNumber+")>latestBlockNumber("+latestBlockNumber+"), wait for chain");
+                throw new CollectionBlockException("currentBlockNumber(" + currentBlockNumber + ")>latestBlockNumber(" + latestBlockNumber + "), wait for chain");
             }
-        }catch (Exception e){
-            log.error("{}",e.getMessage());
+        } catch (Exception e) {
+            log.error("检查当前区块号合法异常{}", e.getMessage());
             throw e;
         }
     }
+
 }

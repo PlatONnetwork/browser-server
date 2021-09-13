@@ -15,20 +15,27 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class VersionDeclareAnalyzer extends PPOSAnalyzer<NodeOpt> {
-	
+
+    /**
+     * 版本声明分析
+     *
+     * @param event
+     * @param tx
+     * @return com.platon.browser.elasticsearch.dto.NodeOpt
+     * @date 2021/6/15
+     */
     @Override
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
         VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
         // 补充节点名称
-        updateTxInfo(txParam,tx);
+        updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
-
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) {
+            return null;
+        }
         long startTime = System.currentTimeMillis();
-
-
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
-
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         return null;
     }
+
 }

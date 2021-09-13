@@ -451,7 +451,7 @@ public class DataGenService {
         token.setTokenTxQty(1);
         token.setHolder(1);
         token.setSymbol("aLAT");
-        token.setTotalSupply(new BigDecimal("100000000000000000000"));
+        token.setTotalSupply("100000000000000000000");
         token.setDecimal(18);
         return token;
     }
@@ -461,7 +461,7 @@ public class DataGenService {
         TokenHolder tokenHolder = new TokenHolder();
         tokenHolder.setTokenAddress(tx.getContractAddress());
         tokenHolder.setAddress(tx.getTo());
-        tokenHolder.setBalance(new BigDecimal("0"));
+        tokenHolder.setBalance("0");
         tokenHolder.setCreateTime(new Date());
         tokenHolder.setUpdateTime(new Date());
         tokenHolder.setTokenTxQty(1);

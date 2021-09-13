@@ -5,9 +5,10 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.bean.govern.ModifiableParam;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
-import com.platon.browser.dao.mapper.CustomConfigMapper;
+import com.platon.browser.dao.custommapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +24,20 @@ import java.util.List;
  * @author: chendongming@matrixelements.com
  * @create: 2019-11-25 20:36:04
  **/
+@Slf4j
 @Service
 @Transactional
 public class ParameterService {
+
     @Resource
     private ConfigMapper configMapper;
+
     @Resource
     private PlatOnClient platOnClient;
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private CustomConfigMapper customConfigMapper;
 
@@ -39,6 +45,7 @@ public class ParameterService {
      * 使用debug_economic_config接口返回的数据初始化配置表，只有从第一个块开始同步时需要调用
      */
     public void initConfigTable() throws Exception {
+        log.info("治理参数初始化...");
         configMapper.deleteByExample(null);
         // 调用提案合约只是为了取得完整的可治理参数列表，至于此时的值是不是链第0块时的值，是不能确定的，所以需要
         // 使用debugEconomicConfig接口获取回来的最初始的值进行替代
@@ -61,7 +68,7 @@ public class ParameterService {
             // 在Alaya版本中，debug_economic接口不会返回minimumRelease参数，因此需要在提案合约中查询出来并设置到BlockChainConfig实例中
             // 防止后面代码 getValueInBlockChainConfig("minimumRelease") 时取不到参数值报错
             ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(config.getName());
-            if(paramEnum == ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE){
+            if (paramEnum == ModifiableGovernParamEnum.RESTRICTING_MINIMUM_RELEASE) {
                 // 如果参数是锁仓最小释放金额，则把blockChainConfig中的锁仓最小释放金额属性设置为当前查询的值
                 String minimumRelease = gp.getParamValue().getValue();
                 chainConfig.setRestrictingMinimumRelease(new BigDecimal(minimumRelease));
@@ -82,7 +89,7 @@ public class ParameterService {
     /**
      * 使用配置表中的配置覆盖内存中的BlockChainConfig，在重新启动的时候调用
      */
-    public void overrideBlockChainConfig(){
+    public void overrideBlockChainConfig() {
         // 使用数据库config表的配置覆盖当前配置
         List<Config> configList = configMapper.selectByExample(null);
         ModifiableParam modifiableParam = ModifiableParam.builder().build().init(configList);
@@ -96,9 +103,9 @@ public class ParameterService {
         //备选结算周期验证节点数量(U)
         chainConfig.setSettlementValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
         //举报最高处罚n3‱
-        chainConfig.setDuplicateSignSlashRate(modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR));
+        chainConfig.setDuplicateSignSlashRate(modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //举报奖励n4%
-        chainConfig.setDuplicateSignRewardRate(modifiableParam.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR));
+        chainConfig.setDuplicateSignRewardRate(modifiableParam.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //证据有效期
         chainConfig.setEvidenceValidEpoch(modifiableParam.getSlashing().getMaxEvidenceAge());
         //扣除区块奖励的个数
@@ -123,6 +130,7 @@ public class ParameterService {
 
     /**
      * 配置值轮换：value旧值覆盖到stale_value，参数中的新值覆盖value
+     *
      * @param activeConfigList 被激活的配置信息列表
      */
     @Transactional
@@ -135,15 +143,16 @@ public class ParameterService {
 
     /**
      * 根据参数提案中的参数name获取当前blockChainConfig中的对应的当前值
+     *
      * @param name
      * @return
      */
     public String getValueInBlockChainConfig(String name) {
         ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(name);
         String staleValue = "";
-        switch (paramEnum){
+        switch (paramEnum) {
             // 质押相关
-            case STAKE_THRESHOLD: 
+            case STAKE_THRESHOLD:
                 staleValue = chainConfig.getStakeThreshold().toString();
                 break;
             case OPERATING_THRESHOLD:
@@ -202,4 +211,5 @@ public class ParameterService {
         }
         return staleValue;
     }
+
 }

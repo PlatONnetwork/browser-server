@@ -439,15 +439,16 @@ public abstract class AbstractEsRepository {
         try {
             BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
             log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-
             log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
         } catch (Exception e) {
+            log.error("ES批量增加或更新异常", e);
             if (e instanceof RuntimeException && e.getMessage().contains("Request cannot be executed; I/O reactor status: STOPPED")) {
                 client = (RestHighLevelClient) springUtils.resetSpring("restHighLevelClient");
                 BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
                 log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
                 log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
             }
+            throw e;
         }
 
     }

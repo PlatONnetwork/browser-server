@@ -4,6 +4,7 @@ import com.platon.browser.bean.ConfigChange;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 /**
  * 网络统计缓存
  */
+@Slf4j
 @Component
 @Data
 public class NetworkStatCache {
@@ -107,7 +109,16 @@ public class NetworkStatCache {
             this.networkStat.setIssueRates(configChange.getIssueRates());
     }
 
+    /**
+     * 初始化网络缓存
+     *
+     * @param networkStat
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/19
+     */
     public void init(NetworkStat networkStat) {
+        log.info("初始化网络缓存");
         this.networkStat = networkStat;
     }
 

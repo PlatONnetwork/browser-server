@@ -7,6 +7,7 @@ import com.platon.browser.response.home.BlockStatisticNewResp;
 import com.platon.browser.response.home.ChainStatisticNewResp;
 import com.platon.browser.response.home.QueryNavigationResp;
 import com.platon.browser.response.home.StakingListNewResp;
+import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,16 +15,19 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class HomeServiceTest extends ApiTestMockBase {
+
     @Spy
     private HomeService target;
+
     @Spy
     private CommonService service;
 
@@ -38,7 +42,6 @@ public class HomeServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target, "commonService", commonService);
         ReflectionTestUtils.setField(target, "customNodeMapper", customNodeMapper);
         ReflectionTestUtils.setField(target, "networkParams", networkParams);
-        ReflectionTestUtils.setField(service, "customNodeMapper", customNodeMapper);
     }
 
     @Test
@@ -80,7 +83,6 @@ public class HomeServiceTest extends ApiTestMockBase {
 
     @Test
     public void testChainStatisticNew() throws IOException {
-        when(statisticCacheService.getNetworkStatCache()).thenReturn(null);
         ChainStatisticNewResp chainStatisticNewResp = target.chainStatisticNew();
         assertNotNull(chainStatisticNewResp);
     }
@@ -93,8 +95,9 @@ public class HomeServiceTest extends ApiTestMockBase {
 
     @Test
     public void testCommonService() throws IOException {
-        service.getNodeName("0x", "test");
+        //service.getNodeName("0x", "test");
         when(customNodeMapper.findNameById("0x")).thenReturn("test");
-        service.getNodeName("0x", "");
+        service.getNodeName("0x", "test");
     }
+
 }

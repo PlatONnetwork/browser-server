@@ -1,4 +1,6 @@
-# ***************************开发配置**************************** #
+#######################
+#      Platon配置      #
+#######################
 # 当前激活的配置名称(请不要修改)
 profile: hrplat100v10000
 # 密码加密配置
@@ -48,7 +50,6 @@ spring:
   #Redis配置
   redis:
     password: platscan
-    database: 0
     cluster:
       max-redirects: 3
       nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
@@ -75,6 +76,16 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+  logback:
+    rollingpolicy:
+      # 日志文件大小上限，达到该上限后，会自动压缩
+      max-file-size: 200MB
+      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
+      file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
+      # 日志文件保存的天数
+      max-history: 7
+      # 是否在应用启动时进行归档管理
+      clean-history-on-start: true
 #初始化链相关的配置
 platon:
   # 地址HRP前缀
@@ -115,7 +126,7 @@ platon:
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/tree/PIPs/PIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
@@ -130,7 +141,6 @@ platon:
   zeroBlockNumber:
     wait-time: 60
 recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
-isRecaptcha: false
 limit:
   num: 10
 output:

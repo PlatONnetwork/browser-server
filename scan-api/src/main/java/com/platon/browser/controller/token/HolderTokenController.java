@@ -35,6 +35,13 @@ public class HolderTokenController {
     @Resource
     private CommonMethod commonMethod;
 
+    /**
+     * 持有者的Token令牌列表
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryHolderTokenListResp>>
+     * @date 2021/5/25
+     */
     @PostMapping("list")
     public Mono<RespPage<QueryHolderTokenListResp>> list(@Valid @RequestBody QueryHolderTokenListReq req) {
         return Mono.just(ercTxService.holderTokenList(req));
@@ -50,7 +57,6 @@ public class HolderTokenController {
      * @param type     合约类型（取值erc20或erc721）
      * @param response
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/27
      */
     @GetMapping("export")

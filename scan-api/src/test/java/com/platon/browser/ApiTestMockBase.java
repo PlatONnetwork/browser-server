@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.service.CommonService;
 import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
@@ -17,7 +18,6 @@ import org.mockito.Mock;
 
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
@@ -31,20 +31,28 @@ public class ApiTestMockBase extends ApiTestData {
 
     @Mock
     protected EsBlockRepository ESBlockRepository;
+
     @Mock
     protected EsTransactionRepository ESTransactionRepository;
+
     @Mock
     protected NodeMapper nodeMapper;
+
     @Mock
     protected AddressMapper addressMapper;
+
     @Mock
     protected StatisticCacheService statisticCacheService;
+
     @Mock
     protected CustomNodeMapper customNodeMapper;
+
     @Mock
     protected I18nUtil i18n;
+
     @Mock
     protected CommonService commonService;
+
     @Mock
     protected NetworkParams networkParams;
 
@@ -122,5 +130,10 @@ public class ApiTestMockBase extends ApiTestData {
 
     private void initNetwork() {
         when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatList.get(0));
+        when(commonService.getIssueValue()).thenReturn(BigDecimal.valueOf(1));
+        when(commonService.getCirculationValue()).thenReturn(BigDecimal.valueOf(1));
+        when(commonService.getStakingDenominator()).thenReturn(BigDecimal.valueOf(1));
+        when(commonService.getTotalStakingValue()).thenReturn(BigDecimal.valueOf(1));
     }
+
 }

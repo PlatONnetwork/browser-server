@@ -65,7 +65,7 @@ public class QueryTokenDetailResp {
         }
         BigDecimal totalSupply = BigDecimal.ZERO;
         if (token.getTotalSupply() != null && token.getDecimal() != null) {
-            totalSupply = ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal());
+            totalSupply = ConvertUtil.convertByFactor(new BigDecimal(token.getTotalSupply()), token.getDecimal());
         }
         return QueryTokenDetailResp.builder()
                 .address(token.getAddress()).name(token.getName())
