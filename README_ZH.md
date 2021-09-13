@@ -1,5 +1,5 @@
 # Platon 区块链浏览器服务端
-> 提供对platon链的浏览功能，包括区块、交易、验证节点、治理参数、令牌等功能
+> 提供对Platon链的浏览功能，包括区块、交易、验证节点、治理参数、令牌等功能
 
 ## 软件架构
 
@@ -46,4 +46,12 @@ gradlew clean buildTar -x test -b scan-agent/build.gradle
 
 ```bash
 gradlew clean buildTar -x test -b scan-api/build.gradle
+```
+
+## 组件版本
+
+```bash
+MySQL 5.7  
+redis 4.0 
+elasticsearch 7.4 
 ```

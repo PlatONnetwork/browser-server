@@ -39,55 +39,85 @@ import java.util.*;
 @Slf4j
 @Service
 public class InitializationService {
+
     private static final InitializationResult initialResult = new InitializationResult();
+
     @Resource
     private EpochRetryService epochRetryService;
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private NodeMapper nodeMapper;
+
     @Resource
     private StakingMapper stakingMapper;
+
     @Resource
     private NetworkStatMapper networkStatMapper;
+
     @Resource
     private AddressMapper addressMapper;
+
     @Resource
     private NodeCache nodeCache;
+
     @Resource
     private NetworkStatCache networkStatCache;
+
     @Resource
     private AddressCache addressCache;
+
     @Resource
     private ParameterService parameterService;
+
     @Resource
     private ProposalCache proposalCache;
+
     @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
+
     @Resource
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+
     @Resource
     private StakeEpochService stakeEpochService;
+
     @Resource
     private EsBlockRepository ESBlockRepository;
+
     @Resource
     private EsTransactionRepository ESTransactionRepository;
+
     @Resource
     private EsDelegationRewardRepository ESDelegationRewardRepository;
+
     @Resource
     private EsNodeOptRepository ESNodeOptRepository;
+
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
+
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
+
     @Resource
     private EsTransferTxRepository esTransferTxRepository;
+
     @Resource
     private ErcCache ercCache;
 
+    /**
+     * 进入应用初始化子流程
+     *
+     * @param traceId
+     * @return com.platon.browser.bootstrap.bean.InitializationResult
+     * @date 2021/4/19
+     */
     @Transactional
-    public InitializationResult init() throws BlockNumberException {
-
+    public InitializationResult init(String traceId) throws BlockNumberException {
+        log.info("进入应用初始化子流程");
         proposalCache.init();
         ercCache.init();
 
@@ -116,6 +146,7 @@ public class InitializationService {
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
             addressMapper.deleteByExample(null);
+            log.info("删除节点表、质押表、地址表数据");
             // 初始化内置节点
             List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
@@ -124,7 +155,7 @@ public class InitializationService {
             networkStatCache.init(networkStat);
             // 初始化内置地址
             addressCache.initOnFirstStart();
-
+            // 初始化ES
             initEs();
 
             return initialResult;
@@ -171,7 +202,7 @@ public class InitializationService {
         gasEstimateLogs.forEach(e -> {
             List<GasEstimate> estimates = JSON.parseArray(e.getJson(), GasEstimate.class);
             if (estimates != null && !estimates.isEmpty()) {
-                gasEstimateEventPublisher.publish(e.getSeq(), estimates);
+                gasEstimateEventPublisher.publish(e.getSeq(), estimates, traceId);
             }
         });
 
@@ -184,6 +215,7 @@ public class InitializationService {
      * @throws Exception
      */
     private List<com.platon.browser.dao.entity.Node> initInnerStake() throws BlockNumberException {
+        log.info("初始化内置节点");
         epochRetryService.issueChange(BigInteger.ZERO);
         epochRetryService.settlementChange(BigInteger.ZERO);
         epochRetryService.consensusChange(BigInteger.ZERO);
@@ -198,7 +230,7 @@ public class InitializationService {
         // 配置中的默认内置节点信息
         Map<String, CustomStaking> defaultStakingMap = new HashMap<>();
         chainConfig.getDefaultStakingList()
-            .forEach(staking -> defaultStakingMap.put(staking.getNodeId(), staking));
+                .forEach(staking -> defaultStakingMap.put(staking.getNodeId(), staking));
 
         List<Node> nodeList = epochRetryService.getPreVerifiers();
         for (int index = 0; index < nodeList.size(); index++) {
@@ -223,16 +255,16 @@ public class InitializationService {
             List<PeriodValueElement> stakeCosts = new ArrayList<>();
             stakeCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
             BigDecimal stakeCostVal = staking.getStakingLocked() // 锁定的质押金
-                .add(staking.getStakingHes()) // 犹豫期的质押金
-                .add(staking.getStatDelegateHes()) // 犹豫期的委托金
-                .add(staking.getStatDelegateLocked()); // 锁定的委托金
+                    .add(staking.getStakingHes()) // 犹豫期的质押金
+                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
+                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
             stakeCosts.add(new PeriodValueElement().setPeriod(1L).setValue(stakeCostVal));
             ari.setStakeCost(stakeCosts);
             // |- 委托的成本
             List<PeriodValueElement> delegateCosts = new ArrayList<>();
             delegateCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
             BigDecimal delegateCostVal = staking.getStatDelegateLocked() // 锁定的委托金
-                .add(staking.getStatDelegateHes()); // 犹豫期的委托金
+                    .add(staking.getStatDelegateHes()); // 犹豫期的委托金
             delegateCosts.add(new PeriodValueElement().setPeriod(1L).setValue(delegateCostVal));
             ari.setDelegateCost(delegateCosts);
 
@@ -249,7 +281,7 @@ public class InitializationService {
             staking.setExceptionStatus(1);
 
             BigInteger curSettleEpochRound =
-                EpochUtil.getEpoch(BigInteger.ONE, chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
+                    EpochUtil.getEpoch(BigInteger.ONE, chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
             // 更新解质押到账需要经过的结算周期数
             BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
             // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
@@ -282,18 +314,28 @@ public class InitializationService {
         return returnData;
     }
 
+    /**
+     * 初始化ES
+     *
+     * @param
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/19
+     */
     private void initEs() {
-    	try {
-    		ESBlockRepository.initIndex();
-        	ESTransactionRepository.initIndex();
-        	ESDelegationRewardRepository.initIndex();
-        	ESNodeOptRepository.initIndex();
-        	esTransferTxRepository.initIndex();
-        	esErc20TxRepository.initIndex();
-        	esErc721TxRepository.initIndex();
-		} catch (Exception e) {
-			log.error("init es error",e);
-		}
+        log.info("初始化ES");
+        try {
+            ESBlockRepository.initIndex();
+            ESTransactionRepository.initIndex();
+            ESDelegationRewardRepository.initIndex();
+            ESNodeOptRepository.initIndex();
+            esTransferTxRepository.initIndex();
+            esErc20TxRepository.initIndex();
+            esErc721TxRepository.initIndex();
+        } catch (Exception e) {
+            log.error("初始化ES异常", e);
+        }
 
     }
+
 }

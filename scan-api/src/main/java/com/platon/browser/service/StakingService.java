@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
@@ -7,17 +8,21 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
+import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.mapper.CustomDelegationMapper;
-import com.platon.browser.dao.mapper.CustomNodeMapper;
-import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.custommapper.CustomDelegationMapper;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
@@ -29,8 +34,7 @@ import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
-import com.platon.browser.utils.HexUtil;
-import com.platon.browser.utils.I18nUtil;
+import com.platon.browser.utils.*;
 import com.platon.contracts.ppos.dto.resp.Reward;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -90,6 +94,9 @@ public class StakingService {
     @Resource
     private CommonService commonService;
 
+    @Resource
+    private AddressMapper addressMapper;
+
     public StakingStatisticNewResp stakingStatisticNew() {
         /** 获取统计信息 */
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
@@ -99,8 +106,7 @@ public class StakingService {
             stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurNumber());
             stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
             // 接受委托 = 实时质押委托总数 - 实时质押总数
-            stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue()
-                    .subtract(networkStatRedis.getStakingValue()));
+            stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue().subtract(networkStatRedis.getStakingValue()));
             //实时除以现有的结算周期人数
             Integer count = customStakingMapper.selectCountByActive();
             // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
@@ -111,7 +117,7 @@ public class StakingService {
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
         BigDecimal totalStakingValue = commonService.getTotalStakingValue();
-        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue );
+        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue);
         return stakingStatisticNewResp;
     }
 
@@ -204,6 +210,16 @@ public class StakingService {
             /** 质押总数=有效的质押+委托 */
             aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
             aliveStakingListResp.setDeleAnnualizedRate(staking.getDeleAnnualizedRate().toString());
+            try {
+                String nodeSettleStatisInfo = staking.getNodeSettleStatisInfo();
+                NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+            } catch (Exception e) {
+                logger.error("获取节点24小时出块率异常", e);
+            }
+            aliveStakingListResp.setDelegatedRewardRatio(new BigDecimal(staking.getRewardPer()).divide(Browser.PERCENTAGE).toString() + "%");
+            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
             lists.add(aliveStakingListResp);
             i++;
         }
@@ -283,11 +299,25 @@ public class StakingService {
             resp.setVerifierTime(stakingNode.getStatVerifierTime());
             resp.setJoinTime(stakingNode.getJoinTime().getTime());
             resp.setDenefitAddr(stakingNode.getBenefitAddr());
+            Address denefitAddr = addressMapper.selectByPrimaryKey(stakingNode.getBenefitAddr());
+            resp.setDenefitAddrType(CommonUtil.ofNullable(() -> denefitAddr.getType()).orElse(AddressTypeEnum.ACCOUNT.getCode()));
+            Address stakingAddr = addressMapper.selectByPrimaryKey(stakingNode.getStakingAddr());
+            resp.setStakingAddrType(CommonUtil.ofNullable(() -> stakingAddr.getType()).orElse(AddressTypeEnum.ACCOUNT.getCode()));
             resp.setStakingIcon(stakingNode.getNodeIcon());
             resp.setDeleAnnualizedRate(stakingNode.getDeleAnnualizedRate().toString());
             resp.setRewardPer(new BigDecimal(stakingNode.getRewardPer()).divide(Browser.PERCENTAGE).toString());
             resp.setNextRewardPer(new BigDecimal(stakingNode.getNextRewardPer()).divide(Browser.PERCENTAGE).toString());
             resp.setTotalDeleReward(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()));
+            try {
+                String nodeSettleStatisInfo = stakingNode.getNodeSettleStatisInfo();
+                NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
+                NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                resp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+            } catch (Exception e) {
+                logger.error("获取节点24小时出块率异常", e);
+            }
+            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getBigVersion())));
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
@@ -295,8 +325,7 @@ public class StakingService {
             /** 只有不是内置节点才计算年化率  */
             if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
-                resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue())
-                        .add(stakingNode.getStatStakingRewardValue()));
+                resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
                 resp.setExpectedIncome("");
@@ -461,8 +490,7 @@ public class StakingService {
             /**
              * 委托金额等于has加上实际lock金额
              */
-            BigDecimal delValue = delegationStaking.getDelegateHes()
-                    .add(delegationStaking.getDelegateLocked());
+            BigDecimal delValue = delegationStaking.getDelegateHes().add(delegationStaking.getDelegateLocked());
             byStakingResp.setDelegateValue(delValue);
             lists.add(byStakingResp);
         }
@@ -478,8 +506,7 @@ public class StakingService {
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         List<DelegationListByAddressResp> lists = new LinkedList<>();
         /** 根据地址分页查询委托列表 */
-        Page<DelegationAddress> delegationAddresses =
-                customDelegationMapper.selectAddressByAddr(req.getAddress());
+        Page<DelegationAddress> delegationAddresses = customDelegationMapper.selectAddressByAddr(req.getAddress());
         /**
          * 初始化奖励节点id列表，用来后续查询对应的待领取奖励使用
          */
@@ -502,8 +529,7 @@ public class StakingService {
             BeanUtils.copyProperties(delegationAddress, byAddressResp);
             byAddressResp.setDelegateHas(delegationAddress.getDelegateHes());
             /** 委托金额=犹豫期金额加上锁定期金额 */
-            BigDecimal deleValue = delegationAddress.getDelegateHes()
-                    .add(byAddressResp.getDelegateLocked());
+            BigDecimal deleValue = delegationAddress.getDelegateHes().add(byAddressResp.getDelegateLocked());
             byAddressResp.setDelegateValue(deleValue);
             byAddressResp.setDelegateUnlock(delegationAddress.getDelegateHes());
             /**
@@ -534,7 +560,7 @@ public class StakingService {
         RespPage<LockedStakingListResp> respPage = new RespPage<>();
         List<LockedStakingListResp> lists = new LinkedList<>();
         NodeExample nodeExample = new NodeExample();
-        nodeExample.setOrderByClause(" update_time desc");
+        nodeExample.setOrderByClause(" leave_time desc");
         NodeExample.Criteria criteria = nodeExample.createCriteria();
         criteria.andStatusEqualTo(StatusEnum.LOCKED.getCode());
 

@@ -46,30 +46,11 @@ public class QueryTokenListResp {
 
     private Integer holder;
 
-//    @ApiModelProperty(value = "合约创建者")
-//    private String creator;
-//    @ApiModelProperty(value = "合约部署所在哈希")
-//    private String txHash;
-//    @ApiModelProperty(value = "合约创建时间")
-//    private Date blockTimestamp;
-
-//    public static QueryTokenListResp fromErc20Token(Erc20Token token) {
-//        return QueryTokenListResp.builder()
-//                .address(token.getAddress()).name(token.getName())
-//                .symbol(token.getSymbol()).decimal(token.getDecimal())
-//                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply(), token.getDecimal()))
-//                .creator(token.getCreator()).txHash(token.getTxHash())
-//                .blockTimestamp(token.getBlockTimestamp())
-//                .createTime(token.getCreateTime())
-//                .holder(token.getHolder())
-//                .build();
-//    }
-
     public static QueryTokenListResp fromToken(CustomToken token) {
         return QueryTokenListResp.builder()
                 .address(token.getAddress()).name(token.getName()).type(token.getType())
                 .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply() == null? BigDecimal.ZERO : token.getTotalSupply(), token.getDecimal() == null ? 0 : token.getDecimal()))
+                .totalSupply(ConvertUtil.convertByFactor(token.getTotalSupply() == null ? BigDecimal.ZERO : new BigDecimal(token.getTotalSupply()), token.getDecimal() == null ? 0 : token.getDecimal()))
                 .createTime(token.getCreateTime())
                 .details(token.getDetails()).holder(token.getHolder())
                 .build();

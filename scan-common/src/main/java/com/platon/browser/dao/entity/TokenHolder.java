@@ -1,13 +1,12 @@
 package com.platon.browser.dao.entity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 public class TokenHolder extends TokenHolderKey {
 
-    private BigDecimal balance;
+    private String balance;
 
     private Date createTime;
 
@@ -15,11 +14,11 @@ public class TokenHolder extends TokenHolderKey {
 
     private Integer tokenTxQty;
 
-    public BigDecimal getBalance() {
+    public String getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(String balance) {
         this.balance = balance;
     }
 
@@ -57,7 +56,7 @@ public class TokenHolder extends TokenHolderKey {
     public enum Column {
         tokenAddress("token_address", "tokenAddress", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
-        balance("balance", "balance", "DECIMAL", false),
+        balance("balance", "balance", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         tokenTxQty("token_tx_qty", "tokenTxQty", "INTEGER", false);
@@ -226,4 +225,5 @@ public class TokenHolder extends TokenHolderKey {
             }
         }
     }
+
 }

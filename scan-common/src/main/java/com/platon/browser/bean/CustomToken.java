@@ -16,7 +16,7 @@ public class CustomToken {
 
     private String symbol;
 
-    private BigDecimal totalSupply;
+    private String totalSupply;
 
     private Integer decimal;
 

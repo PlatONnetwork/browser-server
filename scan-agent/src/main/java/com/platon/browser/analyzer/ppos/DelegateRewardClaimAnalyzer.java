@@ -3,10 +3,10 @@ package com.platon.browser.analyzer.ppos;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.DelegateBusinessMapper;
+import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
 import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.mapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateRewardClaimParam;
@@ -31,23 +31,34 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
 
     @Resource
     private DelegateBusinessMapper delegateBusinessMapper;
+
     @Resource
     private AddressCache addressCache;
+
     @Resource
     private CustomGasEstimateMapper customGasEstimateMapper;
 
+    /**
+     * 领取奖励
+     *
+     * @param event
+     * @param tx
+     * @return com.platon.browser.elasticsearch.dto.DelegationReward
+     * @date 2021/6/15
+     */
     @Override
     public DelegationReward analyze(CollectionEvent event, Transaction tx) {
         // 发起委托
         DelegateRewardClaimParam txParam = tx.getTxParam(DelegateRewardClaimParam.class);
         // 补充节点名称
-        updateTxInfo(txParam,tx);
+        updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
+            return null;
 
         long startTime = System.currentTimeMillis();
 
-        DelegateRewardClaim businessParam= DelegateRewardClaim.builder()
+        DelegateRewardClaim businessParam = DelegateRewardClaim.builder()
                 .address(tx.getFrom()) // 领取者地址
                 .rewardList(txParam.getRewardList()) // 领取的奖励列表
                 .build();
@@ -67,7 +78,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
             extra.setNodeName(reward.getNodeName());
             extra.setReward(reward.getReward().toString());
             extraList.add(extra);
-            if(extra.decimalReward().compareTo(BigDecimal.ZERO)>0){
+            if (extra.decimalReward().compareTo(BigDecimal.ZERO) > 0) {
                 extraCleanList.add(extra);
             }
             txTotalReward = txTotalReward.add(reward.getReward());
@@ -81,7 +92,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         }
 
         DelegationReward delegationReward = null;
-        if(txTotalReward.compareTo(BigDecimal.ZERO)>0){
+        if (txTotalReward.compareTo(BigDecimal.ZERO) > 0) {
             // 如果总奖励大于零，则记录领取明细
             delegationReward = new DelegationReward();
             delegationReward.setHash(tx.getHash());
@@ -97,7 +108,8 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         // 直接入库到mysql数据库
         customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
 
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         return delegationReward;
     }
+
 }

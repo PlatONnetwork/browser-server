@@ -2,7 +2,7 @@ package com.platon.browser.service.ppos;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.custommapper.CustomProposalMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.govern.ParameterService;

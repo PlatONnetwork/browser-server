@@ -12,11 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Data
 public class CollectionBlock extends Block {
 
-    /**
-     * 序号ID,用于计算区块下的交易seq自增
-     */
-    AtomicLong seq;
-
     private CollectionBlock() {
     }
 

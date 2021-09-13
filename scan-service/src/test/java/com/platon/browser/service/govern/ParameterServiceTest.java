@@ -5,7 +5,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
-import com.platon.browser.dao.mapper.CustomConfigMapper;
+import com.platon.browser.dao.custommapper.CustomConfigMapper;
 import com.platon.contracts.ppos.ProposalContract;
 import com.platon.contracts.ppos.dto.CallResponse;
 import com.platon.contracts.ppos.dto.resp.GovernParam;

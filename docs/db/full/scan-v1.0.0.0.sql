@@ -474,5 +474,3 @@ CREATE TABLE `vote` (
                         PRIMARY KEY (`hash`),
                         KEY `verifier` (`node_id`) USING BTREE
 );
-
--- 初始化数据

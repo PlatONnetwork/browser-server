@@ -35,13 +35,20 @@ public class Arc20TxController {
     @Resource
     private CommonMethod commonMethod;
 
+    /**
+     * ARC20交易列表
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenTransferRecordListResp>>
+     * @date 2021/5/25
+     */
     @PostMapping("list")
     public Mono<RespPage<QueryTokenTransferRecordListResp>> token20TransferList(@Valid @RequestBody QueryTokenTransferRecordListReq req) {
         return Mono.just(ercTxService.token20TransferList(req));
     }
 
     /**
-     * 导出交易
+     * ARC20交易列表导出
      *
      * @param address  钱包地址
      * @param contract 合约地址

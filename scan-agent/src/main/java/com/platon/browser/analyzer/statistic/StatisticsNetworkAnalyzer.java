@@ -6,7 +6,7 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.CalculateUtils;

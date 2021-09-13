@@ -6,7 +6,6 @@ import lombok.Data;
 /**
  * 合约地址详情
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/1/27
  */
 @Data

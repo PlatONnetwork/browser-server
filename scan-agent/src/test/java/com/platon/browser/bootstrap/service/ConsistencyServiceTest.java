@@ -10,6 +10,7 @@ import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
 import com.platon.browser.service.elasticsearch.bean.TokenTxSummary;
 import com.platon.browser.service.receipt.ReceiptService;
+import com.platon.browser.utils.CommonUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,21 +67,22 @@ public class ConsistencyServiceTest extends AgentTestBase {
 
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
-        target.post();
+        String traceId = CommonUtil.createTraceId();
+        target.post(traceId);
 
         networkStat = CollectionNetworkStat.newInstance();
         networkStat.setCurNumber(10L);
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
         when(ESBlockRepository.exists(anyString())).thenReturn(false);
-        target.post();
+        target.post(traceId);
         when(ESBlockRepository.exists(anyString())).thenReturn(true);
-        target.post();
+        target.post(traceId);
 
         when(blockService.getBlockAsync(anyLong())).thenReturn(null);
         when(receiptService.getReceiptAsync(anyLong())).thenReturn(null);
-        target.post();
+        target.post(traceId);
 
-        verify(target, times(4)).post();
+        verify(target, times(4)).post(traceId);
     }
 
 }

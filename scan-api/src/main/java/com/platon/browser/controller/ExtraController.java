@@ -15,25 +15,35 @@ import javax.annotation.Resource;
 
 /**
  * controller实现
- *  @file AppDocExtraController.java
- *  @description 
- *	@author zhangrj
- *  @data 2019年11月25日
+ *
+ * @author zhangrj
+ * @file AppDocExtraController.java
+ * @description
+ * @data 2019年11月25日
  */
 @Slf4j
 @RestController
 public class ExtraController {
 
-	@Resource
-	private ExtraService extraService;
-	@Resource
+    @Resource
+    private ExtraService extraService;
+
+    @Resource
     private I18nUtil i18n;
 
-	@PostMapping("extra/queryConfig")
-	public Mono<BaseResp<QueryConfigResp>> queryConfig() {
-		return Mono.create(sink -> {
-			QueryConfigResp resp = extraService.queryConfig();
-			sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp));
-		});
-	}
+    /**
+     * 查询配置详情
+     *
+     * @param
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.extra.QueryConfigResp>>
+     * @date 2021/5/25
+     */
+    @PostMapping("extra/queryConfig")
+    public Mono<BaseResp<QueryConfigResp>> queryConfig() {
+        return Mono.create(sink -> {
+            QueryConfigResp resp = extraService.queryConfig();
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp));
+        });
+    }
+
 }

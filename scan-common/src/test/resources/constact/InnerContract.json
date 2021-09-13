@@ -1,0 +1,38 @@
+[
+  {
+    "contractDescEnumName": "RESTRICTING_PLAN_CONTRACT",
+    "contractName": "LockupContract",
+    "creator": "system",
+    "contractHash": ""
+  },
+  {
+    "contractDescEnumName": "STAKING_CONTRACT",
+    "contractName": "StakingContract",
+    "creator": "system",
+    "contractHash": ""
+  },
+  {
+    "contractDescEnumName": "INCENTIVE_POOL_CONTRACT",
+    "contractName": "RewardManagerPool",
+    "creator": "system",
+    "contractHash": ""
+  },
+  {
+    "contractDescEnumName": "SLASH_CONTRACT",
+    "contractName": "SlashingContract",
+    "creator": "system",
+    "contractHash": ""
+  },
+  {
+    "contractDescEnumName": "PROPOSAL_CONTRACT",
+    "contractName": "GovContract",
+    "creator": "system",
+    "contractHash": ""
+  },
+  {
+    "contractDescEnumName": "REWARD_CONTRACT",
+    "contractName": "DelegateRewardPool",
+    "creator": "system",
+    "contractHash": ""
+  }
+]

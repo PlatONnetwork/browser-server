@@ -480,3 +480,4 @@ CREATE TABLE `vote` (
 );
 
 -- 初始化数据
+;

@@ -1,10 +1,10 @@
 package com.platon.browser.task;
 
 import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.service.account.AccountService;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CalculateUtils;
-import com.platon.browser.dao.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeExample;
@@ -42,7 +42,7 @@ public class NetworkStatUpdateTask {
 	private NodeMapper nodeMapper;
 	
     @Scheduled(cron = "0/1  * * * * ?")
-    public void cron() {
+    public void networkStatUpdate() {
 		// 只有程序正常运行才执行任务
 		if(AppStatusUtil.isRunning()) start();
     }

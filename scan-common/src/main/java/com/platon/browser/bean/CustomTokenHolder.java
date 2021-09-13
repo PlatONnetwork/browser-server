@@ -17,9 +17,9 @@ public class CustomTokenHolder {
 
     private String name;
 
-    private BigDecimal totalSupply;
+    private String totalSupply;
 
-    private BigDecimal balance;
+    private String balance;
 
     private Integer decimal;
 

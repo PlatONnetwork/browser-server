@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.JobPlatOnClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 public class Web3jUpdateTask {
 
     @Resource
-    private PlatOnClient platOnClient;
+    private JobPlatOnClient platOnClient;
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void cron () {

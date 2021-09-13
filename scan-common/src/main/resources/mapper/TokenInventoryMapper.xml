@@ -12,8 +12,9 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
     <result column="token_owner_tx_qty" jdbcType="INTEGER" property="tokenOwnerTxQty" />
-    <result column="small_image" jdbcType="INTEGER" property="smallImage" />
-    <result column="medium_image" jdbcType="INTEGER" property="mediumImage" />
+    <result column="small_image" jdbcType="VARCHAR" property="smallImage" />
+    <result column="medium_image" jdbcType="VARCHAR" property="mediumImage" />
+    <result column="id" jdbcType="INTEGER" property="id" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -75,7 +76,7 @@
   </sql>
   <sql id="Base_Column_List">
     token_address, token_id, `owner`, `name`, description, image, create_time, update_time, 
-    token_tx_qty,token_owner_tx_qty,small_image,medium_image
+    token_tx_qty,token_owner_tx_qty,small_image,medium_image,id
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenInventoryExample" resultMap="BaseResultMap">
     select
