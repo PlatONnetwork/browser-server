@@ -57,6 +57,7 @@
     <result column="zero_produce_freeze_duration" jdbcType="INTEGER" property="zeroProduceFreezeDuration" />
     <result column="zero_produce_freeze_epoch" jdbcType="INTEGER" property="zeroProduceFreezeEpoch" />
     <result column="low_rate_slash_count" jdbcType="INTEGER" property="lowRateSlashCount" />
+    <result column="node_settle_statis_info" jdbcType="LONGVARCHAR" property="nodeSettleStatisInfo" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Node">
     <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
@@ -130,7 +131,7 @@
     predict_staking_reward, create_time, update_time, reward_per, next_reward_per, next_reward_per_mod_epoch, 
     have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward, 
     pre_total_dele_reward, exception_status, un_stake_freeze_duration, un_stake_end_block, 
-    zero_produce_freeze_duration, zero_produce_freeze_epoch, low_rate_slash_count
+    zero_produce_freeze_duration, zero_produce_freeze_epoch, low_rate_slash_count,node_settle_statis_info
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -204,7 +205,7 @@
       total_dele_reward, pre_total_dele_reward, exception_status, 
       un_stake_freeze_duration, un_stake_end_block, 
       zero_produce_freeze_duration, zero_produce_freeze_epoch, 
-      low_rate_slash_count, annualized_rate_info
+      low_rate_slash_count, annualized_rate_info,node_settle_statis_info
       )
     values (#{nodeId,jdbcType=VARCHAR}, #{statSlashMultiQty,jdbcType=INTEGER}, #{statSlashLowQty,jdbcType=INTEGER}, 
       #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=BIGINT}, #{statVerifierTime,jdbcType=INTEGER}, 
@@ -226,7 +227,7 @@
       #{totalDeleReward,jdbcType=DECIMAL}, #{preTotalDeleReward,jdbcType=DECIMAL}, #{exceptionStatus,jdbcType=INTEGER}, 
       #{unStakeFreezeDuration,jdbcType=INTEGER}, #{unStakeEndBlock,jdbcType=BIGINT}, 
       #{zeroProduceFreezeDuration,jdbcType=INTEGER}, #{zeroProduceFreezeEpoch,jdbcType=INTEGER}, 
-      #{lowRateSlashCount,jdbcType=INTEGER}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      #{lowRateSlashCount,jdbcType=INTEGER}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}, #{nodeSettleStatisInfo,jdbcType=LONGVARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
@@ -400,6 +401,9 @@
       <if test="annualizedRateInfo != null">
         annualized_rate_info,
       </if>
+      <if test="nodeSettleStatisInfo != null">
+        node_settle_statis_info,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="nodeId != null">
@@ -569,6 +573,9 @@
       </if>
       <if test="annualizedRateInfo != null">
         #{annualizedRateInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="nodeSettleStatisInfo != null">
+        #{node_settle_statis_info,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -749,6 +756,9 @@
       <if test="record.annualizedRateInfo != null">
         annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
+      <if test="record.nodeSettleStatisInfo != null">
+        node_settle_statis_info = #{record.nodeSettleStatisInfo,jdbcType=LONGVARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -811,7 +821,8 @@
       zero_produce_freeze_duration = #{record.zeroProduceFreezeDuration,jdbcType=INTEGER},
       zero_produce_freeze_epoch = #{record.zeroProduceFreezeEpoch,jdbcType=INTEGER},
       low_rate_slash_count = #{record.lowRateSlashCount,jdbcType=INTEGER},
-      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
+      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
+      node_settle_statis_info = #{record.nodeSettleStatisInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -872,7 +883,8 @@
       un_stake_end_block = #{record.unStakeEndBlock,jdbcType=BIGINT},
       zero_produce_freeze_duration = #{record.zeroProduceFreezeDuration,jdbcType=INTEGER},
       zero_produce_freeze_epoch = #{record.zeroProduceFreezeEpoch,jdbcType=INTEGER},
-      low_rate_slash_count = #{record.lowRateSlashCount,jdbcType=INTEGER}
+      low_rate_slash_count = #{record.lowRateSlashCount,jdbcType=INTEGER},
+      node_settle_statis_info = #{record.nodeSettleStatisInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -1045,6 +1057,9 @@
       <if test="annualizedRateInfo != null">
         annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
+      <if test="nodeSettleStatisInfo != null">
+        node_settle_statis_info = #{nodeSettleStatisInfo,jdbcType=LONGVARCHAR},
+      </if>
     </set>
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
@@ -1104,7 +1119,8 @@
       zero_produce_freeze_duration = #{zeroProduceFreezeDuration,jdbcType=INTEGER},
       zero_produce_freeze_epoch = #{zeroProduceFreezeEpoch,jdbcType=INTEGER},
       low_rate_slash_count = #{lowRateSlashCount,jdbcType=INTEGER},
-      annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
+      node_settle_statis_info = #{nodeSettleStatisInfo,jdbcType=LONGVARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Node">
@@ -1162,7 +1178,8 @@
       un_stake_end_block = #{unStakeEndBlock,jdbcType=BIGINT},
       zero_produce_freeze_duration = #{zeroProduceFreezeDuration,jdbcType=INTEGER},
       zero_produce_freeze_epoch = #{zeroProduceFreezeEpoch,jdbcType=INTEGER},
-      low_rate_slash_count = #{lowRateSlashCount,jdbcType=INTEGER}
+      low_rate_slash_count = #{lowRateSlashCount,jdbcType=INTEGER},
+      node_settle_statis_info = #{nodeSettleStatisInfo,jdbcType=LONGVARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -1183,7 +1200,7 @@
       next_reward_per, next_reward_per_mod_epoch, have_dele_reward, pre_dele_annualized_rate, 
       dele_annualized_rate, total_dele_reward, pre_total_dele_reward, exception_status, 
       un_stake_freeze_duration, un_stake_end_block, zero_produce_freeze_duration, zero_produce_freeze_epoch, 
-      low_rate_slash_count, annualized_rate_info)
+      low_rate_slash_count, annualized_rate_info,node_settle_statis_info)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.statSlashMultiQty,jdbcType=INTEGER}, #{item.statSlashLowQty,jdbcType=INTEGER}, 
@@ -1208,7 +1225,8 @@
         #{item.preTotalDeleReward,jdbcType=DECIMAL}, #{item.exceptionStatus,jdbcType=INTEGER}, 
         #{item.unStakeFreezeDuration,jdbcType=INTEGER}, #{item.unStakeEndBlock,jdbcType=BIGINT}, 
         #{item.zeroProduceFreezeDuration,jdbcType=INTEGER}, #{item.zeroProduceFreezeEpoch,jdbcType=INTEGER}, 
-        #{item.lowRateSlashCount,jdbcType=INTEGER}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        #{item.lowRateSlashCount,jdbcType=INTEGER}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR},
+        #{item.nodeSettleStatisInfo,jdbcType=INTEGER}
         )
     </foreach>
   </insert>
@@ -1394,6 +1412,9 @@
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'node_settle_statis_info'.toString() == column.value">
+          #{item.nodeSettleStatisInfo,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )

@@ -3,7 +3,7 @@ package com.platon.browser.task;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.BlockNode;
-import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
+import com.platon.browser.dao.custommapper.CustomBlockNodeMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;

@@ -19,66 +19,66 @@ import com.platon.browser.response.home.ChainStatisticNewResp;
 import com.platon.browser.serializer.CustomBeanSerializerModifier;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class, value = "spring.profiles.active=dev", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = BrowserApiApplication.class,value = "spring.profiles.active=dev",webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StompPushTaskTest {
 
-    @Autowired
-    private StompPushTask stompPushTask;
-
-    @Test
-    public void test_PushChainStatisticNew() {
-        stompPushTask.pushChainStatisticNew();
-    }
-
-    @Test
-    public void test_PushBlockStatisticNew() {
-        stompPushTask.pushBlockStatisticNew();
-    }
-
-    @Test
-    public void test_PushStakingListNew() {
-        stompPushTask.pushStakingListNew();
-    }
-
-    @Test
-    public void test_PushStakingStatisticNew() {
-        stompPushTask.pushStakingStatisticNew();
-    }
-
-    @Test
-    public void test_PushStakingChangeNew() {
-        List<String> userList = new ArrayList<>();
-        userList.add("1");
-        BrowserCache.getKeys().put("1|10||all", userList);
-        try {
-            stompPushTask.pushStakingChangeNew();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void test_json() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializerFactory(mapper.getSerializerFactory().withSerializerModifier(new CustomBeanSerializerModifier()));
-        ChainStatisticNewResp chainStatisticNewResp = new ChainStatisticNewResp();
-        chainStatisticNewResp.setBlockList(null);
-        chainStatisticNewResp.setNodeId(null);
-        chainStatisticNewResp.setAddressQty(null);
-        assertNotNull(mapper.writeValueAsString(chainStatisticNewResp));
-        chainStatisticNewResp.setBlockList(new ArrayList<>());
-        assertNotNull(mapper.writeValueAsString(chainStatisticNewResp));
-    }
-
-    @Test
-    public void test_Eswarm() {
-        stompPushTask.eswarm();
-    }
-
-    @Test
-    public void test_UpdateConfig() {
-        stompPushTask.updateConfig();
-    }
-
-
+	@Autowired
+	private StompPushTask stompPushTask;
+	
+	@Test
+	public void test_PushChainStatisticNew() {
+		stompPushTask.pushChainStatisticNew();
+	}
+	
+	@Test
+	public void test_PushBlockStatisticNew() {
+		stompPushTask.pushBlockStatisticNew();
+	}
+	
+	@Test
+	public void test_PushStakingListNew() {
+		stompPushTask.pushStakingListNew();
+	}
+	
+	@Test
+	public void test_PushStakingStatisticNew() {
+		stompPushTask.pushStakingStatisticNew();
+	}
+	
+	@Test
+	public void test_PushStakingChangeNew() {
+		List<String> userList = new ArrayList<>();
+		userList.add("1");
+		BrowserCache.getKeys().put("1|10||all",userList);
+		try {
+			stompPushTask.pushStakingChangeNew();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void test_json() throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();  
+		mapper.setSerializerFactory(mapper.getSerializerFactory().withSerializerModifier(new CustomBeanSerializerModifier()));
+		ChainStatisticNewResp chainStatisticNewResp = new ChainStatisticNewResp();
+		chainStatisticNewResp.setBlockList(null);
+		chainStatisticNewResp.setNodeId(null);
+		chainStatisticNewResp.setAddressQty(null);
+		assertNotNull(mapper.writeValueAsString(chainStatisticNewResp));
+		chainStatisticNewResp.setBlockList(new ArrayList<>());
+		assertNotNull(mapper.writeValueAsString(chainStatisticNewResp));
+	}
+	
+	@Test
+	public void test_Eswarm() {
+		stompPushTask.eswarm();
+	}
+	
+	@Test
+	public void test_UpdateConfig() {
+		stompPushTask.updateConfig();
+	}
+	
+	
 }

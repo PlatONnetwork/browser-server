@@ -1,6 +1,7 @@
 package com.platon.browser.utils;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.platon.bech32.Bech32;
 import com.platon.browser.service.BlockResult;
 import com.platon.parameters.NetworkParameters;
@@ -82,18 +83,18 @@ public class CommonUtil {
     /**
      * jasypt加密
      *
-     * @param str 要加密的字符串
+     * @param salt 盐
+     * @param str  要加密的字符串
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/3/15
+     * @date 2021/5/10
      */
-    public static String getEncrypt(String str) {
+    public static String getEncrypt(String salt, String str) {
         try {
-            String path = CommonUtil.isWin() ? "/browser-press/jasypt.properties" : "jasypt.properties";
-            File jasyptFile = FileUtils.getFile(System.getProperty("user.dir"), path);
+            if (StrUtil.isEmpty(salt)) {
+                salt = "my123456";
+            }
             Properties properties = new Properties();
-            properties.load(new FileInputStream(jasyptFile));
-            String propertiesValue = properties.getProperty("jasypt.encryptor.password", "my123456");
+            String propertiesValue = properties.getProperty("jasypt.encryptor.password", salt);
             BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
             //加密所需的salt(盐)
             textEncryptor.setPassword(propertiesValue);

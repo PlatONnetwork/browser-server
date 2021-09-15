@@ -2,15 +2,15 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.bean.NodeVersion;
+import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.utils.AppStatusUtil;
-import com.platon.browser.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.HttpUtil;
 import com.platon.browser.utils.KeyBaseAnalysis;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class NodeUpdateTask {
 	private SpecialApi specialApi;
 	
     @Scheduled(cron = "0/5  * * * * ?")
-    public void cron () {
+    public void nodeUpdate () {
     	// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
 		try {

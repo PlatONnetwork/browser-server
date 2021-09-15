@@ -11,6 +11,7 @@ import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.claim.Reward;
 import com.platon.browser.v0152.analyzer.ErcCache;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,8 +20,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 地址统计缓存
+ * 地址统计缓存，谨慎使用
+ * 在A区块由BlockEventHandler进入CollectionEventHandler，还没有来得及清除缓存的时候，A+1区块进入到BlockEventHandler或CollectionEventHandler中就会读取到脏数据
+ *
+ * @author huangyongpeng@matrixelements.com
+ * @date 2021/4/20
  */
+@Slf4j
 @Component
 public class AddressCache {
 
@@ -254,6 +260,7 @@ public class AddressCache {
             this.addressMap.put(addr, address);
         }
         address.setErc20TxQty(address.getErc20TxQty() + 1);
+        log.info("当前erc20地址[{}]的交易数为[{}]", addr, address.getErc20TxQty());
     }
 
     /**
@@ -273,6 +280,7 @@ public class AddressCache {
             this.addressMap.put(addr, address);
         }
         address.setErc721TxQty(address.getErc721TxQty() + 1);
+        log.info("当前erc721地址[{}]的交易数为[{}]", addr, address.getErc721TxQty());
     }
 
     private Address createDefaultAddress(String addr) {
@@ -342,9 +350,10 @@ public class AddressCache {
     }
 
     /**
-     * 第一次启动初始化
+     * 初始化内置地址,第一次启动初始化
      */
     public void initOnFirstStart() {
+        log.info("初始化内置地址");
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
             this.addressMap.put(contractDescEnum.getAddress(),
                     this.createDefaultAddress(contractDescEnum.getAddress()));

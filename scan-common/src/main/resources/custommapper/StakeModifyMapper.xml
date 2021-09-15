@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.StakeBusinessMapper">
+<update id="modify" parameterType="com.platon.browser.dao.param.ppos.StakeModify">
+	/*1. staking 更新*/
+	update `staking`
+	<set>
+		<if test="nodeName != null">
+			`node_name` = #{nodeName},
+		</if>
+		<if test="externalId != null">
+			`external_id` = #{externalId},
+		</if>
+		<if test="benefitAddr != null">
+			`benefit_addr` = #{benefitAddr},
+		</if>
+		<if test="webSite != null">
+			`web_site` = #{webSite},
+		</if>
+		<if test="details != null">
+			`details` = #{details},
+		</if>
+		<if test="isInit != null">
+			`is_init` =  #{isInit},
+		</if>
+		<if test="nextRewardPer != null">
+			`next_reward_per` = #{nextRewardPer},
+		</if>
+		<if test="settleEpoch != null">
+			`next_reward_per_mod_epoch` = #{settleEpoch}
+		</if>
+	</set>
+	 where `node_id` = #{nodeId} and `staking_block_num` = #{stakingBlockNum};
+	/*2、node 更新*/
+	update `node`
+	<set>
+		<if test="nodeName != null">
+			`node_name` = #{nodeName},
+		</if>
+		<if test="externalId != null">
+			`external_id` = #{externalId},
+		</if>
+		<if test="benefitAddr != null">
+			`benefit_addr` = #{benefitAddr},
+		</if>
+		<if test="webSite != null">
+			`web_site` = #{webSite},
+		</if>
+		<if test="details != null">
+			`details` = #{details},
+		</if>
+		<if test="isInit != null">
+			`is_init` =  #{isInit},
+		</if>
+		<if test="nextRewardPer != null">
+			`next_reward_per` = #{nextRewardPer},
+		</if>
+		<if test="settleEpoch != null">
+			`next_reward_per_mod_epoch` = #{settleEpoch}
+		</if>
+	</set>
+	where `node_id` = #{nodeId};
+</update>
+</mapper>

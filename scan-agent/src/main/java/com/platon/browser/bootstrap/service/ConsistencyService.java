@@ -47,12 +47,15 @@ public class ConsistencyService {
 
 
     /**
-     * 开机自检，检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
+     * 开机自检,一致性开机自检子流程,检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
      *
-     * @throws IOException
+     * @param traceId
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/19
      */
     @Transactional(rollbackFor = Exception.class)
-    public void post() throws IOException {
+    public void post(String traceId) throws IOException {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if (networkStat == null) {
             return;
@@ -97,7 +100,7 @@ public class ConsistencyService {
             CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(number);
             // 异步获取交易回执
             CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(number);
-            bootstrapEventPublisher.publish(blockCF, receiptCF, shutdownCallback);
+            bootstrapEventPublisher.publish(blockCF, receiptCF, shutdownCallback, traceId);
         }
         while (!shutdownCallback.isDone())
             SleepUtil.sleep(1L);

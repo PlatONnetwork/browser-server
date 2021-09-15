@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 @SpringBootApplication
 @EnableEncryptableProperties
 @EnableAsync
-@MapperScan(basePackages = "com.platon.browser.dao.mapper")
+@MapperScan(basePackages = {"com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper"})
 public class BrowserApiApplication implements ApplicationRunner {
 
     @Resource

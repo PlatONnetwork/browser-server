@@ -8,7 +8,7 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.StatisticBusinessMapper;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.param.statistic.AddressStatChange;
 import com.platon.browser.dao.param.statistic.AddressStatItem;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -29,8 +29,10 @@ public class StatisticsAddressAnalyzer {
 
     @Resource
     private AddressCache addressCache;
+
     @Resource
     private StatisticBusinessMapper statisticBusinessMapper;
+
     @Resource
     private AddressMapper addressMapper;
 
@@ -44,15 +46,15 @@ public class StatisticsAddressAnalyzer {
         List<String> addresses = new ArrayList<>();
         this.addressCache.getAll().forEach(cache -> {
             AddressStatItem item = AddressStatItem.builder().address(cache.getAddress()).type(cache.getType())
-                .txQty(cache.getTxQty())
+                    .txQty(cache.getTxQty())
                     .erc20TxQty(cache.getErc20TxQty())
                     .erc721TxQty(cache.getErc721TxQty())
                     .transferQty(cache.getTransferQty())
-                .delegateQty(cache.getDelegateQty())
-                .stakingQty(cache.getStakingQty()).proposalQty(cache.getProposalQty())
-                .contractName(cache.getContractName()).contractCreate(cache.getContractCreate())
-                .contractCreatehash(cache.getContractCreatehash()).contractDestroyHash(cache.getContractDestroyHash())
-                .contractBin(cache.getContractBin()).haveReward(cache.getHaveReward()).build();
+                    .delegateQty(cache.getDelegateQty())
+                    .stakingQty(cache.getStakingQty()).proposalQty(cache.getProposalQty())
+                    .contractName(cache.getContractName()).contractCreate(cache.getContractCreate())
+                    .contractCreatehash(cache.getContractCreatehash()).contractDestroyHash(cache.getContractDestroyHash())
+                    .contractBin(cache.getContractBin()).haveReward(cache.getHaveReward()).build();
             // 检查当前地址是否是普通合约地址
             ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(cache.getAddress());
             if (contractTypeEnum != null) {
@@ -89,12 +91,19 @@ public class StatisticsAddressAnalyzer {
             cacheMap.put(fromCache.getAddress(), fromCache);
             Address fromDb = dbMap.get(fromCache.getAddress());
             if (null != fromDb) {
+                log.info("地址[{}]的交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getTxQty() + fromCache.getTxQty(), fromDb.getTxQty(), fromCache.getTxQty());
                 fromCache.setTxQty(fromDb.getTxQty() + fromCache.getTxQty()); // 交易数量
+                log.info("地址[{}]的erc20交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getErc20TxQty() + fromCache.getErc20TxQty(), fromDb.getErc20TxQty(), fromCache.getErc20TxQty());
                 fromCache.setErc20TxQty(fromDb.getErc20TxQty() + fromCache.getErc20TxQty()); // token交易数量
+                log.info("地址[{}]的erc721交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getErc721TxQty() + fromCache.getErc721TxQty(), fromDb.getErc721TxQty(), fromCache.getErc721TxQty());
                 fromCache.setErc721TxQty(fromDb.getErc721TxQty() + fromCache.getErc721TxQty()); // token交易数量
+                log.info("地址[{}]的转账交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getTransferQty() + fromCache.getTransferQty(), fromDb.getTransferQty(), fromCache.getTransferQty());
                 fromCache.setTransferQty(fromDb.getTransferQty() + fromCache.getTransferQty()); // 转账数量
+                log.info("地址[{}]的委托交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getDelegateQty() + fromCache.getDelegateQty(), fromDb.getDelegateQty(), fromCache.getDelegateQty());
                 fromCache.setDelegateQty(fromDb.getDelegateQty() + fromCache.getDelegateQty()); // 委托数量
+                log.info("地址[{}]的质押交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getStakingQty() + fromCache.getStakingQty(), fromDb.getStakingQty(), fromCache.getStakingQty());
                 fromCache.setStakingQty(fromDb.getStakingQty() + fromCache.getStakingQty()); // 质押数量
+                log.info("地址[{}]的提案交易数[{}]=数据库[{}]+缓存[{}]", fromDb.getAddress(), fromDb.getProposalQty() + fromCache.getProposalQty(), fromDb.getProposalQty(), fromCache.getProposalQty());
                 fromCache.setProposalQty(fromDb.getProposalQty() + fromCache.getProposalQty()); // 提案数量
                 fromCache.setHaveReward(fromDb.getHaveReward().add(fromCache.getHaveReward())); // 已领取委托奖励总额
                 // 合约创建人，数据库的值优先
@@ -146,4 +155,5 @@ public class StatisticsAddressAnalyzer {
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
+
 }

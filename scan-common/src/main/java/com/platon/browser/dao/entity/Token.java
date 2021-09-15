@@ -14,7 +14,7 @@ public class Token {
 
     private String symbol;
 
-    private BigDecimal totalSupply;
+    private String totalSupply;
 
     private Integer decimal;
 
@@ -68,11 +68,11 @@ public class Token {
         this.symbol = symbol == null ? null : symbol.trim();
     }
 
-    public BigDecimal getTotalSupply() {
+    public String getTotalSupply() {
         return totalSupply;
     }
 
-    public void setTotalSupply(BigDecimal totalSupply) {
+    public void setTotalSupply(String totalSupply) {
         this.totalSupply = totalSupply;
     }
 
@@ -168,7 +168,7 @@ public class Token {
         type("type", "type", "VARCHAR", true),
         name("name", "name", "VARCHAR", true),
         symbol("symbol", "symbol", "VARCHAR", false),
-        totalSupply("total_supply", "totalSupply", "DECIMAL", false),
+        totalSupply("total_supply", "totalSupply", "VARCHAR", false),
         decimal("decimal", "decimal", "INTEGER", true),
         isSupportErc165("is_support_erc165", "isSupportErc165", "BIT", false),
         isSupportErc20("is_support_erc20", "isSupportErc20", "BIT", false),

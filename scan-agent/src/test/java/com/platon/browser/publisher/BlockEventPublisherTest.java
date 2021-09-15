@@ -1,6 +1,7 @@
 package com.platon.browser.publisher;
 
 import com.platon.browser.config.DisruptorConfig;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.Receipt;
@@ -49,9 +50,9 @@ public class BlockEventPublisherTest extends AgentTestBase {
 
         EpochMessage ep = EpochMessage.newInstance();
 
-        target.publish(getBlockAsync(7000L), getReceiptAsync(7000L), ep);
+        target.publish(getBlockAsync(7000L), getReceiptAsync(7000L), ep, CommonUtil.createTraceId());
 
-        verify(target, times(1)).publish(any(), any(), any());
+        verify(target, times(1)).publish(any(), any(), any(),any());
     }
 
     /**

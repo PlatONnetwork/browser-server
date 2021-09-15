@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.EpochBusinessMapper">
+<update id="consensus" parameterType="com.platon.browser.dao.param.epoch.Consensus">
+    /*1、更新质押*/
+    update `staking` set
+        `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),
+        `pre_cons_block_qty` = `cur_cons_block_qty`,
+        `cur_cons_block_qty` = 0
+    where `status` in (1,  2);
+    /*2、更新节点*/
+    update `node` set
+        `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),
+        `stat_verifier_time` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, `stat_verifier_time` + 1,  `stat_verifier_time`),
+        `stat_expect_block_qty` =  if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, `stat_expect_block_qty` + #{expectBlockNum},  `stat_expect_block_qty`)
+    where `status` = 1;
+</update>
+</mapper>

@@ -58,8 +58,12 @@ public class BlockUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("打印结果为：" + BlockUtil.delHEXPre("0x4c657420757320636f6d70757465"));
-        System.out.println("打印结果为：" + BlockUtil.getPostscriptFromExtraData("4c657420757320636f6d70757465"));
+        String desc1 = "τῆς ἄνω ὁδοῦ ἀεὶ ἑξόμεθα καὶ δικαιοσύνην μετὰ φρονήσεως παντὶ τρόπῳ ἐπιτηδεύσομεν.";
+        String desc2 = "We shall always keep to the upper road and practice justice with prudence in every way.";
+        String desc3 = "让我们永远坚持走向上的路，全力以审慎践行正义。";
+        desc1 = "0x" + Hex.toHexString(desc1.getBytes());
+        System.out.println("打印结果为：" + desc1);
+        System.out.println("打印结果为：" + BlockUtil.getPostscriptFromExtraData("0x"));
     }
 
 }

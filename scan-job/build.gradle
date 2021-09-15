@@ -79,4 +79,5 @@ dependencies {
     compile "com.alibaba:druid:$druidVersion"
     runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
     compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2"
+    compile "org.jsoup:jsoup:$jsoupVersion"
 }

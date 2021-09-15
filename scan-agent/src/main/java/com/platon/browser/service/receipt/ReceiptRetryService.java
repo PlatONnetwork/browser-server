@@ -1,8 +1,8 @@
 package com.platon.browser.service.receipt;
 
+import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.bean.RpcParam;
-import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;

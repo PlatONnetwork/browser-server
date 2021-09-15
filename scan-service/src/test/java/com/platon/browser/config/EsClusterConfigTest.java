@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class EsClusterConfigTest {
 
     @Value("${spring.elasticsearch.high-level-client.hosts}")
-    private List<String> addresses; // 集群地址，多个用,隔开
+    private List<String> hosts; // 集群地址，多个用,隔开
 
     @Value("${spring.elasticsearch.high-level-client.port}")
     private int port; // 使用的端口号

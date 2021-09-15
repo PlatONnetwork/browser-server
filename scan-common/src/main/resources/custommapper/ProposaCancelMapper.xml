@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.ProposalBusinessMapper">
+<update id="cancel" parameterType="com.platon.browser.dao.param.ppos.ProposalCancel">
+    /*1、创建取消提案*/
+    set @canceledTopic = (select `topic` from `proposal` where `pip_id`=#{canceledId});
+    insert into `proposal` (
+        `hash`,
+        `type`,
+        `node_id`,
+        `node_name`,
+        `url`,
+        `end_voting_block`,
+        `timestamp`,
+        `pip_num`,
+        `pip_id`,
+        `topic`,
+        `description`,
+        `block_number`,
+        `canceled_pip_id`,
+        `canceled_topic`
+    ) values (
+        #{txHash},
+	    '4',
+        #{nodeId},
+        #{stakingName},
+        #{url},
+        #{endVotingBlock},
+        #{timestamp},
+        #{pipNum},
+        #{pIDID},
+        #{topic},
+        #{description},
+        #{blockNumber},
+        #{canceledId},
+        @canceledTopic
+    );
+</update>
+</mapper>
