@@ -43,12 +43,12 @@ public class BatchSizeAdjustTaskTest extends AgentTestData {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
 
         when(persistenceEventHandler.getMaxBlockNumber()).thenReturn(BigInteger.TEN.longValue());
-        target.cron();
+        target.batchSizeAdjust();
         when(persistenceEventHandler.getMaxBlockNumber()).thenReturn(100L);
-        target.cron();
-        verify(target, times(2)).cron();
+        target.batchSizeAdjust();
+        verify(target, times(2)).batchSizeAdjust();
 
         doThrow(new RuntimeException("")).when(platOnClient).getLatestBlockNumber();
-        target.cron();
+        target.batchSizeAdjust();
     }
 }

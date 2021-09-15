@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.DelegateBusinessMapper">
+<update id="exit" parameterType="com.platon.browser.dao.param.ppos.DelegateExit">
+    /*2、更新委托*/
+    update `delegation` set
+    `delegate_hes` = #{balance.delegateHes},
+    `delegate_locked` = #{balance.delegateLocked},
+    `delegate_released` = #{balance.delegateReleased},
+    `is_history` = #{codeIsHistory}
+    where `delegate_addr` = #{txFrom}
+    and `node_id` = #{nodeId}
+    and `staking_block_num` = #{stakingBlockNumber};
+    /*1、更新节点: 不同状态的委托金额变更、已领取委托奖励累加*/
+    update `node` set
+    	<if test="codeIsHistory == 1 and codeNodeIsLeave == false">
+          	`stat_valid_addrs` = `stat_valid_addrs`- 1,
+        </if>
+        <if test="codeIsHistory == 1 and codeNodeIsLeave == true">
+          	`stat_invalid_addrs` = `stat_invalid_addrs` - 1,
+        </if>
+        <if test="codeNodeIsLeave == false">
+        `total_value` = `total_value` - #{realRefundAmount},
+        `stat_delegate_value` = `stat_delegate_value` -  #{realRefundAmount},
+        </if>
+        `stat_delegate_released` = `stat_delegate_released` - #{decrease.delegateReleased},
+        `have_dele_reward` = `have_dele_reward` + #{delegateReward}
+    where `node_id` = #{nodeId};
+
+    /*3、更新质押*/
+    update `staking` set
+        `stat_delegate_hes` = `stat_delegate_hes` - #{decrease.delegateHes},
+        `stat_delegate_locked` = `stat_delegate_locked` - #{decrease.delegateLocked},
+        `stat_delegate_released` = `stat_delegate_released` - #{decrease.delegateReleased},
+        `have_dele_reward` = `have_dele_reward` + #{delegateReward}
+    where `node_id` = #{nodeId}
+    and `staking_block_num` =  #{stakingBlockNumber};
+</update>
+</mapper>

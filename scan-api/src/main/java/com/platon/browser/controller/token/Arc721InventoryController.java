@@ -52,6 +52,13 @@ public class Arc721InventoryController {
         return Mono.just(tokenService.queryTokenIdList(req));
     }
 
+    /**
+     * ARC721库存详情
+     *
+     * @param req
+     * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.token.QueryTokenIdDetailResp>>
+     * @date 2021/5/25
+     */
     @PostMapping("detail")
     public Mono<BaseResp<QueryTokenIdDetailResp>> detail(@Valid @RequestBody QueryTokenIdDetailReq req) {
         return Mono.create(sink -> {
@@ -60,6 +67,19 @@ public class Arc721InventoryController {
         });
     }
 
+    /**
+     * ARC721库存列表导出
+     *
+     * @param address
+     * @param contract
+     * @param tokenId
+     * @param local
+     * @param timeZone
+     * @param token
+     * @param response
+     * @return void
+     * @date 2021/5/25
+     */
     @GetMapping("export")
     public void export(@RequestParam(value = "address", required = false) String address,
                        @RequestParam(value = "contract", required = false) String contract,

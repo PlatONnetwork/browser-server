@@ -18,6 +18,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
@@ -159,7 +160,7 @@ public class InitializationServiceTest extends AgentTestBase {
     public void post() throws Exception {
         NetworkStat networkStat = null;
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
-        InitializationResult result = target.init();
+        InitializationResult result = target.init(CommonUtil.createTraceId());
         assertEquals(-1L, result.getCollectedBlockNumber().longValue());
 
         networkStat = CollectionNetworkStat.newInstance();
@@ -167,7 +168,7 @@ public class InitializationServiceTest extends AgentTestBase {
         when(networkStatMapper.selectByPrimaryKey(anyInt())).thenReturn(networkStat);
         Page<com.platon.browser.dao.entity.Node> page = new Page<>();
         when(nodeMapper.selectByExample(any())).thenReturn(page);
-        result = target.init();
+        result = target.init(CommonUtil.createTraceId());
         assertEquals(7000L, result.getCollectedBlockNumber().longValue());
     }
 

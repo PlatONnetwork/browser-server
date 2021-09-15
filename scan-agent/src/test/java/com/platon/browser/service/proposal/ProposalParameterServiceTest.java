@@ -1,7 +1,7 @@
 package com.platon.browser.service.proposal;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.ProposalMapper;

@@ -1,8 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.text.StrFormatter;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -11,13 +8,11 @@ import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
+import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.CustomAddressMapper;
-import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.I18nEnum;
@@ -28,23 +23,15 @@ import com.platon.browser.request.address.QueryRPPlanDetailRequest;
 import com.platon.browser.response.address.DetailsRPPlanResp;
 import com.platon.browser.response.address.QueryDetailResp;
 import com.platon.browser.response.address.QueryRPPlanDetailResp;
-import com.platon.browser.service.elasticsearch.AbstractEsRepository;
 import com.platon.browser.service.elasticsearch.EsBlockRepository;
-import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
-import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.utils.ConvertUtil;
 import com.platon.browser.utils.I18nUtil;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.contracts.ppos.RestrictingPlanContract;
 import com.platon.contracts.ppos.dto.CallResponse;
 import com.platon.contracts.ppos.dto.resp.RestrictingItem;
 import com.platon.contracts.ppos.dto.resp.Reward;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -74,9 +61,6 @@ public class AddressService {
     private CustomAddressMapper customAddressMapper;
 
     @Resource
-    private AddressMapper addressMapper;
-
-    @Resource
     private RpPlanMapper rpPlanMapper;
 
     @Resource
@@ -92,7 +76,7 @@ public class AddressService {
     private BlockChainConfig blockChainConfig;
 
     @Resource
-    private EsBlockRepository ESBlockRepository;
+    private EsBlockRepository esBlockRepository;
 
     @Resource
     private SpecialApi specialApi;
@@ -100,19 +84,11 @@ public class AddressService {
     @Resource
     private StatisticCacheService statisticCacheService;
 
-    @Resource
-    private EsErc20TxRepository esErc20TxRepository;
-
-    @Resource
-    private EsErc721TxRepository esErc721TxRepository;
-
-
     /**
      * 查询地址详情
      *
      * @param req
      * @return com.platon.browser.response.address.QueryDetailResp
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/15
      */
     public QueryDetailResp getDetails(QueryDetailRequest req) {
@@ -142,8 +118,6 @@ public class AddressService {
         /** 特殊账户余额直接查询链  */
         try {
             this.getAddressInfo(req, resp);
-            updateErcTxQtyFromES(req.getAddress(), resp, esErc20TxRepository, ErcTypeEnum.ERC20);
-            updateErcTxQtyFromES(req.getAddress(), resp, esErc721TxRepository, ErcTypeEnum.ERC721);
         } catch (Exception e) {
             logger.error("getBalance error", e);
             platonClient.updateCurrentWeb3jWrapper();
@@ -165,43 +139,12 @@ public class AddressService {
     }
 
     /**
-     * 从ES查询最新的erc20/erc721交易数，如果值对不上，则更新数据库
+     * 地址锁仓详情
      *
-     * @param address
-     * @param item
-     * @param esRepository
-     * @param ercTypeEnum
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/4/15
+     * @param req
+     * @return com.platon.browser.response.address.QueryRPPlanDetailResp
+     * @date 2021/6/7
      */
-    private void updateErcTxQtyFromES(String address, QueryDetailResp item, AbstractEsRepository esRepository, ErcTypeEnum ercTypeEnum) {
-        try {
-            ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
-            count.buildMust(new BoolQueryBuilder()
-                    .should(QueryBuilders.termQuery("from", address))
-                    .should(QueryBuilders.termQuery("to", address)));
-            ESResult<?> res = esRepository.Count(count);
-            if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
-                if (ObjectUtil.isNull(item.getErc20TxQty()) || item.getErc20TxQty().compareTo(res.getTotal().intValue()) != 0) {
-                    int oldErc20TxQty = Convert.toInt(item.getErc20TxQty(), 0);
-                    int newErc20TxQty = Convert.toInt(res.getTotal(), 0);
-                    item.setErc20TxQty(newErc20TxQty);
-                    logger.info("地址{}的erc20交易数,旧值{},新值{}成功", address, oldErc20TxQty, newErc20TxQty);
-                }
-            } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
-                if (ObjectUtil.isNull(item.getErc721TxQty()) || item.getErc721TxQty().compareTo(res.getTotal().intValue()) != 0) {
-                    int oldErc721TxQty = Convert.toInt(item.getErc721TxQty(), 0);
-                    int newErc721TxQty = Convert.toInt(res.getTotal(), 0);
-                    item.setErc721TxQty(newErc721TxQty);
-                    logger.info("地址{}的erc721交易数,旧值{},新值{}成功", address, oldErc721TxQty, newErc721TxQty);
-                }
-            }
-        } catch (Exception e) {
-            logger.error(StrFormatter.format("查询地址{}的erc交易数异常", address), e);
-        }
-    }
-
     public QueryRPPlanDetailResp rpplanDetail(QueryRPPlanDetailRequest req) {
         QueryRPPlanDetailResp queryRPPlanDetailResp = new QueryRPPlanDetailResp();
         try {
@@ -254,7 +197,7 @@ public class AddressService {
             /** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
             Block block = null;
             try {
-                block = ESBlockRepository.get(String.valueOf(rPlan.getNumber()), Block.class);
+                block = esBlockRepository.get(String.valueOf(rPlan.getNumber()), Block.class);
             } catch (IOException e) {
                 logger.error("获取区块错误。", e);
             }
@@ -285,6 +228,14 @@ public class AddressService {
         return queryRPPlanDetailResp;
     }
 
+    /**
+     * 从链上查询特殊账户余额
+     *
+     * @param req
+     * @param resp
+     * @return com.platon.browser.response.address.QueryDetailResp
+     * @date 2021/6/7
+     */
     private QueryDetailResp getAddressInfo(QueryDetailRequest req, QueryDetailResp resp) throws Exception {
         List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
         if (restrictingBalances != null && !restrictingBalances.isEmpty()) {

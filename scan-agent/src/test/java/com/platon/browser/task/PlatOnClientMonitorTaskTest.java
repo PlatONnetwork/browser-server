@@ -37,10 +37,10 @@ public class PlatOnClientMonitorTaskTest extends AgentTestData {
     @Test
     public void test() {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
-        target.cron();
-        verify(target, times(1)).cron();
+        target.platOnClientMonitor();
+        verify(target, times(1)).platOnClientMonitor();
 
         doThrow(new RuntimeException("")).when(platOnClient).updateCurrentWeb3jWrapper();
-        target.cron();
+        target.platOnClientMonitor();
     }
 }

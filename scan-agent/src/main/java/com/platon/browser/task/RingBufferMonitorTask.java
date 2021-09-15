@@ -18,7 +18,7 @@ import java.util.Map;
 public class RingBufferMonitorTask {
 
     @Scheduled(cron = "0/10 * * * * ?")
-    public void cron () {
+    public void ringBufferMonitor () {
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }

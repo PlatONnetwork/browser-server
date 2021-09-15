@@ -5,7 +5,7 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.utils.AppStatusUtil;
-import com.platon.browser.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -50,10 +50,10 @@ public class NodeUpdateTaskTest extends AgentTestData {
     @Test
     public void test() {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
-        target.cron();
-        verify(target, times(1)).cron();
+        target.nodeUpdate();
+        verify(target, times(1)).nodeUpdate();
 
         doThrow(new RuntimeException("")).when(chainConfig).getKeyBase();
-        target.cron();
+        target.nodeUpdate();
     }
 }

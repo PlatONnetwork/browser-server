@@ -7,8 +7,8 @@ import com.platon.browser.cache.ReportMultiSignParamCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.mapper.EpochBusinessMapper;
-import com.platon.browser.dao.mapper.SlashBusinessMapper;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
+import com.platon.browser.dao.custommapper.SlashBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Consensus;
 import com.platon.browser.dao.param.ppos.Report;
@@ -16,6 +16,7 @@ import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.service.proposal.ProposalParameterService;
+import com.platon.browser.service.statistic.StatisticService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,9 @@ public class OnConsensusAnalyzer {
 
     @Resource
     private ProposalParameterService proposalParameterService;
+
+    @Resource
+    private StatisticService statisticService;
 
     public Optional<List<NodeOpt>> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
@@ -100,6 +104,8 @@ public class OnConsensusAnalyzer {
                 });
             }
         }
+
+        statisticService.nodeSettleStatisElected(event);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 

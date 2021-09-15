@@ -21,7 +21,7 @@ public class PlatOnClientMonitorTask {
     private PlatOnClient platOnClient;
 
     @Scheduled(cron = "0/10 * * * * ?")
-    public void cron () {
+    public void platOnClientMonitor () {
         // 只有程序正常运行才执行任务
         if(AppStatusUtil.isRunning()) start();
     }

@@ -41,7 +41,6 @@ public class HolderController {
      *
      * @param req
      * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenHolderListResp>>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/29
      */
     @PostMapping("list")
@@ -49,6 +48,17 @@ public class HolderController {
         return Mono.just(ercTxService.tokenHolderList(req));
     }
 
+    /**
+     * Token令牌持有人列表导出
+     *
+     * @param contract
+     * @param local
+     * @param timeZone
+     * @param token
+     * @param response
+     * @return void
+     * @date 2021/5/25
+     */
     @GetMapping("export")
     public void export(@RequestParam(value = "contract", required = true) String contract,
                        @RequestParam(value = "local", required = true) String local,

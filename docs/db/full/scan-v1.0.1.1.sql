@@ -488,7 +488,6 @@ CREATE TABLE `internal_address` (
 );
 
 -- 初始化数据
-
 INSERT INTO `internal_address` (`address`,`type`)
 VALUES ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep', 1),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7', 2),

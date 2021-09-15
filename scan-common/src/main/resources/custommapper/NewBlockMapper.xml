@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.NewBlockMapper">
+<update id="newBlock" parameterType="com.platon.browser.dao.param.epoch.NewBlock">
+	/*1、更新质押*/
+	update `staking` set
+		`cur_cons_block_qty` = `cur_cons_block_qty` + 1,
+		`block_reward_value` = `block_reward_value` + #{blockRewardValue},
+		`fee_reward_value` = `fee_reward_value` + #{feeRewardValue},
+		`predict_staking_reward` = #{predictStakingReward}
+	where `node_id` = #{nodeId}
+	and `staking_block_num` = #{stakingBlockNum};
+	/*2、更新节点*/
+	update `node` set
+		`stat_block_qty` = `stat_block_qty` + 1,
+		`stat_block_reward_value` = `stat_block_reward_value` + #{blockRewardValue},
+		`stat_fee_reward_value` = `stat_fee_reward_value` +  #{feeRewardValue},
+		`predict_staking_reward` = #{predictStakingReward}
+	where `node_id` = #{nodeId};
+</update>
+</mapper>

@@ -45,19 +45,17 @@ import java.util.List;
  * 虚拟交易工具
  */
 public class TransactionUtil {
+
     /**
      * 根据合约内部调用PPOS的输入信息生成虚拟PPOS交易列表
-     * 
-     * @param block
-     *            合约调用交易所在区块信息
-     * @param parentTx
-     *            合约调用交易本身
-     * @param invokeContractInput
-     *            合约内部调用PPOS操作的输入信息
+     *
+     * @param block               合约调用交易所在区块信息
+     * @param parentTx            合约调用交易本身
+     * @param invokeContractInput 合约内部调用PPOS操作的输入信息
      * @return
      */
     public static List<Transaction> getVirtualTxList(Block block, Transaction parentTx,
-        PPosInvokeContractInput invokeContractInput) {
+                                                     PPosInvokeContractInput invokeContractInput) {
         List<Transaction> transactionList = new ArrayList<>();
         if (invokeContractInput == null)
             return transactionList;
@@ -65,7 +63,7 @@ public class TransactionUtil {
         for (int i = 0; i < trans.size(); i++) {
             TransData tran = trans.get(i);
             PPOSTxDecodeResult result =
-                PPOSTxDecodeUtil.decode(tran.getInput(), Collections.emptyList());
+                    PPOSTxDecodeUtil.decode(tran.getInput(), Collections.emptyList());
             if (result.getTypeEnum() == null) {
                 continue;
             }
@@ -80,7 +78,7 @@ public class TransactionUtil {
             tx.setIndex(i);
             tx.setInput(tran.getInput());
             tx.setInfo(result.getParam().toJSONString());
-            tx.setSeq((long)i);
+            tx.setSeq((long) i);
             transactionList.add(tx);
 
             if (Integer.parseInt(tran.getCode()) > 0) {
@@ -121,13 +119,13 @@ public class TransactionUtil {
         if (statusCode != ErrorCode.SUCCESS)
             return BigInteger.ZERO;
 
-        return ((RlpString)(RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())).getValues().get(0))
-            .asPositiveBigInteger();
+        return ((RlpString) (RlpDecoder.decode(((RlpString) rlpList.get(1)).getBytes())).getValues().get(0))
+                .asPositiveBigInteger();
     }
 
     /**
      * 处理虚拟交易
-     * 
+     *
      * @param block
      * @param specialApi
      * @param platOnClient
@@ -138,13 +136,13 @@ public class TransactionUtil {
      * @throws ContractInvokeException
      * @throws BlankResponseException
      */
-    public static List<Transaction> processVirtualTx(CollectionBlock block, SpecialApi specialApi,
+    public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi,
         PlatOnClient platOnClient, CollectionTransaction contractInvokeTx, Receipt contractInvokeTxReceipt,
         Logger logger) throws ContractInvokeException, BlankResponseException {
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
             List<PPosInvokeContractInput> inputs = specialApi
-                .getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
+                    .getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
             logger.debug("更新缓存-PPos调用合约输入参数：{}", JSON.toJSONString(inputs, true));
             List<PPosInvokeContractInput> ppremoveList = new ArrayList<>();
             for (PPosInvokeContractInput input : inputs) {
@@ -166,7 +164,7 @@ public class TransactionUtil {
 
         // 取出当前普通合约调用交易内部调用PPOS操作的输入参数
         PPosInvokeContractInput input =
-            PPosInvokeContractInputCache.getPPosInvokeContractInput(contractInvokeTx.getHash());
+                PPosInvokeContractInputCache.getPPosInvokeContractInput(contractInvokeTx.getHash());
         // 使用普通合约内部调用的输入数据构造虚拟PPOS交易列表(包括成功和失败的PPOS调用)
         List<Transaction> virtualTxList = getVirtualTxList(block, contractInvokeTx, input);
         if (!virtualTxList.isEmpty()) {
@@ -197,12 +195,12 @@ public class TransactionUtil {
                 if (vt.getTypeEnum() == Transaction.TypeEnum.CLAIM_REWARDS) {
                     // 领取委托奖励
                     DelegateRewardClaimParam delegateRewardClaimParam =
-                        DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
+                            DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
                     List<Log> logs = Arrays.asList(log);
                     PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(vt.getInput(), logs);
                     TxParam param = result.getParam();
                     if (param != null) {
-                        delegateRewardClaimParam = (DelegateRewardClaimParam)param;
+                        delegateRewardClaimParam = (DelegateRewardClaimParam) param;
                     }
                     vt.setInfo(delegateRewardClaimParam.toJSONString());
                 }
@@ -222,7 +220,7 @@ public class TransactionUtil {
      * 内置合约调用交易,解析补充信息
      */
     public static void resolveInnerContractInvokeTxComplementInfo(CollectionTransaction tx, List<Log> logs,
-        ComplementInfo ci) throws BeanCreateOrUpdateException {
+                                                                  ComplementInfo ci) throws BeanCreateOrUpdateException {
         PPOSTxDecodeResult decodedResult;
         try {
             // 解析交易的输入及交易回执log信息
@@ -240,17 +238,17 @@ public class TransactionUtil {
 
     /**
      * 获取合约的Bin代码
-     * 
+     *
      * @param platOnClient
      * @param contractAddress
      * @return
      * @throws BeanCreateOrUpdateException
      */
     public static String getContractBinCode(CollectionTransaction tx, PlatOnClient platOnClient, String contractAddress,
-        Logger logger) throws BeanCreateOrUpdateException {
+                                            Logger logger) throws BeanCreateOrUpdateException {
         try {
             PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j()
-                .platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(tx.getNum()))).send();
+                    .platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(tx.getNum()))).send();
             return platonGetCode.getCode();
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
@@ -261,27 +259,33 @@ public class TransactionUtil {
     }
 
     /**
-     * 创建普通合约交易,解析补充信息
-     * 
+     * 创建普通合约,解析补充信息
+     *
+     * @param result
      * @param contractAddress
+     * @param platOnClient
      * @param ci
-     * @throws IOException
+     * @param log
+     * @param contractTypeEnum
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/20
      */
     public static void resolveGeneralContractCreateTxComplementInfo(CollectionTransaction result, String contractAddress,
-        PlatOnClient platOnClient, ComplementInfo ci, Logger log, ContractTypeEnum contractTypeEnum ) throws BeanCreateOrUpdateException {
+                                                                    PlatOnClient platOnClient, ComplementInfo ci, Logger log, ContractTypeEnum contractTypeEnum) throws BeanCreateOrUpdateException {
         ci.setInfo("");
         ci.setBinCode(TransactionUtil.getContractBinCode(result, platOnClient, result.getContractAddress(), log));
 
-        if(contractTypeEnum ==  ContractTypeEnum.ERC20_EVM){
+        if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
-        }else if(contractTypeEnum ==  ContractTypeEnum.ERC721_EVM){
+        } else if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
-        }else if(contractTypeEnum ==  ContractTypeEnum.WASM){
+        } else if (contractTypeEnum == ContractTypeEnum.WASM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
-        }else{
+        } else {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
         }
@@ -290,13 +294,19 @@ public class TransactionUtil {
     }
 
     /**
-     * 调用普通合约交易,解析补充信息
-     * 
+     * 调用普通合约,解析补充信息
+     *
+     * @param tx
+     * @param platOnClient
      * @param ci
-     * @throws IOException
+     * @param contractTypeEnum
+     * @param logger
+     * @return void
+     * @author huangyongpeng@matrixelements.com
+     * @date 2021/4/20
      */
     public static void resolveGeneralContractInvokeTxComplementInfo(CollectionTransaction tx, PlatOnClient platOnClient,
-        ComplementInfo ci, ContractTypeEnum contractTypeEnum, Logger logger) throws BeanCreateOrUpdateException {
+                                                                    ComplementInfo ci, ContractTypeEnum contractTypeEnum, Logger logger) throws BeanCreateOrUpdateException {
         ci.setInfo("");
         String binCode = getContractBinCode(tx, platOnClient, tx.getTo(), logger);
         ci.setBinCode(binCode);
@@ -329,11 +339,11 @@ public class TransactionUtil {
 
     /**
      * 发起普通交易,解析补充信息
-     * 
+     *
      * @param ci
      */
     public static void resolveGeneralTransferTxComplementInfo(CollectionTransaction tx, ComplementInfo ci,
-        AddressCache addressCache) {
+                                                              AddressCache addressCache) {
         ci.setType(Transaction.TypeEnum.TRANSFER.getCode());
         ci.setContractType(null);
         ci.setMethod(null);
@@ -369,4 +379,5 @@ public class TransactionUtil {
         }
         ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());
     }
+
 }

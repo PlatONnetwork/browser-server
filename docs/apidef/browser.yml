@@ -159,6 +159,27 @@ paths:
           description: 返回地址详情
           schema:
             $ref: '#/definitions/RpplanDetailResult'
+  #内置地址相关接口
+  /internalAddress/foundationInfo:
+    post:
+      operationId: internalAddress
+      tags:
+        - 内置地址接口
+      summary: 查询内置账户信息
+      description: 实现逻辑：查询mysql中internalAddress表
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/PageReq'
+      responses:
+        '200':
+          description: 返回地址详情
+          schema:
+            $ref: '#/definitions/InternalAddressRespResult'
   #区块相关接口
   /block/blockList:
     post:
@@ -2606,6 +2627,15 @@ definitions:
       deleAnnualizedRate:
         description: 预计委托年化率
         type: string
+      delegatedRewardRatio:
+        description: 委托奖励比例
+        type: string
+      genBlocksRate:
+        description: 24小时出块率
+        type: string
+      Version:
+        description: 版本
+        type: string
   AliveStakingListResult:
     type: object
     properties:
@@ -2794,6 +2824,12 @@ definitions:
         type: string
       deleRewardRed:
         description: 待领取委托奖励
+        type: string
+      genBlocksRate:
+        description: 24小时出块率
+        type: string
+      Version:
+        description: 版本
         type: string
   StakingDetailResult:
     type: object
@@ -3667,3 +3703,62 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/QueryClaimByStakingDetail'
+  #内置地址
+  PageReq:
+    type: object
+    description: 内置地址列表查询参数对象
+    properties:
+      pageNo:
+        description: 页数(必填)
+        type: integer
+      pageSize:
+        description: 页大小(必填)
+        type: integer
+  InternalAddressRespResult:
+    type: object
+    properties:
+      errMsg:
+        description: 描述信息
+        type: string
+      code:
+        description: 成功（0），失败则有相关失败码
+        type: integer
+      data:
+        $ref: '#/definitions/internalAddressBaseResp'
+  internalAddressBaseResp:
+    type: object
+    description: 内置地址列表响应参数对象
+    properties:
+      totalBalance:
+        description: 基金会账户总余额
+        type: number
+      totalRestrictingBalance:
+        description: 基金会账户总锁仓余额
+        type: number
+      InternalAddressBaseResp:
+        description: 基金会账户列表
+        type: array
+        items:
+          $ref: '#/definitions/InternalAddress'
+  InternalAddress:
+    type: object
+    description: 基金会账户
+    properties:
+      address:
+        description: 基金会账户地址
+        type: string
+      type:
+        description: 地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约
+        type: integer
+      balance:
+        description: 余额
+        type: number
+      restrictingBalance:
+        description: 锁仓余额
+        type: number
+      createTime:
+        description: 创建时间
+        type: string
+      updateTime:
+        description: 修改时间
+        type: string

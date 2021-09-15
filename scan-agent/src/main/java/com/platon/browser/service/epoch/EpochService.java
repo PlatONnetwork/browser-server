@@ -4,7 +4,7 @@ import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.BlockNode;
-import com.platon.browser.dao.mapper.CustomBlockNodeMapper;
+import com.platon.browser.dao.custommapper.CustomBlockNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;

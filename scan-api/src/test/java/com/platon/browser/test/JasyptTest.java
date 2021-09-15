@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class, value = "spring.profiles.active=dev",webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = BrowserApiApplication.class,value = "spring.profiles.active=dev", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class JasyptTest {
 
     @Autowired

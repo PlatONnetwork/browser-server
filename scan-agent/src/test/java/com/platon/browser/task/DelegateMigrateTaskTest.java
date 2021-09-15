@@ -43,10 +43,10 @@ public class DelegateMigrateTaskTest extends AgentTestData {
     public void test() throws IOException {
         AppStatusUtil.setStatus(AppStatus.RUNNING);
 
-        target.cron();
-        verify(target, times(1)).cron();
+        target.delegateMigrate();
+        verify(target, times(1)).delegateMigrate();
 
         doThrow(new RuntimeException("")).when(delegationMapper).selectByExample(any());
-        target.cron();
+        target.delegateMigrate();
     }
 }

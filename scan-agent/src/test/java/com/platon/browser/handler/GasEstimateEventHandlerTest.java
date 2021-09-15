@@ -2,7 +2,7 @@ package com.platon.browser.handler;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.GasEstimateEvent;
-import com.platon.browser.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.exception.BeanCreateOrUpdateException;

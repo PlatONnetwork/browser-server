@@ -40,7 +40,6 @@ public class Arc721TxController {
      *
      * @param req
      * @return reactor.core.publisher.Mono<com.platon.browser.response.RespPage < com.platon.browser.response.token.QueryTokenTransferRecordListResp>>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/28
      */
     @PostMapping("list")
@@ -60,7 +59,6 @@ public class Arc721TxController {
      * @param tokenId  token id
      * @param response
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/27
      */
     @GetMapping("export")

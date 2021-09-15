@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TokenHolder">
     <id column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
     <id column="address" jdbcType="VARCHAR" property="address" />
-    <result column="balance" jdbcType="DECIMAL" property="balance" />
+    <result column="balance" jdbcType="VARCHAR" property="balance" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
@@ -106,7 +106,7 @@
     insert into token_holder (token_address, address, balance, 
       create_time, update_time, token_tx_qty
       )
-    values (#{tokenAddress,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{balance,jdbcType=DECIMAL}, 
+    values (#{tokenAddress,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{balance,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}
       )
   </insert>
@@ -140,7 +140,7 @@
         #{address,jdbcType=VARCHAR},
       </if>
       <if test="balance != null">
-        #{balance,jdbcType=DECIMAL},
+        #{balance,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -169,7 +169,7 @@
         address = #{record.address,jdbcType=VARCHAR},
       </if>
       <if test="record.balance != null">
-        balance = #{record.balance,jdbcType=DECIMAL},
+        balance = #{record.balance,jdbcType=VARCHAR},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -189,7 +189,7 @@
     update token_holder
     set token_address = #{record.tokenAddress,jdbcType=VARCHAR},
       address = #{record.address,jdbcType=VARCHAR},
-      balance = #{record.balance,jdbcType=DECIMAL},
+      balance = #{record.balance,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER}
@@ -201,7 +201,7 @@
     update token_holder
     <set>
       <if test="balance != null">
-        balance = #{balance,jdbcType=DECIMAL},
+        balance = #{balance,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -218,7 +218,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenHolder">
     update token_holder
-    set balance = #{balance,jdbcType=DECIMAL},
+    set balance = #{balance,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{tokenTxQty,jdbcType=INTEGER}
@@ -235,7 +235,7 @@
     (token_address, address, balance, create_time, update_time, token_tx_qty)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.balance,jdbcType=DECIMAL}, 
+      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.balance,jdbcType=VARCHAR},
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}
         )
     </foreach>
@@ -262,7 +262,7 @@
           #{item.address,jdbcType=VARCHAR}
         </if>
         <if test="'balance'.toString() == column.value">
-          #{item.balance,jdbcType=DECIMAL}
+          #{item.balance,jdbcType=VARCHAR}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}

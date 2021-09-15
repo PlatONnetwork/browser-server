@@ -61,7 +61,7 @@ public class BlockServiceTest extends AgentTestBase {
         target.getBlockAsync(1L);
 
         target.checkBlockNumber(1L);
-        doThrow(new RuntimeException("")).when(retryService).checkBlockNumber(anyLong());
+        //doThrow(new RuntimeException("")).when(retryService).checkBlockNumber(anyLong());
         target.checkBlockNumber(1L);
 
         when(onElectionAnalyzer.analyze(any(),any())).thenReturn(nodeOptList);
