@@ -12,9 +12,14 @@ import java.math.BigInteger;
  * @create: 2019-11-22 10:18:43
  **/
 public class NodeVersion {
+    private Integer programVersion;
+    public Integer getProgramVersion(){
+        return programVersion;
+    }
     @JSONField(name = "ProgramVersion")
     private Integer bigVersion;
     public void setBigVersion(String bigVersion){
+        this.programVersion = Integer.valueOf(bigVersion);
         this.bigVersion = ChainVersionUtil.toBigVersion(new BigInteger(bigVersion)).intValue();
     }
     @JSONField(name = "NodeId")
@@ -26,6 +31,7 @@ public class NodeVersion {
 		return bigVersion;
 	}
 	public void setBigVersion(Integer bigVersion) {
+        this.programVersion = bigVersion;
 		this.bigVersion = ChainVersionUtil.toBigVersion(new BigInteger(String.valueOf(bigVersion))).intValue();
 	}
 	public String getNodeId() {
