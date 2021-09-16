@@ -104,6 +104,7 @@ public class NodeUpdateTask {
 				NodeVersion version = versionMap.get(node.getNodeId());
 				if(version!=null&& !version.getBigVersion().equals(node.getBigVersion())){
 					node.setBigVersion(version.getBigVersion());
+					node.setProgramVersion(version.getProgramVersion());
 					updateNodeList.add(node);
 				}
 			});

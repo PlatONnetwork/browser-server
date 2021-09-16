@@ -219,7 +219,7 @@ public class StakingService {
                 logger.error("获取节点24小时出块率异常", e);
             }
             aliveStakingListResp.setDelegatedRewardRatio(new BigDecimal(staking.getRewardPer()).divide(Browser.PERCENTAGE).toString() + "%");
-            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
+            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getProgramVersion())));
             lists.add(aliveStakingListResp);
             i++;
         }
@@ -317,7 +317,7 @@ public class StakingService {
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
             }
-            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getBigVersion())));
+            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getProgramVersion())));
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
