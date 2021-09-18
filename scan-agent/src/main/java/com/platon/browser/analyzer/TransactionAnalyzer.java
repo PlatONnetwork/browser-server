@@ -76,14 +76,10 @@ public class TransactionAnalyzer {
      */
     private void initGeneralContractCache() {
         if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.isEmpty()) {
-            addressCache.getEvmContractAddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
-            addressCache.getWasmContractAddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
-            ercCache.getErc20AddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
-            ercCache.getErc721AddressCache()
-                    .forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC721_EVM));
+            addressCache.getEvmContractAddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.EVM));
+            addressCache.getWasmContractAddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
+            ercCache.getErc20AddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
+            ercCache.getErc721AddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC721_EVM));
         }
     }
 
@@ -97,9 +93,7 @@ public class TransactionAnalyzer {
      * @date 2021/4/20
      */
     public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
-        CollectionTransaction result = CollectionTransaction.newInstance()
-                .updateWithBlock(collectionBlock)
-                .updateWithRawTransaction(rawTransaction);
+        CollectionTransaction result = CollectionTransaction.newInstance().updateWithBlock(collectionBlock).updateWithRawTransaction(rawTransaction);
         log.info("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());
         // 使用地址缓存初始化普通合约缓存信息
         initGeneralContractCache();
@@ -111,16 +105,14 @@ public class TransactionAnalyzer {
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             receipt.getContractCreated().forEach(contract -> {
                 // solidity 类型 erc20 或 721 token检测及入口
-                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress());
+                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
                 // solidity or wasm
                 TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
                 // 内存中更新地址类型
                 ContractTypeEnum contractTypeEnum;
-                if (ercToken.getTypeEnum() == ErcTypeEnum.ERC20
-                        && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
+                if (ercToken.getTypeEnum() == ErcTypeEnum.ERC20 && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
                     contractTypeEnum = ContractTypeEnum.ERC20_EVM;
-                } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC721
-                        && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
+                } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC721 && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
                     contractTypeEnum = ContractTypeEnum.ERC721_EVM;
                 } else if (txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
                     contractTypeEnum = ContractTypeEnum.WASM;
@@ -176,12 +168,10 @@ public class TransactionAnalyzer {
         }
 
         if (ci.getType() == null) {
-            throw new BeanCreateOrUpdateException(
-                    "交易类型为空,遇到未知交易:[blockNumber=" + result.getNum() + ",txHash=" + result.getHash() + "]");
+            throw new BeanCreateOrUpdateException("交易类型为空,遇到未知交易:[blockNumber=" + result.getNum() + ",txHash=" + result.getHash() + "]");
         }
         if (ci.getToType() == null) {
-            throw new BeanCreateOrUpdateException(
-                    "To地址为空:[blockNumber=" + result.getNum() + ",txHash=" + result.getHash() + "]");
+            throw new BeanCreateOrUpdateException("To地址为空:[blockNumber=" + result.getNum() + ",txHash=" + result.getHash() + "]");
         }
 
         // 默认取状态字段作为交易成功与否的状态
@@ -193,17 +183,17 @@ public class TransactionAnalyzer {
 
         // 交易信息
         result.setGasUsed(receipt.getGasUsed().toString())
-                .setCost(result.decimalGasUsed().multiply(result.decimalGasPrice()).toString())
-                .setFailReason(receipt.getFailReason())
-                .setStatus(status)
-                .setSeq(result.getNum() * 100000 + result.getIndex())
-                .setInfo(ci.getInfo())
-                .setType(ci.getType())
-                .setToType(ci.getToType())
-                .setContractAddress(receipt.getContractAddress())
-                .setContractType(ci.getContractType())
-                .setBin(ci.getBinCode())
-                .setMethod(ci.getMethod());
+              .setCost(result.decimalGasUsed().multiply(result.decimalGasPrice()).toString())
+              .setFailReason(receipt.getFailReason())
+              .setStatus(status)
+              .setSeq(result.getNum() * 100000 + result.getIndex())
+              .setInfo(ci.getInfo())
+              .setType(ci.getType())
+              .setToType(ci.getToType())
+              .setContractAddress(receipt.getContractAddress())
+              .setContractType(ci.getContractType())
+              .setBin(ci.getBinCode())
+              .setMethod(ci.getMethod());
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 累加总交易数
@@ -235,8 +225,7 @@ public class TransactionAnalyzer {
                 collectionBlock.setDQty(collectionBlock.getDQty() + 1);
                 break;
             case CLAIM_REWARDS: // 领取委托奖励
-                DelegateRewardClaimParam param =
-                        DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
+                DelegateRewardClaimParam param = DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
                 if (status == Receipt.SUCCESS) {
                     // 成功的领取交易才解析info回填
                     param = result.getTxParam(DelegateRewardClaimParam.class);
