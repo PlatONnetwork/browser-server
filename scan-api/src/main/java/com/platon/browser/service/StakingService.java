@@ -465,7 +465,13 @@ public class StakingService {
                      * 版本声明
                      */
                     case VERSION:
-                        stakingOptRecordListResp.setVersion(desces[2]);
+                        String v = desces[2];
+                        if(StringUtils.isNotBlank(v)){
+                            v=ChainVersionUtil.toStringVersion(new BigInteger(v));
+                        } else {
+                            v="0";
+                        }
+                        stakingOptRecordListResp.setVersion(v);
                         stakingOptRecordListResp.setType("12");
                         break;
                     default:
