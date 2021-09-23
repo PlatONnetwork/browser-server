@@ -81,6 +81,7 @@ public class ErcTxService {
 
     @Resource
     private DownFileCommon downFileCommon;
+
     @Resource
     private AddressMapper addressMapper;
 
@@ -347,7 +348,7 @@ public class ErcTxService {
         }
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
         List<String> contractAddressList = new ArrayList<>();
-        Map<String,List<QueryHolderTokenListResp>> respMap = new HashMap<>();
+        Map<String, List<QueryHolderTokenListResp>> respMap = new HashMap<>();
         ids.stream().forEach(tokenHolder -> {
             String contractAddress = tokenHolder.getTokenAddress();
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
@@ -373,16 +374,16 @@ public class ErcTxService {
         AddressExample condition = new AddressExample();
         condition.createCriteria().andAddressIn(contractAddressList);
         List<Address> contractList = addressMapper.selectByExample(condition);
-        if(!contractList.isEmpty()){
-            contractList.forEach(e->{
-                int isDestroy = StringUtils.isBlank(e.getContractDestroyHash())?0:1;
+        if (!contractList.isEmpty()) {
+            contractList.forEach(e -> {
+                int isDestroy = StringUtils.isBlank(e.getContractDestroyHash()) ? 0 : 1;
                 List<QueryHolderTokenListResp> respList = respMap.get(e.getAddress());
-                if(respList!=null){
-                    respList.forEach(r->r.setIsContractDestroy(isDestroy));
+                if (respList != null) {
+                    respList.forEach(r -> r.setIsContractDestroy(isDestroy));
                 }
             });
         }
-
+        listResps.stream().sorted(Comparator.comparingInt(QueryHolderTokenListResp::getIsContractDestroy));
         result.init(ids, listResps);
         return result;
     }
