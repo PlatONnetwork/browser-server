@@ -383,7 +383,12 @@ public class ErcTxService {
                 }
             });
         }
-        listResps.stream().sorted(Comparator.comparingInt(QueryHolderTokenListResp::getIsContractDestroy));
+        listResps.sort(new Comparator<QueryHolderTokenListResp>() {
+            @Override
+            public int compare(QueryHolderTokenListResp o1, QueryHolderTokenListResp o2) {
+                return o1.getIsContractDestroy() - o2.getIsContractDestroy();
+            }
+        });
         result.init(ids, listResps);
         return result;
     }
