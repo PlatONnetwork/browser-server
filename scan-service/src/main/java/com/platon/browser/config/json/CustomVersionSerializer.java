@@ -22,9 +22,7 @@ public class CustomVersionSerializer extends JsonSerializer<String> {
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        if (StrUtil.contains(value, ".")) {
-            gen.writeString(value);
-        } else if (StringUtils.isNotBlank(value)) {
+        if (StringUtils.isNotBlank(value)) {
             gen.writeString(ChainVersionUtil.toStringVersion(new BigInteger(value)));
         } else {
             gen.writeString("");
