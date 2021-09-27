@@ -79,4 +79,15 @@
         </foreach>
     </update>
 
+    <select id="findContractDestroy" parameterType="integer" resultType="string">
+        select
+            address
+        from
+            address a
+        where
+            (a.`contract_destroy_hash` is not null
+            or a.`contract_destroy_hash` != '')
+	        and a.`type` = #{type}
+    </select>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.platon.browser.dao.custommapper;
 
 import com.platon.browser.bean.CustomTokenInventory;
+import com.platon.browser.bean.Erc721ContractDestroyBalanceVO;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryKey;
 import org.apache.ibatis.annotations.Param;
@@ -14,5 +15,7 @@ public interface CustomTokenInventoryMapper {
     void burnAndDelTokenInventory(@Param("list") List<TokenInventoryKey> list);
 
     CustomTokenInventory selectTokenInventory(TokenInventoryKey key);
+
+    List<Erc721ContractDestroyBalanceVO> findErc721ContractDestroyBalance(@Param("tokenAddress") String tokenAddress);
 
 }
