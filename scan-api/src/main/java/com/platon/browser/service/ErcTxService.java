@@ -402,6 +402,9 @@ public class ErcTxService {
         Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
         Map<String, Long> maps = totalTokenInventory.getResult().stream().collect(Collectors.groupingBy(TokenInventory::getOwner, Collectors.counting()));
         String[] headers = new String[0];
+        String[] erc20Headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+        String[] erc721Headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_AMOUNT, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+        headers = erc20Headers;
         for (CustomTokenHolder customTokenHolder : rs) {
             BigDecimal balance = this.getAddressBalance(customTokenHolder);
             BigDecimal originBalance = ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal());
@@ -417,13 +420,13 @@ public class ErcTxService {
                     // 总供应量大于0, 使用实际的余额除以总供应量
                     percent = originBalance.divide(totalSupply, decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
                 }
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+                headers=erc20Headers;
             } else {
                 //erc721
                 int holderNum = maps.get(customTokenHolder.getAddress()).intValue();
                 long total = totalTokenInventory.size();
                 percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_AMOUNT, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+                headers = erc721Headers;
             }
             Object[] row = {customTokenHolder.getAddress(), HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()), percent};
             rows.add(row);

@@ -126,6 +126,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setStakingReduction(BigDecimal.ONE);
         staking.setJoinTime(new Date());
         staking.setDeleAnnualizedRate(120.00);
+        staking.setProgramVersion(1792);
         staking.setBigVersion(1792);
         when(nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
         Address address = new Address();
