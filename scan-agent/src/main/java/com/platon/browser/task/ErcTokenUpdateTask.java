@@ -667,7 +667,7 @@ public class ErcTokenUpdateTask {
     }
 
     /**
-     * 销毁的更新余额
+     * 销毁的合约更新余额
      *
      * @param :
      * @return: void
