@@ -678,45 +678,7 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
-        contractErc20DestroyUpdateBalance();
         contractErc721DestroyUpdateBalance();
-    }
-
-    /**
-     * 销毁的erc20更新余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2021/9/27
-     */
-    private void contractErc20DestroyUpdateBalance() {
-        try {
-            List<String> contractErc20Destroys = customAddressMapper.findContractDestroy(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
-            if (CollUtil.isNotEmpty(contractErc20Destroys)) {
-                for (String tokenAddress : contractErc20Destroys) {
-                    Page<CustomTokenHolder> ids = customTokenHolderMapper.selectListByParams(tokenAddress, null, null);
-                    List<TokenHolder> updateParams = new ArrayList<>();
-                    String balance = "0";
-                    StringBuilder res = new StringBuilder();
-                    for (CustomTokenHolder tokenHolder : ids) {
-                        if (!tokenHolder.getBalance().equalsIgnoreCase(balance)) {
-                            TokenHolder updateTokenHolder = new TokenHolder();
-                            updateTokenHolder.setTokenAddress(tokenHolder.getTokenAddress());
-                            updateTokenHolder.setAddress(tokenHolder.getAddress());
-                            updateTokenHolder.setBalance(cn.hutool.core.convert.Convert.toStr(balance));
-                            updateParams.add(updateTokenHolder);
-                            res.append(StrUtil.format("[合约{}，余额{}->{}] ", tokenHolder.getTokenAddress(), tokenHolder.getBalance(), cn.hutool.core.convert.Convert.toStr(balance)));
-                        }
-                    }
-                    if (CollUtil.isNotEmpty(updateParams)) {
-                        customTokenHolderMapper.batchUpdate(updateParams);
-                        log.info("销毁的erc20[{}]更新余额成功，结果为{}", tokenAddress, res.toString());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("销毁的erc20更新余额异常", e);
-        }
     }
 
     /**
