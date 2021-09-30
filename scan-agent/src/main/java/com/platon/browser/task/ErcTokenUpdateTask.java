@@ -694,7 +694,7 @@ public class ErcTokenUpdateTask {
             if (CollUtil.isNotEmpty(contractErc721Destroys)) {
                 for (String tokenAddress : contractErc721Destroys) {
                     List<Erc721ContractDestroyBalanceVO> list = customTokenInventoryMapper.findErc721ContractDestroyBalance(tokenAddress);
-                    Page<CustomTokenHolder> ids = customTokenHolderMapper.selectListByParams(tokenAddress, null, null);
+                    Page<CustomTokenHolder> ids = customTokenHolderMapper.selectERC721Holder(tokenAddress);
                     List<TokenHolder> updateParams = new ArrayList<>();
                     StringBuilder res = new StringBuilder();
                     for (CustomTokenHolder tokenHolder : ids) {
