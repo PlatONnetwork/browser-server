@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
@@ -12,13 +11,13 @@ import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.custommapper.CustomDelegationMapper;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.custommapper.CustomDelegationMapper;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -219,7 +218,11 @@ public class StakingService {
                 logger.error("获取节点24小时出块率异常", e);
             }
             aliveStakingListResp.setDelegatedRewardRatio(new BigDecimal(staking.getRewardPer()).divide(Browser.PERCENTAGE).toString() + "%");
-            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getProgramVersion())));
+            if (staking.getProgramVersion() != 0) {
+                aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getProgramVersion())));
+            } else {
+                aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
+            }
             lists.add(aliveStakingListResp);
             i++;
         }
@@ -466,10 +469,10 @@ public class StakingService {
                      */
                     case VERSION:
                         String v = desces[2];
-                        if(StringUtils.isNotBlank(v)){
-                            v=ChainVersionUtil.toStringVersion(new BigInteger(v));
+                        if (StringUtils.isNotBlank(v)) {
+                            v = ChainVersionUtil.toStringVersion(new BigInteger(v));
                         } else {
-                            v="0";
+                            v = "0";
                         }
                         stakingOptRecordListResp.setVersion(v);
                         stakingOptRecordListResp.setType("12");

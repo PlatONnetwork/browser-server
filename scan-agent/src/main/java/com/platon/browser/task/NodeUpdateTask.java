@@ -31,89 +31,94 @@ import java.util.*;
 @Component
 @Slf4j
 public class NodeUpdateTask {
-	
+
     @Resource
     private BlockChainConfig chainConfig;
+
     @Resource
     private NodeMapper nodeMapper;
+
     @Resource
     private StakeBusinessMapper stakeBusinessMapper;
-	@Resource
-	private PlatOnClient platOnClient;
+
     @Resource
-	private SpecialApi specialApi;
-	
+    private PlatOnClient platOnClient;
+
+    @Resource
+    private SpecialApi specialApi;
+
     @Scheduled(cron = "0/5  * * * * ?")
-    public void nodeUpdate () {
-    	// 只有程序正常运行才执行任务
-		if(!AppStatusUtil.isRunning()) return;
-		try {
-			//查询待补充的质押信息
-			List<Node> nodeList = nodeMapper.selectByExample(null);
-			
-			Map<String, Optional<KeyBaseUserInfo>> cache = new HashMap<>();
-			List<Node> updateNodeList = new ArrayList<>();
+    public void nodeUpdate() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) return;
+        try {
+            //查询待补充的质押信息
+            List<Node> nodeList = nodeMapper.selectByExample(null);
 
-			// 查询节点版本号列表
-			List<NodeVersion> versionList = specialApi.getNodeVersionList(platOnClient.getWeb3jWrapper().getWeb3j());
-			Map<String,NodeVersion> versionMap = new HashMap<>();
-			versionList.forEach(v->versionMap.put(v.getNodeId(),v));
+            Map<String, Optional<KeyBaseUserInfo>> cache = new HashMap<>();
+            List<Node> updateNodeList = new ArrayList<>();
 
-			// 请求URL前缀
-			String prefix = chainConfig.getKeyBase().concat(chainConfig.getKeyBaseApi());
-			nodeList.forEach(node -> {
+            // 查询节点版本号列表
+            List<NodeVersion> versionList = specialApi.getNodeVersionList(platOnClient.getWeb3jWrapper().getWeb3j());
+            Map<String, NodeVersion> versionMap = new HashMap<>();
+            versionList.forEach(v -> versionMap.put(v.getNodeId(), v));
 
-				// 更新keybase相关信息
-				if( node.getExternalId().trim().length() == 16){
-					Optional<KeyBaseUserInfo> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
-						String url = prefix.concat(key);
-						try {
-							KeyBaseUserInfo keyBaseUser = HttpUtil.get(url,KeyBaseUserInfo.class);
-							return Optional.of(keyBaseUser);
-						} catch (HttpRequestException e) {
-							log.error("get keybase error:key={}",key,e);
-							return Optional.ofNullable(null);
-						}
-					});
+            // 请求URL前缀
+            String prefix = chainConfig.getKeyBase().concat(chainConfig.getKeyBaseApi());
+            nodeList.forEach(node -> {
 
-					optional.ifPresent(keyBaseUser ->{
-						boolean hasChange = false;
-						try {
-							String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
-							String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
-							
-							if(StringUtils.isNotBlank(icon)&&!icon.equals(node.getNodeIcon())){
-								node.setNodeIcon(icon);
-								hasChange = true;
-							}
-							if(StringUtils.isNotBlank(userName)&&!userName.equals(node.getExternalName())){
-								node.setExternalName(userName);
-								hasChange = true;
-							}
-						} catch (Exception e) {
-							log.error("get keybase error:keyBaseUser={}",JSONObject.toJSONString(keyBaseUser),e);
-						}
+                // 更新keybase相关信息
+                if (node.getExternalId().trim().length() == 16) {
+                    Optional<KeyBaseUserInfo> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
+                        String url = prefix.concat(key);
+                        try {
+                            KeyBaseUserInfo keyBaseUser = HttpUtil.get(url, KeyBaseUserInfo.class);
+                            return Optional.of(keyBaseUser);
+                        } catch (HttpRequestException e) {
+                            log.error("get keybase error:key={}", key, e);
+                            return Optional.ofNullable(null);
+                        }
+                    });
 
-						if(hasChange) {
-							updateNodeList.add(node);
-						}
-					});
-				}
+                    optional.ifPresent(keyBaseUser -> {
+                        boolean hasChange = false;
+                        try {
+                            String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
+                            String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
 
-				// 更新节点版本号相关信息
-				NodeVersion version = versionMap.get(node.getNodeId());
-				if(version!=null&& !version.getBigVersion().equals(node.getBigVersion())){
-					node.setBigVersion(version.getBigVersion());
-					node.setProgramVersion(version.getProgramVersion());
-					updateNodeList.add(node);
-				}
-			});
-			
-			if(!updateNodeList.isEmpty()) {
-				stakeBusinessMapper.updateNodeForTask(updateNodeList);
-			}
-		} catch (Exception e) {
-            log.error("on NodeUpdateTask error",e);
-		}
-    }   
+                            if (StringUtils.isNotBlank(icon) && !icon.equals(node.getNodeIcon())) {
+                                node.setNodeIcon(icon);
+                                hasChange = true;
+                            }
+                            if (StringUtils.isNotBlank(userName) && !userName.equals(node.getExternalName())) {
+                                node.setExternalName(userName);
+                                hasChange = true;
+                            }
+                        } catch (Exception e) {
+                            log.error("get keybase error:keyBaseUser={}", JSONObject.toJSONString(keyBaseUser), e);
+                        }
+
+                        if (hasChange) {
+                            updateNodeList.add(node);
+                        }
+                    });
+                }
+
+                // 更新节点版本号相关信息
+                NodeVersion version = versionMap.get(node.getNodeId());
+                if (version != null && (!version.getBigVersion().equals(node.getBigVersion()) || !version.getProgramVersion().equals(node.getProgramVersion()))) {
+                    node.setBigVersion(version.getBigVersion());
+                    node.setProgramVersion(version.getProgramVersion());
+                    updateNodeList.add(node);
+                }
+            });
+
+            if (!updateNodeList.isEmpty()) {
+                stakeBusinessMapper.updateNodeForTask(updateNodeList);
+            }
+        } catch (Exception e) {
+            log.error("on NodeUpdateTask error", e);
+        }
+    }
+
 }
