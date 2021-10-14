@@ -19,24 +19,21 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "**/KeyBaseAnalysis.java," +
+        property "sonar.coverage.exclusions", "**/KeyBaseAnalysis.java," +
                 "src/main/java/**/bean/**," +
-                "src/main/java/**/enums/**," +
+                "src/main/java/**/aop/**," +
+                "src/main/java/**/cache/**," +
+                "src/main/java/**/client/**," +
                 "src/main/java/**/config/**," +
-                "src/main/java/**/util/**," +
-                "src/main/java/**/erc20/**," +
-                "**/SpecialApi.java,**/JedisNoResultCall.java," +
-                "**/JdkSerializer.java,**/JedisClusterManager.java," +
-                "**/JedisHelper.java,**/SerializerUtils.java,**/*Application.java," +
-                "**/BusinessException.java,**/I18nUtil.java,**/HttpUtil.java," +
-                "**/RedisStatisticService.java,**/RedisService.java,**/JedisSerializeUtil.java," +
-                "**/PlatOnClient.java,**/RetryableClient.java,**/SleepUtil.java," +
-                "**/CacheBase.java,**/NullStringJsonSerializer.java,**/RoundCalculation.java," +
-                "**/DownFileCommon.java,**/AccountDownload.java,**/BlockDownload.java," +
-                "**/BrowserCache.java,**/JedisNoResultCall.java,**/CommonMethod.java," +
-                "**/NullStringJsonSerializer.java,**/AccuVerifiersCount.java,**/BlockListResp.java," +
-                "**/AliveStakingListResp.java,**/QueryDetailResp.java,**/res/token/*.java,**/converter/*.java," +
-                "**/ERC20Client.java,**/ESQueryBuilderConstructor.java,**/ESSimpleExpression.java,"
-                "**/InnerTxESRepository.java,**/ESRepository.java"
+                "src/main/java/**/constant/**," +
+                "src/main/java/**/decoder/**," +
+                "src/main/java/**/enums/**," +
+                "src/main/java/**/exception/**," +
+                "src/main/java/**/filter/**," +
+                "src/main/java/**/interceptor/**," +
+                "src/main/java/**/utils/**," +
+                "src/main/java/**/v0150/**," +
+                "src/main/java/**/v0152/**,"
+
     }
 }

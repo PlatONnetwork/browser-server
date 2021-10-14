@@ -25,15 +25,14 @@ dependencies {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "src/main/java/**/dao/param**,**/*Mapper.java," +
-                "**/*Application.java,**/NodeUpdateTask.java,**/NetworkStatUpdateTask.java," +
-                "**/ProposalInfoTask.java,**/AddressUpdateTask.java,**/EpochMessage.java," +
-                "**/NetworkStatCache.java,**/ShutdownCallback.java,**/AccountService.java," +
-                "**/OnSettleConverter.java,**/PersistenceEvent.java,**/AddressTypeEnum.java," +
-                "**/ConfigChange.java,**/TxAnalyseResult.java,**/DelegateExitResult.java," +
-                "**/CalculateUtils.java,**/PersistenceEventHandler.java,**/DelegateRewardClaimConverter.java," +
-                "**/EsDelegateRewardService.java,**/ERC20Client.java,**/TransferEventConverter.java,"+
-                "**/StakingDelegateBalanceAdjustmentServiceTest2.java"
+        property "sonar.coverage.exclusions", "src/main/java/**/dao/param**,**/*Mapper.java," +
+                "**/*Application.java," +
+                "**src/main/java/**/task/**," +
+                "**src/main/java/**/utils/**," +
+                "**src/main/java/**/exception/**," +
+                "**src/main/java/**/cache/**," +
+                "**src/main/java/**/bean/**," +
+                "**src/main/java/**/v0152/**,"
 
     }
 }
