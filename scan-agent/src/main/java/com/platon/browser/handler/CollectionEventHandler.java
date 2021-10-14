@@ -116,8 +116,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
 
         // 使用已入库的交易数量初始化交易ID初始值
-        if (transactionId == 0)
-            transactionId = networkStatCache.getNetworkStat().getTxQty();
+        if (transactionId == 0) transactionId = networkStatCache.getNetworkStat().getTxQty();
 
         try {
             List<Transaction> transactions = event.getTransactions();
@@ -134,11 +133,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             // 统计业务参数
             statisticService.analyze(event);
 
-            if (!txAnalyseResult.getNodeOptList().isEmpty())
-                nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
-
-            complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1,
-                    txAnalyseResult.getDelegationRewardList(), event.getTraceId());
+            if (!txAnalyseResult.getNodeOptList().isEmpty()) nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
             txDeleteBatchCount++;
             optDeleteBatchCount++;
@@ -180,13 +175,16 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 });
                 customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.values());
             }
+            complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
             // 释放对象引用
             event.releaseRef();
         } catch (Exception e) {
             log.error("", e);
             throw e;
         } finally {
-            log.info("清除地址缓存[addressCache]数据[{}]条,addressCache:({})", addressCache.getAll().size(), JSONUtil.toJsonStr(addressCache.getAll().stream().map(v -> v.getAddress()).collect(Collectors.toList())));
+            log.info("清除地址缓存[addressCache]数据[{}]条,addressCache:({})",
+                     addressCache.getAll().size(),
+                     JSONUtil.toJsonStr(addressCache.getAll().stream().map(v -> v.getAddress()).collect(Collectors.toList())));
             // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
             // 因为地址缓存是当前事务处理的增量缓存，在 StatisticsAddressAnalyzer 进行数据合并入库时：
             // 1、如果出现异常，由于事务保证，当前事务统计的地址数据不会入库mysql，此时应该清空增量缓存，等待下次重试时重新生成缓存

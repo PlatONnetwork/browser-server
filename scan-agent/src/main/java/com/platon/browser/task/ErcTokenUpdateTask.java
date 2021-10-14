@@ -198,6 +198,8 @@ public class ErcTokenUpdateTask {
         }
         // 分批并发查询Token totalSupply
         batchList.forEach(b -> {
+            // 过滤销毁的合约
+
             CountDownLatch latch = new CountDownLatch(b.size());
             for (ErcToken token : b) {
                 TOKEN_UPDATE_POOL.submit(() -> {
