@@ -524,7 +524,7 @@ public class ErcTokenUpdateTask {
         // 当前页码
         int page = pageNum;
         // 分页更新token库存相关信息
-        List<TokenInventory> batch = null;
+        List<TokenInventory> res = null;
         do {
             // 当次更新的条数
             int updateNum = 0;
@@ -535,12 +535,14 @@ public class ErcTokenUpdateTask {
             try {
                 TokenInventoryExample condition = new TokenInventoryExample();
                 condition.setOrderByClause(" id asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
-                batch = tokenInventoryMapper.selectByExample(condition);
+                List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
+                // 过滤销毁的合约
+                res = tokenInventorySubtractToList(batch, destroyContractCache.getDestroyContracts());
                 List<TokenInventory> updateParams = new ArrayList<>();
-                if (!batch.isEmpty()) {
-                    batchNum = batch.size();
+                if (!res.isEmpty()) {
+                    batchNum = res.size();
                     int finalPage = page;
-                    batch.forEach(inventory -> {
+                    res.forEach(inventory -> {
                         String tokenURI = "";
                         try {
                             tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
@@ -579,12 +581,12 @@ public class ErcTokenUpdateTask {
                                 } else {
                                     errorNum.getAndIncrement();
                                     log.warn("http请求异常：http状态码:{},http消息:{},当前标识为:{},token_address:{}, token_id:{}, tokenURI:{}",
-                                              response.code(),
-                                              response.message(),
-                                              pageNum,
-                                              inventory.getTokenAddress(),
-                                              inventory.getTokenId(),
-                                              tokenURI);
+                                             response.code(),
+                                             response.message(),
+                                             pageNum,
+                                             inventory.getTokenAddress(),
+                                             inventory.getTokenId(),
+                                             tokenURI);
                                 }
                             } else {
                                 errorNum.getAndIncrement();
@@ -606,7 +608,27 @@ public class ErcTokenUpdateTask {
             } finally {
                 page++;
             }
-        } while (CollUtil.isNotEmpty(batch));
+        } while (CollUtil.isNotEmpty(res));
+    }
+
+    /**
+     * 过滤销毁的合约
+     *
+     * @param list:
+     * @param destroyContracts:
+     * @return: java.util.List<com.platon.browser.dao.entity.TokenInventory>
+     * @date: 2021/10/15
+     */
+    private List<TokenInventory> tokenInventorySubtractToList(List<TokenInventory> list, Set<String> destroyContracts) {
+        List<TokenInventory> res = CollUtil.newArrayList();
+        if (CollUtil.isNotEmpty(list)) {
+            for (TokenInventory tokenInventory : list) {
+                if (!destroyContracts.contains(tokenInventory.getTokenAddress())) {
+                    res.add(tokenInventory);
+                }
+            }
+        }
+        return res;
     }
 
     /**
@@ -655,10 +677,11 @@ public class ErcTokenUpdateTask {
             condition.setOrderByClause(" id asc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
             // 分页更新token库存相关信息
             List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
-            batchNum = CommonUtil.ofNullable(() -> batch.size()).orElse(0);
+            List<TokenInventory> res = tokenInventorySubtractToList(batch, destroyContractCache.getDestroyContracts());
+            batchNum = CommonUtil.ofNullable(() -> res.size()).orElse(0);
             List<TokenInventory> updateParams = new ArrayList<>();
-            if (CollUtil.isNotEmpty(batch)) {
-                batch.forEach(inventory -> {
+            if (CollUtil.isNotEmpty(res)) {
+                res.forEach(inventory -> {
                     String tokenURI = "";
                     try {
                         tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
@@ -697,12 +720,12 @@ public class ErcTokenUpdateTask {
                             } else {
                                 errorNum.getAndIncrement();
                                 log.warn("http请求异常：http状态码:{},http消息:{},当前标识为:{},token_address:{}, token_id:{}, tokenURI:{}",
-                                          response.code(),
-                                          response.message(),
-                                          pageNum,
-                                          inventory.getTokenAddress(),
-                                          inventory.getTokenId(),
-                                          tokenURI);
+                                         response.code(),
+                                         response.message(),
+                                         pageNum,
+                                         inventory.getTokenAddress(),
+                                         inventory.getTokenId(),
+                                         tokenURI);
                             }
                         } else {
                             errorNum.getAndIncrement();
@@ -729,7 +752,7 @@ public class ErcTokenUpdateTask {
     }
 
     /**
-     * 销毁的合约更新余额
+     * 销毁的721合约更新余额
      *
      * @param :
      * @return: void
