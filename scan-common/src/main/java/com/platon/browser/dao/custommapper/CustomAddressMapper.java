@@ -24,4 +24,5 @@ public interface CustomAddressMapper {
      */
     List<String> findContractDestroy(@Param("type") Integer type);
 
+
 }

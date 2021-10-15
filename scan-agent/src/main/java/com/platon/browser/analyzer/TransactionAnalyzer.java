@@ -5,6 +5,7 @@ import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.DestroyContractCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.decoder.TxInputDecodeResult;
@@ -54,6 +55,9 @@ public class TransactionAnalyzer {
 
     @Resource
     private ErcTokenAnalyzer ercTokenAnalyzer;
+
+    @Resource
+    private DestroyContractCache destroyContractCache;
 
     // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存和erc緩存
     // <普通合约地址,合约类型枚举>
@@ -139,9 +143,20 @@ public class TransactionAnalyzer {
         } else {
             // to地址为空 或者 contractAddress有值时代表交易为创建合约
             if (StringUtils.isBlank(result.getTo())) {
-                TransactionUtil.resolveGeneralContractCreateTxComplementInfo(result, receipt.getContractAddress(), platOnClient, ci, log, GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(receipt.getContractAddress()));
+                TransactionUtil.resolveGeneralContractCreateTxComplementInfo(result,
+                                                                             receipt.getContractAddress(),
+                                                                             platOnClient,
+                                                                             ci,
+                                                                             log,
+                                                                             GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(receipt.getContractAddress()));
                 result.setTo(receipt.getContractAddress());
-                log.info("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]", result.getHash(), result.getFrom(), result.getTo(), ci.getType(), ci.getToType(), ci.getContractType());
+                log.info("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
+                         result.getHash(),
+                         result.getFrom(),
+                         result.getTo(),
+                         ci.getType(),
+                         ci.getToType(),
+                         ci.getContractType());
             } else {
                 if (GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.containsKey(result.getTo()) && inputWithoutPrefix.length() >= 8) {
                     // 如果是普通合约调用（EVM||WASM）
@@ -151,11 +166,22 @@ public class TransactionAnalyzer {
                     result.setStatus(receipt.getStatus());
                     if (result.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                         // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表
-                        List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock, specialApi, platOnClient, result, receipt, log);
+                        List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
+                                                                                                                                             specialApi,
+                                                                                                                                             platOnClient,
+                                                                                                                                             result,
+                                                                                                                                             receipt,
+                                                                                                                                             log);
                         // 把成功的虚拟交易挂到当前普通合约交易上
                         result.setVirtualTransactions(successVirtualTransactions);
                     }
-                    log.info("当前交易[{}]为普通合约调用,from[{}],to[{}],type为[{}],toType[{}],虚拟交易数为[{}]", result.getHash(), result.getFrom(), result.getTo(), ci.getType(), ci.getToType(), result.getVirtualTransactions().size());
+                    log.info("当前交易[{}]为普通合约调用,from[{}],to[{}],type为[{}],toType[{}],虚拟交易数为[{}]",
+                             result.getHash(),
+                             result.getFrom(),
+                             result.getTo(),
+                             ci.getType(),
+                             ci.getToType(),
+                             result.getVirtualTransactions().size());
                 } else {
                     BigInteger value = StringUtils.isNotBlank(result.getValue()) ? new BigInteger(result.getValue()) : BigInteger.ZERO;
                     if (value.compareTo(BigInteger.ZERO) >= 0) {
@@ -195,6 +221,10 @@ public class TransactionAnalyzer {
               .setBin(ci.getBinCode())
               .setMethod(ci.getMethod());
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
+
+        if (ci.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {
+            destroyContractCache.getDestroyContracts().add(receipt.getContractAddress());
+        }
 
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);
@@ -245,7 +275,14 @@ public class TransactionAnalyzer {
         }
         // 累加当前交易的手续费到当前区块的txFee
         String txFee = collectionBlock.decimalTxFee().add(result.decimalCost()).toString();
-        log.info("当前区块[{}]交易[{}]:区块累计手续费[{}]=累计手续费[{}]+交易成本[{}](gas燃料[{}] * gas价格[{}])", collectionBlock.getNum(), result.getHash(), txFee, collectionBlock.decimalTxFee(), result.decimalCost(), result.decimalGasUsed(), result.decimalGasPrice());
+        log.info("当前区块[{}]交易[{}]:区块累计手续费[{}]=累计手续费[{}]+交易成本[{}](gas燃料[{}] * gas价格[{}])",
+                 collectionBlock.getNum(),
+                 result.getHash(),
+                 txFee,
+                 collectionBlock.decimalTxFee(),
+                 result.decimalCost(),
+                 result.decimalGasUsed(),
+                 result.decimalGasPrice());
         collectionBlock.setTxFee(txFee);
         // 累加当前交易的能量限制到当前区块的txGasLimit
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(result.decimalGasLimit()).toString());

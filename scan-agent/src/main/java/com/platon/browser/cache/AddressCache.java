@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * 地址统计缓存，谨慎使用
  * 在A区块由BlockEventHandler进入CollectionEventHandler，还没有来得及清除缓存的时候，A+1区块进入到BlockEventHandler或CollectionEventHandler中就会读取到脏数据
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/20
  */
 @Slf4j
@@ -68,16 +67,11 @@ public class AddressCache {
     }
 
     public Integer getTypeData(String address) {
-        if (InnerContractAddrEnum.getAddresses().contains(address))
-            return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
-        if (this.isEvmContractAddress(address))
-            return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
-        if (this.isWasmContractAddress(address))
-            return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
-        if (isErc20ContractAddress(address))
-            return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
-        if (isErc721ContractAddress(address))
-            return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
+        if (InnerContractAddrEnum.getAddresses().contains(address)) return Transaction.ToTypeEnum.INNER_CONTRACT.getCode();
+        if (this.isEvmContractAddress(address)) return Transaction.ToTypeEnum.EVM_CONTRACT.getCode();
+        if (this.isWasmContractAddress(address)) return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
+        if (isErc20ContractAddress(address)) return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
+        if (isErc721ContractAddress(address)) return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
         return Transaction.ToTypeEnum.ACCOUNT.getCode();
     }
 
@@ -160,8 +154,7 @@ public class AddressCache {
     }
 
     private void updateAddress(Transaction tx, String addr) {
-        if (addr == null)
-            return;
+        if (addr == null) return;
         Address address = this.addressMap.get(addr);
         if (address == null) {
             address = this.createDefaultAddress(addr);
@@ -232,8 +225,7 @@ public class AddressCache {
     }
 
     private void updateContractFromAddress(String addr) {
-        if (addr == null)
-            return;
+        if (addr == null) return;
         Address address = this.addressMap.get(addr);
         if (address == null) {
             address = this.createDefaultAddress(addr);
@@ -252,8 +244,7 @@ public class AddressCache {
      * @date 2021/4/14
      */
     public void updateErc20TxQty(String addr) {
-        if (addr == null)
-            return;
+        if (addr == null) return;
         Address address = this.addressMap.get(addr);
         if (address == null) {
             address = this.createDefaultAddress(addr);
@@ -272,8 +263,7 @@ public class AddressCache {
      * @date 2021/4/14
      */
     public void updateErc721TxQty(String addr) {
-        if (addr == null)
-            return;
+        if (addr == null) return;
         Address address = this.addressMap.get(addr);
         if (address == null) {
             address = this.createDefaultAddress(addr);
@@ -323,8 +313,7 @@ public class AddressCache {
      * @param addressList 地址实体列表
      */
     public void initEvmContractAddressCache(List<Address> addressList) {
-        if (addressList.isEmpty())
-            return;
+        if (addressList.isEmpty()) return;
         this.evmContractAddressCache.clear();
         addressList.forEach(address -> {
             if (address.getType() == AddressTypeEnum.EVM_CONTRACT.getCode()) {
@@ -339,8 +328,7 @@ public class AddressCache {
      * @param addressList 地址实体列表
      */
     public void initWasmContractAddressCache(List<Address> addressList) {
-        if (addressList.isEmpty())
-            return;
+        if (addressList.isEmpty()) return;
         this.wasmContractAddressCache.clear();
         addressList.forEach(address -> {
             if (address.getType() == AddressTypeEnum.WASM_CONTRACT.getCode()) {
@@ -355,8 +343,7 @@ public class AddressCache {
     public void initOnFirstStart() {
         log.info("初始化内置地址");
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
-            this.addressMap.put(contractDescEnum.getAddress(),
-                    this.createDefaultAddress(contractDescEnum.getAddress()));
+            this.addressMap.put(contractDescEnum.getAddress(), this.createDefaultAddress(contractDescEnum.getAddress()));
         }
     }
 

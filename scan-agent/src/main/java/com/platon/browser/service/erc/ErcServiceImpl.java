@@ -50,11 +50,11 @@ public class ErcServiceImpl {
                 balance = ercContract.balanceOf(account).send();
             }
         } catch (Exception e) {
-            log.error(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
+            log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException interruptedException) {
-                log.error("InterruptedException异常", interruptedException);
+                log.warn("InterruptedException异常", interruptedException);
             }
             throw new BusinessException("查询Token余额失败！");
         }
@@ -77,7 +77,7 @@ public class ErcServiceImpl {
                 totalSupply = ercContract.totalSupply().send();
             }
         } catch (Exception e) {
-            log.error(StrFormatter.format("获取供应总量异常,contractAddress：{}", contractAddress), e);
+            log.warn(StrFormatter.format("获取供应总量异常,contractAddress：{}", contractAddress), e);
         }
         return totalSupply;
     }
@@ -120,7 +120,7 @@ public class ErcServiceImpl {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }
         } catch (Exception e) {
-            log.error(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
         }
         return tokenURI;
     }

@@ -80,14 +80,16 @@
     </update>
 
     <select id="findContractDestroy" parameterType="integer" resultType="string">
-        select
-            address
-        from
-            address a
-        where
-            (a.`contract_destroy_hash` is not null
-            or a.`contract_destroy_hash` != '')
-	        and a.`type` = #{type}
+        SELECT DISTINCT
+        address
+        FROM
+        address t1
+        WHERE
+        t1.contract_destroy_hash IS NOT NULL
+        AND LENGTH( trim( t1.contract_destroy_hash ) ) > 0
+        <if test="type!=null">
+            and t1.`type` = #{type}
+        </if>
     </select>
 
 </mapper>
