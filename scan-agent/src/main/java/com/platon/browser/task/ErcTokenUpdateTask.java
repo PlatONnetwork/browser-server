@@ -306,7 +306,7 @@ public class ErcTokenUpdateTask {
                 tokenHolderLock.unlock();
             }
         } else {
-            log.error("本次增量更新token持有者余额抢不到锁,erc20TxSeq:{},erc721TxSeq:{}", erc20TxSeq, erc721TxSeq);
+            log.warn("本次增量更新token持有者余额抢不到锁,erc20TxSeq:{},erc721TxSeq:{}", erc20TxSeq, erc721TxSeq);
         }
     }
 
@@ -445,7 +445,7 @@ public class ErcTokenUpdateTask {
                                     }
                                 }
                             } catch (Exception e) {
-                                log.error(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
+                                log.warn(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
                             } finally {
                                 latch.countDown();
                             }
@@ -650,7 +650,7 @@ public class ErcTokenUpdateTask {
                 tokenInventoryLock.unlock();
             }
         } else {
-            log.error("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
+            log.warn("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
         }
     }
 

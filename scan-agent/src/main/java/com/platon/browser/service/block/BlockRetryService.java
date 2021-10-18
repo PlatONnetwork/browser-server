@@ -1,5 +1,6 @@
 package com.platon.browser.service.block;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.CollectionBlockException;
 import com.platon.protocol.core.DefaultBlockParameter;
@@ -44,7 +45,7 @@ public class BlockRetryService {
             return block;
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
-            log.error("", e);
+            log.error(StrUtil.format("获取区块[{}]异常", blockNumber), e);
             throw e;
         }
     }
