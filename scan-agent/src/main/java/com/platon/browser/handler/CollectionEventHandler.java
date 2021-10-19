@@ -1,5 +1,7 @@
 package com.platon.browser.handler;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.TransactionAnalyzer;
@@ -9,12 +11,9 @@ import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.TxAnalyseResult;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.dao.entity.NOptBak;
-import com.platon.browser.dao.entity.NOptBakExample;
-import com.platon.browser.dao.entity.TxBak;
-import com.platon.browser.dao.entity.TxBakExample;
 import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
 import com.platon.browser.dao.custommapper.CustomTxBakMapper;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -85,6 +85,11 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     private long optDeleteBatchCount = 0;
 
+    /**
+     * 重试次数
+     */
+    private AtomicLong retryCount = new AtomicLong(0);
+
     @Transactional
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
@@ -100,7 +105,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     }
 
     private void exec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
-
+        resetBlock(event);
         // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 START
         Map<String, Receipt> receiptMap = event.getBlock().getReceiptMap();
         List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = event.getBlock().getOriginTransactions();
@@ -113,7 +118,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             event.getBlock().setErc721TxQty(event.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
         }
         // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 END
-
 
         // 使用已入库的交易数量初始化交易ID初始值
         if (transactionId == 0) transactionId = networkStatCache.getNetworkStat().getTxQty();
@@ -132,7 +136,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             TxAnalyseResult txAnalyseResult = pposService.analyze(event);
             // 统计业务参数
             statisticService.analyze(event);
-
             if (!txAnalyseResult.getNodeOptList().isEmpty()) nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
             txDeleteBatchCount++;
@@ -178,18 +181,42 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
             // 释放对象引用
             event.releaseRef();
+            retryCount.set(0);
         } catch (Exception e) {
-            log.error("", e);
+            log.error(StrUtil.format("区块[{}]解析交易异常", event.getBlock().getNum()), e);
             throw e;
         } finally {
             log.info("清除地址缓存[addressCache]数据[{}]条,addressCache:({})",
                      addressCache.getAll().size(),
-                     JSONUtil.toJsonStr(addressCache.getAll().stream().map(v -> v.getAddress()).collect(Collectors.toList())));
+                     JSONUtil.toJsonStr(addressCache.getAll().stream().map(Address::getAddress).collect(Collectors.toList())));
             // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
             // 因为地址缓存是当前事务处理的增量缓存，在 StatisticsAddressAnalyzer 进行数据合并入库时：
             // 1、如果出现异常，由于事务保证，当前事务统计的地址数据不会入库mysql，此时应该清空增量缓存，等待下次重试时重新生成缓存
             // 2、如果正常结束，当前事务统计的地址数据会入库mysql，此时应该清空增量缓存
             addressCache.cleanAll();
+        }
+    }
+
+    /**
+     * 避免重试机制会重复统计
+     *
+     * @param event:
+     * @return: void
+     * @date: 2021/10/18
+     */
+    private void resetBlock(CollectionEvent event) {
+        if (CollUtil.isNotEmpty(event.getBlock().getTransactions())) {
+            event.getBlock().getTransactions().clear();
+        }
+        event.getBlock().setErc20TxQty(0);
+        event.getBlock().setErc721TxQty(0);
+        event.getBlock().setTxQty(0);
+        if (retryCount.incrementAndGet() > 1) {
+            List<String> txHashList = CollUtil.newArrayList();
+            if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
+                txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
+            }
+            log.error("该区块[{}]交易列表{}重复处理，可能会引起数据重复统计", event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList));
         }
     }
 
