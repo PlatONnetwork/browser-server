@@ -216,7 +216,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.error("该区块[{}]交易列表{}重复处理，可能会引起数据重复统计", event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList));
+            log.error("该区块[{}]交易列表{}重复处理，可能会引起数据重复统计，重试次数[{}]", event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList), retryCount.get());
         }
     }
 

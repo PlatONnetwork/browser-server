@@ -95,7 +95,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 }
                 // ES的id是用hash做key，重复入库会覆盖
                 // redis是上游做了去重，如果入库时重试，是没有实现去重机制的
-                log.error("相关区块[{}]的数据重复入库，可能引起数据重复入库", JSONUtil.toJsonStr(blockNums));
+                log.error("相关区块[{}]的数据重复入库，可能引起数据重复入库，重试次数[{}]", JSONUtil.toJsonStr(blockNums), retryCount.get());
             }
 
             // 把区块的交易列表属性置为null,防止把交易信息存储到区块信息中
@@ -104,6 +104,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
             if (blockStage.size() < disruptorConfig.getPersistenceBatchSize()) {
                 maxBlockNumber = event.getBlock().getNum();
+                retryCount.set(0);
                 return;
             } else {
                 log.info("相关区块[{}]达到入库标准", JSONUtil.toJsonStr(blockNums));
