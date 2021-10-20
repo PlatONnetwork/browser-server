@@ -329,8 +329,14 @@ public class StakingService {
             if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
+                logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
+                            resp.getRewardValue(),
+                            stakingNode.getStatFeeRewardValue(),
+                            stakingNode.getStatBlockRewardValue(),
+                            stakingNode.getStatStakingRewardValue());
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
+                logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]", resp.getRewardValue(), stakingNode.getStatFeeRewardValue());
                 resp.setExpectedIncome("");
             }
             String webSite = "";
