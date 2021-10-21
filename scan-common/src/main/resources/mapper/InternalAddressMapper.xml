@@ -3,10 +3,17 @@
 <mapper namespace="com.platon.browser.dao.mapper.InternalAddressMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.InternalAddress">
     <id column="address" jdbcType="VARCHAR" property="address" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="type" jdbcType="INTEGER" property="type" />
     <result column="balance" jdbcType="DECIMAL" property="balance" />
     <result column="restricting_balance" jdbcType="DECIMAL" property="restrictingBalance" />
+    <result column="is_show" jdbcType="BIT" property="isShow" />
+    <result column="is_calculate" jdbcType="BIT" property="isCalculate" />
+    <result column="create_id" jdbcType="BIGINT" property="createId" />
+    <result column="create_name" jdbcType="VARCHAR" property="createName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_id" jdbcType="BIGINT" property="updateId" />
+    <result column="update_name" jdbcType="VARCHAR" property="updateName" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -68,7 +75,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    address, `type`, balance, restricting_balance, create_time, update_time
+    address, `name`, `type`, balance, restricting_balance, is_show, is_calculate, create_id, 
+    create_name, create_time, update_id, update_name, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.InternalAddressExample" resultMap="BaseResultMap">
     select
@@ -101,18 +109,25 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.InternalAddress">
-    insert into internal_address (address, `type`, balance, 
-      restricting_balance, create_time, update_time
-      )
-    values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
-      #{restrictingBalance,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+    insert into internal_address (address, `name`, `type`, 
+      balance, restricting_balance, is_show, 
+      is_calculate, create_id, create_name, 
+      create_time, update_id, update_name, 
+      update_time)
+    values (#{address,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{balance,jdbcType=DECIMAL}, #{restrictingBalance,jdbcType=DECIMAL}, #{isShow,jdbcType=BIT}, 
+      #{isCalculate,jdbcType=BIT}, #{createId,jdbcType=BIGINT}, #{createName,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=BIGINT}, #{updateName,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.InternalAddress">
     insert into internal_address
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="address != null">
         address,
+      </if>
+      <if test="name != null">
+        `name`,
       </if>
       <if test="type != null">
         `type`,
@@ -123,8 +138,26 @@
       <if test="restrictingBalance != null">
         restricting_balance,
       </if>
+      <if test="isShow != null">
+        is_show,
+      </if>
+      <if test="isCalculate != null">
+        is_calculate,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="createName != null">
+        create_name,
+      </if>
       <if test="createTime != null">
         create_time,
+      </if>
+      <if test="updateId != null">
+        update_id,
+      </if>
+      <if test="updateName != null">
+        update_name,
       </if>
       <if test="updateTime != null">
         update_time,
@@ -133,6 +166,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="address != null">
         #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
         #{type,jdbcType=INTEGER},
@@ -143,8 +179,26 @@
       <if test="restrictingBalance != null">
         #{restrictingBalance,jdbcType=DECIMAL},
       </if>
+      <if test="isShow != null">
+        #{isShow,jdbcType=BIT},
+      </if>
+      <if test="isCalculate != null">
+        #{isCalculate,jdbcType=BIT},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=BIGINT},
+      </if>
+      <if test="createName != null">
+        #{createName,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateId != null">
+        #{updateId,jdbcType=BIGINT},
+      </if>
+      <if test="updateName != null">
+        #{updateName,jdbcType=VARCHAR},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
@@ -163,6 +217,9 @@
       <if test="record.address != null">
         address = #{record.address,jdbcType=VARCHAR},
       </if>
+      <if test="record.name != null">
+        `name` = #{record.name,jdbcType=VARCHAR},
+      </if>
       <if test="record.type != null">
         `type` = #{record.type,jdbcType=INTEGER},
       </if>
@@ -172,8 +229,26 @@
       <if test="record.restrictingBalance != null">
         restricting_balance = #{record.restrictingBalance,jdbcType=DECIMAL},
       </if>
+      <if test="record.isShow != null">
+        is_show = #{record.isShow,jdbcType=BIT},
+      </if>
+      <if test="record.isCalculate != null">
+        is_calculate = #{record.isCalculate,jdbcType=BIT},
+      </if>
+      <if test="record.createId != null">
+        create_id = #{record.createId,jdbcType=BIGINT},
+      </if>
+      <if test="record.createName != null">
+        create_name = #{record.createName,jdbcType=VARCHAR},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateId != null">
+        update_id = #{record.updateId,jdbcType=BIGINT},
+      </if>
+      <if test="record.updateName != null">
+        update_name = #{record.updateName,jdbcType=VARCHAR},
       </if>
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
@@ -186,10 +261,17 @@
   <update id="updateByExample" parameterType="map">
     update internal_address
     set address = #{record.address,jdbcType=VARCHAR},
+      `name` = #{record.name,jdbcType=VARCHAR},
       `type` = #{record.type,jdbcType=INTEGER},
       balance = #{record.balance,jdbcType=DECIMAL},
       restricting_balance = #{record.restrictingBalance,jdbcType=DECIMAL},
+      is_show = #{record.isShow,jdbcType=BIT},
+      is_calculate = #{record.isCalculate,jdbcType=BIT},
+      create_id = #{record.createId,jdbcType=BIGINT},
+      create_name = #{record.createName,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_id = #{record.updateId,jdbcType=BIGINT},
+      update_name = #{record.updateName,jdbcType=VARCHAR},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -198,6 +280,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.InternalAddress">
     update internal_address
     <set>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
       <if test="type != null">
         `type` = #{type,jdbcType=INTEGER},
       </if>
@@ -207,8 +292,26 @@
       <if test="restrictingBalance != null">
         restricting_balance = #{restrictingBalance,jdbcType=DECIMAL},
       </if>
+      <if test="isShow != null">
+        is_show = #{isShow,jdbcType=BIT},
+      </if>
+      <if test="isCalculate != null">
+        is_calculate = #{isCalculate,jdbcType=BIT},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=BIGINT},
+      </if>
+      <if test="createName != null">
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateId != null">
+        update_id = #{updateId,jdbcType=BIGINT},
+      </if>
+      <if test="updateName != null">
+        update_name = #{updateName,jdbcType=VARCHAR},
       </if>
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
@@ -218,10 +321,17 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.InternalAddress">
     update internal_address
-    set `type` = #{type,jdbcType=INTEGER},
+    set `name` = #{name,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=INTEGER},
       balance = #{balance,jdbcType=DECIMAL},
       restricting_balance = #{restrictingBalance,jdbcType=DECIMAL},
+      is_show = #{isShow,jdbcType=BIT},
+      is_calculate = #{isCalculate,jdbcType=BIT},
+      create_id = #{createId,jdbcType=BIGINT},
+      create_name = #{createName,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_id = #{updateId,jdbcType=BIGINT},
+      update_name = #{updateName,jdbcType=VARCHAR},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where address = #{address,jdbcType=VARCHAR}
   </update>
@@ -232,12 +342,15 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into internal_address
-    (address, `type`, balance, restricting_balance, create_time, update_time)
+    (address, `name`, `type`, balance, restricting_balance, is_show, is_calculate, create_id, 
+      create_name, create_time, update_id, update_name, update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
-        #{item.restrictingBalance,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP})
+      (#{item.address,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, 
+        #{item.balance,jdbcType=DECIMAL}, #{item.restrictingBalance,jdbcType=DECIMAL}, 
+        #{item.isShow,jdbcType=BIT}, #{item.isCalculate,jdbcType=BIT}, #{item.createId,jdbcType=BIGINT}, 
+        #{item.createName,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateId,jdbcType=BIGINT}, 
+        #{item.updateName,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -258,6 +371,9 @@
         <if test="'address'.toString() == column.value">
           #{item.address,jdbcType=VARCHAR}
         </if>
+        <if test="'name'.toString() == column.value">
+          #{item.name,jdbcType=VARCHAR}
+        </if>
         <if test="'type'.toString() == column.value">
           #{item.type,jdbcType=INTEGER}
         </if>
@@ -267,8 +383,26 @@
         <if test="'restricting_balance'.toString() == column.value">
           #{item.restrictingBalance,jdbcType=DECIMAL}
         </if>
+        <if test="'is_show'.toString() == column.value">
+          #{item.isShow,jdbcType=BIT}
+        </if>
+        <if test="'is_calculate'.toString() == column.value">
+          #{item.isCalculate,jdbcType=BIT}
+        </if>
+        <if test="'create_id'.toString() == column.value">
+          #{item.createId,jdbcType=BIGINT}
+        </if>
+        <if test="'create_name'.toString() == column.value">
+          #{item.createName,jdbcType=VARCHAR}
+        </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_id'.toString() == column.value">
+          #{item.updateId,jdbcType=BIGINT}
+        </if>
+        <if test="'update_name'.toString() == column.value">
+          #{item.updateName,jdbcType=VARCHAR}
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
@@ -277,4 +411,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>
