@@ -107,6 +107,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 retryCount.set(0);
                 return;
             } else {
+                blockNums = blockStage.stream().map(Block::getNum).sorted().collect(Collectors.toList());
                 log.info("相关区块[{}]达到入库标准", JSONUtil.toJsonStr(blockNums));
             }
 
