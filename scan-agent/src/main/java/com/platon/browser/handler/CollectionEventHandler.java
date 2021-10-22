@@ -208,8 +208,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         if (CollUtil.isNotEmpty(event.getBlock().getTransactions())) {
             event.getBlock().getTransactions().clear();
         }
-        event.getBlock().setErc20TxQty(0).setErc721TxQty(0).setTxFee("0").setDQty(0).setPQty(0).setSQty(0).setTranQty(0).setTxQty(0);
         if (retryCount.incrementAndGet() > 1) {
+            event.getBlock().setErc20TxQty(0).setErc721TxQty(0).setTxFee("0").setDQty(0).setPQty(0).setSQty(0).setTranQty(0).setTxQty(0);
             List<String> txHashList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
