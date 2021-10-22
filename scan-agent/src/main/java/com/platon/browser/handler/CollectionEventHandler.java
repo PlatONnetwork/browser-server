@@ -208,15 +208,13 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         if (CollUtil.isNotEmpty(event.getBlock().getTransactions())) {
             event.getBlock().getTransactions().clear();
         }
-        event.getBlock().setErc20TxQty(0);
-        event.getBlock().setErc721TxQty(0);
-        event.getBlock().setTxQty(0);
+        event.getBlock().setErc20TxQty(0).setErc721TxQty(0).setTxFee("0").setDQty(0).setPQty(0).setSQty(0).setTranQty(0).setTxQty(0);
         if (retryCount.incrementAndGet() > 1) {
             List<String> txHashList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.error("该区块[{}]交易列表{}重复处理，可能会引起数据重复统计，重试次数[{}]", event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList), retryCount.get());
+            log.error("重试次数[{}],该区块[{}]交易列表{}重复处理，可能会引起数据重复统计，block对象数据为[{}]", retryCount.get(), event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList), JSONUtil.toJsonStr(event.getBlock()));
         }
     }
 
