@@ -462,15 +462,23 @@ CREATE TABLE `vote` (
 
 DROP TABLE IF EXISTS `internal_address`;
 CREATE TABLE `internal_address` (
-                                    `address` VARCHAR(42) NOT NULL COMMENT '地址',
-                                    `type` INT(11) NOT NULL DEFAULT '0' COMMENT '地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约 ',
-                                    `balance` DECIMAL(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
-                                    `restricting_balance` DECIMAL(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
-                                    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    `name` varchar(64) NOT NULL DEFAULT '基金会地址' COMMENT '地址名称',
+                                    `address` varchar(42) NOT NULL COMMENT '地址',
+                                    `type` int(11) NOT NULL DEFAULT '0' COMMENT '地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约 ',
+                                    `balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
+                                    `restricting_balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
+                                    `is_show` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否用于展示  0-否 1-是',
+                                    `is_calculate` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否用于计算  0-否 1-是',
+                                    `create_id` bigint(20) NOT NULL DEFAULT '1' COMMENT '创建者',
+                                    `create_name` varchar(64) NOT NULL DEFAULT 'admin' COMMENT '创建者名称',
+                                    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_id` bigint(20) NOT NULL DEFAULT '1' COMMENT '更新者',
+                                    `update_name` varchar(64) NOT NULL DEFAULT 'admin' COMMENT '更新者名称',
+                                    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                                     PRIMARY KEY (`address`),
                                     KEY `type` (`type`) USING BTREE
 );
+
 -- 初始化数据
 -- 还有部分基金会地址由运维手工导入
 INSERT INTO `internal_address` (`address`,`type`)
