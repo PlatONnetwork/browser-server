@@ -46,7 +46,7 @@ public class InternalAddressService {
         List<InternalAddressResp> lists = new ArrayList<>();
         lists.add(internalAddressResp);
         InternalAddressExample internalAddressExample = new InternalAddressExample();
-        internalAddressExample.createCriteria().andTypeEqualTo(0);
+        internalAddressExample.createCriteria().andTypeEqualTo(0).andIsShowEqualTo(true);
         internalAddressExample.setOrderByClause(" balance desc,restricting_balance desc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<InternalAddress> internalAddressList = customInternalAddressMapper.selectListByExample(internalAddressExample);
@@ -73,7 +73,7 @@ public class InternalAddressService {
     public RespPage<String> getInternalAddressList(PageReq req) {
         RespPage<String> respPage = new RespPage<>();
         InternalAddressExample internalAddressExample = new InternalAddressExample();
-        internalAddressExample.createCriteria().andTypeEqualTo(0);
+        internalAddressExample.createCriteria().andTypeEqualTo(0).andIsShowEqualTo(true);
         internalAddressExample.setOrderByClause(" address asc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<InternalAddress> internalAddressList = customInternalAddressMapper.selectListByExample(internalAddressExample);
