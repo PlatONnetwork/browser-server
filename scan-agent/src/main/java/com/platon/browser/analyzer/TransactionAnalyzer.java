@@ -5,7 +5,6 @@ import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.DestroyContractCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.decoder.TxInputDecodeResult;
@@ -55,9 +54,6 @@ public class TransactionAnalyzer {
 
     @Resource
     private ErcTokenAnalyzer ercTokenAnalyzer;
-
-    @Resource
-    private DestroyContractCache destroyContractCache;
 
     // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存和erc緩存
     // <普通合约地址,合约类型枚举>
@@ -221,10 +217,6 @@ public class TransactionAnalyzer {
               .setBin(ci.getBinCode())
               .setMethod(ci.getMethod());
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
-
-        if (ci.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {
-            destroyContractCache.getDestroyContracts().add(receipt.getContractAddress());
-        }
 
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);

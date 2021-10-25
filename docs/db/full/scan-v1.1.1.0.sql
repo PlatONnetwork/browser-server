@@ -399,6 +399,8 @@ CREATE TABLE `token` (
                          `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                          `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的交易数',
                          `holder` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的持有人的数量',
+                         `contract_destroy_block` bigint(20) DEFAULT NULL COMMENT '合约的销毁块高',
+                         `contract_destroy_update` tinyint(1) NOT NULL DEFAULT '0' COMMENT '销毁的合约是否已更新显示在scan管理台，1为是，0为否，默认是0',
                          PRIMARY KEY (`address`),
                          UNIQUE KEY `token_address` (`address`)
 );

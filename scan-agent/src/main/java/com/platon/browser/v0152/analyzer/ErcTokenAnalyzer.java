@@ -7,8 +7,10 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.DestroyContractCache;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
+import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
@@ -57,6 +59,12 @@ public class ErcTokenAnalyzer {
 
     @Resource
     private CustomTokenMapper customTokenMapper;
+
+    @Resource
+    private DestroyContractCache destroyContractCache;
+
+    @Resource
+    private TokenMapper tokenMapper;
 
     /**
      * 解析Token,在合约创建时调用
@@ -198,8 +206,13 @@ public class ErcTokenAnalyzer {
      */
     public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
         try {
+
             // 过滤交易回执日志，地址不能为空且在token缓存里的
-            List<Log> tokenLogs = receipt.getLogs().stream().filter(receiptLog -> StrUtil.isNotEmpty(receiptLog.getAddress())).filter(receiptLog -> ercCache.tokenCache.containsKey(receiptLog.getAddress())).collect(Collectors.toList());
+            List<Log> tokenLogs = receipt.getLogs()
+                                         .stream()
+                                         .filter(receiptLog -> StrUtil.isNotEmpty(receiptLog.getAddress()))
+                                         .filter(receiptLog -> ercCache.tokenCache.containsKey(receiptLog.getAddress()))
+                                         .collect(Collectors.toList());
 
             if (CollUtil.isEmpty(tokenLogs)) {
                 return;
@@ -290,6 +303,17 @@ public class ErcTokenAnalyzer {
                      CommonUtil.ofNullable(() -> tokenLogs.size()).orElse(0),
                      CommonUtil.ofNullable(() -> tx.getErc20TxList().size()).orElse(0),
                      CommonUtil.ofNullable(() -> tx.getErc721TxList().size()).orElse(0));
+
+            // 针对销毁的合约处理
+            if (tx.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {
+                destroyContractCache.getDestroyContracts().add(receipt.getContractAddress());
+                Token token = new Token();
+                token.setAddress(receipt.getContractAddress());
+                token.setContractDestroyBlock(collectionBlock.getNum());
+                tokenMapper.updateByPrimaryKeySelective(token);
+                log.info("合约[{}]在区块[{}]已销毁", receipt.getContractAddress(), collectionBlock.getNum());
+            }
+
         } catch (Exception e) {
             log.error(StrUtil.format("当前交易[{}]解析ERC交易异常", tx.getHash()), e);
         }

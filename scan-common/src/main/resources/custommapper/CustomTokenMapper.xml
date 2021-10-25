@@ -1,107 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomTokenMapper">
-  <resultMap id="BaseResultMap" type="com.platon.browser.bean.CustomToken">
-    <id column="address" jdbcType="VARCHAR" property="address" />
-    <result column="type" jdbcType="VARCHAR" property="type" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="symbol" jdbcType="VARCHAR" property="symbol" />
-    <result column="total_supply" jdbcType="VARCHAR" property="totalSupply" />
-    <result column="decimal" jdbcType="INTEGER" property="decimal" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
-    <result column="holder" jdbcType="INTEGER" property="holder" />
-    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
-    <result column="details" jdbcType="VARCHAR" property="details" />
-  </resultMap>
-  <resultMap id="DetailResultMap" type="com.platon.browser.bean.CustomTokenDetail" extends="BaseResultMap">
-    <result column="contract_create" jdbcType="VARCHAR" property="creator" />
-    <result column="contract_createHash" jdbcType="VARCHAR" property="txHash" />
-    <result column="is_contract_destroy" jdbcType="VARCHAR" property="isContractDestroy" />
-    <result column="contract_bin" jdbcType="LONGVARCHAR" property="binCode" />
-    <result column="token_tx_qty" jdbcType="INTEGER" property="txCount" />
-  </resultMap>
-  <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
-    t.holder,te.web_site,te.details
-    from token t left join  token_expand te on t.address = te.address
-    where 1=1
-    AND te.is_show_in_scan = 1
-    <if test="type != null">
-      and t.type = #{type}
-    </if>
-    order by t.holder desc,t.create_time desc
-  </select>
-  <select id="selectDetailByAddress" parameterType="java.lang.String" resultMap="DetailResultMap">
-    select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
-    t.holder,te.web_site,te.details,a.contract_create,a.contract_createHash,a.contract_bin,
-    CASE WHEN a.`contract_destroy_hash` IS NOT NULL AND a.`contract_destroy_hash`!='' THEN 1 ELSE 0 END is_contract_destroy,
-    a.tx_qty
-    from token t left join  token_expand te on t.address = te.address
-    left join address a on t.address = a.address
-    where 1=1
-    <if test="address != null">
-      and t.address = #{address}
-    </if>
-  </select>
-  <insert id="batchInsertOrUpdateSelective" parameterType="map">
-    replace into token (
-    <foreach collection="selective" item="column" separator=",">
-      ${column.escapedColumnName}
-    </foreach>
-    )
-    values
-    <foreach collection="list" item="item" separator=",">
-      (
-      <foreach collection="selective" item="column" separator=",">
-        <if test="'address'.toString() == column.value">
-          #{item.address,jdbcType=VARCHAR}
+    <resultMap id="BaseResultMap" type="com.platon.browser.bean.CustomToken">
+        <id column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="symbol" jdbcType="VARCHAR" property="symbol"/>
+        <result column="total_supply" jdbcType="VARCHAR" property="totalSupply"/>
+        <result column="decimal" jdbcType="INTEGER" property="decimal"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty"/>
+        <result column="holder" jdbcType="INTEGER" property="holder"/>
+        <result column="web_site" jdbcType="VARCHAR" property="webSite"/>
+        <result column="details" jdbcType="VARCHAR" property="details"/>
+    </resultMap>
+    <resultMap id="DetailResultMap" type="com.platon.browser.bean.CustomTokenDetail" extends="BaseResultMap">
+        <result column="contract_create" jdbcType="VARCHAR" property="creator"/>
+        <result column="contract_createHash" jdbcType="VARCHAR" property="txHash"/>
+        <result column="is_contract_destroy" jdbcType="VARCHAR" property="isContractDestroy"/>
+        <result column="contract_bin" jdbcType="LONGVARCHAR" property="binCode"/>
+        <result column="token_tx_qty" jdbcType="INTEGER" property="txCount"/>
+    </resultMap>
+    <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
+        t.holder,te.web_site,te.details
+        from token t left join token_expand te on t.address = te.address
+        where 1=1
+        AND te.is_show_in_scan = 1
+        <if test="type != null">
+            and t.type = #{type}
         </if>
-        <if test="'type'.toString() == column.value">
-          #{item.type,jdbcType=VARCHAR}
+        order by t.holder desc,t.create_time desc
+    </select>
+    <select id="selectDetailByAddress" parameterType="java.lang.String" resultMap="DetailResultMap">
+        select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
+        t.holder,te.web_site,te.details,a.contract_create,a.contract_createHash,a.contract_bin,
+        CASE WHEN a.`contract_destroy_hash` IS NOT NULL AND a.`contract_destroy_hash`!='' THEN 1 ELSE 0 END is_contract_destroy,
+        a.tx_qty
+        from token t left join token_expand te on t.address = te.address
+        left join address a on t.address = a.address
+        where 1=1
+        <if test="address != null">
+            and t.address = #{address}
         </if>
-        <if test="'name'.toString() == column.value">
-          #{item.name,jdbcType=VARCHAR}
+    </select>
+    <insert id="batchInsertOrUpdateSelective" parameterType="map">
+        replace into token (
+        <foreach collection="selective" item="column" separator=",">
+            ${column.escapedColumnName}
+        </foreach>
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            <foreach collection="selective" item="column" separator=",">
+                <if test="'address'.toString() == column.value">
+                    #{item.address,jdbcType=VARCHAR}
+                </if>
+                <if test="'type'.toString() == column.value">
+                    #{item.type,jdbcType=VARCHAR}
+                </if>
+                <if test="'name'.toString() == column.value">
+                    #{item.name,jdbcType=VARCHAR}
+                </if>
+                <if test="'symbol'.toString() == column.value">
+                    #{item.symbol,jdbcType=VARCHAR}
+                </if>
+                <if test="'total_supply'.toString() == column.value">
+                    #{item.totalSupply,jdbcType=VARCHAR}
+                </if>
+                <if test="'decimal'.toString() == column.value">
+                    #{item.decimal,jdbcType=INTEGER}
+                </if>
+                <if test="'is_support_erc165'.toString() == column.value">
+                    #{item.isSupportErc165,jdbcType=BIT}
+                </if>
+                <if test="'is_support_erc20'.toString() == column.value">
+                    #{item.isSupportErc20,jdbcType=BIT}
+                </if>
+                <if test="'is_support_erc721'.toString() == column.value">
+                    #{item.isSupportErc721,jdbcType=BIT}
+                </if>
+                <if test="'is_support_erc721_enumeration'.toString() == column.value">
+                    #{item.isSupportErc721Enumeration,jdbcType=BIT}
+                </if>
+                <if test="'is_support_erc721_metadata'.toString() == column.value">
+                    #{item.isSupportErc721Metadata,jdbcType=BIT}
+                </if>
+                <if test="'create_time'.toString() == column.value">
+                    #{item.createTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'update_time'.toString() == column.value">
+                    #{item.updateTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'token_tx_qty'.toString() == column.value">
+                    #{item.tokenTxQty,jdbcType=INTEGER}
+                </if>
+                <if test="'holder'.toString() == column.value">
+                    #{item.holder,jdbcType=INTEGER}
+                </if>
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <select id="findDestroyContract" parameterType="string" resultType="com.platon.browser.bean.DestroyContract">
+        select
+        t1.address as tokenAddress ,
+        t1.contract_destroy_block as contractDestroyBlock ,
+        t2.address as account
+        from
+        token t1
+        left join token_holder t2 on
+        t1.address = t2.token_address
+        where
+        t1.contract_destroy_block is not null
+        and t1.contract_destroy_update = 0
+        <if test="type != null">
+            and t1.type = #{type}
         </if>
-        <if test="'symbol'.toString() == column.value">
-          #{item.symbol,jdbcType=VARCHAR}
-        </if>
-        <if test="'total_supply'.toString() == column.value">
-          #{item.totalSupply,jdbcType=VARCHAR}
-        </if>
-        <if test="'decimal'.toString() == column.value">
-          #{item.decimal,jdbcType=INTEGER}
-        </if>
-        <if test="'is_support_erc165'.toString() == column.value">
-          #{item.isSupportErc165,jdbcType=BIT}
-        </if>
-        <if test="'is_support_erc20'.toString() == column.value">
-          #{item.isSupportErc20,jdbcType=BIT}
-        </if>
-        <if test="'is_support_erc721'.toString() == column.value">
-          #{item.isSupportErc721,jdbcType=BIT}
-        </if>
-        <if test="'is_support_erc721_enumeration'.toString() == column.value">
-          #{item.isSupportErc721Enumeration,jdbcType=BIT}
-        </if>
-        <if test="'is_support_erc721_metadata'.toString() == column.value">
-          #{item.isSupportErc721Metadata,jdbcType=BIT}
-        </if>
-        <if test="'create_time'.toString() == column.value">
-          #{item.createTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'update_time'.toString() == column.value">
-          #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'token_tx_qty'.toString() == column.value">
-          #{item.tokenTxQty,jdbcType=INTEGER}
-        </if>
-        <if test="'holder'.toString() == column.value">
-          #{item.holder,jdbcType=INTEGER}
-        </if>
-      </foreach>
-      )
-    </foreach>
-  </insert>
+    </select>
 
 </mapper>

@@ -17,6 +17,8 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
     <result column="holder" jdbcType="INTEGER" property="holder" />
+    <result column="contract_destroy_block" jdbcType="BIGINT" property="contractDestroyBlock" />
+    <result column="contract_destroy_update" jdbcType="BIT" property="contractDestroyUpdate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -79,7 +81,7 @@
   <sql id="Base_Column_List">
     address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
     is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, create_time, 
-    update_time, token_tx_qty, holder
+    update_time, token_tx_qty, holder, contract_destroy_block, contract_destroy_update
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenExample" resultMap="BaseResultMap">
     select
@@ -117,13 +119,15 @@
       is_support_erc165, is_support_erc20, is_support_erc721, 
       is_support_erc721_enumeration, is_support_erc721_metadata, 
       create_time, update_time, token_tx_qty, 
-      holder)
+      holder, contract_destroy_block, contract_destroy_update
+      )
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{symbol,jdbcType=VARCHAR}, #{totalSupply,jdbcType=DECIMAL}, #{decimal,jdbcType=INTEGER}, 
+      #{symbol,jdbcType=VARCHAR}, #{totalSupply,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, 
       #{isSupportErc165,jdbcType=BIT}, #{isSupportErc20,jdbcType=BIT}, #{isSupportErc721,jdbcType=BIT}, 
       #{isSupportErc721Enumeration,jdbcType=BIT}, #{isSupportErc721Metadata,jdbcType=BIT}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
-      #{holder,jdbcType=INTEGER})
+      #{holder,jdbcType=INTEGER}, #{contractDestroyBlock,jdbcType=BIGINT}, #{contractDestroyUpdate,jdbcType=BIT}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Token">
     insert into token
@@ -173,6 +177,12 @@
       <if test="holder != null">
         holder,
       </if>
+      <if test="contractDestroyBlock != null">
+        contract_destroy_block,
+      </if>
+      <if test="contractDestroyUpdate != null">
+        contract_destroy_update,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="address != null">
@@ -188,7 +198,7 @@
         #{symbol,jdbcType=VARCHAR},
       </if>
       <if test="totalSupply != null">
-        #{totalSupply,jdbcType=DECIMAL},
+        #{totalSupply,jdbcType=VARCHAR},
       </if>
       <if test="decimal != null">
         #{decimal,jdbcType=INTEGER},
@@ -219,6 +229,12 @@
       </if>
       <if test="holder != null">
         #{holder,jdbcType=INTEGER},
+      </if>
+      <if test="contractDestroyBlock != null">
+        #{contractDestroyBlock,jdbcType=BIGINT},
+      </if>
+      <if test="contractDestroyUpdate != null">
+        #{contractDestroyUpdate,jdbcType=BIT},
       </if>
     </trim>
   </insert>
@@ -276,6 +292,12 @@
       <if test="record.holder != null">
         holder = #{record.holder,jdbcType=INTEGER},
       </if>
+      <if test="record.contractDestroyBlock != null">
+        contract_destroy_block = #{record.contractDestroyBlock,jdbcType=BIGINT},
+      </if>
+      <if test="record.contractDestroyUpdate != null">
+        contract_destroy_update = #{record.contractDestroyUpdate,jdbcType=BIT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -297,7 +319,9 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
-      holder = #{record.holder,jdbcType=INTEGER}
+      holder = #{record.holder,jdbcType=INTEGER},
+      contract_destroy_block = #{record.contractDestroyBlock,jdbcType=BIGINT},
+      contract_destroy_update = #{record.contractDestroyUpdate,jdbcType=BIT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -347,6 +371,12 @@
       <if test="holder != null">
         holder = #{holder,jdbcType=INTEGER},
       </if>
+      <if test="contractDestroyBlock != null">
+        contract_destroy_block = #{contractDestroyBlock,jdbcType=BIGINT},
+      </if>
+      <if test="contractDestroyUpdate != null">
+        contract_destroy_update = #{contractDestroyUpdate,jdbcType=BIT},
+      </if>
     </set>
     where address = #{address,jdbcType=VARCHAR}
   </update>
@@ -365,7 +395,9 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
-      holder = #{holder,jdbcType=INTEGER}
+      holder = #{holder,jdbcType=INTEGER},
+      contract_destroy_block = #{contractDestroyBlock,jdbcType=BIGINT},
+      contract_destroy_update = #{contractDestroyUpdate,jdbcType=BIT}
     where address = #{address,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -377,15 +409,17 @@
     insert into token
     (address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
       is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, create_time, 
-      update_time, token_tx_qty, holder)
+      update_time, token_tx_qty, holder, contract_destroy_block, contract_destroy_update
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
-        #{item.symbol,jdbcType=VARCHAR}, #{item.totalSupply,jdbcType=DECIMAL}, #{item.decimal,jdbcType=INTEGER}, 
+        #{item.symbol,jdbcType=VARCHAR}, #{item.totalSupply,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, 
         #{item.isSupportErc165,jdbcType=BIT}, #{item.isSupportErc20,jdbcType=BIT}, #{item.isSupportErc721,jdbcType=BIT}, 
         #{item.isSupportErc721Enumeration,jdbcType=BIT}, #{item.isSupportErc721Metadata,jdbcType=BIT}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
-        #{item.holder,jdbcType=INTEGER})
+        #{item.holder,jdbcType=INTEGER}, #{item.contractDestroyBlock,jdbcType=BIGINT}, 
+        #{item.contractDestroyUpdate,jdbcType=BIT})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -448,8 +482,15 @@
         <if test="'holder'.toString() == column.value">
           #{item.holder,jdbcType=INTEGER}
         </if>
+        <if test="'contract_destroy_block'.toString() == column.value">
+          #{item.contractDestroyBlock,jdbcType=BIGINT}
+        </if>
+        <if test="'contract_destroy_update'.toString() == column.value">
+          #{item.contractDestroyUpdate,jdbcType=BIT}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

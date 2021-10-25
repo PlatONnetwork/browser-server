@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.Page;
 import com.platon.browser.bean.CustomTokenHolder;
+import com.platon.browser.bean.DestroyContract;
 import com.platon.browser.bean.Erc721ContractDestroyBalanceVO;
 import com.platon.browser.bean.TokenHolderCount;
 import com.platon.browser.bean.http.CustomHttpClient;
@@ -763,6 +764,7 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
+        contractErc20DestroyUpdateBalance();
         contractErc721DestroyUpdateBalance();
     }
 
@@ -805,6 +807,41 @@ public class ErcTokenUpdateTask {
             }
         } catch (Exception e) {
             log.error("销毁的erc721更新余额异常", e);
+        }
+    }
+
+    private void contractErc20DestroyUpdateBalance() {
+        try {
+            List<DestroyContract> tokenList = customTokenMapper.findDestroyContract(ErcTypeEnum.ERC20.getDesc());
+            if (CollUtil.isNotEmpty(tokenList)) {
+                List<TokenHolder> updateList = new ArrayList<>();
+                for (DestroyContract destroyContract : tokenList) {
+                    try {
+                        BigInteger balance = ercServiceImpl.getErc20HistoryBalance(destroyContract.getTokenAddress(),
+                                                                                   destroyContract.getAccount(),
+                                                                                   BigInteger.valueOf(destroyContract.getContractDestroyBlock() - 1));
+                        TokenHolder tokenHolder = new TokenHolder();
+                        tokenHolder.setTokenAddress(destroyContract.getTokenAddress());
+                        tokenHolder.setAddress(destroyContract.getAccount());
+                        tokenHolder.setBalance(balance.toString());
+                        updateList.add(tokenHolder);
+                    } catch (Exception e) {
+                        log.error(StrUtil.format("已销毁的erc20合约[{}]账号[{}]更新余额异常", destroyContract.getTokenAddress(), destroyContract.getAccount()), e);
+                    }
+                }
+                if (CollUtil.isNotEmpty(updateList)) {
+                    customTokenHolderMapper.batchUpdate(updateList);
+                    Set<String> destroyContractSet = updateList.stream().map(TokenHolderKey::getTokenAddress).collect(Collectors.toSet());
+                    for (String destroyContract : destroyContractSet) {
+                        Token token = new Token();
+                        token.setAddress(destroyContract);
+                        token.setContractDestroyUpdate(true);
+                        tokenMapper.updateByPrimaryKeySelective(token);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("更新已销毁的erc20合约余额异常", e);
         }
     }
 

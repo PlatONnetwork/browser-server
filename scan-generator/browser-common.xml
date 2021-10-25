@@ -23,26 +23,26 @@
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_faucet?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/scan_alayahyp?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="platon"
                         password="platon"/>
 
-        <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="E:\Java\browser-server\scan-common/src/main/java">
+        <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="C:/project/browser-server/scan-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
        <sqlMapGenerator targetPackage="mapper"
-                         targetProject="E:\Java\browser-server\scan-common/src/main/resources">
+                         targetProject="C:/project/browser-server/scan-common/src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
         <javaClientGenerator targetPackage="com.platon.browser.dao.mapper"
-                             targetProject="E:\Java\browser-server\scan-common/src/main/java" type="XMLMAPPER">
+                             targetProject="C:/project/browser-server/scan-common/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="plat_account_manage" domainObjectName="PlatAccountManage">
+        <table tableName="token" domainObjectName="Token">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>

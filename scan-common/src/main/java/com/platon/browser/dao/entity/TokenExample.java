@@ -1,6 +1,5 @@
 package com.platon.browser.dao.entity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -396,52 +395,62 @@ public class TokenExample {
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyEqualTo(BigDecimal value) {
+        public Criteria andTotalSupplyEqualTo(String value) {
             addCriterion("total_supply =", value, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyNotEqualTo(BigDecimal value) {
+        public Criteria andTotalSupplyNotEqualTo(String value) {
             addCriterion("total_supply <>", value, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyGreaterThan(BigDecimal value) {
+        public Criteria andTotalSupplyGreaterThan(String value) {
             addCriterion("total_supply >", value, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyGreaterThanOrEqualTo(BigDecimal value) {
+        public Criteria andTotalSupplyGreaterThanOrEqualTo(String value) {
             addCriterion("total_supply >=", value, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyLessThan(BigDecimal value) {
+        public Criteria andTotalSupplyLessThan(String value) {
             addCriterion("total_supply <", value, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyLessThanOrEqualTo(BigDecimal value) {
+        public Criteria andTotalSupplyLessThanOrEqualTo(String value) {
             addCriterion("total_supply <=", value, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyIn(List<BigDecimal> values) {
+        public Criteria andTotalSupplyLike(String value) {
+            addCriterion("total_supply like", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyNotLike(String value) {
+            addCriterion("total_supply not like", value, "totalSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalSupplyIn(List<String> values) {
             addCriterion("total_supply in", values, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyNotIn(List<BigDecimal> values) {
+        public Criteria andTotalSupplyNotIn(List<String> values) {
             addCriterion("total_supply not in", values, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andTotalSupplyBetween(String value1, String value2) {
             addCriterion("total_supply between", value1, value2, "totalSupply");
             return (Criteria) this;
         }
 
-        public Criteria andTotalSupplyNotBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andTotalSupplyNotBetween(String value1, String value2) {
             addCriterion("total_supply not between", value1, value2, "totalSupply");
             return (Criteria) this;
         }
@@ -1043,6 +1052,126 @@ public class TokenExample {
 
         public Criteria andHolderNotBetween(Integer value1, Integer value2) {
             addCriterion("holder not between", value1, value2, "holder");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockIsNull() {
+            addCriterion("contract_destroy_block is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockIsNotNull() {
+            addCriterion("contract_destroy_block is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockEqualTo(Long value) {
+            addCriterion("contract_destroy_block =", value, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockNotEqualTo(Long value) {
+            addCriterion("contract_destroy_block <>", value, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockGreaterThan(Long value) {
+            addCriterion("contract_destroy_block >", value, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockGreaterThanOrEqualTo(Long value) {
+            addCriterion("contract_destroy_block >=", value, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockLessThan(Long value) {
+            addCriterion("contract_destroy_block <", value, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockLessThanOrEqualTo(Long value) {
+            addCriterion("contract_destroy_block <=", value, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockIn(List<Long> values) {
+            addCriterion("contract_destroy_block in", values, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockNotIn(List<Long> values) {
+            addCriterion("contract_destroy_block not in", values, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockBetween(Long value1, Long value2) {
+            addCriterion("contract_destroy_block between", value1, value2, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyBlockNotBetween(Long value1, Long value2) {
+            addCriterion("contract_destroy_block not between", value1, value2, "contractDestroyBlock");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateIsNull() {
+            addCriterion("contract_destroy_update is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateIsNotNull() {
+            addCriterion("contract_destroy_update is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateEqualTo(Boolean value) {
+            addCriterion("contract_destroy_update =", value, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateNotEqualTo(Boolean value) {
+            addCriterion("contract_destroy_update <>", value, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateGreaterThan(Boolean value) {
+            addCriterion("contract_destroy_update >", value, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateGreaterThanOrEqualTo(Boolean value) {
+            addCriterion("contract_destroy_update >=", value, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateLessThan(Boolean value) {
+            addCriterion("contract_destroy_update <", value, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateLessThanOrEqualTo(Boolean value) {
+            addCriterion("contract_destroy_update <=", value, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateIn(List<Boolean> values) {
+            addCriterion("contract_destroy_update in", values, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateNotIn(List<Boolean> values) {
+            addCriterion("contract_destroy_update not in", values, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateBetween(Boolean value1, Boolean value2) {
+            addCriterion("contract_destroy_update between", value1, value2, "contractDestroyUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andContractDestroyUpdateNotBetween(Boolean value1, Boolean value2) {
+            addCriterion("contract_destroy_update not between", value1, value2, "contractDestroyUpdate");
             return (Criteria) this;
         }
     }
