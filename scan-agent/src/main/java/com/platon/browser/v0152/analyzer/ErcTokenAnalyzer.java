@@ -103,6 +103,8 @@ public class ErcTokenAnalyzer {
             if (token.getTypeEnum() != ErcTypeEnum.UNKNOWN) {
                 // 入库ERC721或ERC20 Token记录
                 token.setTokenTxQty(0);
+                token.setContractDestroyBlock(0L);
+                token.setContractDestroyUpdate(false);
                 // 检查token是否合法
                 checkToken(token);
                 customTokenMapper.batchInsertOrUpdateSelective(Collections.singletonList(token), Token.Column.values());

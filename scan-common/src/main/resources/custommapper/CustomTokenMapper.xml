@@ -121,6 +121,7 @@
         t1.address = t2.token_address
         where
         t1.contract_destroy_block is not null
+        and t1.contract_destroy_block > 0
         and t1.contract_destroy_update = 0
         <if test="type != null">
             and t1.type = #{type}
