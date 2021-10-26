@@ -99,11 +99,11 @@
                 <if test="'holder'.toString() == column.value">
                     #{item.holder,jdbcType=INTEGER}
                 </if>
-                <if test="contractDestroyBlock != null">
-                    contract_destroy_block = #{contractDestroyBlock,jdbcType=BIGINT},
+                <if test="'contract_destroy_block'.toString() == column.value">
+                    #{item.contractDestroyBlock,jdbcType=BIGINT}
                 </if>
-                <if test="contractDestroyUpdate != null">
-                    contract_destroy_update = #{contractDestroyUpdate,jdbcType=BIT},
+                <if test="'contract_destroy_update'.toString() == column.value">
+                    #{item.contractDestroyUpdate,jdbcType=BIT}
                 </if>
             </foreach>
             )
