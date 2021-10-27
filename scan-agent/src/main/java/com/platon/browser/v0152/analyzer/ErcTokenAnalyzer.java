@@ -309,9 +309,9 @@ public class ErcTokenAnalyzer {
 
             // 针对销毁的合约处理
             if (tx.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {
-                destroyContractCache.getDestroyContracts().add(receipt.getContractAddress());
+                destroyContractCache.getDestroyContracts().add(tx.getTo());
                 Token token = new Token();
-                token.setAddress(receipt.getContractAddress());
+                token.setAddress(tx.getTo());
                 token.setContractDestroyBlock(collectionBlock.getNum());
                 tokenMapper.updateByPrimaryKeySelective(token);
                 log.info("合约[{}]在区块[{}]已销毁", receipt.getContractAddress(), collectionBlock.getNum());
