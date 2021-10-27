@@ -78,7 +78,7 @@ public class ErcTokenAnalyzer {
             token.setAddress(contractAddress);
             ErcContractId contractId = ercDetectService.getContractId(contractAddress, blockNumber);
             BeanUtils.copyProperties(contractId, token);
-            token.setTotalSupply(contractId.getTotalSupply().toPlainString());
+            token.setTotalSupply(CommonUtil.ofNullable(() -> contractId.getTotalSupply().toPlainString()).orElse("0"));
             token.setTypeEnum(contractId.getTypeEnum());
             token.setType(contractId.getTypeEnum().name().toLowerCase());
             switch (contractId.getTypeEnum()) {
