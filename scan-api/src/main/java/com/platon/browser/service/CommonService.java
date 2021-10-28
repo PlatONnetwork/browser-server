@@ -78,7 +78,7 @@ public class CommonService {
             issueValue = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON)
                                                  .multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum))
                                                  .setScale(4, BigDecimal.ROUND_HALF_UP);
-            log.debug("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+            log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
             if (issueValue.signum() == -1) {
                 log.error("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString());
             }
@@ -106,6 +106,7 @@ public class CommonService {
             EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
             // 第几年
             yearNum = epochInfo.getYearNum().intValue();
+            log.info("获取年份：当前块高[{}]，上一结算周期最后一个块号[{}]，年份[{}]", currentNumber, preSettleEpochLastBlockNumber, yearNum);
         } catch (Exception e) {
             log.error("获取年份(第几年)异常", e);
         }
@@ -156,7 +157,7 @@ public class CommonService {
                                                 .subtract(delegationValue.getFree())
                                                 .subtract(incentivePoolValue.getFree())
                                                 .subtract(foundationValue.getFree());
-        log.debug("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
+        log.info("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
                   circulationValue.toPlainString(),
                   issueValue.toPlainString(),
                   lockUpValue.getFree().toPlainString(),
