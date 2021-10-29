@@ -78,14 +78,19 @@ public class CommonService {
             issueValue = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON)
                                                  .multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum))
                                                  .setScale(4, BigDecimal.ROUND_HALF_UP);
-            log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+            log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];",
+                     issueValue.toPlainString(),
+                     com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON).toPlainString(),
+                     addIssueRate.toPlainString(),
+                     yearNum);
             if (issueValue.signum() == -1) {
                 log.error("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString());
             }
         } catch (Exception e) {
             log.error("获取取总发行量异常", e);
         }
-        return issueValue;
+        // TODO 临时方案
+        return new BigDecimal("10250000000000000000000000000.0000");
     }
 
     /**
@@ -158,15 +163,15 @@ public class CommonService {
                                                 .subtract(incentivePoolValue.getFree())
                                                 .subtract(foundationValue.getFree());
         log.info("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
-                  circulationValue.toPlainString(),
-                  issueValue.toPlainString(),
-                  lockUpValue.getFree().toPlainString(),
-                  stakingValue.getFree().toPlainString(),
-                  delegationValue.getFree().toPlainString(),
-                  incentivePoolValue.getFree().toPlainString(),
-                  foundationValue.getFree().toPlainString());
+                 circulationValue.toPlainString(),
+                 issueValue.toPlainString(),
+                 lockUpValue.getFree().toPlainString(),
+                 stakingValue.getFree().toPlainString(),
+                 delegationValue.getFree().toPlainString(),
+                 incentivePoolValue.getFree().toPlainString(),
+                 foundationValue.getFree().toPlainString());
         if (circulationValue.signum() == -1) {
-            log.error("获取流通量[{}]错误,不能为负数", issueValue.toPlainString());
+            log.error("获取流通量[{}]错误,不能为负数", circulationValue.toPlainString());
         }
         return circulationValue;
     }
