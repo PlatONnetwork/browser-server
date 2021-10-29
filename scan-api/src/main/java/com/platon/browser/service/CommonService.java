@@ -68,6 +68,7 @@ public class CommonService {
     @Cacheable(value = "getIssueValue")
     public BigDecimal getIssueValue() {
         BigDecimal issueValue = new BigDecimal(0);
+        log.info("进入获取总发行量方法");
         try {
             // 获取初始发行金额
             BigDecimal initIssueAmount = blockChainConfig.getInitIssueAmount();
@@ -86,11 +87,13 @@ public class CommonService {
             if (issueValue.signum() == -1) {
                 log.error("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString());
             }
+            if (com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON).compareTo(issueValue) >= 0) {
+                log.error("获取总发行量[{}]错误,小于或等于初始发行量", issueValue.toPlainString());
+            }
         } catch (Exception e) {
             log.error("获取取总发行量异常", e);
         }
-        // TODO 临时方案
-        return new BigDecimal("10250000000000000000000000000.0000");
+        return issueValue;
     }
 
     /**
@@ -147,6 +150,8 @@ public class CommonService {
     public BigDecimal getCirculationValue() {
         List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
+        log.info("获取总发行量[{}]", issueValue.toPlainString());
+        issueValue = new BigDecimal("10250000000000000000000000000.0000");
         // 获取实时锁仓合约余额
         CountBalance lockUpValue = list.stream().filter(v -> v.getType() == 1).findFirst().orElseGet(CountBalance::new);
         // 获取实时质押合约余额
@@ -215,6 +220,8 @@ public class CommonService {
     public BigDecimal getStakingDenominator() {
         List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
+        log.info("获取总发行量[{}]", issueValue.toPlainString());
+        issueValue = new BigDecimal("10250000000000000000000000000.0000");
         // 获取实时委托奖励池合约余额
         CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
         // 实时激励池余额

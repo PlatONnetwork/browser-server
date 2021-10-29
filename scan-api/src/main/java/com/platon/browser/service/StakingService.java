@@ -112,6 +112,8 @@ public class StakingService {
             stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
         }
         BigDecimal issueValue = commonService.getIssueValue();
+        logger.info("获取总发行量[{}]", issueValue.toPlainString());
+        issueValue = new BigDecimal("10250000000000000000000000000.0000");
         stakingStatisticNewResp.setIssueValue(issueValue);
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
