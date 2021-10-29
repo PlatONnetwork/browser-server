@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
@@ -72,26 +73,22 @@ public class CommonService {
         try {
             // 获取初始发行金额
             BigDecimal initIssueAmount = blockChainConfig.getInitIssueAmount();
+            initIssueAmount = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON);
             // 每年固定增发比例
             BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
             // 第几年
             int yearNum = getYearNum();
-            issueValue = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON)
-                                                 .multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum))
-                                                 .setScale(4, BigDecimal.ROUND_HALF_UP);
-            log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];",
-                     issueValue.toPlainString(),
-                     com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON).toPlainString(),
-                     addIssueRate.toPlainString(),
-                     yearNum);
+            issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
+            log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
             if (issueValue.signum() == -1) {
-                log.error("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString());
+                throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString()));
             }
-            if (com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON).compareTo(issueValue) >= 0) {
-                log.error("获取总发行量[{}]错误,小于或等于初始发行量", issueValue.toPlainString());
+            if (initIssueAmount.compareTo(issueValue) >= 0) {
+                throw new Exception(StrUtil.format("获取总发行量[{}]错误,小于或等于初始发行量", issueValue.toPlainString()));
             }
         } catch (Exception e) {
             log.error("获取取总发行量异常", e);
+            issueValue = new BigDecimal("10250000000000000000000000000.0000");
         }
         return issueValue;
     }
