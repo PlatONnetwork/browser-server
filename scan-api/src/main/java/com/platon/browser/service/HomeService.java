@@ -305,7 +305,10 @@ public class HomeService {
         chainStatisticNewResp.setBlockList(lists);
         BigDecimal issueValue = commonService.getIssueValue();
         log.info("获取总发行量[{}]", issueValue);
-        issueValue = new BigDecimal("10250000000000000000000000000.0000");
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         chainStatisticNewResp.setIssueValue(issueValue.abs());
         BigDecimal circulationValue = commonService.getCirculationValue();
         chainStatisticNewResp.setTurnValue(circulationValue);
