@@ -24,20 +24,17 @@ dependencies {
 
 //sonar扫描的路径
 sonarqube {
-    properties {
-        property "sonar.sources", "src/main/java"
-        property "sonar.exclusions", "**/*Application.java," +
-                "src/main/java/**/utils/**," +
-                "src/main/java/**/serializer/**," +
-                "src/main/java/**/config/**," +
-                "src/main/java/**/task/**," +
-                "src/main/java/**/response/token/**," +
-                "src/main/java/**/exception/**," +
-                "**/WebSocketController.java,**/BrowserCache.java," +
-                "**/JedisNoResultCall.java,**/CommonMethod.java," +
-                "**/NullStringJsonSerializer.java,**/NullArrayJsonSerializer.java," +
-                "**/RecaptchaDto.java,**/RewardJob.java,"
-                "**/PageHelper.java"
-
-    }
+	properties {
+		property "sonar.coverage.exclusions", "**/*Application.java," +
+				"**src/main/java/**/utils/**," +
+				"**src/main/java/**/task/**," +
+				"**src/main/java/**/serializer/**," +
+				"**src/main/java/**/response/**," +
+				"**src/main/java/**/request/**," +
+				"**src/main/java/**/exception/**," +
+				"**src/main/java/**/config/**," +
+				"**src/main/java/**/cache/**," +
+				"**src/main/java/**/controller/**," +
+				"**src/main/java/**/service/**,"
+	}
 }

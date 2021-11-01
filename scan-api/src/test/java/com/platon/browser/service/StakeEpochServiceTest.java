@@ -102,7 +102,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
 
 
         StakingDetailsReq stakingDetailsReq = new StakingDetailsReq();
-        stakingDetailsReq.setNodeId("0xdssfsf");
+        stakingDetailsReq.setNodeId("0xe0b6af6cc2e10b2b74540b87098083d48343805a3ff09c655eab0b20dba2b2851aea79ee75b6e150bde58ead0be03ee4a8619ea1dfaf529cbb8ff55ca23531ed");
 
         Node staking = new Node();
         staking.setNodeName("test");
@@ -127,11 +127,12 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setJoinTime(new Date());
         staking.setDeleAnnualizedRate(120.00);
         staking.setBigVersion(1792);
+        staking.setProgramVersion(1792);
         when(nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
         Address address = new Address();
         address.setType(1);
         when(addressMapper.selectByPrimaryKey(any())).thenReturn(address);
-        NetworkStat networkStatRedis =new NetworkStat();
+        NetworkStat networkStatRedis = new NetworkStat();
         networkStatRedis.setCurNumber(1000L);
         networkStatRedis.setNodeId("sfadafw55");
         when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatRedis);
