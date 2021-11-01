@@ -33,6 +33,8 @@ import java.util.List;
 @Service
 public class CommonService {
 
+    public final static  BigDecimal ISSUE_VALUE = new BigDecimal("10250000000000000000000000000.0000");
+
     @Resource
     private CustomNodeMapper customNodeMapper;
 
@@ -88,7 +90,6 @@ public class CommonService {
             }
         } catch (Exception e) {
             log.error("获取取总发行量异常", e);
-            issueValue = new BigDecimal("10250000000000000000000000000.0000");
         }
         return issueValue;
     }
@@ -146,9 +147,13 @@ public class CommonService {
     @Cacheable(value = "getCirculationValue")
     public BigDecimal getCirculationValue() {
         List<CountBalance> list = countBalance();
+
         BigDecimal issueValue = getIssueValue();
         log.info("获取总发行量[{}]", issueValue.toPlainString());
-        issueValue = new BigDecimal("10250000000000000000000000000.0000");
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         // 获取实时锁仓合约余额
         CountBalance lockUpValue = list.stream().filter(v -> v.getType() == 1).findFirst().orElseGet(CountBalance::new);
         // 获取实时质押合约余额
@@ -218,7 +223,10 @@ public class CommonService {
         List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
         log.info("获取总发行量[{}]", issueValue.toPlainString());
-        issueValue = new BigDecimal("10250000000000000000000000000.0000");
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         // 获取实时委托奖励池合约余额
         CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
         // 实时激励池余额
@@ -237,6 +245,16 @@ public class CommonService {
             log.error("获取质押率分母[{}]错误,不能为负数", stakingDenominator.toPlainString());
         }
         return stakingDenominator;
+    }
+
+    public static void check( BigDecimal calculated){
+        if(calculated == null){
+            log.error("总发行量 check value error calculated is null" );
+        }
+
+        if(calculated.compareTo(ISSUE_VALUE) != 0){
+            log.error("总发行量 check value error calculated = {}  inner = {}", calculated, ISSUE_VALUE);
+        }
     }
 
 }

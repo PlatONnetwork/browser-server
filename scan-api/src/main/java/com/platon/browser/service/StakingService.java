@@ -113,7 +113,10 @@ public class StakingService {
         }
         BigDecimal issueValue = commonService.getIssueValue();
         logger.info("获取总发行量[{}]", issueValue.toPlainString());
-        issueValue = new BigDecimal("10250000000000000000000000000.0000");
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         stakingStatisticNewResp.setIssueValue(issueValue);
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
