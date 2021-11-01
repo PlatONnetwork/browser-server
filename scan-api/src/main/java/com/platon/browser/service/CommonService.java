@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.client.PlatOnClient;
@@ -31,6 +32,8 @@ import java.util.List;
 @Slf4j
 @Service
 public class CommonService {
+
+    public final static  BigDecimal ISSUE_VALUE = new BigDecimal("10250000000000000000000000000.0000");
 
     @Resource
     private CustomNodeMapper customNodeMapper;
@@ -68,19 +71,22 @@ public class CommonService {
     @Cacheable(value = "getIssueValue")
     public BigDecimal getIssueValue() {
         BigDecimal issueValue = new BigDecimal(0);
+        log.info("进入获取总发行量方法");
         try {
             // 获取初始发行金额
             BigDecimal initIssueAmount = blockChainConfig.getInitIssueAmount();
+            initIssueAmount = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON);
             // 每年固定增发比例
             BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
             // 第几年
             int yearNum = getYearNum();
-            issueValue = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON)
-                                                 .multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum))
-                                                 .setScale(4, BigDecimal.ROUND_HALF_UP);
-            log.debug("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+            issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
+            log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
             if (issueValue.signum() == -1) {
-                log.error("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString());
+                throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString()));
+            }
+            if (initIssueAmount.compareTo(issueValue) >= 0) {
+                throw new Exception(StrUtil.format("获取总发行量[{}]错误,小于或等于初始发行量", issueValue.toPlainString()));
             }
         } catch (Exception e) {
             log.error("获取取总发行量异常", e);
@@ -106,6 +112,7 @@ public class CommonService {
             EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
             // 第几年
             yearNum = epochInfo.getYearNum().intValue();
+            log.info("获取年份：当前块高[{}]，上一结算周期最后一个块号[{}]，年份[{}]", currentNumber, preSettleEpochLastBlockNumber, yearNum);
         } catch (Exception e) {
             log.error("获取年份(第几年)异常", e);
         }
@@ -140,7 +147,13 @@ public class CommonService {
     @Cacheable(value = "getCirculationValue")
     public BigDecimal getCirculationValue() {
         List<CountBalance> list = countBalance();
+
         BigDecimal issueValue = getIssueValue();
+        log.info("获取总发行量[{}]", issueValue.toPlainString());
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         // 获取实时锁仓合约余额
         CountBalance lockUpValue = list.stream().filter(v -> v.getType() == 1).findFirst().orElseGet(CountBalance::new);
         // 获取实时质押合约余额
@@ -156,16 +169,16 @@ public class CommonService {
                                                 .subtract(delegationValue.getFree())
                                                 .subtract(incentivePoolValue.getFree())
                                                 .subtract(foundationValue.getFree());
-        log.debug("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
-                  circulationValue.toPlainString(),
-                  issueValue.toPlainString(),
-                  lockUpValue.getFree().toPlainString(),
-                  stakingValue.getFree().toPlainString(),
-                  delegationValue.getFree().toPlainString(),
-                  incentivePoolValue.getFree().toPlainString(),
-                  foundationValue.getFree().toPlainString());
+        log.info("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
+                 circulationValue.toPlainString(),
+                 issueValue.toPlainString(),
+                 lockUpValue.getFree().toPlainString(),
+                 stakingValue.getFree().toPlainString(),
+                 delegationValue.getFree().toPlainString(),
+                 incentivePoolValue.getFree().toPlainString(),
+                 foundationValue.getFree().toPlainString());
         if (circulationValue.signum() == -1) {
-            log.error("获取流通量[{}]错误,不能为负数", issueValue.toPlainString());
+            log.error("获取流通量[{}]错误,不能为负数", circulationValue.toPlainString());
         }
         return circulationValue;
     }
@@ -209,6 +222,11 @@ public class CommonService {
     public BigDecimal getStakingDenominator() {
         List<CountBalance> list = countBalance();
         BigDecimal issueValue = getIssueValue();
+        log.info("获取总发行量[{}]", issueValue.toPlainString());
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         // 获取实时委托奖励池合约余额
         CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
         // 实时激励池余额
@@ -227,6 +245,16 @@ public class CommonService {
             log.error("获取质押率分母[{}]错误,不能为负数", stakingDenominator.toPlainString());
         }
         return stakingDenominator;
+    }
+
+    public static void check( BigDecimal calculated){
+        if(calculated == null){
+            log.error("总发行量 check value error calculated is null" );
+        }
+
+        if(calculated.compareTo(ISSUE_VALUE) != 0){
+            log.error("总发行量 check value error calculated = {}  inner = {}", calculated, ISSUE_VALUE);
+        }
     }
 
 }

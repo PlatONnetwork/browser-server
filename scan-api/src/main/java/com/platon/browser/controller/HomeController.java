@@ -54,12 +54,12 @@ public class HomeController {
      * @date 2021/5/25
      */
     @PostMapping("home/queryNavigation")
-	public Mono<BaseResp<QueryNavigationResp>> queryNavigation(@Valid @RequestBody QueryNavigationRequest req) {
+    public Mono<BaseResp<QueryNavigationResp>> queryNavigation(@Valid @RequestBody QueryNavigationRequest req) {
         return Mono.create(sink -> {
             QueryNavigationResp resp = homeService.queryNavigation(req);
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),resp));
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp));
         });
-	}
+    }
 
     /**
      * 出块趋势
@@ -70,32 +70,32 @@ public class HomeController {
      */
     @SubscribeMapping("topic/block/statistic/new")
     @PostMapping("home/blockStatistic")
-	public Mono<BaseResp<BlockStatisticNewResp>> blockStatisticNew() {
+    public Mono<BaseResp<BlockStatisticNewResp>> blockStatisticNew() {
         return Mono.create(sink -> {
             BlockStatisticNewResp blockStatisticNewResp = homeService.blockStatisticNew();
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockStatisticNewResp));
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), blockStatisticNewResp));
         });
-	}
+    }
 
     @SubscribeMapping("/topic/chain/statistic/new")
     @PostMapping("home/chainStatistic")
-	public Mono<BaseResp<ChainStatisticNewResp>> chainStatisticNew() {
+    public Mono<BaseResp<ChainStatisticNewResp>> chainStatisticNew() {
         return Mono.create(sink -> {
             ChainStatisticNewResp chainStatisticNewResp = homeService.chainStatisticNew();
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),chainStatisticNewResp));
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), chainStatisticNewResp));
         });
-	}
+    }
 
     @SubscribeMapping("topic/staking/list/new")
     @PostMapping("home/stakingList")
-	public Mono<BaseResp<StakingListNewResp>> stakingListNew() {
+    public Mono<BaseResp<StakingListNewResp>> stakingListNew() {
         return Mono.create(sink -> {
             StakingListNewResp stakingListNewResp = homeService.stakingListNew();
             /**
              * 第一次返回都设为true
              */
             stakingListNewResp.setIsRefresh(true);
-            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp));
+            sink.success(BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), stakingListNewResp));
         });
     }
 
@@ -109,6 +109,11 @@ public class HomeController {
     public Mono<String> getIssueValue() {
         return Mono.create(sink -> {
             BigDecimal issueValue = commonService.getIssueValue();
+            log.info("总发行量为[{}]", issueValue.toPlainString());
+
+            CommonService.check(issueValue);
+            issueValue = CommonService.ISSUE_VALUE;
+
             issueValue = Convert.fromVon(issueValue, Convert.Unit.KPVON).setScale(8, RoundingMode.DOWN);
             sink.success(issueValue.toPlainString());
         });

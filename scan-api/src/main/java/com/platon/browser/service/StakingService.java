@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
@@ -12,13 +11,13 @@ import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.custommapper.CustomDelegationMapper;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.custommapper.CustomDelegationMapper;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -113,6 +112,11 @@ public class StakingService {
             stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
         }
         BigDecimal issueValue = commonService.getIssueValue();
+        logger.info("获取总发行量[{}]", issueValue.toPlainString());
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         stakingStatisticNewResp.setIssueValue(issueValue);
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
