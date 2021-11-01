@@ -223,7 +223,11 @@ public class StakingService {
                 logger.error("获取节点24小时出块率异常", e);
             }
             aliveStakingListResp.setDelegatedRewardRatio(new BigDecimal(staking.getRewardPer()).divide(Browser.PERCENTAGE).toString() + "%");
-            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
+            if (staking.getProgramVersion() != 0) {
+                aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getProgramVersion())));
+            } else {
+                aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
+            }
             lists.add(aliveStakingListResp);
             i++;
         }
@@ -321,7 +325,7 @@ public class StakingService {
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
             }
-            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getBigVersion())));
+            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getProgramVersion())));
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
@@ -330,8 +334,14 @@ public class StakingService {
             if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
+                logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
+                            resp.getRewardValue(),
+                            stakingNode.getStatFeeRewardValue(),
+                            stakingNode.getStatBlockRewardValue(),
+                            stakingNode.getStatStakingRewardValue());
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
+                logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]", resp.getRewardValue(), stakingNode.getStatFeeRewardValue());
                 resp.setExpectedIncome("");
             }
             String webSite = "";
