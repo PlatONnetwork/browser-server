@@ -109,6 +109,11 @@ public class HomeController {
     public Mono<String> getIssueValue() {
         return Mono.create(sink -> {
             BigDecimal issueValue = commonService.getIssueValue();
+            log.info("总发行量为[{}]", issueValue.toPlainString());
+
+            CommonService.check(issueValue);
+            issueValue = CommonService.ISSUE_VALUE;
+
             issueValue = Convert.fromVon(issueValue, Convert.Unit.KPVON).setScale(8, RoundingMode.DOWN);
             sink.success(issueValue.toPlainString());
         });

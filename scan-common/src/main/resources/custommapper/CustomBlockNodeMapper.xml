@@ -59,7 +59,7 @@
   </select>
 
   <select id="selectNodeByDis" resultMap="BaseResultMap">
-    select distinct(node_id) from block_node where staking_consensus_epoch >= #{startNum} and  #{endNum} >= staking_consensus_epoch;
+    select distinct(node_id) from block_node where staking_consensus_epoch >= #{startNum} and  #{endNum} >= staking_consensus_epoch
   </select>
 
 </mapper>
