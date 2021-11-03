@@ -37,7 +37,7 @@
     node_name,  node_icon, annualized_rate, leave_time, `status`, 
     is_consensus, is_settle, is_init, stat_delegate_value, stat_valid_addrs,  dele_annualized_rate ,stat_delegate_released,un_stake_freeze_duration,un_stake_end_block,
     stat_delegate_released,staking_reduction,zero_produce_freeze_duration, zero_produce_freeze_epoch,
-    low_rate_slash_count,reward_per,node_settle_statis_info,big_version
+    low_rate_slash_count,reward_per,node_settle_statis_info,program_version,big_version
   </sql>
   <select id="findNameById" resultType="java.lang.String">
     select node_name from node where node_id = #{nodeId,jdbcType=VARCHAR}

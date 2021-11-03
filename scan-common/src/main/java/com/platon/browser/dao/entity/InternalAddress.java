@@ -8,13 +8,27 @@ import java.util.Date;
 public class InternalAddress {
     private String address;
 
+    private String name;
+
     private Integer type;
 
     private BigDecimal balance;
 
     private BigDecimal restrictingBalance;
 
+    private Boolean isShow;
+
+    private Boolean isCalculate;
+
+    private Long createId;
+
+    private String createName;
+
     private Date createTime;
+
+    private Long updateId;
+
+    private String updateName;
 
     private Date updateTime;
 
@@ -24,6 +38,14 @@ public class InternalAddress {
 
     public void setAddress(String address) {
         this.address = address == null ? null : address.trim();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
     }
 
     public Integer getType() {
@@ -50,12 +72,60 @@ public class InternalAddress {
         this.restrictingBalance = restrictingBalance;
     }
 
+    public Boolean getIsShow() {
+        return isShow;
+    }
+
+    public void setIsShow(Boolean isShow) {
+        this.isShow = isShow;
+    }
+
+    public Boolean getIsCalculate() {
+        return isCalculate;
+    }
+
+    public void setIsCalculate(Boolean isCalculate) {
+        this.isCalculate = isCalculate;
+    }
+
+    public Long getCreateId() {
+        return createId;
+    }
+
+    public void setCreateId(Long createId) {
+        this.createId = createId;
+    }
+
+    public String getCreateName() {
+        return createName;
+    }
+
+    public void setCreateName(String createName) {
+        this.createName = createName == null ? null : createName.trim();
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Long getUpdateId() {
+        return updateId;
+    }
+
+    public void setUpdateId(Long updateId) {
+        this.updateId = updateId;
+    }
+
+    public String getUpdateName() {
+        return updateName;
+    }
+
+    public void setUpdateName(String updateName) {
+        this.updateName = updateName == null ? null : updateName.trim();
     }
 
     public Date getUpdateTime() {
@@ -75,10 +145,17 @@ public class InternalAddress {
      */
     public enum Column {
         address("address", "address", "VARCHAR", false),
+        name("name", "name", "VARCHAR", true),
         type("type", "type", "INTEGER", true),
         balance("balance", "balance", "DECIMAL", false),
         restrictingBalance("restricting_balance", "restrictingBalance", "DECIMAL", false),
+        isShow("is_show", "isShow", "BIT", false),
+        isCalculate("is_calculate", "isCalculate", "BIT", false),
+        createId("create_id", "createId", "BIGINT", false),
+        createName("create_name", "createName", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
+        updateId("update_id", "updateId", "BIGINT", false),
+        updateName("update_name", "updateName", "VARCHAR", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
         /**

@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.client.JobPlatOnClient;
@@ -128,10 +129,11 @@ public class BalanceUpdateTask {
                 synchronized (BalanceUpdateTask.class) {
                     // 批量更新余额
                     Instant start1 = Instant.now();
-                    customInternalAddressMapper.batchInsertOrUpdateSelective(
-                            addressMap.values(),
-                            InternalAddress.Column.excludes(InternalAddress.Column.updateTime)
-                    );
+                    if (CollUtil.isNotEmpty(addressMap)) {
+                        for (Map.Entry<String, InternalAddress> entry : addressMap.entrySet()) {
+                            internalAddressMapper.updateByPrimaryKey(entry.getValue());
+                        }
+                    }
                     Instant end1 = Instant.now();
                     Duration duration1 = Duration.between(start1, end1);
                     log.debug("本批次更新地址余额耗时：{} ms", duration1.toMillis());

@@ -44,6 +44,8 @@
       SUM( `restricting_balance` ) AS locked
     FROM
       `internal_address`
+    where
+      is_calculate = 1
     GROUP BY
       `type`
   </select>
@@ -79,7 +81,8 @@
   </sql>
 
   <sql id="Base_Column_List">
-    address, `type`, balance, restricting_balance, create_time, update_time
+    address, `name`, `type`, balance, restricting_balance, is_show, is_calculate, create_id,
+    create_name, create_time, update_id, update_name, update_time
   </sql>
 
   <select id="selectListByExample" parameterType="com.platon.browser.dao.entity.InternalAddressExample" resultMap="BaseResultMap">

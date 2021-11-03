@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
@@ -12,13 +11,13 @@ import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.custommapper.CustomDelegationMapper;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.custommapper.CustomDelegationMapper;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -113,6 +112,11 @@ public class StakingService {
             stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
         }
         BigDecimal issueValue = commonService.getIssueValue();
+        logger.info("获取总发行量[{}]", issueValue.toPlainString());
+
+        CommonService.check(issueValue);
+        issueValue = CommonService.ISSUE_VALUE;
+
         stakingStatisticNewResp.setIssueValue(issueValue);
         BigDecimal stakingDenominator = commonService.getStakingDenominator();
         stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
@@ -219,7 +223,11 @@ public class StakingService {
                 logger.error("获取节点24小时出块率异常", e);
             }
             aliveStakingListResp.setDelegatedRewardRatio(new BigDecimal(staking.getRewardPer()).divide(Browser.PERCENTAGE).toString() + "%");
-            aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
+            if (staking.getProgramVersion() != 0) {
+                aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getProgramVersion())));
+            } else {
+                aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
+            }
             lists.add(aliveStakingListResp);
             i++;
         }
@@ -317,7 +325,7 @@ public class StakingService {
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
             }
-            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getBigVersion())));
+            resp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(stakingNode.getProgramVersion())));
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
@@ -326,8 +334,14 @@ public class StakingService {
             if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
+                logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
+                            resp.getRewardValue(),
+                            stakingNode.getStatFeeRewardValue(),
+                            stakingNode.getStatBlockRewardValue(),
+                            stakingNode.getStatStakingRewardValue());
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
+                logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]", resp.getRewardValue(), stakingNode.getStatFeeRewardValue());
                 resp.setExpectedIncome("");
             }
             String webSite = "";

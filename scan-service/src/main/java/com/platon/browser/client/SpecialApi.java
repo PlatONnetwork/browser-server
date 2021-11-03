@@ -265,6 +265,9 @@ public class SpecialApi {
         if(br==null||br.getData()==null){
             throw new BlankResponseException(String.format("查询历史周期信息出错【blockNumber:%s)】,返回为空!",blockNumber));
         }
+
+        log.info("总发行量 特殊节点 req = {}  resp = {}", blockNumber,  cn.hutool.json.JSONUtil.toJsonStr(br));
+
         if(br.isStatusOk()){
             String data = br.getData();
             if(data==null){

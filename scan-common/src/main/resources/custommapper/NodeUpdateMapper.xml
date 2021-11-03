@@ -6,6 +6,7 @@
 		update `node` set
 			`node_icon` = #{item.nodeIcon},
 			`external_name` = #{item.externalName},
+			`program_version` = #{item.programVersion},
 			`big_version` = #{item.bigVersion}
 		where
 			`node_id` = #{item.nodeId};
