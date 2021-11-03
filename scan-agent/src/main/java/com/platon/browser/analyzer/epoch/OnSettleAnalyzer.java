@@ -1,28 +1,26 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.contracts.ppos.dto.resp.Node;
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.v0150.service.RestrictingMinimumReleaseParamService;
-import com.platon.browser.bean.AnnualizedRateInfo;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.bean.PeriodValueElement;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.custommapper.CustomGasEstimateLogMapper;
-import com.platon.browser.dao.custommapper.EpochBusinessMapper;
+import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Settle;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.utils.CalculateUtils;
+import com.platon.browser.v0150.service.RestrictingMinimumReleaseParamService;
+import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -55,6 +53,9 @@ public class OnSettleAnalyzer {
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
     @Resource
+    private GasEstimateLogMapper gasEstimateLogMapper;
+
+    @Resource
     private NetworkStatCache networkStatCache;
 
     @Resource
@@ -64,8 +65,7 @@ public class OnSettleAnalyzer {
         long startTime = System.currentTimeMillis();
         // 操作日志列表
         List<NodeOpt> nodeOpts = new ArrayList<>();
-        if (block.getNum() == 1)
-            return nodeOpts;
+        if (block.getNum() == 1) return nodeOpts;
 
         log.debug("Block Number:{}", block.getNum());
 
@@ -79,20 +79,19 @@ public class OnSettleAnalyzer {
         }
 
         Settle settle = Settle.builder()
-                .preVerifierSet(preVerifierMap.keySet())
-                .curVerifierSet(curVerifierMap.keySet())
-                .stakingReward(event.getEpochMessage().getPreStakeReward())
-                .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
-                .build();
+                              .preVerifierSet(preVerifierMap.keySet())
+                              .curVerifierSet(curVerifierMap.keySet())
+                              .stakingReward(event.getEpochMessage().getPreStakeReward())
+                              .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                              .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
+                              .build();
 
         List<Integer> statusList = new ArrayList<>();
         statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
         statusList.add(CustomStaking.StatusEnum.EXITING.getCode());
         statusList.add(CustomStaking.StatusEnum.LOCKED.getCode());
         StakingExample stakingExample = new StakingExample();
-        stakingExample.createCriteria()
-                .andStatusIn(statusList);
+        stakingExample.createCriteria().andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
         List<String> exitedNodeIds = new ArrayList<>();
         stakingList.forEach(staking -> {
@@ -101,10 +100,9 @@ public class OnSettleAnalyzer {
             staking.setStakingHes(BigDecimal.ZERO);
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
-            if (
-                    staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
-                            //(staking.getStakingReductionEpoch() + staking.getUnStakeFreezeDuration()) < settle.getSettingEpoch()
-                            event.getBlock().getNum() >= staking.getUnStakeEndBlock() // 且当前区块号大于等于质押预计的实际退出区块号
+            if (staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
+                    //(staking.getStakingReductionEpoch() + staking.getUnStakeFreezeDuration()) < settle.getSettingEpoch()
+                    event.getBlock().getNum() >= staking.getUnStakeEndBlock() // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 staking.setStakingReduction(BigDecimal.ZERO);
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
@@ -113,9 +111,8 @@ public class OnSettleAnalyzer {
             }
 
             //锁定中记录状态设置（状态为已锁定中且已经经过指定的结算周期数，则把状态置为候选中）
-            if (
-                    staking.getStatus() == CustomStaking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
-                            (staking.getZeroProduceFreezeEpoch() + staking.getZeroProduceFreezeDuration()) < settle.getSettingEpoch()
+            if (staking.getStatus() == CustomStaking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
+                    (staking.getZeroProduceFreezeEpoch() + staking.getZeroProduceFreezeDuration()) < settle.getSettingEpoch()
                 // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 // 低出块处罚次数置0
@@ -175,7 +172,13 @@ public class OnSettleAnalyzer {
         });
         settle.setStakingList(stakingList);
         settle.setExitNodeList(exitedNodeIds);
+
         epochBusinessMapper.settle(settle);
+        if (CollUtil.isNotEmpty(settle.getStakingList())) {
+            settle.getStakingList().forEach(staking -> {
+                log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为{}", block.getNum(), event.getEpochMessage().getSettleEpochRound(), staking.getNodeId(), staking.getStakingRewardValue().toPlainString());
+            });
+        }
 
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k, v) -> {
@@ -194,8 +197,10 @@ public class OnSettleAnalyzer {
         gasEstimateLogs.add(gasEstimateLog);
         customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
 
-        // 2、发布到操作队列
-        gasEstimateEventPublisher.publish(seq, gasEstimates, event.getTraceId());
+        if (CollUtil.isNotEmpty(gasEstimates)) {
+            epochBusinessMapper.updateGasEstimate(gasEstimates);
+        }
+        gasEstimateLogMapper.deleteByPrimaryKey(seq);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
@@ -221,12 +226,9 @@ public class OnSettleAnalyzer {
         // 解析年化率信息对象
         String ariString = staking.getAnnualizedRateInfo();
         AnnualizedRateInfo ari = StringUtils.isNotBlank(ariString) ? JSON.parseObject(ariString, AnnualizedRateInfo.class) : new AnnualizedRateInfo();
-        if (ari.getStakeProfit() == null)
-            ari.setStakeProfit(new ArrayList<>());
-        if (ari.getStakeCost() == null)
-            ari.setStakeCost(new ArrayList<>());
-        if (ari.getSlash() == null)
-            ari.setSlash(new ArrayList<>());
+        if (ari.getStakeProfit() == null) ari.setStakeProfit(new ArrayList<>());
+        if (ari.getStakeCost() == null) ari.setStakeCost(new ArrayList<>());
+        if (ari.getSlash() == null) ari.setSlash(new ArrayList<>());
 
         // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的质押成本为0
         BigDecimal curSettleCost = BigDecimal.ZERO;
@@ -234,7 +236,7 @@ public class OnSettleAnalyzer {
         // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
         // 计算当前质押成本 成本暂时不需要委托
         curSettleCost = staking.getStakingLocked() // 锁定的质押金
-                .add(staking.getStakingHes()); // 犹豫期的质押金
+                               .add(staking.getStakingHes()); // 犹豫期的质押金
 //                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
 //                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
 
@@ -246,8 +248,7 @@ public class OnSettleAnalyzer {
         // 打地基 START -- 这样收益总和才有减数基础
         layFoundation(ari.getStakeProfit(), settle.getSettingEpoch());
 
-        if (ari.getSlash() == null)
-            ari.setSlash(new ArrayList<>());
+        if (ari.getSlash() == null) ari.setSlash(new ArrayList<>());
         // 打地基 END
 
         // 默认节点在上一周期的收益为零
@@ -255,9 +256,9 @@ public class OnSettleAnalyzer {
         if (settle.getPreVerifierSet().contains(staking.getNodeId())) {
             // 如果当前节点在前一轮结算周期，则计算真实收益
             curSettleStakeProfit = staking.getStakingRewardValue() // 质押奖励
-                    .add(staking.getBlockRewardValue()) // + 出块奖励
-                    .add(staking.getFeeRewardValue()) // + 手续费奖励
-                    .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
+                                          .add(staking.getBlockRewardValue()) // + 出块奖励
+                                          .add(staking.getFeeRewardValue()) // + 手续费奖励
+                                          .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
         }
         // 轮换质押收益信息，把当前节点在上一周期的收益放入轮换信息里
         CalculateUtils.rotateProfit(ari.getStakeProfit(), curSettleStakeProfit, BigInteger.valueOf(settle.getSettingEpoch() - 1L), chainConfig);
@@ -288,10 +289,8 @@ public class OnSettleAnalyzer {
         // 解析年化率信息对象
         String ariString = staking.getAnnualizedRateInfo();
         AnnualizedRateInfo ari = StringUtils.isNotBlank(ariString) ? JSON.parseObject(ariString, AnnualizedRateInfo.class) : new AnnualizedRateInfo();
-        if (ari.getDelegateProfit() == null)
-            ari.setDelegateProfit(new ArrayList<>());
-        if (ari.getDelegateCost() == null)
-            ari.setDelegateCost(new ArrayList<>());
+        if (ari.getDelegateProfit() == null) ari.setDelegateProfit(new ArrayList<>());
+        if (ari.getDelegateCost() == null) ari.setDelegateCost(new ArrayList<>());
 
         // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的委托成本为0
         BigDecimal curDelegateCost = BigDecimal.ZERO;
@@ -347,9 +346,10 @@ public class OnSettleAnalyzer {
      * @param nodeOpts
      */
     private void recoverLog(Staking staking, int settingEpoch, Block block, List<NodeOpt> nodeOpts) {
-        String desc = NodeOpt.TypeEnum.UNLOCKED.getTpl().replace("LOCKED_EPOCH", staking.getZeroProduceFreezeEpoch().toString())
-                .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
-                .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
+        String desc = NodeOpt.TypeEnum.UNLOCKED.getTpl()
+                                               .replace("LOCKED_EPOCH", staking.getZeroProduceFreezeEpoch().toString())
+                                               .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
+                                               .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(staking.getNodeId());

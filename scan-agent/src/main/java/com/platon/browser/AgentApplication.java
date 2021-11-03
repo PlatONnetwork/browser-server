@@ -34,13 +34,7 @@ import java.util.concurrent.CompletableFuture;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@MapperScan(basePackages = {
-        "com.platon.browser",
-        "com.platon.browser.dao.mapper",
-        "com.platon.browser.dao.custommapper",
-        "com.platon.browser.v0150.dao",
-        "com.platon.browser.v0151.dao"
-})
+@MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper", "com.platon.browser.v0150.dao", "com.platon.browser.v0151.dao"})
 public class AgentApplication implements ApplicationRunner {
 
     // 区块服务
@@ -86,6 +80,7 @@ public class AgentApplication implements ApplicationRunner {
         retryableClient.zeroBlockNumberWait();
         InitializationResult initialResult = initializationService.init(traceId);
         consistencyService.post(traceId);
+        consistencyService.loadDestroyContract();
         // 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
         // 已采最高块号

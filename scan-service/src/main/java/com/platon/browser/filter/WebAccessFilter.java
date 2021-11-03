@@ -33,7 +33,7 @@ public class WebAccessFilter implements Filter {
         HttpServletResponse response = ((HttpServletResponse) servletResponse);
         long start = System.currentTimeMillis();
         RequestWrapper requestWrapper = new RequestWrapper(request);
-        String traceId = getReqTraceId(requestWrapper);
+        String traceId = CommonUtil.createTraceId();
         CommonUtil.putTraceId(traceId);
         requestParamLog(requestWrapper);
         requestWrapper.setAttribute(CommonConstant.TRACE_ID, traceId);
@@ -97,17 +97,12 @@ public class WebAccessFilter implements Filter {
         if (!ServletUtil.isMultipart(requestWrapper)) {
             // 不是文件上传，则打印请求参数
             log.info("[请求接口开始] 路径URL:{}, 请求方式:{}, Content-Type:{}, 请求参数:{}",
-                    requestWrapper.getRequestURL(),
-                    requestWrapper.getMethod(),
-                    StrUtil.blankToDefault(requestWrapper.getContentType(), "无"),
-                    StrUtil.blankToDefault(requestWrapper.getParamBody(), "无")
-            );
+                     requestWrapper.getRequestURL(),
+                     requestWrapper.getMethod(),
+                     StrUtil.blankToDefault(requestWrapper.getContentType(), "无"),
+                     StrUtil.blankToDefault(requestWrapper.getParamBody(), "无"));
         } else {
-            log.info("[请求接口开始] 路径URL:{}, 请求方式:{}, Content-Type:{}, 请求参数:文件上传",
-                    requestWrapper.getRequestURL(),
-                    requestWrapper.getMethod(),
-                    StrUtil.blankToDefault(requestWrapper.getContentType(), "无")
-            );
+            log.info("[请求接口开始] 路径URL:{}, 请求方式:{}, Content-Type:{}, 请求参数:文件上传", requestWrapper.getRequestURL(), requestWrapper.getMethod(), StrUtil.blankToDefault(requestWrapper.getContentType(), "无"));
         }
     }
 

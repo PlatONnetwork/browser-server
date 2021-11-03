@@ -1,12 +1,13 @@
 package com.platon.browser.service.block;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.CollectionBlockException;
+import com.platon.protocol.core.DefaultBlockParameter;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import com.platon.protocol.core.DefaultBlockParameter;
-import com.platon.protocol.core.methods.response.PlatonBlock;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class BlockRetryService {
             return block;
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
-            log.error("", e);
+            log.error(StrUtil.format("获取区块[{}]异常", blockNumber), e);
             throw e;
         }
     }
@@ -68,7 +69,7 @@ public class BlockRetryService {
                 throw new CollectionBlockException("currentBlockNumber(" + currentBlockNumber + ")>latestBlockNumber(" + latestBlockNumber + "), wait for chain");
             }
         } catch (Exception e) {
-            log.error("检查当前区块号合法异常{}", e.getMessage());
+            log.warn("检查当前区块号合法异常{}", e.getMessage());
             throw e;
         }
     }

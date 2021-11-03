@@ -3,7 +3,6 @@ package com.platon.browser.service.erc;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.contract.Erc20Contract;
@@ -12,7 +11,6 @@ import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.browser.v0152.service.ErcDetectService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,9 +27,6 @@ public class ErcServiceImpl {
     @Resource
     private ErcDetectService ercDetectService;
 
-    @Resource
-    private BlockChainConfig chainConfig;
-
     /**
      * 获取地址代币余额, ERC20为金额，ERC721为tokenId数
      *
@@ -41,7 +36,6 @@ public class ErcServiceImpl {
      * @return java.math.BigInteger
      * @date 2021/1/20
      */
-    @Retryable(value = Exception.class)
     public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account) {
         BigInteger balance = BigInteger.ZERO;
         try {
@@ -50,11 +44,11 @@ public class ErcServiceImpl {
                 balance = ercContract.balanceOf(account).send();
             }
         } catch (Exception e) {
-            log.error(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
+            log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException interruptedException) {
-                log.error("InterruptedException异常", interruptedException);
+                log.warn("InterruptedException异常", interruptedException);
             }
             throw new BusinessException("查询Token余额失败！");
         }
@@ -77,7 +71,7 @@ public class ErcServiceImpl {
                 totalSupply = ercContract.totalSupply().send();
             }
         } catch (Exception e) {
-            log.error(StrFormatter.format("获取供应总量异常,contractAddress：{}", contractAddress), e);
+            log.warn(StrFormatter.format("获取供应总量异常,contractAddress：{}", contractAddress), e);
         }
         return totalSupply;
     }
@@ -93,15 +87,58 @@ public class ErcServiceImpl {
     private ErcContract getErcContract(String contractAddress, ErcTypeEnum ercTypeEnum) {
         ErcContract ercContract = null;
         if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
-            ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
-                    ErcDetectService.CREDENTIALS,
-                    ErcDetectService.GAS_PROVIDER);
+            ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
-            ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(),
-                    ErcDetectService.CREDENTIALS,
-                    ErcDetectService.GAS_PROVIDER);
+            ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
         }
         return ercContract;
+    }
+
+    /**
+     * 根据contractAddress和ercTypeEnum获取对应类型的ErcContract
+     *
+     * @param contractAddress: 合约地址
+     * @param ercTypeEnum:     合约类型
+     * @param blockNumber:     块高
+     * @return: com.platon.browser.v0152.contract.ErcContract
+     * @date: 2021/10/25
+     */
+    private ErcContract getErcContract(String contractAddress, ErcTypeEnum ercTypeEnum, BigInteger blockNumber) {
+        ErcContract ercContract = null;
+        if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
+            ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
+        } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
+            ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
+        }
+        return ercContract;
+    }
+
+    /**
+     * 获取历史块高的erc20的合约余额
+     *
+     * @param tokenAddress:
+     * @param account:
+     * @param blockNumber:
+     * @return: java.math.BigInteger
+     * @date: 2021/10/25
+     */
+    public BigInteger getErc20HistoryBalance(String tokenAddress, String account, BigInteger blockNumber) {
+        BigInteger balance = BigInteger.ZERO;
+        try {
+            ErcContract ercContract = getErcContract(tokenAddress, ErcTypeEnum.ERC20, blockNumber);
+            if (ObjectUtil.isNotNull(ercContract)) {
+                balance = ercContract.balanceOf(account).send();
+            }
+        } catch (Exception e) {
+            log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException interruptedException) {
+                log.warn("InterruptedException异常", interruptedException);
+            }
+            throw new BusinessException("查询Token余额失败！");
+        }
+        return balance;
     }
 
     /**
@@ -120,7 +157,7 @@ public class ErcServiceImpl {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }
         } catch (Exception e) {
-            log.error(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
         }
         return tokenURI;
     }

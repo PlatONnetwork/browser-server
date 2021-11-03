@@ -12,6 +12,8 @@ public interface CustomTokenHolderMapper {
 
     Page<CustomTokenHolder> selectListByParams(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
 
+    Page<CustomTokenHolder> selectERC721Holder(@Param("tokenAddress") String tokenAddress);
+
     /**
      * 查询erc721令牌数量
      *

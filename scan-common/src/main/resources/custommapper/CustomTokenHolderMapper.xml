@@ -26,6 +26,24 @@
         </if>
         order by balance desc
     </select>
+    <select id="selectERC721Holder" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        select
+        th.token_address as tokenAddress,
+        th.address,
+        t.type,
+        t.symbol,
+        t.name,
+        t.total_supply as totalSupply,
+        th.balance,
+        t.decimal,
+        th.token_tx_qty as txCount
+        from token_holder th left join token t on th.token_address = t.address
+        where
+             th.token_address = #{tokenAddress}
+             AND t.type = 'erc721'
+        order by balance desc
+    </select>
     <select id="findErc721TokenHolder" parameterType="java.lang.String" resultType="com.platon.browser.bean.CustomTokenHolder">
         SELECT
             th.token_address AS tokenAddress,

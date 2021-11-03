@@ -59,6 +59,8 @@ public class QueryTokenDetailResp {
 
     private String sourceCode;
 
+    private int isContractDestroy;
+
     public static QueryTokenDetailResp fromTokenDetail(CustomTokenDetail token) {
         if (null == token) {
             return null;
@@ -78,6 +80,7 @@ public class QueryTokenDetailResp {
                 .binCode(token.getBinCode())
                 .webSite(token.getWebSite())
                 .type(token.getType())
+                .isContractDestroy(token.getIsContractDestroy())
                 .build();
     }
 
