@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.epoch;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.NetworkStatCache;
@@ -33,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -177,8 +175,9 @@ public class OnSettleAnalyzer {
 
         epochBusinessMapper.settle(settle);
         if (CollUtil.isNotEmpty(settle.getStakingList())) {
-            Map<String, String> res = settle.getStakingList().stream().collect(Collectors.toMap(Staking::getNodeId, v -> v.getStakingRewardValue().toPlainString(), (key1, key2) -> key2));
-            log.info("块高[{}]对应的结算周期为[{}]--节点的质押奖励信息为{}", block.getNum(), event.getEpochMessage().getSettleEpochRound(), JSONUtil.toJsonStr(res));
+            settle.getStakingList().forEach(staking -> {
+                log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为{}", block.getNum(), event.getEpochMessage().getSettleEpochRound(), staking.getNodeId(), staking.getStakingRewardValue().toPlainString());
+            });
         }
 
         List<GasEstimate> gasEstimates = new ArrayList<>();
