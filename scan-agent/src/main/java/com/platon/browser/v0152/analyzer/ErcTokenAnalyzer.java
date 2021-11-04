@@ -111,7 +111,7 @@ public class ErcTokenAnalyzer {
                 ercCache.tokenCache.put(token.getAddress(), token);
                 log.info("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
             } else {
-                log.error("该合约地址[{}]无法识别该类型[{}]", token.getAddress(), token.getTypeEnum());
+                log.warn("该合约地址[{}]无法识别该类型[{}]", token.getAddress(), token.getTypeEnum());
             }
         } catch (Exception e) {
             log.error("合约创建,解析Token异常", e);
