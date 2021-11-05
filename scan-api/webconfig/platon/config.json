@@ -14,7 +14,7 @@
     },
     {
       "order": 1,
-      "name": {"cn":"PlatON白皮书","en":"PlatON White Paper"},
+      "name": {"cn":"白皮书1.0","en":"White Paper1.0"},
       "logo": "",
       "url": {
         "cn": "https://www.platon.network/pdf/zh/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_ZH.pdf",
@@ -23,12 +23,21 @@
     },
     {
       "order": 2,
+      "name": {"cn":"白皮书2.0","en":"White Paper2.0"},
+      "logo": "",
+      "url": {
+        "cn": "https://www.platon.network/pdf/zh/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_ZH_2.pdf",
+        "en": "https://www.platon.network/pdf/en/PlatON_A_High-Efficiency_Trustless_Computing_Network_Whitepaper_EN_2.pdf"
+      }
+    },
+    {
+      "order": 3,
       "name": {"cn":"ATON钱包下载","en":"ATON Download"},
       "logo": "",
       "url": {"cn":"https://www.platon.network/developer#aton","en": "https://www.platon.network/en/developer#aton"}
     },
     {
-      "order": 3,
+      "order": 4,
       "name": {"cn":"开发者帮助","en":"Developer"},
       "logo": "",
       "url": {"cn":"https://devdocs.platon.network/docs/zh-CN/","en": "https://devdocs.platon.network/docs/en/"}
