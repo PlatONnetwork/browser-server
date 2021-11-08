@@ -95,6 +95,7 @@ public class OnSettleAnalyzer {
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
         List<String> exitedNodeIds = new ArrayList<>();
         stakingList.forEach(staking -> {
+
             //犹豫期金额变成锁定金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
             staking.setStakingHes(BigDecimal.ZERO);
@@ -138,6 +139,15 @@ public class OnSettleAnalyzer {
                 curSettleStakeReward = settle.getStakingReward();
             }
 
+            // MySQL数据库会四舍五入取整
+            log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
+                     block.getNum(),
+                     event.getEpochMessage().getSettleEpochRound(),
+                     staking.getNodeId(),
+                     staking.getStakingRewardValue().add(curSettleStakeReward).setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(),
+                     staking.getStakingRewardValue().toPlainString(),
+                     curSettleStakeReward.toPlainString());
+
             //当前质押是下轮结算周期验证人
             if (settle.getCurVerifierSet().contains(staking.getNodeId())) {
                 staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
@@ -174,11 +184,6 @@ public class OnSettleAnalyzer {
         settle.setExitNodeList(exitedNodeIds);
 
         epochBusinessMapper.settle(settle);
-        if (CollUtil.isNotEmpty(settle.getStakingList())) {
-            settle.getStakingList().forEach(staking -> {
-                log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为{}", block.getNum(), event.getEpochMessage().getSettleEpochRound(), staking.getNodeId(), staking.getStakingRewardValue().toPlainString());
-            });
-        }
 
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k, v) -> {
