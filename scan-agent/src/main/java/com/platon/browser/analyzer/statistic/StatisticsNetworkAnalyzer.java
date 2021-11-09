@@ -88,7 +88,7 @@ public class StatisticsNetworkAnalyzer {
         try {
             // 新结算周期事件
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
-                log.error("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
+                log.info("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
                 yearNum = getYearNum(curBlockNum);
                 totalIssueValue = getTotalIssueValue(yearNum);
                 networkStat.setYearNum(yearNum);
@@ -106,7 +106,7 @@ public class StatisticsNetworkAnalyzer {
                 log.info("当前块高[{}]在第[{}]结算周期获取本地内存的年份[{}]和总发行量[{}]成功", curBlockNum, settleEpochRound, yearNum, totalIssueValue.toPlainString());
             }
         } catch (Exception e) {
-            log.error(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常", curBlockNum, settleEpochRound), e);
+            log.info(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常", curBlockNum, settleEpochRound), e);
             // 如果当前区块获取总发行量异常，则重置本地内存的值，让下一个区块重新获取年份和总发行量，当前区块会丢失年份和总发行量(不建议做重试处理)
             yearNum = 0;
             totalIssueValue = null;
@@ -147,7 +147,7 @@ public class StatisticsNetworkAnalyzer {
         // 每年固定增发比例
         BigDecimal addIssueRate = chainConfig.getAddIssueRate();
         BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
-        log.error("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+        log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
         if (issueValue.signum() == -1) {
             throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString()));
         }
