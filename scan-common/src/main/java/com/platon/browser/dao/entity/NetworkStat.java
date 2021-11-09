@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class NetworkStat {
-
     private Integer id;
 
     private Long curNumber;
@@ -68,6 +67,10 @@ public class NetworkStat {
      * 整个链的erc20交易数
      */
     private Integer erc20TxQty;
+
+    private Integer yearNum;
+
+    private BigDecimal totalIssueValue;
 
     private String issueRates;
 
@@ -295,6 +298,22 @@ public class NetworkStat {
         this.erc20TxQty = erc20TxQty;
     }
 
+    public Integer getYearNum() {
+        return yearNum;
+    }
+
+    public void setYearNum(Integer yearNum) {
+        this.yearNum = yearNum;
+    }
+
+    public BigDecimal getTotalIssueValue() {
+        return totalIssueValue;
+    }
+
+    public void setTotalIssueValue(BigDecimal totalIssueValue) {
+        this.totalIssueValue = totalIssueValue;
+    }
+
     public String getIssueRates() {
         return issueRates;
     }
@@ -339,6 +358,8 @@ public class NetworkStat {
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),
         erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
         erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
+        yearNum("year_num", "yearNum", "INTEGER", false),
+        totalIssueValue("total_issue_value", "totalIssueValue", "DECIMAL", false),
         issueRates("issue_rates", "issueRates", "LONGVARCHAR", false);
 
         /**
@@ -482,7 +503,7 @@ public class NetworkStat {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column... excludes) {
+        public static Column[] excludes(Column ... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -505,5 +526,4 @@ public class NetworkStat {
             }
         }
     }
-
 }
