@@ -14,7 +14,6 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +55,7 @@ public class StatisticService {
      *
      * @return
      */
-    public void analyze(CollectionEvent event) throws NoSuchBeanException {
+    public void analyze(CollectionEvent event) throws Exception {
         long startTime = System.currentTimeMillis();
         Block block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
@@ -121,9 +120,15 @@ public class StatisticService {
                 if (CollUtil.isNotEmpty(updateNodeList)) {
                     int res = customNodeMapper.updateNodeSettleStatis(updateNodeList);
                     if (res > 0) {
-                        log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功", updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()), event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber());
+                        log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功",
+                                 updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()),
+                                 event.getEpochMessage().getConsensusEpochRound(),
+                                 event.getEpochMessage().getCurrentBlockNumber());
                     } else {
-                        log.error("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据失败", updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()), event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber());
+                        log.error("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据失败",
+                                  updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()),
+                                  event.getEpochMessage().getConsensusEpochRound(),
+                                  event.getEpochMessage().getCurrentBlockNumber());
                     }
                 }
             }
@@ -216,7 +221,10 @@ public class StatisticService {
             } else {
                 nodeSettleStatis = NodeSettleStatis.jsonToBean(info);
                 if (event.getEpochMessage().getCurrentBlockNumber().compareTo(BigInteger.valueOf(nodeSettleStatis.getBlockNum())) > 0) {
-                    addNodeSettleStatisBlockNum(event.getEpochMessage().getCurrentBlockNumber().longValue(), event.getBlock().getNodeId(), event.getEpochMessage().getSettleEpochRound(), nodeSettleStatis);
+                    addNodeSettleStatisBlockNum(event.getEpochMessage().getCurrentBlockNumber().longValue(),
+                                                event.getBlock().getNodeId(),
+                                                event.getEpochMessage().getSettleEpochRound(),
+                                                nodeSettleStatis);
                 }
             }
             updateNodeCacheSettleStatis(nodeItem.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));

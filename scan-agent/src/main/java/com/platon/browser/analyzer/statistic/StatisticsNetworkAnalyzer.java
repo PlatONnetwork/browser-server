@@ -13,15 +13,16 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.CalculateUtils;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -55,14 +56,19 @@ public class StatisticsNetworkAnalyzer {
      */
     private volatile BigDecimal totalIssueValue;
 
-    public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) throws NoSuchBeanException {
+    /**
+     * 重试次数
+     */
+    private AtomicLong retryCount = new AtomicLong(0);
+
+    public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
         long startTime = System.currentTimeMillis();
-        log.info("区块入库统计：区块[{}],交易数[{}],共识周期轮数[{}],结算周期轮数[{}],增发周期轮数[{}]",
-                 block.getNum(),
-                 event.getTransactions().size(),
-                 epochMessage.getConsensusEpochRound(),
-                 epochMessage.getSettleEpochRound(),
-                 epochMessage.getIssueEpochRound());
+        log.debug("区块入库统计：区块[{}],交易数[{}],共识周期轮数[{}],结算周期轮数[{}],增发周期轮数[{}]",
+                  block.getNum(),
+                  event.getTransactions().size(),
+                  epochMessage.getConsensusEpochRound(),
+                  epochMessage.getSettleEpochRound(),
+                  epochMessage.getIssueEpochRound());
         // 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
         networkStat.setNodeId(block.getNodeId());
@@ -84,8 +90,12 @@ public class StatisticsNetworkAnalyzer {
      * @return: void
      * @date: 2021/11/9
      */
-    private void setTotalIssueValue(Long curBlockNum, BigInteger settleEpochRound, NetworkStat networkStat) {
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    private void setTotalIssueValue(Long curBlockNum, BigInteger settleEpochRound, NetworkStat networkStat) throws Exception {
         try {
+            if (retryCount.incrementAndGet() > 1) {
+                log.info("重试次数[{}]", retryCount.get());
+            }
             // 新结算周期事件
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
                 log.info("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
@@ -105,11 +115,13 @@ public class StatisticsNetworkAnalyzer {
                 networkStat.setTotalIssueValue(totalIssueValue);
                 log.info("当前块高[{}]在第[{}]结算周期获取本地内存的年份[{}]和总发行量[{}]成功", curBlockNum, settleEpochRound, yearNum, totalIssueValue.toPlainString());
             }
+            retryCount.set(0);
         } catch (Exception e) {
-            log.info(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常", curBlockNum, settleEpochRound), e);
-            // 如果当前区块获取总发行量异常，则重置本地内存的值，让下一个区块重新获取年份和总发行量，当前区块会丢失年份和总发行量(不建议做重试处理)
+            log.error(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常，即将重试", curBlockNum, settleEpochRound), e);
+            // 如果当前区块获取总发行量异常，则重置本地内存的值
             yearNum = 0;
             totalIssueValue = null;
+            throw e;
         }
     }
 
@@ -147,7 +159,7 @@ public class StatisticsNetworkAnalyzer {
         // 每年固定增发比例
         BigDecimal addIssueRate = chainConfig.getAddIssueRate();
         BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
-        log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第几年[{}];", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+        log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第[{}]年", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
         if (issueValue.signum() == -1) {
             throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString()));
         }
