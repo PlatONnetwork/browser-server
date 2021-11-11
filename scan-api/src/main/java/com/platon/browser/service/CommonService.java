@@ -9,6 +9,8 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 实现
@@ -33,7 +36,7 @@ import java.util.List;
 @Service
 public class CommonService {
 
-    public final static  BigDecimal ISSUE_VALUE = new BigDecimal("10250000000000000000000000000.0000");
+    public final static BigDecimal ISSUE_VALUE = new BigDecimal("10250000000000000000000000000.0000");
 
     @Resource
     private CustomNodeMapper customNodeMapper;
@@ -49,6 +52,12 @@ public class CommonService {
 
     @Resource
     private CustomInternalAddressMapper customInternalAddressMapper;
+
+    @Resource
+    private CustomRpPlanMapper customRpPlanMapper;
+
+    @Resource
+    private StatisticCacheService statisticCacheService;
 
     public String getNodeName(String nodeId, String nodeName) {
         /**
@@ -138,7 +147,7 @@ public class CommonService {
 
     /**
      * 获取流通量
-     * 流通量 = 本增发周期总发行量 - 实时锁仓合约余额 -  实时质押合约余额 - 实时委托奖励池合约余额 - 实时激励池余额 - 实时所有基金会账户余额
+     * 流通量 = 本增发周期总发行量 - 锁仓未到期的金额 - 实时委托奖励池合约余额 - 实时激励池余额 - 实时所有基金会账户余额
      *
      * @param
      * @return void
@@ -150,33 +159,29 @@ public class CommonService {
 
         BigDecimal issueValue = getIssueValue();
         log.info("获取总发行量[{}]", issueValue.toPlainString());
-
         CommonService.check(issueValue);
         issueValue = CommonService.ISSUE_VALUE;
 
-        // 获取实时锁仓合约余额
-        CountBalance lockUpValue = list.stream().filter(v -> v.getType() == 1).findFirst().orElseGet(CountBalance::new);
-        // 获取实时质押合约余额
-        CountBalance stakingValue = list.stream().filter(v -> v.getType() == 2).findFirst().orElseGet(CountBalance::new);
+        NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+        // 锁仓未到期的金额
+        BigDecimal rpNotExpiredValue = customRpPlanMapper.getRPNotExpiredValue(blockChainConfig.getSettlePeriodBlockCount().longValue(), networkStat.getCurNumber());
+        rpNotExpiredValue = Optional.ofNullable(rpNotExpiredValue).orElse(BigDecimal.ZERO);
         // 获取实时委托奖励池合约余额
         CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
         // 实时激励池余额
         CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
         // 获取实时所有基金会账户余额
         CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
-        BigDecimal circulationValue = issueValue.subtract(lockUpValue.getFree())
-                                                .subtract(stakingValue.getFree())
-                                                .subtract(delegationValue.getFree())
-                                                .subtract(incentivePoolValue.getFree())
-                                                .subtract(foundationValue.getFree());
-        log.info("流通量[{}]=本增发周期总发行量[{}]-实时锁仓合约余额[{}]-实时质押合约余额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];",
+        BigDecimal circulationValue = issueValue.subtract(rpNotExpiredValue).subtract(delegationValue.getFree()).subtract(incentivePoolValue.getFree()).subtract(foundationValue.getFree());
+        log.info("流通量[{}]=本增发周期总发行量[{}]-锁仓未到期的金额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];当前块高[{}]结算周期总块数[{}]",
                  circulationValue.toPlainString(),
                  issueValue.toPlainString(),
-                 lockUpValue.getFree().toPlainString(),
-                 stakingValue.getFree().toPlainString(),
+                 rpNotExpiredValue.toPlainString(),
                  delegationValue.getFree().toPlainString(),
                  incentivePoolValue.getFree().toPlainString(),
-                 foundationValue.getFree().toPlainString());
+                 foundationValue.getFree().toPlainString(),
+                 networkStat.getCurNumber(),
+                 blockChainConfig.getSettlePeriodBlockCount().longValue());
         if (circulationValue.signum() == -1) {
             log.error("获取流通量[{}]错误,不能为负数", circulationValue.toPlainString());
         }
@@ -247,12 +252,12 @@ public class CommonService {
         return stakingDenominator;
     }
 
-    public static void check( BigDecimal calculated){
-        if(calculated == null){
-            log.error("总发行量 check value error calculated is null" );
+    public static void check(BigDecimal calculated) {
+        if (calculated == null) {
+            log.error("总发行量 check value error calculated is null");
         }
 
-        if(calculated.compareTo(ISSUE_VALUE) != 0){
+        if (calculated.compareTo(ISSUE_VALUE) != 0) {
             log.error("总发行量 check value error calculated = {}  inner = {}", calculated, ISSUE_VALUE);
         }
     }

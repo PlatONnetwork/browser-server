@@ -21,4 +21,14 @@ public interface CustomRpPlanMapper {
 
     BigDecimal sumAmountByAddressAndBlockNumber(@Param("address") String address, @Param("blockNumber") Long blockNumber);
 
+    /**
+     * 锁仓未到期的金额
+     *
+     * @param settlePeriodBlockCount: 每个结算周期区块总数
+     * @param curBlockNumber:         当前块高
+     * @return: java.math.BigDecimal
+     * @date: 2021/11/11
+     */
+    BigDecimal getRPNotExpiredValue(@Param("settlePeriodBlockCount") Long settlePeriodBlockCount, @Param("curBlockNumber") Long curBlockNumber);
+
 }
