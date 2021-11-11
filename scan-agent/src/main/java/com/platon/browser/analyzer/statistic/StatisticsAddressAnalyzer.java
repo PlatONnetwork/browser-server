@@ -68,6 +68,9 @@ public class StatisticsAddressAnalyzer {
                     case ERC20_EVM:
                         item.setType(CustomAddress.TypeEnum.ERC20_EVM.getCode());
                         break;
+                    case ERC721_EVM:
+                        item.setType(CustomAddress.TypeEnum.ERC721_EVM.getCode());
+                        break;
                 }
             }
             itemFromCache.add(item);

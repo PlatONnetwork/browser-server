@@ -47,7 +47,12 @@ public class CustomAddress extends Address {
      * 地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约
      */
     public enum TypeEnum {
-        ACCOUNT(1, "账号"), INNER_CONTRACT(2, "内置合约"), EVM(3, "3EVM合约"), WASM(4, "WASM合约"), ERC20_EVM(5, "ERC20合约");
+        ACCOUNT(1, "账号"),
+        INNER_CONTRACT(2, "内置合约"),
+        EVM(3, "3EVM合约"),
+        WASM(4, "WASM合约"),
+        ERC20_EVM(5, "ERC20合约"),
+        ERC721_EVM(6, "ERC721合约");
 
         private int code;
         private String desc;

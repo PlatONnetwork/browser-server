@@ -20,7 +20,7 @@ def itfswMybatisGeneratorPlugin = 'com.itfsw:mybatis-generator-plugin:1.2.20'
 mybatisGenerator {
     verbose = false
     configFile = "logs.xml"
-    configFile = "E:\\Java\\browser-server\\scan-generator\\browser-common.xml"
+    configFile = "C:\\project\\browser-server\\scan-generator\\browser-common.xml"
 
     dependencies {
         mybatisGenerator project(':scan-generator')

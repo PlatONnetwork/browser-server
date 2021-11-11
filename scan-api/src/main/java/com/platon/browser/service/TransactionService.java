@@ -254,20 +254,22 @@ public class TransactionService {
                     */
                     this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local), transaction.getFrom(), transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
-                    HexUtil.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)), HexUtil.append(EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN),
-                                                                                                                                                                            18)), HexUtil.append(EnergonUtil.format(Convert.fromVon(transaction.getCost(),
-                                                                                                                                                                                                                                    Convert.Unit.KPVON)
-                                                                                                                                                                                                                           .setScale(18,
-                                                                                                                                                                                                                                     RoundingMode.DOWN),
-                                                                                                                                                                                                                    18))};
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)), HexUtil.append(EnergonUtil.format(Convert.fromVon(valueOut,
+                                                                                                                                                                                            Convert.Unit.KPVON)
+                                                                                                                                                                                   .setScale(18,
+                                                                                                                                                                                             RoundingMode.DOWN),
+                                                                                                                                                                            18)), HexUtil.append(
+                    EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18))};
             rows.add(row);
         });
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE,
-                                                                                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
-                                                                                                                                                                                                                                       local), this.i18n.i(
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP,
+                                                                                                                                                        local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE,
+                                                                                                                                                                            local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
+                                                                                                                                                                                                local), this.i18n.i(
                 I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
-                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE,
-                                                                                                                                                                                                             local) + "(" + valueUnit + ")"};
+                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT,
+                                                                                                                        local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE,
+                                                                                                                                                                    local) + "(" + valueUnit + ")"};
         return this.downFileCommon.writeDate("Transaction-" + address + "-" + date + ".CSV", rows, headers);
     }
 

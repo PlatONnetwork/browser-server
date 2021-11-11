@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,8 +11,11 @@ import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -78,6 +82,9 @@ public class ErcTxService {
 
     @Resource
     private DownFileCommon downFileCommon;
+
+    @Resource
+    private AddressMapper addressMapper;
 
     @Resource
     private NetworkStatMapper networkStatMapper;
@@ -167,7 +174,10 @@ public class ErcTxService {
             }
         }
 
-        List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream().filter(p -> p != null && p.getDecimal() != null).map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p)).collect(Collectors.toList());
+        List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
+                                                                       .filter(p -> p != null && p.getDecimal() != null)
+                                                                       .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p))
+                                                                       .collect(Collectors.toList());
         result.init(recordListResp, totalCount, displayTotalCount, totalCount / req.getPageSize() + 1);
         return result;
     }
@@ -219,10 +229,12 @@ public class ErcTxService {
                 boolean toIsAddress = address.equals(esTokenTransferRecord.getTo());
                 String valueIn = toIsAddress ? esTokenTransferRecord.getValue() : "0";
                 String valueOut = !toIsAddress ? esTokenTransferRecord.getValue() : "0";
-                Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
+                Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(),
+                                                                                           "0",
+                                                                                           timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal())
-                                                                                                                                                                       .toString()), esTokenTransferRecord.getSymbol()};
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(
+                        valueOut), esTokenTransferRecord.getDecimal()).toString()), esTokenTransferRecord.getSymbol()};
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
                 String symbol = "";
@@ -232,7 +244,9 @@ public class ErcTxService {
                 if (tokenTypeEnum.equals(TokenTypeEnum.ERC721)) {
                     symbol = StrUtil.format("{}({})", esTokenTransferRecord.getName(), esTokenTransferRecord.getSymbol());
                 }
-                Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(), "0", timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
+                Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(),
+                                                                                           "0",
+                                                                                           timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
                         HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getValue()), esTokenTransferRecord.getDecimal()).toString()), symbol};
                 rows.add(row);
@@ -242,24 +256,25 @@ public class ErcTxService {
         if (StringUtils.isNotBlank(address)) {
             headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
                                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
-                                                                                                                                                                                      local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_IN,
-                                                                                                                                                                                                          local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_OUT,
-                                                                                                                                                                                                                              local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL,
-                                                                                                                                                                                                                                                  local)};
+                                                                                                                                                                                      local), this.i18n.i(
+                    I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_IN,
+                    local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_VALUE_OUT, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local)};
         } else if (StringUtils.isNotBlank(contract)) {
             if (tokenTypeEnum.equals(TokenTypeEnum.ERC20)) {
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
-                                                                                                                                                                      local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
-                                                                                                                                                                                          local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE,
-                                                                                                                                                                                                              local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL,
-                                                                                                                                                                                                                                  local)};
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP,
+                                                                                                           local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
+                                                                                                                               local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
+                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE,
+                                                                                                                                                                       local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL,
+                                                                                                                                                                                           local)};
             }
             if (tokenTypeEnum.equals(TokenTypeEnum.ERC721)) {
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
-                                                                                                                                                                      local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
-                                                                                                                                                                                          local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TOKEN_ID,
-                                                                                                                                                                                                              local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TOKEN,
-                                                                                                                                                                                                                                  local)};
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP,
+                                                                                                           local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
+                                                                                                                               local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
+                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TOKEN_ID,
+                                                                                                                                                                       local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TOKEN,
+                                                                                                                                                                                           local)};
             }
         }
         String fileName = "";
@@ -305,13 +320,21 @@ public class ErcTxService {
                     } else {
                         BigDecimal totalSupply = ConvertUtil.convertByFactor(new BigDecimal(originTotalSupply), tokenHolder.getDecimal());
                         // 总供应量大于0, 使用实际的余额除以总供应量
-                        resp.setPercent(balance.divide(totalSupply, decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(decimal, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "%");
+                        resp.setPercent(balance.divide(totalSupply, decimal, RoundingMode.HALF_UP)
+                                               .multiply(BigDecimal.valueOf(100))
+                                               .setScale(decimal, RoundingMode.HALF_UP)
+                                               .stripTrailingZeros()
+                                               .toPlainString() + "%");
                     }
                 } else {
                     //erc721
                     int holderNum = map.get(tokenHolder.getAddress()).intValue();
                     long total = totalTokenInventory.size();
-                    String percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(decimal, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString() + "%";
+                    String percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP)
+                                                              .multiply(BigDecimal.valueOf(100))
+                                                              .setScale(decimal, RoundingMode.HALF_UP)
+                                                              .stripTrailingZeros()
+                                                              .toPlainString() + "%";
                     resp.setPercent(percent);
                 }
             } else {
@@ -341,10 +364,13 @@ public class ErcTxService {
             return result;
         }
         List<QueryHolderTokenListResp> listResps = new ArrayList<>();
+        List<String> contractAddressList = new ArrayList<>();
+        Map<String, List<QueryHolderTokenListResp>> respMap = new HashMap<>();
         ids.stream().forEach(tokenHolder -> {
+            String contractAddress = tokenHolder.getTokenAddress();
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
-            queryHolderTokenListResp.setContract(tokenHolder.getTokenAddress());
+            queryHolderTokenListResp.setContract(contractAddress);
 
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
@@ -355,6 +381,30 @@ public class ErcTxService {
                 queryHolderTokenListResp.setBalance(BigDecimal.ZERO);
             }
             listResps.add(queryHolderTokenListResp);
+            contractAddressList.add(contractAddress);
+
+            List<QueryHolderTokenListResp> respList = respMap.computeIfAbsent(contractAddress, k -> new ArrayList<>());
+            respList.add(queryHolderTokenListResp);
+        });
+
+        // 批量查询地址表,并设置响应结果中的合约状态
+        AddressExample condition = new AddressExample();
+        condition.createCriteria().andAddressIn(contractAddressList);
+        List<Address> contractList = addressMapper.selectByExample(condition);
+        if (!contractList.isEmpty()) {
+            contractList.forEach(e -> {
+                int isDestroy = StringUtils.isBlank(e.getContractDestroyHash()) ? 0 : 1;
+                List<QueryHolderTokenListResp> respList = respMap.get(e.getAddress());
+                if (respList != null) {
+                    respList.forEach(r -> r.setIsContractDestroy(isDestroy));
+                }
+            });
+        }
+        listResps.sort(new Comparator<QueryHolderTokenListResp>() {
+            @Override
+            public int compare(QueryHolderTokenListResp o1, QueryHolderTokenListResp o2) {
+                return o1.getIsContractDestroy() - o2.getIsContractDestroy();
+            }
         });
         result.init(ids, listResps);
         return result;
@@ -384,15 +434,23 @@ public class ErcTxService {
                     // 总供应量大于0, 使用实际的余额除以总供应量
                     percent = originBalance.divide(totalSupply, decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
                 }
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
+                                                                                                               local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
             } else {
                 //erc721
                 int holderNum = maps.get(customTokenHolder.getAddress()).intValue();
                 long total = totalTokenInventory.size();
                 percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_AMOUNT, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_AMOUNT,
+                                                                                                               local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
             }
             Object[] row = {customTokenHolder.getAddress(), HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()), percent};
+            rows.add(row);
+        }
+        if (CollUtil.isEmpty(rows)) {
+            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
+                                                                                                           local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
+            Object[] row = {"", "", ""};
             rows.add(row);
         }
         return this.downFileCommon.writeDate("TokenHolder-" + contract + "-" + new Date().getTime() + ".CSV", rows, headers);
@@ -415,7 +473,8 @@ public class ErcTxService {
                 rows.add(row);
             });
             headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
-                                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT, local), this.i18n.i(
+                                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT,
+                                                                                                                                                                                       local), this.i18n.i(
                     I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT,
                     local)};
         } else {
@@ -426,10 +485,12 @@ public class ErcTxService {
                                                                                                                       .toString()), customTokenHolder.getDecimal(), customTokenHolder.getTxCount(), customTokenHolder.getTokenAddress()};
                 rows.add(row);
             });
-            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
-                                                                                                                                                                   local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS, local), this.i18n.i(
-                    I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT,
-                    local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local)};
+            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_SYMBOL,
+                                                                                                        local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
+                                                                                                                            local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS,
+                                                                                                                                                local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT,
+                                                                                                                                                                    local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT,
+                                                                                                                                                                                        local)};
         }
         return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
     }

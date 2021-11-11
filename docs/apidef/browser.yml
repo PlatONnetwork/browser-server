@@ -1588,6 +1588,9 @@ definitions:
       binCode:
         description: 合约的二进制码
         type: string
+      isContractDestroy:
+        description: 合约是否已销毁 0-否，1-是
+        type: integer
       holder:
         description: 持有人数
         type: integer
@@ -1828,6 +1831,9 @@ definitions:
         type: string
       txCount:
         description: 交易数
+        type: integer
+      isContractDestroy:
+        description: token所属合约是否已销毁：0-否，1-是
         type: integer
   HolderTokenListResult:
     type: object
@@ -3153,6 +3159,7 @@ definitions:
           - 0-转账
           - 1-合约发布(合约创建)
           - 2-合约调用(合约执行)
+          - 21-合约销毁
           - 4-其他
           - 5-MPC交易
           - 6-erc20合约创建
@@ -3312,6 +3319,7 @@ definitions:
           - 0-转账
           - 1-合约发布(合约创建)
           - 2-合约调用(合约执行)
+          - 21-合约销毁
           - 4-其他
           - 5-MPC交易
           - 6-erc20合约创建

@@ -308,7 +308,8 @@ public class TransactionUtil {
     public static void resolveGeneralContractInvokeTxComplementInfo(CollectionTransaction tx, PlatOnClient platOnClient,
                                                                     ComplementInfo ci, ContractTypeEnum contractTypeEnum, Logger logger) throws BeanCreateOrUpdateException {
         ci.setInfo("");
-        ci.setBinCode(getContractBinCode(tx, platOnClient, tx.getTo(), logger));
+        String binCode = getContractBinCode(tx, platOnClient, tx.getTo(), logger);
+        ci.setBinCode(binCode);
         // TODO: 解析出调用合约方法名
         String txInput = tx.getInput();
         // ci.method = getGeneralContractMethod();
@@ -328,6 +329,11 @@ public class TransactionUtil {
         if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
             ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             ci.setType(Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode());
+        }
+
+        if("0x".equals(binCode)){
+            // 如果交易的binCode属性为0x,则表明掉用了合约自毁方法, 交易类型设置为 合约销毁
+            ci.setType(Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode());
         }
     }
 

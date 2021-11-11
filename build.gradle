@@ -45,7 +45,7 @@ def recursiveCopy(startDir, replaceDir) {
             def gg = replaceDir
             def ss = conf.path.replace(replaceDir, 'scan-api/build/package/public')
             def packagePathFile = file(ss)
-            def outPathFile = file(conf.path.replace(replaceDir, 'scan-api/out/production/resources/public'))
+            def outPathFile = file(conf.path.replace(replaceDir, 'scan-api/build/distributions/public'))
             if (!classPathFile.exists()) classPathFile.parentFile.mkdirs()
             if (!packagePathFile.exists()) packagePathFile.parentFile.mkdirs()
             if (!outPathFile.exists()) outPathFile.parentFile.mkdirs()
@@ -109,9 +109,8 @@ subprojects {
 
         // 复制配置文件
         task copyConf(type: Copy) {
-            from('src/main/resources/application-prod.yml')
-            from('src/main/resources/application-hrpatp201018v10000.yml')
-            from('src/main/resources/application-hrplat100v10000.yml')
+            from('src/main/resources/application-platon.yml')
+            from('src/main/resources/application-alaya.yml')
             from('jasypt.properties')
             from('status.hook')
             from("build/libs/${packageName}.jar")
@@ -148,7 +147,7 @@ subprojects {
                                     new Yaml().load(api.text
                                             .replace("_VERSION_", "$projectVersion")
                                             .replace("_COMMIT_ID_", shortCommitId)
-                                            .replace("_BASE_PATH_", "/scan-api")
+                                            .replace("_BASE_PATH_", "/browser-server")
                                     )
                             ).toString(), "utf-8"
                     )

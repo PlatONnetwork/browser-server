@@ -399,28 +399,10 @@ CREATE TABLE `token` (
                          `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                          `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的交易数',
                          `holder` int(11) NOT NULL DEFAULT '0' COMMENT 'token对应的持有人的数量',
+                         `contract_destroy_block` bigint(20) DEFAULT NULL COMMENT '合约的销毁块高',
+                         `contract_destroy_update` tinyint(1) NOT NULL DEFAULT '0' COMMENT '销毁的合约是否已更新，1为是，0为否，默认是0',
                          PRIMARY KEY (`address`),
                          UNIQUE KEY `token_address` (`address`)
-);
-
-DROP TABLE IF EXISTS `token_expand`;
-CREATE TABLE `token_expand` (
-                                `address` varchar(64)  NOT NULL COMMENT '合约地址',
-                                `icon` text  COMMENT '合约图标',
-                                `web_site` varchar(256)  DEFAULT NULL COMMENT '合约地址',
-                                `details` varchar(256)  DEFAULT NULL COMMENT '合约官网',
-                                `is_show_in_aton` tinyint(1) DEFAULT '0' COMMENT 'aton中是否显示，0-隐藏 1-展示',
-                                `is_show_in_scan` tinyint(1) DEFAULT '0' COMMENT 'scan中是否显示，0-隐藏 1-展示',
-                                `is_can_transfer` tinyint(1) DEFAULT '0' COMMENT '是否可转账 0-不可转账 1-可转账',
-                                `create_id` bigint(20) NOT NULL COMMENT '创建者',
-                                `create_name` varchar(50)  NOT NULL COMMENT '创建者名称',
-                                `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                `update_id` bigint(20) NOT NULL COMMENT '更新者',
-                                `update_name` varchar(50)  NOT NULL COMMENT '更新者名称',
-                                `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                `is_show_in_aton_admin` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否显示在aton管理台，1为显示，0不显示，默认是0',
-                                `is_show_in_scan_admin` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否显示在scan管理台，1为显示，0不显示，默认是0',
-                                PRIMARY KEY (`address`)
 );
 
 DROP TABLE IF EXISTS `token_holder`;
@@ -480,15 +462,23 @@ CREATE TABLE `vote` (
 
 DROP TABLE IF EXISTS `internal_address`;
 CREATE TABLE `internal_address` (
-                                    `address` VARCHAR(42) NOT NULL COMMENT '地址',
-                                    `type` INT(11) NOT NULL DEFAULT '0' COMMENT '地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约 ',
-                                    `balance` DECIMAL(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
-                                    `restricting_balance` DECIMAL(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
-                                    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    `name` varchar(64) NOT NULL DEFAULT '基金会地址' COMMENT '地址名称',
+                                    `address` varchar(42) NOT NULL COMMENT '地址',
+                                    `type` int(11) NOT NULL DEFAULT '0' COMMENT '地址类型 :0-基金会账户  1-锁仓合约地址  2-质押合约  3-激励池合约  6-委托奖励池合约 ',
+                                    `balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '余额(von)',
+                                    `restricting_balance` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '锁仓余额(von)',
+                                    `is_show` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否用于展示  0-否 1-是',
+                                    `is_calculate` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否用于计算  0-否 1-是',
+                                    `create_id` bigint(20) NOT NULL DEFAULT '1' COMMENT '创建者',
+                                    `create_name` varchar(64) NOT NULL DEFAULT 'admin' COMMENT '创建者名称',
+                                    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_id` bigint(20) NOT NULL DEFAULT '1' COMMENT '更新者',
+                                    `update_name` varchar(64) NOT NULL DEFAULT 'admin' COMMENT '更新者名称',
+                                    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                                     PRIMARY KEY (`address`),
                                     KEY `type` (`type`) USING BTREE
 );
+
 -- 初始化数据
 -- 还有部分基金会地址由运维手工导入
 INSERT INTO `internal_address` (`address`,`type`)
@@ -496,6 +486,3 @@ VALUES ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7pn3ep', 1),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzsjx8h7', 2),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrdyjj2v', 3),
        ('lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxlcypcy', 6);
-
-update token_expand set `is_show_in_aton_admin` = 1 where `is_show_in_aton` = 1;
-update token_expand set `is_show_in_scan_admin` = 1 where `is_show_in_scan` = 1;

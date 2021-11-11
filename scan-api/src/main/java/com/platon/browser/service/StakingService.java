@@ -475,6 +475,19 @@ public class StakingService {
                         stakingOptRecordListResp.setProposalType(desces[2]);
                         stakingOptRecordListResp.setType("4");
                         break;
+                    /**
+                     * 版本声明
+                     */
+                    case VERSION:
+                        String v = desces[2];
+                        if (StringUtils.isNotBlank(v)) {
+                            v = ChainVersionUtil.toStringVersion(new BigInteger(v));
+                        } else {
+                            v = "0";
+                        }
+                        stakingOptRecordListResp.setVersion(v);
+                        stakingOptRecordListResp.setType("12");
+                        break;
                     default:
                         break;
                 }

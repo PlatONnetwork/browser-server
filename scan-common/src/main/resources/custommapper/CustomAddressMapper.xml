@@ -79,4 +79,17 @@
         </foreach>
     </update>
 
+    <select id="findContractDestroy" parameterType="integer" resultType="string">
+        SELECT DISTINCT
+        address
+        FROM
+        address t1
+        WHERE
+        t1.contract_destroy_hash IS NOT NULL
+        AND LENGTH( trim( t1.contract_destroy_hash ) ) > 0
+        <if test="type!=null">
+            and t1.`type` = #{type}
+        </if>
+    </select>
+
 </mapper>

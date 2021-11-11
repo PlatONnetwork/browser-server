@@ -123,6 +123,10 @@ public class Transaction {
          */
         TRANSFER(0, "转账"),
         /**
+         * 合约销毁
+         */
+        CONTRACT_EXEC_DESTROY(21, "合约销毁"),
+        /**
          * 1-EVM合约发布(合约创建)
          */
         EVM_CONTRACT_CREATE(1, "EVM合约发布(合约创建)"),
@@ -251,7 +255,8 @@ public class Transaction {
      * 交易结果成败枚举类： 1.成功 2.失败
      */
     public enum StatusEnum {
-        SUCCESS(1, "成功"), FAILURE(2, "失败");
+        SUCCESS(1, "成功"),
+        FAILURE(2, "失败");
 
         private int code;
 
