@@ -78,7 +78,7 @@
             rp_plan t1
     ) t2
     where
-    t2.endBlockNum <![CDATA[ <= ]]> #{curBlockNumber}
+    t2.endBlockNum <![CDATA[ >= ]]> #{curBlockNumber}
   </select>
 
 </mapper>
