@@ -17,29 +17,29 @@ public interface StakeBusinessMapper {
      * 发起质押
      * @param param
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void create(BusinessParam param);
     /**
      * 增持质押
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void increase(BusinessParam param);
     /**
      * 修改质押信息
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void modify(BusinessParam param );
 
     /**
      * 质押金被锁定状态下，退出质押
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void lockedExit(BusinessParam param);
 
     /**
      * 质押金未被锁定状态下，退出质押
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void unlockExit(BusinessParam param);
 
     /**

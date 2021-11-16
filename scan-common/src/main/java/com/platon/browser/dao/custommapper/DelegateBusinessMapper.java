@@ -13,13 +13,13 @@ public interface DelegateBusinessMapper {
      * 发起委托
      * @param param
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void create ( BusinessParam param );
 
     /**
      * 退出委托
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void exit ( BusinessParam param );
 
     /**
@@ -27,6 +27,6 @@ public interface DelegateBusinessMapper {
      * 领取委托奖励
      * @param param
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void claim(BusinessParam param);
 }

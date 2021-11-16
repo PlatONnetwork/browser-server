@@ -12,6 +12,6 @@ public interface NewBlockMapper {
     /**
      * 新区块相关数据更新
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void newBlock(BusinessParam param);
 }

@@ -115,7 +115,7 @@ public class InitializationService {
      * @return com.platon.browser.bootstrap.bean.InitializationResult
      * @date 2021/4/19
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public InitializationResult init(String traceId) throws BlockNumberException {
         log.info("进入应用初始化子流程");
         proposalCache.init();

@@ -20,14 +20,14 @@ public interface StatisticBusinessMapper {
      * 地址数据变更
      * @param param
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void addressChange ( BusinessParam param );
 
     /**
      * 统计数据变更
      * @param param
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void networkChange ( NetworkStat param );
     
     /**
@@ -51,8 +51,8 @@ public interface StatisticBusinessMapper {
 	List<AddressStatistics> getAddressStatisticsFromStaking(@Param("list") List<String> list);
 
 	List<AddressStatistics> getAddressStatisticsFromDelegation(@Param("list") List<String> list);
-	
-	@Transactional
+
+    @Transactional(rollbackFor = {Exception.class, Error.class})
 	int batchUpdateFromTask(@Param("list") List<Address> list);
 
 

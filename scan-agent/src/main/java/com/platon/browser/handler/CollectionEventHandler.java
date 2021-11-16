@@ -90,7 +90,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      */
     private AtomicLong retryCount = new AtomicLong(0);
 
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);

@@ -14,39 +14,41 @@ import java.util.List;
  * @Description:
  */
 public interface ProposalBusinessMapper {
+
     /**
      * 文本提案
      */
-    @Transactional
-    void text ( BusinessParam param );
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    void text(BusinessParam param);
 
     /**
      * 升级提案
      */
-    @Transactional
-    void upgrade ( BusinessParam param );
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    void upgrade(BusinessParam param);
 
     /**
      * 取消提案
      */
-    @Transactional
-    void cancel ( BusinessParam param );
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    void cancel(BusinessParam param);
 
     /**
      * 投票
      */
-    @Transactional
-    void vote ( BusinessParam param );
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    void vote(BusinessParam param);
 
     /**
      * 参数提案
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void parameter(ProposalParameter businessParam);
-    
+
     /**
      * 提案数据更新
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void proposalSlashUpdate(@Param("proposalSlashs") List<ProposalSlash> proposalSlashs);
+
 }
