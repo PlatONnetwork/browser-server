@@ -2,23 +2,23 @@ package com.platon.browser.service.epoch;
 
 import com.platon.browser.bean.ConfigChange;
 import com.platon.browser.bean.EpochInfo;
+import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.constant.Browser;
-import com.platon.browser.exception.CandidateException;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.CandidateException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexUtil;
 import com.platon.contracts.ppos.dto.CallResponse;
 import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.protocol.Web3j;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import com.platon.protocol.Web3j;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -210,8 +210,7 @@ public class EpochRetryService {
             // 前一结算周期质押奖励轮换
             preStakeReward = stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
-            stakeReward = settleStakeReward.divide(BigDecimal.valueOf(curVerifiers.size()), 10, RoundingMode.FLOOR);
-            log.info("当前块高[{}]第[{}]个结算周期，质押奖励[{}]=总质押奖励[{}]/当前验证人数量[{}]", currentBlockNumber, currentEpoch, stakeReward.toPlainString(), settleStakeReward.toPlainString(), curVerifiers.size());
+            stakeReward = getStakeReward(currentBlockNumber, currentEpoch);
             ConfigChange configChange = new ConfigChange();
             configChange.setAvgPackTime(epochInfo.getAvgPackTime());
             configChange.setBlockReward(epochInfo.getPackageReward());
@@ -228,6 +227,40 @@ public class EpochRetryService {
             platOnClient.updateCurrentWeb3jWrapper();
             throw new BusinessException(e.getMessage());
         }
+    }
+
+    /**
+     * 计算当前结算周期内每个验证人的质押奖励
+     *
+     * @param currentBlockNumber: 当前块高=(n-1)*10750+1;n>=1;
+     * @param currentEpoch:       当前结算周期=n
+     * @return: java.math.BigDecimal
+     * @date: 2021/11/16
+     */
+    private BigDecimal getStakeReward(BigInteger currentBlockNumber, BigInteger currentEpoch) throws Exception {
+        // 链上最新块所处周期
+        Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
+        // 上一结算周期最后一个块号
+        BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getSettlePeriodBlockCount());
+        // 从特殊接口获取
+        EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
+        // 当前增发周期内每个结算周期的质押奖励
+        BigDecimal settleStakeReward = epochInfo.getStakingReward();
+        // 如果前一个周期的最后一个块是0，则查第0块时的验证人作为当前验证人
+        BigInteger targetBlockNumber = preSettleEpochLastBlockNumber.compareTo(BigInteger.ZERO) == 0 ? BigInteger.ZERO : preSettleEpochLastBlockNumber.add(BigInteger.ONE);
+        List<Node> lastNodes = Collections.emptyList();
+        lastNodes = specialApi.getHistoryVerifierList(web3j, targetBlockNumber);
+        // 计算当前结算周期内每个验证人的质押奖励
+        BigDecimal stakeReward = settleStakeReward.divide(BigDecimal.valueOf(lastNodes.size()), 10, RoundingMode.FLOOR);
+        log.info("当前块高[{}]第[{}]个结算周期，质押奖励[{}]=第[{}]个结算周期的总质押奖励[{}]/第[{}]个结算周期的验证人数量[{}]",
+                 currentBlockNumber,
+                 currentEpoch,
+                 stakeReward.toPlainString(),
+                 currentEpoch.subtract(BigInteger.ONE),
+                 settleStakeReward.toPlainString(),
+                 currentEpoch.subtract(BigInteger.ONE),
+                 lastNodes.size());
+        return stakeReward;
     }
 
     /**
