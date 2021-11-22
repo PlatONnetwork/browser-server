@@ -231,6 +231,7 @@ public class EpochRetryService {
 
     /**
      * 计算当前结算周期内每个验证人的质押奖励
+     * 第n个结算周期的分配质押奖励=第n-1个结算周期的总质押奖励/第n-1个结算周期的验证人列表数
      *
      * @param currentBlockNumber: 当前块高=(n-1)*10750+1;n>=1;
      * @param currentEpoch:       当前结算周期=n
@@ -252,9 +253,10 @@ public class EpochRetryService {
         lastNodes = specialApi.getHistoryVerifierList(web3j, targetBlockNumber);
         // 计算当前结算周期内每个验证人的质押奖励
         BigDecimal stakeReward = settleStakeReward.divide(BigDecimal.valueOf(lastNodes.size()), 10, RoundingMode.FLOOR);
-        log.info("当前块高[{}]第[{}]个结算周期，质押奖励[{}]=第[{}]个结算周期的总质押奖励[{}]/第[{}]个结算周期的验证人数量[{}]",
+        log.info("当前块高[{}]第[{}]个结算周期，上一个结算周期最后一个块高[{}]，质押奖励[{}]=第[{}]个结算周期的总质押奖励[{}]/第[{}]个结算周期的验证人数量[{}]",
                  currentBlockNumber,
                  currentEpoch,
+                 preSettleEpochLastBlockNumber,
                  stakeReward.toPlainString(),
                  currentEpoch.subtract(BigInteger.ONE),
                  settleStakeReward.toPlainString(),
