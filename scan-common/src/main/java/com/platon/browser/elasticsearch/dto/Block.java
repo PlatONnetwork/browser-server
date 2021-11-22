@@ -70,13 +70,13 @@ public class Block {
     AtomicLong seq;
 
     @JSONField(serialize = false)
-    private List<com.platon.protocol.core.methods.response.Transaction> originTransactions = Collections.emptyList();
+    private List<com.platon.protocol.core.methods.response.Transaction> originTransactions = new ArrayList<>();
 
     /**
      * key:交易hash,value:回执
      */
     @JSONField(serialize = false)
-    private Map<String, Receipt> receiptMap = Collections.emptyMap();
+    private Map<String, Receipt> receiptMap = new HashMap<>();
 
     /******** 把字符串类数值转换为大浮点数的便捷方法 ********/
     public BigDecimal decimalGasLimit() {

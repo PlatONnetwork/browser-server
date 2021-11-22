@@ -4,6 +4,7 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class CollectionEvent {
     private Block block;
 
     // 交易列表
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
 
     private EpochMessage epochMessage;
 
