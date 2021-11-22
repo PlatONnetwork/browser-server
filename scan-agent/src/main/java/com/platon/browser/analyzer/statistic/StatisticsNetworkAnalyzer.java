@@ -102,7 +102,7 @@ public class StatisticsNetworkAnalyzer {
                 yearNum = getYearNum(curBlockNum);
                 totalIssueValue = getTotalIssueValue(yearNum);
                 networkStat.setYearNum(yearNum);
-                networkStat.setTotalIssueValue(totalIssueValue);
+                networkStat.setIssueValue(totalIssueValue);
             } else {
                 // 非结算周期的区块则取本地内存中的值
                 if (yearNum < 1 || totalIssueValue == null) {
@@ -112,7 +112,7 @@ public class StatisticsNetworkAnalyzer {
                     totalIssueValue = getTotalIssueValue(yearNum);
                 }
                 networkStat.setYearNum(yearNum);
-                networkStat.setTotalIssueValue(totalIssueValue);
+                networkStat.setIssueValue(totalIssueValue);
                 log.info("当前块高[{}]在第[{}]结算周期获取本地内存的年份[{}]和总发行量[{}]成功", curBlockNum, settleEpochRound, yearNum, totalIssueValue.toPlainString());
             }
             retryCount.set(0);

@@ -1875,66 +1875,6 @@ public class NetworkStatExample {
             addCriterion("year_num not between", value1, value2, "yearNum");
             return (Criteria) this;
         }
-
-        public Criteria andTotalIssueValueIsNull() {
-            addCriterion("total_issue_value is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueIsNotNull() {
-            addCriterion("total_issue_value is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueEqualTo(BigDecimal value) {
-            addCriterion("total_issue_value =", value, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueNotEqualTo(BigDecimal value) {
-            addCriterion("total_issue_value <>", value, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueGreaterThan(BigDecimal value) {
-            addCriterion("total_issue_value >", value, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("total_issue_value >=", value, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueLessThan(BigDecimal value) {
-            addCriterion("total_issue_value <", value, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("total_issue_value <=", value, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueIn(List<BigDecimal> values) {
-            addCriterion("total_issue_value in", values, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueNotIn(List<BigDecimal> values) {
-            addCriterion("total_issue_value not in", values, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("total_issue_value between", value1, value2, "totalIssueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalIssueValueNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("total_issue_value not between", value1, value2, "totalIssueValue");
-            return (Criteria) this;
-        }
     }
 
     public static class Criteria extends GeneratedCriteria {

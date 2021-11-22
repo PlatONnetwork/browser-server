@@ -31,7 +31,6 @@
     <result column="erc721_tx_qty" jdbcType="INTEGER" property="erc721TxQty" />
     <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty" />
     <result column="year_num" jdbcType="INTEGER" property="yearNum" />
-    <result column="total_issue_value" jdbcType="DECIMAL" property="totalIssueValue" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.NetworkStat">
     <result column="issue_rates" jdbcType="LONGVARCHAR" property="issueRates" />
@@ -99,7 +98,7 @@
     turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
     proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
     add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time, 
-    erc721_tx_qty, erc20_tx_qty, year_num, total_issue_value
+    erc721_tx_qty, erc20_tx_qty, year_num
   </sql>
   <sql id="Blob_Column_List">
     issue_rates
@@ -162,8 +161,8 @@
       settle_staking_reward, add_issue_begin, add_issue_end, 
       next_settle, node_opt_seq, create_time, 
       update_time, avg_pack_time, erc721_tx_qty, 
-      erc20_tx_qty, year_num, total_issue_value, 
-      issue_rates)
+      erc20_tx_qty, year_num, issue_rates
+      )
     values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
       #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, 
       #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, 
@@ -173,8 +172,8 @@
       #{settleStakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
       #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT}, #{erc721TxQty,jdbcType=INTEGER}, 
-      #{erc20TxQty,jdbcType=INTEGER}, #{yearNum,jdbcType=INTEGER}, #{totalIssueValue,jdbcType=DECIMAL}, 
-      #{issueRates,jdbcType=LONGVARCHAR})
+      #{erc20TxQty,jdbcType=INTEGER}, #{yearNum,jdbcType=INTEGER}, #{issueRates,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into network_stat
@@ -265,9 +264,6 @@
       </if>
       <if test="yearNum != null">
         year_num,
-      </if>
-      <if test="totalIssueValue != null">
-        total_issue_value,
       </if>
       <if test="issueRates != null">
         issue_rates,
@@ -360,9 +356,6 @@
       </if>
       <if test="yearNum != null">
         #{yearNum,jdbcType=INTEGER},
-      </if>
-      <if test="totalIssueValue != null">
-        #{totalIssueValue,jdbcType=DECIMAL},
       </if>
       <if test="issueRates != null">
         #{issueRates,jdbcType=LONGVARCHAR},
@@ -465,9 +458,6 @@
       <if test="record.yearNum != null">
         year_num = #{record.yearNum,jdbcType=INTEGER},
       </if>
-      <if test="record.totalIssueValue != null">
-        total_issue_value = #{record.totalIssueValue,jdbcType=DECIMAL},
-      </if>
       <if test="record.issueRates != null">
         issue_rates = #{record.issueRates,jdbcType=LONGVARCHAR},
       </if>
@@ -507,7 +497,6 @@
       erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
       year_num = #{record.yearNum,jdbcType=INTEGER},
-      total_issue_value = #{record.totalIssueValue,jdbcType=DECIMAL},
       issue_rates = #{record.issueRates,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -543,8 +532,7 @@
       avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
       erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
-      year_num = #{record.yearNum,jdbcType=INTEGER},
-      total_issue_value = #{record.totalIssueValue,jdbcType=DECIMAL}
+      year_num = #{record.yearNum,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -636,9 +624,6 @@
       <if test="yearNum != null">
         year_num = #{yearNum,jdbcType=INTEGER},
       </if>
-      <if test="totalIssueValue != null">
-        total_issue_value = #{totalIssueValue,jdbcType=DECIMAL},
-      </if>
       <if test="issueRates != null">
         issue_rates = #{issueRates,jdbcType=LONGVARCHAR},
       </if>
@@ -675,7 +660,6 @@
       erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
       year_num = #{yearNum,jdbcType=INTEGER},
-      total_issue_value = #{totalIssueValue,jdbcType=DECIMAL},
       issue_rates = #{issueRates,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -708,8 +692,7 @@
       avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
       erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
-      year_num = #{yearNum,jdbcType=INTEGER},
-      total_issue_value = #{totalIssueValue,jdbcType=DECIMAL}
+      year_num = #{yearNum,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -723,8 +706,7 @@
       turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
       proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, 
       add_issue_begin, add_issue_end, next_settle, node_opt_seq, create_time, update_time, 
-      avg_pack_time, erc721_tx_qty, erc20_tx_qty, year_num, total_issue_value, issue_rates
-      )
+      avg_pack_time, erc721_tx_qty, erc20_tx_qty, year_num, issue_rates)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
@@ -738,8 +720,7 @@
         #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.avgPackTime,jdbcType=BIGINT}, 
         #{item.erc721TxQty,jdbcType=INTEGER}, #{item.erc20TxQty,jdbcType=INTEGER}, #{item.yearNum,jdbcType=INTEGER}, 
-        #{item.totalIssueValue,jdbcType=DECIMAL}, #{item.issueRates,jdbcType=LONGVARCHAR}
-        )
+        #{item.issueRates,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -844,9 +825,6 @@
         <if test="'year_num'.toString() == column.value">
           #{item.yearNum,jdbcType=INTEGER}
         </if>
-        <if test="'total_issue_value'.toString() == column.value">
-          #{item.totalIssueValue,jdbcType=DECIMAL}
-        </if>
         <if test="'issue_rates'.toString() == column.value">
           #{item.issueRates,jdbcType=LONGVARCHAR}
         </if>
@@ -854,5 +832,6 @@
       )
     </foreach>
   </insert>
+
 
 </mapper>

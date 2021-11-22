@@ -46,8 +46,7 @@
         `issue_rates`,
         `erc20_tx_qty`,
         `erc721_tx_qty`,
-        `year_num`,
-        `total_issue_value`
+        `year_num`
     )
     values
     (
@@ -77,8 +76,7 @@
         #{issueRates},
         #{erc20TxQty},
         #{erc721TxQty},
-        #{yearNum},
-        #{totalIssueValue}
+        #{yearNum}
     )
     on duplicate
     key update
@@ -107,8 +105,7 @@
         `issue_rates` = #{issueRates},
         `erc20_tx_qty` = #{erc20TxQty},
         `erc721_tx_qty` = #{erc721TxQty},
-        `year_num` = #{yearNum},
-        `total_issue_value` = #{totalIssueValue}
+        `year_num` = #{yearNum}
         ;
 </update>
 </mapper>
