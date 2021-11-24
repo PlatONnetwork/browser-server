@@ -10,13 +10,11 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 实现
@@ -112,6 +110,7 @@ public class CommonService {
         // 获取实时质押合约余额
         CountBalance stakingValue = list.stream().filter(v -> v.getType() == 2).findFirst().orElseGet(CountBalance::new);
         bo.setTotalStakingValue(stakingValue.getFree());
+        log.debug("实时质押合约余额(总质押)为[{}]", stakingValue.getFree().toPlainString());
         BigDecimal issueValue = networkStatRedis.getIssueValue();
         // 获取实时委托奖励池合约余额
         CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
@@ -120,13 +119,13 @@ public class CommonService {
         // 获取实时所有基金会账户余额
         CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
         BigDecimal stakingDenominator = issueValue.subtract(incentivePoolValue.getFree()).subtract(delegationValue.getFree()).subtract(foundationValue.getFree()).subtract(foundationValue.getLocked());
-        log.info("质押率分母[{}]=总发行量[{}]-实时激励池余额[{}]-实时委托奖励池合约余额[{}]-实时所有基金会账户余额[{}]-实时所有基金会账户锁仓余额[{}];",
-                 stakingDenominator.toPlainString(),
-                 issueValue.toPlainString(),
-                 incentivePoolValue.getFree().toPlainString(),
-                 delegationValue.getFree().toPlainString(),
-                 foundationValue.getFree().toPlainString(),
-                 foundationValue.getLocked().toPlainString());
+        log.debug("质押率分母[{}]=总发行量[{}]-实时激励池余额[{}]-实时委托奖励池合约余额[{}]-实时所有基金会账户余额[{}]-实时所有基金会账户锁仓余额[{}];",
+                  stakingDenominator.toPlainString(),
+                  issueValue.toPlainString(),
+                  incentivePoolValue.getFree().toPlainString(),
+                  delegationValue.getFree().toPlainString(),
+                  foundationValue.getFree().toPlainString(),
+                  foundationValue.getLocked().toPlainString());
         if (stakingDenominator.compareTo(BigDecimal.ZERO) <= 0) {
             log.error("获取质押率分母[{}]错误,不能小于等于0", stakingDenominator.toPlainString());
         }

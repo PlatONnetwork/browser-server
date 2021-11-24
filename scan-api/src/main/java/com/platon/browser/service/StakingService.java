@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -103,10 +102,7 @@ public class StakingService {
             stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
             // 接受委托 = 实时质押委托总数 - 实时质押总数
             stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue().subtract(networkStatRedis.getStakingValue()));
-            //实时除以现有的结算周期人数
-            Integer count = customStakingMapper.selectCountByActive();
-            // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
-            stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
+            stakingStatisticNewResp.setStakingReward(networkStatRedis.getStakingReward());
             stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
             StakingBO bo = commonService.getTotalStakingValueAndStakingDenominator(networkStatRedis);
             stakingStatisticNewResp.setStakingDenominator(bo.getStakingDenominator());
