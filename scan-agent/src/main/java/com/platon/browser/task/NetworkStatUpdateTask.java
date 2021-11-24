@@ -1,14 +1,12 @@
 package com.platon.browser.task;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.platon.browser.analyzer.statistic.StatisticsNetworkAnalyzer;
-import com.platon.browser.bean.CustomNode;
+import com.platon.browser.bean.CountBalance;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
+import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.service.account.AccountService;
 import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.utils.AppStatusUtil;
@@ -20,7 +18,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @Auther: dongqile
@@ -45,12 +44,12 @@ public class NetworkStatUpdateTask {
     private StatisticBusinessMapper statisticBusinessMapper;
 
     @Resource
-    private NodeMapper nodeMapper;
+    private CustomRpPlanMapper customRpPlanMapper;
 
     @Resource
-    private StatisticsNetworkAnalyzer statisticsNetworkAnalyzer;
+    private CustomInternalAddressMapper customInternalAddressMapper;
 
-    @Scheduled(cron = "0/1  * * * * ?")
+    @Scheduled(cron = "0/5  * * * * ?")
     public void networkStatUpdate() {
         // 只有程序正常运行才执行任务
         if (AppStatusUtil.isRunning()) start();
@@ -60,28 +59,10 @@ public class NetworkStatUpdateTask {
         try {
             NetworkStat networkStat = networkStatCache.getNetworkStat();
             Long curNumber = networkStat.getCurNumber();
-            //config中获取增发年份
-            BigDecimal issueEpochRound = chainConfig.getIssueEpochRound();
             //获取激励池余额
             BigDecimal inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(curNumber));
-            //获取质押余额
-            BigDecimal stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(curNumber));
-            //获取锁仓余额
-            BigDecimal restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(curNumber));
-            //获取锁仓余额
-            BigDecimal rewardBalance = accountService.getRewardBalance(BigInteger.valueOf(curNumber));
-            //增发年份
-            Integer yearNum = 0;
-            if (ObjectUtil.isNotNull(statisticsNetworkAnalyzer.getYearNum()) && statisticsNetworkAnalyzer.getYearNum() > 0) {
-                yearNum = statisticsNetworkAnalyzer.getYearNum();
-            }
-            //计算发行量
-            BigDecimal issueValue = BigDecimal.ZERO;
-            if (ObjectUtil.isNotNull(statisticsNetworkAnalyzer.getTotalIssueValue()) && statisticsNetworkAnalyzer.getTotalIssueValue().compareTo(BigDecimal.ZERO) > 0) {
-                issueValue = statisticsNetworkAnalyzer.getTotalIssueValue();
-            }
             //计算流通量
-            BigDecimal turnValue = CalculateUtils.calculationTurnValue(chainConfig, networkStat.getIssueRates(), inciteBalance, stakingBalance, restrictBalance, rewardBalance);
+            BigDecimal turnValue = getCirculationValue(networkStat);
             //计算可使用质押量
             BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat.getIssueRates(), chainConfig, inciteBalance);
             //获得节点相关的网络统计
@@ -90,20 +71,60 @@ public class NetworkStatUpdateTask {
             BigDecimal stakingValue = networkStatistics.getStakingValue() == null ? BigDecimal.ZERO : networkStatistics.getStakingValue();
             //获得地址数统计
             int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
-            // 重新计算质押奖励
-            NodeExample nodeExample = new NodeExample();
-            nodeExample.createCriteria().andIsSettleEqualTo(CustomNode.YesNoEnum.YES.getCode());
-            long nodeCount = nodeMapper.countByExample(nodeExample);
-            BigDecimal stakingReward = networkStatCache.getNetworkStat().getStakingReward();
-            if (nodeCount != 0) {
-                stakingReward = networkStatCache.getNetworkStat().getSettleStakingReward().divide(BigDecimal.valueOf(nodeCount), 16, RoundingMode.FLOOR);
-            }
             //获得进行中的提案
             int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-            networkStatCache.updateByTask(yearNum, issueValue, turnValue, availableStaking, totalValue, stakingValue, addressQty, doingProposalQty, stakingReward);
+            networkStatCache.updateByTask(turnValue, availableStaking, totalValue, stakingValue, addressQty, doingProposalQty);
         } catch (Exception e) {
             log.error("网络统计任务出错:", e);
         }
+    }
+
+    /**
+     * 查询统计的余额
+     *
+     * @param
+     * @return java.util.List<com.platon.browser.bean.CountBalance>
+     * @date 2021/5/15
+     */
+    private List<CountBalance> countBalance() {
+        List<CountBalance> list = customInternalAddressMapper.countBalance();
+        return list;
+    }
+
+    /**
+     * 获取流通量
+     * 流通量 = 本增发周期总发行量 - 锁仓未到期的金额 - 实时委托奖励池合约余额 - 实时激励池余额 - 实时所有基金会账户余额
+     *
+     * @param networkStat:
+     * @return: java.math.BigDecimal
+     * @date: 2021/11/24
+     */
+    private BigDecimal getCirculationValue(NetworkStat networkStat) {
+        List<CountBalance> list = countBalance();
+        // 锁仓未到期的金额
+        BigDecimal rpNotExpiredValue = customRpPlanMapper.getRPNotExpiredValue(chainConfig.getSettlePeriodBlockCount().longValue(), networkStat.getCurNumber());
+        rpNotExpiredValue = Optional.ofNullable(rpNotExpiredValue).orElse(BigDecimal.ZERO);
+        // 获取实时委托奖励池合约余额
+        CountBalance delegationValue = list.stream().filter(v -> v.getType() == 6).findFirst().orElseGet(CountBalance::new);
+        // 实时激励池余额
+        CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
+        // 获取实时所有基金会账户余额
+        CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
+        BigDecimal circulationValue = networkStat.getIssueValue()
+                                                 .subtract(rpNotExpiredValue)
+                                                 .subtract(delegationValue.getFree())
+                                                 .subtract(incentivePoolValue.getFree())
+                                                 .subtract(foundationValue.getFree());
+        log.info("流通量[{}]=本增发周期总发行量[{}]-锁仓未到期的金额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];当前块高[{}]结算周期总块数[{}]",
+                 circulationValue.toPlainString(),
+                 networkStat.getIssueValue().toPlainString(),
+                 rpNotExpiredValue.toPlainString(),
+                 delegationValue.getFree().toPlainString(),
+                 incentivePoolValue.getFree().toPlainString(),
+                 foundationValue.getFree().toPlainString(),
+                 networkStat.getCurNumber(),
+                 chainConfig.getSettlePeriodBlockCount().longValue());
+        return circulationValue;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.platon.browser.analyzer.statistic;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochInfo;
@@ -50,13 +51,11 @@ public class StatisticsNetworkAnalyzer {
     /**
      * 年份
      */
-    @Getter
-    private volatile int yearNum;
+    private volatile int yearNum = 0;
 
     /**
      * 总发行量
      */
-    @Getter
     private volatile BigDecimal totalIssueValue = BigDecimal.ZERO;
 
     /**
@@ -99,7 +98,7 @@ public class StatisticsNetworkAnalyzer {
             if (retryCount.incrementAndGet() > 1) {
                 log.warn("获取总发行量-重试次数[{}]", retryCount.get());
             }
-            // 新结算周期事件
+            // 结算周期的区块获取总发行量
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
                 log.info("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
                 yearNum = getYearNum(curBlockNum);
@@ -107,10 +106,10 @@ public class StatisticsNetworkAnalyzer {
                 networkStat.setYearNum(yearNum);
                 networkStat.setIssueValue(totalIssueValue);
             } else {
-                // 非结算周期的区块则取本地内存中的值
-                if (yearNum < 1 || totalIssueValue == null) {
-                    // agent重启，并未追到结算周期时，本地内存失效
-                    log.info("本地内存中的年份小于1或者总发行量为空，将重新获取年份和总发行量");
+                // 非结算周期的区块则取本地内存中的值，如果值校验不对则重新获取
+                if (yearNum < 1 || ObjectUtil.isNull(totalIssueValue) || totalIssueValue.compareTo(BigDecimal.ZERO) <= 0) {
+                    // agent重启，并未追到结算周期时，本地内存失效则重新获取
+                    log.info("本地内存中的年份小于1或者总发行量为空或者总发行量小于0，将重新获取年份和总发行量");
                     yearNum = getYearNum(curBlockNum);
                     totalIssueValue = getTotalIssueValue(yearNum);
                 }
@@ -143,7 +142,7 @@ public class StatisticsNetworkAnalyzer {
         // 第几年
         int yearNum = epochInfo.getYearNum().intValue();
         if (yearNum < 1) {
-            throw new Exception(StrUtil.format("当前区块[{}]获取年份异常", currentNumber));
+            throw new Exception(StrUtil.format("当前区块[{}],上一结算周期最后一个块号[{}]获取年份[{}]异常", currentNumber, preSettleEpochLastBlockNumber, yearNum));
         }
         return yearNum;
     }
@@ -163,11 +162,8 @@ public class StatisticsNetworkAnalyzer {
         BigDecimal addIssueRate = chainConfig.getAddIssueRate();
         BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
         log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第[{}]年", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
-        if (issueValue.signum() == -1) {
-            throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能为负数", issueValue.toPlainString()));
-        }
-        if (initIssueAmount.compareTo(issueValue) >= 0) {
-            throw new Exception(StrUtil.format("获取总发行量[{}]错误,小于或等于初始发行量", issueValue.toPlainString()));
+        if (issueValue.compareTo(BigDecimal.ZERO) <= 0 || issueValue.compareTo(initIssueAmount) <= 0) {
+            throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能小于等于0或者小于等于初始发行量", issueValue.toPlainString()));
         }
         return issueValue;
     }

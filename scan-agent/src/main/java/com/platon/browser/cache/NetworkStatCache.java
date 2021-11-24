@@ -69,32 +69,22 @@ public class NetworkStatCache {
     /**
      * 基于任务更新网络统计信息
      *
-     * @param yearNum:
-     * @param issueValue:
      * @param turnValue:
      * @param availableStaking:
      * @param totalValue:
      * @param stakingValue:
      * @param addressQty:
      * @param doingProposalQty:
-     * @param stakingReward:
      * @return: void
      * @date: 2021/11/24
      */
-    public void updateByTask(Integer yearNum, BigDecimal issueValue, BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty, BigDecimal stakingReward) {
-        if (yearNum > 0) {
-            this.networkStat.setYearNum(yearNum);
-        }
-        if (issueValue.compareTo(BigDecimal.ZERO) > 0) {
-            this.networkStat.setIssueValue(issueValue);
-        }
+    public void updateByTask( BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty) {
         this.networkStat.setTurnValue(turnValue);
         this.networkStat.setAvailableStaking(availableStaking);
         this.networkStat.setStakingDelegationValue(totalValue);
         this.networkStat.setStakingValue(stakingValue);
         this.networkStat.setAddressQty(addressQty);
         this.networkStat.setDoingProposalQty(doingProposalQty);
-        this.networkStat.setStakingReward(stakingReward);
     }
 
     /**

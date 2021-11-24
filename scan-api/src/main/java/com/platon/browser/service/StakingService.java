@@ -3,11 +3,8 @@ package com.platon.browser.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.bean.*;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
-import com.platon.browser.bean.DelegationAddress;
-import com.platon.browser.bean.DelegationStaking;
-import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
@@ -110,18 +107,11 @@ public class StakingService {
             Integer count = customStakingMapper.selectCountByActive();
             // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
             stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
+            stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
+            StakingBO bo = commonService.getTotalStakingValueAndStakingDenominator(networkStatRedis);
+            stakingStatisticNewResp.setStakingDenominator(bo.getStakingDenominator());
+            stakingStatisticNewResp.setStakingDelegationValue(bo.getTotalStakingValue());
         }
-        BigDecimal issueValue = commonService.getIssueValue();
-        logger.info("获取总发行量[{}]", issueValue.toPlainString());
-
-        CommonService.check(issueValue);
-        issueValue = CommonService.ISSUE_VALUE;
-
-        stakingStatisticNewResp.setIssueValue(issueValue);
-        BigDecimal stakingDenominator = commonService.getStakingDenominator();
-        stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
-        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
-        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue);
         return stakingStatisticNewResp;
     }
 

@@ -1,13 +1,14 @@
 package com.platon.browser.service;
 
 import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.bean.StakingBO;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -18,6 +19,7 @@ import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
+import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.NetworkParams;
 import lombok.extern.slf4j.Slf4j;
@@ -240,11 +242,9 @@ public class HomeService {
                 }
             }
             /* 第一个区块不需要计算出块时间 */
-            if (i == 0)
-                continue;
+            if (i == 0) continue;
             Block previousBlock = items.get(i - 1);
-            BigDecimal sec = BigDecimal.valueOf(previousBlock.getTime().getTime() - currentBlock.getTime().getTime())
-                    .divide(BigDecimal.valueOf(1000), 4, RoundingMode.FLOOR);
+            BigDecimal sec = BigDecimal.valueOf(previousBlock.getTime().getTime() - currentBlock.getTime().getTime()).divide(BigDecimal.valueOf(1000), 4, RoundingMode.FLOOR);
             ya[i - 1] = sec.doubleValue();
         }
         blockStatisticNewResp.setX(x);
@@ -256,8 +256,7 @@ public class HomeService {
     public ChainStatisticNewResp chainStatisticNew() {
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
         ChainStatisticNewResp chainStatisticNewResp = new ChainStatisticNewResp();
-        if (networkStatRedis == null)
-            return chainStatisticNewResp;
+        if (networkStatRedis == null) return chainStatisticNewResp;
         /* 查询redis统计信息并转换对应返回对象 */
         BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
         chainStatisticNewResp.setCurrentTps(networkStatRedis.getCurTps());
@@ -306,19 +305,13 @@ public class HomeService {
             lists.add(blockListNewResp);
         }
         chainStatisticNewResp.setBlockList(lists);
-        BigDecimal issueValue = commonService.getIssueValue();
-        log.info("获取总发行量[{}]", issueValue);
-
-        CommonService.check(issueValue);
-        issueValue = CommonService.ISSUE_VALUE;
-
+        BigDecimal issueValue = networkStatRedis.getIssueValue();
         chainStatisticNewResp.setIssueValue(issueValue.abs());
-        BigDecimal circulationValue = commonService.getCirculationValue();
+        BigDecimal circulationValue = CommonUtil.ofNullable(() -> networkStatRedis.getTurnValue()).orElse(BigDecimal.ZERO);
         chainStatisticNewResp.setTurnValue(circulationValue);
-        BigDecimal stakingDenominator = commonService.getStakingDenominator();
-        chainStatisticNewResp.setStakingDenominator(stakingDenominator);
-        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
-        chainStatisticNewResp.setStakingDelegationValue(totalStakingValue);
+        StakingBO bo = commonService.getTotalStakingValueAndStakingDenominator(networkStatRedis);
+        chainStatisticNewResp.setStakingDenominator(bo.getStakingDenominator());
+        chainStatisticNewResp.setStakingDelegationValue(bo.getTotalStakingValue());
         return chainStatisticNewResp;
     }
 
@@ -354,8 +347,7 @@ public class HomeService {
                 stakingListResp.setExpectedIncome("");
             }
             /* 质押总数=有效的质押+委托 */
-            BigDecimal totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked())
-                    .add(nodes.get(i).getStatDelegateValue());
+            BigDecimal totalValue = nodes.get(i).getStakingHes().add(nodes.get(i).getStakingLocked()).add(nodes.get(i).getStatDelegateValue());
             stakingListResp.setTotalValue(totalValue);
             stakingListResp.setRanking(i + 1);
             lists.add(stakingListResp);

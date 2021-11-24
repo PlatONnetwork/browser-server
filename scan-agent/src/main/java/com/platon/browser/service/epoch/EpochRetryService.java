@@ -221,7 +221,6 @@ public class EpochRetryService {
             configChange.setSettleStakeReward(epochInfo.getStakingReward());
             configChange.setStakeReward(stakeReward);
             epochChanges.offer(configChange);
-
             applyConfigChange();
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
