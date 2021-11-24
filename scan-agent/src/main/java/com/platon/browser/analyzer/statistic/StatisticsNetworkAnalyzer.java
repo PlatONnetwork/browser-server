@@ -15,6 +15,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.utils.CalculateUtils;
 import com.platon.browser.utils.EpochUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -49,12 +50,14 @@ public class StatisticsNetworkAnalyzer {
     /**
      * 年份
      */
+    @Getter
     private volatile int yearNum;
 
     /**
      * 总发行量
      */
-    private volatile BigDecimal totalIssueValue;
+    @Getter
+    private volatile BigDecimal totalIssueValue = BigDecimal.ZERO;
 
     /**
      * 重试次数
@@ -94,7 +97,7 @@ public class StatisticsNetworkAnalyzer {
     private void setTotalIssueValue(Long curBlockNum, BigInteger settleEpochRound, NetworkStat networkStat) throws Exception {
         try {
             if (retryCount.incrementAndGet() > 1) {
-                log.info("重试次数[{}]", retryCount.get());
+                log.warn("获取总发行量-重试次数[{}]", retryCount.get());
             }
             // 新结算周期事件
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
@@ -120,7 +123,7 @@ public class StatisticsNetworkAnalyzer {
             log.error(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常，即将重试", curBlockNum, settleEpochRound), e);
             // 如果当前区块获取总发行量异常，则重置本地内存的值
             yearNum = 0;
-            totalIssueValue = null;
+            totalIssueValue = BigDecimal.ZERO;
             throw e;
         }
     }
