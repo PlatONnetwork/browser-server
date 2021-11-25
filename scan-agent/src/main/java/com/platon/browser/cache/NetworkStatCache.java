@@ -1,5 +1,6 @@
 package com.platon.browser.cache;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.bean.ConfigChange;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -78,8 +79,10 @@ public class NetworkStatCache {
      * @return: void
      * @date: 2021/11/24
      */
-    public void updateByTask( BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty) {
-        this.networkStat.setTurnValue(turnValue);
+    public void updateByTask(BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty) {
+        if (ObjectUtil.isNotNull(turnValue) && turnValue.compareTo(BigDecimal.ZERO) > 0) {
+            this.networkStat.setTurnValue(turnValue);
+        }
         this.networkStat.setAvailableStaking(availableStaking);
         this.networkStat.setStakingDelegationValue(totalValue);
         this.networkStat.setStakingValue(stakingValue);
