@@ -16,7 +16,6 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.utils.CalculateUtils;
 import com.platon.browser.utils.EpochUtil;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -109,7 +108,7 @@ public class StatisticsNetworkAnalyzer {
                 // 非结算周期的区块则取本地内存中的值，如果值校验不对则重新获取
                 if (yearNum < 1 || ObjectUtil.isNull(totalIssueValue) || totalIssueValue.compareTo(BigDecimal.ZERO) <= 0) {
                     // agent重启，并未追到结算周期时，本地内存失效则重新获取
-                    log.info("本地内存中的年份小于1或者总发行量为空或者总发行量小于0，将重新获取年份和总发行量");
+                    log.info("本地内存中的年份小于1或者总发行量为空或者总发行量小于等于0，将重新获取年份和总发行量");
                     yearNum = getYearNum(curBlockNum);
                     totalIssueValue = getTotalIssueValue(yearNum);
                 }

@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
@@ -100,6 +101,10 @@ public class NetworkStatUpdateTask {
      * @date: 2021/11/24
      */
     private BigDecimal getCirculationValue(NetworkStat networkStat) {
+        // agent刚启动的时候，如果第一次定时任务比主流程快，则可能总发行量还没计算
+        if (ObjectUtil.isNull(networkStat.getIssueValue()) || networkStat.getIssueValue().compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
         List<CountBalance> list = countBalance();
         // 锁仓未到期的金额
         BigDecimal rpNotExpiredValue = customRpPlanMapper.getRPNotExpiredValue(chainConfig.getSettlePeriodBlockCount().longValue(), networkStat.getCurNumber());

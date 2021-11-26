@@ -137,7 +137,7 @@ public class RedisImportService {
                 log.info("redis批量入库成功统计:erc721交易数[{}]", data.size());
             }
         } catch (Exception e) {
-            log.error("redis批量入库成功统计打印异常", e);
+            log.error("redis批量入库统计异常", e);
         }
     }
 
