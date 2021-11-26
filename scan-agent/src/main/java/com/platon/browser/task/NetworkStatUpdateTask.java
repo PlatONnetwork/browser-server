@@ -101,10 +101,6 @@ public class NetworkStatUpdateTask {
      * @date: 2021/11/24
      */
     private BigDecimal getCirculationValue(NetworkStat networkStat) {
-        // agent刚启动的时候，如果第一次定时任务比主流程快，则可能总发行量还没计算
-        if (ObjectUtil.isNull(networkStat.getIssueValue()) || networkStat.getIssueValue().compareTo(BigDecimal.ZERO) <= 0) {
-            return BigDecimal.ZERO;
-        }
         List<CountBalance> list = countBalance();
         // 锁仓未到期的金额
         BigDecimal rpNotExpiredValue = customRpPlanMapper.getRPNotExpiredValue(chainConfig.getSettlePeriodBlockCount().longValue(), networkStat.getCurNumber());
@@ -115,6 +111,7 @@ public class NetworkStatUpdateTask {
         CountBalance incentivePoolValue = list.stream().filter(v -> v.getType() == 3).findFirst().orElseGet(CountBalance::new);
         // 获取实时所有基金会账户余额
         CountBalance foundationValue = list.stream().filter(v -> v.getType() == 0).findFirst().orElseGet(CountBalance::new);
+        // agent刚启动的时候，如果第一次定时任务比主流程快，可能总发行量还没计算，则流通量可能为负数
         BigDecimal circulationValue = networkStat.getIssueValue()
                                                  .subtract(rpNotExpiredValue)
                                                  .subtract(delegationValue.getFree())
