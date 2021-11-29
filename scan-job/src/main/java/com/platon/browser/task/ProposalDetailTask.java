@@ -11,8 +11,8 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.MarkDownParserUtil;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,8 +27,10 @@ import java.util.List;
 @Slf4j
 @Component
 public class ProposalDetailTask {
+
     @Resource
     private CustomProposalMapper customProposalMapper;
+
     @Resource
     private ProposalMapper proposalMapper;
 
@@ -37,17 +39,18 @@ public class ProposalDetailTask {
      * 2.根据proposalId查询keybase上信息
      * 3.查询到的信息更新并修改数据库
      */
-    @Scheduled(cron = "0/15  * * * * ?")
+    @XxlJob("proposalDetailUpdateJobHandler")
     public void proposalDetail() {
         // 只有程序正常运行才执行任务
-        if(AppStatusUtil.isRunning()) start();
+        if (AppStatusUtil.isRunning()) start();
+        log.error("proposalDetailUpdateJobHandler执行");
     }
 
     protected void start() {
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();
         proposalExample.createCriteria().andCompletionFlagEqualTo(CustomProposal.FlagEnum.INCOMPLETE.getCode());
-        List <Proposal> proposals = proposalMapper.selectByExample(proposalExample);
+        List<Proposal> proposals = proposalMapper.selectByExample(proposalExample);
         //如果已经补充则无需补充
         if (proposals.isEmpty()) return;
 

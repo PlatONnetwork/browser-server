@@ -59,3 +59,17 @@ logging:
       max-history: 90
       # 是否在应用启动时进行归档管理
       clean-history-on-start: true
+xxl:
+  job:
+    admin:
+      #调度中心部署跟地址
+      addresses: http://192.168.120.150:8080/xxl-job-admin
+    executor:
+      #执行器AppName
+      appname: scan-job
+      #执行器端口号
+      port: 9999
+      #执行器运行日志文件存储磁盘路径
+      logpath: ./log/jobhandler
+      #执行器日志文件保存天数
+      logretentiondays: 90

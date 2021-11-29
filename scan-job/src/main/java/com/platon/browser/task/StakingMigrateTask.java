@@ -6,9 +6,9 @@ import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.utils.AppStatusUtil;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,11 +31,10 @@ public class StakingMigrateTask {
     @Resource
     private CustomStakingHistoryMapper customStakingHistoryMapper;
 
-    @Scheduled(cron = "0/30  * * * * ?")
+    @XxlJob("stakingMigrateJobHandler")
     void stakingMigrate() {
         // 只有程序正常运行才执行任务
-        if (AppStatusUtil.isRunning())
-            start();
+        if (AppStatusUtil.isRunning()) start();
     }
 
     protected void start() {
@@ -52,6 +51,7 @@ public class StakingMigrateTask {
                 });
                 customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
+            log.error("StakingMigrateTask执行");
             log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
         } catch (Exception e) {
             log.error("", e);

@@ -8,12 +8,11 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.TaskConfig;
 import com.platon.browser.dao.entity.InternalAddress;
 import com.platon.browser.dao.entity.InternalAddressExample;
-import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.mapper.InternalAddressMapper;
 import com.platon.browser.enums.InternalAddressType;
 import com.platon.protocol.Web3j;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -30,9 +29,6 @@ public class BalanceUpdateTask {
     private InternalAddressMapper internalAddressMapper;
 
     @Resource
-    private CustomInternalAddressMapper customInternalAddressMapper;
-
-    @Resource
     private SpecialApi specialApi;
 
     @Resource(name = "jobPlatOnClient")
@@ -44,7 +40,7 @@ public class BalanceUpdateTask {
     /**
      * 更新基金会账户余额
      */
-    @Scheduled(cron = "${task.fundAddressCron}")
+    @XxlJob("balanceUpdateJobHandler")
     public void updateFundAccount() {
         log.info("更新基金会地址余额 START...");
         updateBalance(InternalAddressType.FUND_ACCOUNT);
@@ -54,7 +50,7 @@ public class BalanceUpdateTask {
     /**
      * 更新内置合约账户余额
      */
-    @Scheduled(cron = "${task.innerContractCron}")
+    @XxlJob("updateContractAccountJobHandler")
     public void updateContractAccount() {
         log.info("更新内置合约地址余额 START...");
         updateBalance(InternalAddressType.OTHER);

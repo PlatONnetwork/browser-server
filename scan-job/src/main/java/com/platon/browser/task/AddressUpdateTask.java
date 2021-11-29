@@ -6,10 +6,12 @@ import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AppStatusUtil;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -49,11 +51,10 @@ public class AddressUpdateTask {
     @Value("${task.address-batch-size}")
     private int batchSize;
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @XxlJob("addressUpdateJobHandler")
     public void addressUpdate() {
         // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning())
-            return;
+        if (!AppStatusUtil.isRunning()) return;
 
         try {
             int start = 0;
@@ -73,6 +74,7 @@ public class AddressUpdateTask {
      * @param size  执行的批次
      * @return
      */
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     protected boolean batchUpdate(int start, int size) {
         boolean stop = false;
 
@@ -174,6 +176,7 @@ public class AddressUpdateTask {
         if (!updateAddressList.isEmpty()) {
             statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
         }
+        log.error("地址余额执行");
         return stop;
     }
 
