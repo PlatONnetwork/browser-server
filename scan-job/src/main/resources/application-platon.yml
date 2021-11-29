@@ -68,6 +68,8 @@ xxl:
     admin:
       #调度中心部署跟地址
       addresses: http://192.168.120.150:8080/xxl-job-admin
+    #调度中心通讯TOKEN
+    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
     executor:
       #执行器AppName
       appname: scan-job
