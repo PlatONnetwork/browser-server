@@ -247,7 +247,7 @@ public class EpochRetryService {
         // 当前增发周期内每个结算周期的质押奖励
         BigDecimal settleStakeReward = epochInfo.getStakingReward();
         // 如果前一个周期的最后一个块是0，则查第0块时的验证人作为当前验证人
-        BigInteger targetBlockNumber = preSettleEpochLastBlockNumber.compareTo(BigInteger.ZERO) == 0 ? BigInteger.ZERO : preSettleEpochLastBlockNumber.add(BigInteger.ONE);
+        BigInteger targetBlockNumber = preSettleEpochLastBlockNumber.compareTo(BigInteger.ZERO) == 0 ? BigInteger.ZERO : preSettleEpochLastBlockNumber;
         List<Node> lastNodes = Collections.emptyList();
         lastNodes = specialApi.getHistoryVerifierList(web3j, targetBlockNumber);
         // 计算当前结算周期内每个验证人的质押奖励
