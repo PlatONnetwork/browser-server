@@ -1,11 +1,12 @@
 package com.platon.browser.task;
 
-import com.platon.browser.service.elasticsearch.EsDelegationService;
-import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.bean.CustomDelegation;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
-import com.platon.browser.bean.CustomDelegation;
+import com.platon.browser.service.elasticsearch.EsDelegationService;
+import com.platon.browser.utils.AppStatusUtil;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @Auther: dongqile
- * @Date: 2019/11/6
- * @Description: 委托表中的历史数据迁移至ES任务
+ * 委托表中的历史数据迁移至ES任务
+ *
+ * @date: 2021/11/30
  */
 @Component
 @Slf4j
@@ -32,11 +33,10 @@ public class DelegateMigrateTask {
     private EsDelegationService esDelegationService;
 
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    @Scheduled(cron = "0/30  * * * * ?")
+    @XxlJob("delegateMigrateJobHandler")
     public void delegateMigrate() {
         // 只有程序正常运行才执行任务
-        if (AppStatusUtil.isRunning())
-            start();
+        if (AppStatusUtil.isRunning()) start();
     }
 
     protected void start() {
@@ -44,8 +44,7 @@ public class DelegateMigrateTask {
             DelegationExample delegationExample = new DelegationExample();
             delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
             List<Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
-            if (delegationList.isEmpty())
-                return;
+            if (delegationList.isEmpty()) return;
             Set<Delegation> delegationSet = new HashSet<>(delegationList);
             esDelegationService.save(delegationSet);
             delegationMapper.batchDeleteIsHistory(delegationList);

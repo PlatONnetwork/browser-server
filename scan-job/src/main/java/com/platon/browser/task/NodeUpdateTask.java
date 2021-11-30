@@ -13,6 +13,7 @@ import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.HttpUtil;
 import com.platon.browser.utils.KeyBaseAnalysis;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,12 +22,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.*;
 
-
 /**
  * 节点表补充
- * <pre>
- * <pre/>
- * @author chendai
+ *
+ * @date: 2021/11/30
  */
 @Component
 @Slf4j
@@ -46,8 +45,8 @@ public class NodeUpdateTask {
 
     @Resource
     private SpecialApi specialApi;
-
-    @Scheduled(cron = "0/5  * * * * ?")
+    
+    @XxlJob("nodeUpdateJobHandler")
     public void nodeUpdate() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) return;

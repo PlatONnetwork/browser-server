@@ -1,7 +1,7 @@
 package com.platon.browser.service.proposal;
 
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.bean.ProposalParticipantStat;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;

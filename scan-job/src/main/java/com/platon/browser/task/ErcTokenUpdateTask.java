@@ -14,7 +14,6 @@ import com.platon.browser.bean.DestroyContract;
 import com.platon.browser.bean.Erc721ContractDestroyBalanceVO;
 import com.platon.browser.bean.TokenHolderCount;
 import com.platon.browser.bean.http.CustomHttpClient;
-import com.platon.browser.cache.DestroyContractCache;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
@@ -35,15 +34,16 @@ import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CommonUtil;
-import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -62,17 +62,19 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
- * token定时器
- * 全量更新的时间需要错开
+ * token定时任务
  *
- * @date 2021/1/22
+ * @date: 2021/11/30
  */
 @Slf4j
 @Component
 public class ErcTokenUpdateTask {
 
     @Resource
-    private CustomTokenMapper customTokenMapper;
+    private TokenInventoryMapper tokenInventoryMapper;
+
+    @Resource
+    private CustomTokenInventoryMapper customTokenInventoryMapper;
 
     @Resource
     private TokenHolderMapper tokenHolderMapper;
@@ -81,19 +83,13 @@ public class ErcTokenUpdateTask {
     private CustomTokenHolderMapper customTokenHolderMapper;
 
     @Resource
-    private TokenInventoryMapper tokenInventoryMapper;
-
-    @Resource
-    private CustomAddressMapper customAddressMapper;
-
-    @Resource
-    private CustomTokenInventoryMapper customTokenInventoryMapper;
+    private CustomTokenMapper customTokenMapper;
 
     @Resource
     private TokenMapper tokenMapper;
 
     @Resource
-    private ErcCache ercCache;
+    private CustomAddressMapper customAddressMapper;
 
     @Resource
     private ErcServiceImpl ercServiceImpl;
@@ -104,9 +100,6 @@ public class ErcTokenUpdateTask {
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
 
-    @Resource
-    private DestroyContractCache destroyContractCache;
-
     private static final int TOKEN_BATCH_SIZE = 10;
 
     private static final ExecutorService TOKEN_UPDATE_POOL = Executors.newFixedThreadPool(TOKEN_BATCH_SIZE);
@@ -116,6 +109,7 @@ public class ErcTokenUpdateTask {
     private static final ExecutorService HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
 
     private static final int INVENTORY_BATCH_SIZE = 100;
+
 
     /**
      * token更新标识位
@@ -152,22 +146,170 @@ public class ErcTokenUpdateTask {
     private final Lock tokenHolderLock = new ReentrantLock();
 
     /**
-     * 更新ERC20和Erc721Enumeration token的总供应量===》全量更新
+     * 全量更新token的总供应量
      * 每5分钟更新
      *
      * @return void
      * @date 2021/1/18
      */
-    @Scheduled(cron = "0 */5 * * * ?")
+    @XxlJob("totalUpdateTokenTotalSupplyJobHandler")
     public void totalUpdateTokenTotalSupply() {
         lock.lock();
         try {
-            this.updateTokenTotalSupply();
+            updateTokenTotalSupply();
         } catch (Exception e) {
             log.warn("全量更新token的总供应量异常", e);
         } finally {
             lock.unlock();
         }
+    }
+
+    /**
+     * 增量更新token持有者余额
+     * 每1分钟运行一次
+     *
+     * @param
+     * @return void
+     * @date 2021/2/1
+     */
+    @XxlJob("incrementUpdateTokenHolderBalanceJobHandler")
+    public void incrementUpdateTokenHolderBalance() {
+        if (tokenHolderLock.tryLock()) {
+            try {
+                incrementUpdateTokenHolderBalance(esErc20TxRepository, ErcTypeEnum.ERC20, this.getErc20TxSeq());
+                incrementUpdateTokenHolderBalance(esErc721TxRepository, ErcTypeEnum.ERC721, this.getErc721TxSeq());
+            } catch (Exception e) {
+                log.error("增量更新token持有者余额异常", e);
+            } finally {
+                tokenHolderLock.unlock();
+            }
+        } else {
+            log.warn("本次增量更新token持有者余额抢不到锁,erc20TxSeq:{},erc721TxSeq:{}", erc20TxSeq, erc721TxSeq);
+        }
+    }
+
+    /**
+     * 全量更新token持有者余额
+     * 每天00:00:00运行一次
+     */
+    @XxlJob("totalUpdateTokenHolderBalanceJobHandler")
+    public void totalUpdateTokenHolderBalance() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+        tokenHolderLock.lock();
+        try {
+            // 分页更新holder的balance
+            List<TokenHolder> batch;
+            int page = 0;
+            do {
+                TokenHolderExample condition = new TokenHolderExample();
+                condition.setOrderByClause(" token_address asc, address asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
+                batch = tokenHolderMapper.selectByExample(condition);
+                // 过滤销毁的合约
+                List<TokenHolder> res = subtractToList(batch, getDestroyContracts());
+                List<TokenHolder> updateParams = new ArrayList<>();
+                if (CollUtil.isNotEmpty(res)) {
+                    CountDownLatch latch = new CountDownLatch(res.size());
+                    res.forEach(holder -> {
+                        HOLDER_UPDATE_POOL.submit(() -> {
+                            try {
+                                // 查询余额并回填
+                                List<ErcToken> ercTokens = getErcTokens();
+                                ErcToken token = CollUtil.findOne(ercTokens, ercToken -> ercToken.getAddress().equalsIgnoreCase(holder.getTokenAddress()));
+                                if (token != null) {
+                                    BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress());
+                                    if (ObjectUtil.isNull(holder.getBalance()) || new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
+                                        log.info("token[{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]", holder.getTokenAddress(), holder.getAddress(), holder.getBalance(), balance.toString());
+                                        // 余额有变动才加入更新列表，避免频繁访问表
+                                        holder.setBalance(balance.toString());
+                                        holder.setUpdateTime(DateUtil.date());
+                                        updateParams.add(holder);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.warn(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
+                            } finally {
+                                latch.countDown();
+                            }
+                        });
+                    });
+                    try {
+                        latch.await();
+                    } catch (InterruptedException e) {
+                        log.error("", e);
+                    }
+                }
+                if (!updateParams.isEmpty()) {
+                    customTokenHolderMapper.batchUpdate(updateParams);
+                }
+                page++;
+            } while (!batch.isEmpty());
+        } catch (Exception e) {
+            log.error("更新地址代币余额异常", e);
+        } finally {
+            tokenHolderLock.unlock();
+        }
+    }
+
+    /**
+     * 全量更新token库存信息
+     * 每天凌晨1点更新
+     *
+     * @param
+     * @return void
+     * @date 2021/4/17
+     */
+    @XxlJob("totalUpdateTokenInventoryJobHandler")
+    public void totalUpdateTokenInventory() {
+        tokenInventoryLock.lock();
+        try {
+            updateTokenInventory(0);
+        } catch (Exception e) {
+            log.error("更新token库存信息", e);
+        } finally {
+            tokenInventoryLock.unlock();
+        }
+    }
+
+    /**
+     * 增量更新token库存信息
+     * 每1分钟更新
+     *
+     * @param
+     * @return void
+     * @date 2021/2/1
+     */
+    @XxlJob("incrementUpdateTokenInventoryJobHandler")
+    public void incrementUpdateTokenInventory() {
+        if (tokenInventoryLock.tryLock()) {
+            try {
+                cronIncrementUpdateTokenInventory(tokenInventoryPage.intValue());
+            } catch (Exception e) {
+                log.warn("增量更新token库存信息异常", e);
+            } finally {
+                tokenInventoryLock.unlock();
+            }
+        } else {
+            log.warn("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
+        }
+    }
+
+    /**
+     * 销毁的721合约更新余额
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/9/27
+     */
+    @XxlJob("contractDestroyUpdateBalanceJobHandler")
+    public void contractDestroyUpdateBalance() {
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+        contractErc20DestroyUpdateBalance();
+        contractErc721DestroyUpdateBalance();
     }
 
     /**
@@ -186,7 +328,9 @@ public class ErcTokenUpdateTask {
         // 从缓存中获取Token更新参数，并构造批次列表
         List<ErcToken> batch = new ArrayList<>();
         batchList.add(batch);
-        for (ErcToken token : ercCache.getTokenCache().values()) {
+
+        List<ErcToken> tokens = getErcTokens();
+        for (ErcToken token : tokens) {
             if (token.isDirty()) {
                 updateParams.add(token);
             }
@@ -204,7 +348,7 @@ public class ErcTokenUpdateTask {
         // 分批并发查询Token totalSupply
         batchList.forEach(b -> {
             // 过滤销毁的合约
-            List<ErcToken> res = tokenSubtractToList(b, destroyContractCache.getDestroyContracts());
+            List<ErcToken> res = tokenSubtractToList(b, getDestroyContracts());
             if (CollUtil.isNotEmpty(res)) {
                 CountDownLatch latch = new CountDownLatch(res.size());
                 for (ErcToken token : res) {
@@ -240,75 +384,6 @@ public class ErcTokenUpdateTask {
             updateParams.forEach(token -> token.setDirty(false));
         }
         updateTokenHolderCount();
-    }
-
-    /**
-     * 过滤销毁的合约
-     *
-     * @param ercTokens:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.v0152.bean.ErcToken>
-     * @date: 2021/10/14
-     */
-    private List<ErcToken> tokenSubtractToList(List<ErcToken> ercTokens, Set<String> destroyContracts) {
-        List<ErcToken> res = CollUtil.newArrayList();
-        for (ErcToken ercToken : ercTokens) {
-            if (!destroyContracts.contains(ercToken.getAddress())) {
-                res.add(ercToken);
-            }
-        }
-        return res;
-    }
-
-    /**
-     * 更新token对应的持有人的数量
-     *
-     * @param
-     * @return void
-     * @date 2021/3/17
-     */
-    private void updateTokenHolderCount() {
-        List<Token> updateTokenList = new ArrayList<>();
-        List<TokenHolderCount> list = customTokenHolderMapper.findTokenHolderCount();
-        List<Token> tokenList = tokenMapper.selectByExample(null);
-        if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(tokenList)) {
-            list.forEach(tokenHolderCount -> {
-                tokenList.forEach(token -> {
-                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
-                        token.setHolder(tokenHolderCount.getTokenHolderCount());
-                        updateTokenList.add(token);
-                    }
-                });
-            });
-        }
-        if (CollUtil.isNotEmpty(updateTokenList)) {
-            customTokenMapper.batchInsertOrUpdateSelective(updateTokenList, Token.Column.values());
-            log.info("更新token对应的持有人的数量{}", JSONUtil.toJsonStr(updateTokenList));
-        }
-    }
-
-    /**
-     * 更新token持有者余额===》增量更新
-     * 每1分钟运行一次
-     *
-     * @param
-     * @return void
-     * @date 2021/2/1
-     */
-    @Scheduled(cron = "0 */1 * * * ?")
-    public void incrementUpdateTokenHolderBalance() {
-        if (tokenHolderLock.tryLock()) {
-            try {
-                incrementUpdateTokenHolderBalance(esErc20TxRepository, ErcTypeEnum.ERC20, this.getErc20TxSeq());
-                incrementUpdateTokenHolderBalance(esErc721TxRepository, ErcTypeEnum.ERC721, this.getErc721TxSeq());
-            } catch (Exception e) {
-                log.error("增量更新token持有者余额异常", e);
-            } finally {
-                tokenHolderLock.unlock();
-            }
-        } else {
-            log.warn("本次增量更新token持有者余额抢不到锁,erc20TxSeq:{},erc721TxSeq:{}", erc20TxSeq, erc721TxSeq);
-        }
     }
 
     private void incrementUpdateTokenHolderBalance(AbstractEsRepository abstractEsRepository, ErcTypeEnum typeEnum, Long txSeq) {
@@ -361,7 +436,7 @@ public class ErcTokenUpdateTask {
             });
 
             // 过滤销毁的合约
-            HashMap<String, HashSet<String>> res = subtractToMap(map, destroyContractCache.getDestroyContracts());
+            HashMap<String, HashSet<String>> res = subtractToMap(map, getDestroyContracts());
             if (MapUtil.isNotEmpty(res)) {
                 // 串行查余额
                 res.forEach((contract, addressSet) -> {
@@ -394,122 +469,6 @@ public class ErcTokenUpdateTask {
         }
     }
 
-    private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {
-        HashMap<String, HashSet<String>> res = CollUtil.newHashMap();
-        if (CollUtil.isNotEmpty(map)) {
-            for (Map.Entry<String, HashSet<String>> entry : map.entrySet()) {
-                if (!destroyContracts.contains(entry.getKey())) {
-                    res.put(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * 更新token持有者余额===》全量更新
-     * 每天00:00:00运行一次
-     */
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void totalUpdateTokenHolderBalance() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
-        }
-        tokenHolderLock.lock();
-        try {
-            // 分页更新holder的balance
-            List<TokenHolder> batch;
-            int page = 0;
-            do {
-                TokenHolderExample condition = new TokenHolderExample();
-                condition.setOrderByClause(" token_address asc, address asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
-                batch = tokenHolderMapper.selectByExample(condition);
-                // 过滤销毁的合约
-                List<TokenHolder> res = subtractToList(batch, destroyContractCache.getDestroyContracts());
-                List<TokenHolder> updateParams = new ArrayList<>();
-                if (CollUtil.isNotEmpty(res)) {
-                    CountDownLatch latch = new CountDownLatch(res.size());
-                    res.forEach(holder -> {
-                        HOLDER_UPDATE_POOL.submit(() -> {
-                            try {
-                                // 查询余额并回填
-                                ErcToken token = ercCache.getTokenCache().get(holder.getTokenAddress());
-                                if (token != null) {
-                                    BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress());
-                                    if (ObjectUtil.isNull(holder.getBalance()) || new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
-                                        log.info("token[{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]", holder.getTokenAddress(), holder.getAddress(), holder.getBalance(), balance.toString());
-                                        // 余额有变动才加入更新列表，避免频繁访问表
-                                        holder.setBalance(balance.toString());
-                                        holder.setUpdateTime(DateUtil.date());
-                                        updateParams.add(holder);
-                                    }
-                                }
-                            } catch (Exception e) {
-                                log.warn(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
-                            } finally {
-                                latch.countDown();
-                            }
-                        });
-                    });
-                    try {
-                        latch.await();
-                    } catch (InterruptedException e) {
-                        log.error("", e);
-                    }
-                }
-                if (!updateParams.isEmpty()) {
-                    customTokenHolderMapper.batchUpdate(updateParams);
-                }
-                page++;
-            } while (!batch.isEmpty());
-        } catch (Exception e) {
-            log.error("更新地址代币余额异常", e);
-        } finally {
-            tokenHolderLock.unlock();
-        }
-    }
-
-    /**
-     * 过滤销毁的合约
-     *
-     * @param list:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.dao.entity.TokenHolder>
-     * @date: 2021/10/14
-     */
-    private List<TokenHolder> subtractToList(List<TokenHolder> list, Set<String> destroyContracts) {
-        List<TokenHolder> res = CollUtil.newArrayList();
-        if (CollUtil.isNotEmpty(list)) {
-            for (TokenHolder tokenHolder : list) {
-                if (!destroyContracts.contains(tokenHolder.getTokenAddress())) {
-                    res.add(tokenHolder);
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * 更新token库存信息=>全量更新
-     * 每天凌晨1点更新
-     *
-     * @param
-     * @return void
-     * @date 2021/4/17
-     */
-    @Scheduled(cron = "0 0 1 */1 * ?")
-    public void totalUpdateTokenInventory() {
-        tokenInventoryLock.lock();
-        try {
-            updateTokenInventory(0);
-        } catch (Exception e) {
-            log.error("更新token库存信息", e);
-        } finally {
-            tokenInventoryLock.unlock();
-        }
-    }
-
     /**
      * 更新token库存信息
      *
@@ -538,7 +497,7 @@ public class ErcTokenUpdateTask {
                 condition.setOrderByClause(" id asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
                 List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
                 // 过滤销毁的合约
-                res = tokenInventorySubtractToList(batch, destroyContractCache.getDestroyContracts());
+                res = tokenInventorySubtractToList(batch, getDestroyContracts());
                 List<TokenInventory> updateParams = new ArrayList<>();
                 if (!res.isEmpty()) {
                     batchNum = res.size();
@@ -613,49 +572,6 @@ public class ErcTokenUpdateTask {
     }
 
     /**
-     * 过滤销毁的合约
-     *
-     * @param list:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.dao.entity.TokenInventory>
-     * @date: 2021/10/15
-     */
-    private List<TokenInventory> tokenInventorySubtractToList(List<TokenInventory> list, Set<String> destroyContracts) {
-        List<TokenInventory> res = CollUtil.newArrayList();
-        if (CollUtil.isNotEmpty(list)) {
-            for (TokenInventory tokenInventory : list) {
-                if (!destroyContracts.contains(tokenInventory.getTokenAddress())) {
-                    res.add(tokenInventory);
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * 更新token库存信息=>增量更新
-     * 每1分钟更新
-     *
-     * @param
-     * @return void
-     * @date 2021/2/1
-     */
-    @Scheduled(cron = "0 */1 * * * ?")
-    public void incrementUpdateTokenInventory() {
-        if (tokenInventoryLock.tryLock()) {
-            try {
-                cronIncrementUpdateTokenInventory(tokenInventoryPage.intValue());
-            } catch (Exception e) {
-                log.warn("增量更新token库存信息异常", e);
-            } finally {
-                tokenInventoryLock.unlock();
-            }
-        } else {
-            log.warn("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
-        }
-    }
-
-    /**
      * 更新token库存信息=>增量更新
      *
      * @param pageNum 当前页码
@@ -678,7 +594,7 @@ public class ErcTokenUpdateTask {
             condition.setOrderByClause(" id asc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
             // 分页更新token库存相关信息
             List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
-            List<TokenInventory> res = tokenInventorySubtractToList(batch, destroyContractCache.getDestroyContracts());
+            List<TokenInventory> res = tokenInventorySubtractToList(batch, getDestroyContracts());
             batchNum = CommonUtil.ofNullable(() -> res.size()).orElse(0);
             List<TokenInventory> updateParams = new ArrayList<>();
             if (CollUtil.isNotEmpty(res)) {
@@ -752,20 +668,39 @@ public class ErcTokenUpdateTask {
         }
     }
 
-    /**
-     * 销毁的721合约更新余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2021/9/27
-     */
-    @Scheduled(cron = "0 */10 * * * ?")
-    public void contractDestroyUpdateBalance() {
-        if (!AppStatusUtil.isRunning()) {
-            return;
+    private void contractErc20DestroyUpdateBalance() {
+        try {
+            List<DestroyContract> tokenList = customTokenMapper.findDestroyContract(ErcTypeEnum.ERC20.getDesc());
+            if (CollUtil.isNotEmpty(tokenList)) {
+                List<TokenHolder> updateList = new ArrayList<>();
+                for (DestroyContract destroyContract : tokenList) {
+                    try {
+                        BigInteger balance = ercServiceImpl.getErc20HistoryBalance(destroyContract.getTokenAddress(),
+                                                                                   destroyContract.getAccount(),
+                                                                                   BigInteger.valueOf(destroyContract.getContractDestroyBlock() - 1));
+                        TokenHolder tokenHolder = new TokenHolder();
+                        tokenHolder.setTokenAddress(destroyContract.getTokenAddress());
+                        tokenHolder.setAddress(destroyContract.getAccount());
+                        tokenHolder.setBalance(balance.toString());
+                        updateList.add(tokenHolder);
+                    } catch (Exception e) {
+                        log.error(StrUtil.format("已销毁的erc20合约[{}]账号[{}]更新余额异常", destroyContract.getTokenAddress(), destroyContract.getAccount()), e);
+                    }
+                }
+                if (CollUtil.isNotEmpty(updateList)) {
+                    customTokenHolderMapper.batchUpdate(updateList);
+                    Set<String> destroyContractSet = updateList.stream().map(TokenHolderKey::getTokenAddress).collect(Collectors.toSet());
+                    for (String destroyContract : destroyContractSet) {
+                        Token token = new Token();
+                        token.setAddress(destroyContract);
+                        token.setContractDestroyUpdate(true);
+                        tokenMapper.updateByPrimaryKeySelective(token);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("更新已销毁的erc20合约余额异常", e);
         }
-        contractErc20DestroyUpdateBalance();
-        contractErc721DestroyUpdateBalance();
     }
 
     /**
@@ -810,39 +745,135 @@ public class ErcTokenUpdateTask {
         }
     }
 
-    private void contractErc20DestroyUpdateBalance() {
-        try {
-            List<DestroyContract> tokenList = customTokenMapper.findDestroyContract(ErcTypeEnum.ERC20.getDesc());
-            if (CollUtil.isNotEmpty(tokenList)) {
-                List<TokenHolder> updateList = new ArrayList<>();
-                for (DestroyContract destroyContract : tokenList) {
-                    try {
-                        BigInteger balance = ercServiceImpl.getErc20HistoryBalance(destroyContract.getTokenAddress(),
-                                                                                   destroyContract.getAccount(),
-                                                                                   BigInteger.valueOf(destroyContract.getContractDestroyBlock() - 1));
-                        TokenHolder tokenHolder = new TokenHolder();
-                        tokenHolder.setTokenAddress(destroyContract.getTokenAddress());
-                        tokenHolder.setAddress(destroyContract.getAccount());
-                        tokenHolder.setBalance(balance.toString());
-                        updateList.add(tokenHolder);
-                    } catch (Exception e) {
-                        log.error(StrUtil.format("已销毁的erc20合约[{}]账号[{}]更新余额异常", destroyContract.getTokenAddress(), destroyContract.getAccount()), e);
+    /**
+     * 获取ercToken
+     *
+     * @param :
+     * @return: java.util.List<com.platon.browser.v0152.bean.ErcToken>
+     * @date: 2021/11/30
+     */
+    private List<ErcToken> getErcTokens() {
+        List<ErcToken> ercTokens = new ArrayList<>();
+        List<Token> tokens = tokenMapper.selectByExample(null);
+        tokens.forEach(token -> {
+            ErcToken et = new ErcToken();
+            BeanUtils.copyProperties(token, et);
+            ErcTypeEnum typeEnum = ErcTypeEnum.valueOf(token.getType().toUpperCase());
+            et.setTypeEnum(typeEnum);
+            ercTokens.add(et);
+        });
+        return ercTokens;
+    }
+
+    /**
+     * 获取销毁的合约
+     *
+     * @param :
+     * @return: java.util.Set<java.lang.String>
+     * @date: 2021/11/30
+     */
+    private Set<String> getDestroyContracts() {
+        Set<String> destroyContracts = new HashSet<>();
+        List<String> list = customAddressMapper.findContractDestroy(null);
+        destroyContracts.addAll(list);
+        return destroyContracts;
+    }
+
+    /**
+     * 过滤销毁的合约
+     *
+     * @param ercTokens:
+     * @param destroyContracts:
+     * @return: java.util.List<com.platon.browser.v0152.bean.ErcToken>
+     * @date: 2021/10/14
+     */
+    private List<ErcToken> tokenSubtractToList(List<ErcToken> ercTokens, Set<String> destroyContracts) {
+        List<ErcToken> res = CollUtil.newArrayList();
+        for (ErcToken ercToken : ercTokens) {
+            if (!destroyContracts.contains(ercToken.getAddress())) {
+                res.add(ercToken);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 更新token对应的持有人的数量
+     *
+     * @param
+     * @return void
+     * @date 2021/3/17
+     */
+    private void updateTokenHolderCount() {
+        List<Token> updateTokenList = new ArrayList<>();
+        List<TokenHolderCount> list = customTokenHolderMapper.findTokenHolderCount();
+        List<Token> tokenList = tokenMapper.selectByExample(null);
+        if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(tokenList)) {
+            list.forEach(tokenHolderCount -> {
+                tokenList.forEach(token -> {
+                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
+                        token.setHolder(tokenHolderCount.getTokenHolderCount());
+                        updateTokenList.add(token);
                     }
-                }
-                if (CollUtil.isNotEmpty(updateList)) {
-                    customTokenHolderMapper.batchUpdate(updateList);
-                    Set<String> destroyContractSet = updateList.stream().map(TokenHolderKey::getTokenAddress).collect(Collectors.toSet());
-                    for (String destroyContract : destroyContractSet) {
-                        Token token = new Token();
-                        token.setAddress(destroyContract);
-                        token.setContractDestroyUpdate(true);
-                        tokenMapper.updateByPrimaryKeySelective(token);
-                    }
+                });
+            });
+        }
+        if (CollUtil.isNotEmpty(updateTokenList)) {
+            customTokenMapper.batchInsertOrUpdateSelective(updateTokenList, Token.Column.values());
+            log.info("更新token对应的持有人的数量{}", JSONUtil.toJsonStr(updateTokenList));
+        }
+    }
+
+    private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {
+        HashMap<String, HashSet<String>> res = CollUtil.newHashMap();
+        if (CollUtil.isNotEmpty(map)) {
+            for (Map.Entry<String, HashSet<String>> entry : map.entrySet()) {
+                if (!destroyContracts.contains(entry.getKey())) {
+                    res.put(entry.getKey(), entry.getValue());
                 }
             }
-        } catch (Exception e) {
-            log.error("更新已销毁的erc20合约余额异常", e);
         }
+        return res;
+    }
+
+    /**
+     * 过滤销毁的合约
+     *
+     * @param list:
+     * @param destroyContracts:
+     * @return: java.util.List<com.platon.browser.dao.entity.TokenHolder>
+     * @date: 2021/10/14
+     */
+    private List<TokenHolder> subtractToList(List<TokenHolder> list, Set<String> destroyContracts) {
+        List<TokenHolder> res = CollUtil.newArrayList();
+        if (CollUtil.isNotEmpty(list)) {
+            for (TokenHolder tokenHolder : list) {
+                if (!destroyContracts.contains(tokenHolder.getTokenAddress())) {
+                    res.add(tokenHolder);
+                }
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 过滤销毁的合约
+     *
+     * @param list:
+     * @param destroyContracts:
+     * @return: java.util.List<com.platon.browser.dao.entity.TokenInventory>
+     * @date: 2021/10/15
+     */
+    private List<TokenInventory> tokenInventorySubtractToList(List<TokenInventory> list, Set<String> destroyContracts) {
+        List<TokenInventory> res = CollUtil.newArrayList();
+        if (CollUtil.isNotEmpty(list)) {
+            for (TokenInventory tokenInventory : list) {
+                if (!destroyContracts.contains(tokenInventory.getTokenAddress())) {
+                    res.add(tokenInventory);
+                }
+            }
+        }
+        return res;
     }
 
 }

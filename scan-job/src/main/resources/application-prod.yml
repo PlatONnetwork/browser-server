@@ -72,6 +72,6 @@ xxl:
       #执行器端口号
       port: 9999
       #执行器运行日志文件存储磁盘路径
-      logpath: ./log/jobhandler
+      logpath: ./logs/jobhandler
       #执行器日志文件保存天数
       logretentiondays: 90
