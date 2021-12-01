@@ -2,12 +2,14 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.PointLog;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.PointLogMapper;
 import com.platon.browser.service.elasticsearch.EsNodeOptService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -31,15 +33,23 @@ public class NodeOptTask {
     @Resource
     private EsNodeOptService esNodeOptService;
 
+    /**
+     * 节点操作备份表迁移到ES任务
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/1
+     */
     @XxlJob("nodeOptMoveToESJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void nodeOptMoveToES() throws Exception {
         try {
+            String batchSize = StrUtil.isEmpty(XxlJobHelper.getJobParam()) ? "10" : XxlJobHelper.getJobParam();
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(1);
             NOptBakExample nOptBakExample = new NOptBakExample();
             nOptBakExample.setOrderByClause("id");
-            long maxPosition = Convert.toLong(pointLog.getPosition()) + 100;
-            nOptBakExample.createCriteria().andNodeIdBetween(pointLog.getPosition(), Long.toString(maxPosition));
+            long maxPosition = Convert.toLong(pointLog.getPosition()) + Convert.toLong(batchSize);
+            nOptBakExample.createCriteria().andIdGreaterThan(Convert.toLong(pointLog.getPosition())).andIdLessThanOrEqualTo(maxPosition);
             List<NOptBak> nOptBakList = nOptBakMapper.selectByExample(nOptBakExample);
             if (CollUtil.isNotEmpty(nOptBakList)) {
                 Set<NOptBak> nodeOpts = new HashSet<>(nOptBakList);

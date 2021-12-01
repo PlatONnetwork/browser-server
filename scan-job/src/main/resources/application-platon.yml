@@ -12,6 +12,14 @@ spring:
     url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+  #ES配置
+  elasticsearch:
+    high-level-client:
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
+      port: 9200
+      schema: http
+      username: elastic
+      password: changeme
 #PlatOn相关配置
 platon:
   #链id
@@ -27,19 +35,13 @@ platon:
   defaultStakingLockedAmount: 150000
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
+  #Es索引命名空间
+  es-namespace: browser_${profile}
 task:
   #允许更新的最大地址数量
   maxAddressCount: 5004
   #每次批量查询锁仓余额的最大数量
   maxBatchSize: 100
-  #基金会地址统计cron表达式：
-  #    生产：每10分钟执行一次：0 0/10 * * * ?
-  #    测试：每10秒钟执行一次：0/10 * * * * ?
-  fundAddressCron: 0 0/6 * * * ?
-  #内置合约地址统计cron表达式：
-  #    生产：每1分钟执行一次：0 0/1 * * * ?
-  #    测试：每5秒钟执行一次：0/5 * * * * ?
-  innerContractCron: 0/10 * * * * ?
   #地址统计任务批次大小
   addressBatchSize: 1000
 #日志配置

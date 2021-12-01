@@ -7,6 +7,17 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
+  #ES索引配置
+  elasticsearch:
+    index:
+      blockIndexName: ${platon.es-namespace}_block
+      transactionIndexName: ${platon.es-namespace}_transaction
+      delegationIndexName: ${platon.es-namespace}_delegation
+      nodeOptIndexName: ${platon.es-namespace}_nodeopt
+      delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
+      transferTxIndexName: ${platon.es-namespace}_transfer_tx
+      erc20TxIndexName: ${platon.es-namespace}_erc20_tx
+      erc721TxIndexName: ${platon.es-namespace}_erc721_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml

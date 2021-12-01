@@ -12,12 +12,12 @@ import javax.annotation.Resource;
 public class Web3jUpdateTask {
 
     @Resource
-    private JobPlatOnClient platOnClient;
+    private JobPlatOnClient jobPlatOnClient;
 
     @XxlJob("web3jUpdateJobHandler")
     public void cron() {
         try {
-            platOnClient.updateCurrentWeb3jWrapper();
+            jobPlatOnClient.updateCurrentWeb3jWrapper();
         } catch (Exception e) {
             log.error("detect exception:{}", e);
         }
