@@ -2,7 +2,6 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.PointLog;
@@ -44,11 +43,11 @@ public class NodeOptTask {
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void nodeOptMoveToES() throws Exception {
         try {
-            String batchSize = StrUtil.isEmpty(XxlJobHelper.getJobParam()) ? "10" : XxlJobHelper.getJobParam();
+            int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 10);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(1);
             NOptBakExample nOptBakExample = new NOptBakExample();
             nOptBakExample.setOrderByClause("id");
-            long maxPosition = Convert.toLong(pointLog.getPosition()) + Convert.toLong(batchSize);
+            long maxPosition = Convert.toInt(pointLog.getPosition(), 0) + batchSize;
             nOptBakExample.createCriteria().andIdGreaterThan(Convert.toLong(pointLog.getPosition())).andIdLessThanOrEqualTo(maxPosition);
             List<NOptBak> nOptBakList = nOptBakMapper.selectByExample(nOptBakExample);
             if (CollUtil.isNotEmpty(nOptBakList)) {

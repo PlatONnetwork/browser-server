@@ -2,6 +2,7 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
@@ -36,6 +37,7 @@ import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.v0152.bean.ErcToken;
 import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.Getter;
 import lombok.Setter;
@@ -106,9 +108,6 @@ public class ErcTokenUpdateTask {
     private static final int HOLDER_BATCH_SIZE = 10;
 
     private static final ExecutorService HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
-
-    private static final int INVENTORY_BATCH_SIZE = 100;
-
 
     /**
      * token更新标识位
@@ -492,8 +491,9 @@ public class ErcTokenUpdateTask {
             // 当前失败的条数
             AtomicInteger errorNum = new AtomicInteger(0);
             try {
+                int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
                 TokenInventoryExample condition = new TokenInventoryExample();
-                condition.setOrderByClause(" id asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+                condition.setOrderByClause(" id asc limit " + page * batchSize + "," + batchSize);
                 List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
                 // 过滤销毁的合约
                 res = tokenInventorySubtractToList(batch, getDestroyContracts());
@@ -588,9 +588,10 @@ public class ErcTokenUpdateTask {
         int batchNum = 0;
         // 当前失败的条数
         AtomicInteger errorNum = new AtomicInteger(0);
+        int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
         try {
             TokenInventoryExample condition = new TokenInventoryExample();
-            condition.setOrderByClause(" id asc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+            condition.setOrderByClause(" id asc limit " + pageNum * batchSize + "," + batchSize);
             // 分页更新token库存相关信息
             List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
             List<TokenInventory> res = tokenInventorySubtractToList(batch, getDestroyContracts());
@@ -661,7 +662,7 @@ public class ErcTokenUpdateTask {
         } catch (Exception e) {
             log.error(StrUtil.format("增量更新token库存信息异常,当前标识为:{}", pageNum), e);
         } finally {
-            if (batchNum == INVENTORY_BATCH_SIZE) {
+            if (batchNum == batchSize) {
                 tokenInventoryPage.incrementAndGet();
             }
         }

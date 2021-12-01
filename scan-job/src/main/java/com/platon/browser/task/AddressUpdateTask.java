@@ -1,15 +1,15 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.convert.Convert;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AppStatusUtil;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,9 +48,6 @@ public class AddressUpdateTask {
     @Resource
     private AddressMapper addressMapper;
 
-    @Value("${task.address-batch-size}")
-    private int batchSize;
-
     @XxlJob("addressUpdateJobHandler")
     public void addressUpdate() {
         // 只有程序正常运行才执行任务
@@ -58,6 +55,7 @@ public class AddressUpdateTask {
 
         try {
             int start = 0;
+            int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 1000);
             while (!batchUpdate(start, batchSize)) {
                 start += batchSize;
             }

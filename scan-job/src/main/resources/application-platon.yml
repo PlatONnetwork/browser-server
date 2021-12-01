@@ -42,8 +42,6 @@ task:
   maxAddressCount: 5004
   #每次批量查询锁仓余额的最大数量
   maxBatchSize: 100
-  #地址统计任务批次大小
-  addressBatchSize: 1000
 #日志配置
 logging:
   #日志级别
