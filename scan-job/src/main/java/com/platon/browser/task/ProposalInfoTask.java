@@ -2,19 +2,18 @@ package com.platon.browser.task;
 
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.bean.ProposalParticipantStat;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.dao.custommapper.CustomProposalMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.service.StatisticCacheService;
 import com.platon.browser.service.proposal.ProposalService;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,9 +30,6 @@ import java.util.List;
 public class ProposalInfoTask {
 
     @Resource
-    private NetworkStatCache networkStatCache;
-
-    @Resource
     private ProposalMapper proposalMapper;
 
     @Resource
@@ -44,7 +40,10 @@ public class ProposalInfoTask {
 
     @Resource
     private NetworkStatMapper networkStatMapper;
-    
+
+    @Resource
+    private StatisticCacheService statisticCacheService;
+
     @XxlJob("proposalInfoJobHandler")
     public void proposalInfo() {
         // 只有程序正常运行才执行任务
@@ -70,8 +69,9 @@ public class ProposalInfoTask {
 
         for (Proposal proposal : proposals) {
             try {
+                NetworkStat networkStatCache = statisticCacheService.getNetworkStatCache();
                 //发送rpc请求查询提案结果
-                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getNetworkStat().getCurBlockHash());
+                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getCurBlockHash());
                 //设置参与人数
                 if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
                     // 有变更

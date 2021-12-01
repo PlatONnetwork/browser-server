@@ -1,5 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
+import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -19,20 +20,23 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class EsNodeOptService implements EsService<NodeOpt>{
+public class EsNodeOptService implements EsService<NOptBak> {
+
     @Resource
     private EsNodeOptRepository ESNodeOptRepository;
+
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
-    public void save(Set<NodeOpt> nodeOpts) throws IOException {
-        if(nodeOpts.isEmpty()) return;
+    public void save(Set<NOptBak> nodeOpts) throws IOException {
+        if (nodeOpts.isEmpty()) return;
         try {
-            Map<String,NodeOpt> nodeOptMap = new HashMap<>();
+            Map<String, NOptBak> nodeOptMap = new HashMap<>();
             // 使用(<id>)作ES的docId
-            nodeOpts.forEach(n->nodeOptMap.put(n.getId().toString(),n));
+            nodeOpts.forEach(n -> nodeOptMap.put(n.getId().toString(), n));
             ESNodeOptRepository.bulkAddOrUpdate(nodeOptMap);
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
     }
+
 }

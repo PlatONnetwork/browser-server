@@ -53,8 +53,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     private Set<Transaction> transactionStage = new HashSet<>();
 
-    private Set<NodeOpt> nodeOptStage = new HashSet<>();
-
     private Set<DelegationReward> delegationRewardStage = new HashSet<>();
 
     /**
@@ -64,11 +62,11 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "PersistenceEventHandler")
-    public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
     }
 
-    private void surroundExec(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    private void surroundExec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         CommonUtil.putTraceId(event.getTraceId());
         long startTime = System.currentTimeMillis();
         exec(event, sequence, endOfBatch);
@@ -76,16 +74,14 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
         CommonUtil.removeTraceId();
     }
 
-    private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         try {
-            log.info("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
+            log.info("当前区块[{}]有[{}]笔交易有[{}]笔委托奖励",
                      event.getBlock().getNum(),
                      CommonUtil.ofNullable(() -> event.getTransactions().size()).orElse(0),
-                     CommonUtil.ofNullable(() -> event.getNodeOpts().size()).orElse(0),
                      CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
-            nodeOptStage.addAll(event.getNodeOpts());
             delegationRewardStage.addAll(event.getDelegationRewards());
 
             List<Long> blockNums = CollUtil.newArrayList();
@@ -113,7 +109,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             statisticsLog();
 
             // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(blockStage, transactionStage, nodeOptStage, delegationRewardStage);
+            esImportService.batchImport(blockStage, transactionStage, delegationRewardStage);
 
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
@@ -121,7 +117,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             redisImportService.batchImport(blockStage, transactionStage, statistics);
             blockStage.clear();
             transactionStage.clear();
-            nodeOptStage.clear();
             delegationRewardStage.clear();
 
             // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
@@ -133,17 +128,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 }
             }
             BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
-
-            // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
-            List<NodeOpt> nOptBaks = event.getNodeOpts();
-            Long nOptMaxId = 0L;
-            if (!nOptBaks.isEmpty()) {
-                for (NodeOpt no : nOptBaks) {
-                    if (no.getId() > nOptMaxId) nOptMaxId = no.getId();
-                }
-                nOptMaxId = nOptBaks.get(0).getId();
-            }
-            BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             maxBlockNumber = event.getBlock().getNum();
             // 释放对象引用

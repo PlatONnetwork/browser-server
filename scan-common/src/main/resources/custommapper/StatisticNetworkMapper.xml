@@ -17,6 +17,10 @@
 	select count(1) from proposal where status = 1
 </select>
 
+    <select id="getProposalQty"  resultType="java.lang.Integer">
+        select count(1) from proposal
+    </select>
+
 <update id="networkChange" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into `network_stat`
     (

@@ -31,8 +31,8 @@ public class NetworkStatCacheTest extends AgentTestBase {
         assertEquals(this.networkStatCache.getTpsCalcCache(), tpsCalcCache);
         this.networkStatCache.setNetworkStat(this.networkStatList.get(0));
         assertEquals(this.networkStatCache.getNetworkStat(), this.networkStatList.get(0));
-        this.networkStatCache.updateByBlock(this.blockList.get(0), 333);
-        this.networkStatCache.updateByTask(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE, 33, 33);
+        this.networkStatCache.updateByBlock(this.blockList.get(0));
+        this.networkStatCache.updateByTask(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE);
         this.networkStatCache.getNetworkStat();
         this.networkStatCache.getAndIncrementNodeOptSeq();
         this.networkStatCache.getTpsCalcCache();

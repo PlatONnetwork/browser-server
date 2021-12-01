@@ -29,28 +29,12 @@ public class NetworkStatCache {
      * 基于区块维度更新网络统计信息
      *
      * @param block
-     * @param proposalQty
      */
-    public void updateByBlock(Block block, int proposalQty) {
-        this.tpsCalcCache.update(block);
+    public void updateByBlock(Block block) {
+        this.tpsCalcCache.updateIfNotHandle(block);
         int tps = this.tpsCalcCache.getTps();
         int maxTps = this.tpsCalcCache.getMaxTps();
-        this.networkStat.setTxQty(block.getTransactions().size() + this.networkStat.getTxQty());
-        Integer erc20TxQty = 0;
-        if (this.networkStat.getErc20TxQty() != null) {
-            erc20TxQty = this.networkStat.getErc20TxQty();
-        }
-        erc20TxQty = block.getErc20TxQty() + erc20TxQty;
-        Integer erc721TxQty = 0;
-        if (this.networkStat.getErc721TxQty() != null) {
-            erc721TxQty = this.networkStat.getErc721TxQty();
-        }
-        erc721TxQty = block.getErc721TxQty() + erc721TxQty;
-        this.networkStat.setErc20TxQty(erc20TxQty);
-        this.networkStat.setErc721TxQty(erc721TxQty);
-        this.networkStat.setProposalQty(proposalQty + this.networkStat.getProposalQty());
         this.networkStat.setCurTps(tps);
-        this.networkStat.setCurBlockHash(block.getHash());
         if (maxTps > this.networkStat.getMaxTps()) {
             this.networkStat.setMaxTps(maxTps);
         }
@@ -74,20 +58,16 @@ public class NetworkStatCache {
      * @param availableStaking:
      * @param totalValue:
      * @param stakingValue:
-     * @param addressQty:
-     * @param doingProposalQty:
      * @return: void
      * @date: 2021/11/24
      */
-    public void updateByTask(BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty) {
+    public void updateByTask(BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue) {
         if (ObjectUtil.isNotNull(turnValue) && turnValue.compareTo(BigDecimal.ZERO) > 0) {
             this.networkStat.setTurnValue(turnValue);
         }
         this.networkStat.setAvailableStaking(availableStaking);
         this.networkStat.setStakingDelegationValue(totalValue);
         this.networkStat.setStakingValue(stakingValue);
-        this.networkStat.setAddressQty(addressQty);
-        this.networkStat.setDoingProposalQty(doingProposalQty);
     }
 
     /**
@@ -111,7 +91,6 @@ public class NetworkStatCache {
      * @date 2021/4/19
      */
     public void init(NetworkStat networkStat) {
-        log.info("初始化网络缓存");
         this.networkStat = networkStat;
     }
 

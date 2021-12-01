@@ -7,7 +7,6 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.DestroyContractCache;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.TokenMapper;
@@ -59,9 +58,6 @@ public class ErcTokenAnalyzer {
 
     @Resource
     private CustomTokenMapper customTokenMapper;
-
-    @Resource
-    private DestroyContractCache destroyContractCache;
 
     @Resource
     private TokenMapper tokenMapper;
@@ -309,7 +305,6 @@ public class ErcTokenAnalyzer {
 
             // 针对销毁的合约处理
             if (tx.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {
-                destroyContractCache.getDestroyContracts().add(tx.getTo());
                 Token token = new Token();
                 token.setAddress(tx.getTo());
                 token.setContractDestroyBlock(collectionBlock.getNum());

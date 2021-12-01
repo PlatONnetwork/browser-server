@@ -80,7 +80,6 @@ public class AgentApplication implements ApplicationRunner {
         retryableClient.zeroBlockNumberWait();
         InitializationResult initialResult = initializationService.init(traceId);
         consistencyService.post(traceId);
-        consistencyService.loadDestroyContract();
         // 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
         // 已采最高块号

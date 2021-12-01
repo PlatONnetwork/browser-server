@@ -22,6 +22,17 @@ public class NodeCache {
     private static final Map<String, NodeItem> cache = new HashMap<>();
 
     /**
+     * 清除节点缓存
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/11/30
+     */
+    public void cleanNodeCache() {
+        cache.clear();
+    }
+
+    /**
      * 根据节点ID获取节点
      *
      * @param nodeId
@@ -30,8 +41,7 @@ public class NodeCache {
      */
     public NodeItem getNode(String nodeId) throws NoSuchBeanException {
         NodeItem node = cache.get(nodeId);
-        if (node == null)
-            throw new NoSuchBeanException("节点(id=" + nodeId + ")的节点不存在");
+        if (node == null) throw new NoSuchBeanException("节点(id=" + nodeId + ")的节点不存在");
         return node;
     }
 
@@ -53,15 +63,14 @@ public class NodeCache {
      */
     public void init(List<Node> nodeList) {
         log.info("初始化节点缓存");
-        if (nodeList.isEmpty())
-            return;
+        if (nodeList.isEmpty()) return;
         nodeList.forEach(s -> {
             NodeItem node = NodeItem.builder()
-                    .nodeId(s.getNodeId())
-                    .nodeName(s.getNodeName())
-                    .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
-                    .nodeSettleStatisInfo(s.getNodeSettleStatisInfo())
-                    .build();
+                                    .nodeId(s.getNodeId())
+                                    .nodeName(s.getNodeName())
+                                    .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
+                                    .nodeSettleStatisInfo(s.getNodeSettleStatisInfo())
+                                    .build();
             addNode(node);
         });
     }

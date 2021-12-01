@@ -87,6 +87,7 @@ public class OnNewBlockAnalyzer {
         long startTime = System.currentTimeMillis();
 
         networkStatCache.getNetworkStat().setCurNumber(event.getBlock().getNum());
+        networkStatCache.getNetworkStat().setCurBlockHash(event.getBlock().getHash());
         NewBlock newBlock = NewBlock.builder()
                                     .nodeId(block.getNodeId())
                                     .stakingBlockNum(nodeCache.getNode(block.getNodeId()).getStakingBlockNum())

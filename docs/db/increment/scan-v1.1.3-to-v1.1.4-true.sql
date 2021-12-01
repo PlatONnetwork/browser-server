@@ -2,15 +2,18 @@ USE `scan_platon`;
 ALTER TABLE slash add COLUMN `is_handle` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已处理，1为是，0为否，默认是0';
 ALTER TABLE token_inventory add COLUMN `retry_count` int(1) DEFAULT 0 COMMENT '重试次数，最多重试5次';
 
-DROP TABLE IF EXISTS `es_point`;
-CREATE TABLE `es_point` (
-                            `id` int(64) NOT NULL COMMENT '主键id',
-                            `index_name` varchar(255) NOT NULL COMMENT '索引名',
-                            `max_seq` varchar(128) NOT NULL COMMENT '已统计的最大seq',
-                            `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            PRIMARY KEY (`id`)
-) COMMENT='es统计断点表';
+DROP TABLE IF EXISTS `point_log`;
+CREATE TABLE `point_log` (
+                             `id` int(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+                             `type` int(1) NOT NULL COMMENT '类型,1-mysql,2-es',
+                             `name` varchar(255) NOT NULL COMMENT '类型为1-表名，类型为2-索引名',
+                             `position` varchar(128) NOT NULL COMMENT '已统计的位置(MySQL为自增id,es为seq)',
+                             `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                             `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                             PRIMARY KEY (`id`)
+) COMMENT='断点统计表';
+INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (1, 1, 'n_opt_bak', '0', '2021-12-01 07:50:41', '2021-12-01 07:50:41');
+
 
 use `xxl_job`;
 INSERT INTO `xxl_job`.`xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (2, 'scan-job', 'scan-job定时任务', 0, NULL, '2021-11-30 10:54:54');

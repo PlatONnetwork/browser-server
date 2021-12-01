@@ -64,22 +64,23 @@ public class EsImportService {
     }
 
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
-    public void batchImport(Set<Block> blocks, Set<Transaction> transactions,
-                            Set<NodeOpt> nodeOpts, Set<DelegationReward> delegationRewards) throws InterruptedException {
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<DelegationReward> delegationRewards) throws Exception {
         Set<ErcTx> erc20TxList = getErc20TxList(transactions);
         Set<ErcTx> erc721TxList = getErc721TxList(transactions);
         if (log.isDebugEnabled()) {
-            log.debug("ES batch import: {}(blocks({}), transactions({}), nodeOpts({}), delegationRewards({}), erc20TxList({}), erc721TxList({}))",
-                    Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size(),
-                    nodeOpts.size(), delegationRewards.size(), erc20TxList.size(), erc721TxList.size());
+            log.debug("ES batch import: {}(blocks({}), transactions({}), delegationRewards({}), erc20TxList({}), erc721TxList({}))",
+                      Thread.currentThread().getStackTrace()[1].getMethodName(),
+                      blocks.size(),
+                      transactions.size(),
+                      delegationRewards.size(),
+                      erc20TxList.size(),
+                      erc721TxList.size());
         }
         try {
             long startTime = System.currentTimeMillis();
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
-
             submit(esBlockService, blocks, latch, ESKeyEnum.Block, CommonUtil.getTraceId());
             submit(esTransactionService, transactions, latch, ESKeyEnum.Transaction, CommonUtil.getTraceId());
-            submit(esNodeOptService, nodeOpts, latch, ESKeyEnum.NodeOpt, CommonUtil.getTraceId());
             submit(esDelegateRewardService, delegationRewards, latch, ESKeyEnum.DelegateReward, CommonUtil.getTraceId());
             submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx, CommonUtil.getTraceId());
             submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx, CommonUtil.getTraceId());
@@ -98,8 +99,7 @@ public class EsImportService {
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (tx.getErc20TxList().isEmpty())
-                    continue;
+                if (tx.getErc20TxList().isEmpty()) continue;
                 result.addAll(tx.getErc20TxList());
             }
         }
@@ -113,8 +113,7 @@ public class EsImportService {
         Set<ErcTx> result = new HashSet<>();
         if (transactions != null && !transactions.isEmpty()) {
             for (Transaction tx : transactions) {
-                if (tx.getErc721TxList().isEmpty())
-                    continue;
+                if (tx.getErc721TxList().isEmpty()) continue;
                 result.addAll(tx.getErc721TxList());
             }
         }
@@ -133,13 +132,9 @@ public class EsImportService {
         try {
             if (eSKeyEnum.compareTo(ESKeyEnum.Block) == 0) {
                 LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
-                log.info("ES批量入库成功统计:区块[{}]-[{}]",
-                        blockSum.getMin(),
-                        blockSum.getMax());
+                log.info("ES批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Transaction) == 0) {
                 log.info("ES批量入库成功统计:交易数[{}]", data.size());
-            } else if (eSKeyEnum.compareTo(ESKeyEnum.NodeOpt) == 0) {
-                log.info("ES批量入库成功统计:节点操作数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc20Tx) == 0) {
                 log.info("ES批量入库成功统计:erc20交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc721Tx) == 0) {

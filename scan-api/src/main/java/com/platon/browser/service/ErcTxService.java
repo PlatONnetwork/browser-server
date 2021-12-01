@@ -87,9 +87,6 @@ public class ErcTxService {
     private AddressMapper addressMapper;
 
     @Resource
-    private NetworkStatMapper networkStatMapper;
-
-    @Resource
     private TokenInventoryMapper tokenInventoryMapper;
 
     /**

@@ -9,10 +9,14 @@ import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
 import com.platon.browser.dao.custommapper.CustomTxBakMapper;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.NOptBak;
+import com.platon.browser.dao.entity.TxBak;
+import com.platon.browser.dao.entity.TxBakExample;
 import com.platon.browser.dao.mapper.NOptBakMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -69,10 +73,16 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private TxBakMapper txBakMapper;
 
     @Resource
+    private NodeMapper nodeMapper;
+
+    @Resource
     private CustomTxBakMapper customTxBakMapper;
 
     @Resource
     private AddressCache addressCache;
+
+    @Resource
+    private NodeCache nodeCache;
 
     @Resource
     private TransactionAnalyzer transactionAnalyzer;
@@ -81,8 +91,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private long transactionId = 0;
 
     private long txDeleteBatchCount = 0;
-
-    private long optDeleteBatchCount = 0;
 
     /**
      * 重试次数
@@ -140,7 +148,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             if (!txAnalyseResult.getNodeOptList().isEmpty()) nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
             txDeleteBatchCount++;
-            optDeleteBatchCount++;
 
             if (txDeleteBatchCount >= 10) {
                 // 删除小于最高ID的交易备份
@@ -161,14 +168,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 customTxBakMapper.batchInsertOrUpdateSelective(baks, TxBak.Column.values());
             }
 
-            if (optDeleteBatchCount >= 10) {
-                // 删除小于最高ID的操作记录备份
-                NOptBakExample nOptBakExample = new NOptBakExample();
-                nOptBakExample.createCriteria().andIdLessThanOrEqualTo(BakDataDeleteUtil.getNOptBakMaxId());
-                int optCount = nOptBakMapper.deleteByExample(nOptBakExample);
-                log.debug("清除操作备份记录({})条", optCount);
-                optDeleteBatchCount = 0;
-            }
             // 操作日志入库mysql
             if (!nodeOpts1.isEmpty()) {
                 List<NOptBak> baks = new ArrayList<>();
@@ -177,7 +176,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                     BeanUtils.copyProperties(no, bak);
                     baks.add(bak);
                 });
-                customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.values());
+                customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.excludes(NOptBak.Column.id));
             }
 
             complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
@@ -188,9 +187,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             log.error(StrUtil.format("区块[{}]解析交易异常", copyEvent.getBlock().getNum()), e);
             throw e;
         } finally {
-            log.info("清除地址缓存[addressCache]数据[{}]条,addressCache:{}",
-                     addressCache.getAll().size(),
-                     JSONUtil.toJsonStr(addressCache.getAll().stream().map(Address::getAddress).collect(Collectors.toList())));
             // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
             // 因为地址缓存是当前事务处理的增量缓存，在 StatisticsAddressAnalyzer 进行数据合并入库时：
             // 1、如果出现异常，由于事务保证，当前事务统计的地址数据不会入库mysql，此时应该清空增量缓存，等待下次重试时重新生成缓存
@@ -218,11 +214,12 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         copyEvent.setEpochMessage(epochMessage);
         copyEvent.setTraceId(event.getTraceId());
         if (retryCount.incrementAndGet() > 1) {
+            initNodeCache();
             List<String> txHashList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.warn("重试次数[{}],该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
+            log.warn("重试次数[{}],节点重新初始化，该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
                      retryCount.get(),
                      event.getBlock().getNum(),
                      JSONUtil.toJsonStr(txHashList),
@@ -230,6 +227,19 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                      JSONUtil.toJsonStr(copyEvent));
         }
         return copyEvent;
+    }
+
+    /**
+     * 初始化节点缓存
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/11/30
+     */
+    private void initNodeCache() {
+        nodeCache.cleanNodeCache();
+        List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
+        nodeCache.init(nodeList);
     }
 
 }

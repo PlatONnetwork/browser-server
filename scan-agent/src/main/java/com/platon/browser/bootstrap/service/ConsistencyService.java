@@ -4,8 +4,6 @@ package com.platon.browser.bootstrap.service;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bootstrap.BootstrapEventPublisher;
 import com.platon.browser.bootstrap.ShutdownCallback;
-import com.platon.browser.cache.DestroyContractCache;
-import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.service.block.BlockService;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -45,12 +42,6 @@ public class ConsistencyService {
 
     @Resource
     private BootstrapEventPublisher bootstrapEventPublisher;
-
-    @Resource
-    private CustomAddressMapper customAddressMapper;
-
-    @Resource
-    private DestroyContractCache destroyContractCache;
 
     private ShutdownCallback shutdownCallback = new ShutdownCallback();
 
@@ -111,18 +102,6 @@ public class ConsistencyService {
         while (!shutdownCallback.isDone()) SleepUtil.sleep(1L);
         bootstrapEventPublisher.shutdown();
         log.warn("MYSQL/ES/REDIS中的数据同步完成!");
-    }
-
-    /**
-     * 加载销毁的合约到内存
-     *
-     * @param :
-     * @return: void
-     * @date: 2021/10/14
-     */
-    public void loadDestroyContract() {
-        List<String> list = customAddressMapper.findContractDestroy(null);
-        destroyContractCache.getDestroyContracts().addAll(list);
     }
 
 }

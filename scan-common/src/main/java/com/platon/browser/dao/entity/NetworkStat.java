@@ -17,6 +17,9 @@ public class NetworkStat {
 
     private String nodeName;
 
+    /**
+     * 交易总数
+     */
     private Integer txQty;
 
     private Integer curTps;
@@ -41,8 +44,14 @@ public class NetworkStat {
 
     private Integer doingProposalQty;
 
+    /**
+     * 提案总数
+     */
     private Integer proposalQty;
 
+    /**
+     * 地址数
+     */
     private Integer addressQty;
 
     private BigDecimal blockReward;
@@ -80,6 +89,9 @@ public class NetworkStat {
      */
     private Integer yearNum;
 
+    /**
+     * 增发比例
+     */
     private String issueRates;
 
     public Integer getId() {
