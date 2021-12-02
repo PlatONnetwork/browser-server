@@ -356,7 +356,6 @@ public class OnSettleAnalyzer {
                                                .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
                                                .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(staking.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.UNLOCKED.getCode()));
         nodeOpt.setBNum(block.getNum());

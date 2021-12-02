@@ -18,15 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -43,7 +42,7 @@ public class DataGenService {
 
     private static final List<String> ADDRESS = new ArrayList<>();
 
-    @Autowired
+    @Resource
     private NodeMapper nodeMapper;
 
     static {
@@ -71,14 +70,7 @@ public class DataGenService {
 
     }
 
-    private static final Status[] STATUSES_ARR = {
-            new Status(1, 1, 1, 2),
-            new Status(1, 1, 1, 2),
-            new Status(2, 1, 1, 2),
-            new Status(2, 2, 2, 2),
-            new Status(3, 2, 2, 2),
-            new Status(3, 1, 2, 2),
-    };
+    private static final Status[] STATUSES_ARR = {new Status(1, 1, 1, 2), new Status(1, 1, 1, 2), new Status(2, 1, 1, 2), new Status(2, 2, 2, 2), new Status(3, 2, 2, 2), new Status(3, 1, 2, 2),};
 
     private Status randomStatus() {
         Status status = STATUSES_ARR[random.nextInt(STATUSES_ARR.length)];
@@ -107,8 +99,7 @@ public class DataGenService {
 
     private String rMockAddress() {
         try {
-            return NetworkParameters.getHrp() + "0000000"
-                    + UUID.randomUUID().toString().replace("-", "");
+            return NetworkParameters.getHrp() + "0000000" + UUID.randomUUID().toString().replace("-", "");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -421,8 +412,8 @@ public class DataGenService {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public Slash getSlash(Transaction tx) {
         Slash copy = JSON.parseObject(slashStr, Slash.class);
-        copy.setHash(tx.getHash());
-        copy.setBenefitAddr(randomAddress());
+        copy.setTxHash(tx.getHash());
+        copy.setBenefitAddress(randomAddress());
         copy.setNodeId(BlockResult.createNodeId(BlockResult.getRandom(1, 1000)));
         return copy;
     }

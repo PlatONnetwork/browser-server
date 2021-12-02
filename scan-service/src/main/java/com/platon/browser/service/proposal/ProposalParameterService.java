@@ -19,8 +19,6 @@ import java.util.List;
 
 /**
  * 惩罚之后更新提案参数服务
- *
- * @author zhangrongjin
  */
 @Slf4j
 @Service

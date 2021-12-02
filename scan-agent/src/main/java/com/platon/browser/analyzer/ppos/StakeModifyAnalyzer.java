@@ -100,7 +100,6 @@ public class StakeModifyAnalyzer extends PPOSAnalyzer<NodeOpt> {
         }
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MODIFY.getCode()));
         nodeOpt.setTxHash(tx.getHash());

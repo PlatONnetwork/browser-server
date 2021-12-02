@@ -2,18 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.SlashMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Slash">
-    <id column="hash" jdbcType="VARCHAR" property="hash" />
+    <id column="id" jdbcType="BIGINT" property="id" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
-    <result column="slash_rate" jdbcType="VARCHAR" property="slashRate" />
-    <result column="slash_value" jdbcType="DECIMAL" property="slashValue" />
-    <result column="reward" jdbcType="DECIMAL" property="reward" />
-    <result column="benefit_addr" jdbcType="VARCHAR" property="benefitAddr" />
+    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="setting_epoch" jdbcType="INTEGER" property="settingEpoch" />
+    <result column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
+    <result column="slash_rate" jdbcType="DECIMAL" property="slashRate" />
+    <result column="slash_report_rate" jdbcType="DECIMAL" property="slashReportRate" />
+    <result column="benefit_address" jdbcType="VARCHAR" property="benefitAddress" />
+    <result column="code_remain_redeem_amount" jdbcType="DECIMAL" property="codeRemainRedeemAmount" />
+    <result column="code_reward_value" jdbcType="DECIMAL" property="codeRewardValue" />
+    <result column="code_status" jdbcType="INTEGER" property="codeStatus" />
+    <result column="code_staking_reduction_epoch" jdbcType="INTEGER" property="codeStakingReductionEpoch" />
+    <result column="code_slash_value" jdbcType="DECIMAL" property="codeSlashValue" />
+    <result column="un_stake_freeze_duration" jdbcType="INTEGER" property="unStakeFreezeDuration" />
+    <result column="un_stake_end_block" jdbcType="BIGINT" property="unStakeEndBlock" />
+    <result column="block_num" jdbcType="BIGINT" property="blockNum" />
     <result column="is_quit" jdbcType="INTEGER" property="isQuit" />
+    <result column="is_handle" jdbcType="BIT" property="isHandle" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Slash">
-    <result column="data" jdbcType="LONGVARCHAR" property="data" />
+    <result column="slash_data" jdbcType="LONGVARCHAR" property="slashData" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -74,11 +86,13 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, node_id, slash_rate, slash_value, reward, benefit_addr, is_quit, create_time, 
-    update_time
+    id, node_id, tx_hash, `time`, setting_epoch, staking_block_num, slash_rate, slash_report_rate, 
+    benefit_address, code_remain_redeem_amount, code_reward_value, code_status, code_staking_reduction_epoch, 
+    code_slash_value, un_stake_freeze_duration, un_stake_end_block, block_num, is_quit, 
+    is_handle, create_time, update_time
   </sql>
   <sql id="Blob_Column_List">
-    `data`
+    slash_data
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.SlashExample" resultMap="ResultMapWithBLOBs">
     select
@@ -110,17 +124,17 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from slash
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from slash
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.SlashExample">
     delete from slash
@@ -129,38 +143,84 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Slash">
-    insert into slash (hash, node_id, slash_rate, 
-      slash_value, reward, benefit_addr, 
-      is_quit, create_time, update_time, 
-      `data`)
-    values (#{hash,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{slashRate,jdbcType=VARCHAR}, 
-      #{slashValue,jdbcType=DECIMAL}, #{reward,jdbcType=DECIMAL}, #{benefitAddr,jdbcType=VARCHAR}, 
-      #{isQuit,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{data,jdbcType=LONGVARCHAR})
+    insert into slash (id, node_id, tx_hash, 
+      `time`, setting_epoch, staking_block_num, 
+      slash_rate, slash_report_rate, benefit_address, 
+      code_remain_redeem_amount, code_reward_value, 
+      code_status, code_staking_reduction_epoch, 
+      code_slash_value, un_stake_freeze_duration, 
+      un_stake_end_block, block_num, is_quit, 
+      is_handle, create_time, update_time, 
+      slash_data)
+    values (#{id,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR}, 
+      #{time,jdbcType=TIMESTAMP}, #{settingEpoch,jdbcType=INTEGER}, #{stakingBlockNum,jdbcType=BIGINT}, 
+      #{slashRate,jdbcType=DECIMAL}, #{slashReportRate,jdbcType=DECIMAL}, #{benefitAddress,jdbcType=VARCHAR}, 
+      #{codeRemainRedeemAmount,jdbcType=DECIMAL}, #{codeRewardValue,jdbcType=DECIMAL}, 
+      #{codeStatus,jdbcType=INTEGER}, #{codeStakingReductionEpoch,jdbcType=INTEGER}, 
+      #{codeSlashValue,jdbcType=DECIMAL}, #{unStakeFreezeDuration,jdbcType=INTEGER}, 
+      #{unStakeEndBlock,jdbcType=BIGINT}, #{blockNum,jdbcType=BIGINT}, #{isQuit,jdbcType=INTEGER}, 
+      #{isHandle,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{slashData,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Slash">
     insert into slash
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="hash != null">
-        hash,
+      <if test="id != null">
+        id,
       </if>
       <if test="nodeId != null">
         node_id,
       </if>
+      <if test="txHash != null">
+        tx_hash,
+      </if>
+      <if test="time != null">
+        `time`,
+      </if>
+      <if test="settingEpoch != null">
+        setting_epoch,
+      </if>
+      <if test="stakingBlockNum != null">
+        staking_block_num,
+      </if>
       <if test="slashRate != null">
         slash_rate,
       </if>
-      <if test="slashValue != null">
-        slash_value,
+      <if test="slashReportRate != null">
+        slash_report_rate,
       </if>
-      <if test="reward != null">
-        reward,
+      <if test="benefitAddress != null">
+        benefit_address,
       </if>
-      <if test="benefitAddr != null">
-        benefit_addr,
+      <if test="codeRemainRedeemAmount != null">
+        code_remain_redeem_amount,
+      </if>
+      <if test="codeRewardValue != null">
+        code_reward_value,
+      </if>
+      <if test="codeStatus != null">
+        code_status,
+      </if>
+      <if test="codeStakingReductionEpoch != null">
+        code_staking_reduction_epoch,
+      </if>
+      <if test="codeSlashValue != null">
+        code_slash_value,
+      </if>
+      <if test="unStakeFreezeDuration != null">
+        un_stake_freeze_duration,
+      </if>
+      <if test="unStakeEndBlock != null">
+        un_stake_end_block,
+      </if>
+      <if test="blockNum != null">
+        block_num,
       </if>
       <if test="isQuit != null">
         is_quit,
+      </if>
+      <if test="isHandle != null">
+        is_handle,
       </if>
       <if test="createTime != null">
         create_time,
@@ -168,31 +228,67 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="data != null">
-        `data`,
+      <if test="slashData != null">
+        slash_data,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="hash != null">
-        #{hash,jdbcType=VARCHAR},
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="nodeId != null">
         #{nodeId,jdbcType=VARCHAR},
       </if>
+      <if test="txHash != null">
+        #{txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settingEpoch != null">
+        #{settingEpoch,jdbcType=INTEGER},
+      </if>
+      <if test="stakingBlockNum != null">
+        #{stakingBlockNum,jdbcType=BIGINT},
+      </if>
       <if test="slashRate != null">
-        #{slashRate,jdbcType=VARCHAR},
+        #{slashRate,jdbcType=DECIMAL},
       </if>
-      <if test="slashValue != null">
-        #{slashValue,jdbcType=DECIMAL},
+      <if test="slashReportRate != null">
+        #{slashReportRate,jdbcType=DECIMAL},
       </if>
-      <if test="reward != null">
-        #{reward,jdbcType=DECIMAL},
+      <if test="benefitAddress != null">
+        #{benefitAddress,jdbcType=VARCHAR},
       </if>
-      <if test="benefitAddr != null">
-        #{benefitAddr,jdbcType=VARCHAR},
+      <if test="codeRemainRedeemAmount != null">
+        #{codeRemainRedeemAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="codeRewardValue != null">
+        #{codeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="codeStatus != null">
+        #{codeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="codeStakingReductionEpoch != null">
+        #{codeStakingReductionEpoch,jdbcType=INTEGER},
+      </if>
+      <if test="codeSlashValue != null">
+        #{codeSlashValue,jdbcType=DECIMAL},
+      </if>
+      <if test="unStakeFreezeDuration != null">
+        #{unStakeFreezeDuration,jdbcType=INTEGER},
+      </if>
+      <if test="unStakeEndBlock != null">
+        #{unStakeEndBlock,jdbcType=BIGINT},
+      </if>
+      <if test="blockNum != null">
+        #{blockNum,jdbcType=BIGINT},
       </if>
       <if test="isQuit != null">
         #{isQuit,jdbcType=INTEGER},
+      </if>
+      <if test="isHandle != null">
+        #{isHandle,jdbcType=BIT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -200,8 +296,8 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="data != null">
-        #{data,jdbcType=LONGVARCHAR},
+      <if test="slashData != null">
+        #{slashData,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -214,26 +310,62 @@
   <update id="updateByExampleSelective" parameterType="map">
     update slash
     <set>
-      <if test="record.hash != null">
-        hash = #{record.hash,jdbcType=VARCHAR},
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
       </if>
       <if test="record.nodeId != null">
         node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
+      <if test="record.txHash != null">
+        tx_hash = #{record.txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.time != null">
+        `time` = #{record.time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.settingEpoch != null">
+        setting_epoch = #{record.settingEpoch,jdbcType=INTEGER},
+      </if>
+      <if test="record.stakingBlockNum != null">
+        staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      </if>
       <if test="record.slashRate != null">
-        slash_rate = #{record.slashRate,jdbcType=VARCHAR},
+        slash_rate = #{record.slashRate,jdbcType=DECIMAL},
       </if>
-      <if test="record.slashValue != null">
-        slash_value = #{record.slashValue,jdbcType=DECIMAL},
+      <if test="record.slashReportRate != null">
+        slash_report_rate = #{record.slashReportRate,jdbcType=DECIMAL},
       </if>
-      <if test="record.reward != null">
-        reward = #{record.reward,jdbcType=DECIMAL},
+      <if test="record.benefitAddress != null">
+        benefit_address = #{record.benefitAddress,jdbcType=VARCHAR},
       </if>
-      <if test="record.benefitAddr != null">
-        benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      <if test="record.codeRemainRedeemAmount != null">
+        code_remain_redeem_amount = #{record.codeRemainRedeemAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.codeRewardValue != null">
+        code_reward_value = #{record.codeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.codeStatus != null">
+        code_status = #{record.codeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.codeStakingReductionEpoch != null">
+        code_staking_reduction_epoch = #{record.codeStakingReductionEpoch,jdbcType=INTEGER},
+      </if>
+      <if test="record.codeSlashValue != null">
+        code_slash_value = #{record.codeSlashValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.unStakeFreezeDuration != null">
+        un_stake_freeze_duration = #{record.unStakeFreezeDuration,jdbcType=INTEGER},
+      </if>
+      <if test="record.unStakeEndBlock != null">
+        un_stake_end_block = #{record.unStakeEndBlock,jdbcType=BIGINT},
+      </if>
+      <if test="record.blockNum != null">
+        block_num = #{record.blockNum,jdbcType=BIGINT},
       </if>
       <if test="record.isQuit != null">
         is_quit = #{record.isQuit,jdbcType=INTEGER},
+      </if>
+      <if test="record.isHandle != null">
+        is_handle = #{record.isHandle,jdbcType=BIT},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -241,8 +373,8 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.data != null">
-        `data` = #{record.data,jdbcType=LONGVARCHAR},
+      <if test="record.slashData != null">
+        slash_data = #{record.slashData,jdbcType=LONGVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -251,29 +383,53 @@
   </update>
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update slash
-    set hash = #{record.hash,jdbcType=VARCHAR},
+    set id = #{record.id,jdbcType=BIGINT},
       node_id = #{record.nodeId,jdbcType=VARCHAR},
-      slash_rate = #{record.slashRate,jdbcType=VARCHAR},
-      slash_value = #{record.slashValue,jdbcType=DECIMAL},
-      reward = #{record.reward,jdbcType=DECIMAL},
-      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      tx_hash = #{record.txHash,jdbcType=VARCHAR},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
+      setting_epoch = #{record.settingEpoch,jdbcType=INTEGER},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      slash_rate = #{record.slashRate,jdbcType=DECIMAL},
+      slash_report_rate = #{record.slashReportRate,jdbcType=DECIMAL},
+      benefit_address = #{record.benefitAddress,jdbcType=VARCHAR},
+      code_remain_redeem_amount = #{record.codeRemainRedeemAmount,jdbcType=DECIMAL},
+      code_reward_value = #{record.codeRewardValue,jdbcType=DECIMAL},
+      code_status = #{record.codeStatus,jdbcType=INTEGER},
+      code_staking_reduction_epoch = #{record.codeStakingReductionEpoch,jdbcType=INTEGER},
+      code_slash_value = #{record.codeSlashValue,jdbcType=DECIMAL},
+      un_stake_freeze_duration = #{record.unStakeFreezeDuration,jdbcType=INTEGER},
+      un_stake_end_block = #{record.unStakeEndBlock,jdbcType=BIGINT},
+      block_num = #{record.blockNum,jdbcType=BIGINT},
       is_quit = #{record.isQuit,jdbcType=INTEGER},
+      is_handle = #{record.isHandle,jdbcType=BIT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      `data` = #{record.data,jdbcType=LONGVARCHAR}
+      slash_data = #{record.slashData,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update slash
-    set hash = #{record.hash,jdbcType=VARCHAR},
+    set id = #{record.id,jdbcType=BIGINT},
       node_id = #{record.nodeId,jdbcType=VARCHAR},
-      slash_rate = #{record.slashRate,jdbcType=VARCHAR},
-      slash_value = #{record.slashValue,jdbcType=DECIMAL},
-      reward = #{record.reward,jdbcType=DECIMAL},
-      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      tx_hash = #{record.txHash,jdbcType=VARCHAR},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
+      setting_epoch = #{record.settingEpoch,jdbcType=INTEGER},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      slash_rate = #{record.slashRate,jdbcType=DECIMAL},
+      slash_report_rate = #{record.slashReportRate,jdbcType=DECIMAL},
+      benefit_address = #{record.benefitAddress,jdbcType=VARCHAR},
+      code_remain_redeem_amount = #{record.codeRemainRedeemAmount,jdbcType=DECIMAL},
+      code_reward_value = #{record.codeRewardValue,jdbcType=DECIMAL},
+      code_status = #{record.codeStatus,jdbcType=INTEGER},
+      code_staking_reduction_epoch = #{record.codeStakingReductionEpoch,jdbcType=INTEGER},
+      code_slash_value = #{record.codeSlashValue,jdbcType=DECIMAL},
+      un_stake_freeze_duration = #{record.unStakeFreezeDuration,jdbcType=INTEGER},
+      un_stake_end_block = #{record.unStakeEndBlock,jdbcType=BIGINT},
+      block_num = #{record.blockNum,jdbcType=BIGINT},
       is_quit = #{record.isQuit,jdbcType=INTEGER},
+      is_handle = #{record.isHandle,jdbcType=BIT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -286,20 +442,56 @@
       <if test="nodeId != null">
         node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
+      <if test="txHash != null">
+        tx_hash = #{txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        `time` = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settingEpoch != null">
+        setting_epoch = #{settingEpoch,jdbcType=INTEGER},
+      </if>
+      <if test="stakingBlockNum != null">
+        staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
+      </if>
       <if test="slashRate != null">
-        slash_rate = #{slashRate,jdbcType=VARCHAR},
+        slash_rate = #{slashRate,jdbcType=DECIMAL},
       </if>
-      <if test="slashValue != null">
-        slash_value = #{slashValue,jdbcType=DECIMAL},
+      <if test="slashReportRate != null">
+        slash_report_rate = #{slashReportRate,jdbcType=DECIMAL},
       </if>
-      <if test="reward != null">
-        reward = #{reward,jdbcType=DECIMAL},
+      <if test="benefitAddress != null">
+        benefit_address = #{benefitAddress,jdbcType=VARCHAR},
       </if>
-      <if test="benefitAddr != null">
-        benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      <if test="codeRemainRedeemAmount != null">
+        code_remain_redeem_amount = #{codeRemainRedeemAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="codeRewardValue != null">
+        code_reward_value = #{codeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="codeStatus != null">
+        code_status = #{codeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="codeStakingReductionEpoch != null">
+        code_staking_reduction_epoch = #{codeStakingReductionEpoch,jdbcType=INTEGER},
+      </if>
+      <if test="codeSlashValue != null">
+        code_slash_value = #{codeSlashValue,jdbcType=DECIMAL},
+      </if>
+      <if test="unStakeFreezeDuration != null">
+        un_stake_freeze_duration = #{unStakeFreezeDuration,jdbcType=INTEGER},
+      </if>
+      <if test="unStakeEndBlock != null">
+        un_stake_end_block = #{unStakeEndBlock,jdbcType=BIGINT},
+      </if>
+      <if test="blockNum != null">
+        block_num = #{blockNum,jdbcType=BIGINT},
       </if>
       <if test="isQuit != null">
         is_quit = #{isQuit,jdbcType=INTEGER},
+      </if>
+      <if test="isHandle != null">
+        is_handle = #{isHandle,jdbcType=BIT},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -307,36 +499,60 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="data != null">
-        `data` = #{data,jdbcType=LONGVARCHAR},
+      <if test="slashData != null">
+        slash_data = #{slashData,jdbcType=LONGVARCHAR},
       </if>
     </set>
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.Slash">
     update slash
     set node_id = #{nodeId,jdbcType=VARCHAR},
-      slash_rate = #{slashRate,jdbcType=VARCHAR},
-      slash_value = #{slashValue,jdbcType=DECIMAL},
-      reward = #{reward,jdbcType=DECIMAL},
-      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      tx_hash = #{txHash,jdbcType=VARCHAR},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      setting_epoch = #{settingEpoch,jdbcType=INTEGER},
+      staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
+      slash_rate = #{slashRate,jdbcType=DECIMAL},
+      slash_report_rate = #{slashReportRate,jdbcType=DECIMAL},
+      benefit_address = #{benefitAddress,jdbcType=VARCHAR},
+      code_remain_redeem_amount = #{codeRemainRedeemAmount,jdbcType=DECIMAL},
+      code_reward_value = #{codeRewardValue,jdbcType=DECIMAL},
+      code_status = #{codeStatus,jdbcType=INTEGER},
+      code_staking_reduction_epoch = #{codeStakingReductionEpoch,jdbcType=INTEGER},
+      code_slash_value = #{codeSlashValue,jdbcType=DECIMAL},
+      un_stake_freeze_duration = #{unStakeFreezeDuration,jdbcType=INTEGER},
+      un_stake_end_block = #{unStakeEndBlock,jdbcType=BIGINT},
+      block_num = #{blockNum,jdbcType=BIGINT},
       is_quit = #{isQuit,jdbcType=INTEGER},
+      is_handle = #{isHandle,jdbcType=BIT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      `data` = #{data,jdbcType=LONGVARCHAR}
-    where hash = #{hash,jdbcType=VARCHAR}
+      slash_data = #{slashData,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Slash">
     update slash
     set node_id = #{nodeId,jdbcType=VARCHAR},
-      slash_rate = #{slashRate,jdbcType=VARCHAR},
-      slash_value = #{slashValue,jdbcType=DECIMAL},
-      reward = #{reward,jdbcType=DECIMAL},
-      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      tx_hash = #{txHash,jdbcType=VARCHAR},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      setting_epoch = #{settingEpoch,jdbcType=INTEGER},
+      staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
+      slash_rate = #{slashRate,jdbcType=DECIMAL},
+      slash_report_rate = #{slashReportRate,jdbcType=DECIMAL},
+      benefit_address = #{benefitAddress,jdbcType=VARCHAR},
+      code_remain_redeem_amount = #{codeRemainRedeemAmount,jdbcType=DECIMAL},
+      code_reward_value = #{codeRewardValue,jdbcType=DECIMAL},
+      code_status = #{codeStatus,jdbcType=INTEGER},
+      code_staking_reduction_epoch = #{codeStakingReductionEpoch,jdbcType=INTEGER},
+      code_slash_value = #{codeSlashValue,jdbcType=DECIMAL},
+      un_stake_freeze_duration = #{unStakeFreezeDuration,jdbcType=INTEGER},
+      un_stake_end_block = #{unStakeEndBlock,jdbcType=BIGINT},
+      block_num = #{blockNum,jdbcType=BIGINT},
       is_quit = #{isQuit,jdbcType=INTEGER},
+      is_handle = #{isHandle,jdbcType=BIT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -345,14 +561,21 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into slash
-    (hash, node_id, slash_rate, slash_value, reward, benefit_addr, is_quit, create_time, 
-      update_time, `data`)
+    (id, node_id, tx_hash, `time`, setting_epoch, staking_block_num, slash_rate, slash_report_rate, 
+      benefit_address, code_remain_redeem_amount, code_reward_value, code_status, code_staking_reduction_epoch, 
+      code_slash_value, un_stake_freeze_duration, un_stake_end_block, block_num, is_quit, 
+      is_handle, create_time, update_time, slash_data)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, #{item.slashRate,jdbcType=VARCHAR}, 
-        #{item.slashValue,jdbcType=DECIMAL}, #{item.reward,jdbcType=DECIMAL}, #{item.benefitAddr,jdbcType=VARCHAR}, 
-        #{item.isQuit,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.data,jdbcType=LONGVARCHAR})
+      (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR}, 
+        #{item.time,jdbcType=TIMESTAMP}, #{item.settingEpoch,jdbcType=INTEGER}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
+        #{item.slashRate,jdbcType=DECIMAL}, #{item.slashReportRate,jdbcType=DECIMAL}, #{item.benefitAddress,jdbcType=VARCHAR}, 
+        #{item.codeRemainRedeemAmount,jdbcType=DECIMAL}, #{item.codeRewardValue,jdbcType=DECIMAL}, 
+        #{item.codeStatus,jdbcType=INTEGER}, #{item.codeStakingReductionEpoch,jdbcType=INTEGER}, 
+        #{item.codeSlashValue,jdbcType=DECIMAL}, #{item.unStakeFreezeDuration,jdbcType=INTEGER}, 
+        #{item.unStakeEndBlock,jdbcType=BIGINT}, #{item.blockNum,jdbcType=BIGINT}, #{item.isQuit,jdbcType=INTEGER}, 
+        #{item.isHandle,jdbcType=BIT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.slashData,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -370,26 +593,62 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
-        <if test="'hash'.toString() == column.value">
-          #{item.hash,jdbcType=VARCHAR}
+        <if test="'id'.toString() == column.value">
+          #{item.id,jdbcType=BIGINT}
         </if>
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
         </if>
+        <if test="'tx_hash'.toString() == column.value">
+          #{item.txHash,jdbcType=VARCHAR}
+        </if>
+        <if test="'time'.toString() == column.value">
+          #{item.time,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'setting_epoch'.toString() == column.value">
+          #{item.settingEpoch,jdbcType=INTEGER}
+        </if>
+        <if test="'staking_block_num'.toString() == column.value">
+          #{item.stakingBlockNum,jdbcType=BIGINT}
+        </if>
         <if test="'slash_rate'.toString() == column.value">
-          #{item.slashRate,jdbcType=VARCHAR}
+          #{item.slashRate,jdbcType=DECIMAL}
         </if>
-        <if test="'slash_value'.toString() == column.value">
-          #{item.slashValue,jdbcType=DECIMAL}
+        <if test="'slash_report_rate'.toString() == column.value">
+          #{item.slashReportRate,jdbcType=DECIMAL}
         </if>
-        <if test="'reward'.toString() == column.value">
-          #{item.reward,jdbcType=DECIMAL}
+        <if test="'benefit_address'.toString() == column.value">
+          #{item.benefitAddress,jdbcType=VARCHAR}
         </if>
-        <if test="'benefit_addr'.toString() == column.value">
-          #{item.benefitAddr,jdbcType=VARCHAR}
+        <if test="'code_remain_redeem_amount'.toString() == column.value">
+          #{item.codeRemainRedeemAmount,jdbcType=DECIMAL}
+        </if>
+        <if test="'code_reward_value'.toString() == column.value">
+          #{item.codeRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'code_status'.toString() == column.value">
+          #{item.codeStatus,jdbcType=INTEGER}
+        </if>
+        <if test="'code_staking_reduction_epoch'.toString() == column.value">
+          #{item.codeStakingReductionEpoch,jdbcType=INTEGER}
+        </if>
+        <if test="'code_slash_value'.toString() == column.value">
+          #{item.codeSlashValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'un_stake_freeze_duration'.toString() == column.value">
+          #{item.unStakeFreezeDuration,jdbcType=INTEGER}
+        </if>
+        <if test="'un_stake_end_block'.toString() == column.value">
+          #{item.unStakeEndBlock,jdbcType=BIGINT}
+        </if>
+        <if test="'block_num'.toString() == column.value">
+          #{item.blockNum,jdbcType=BIGINT}
         </if>
         <if test="'is_quit'.toString() == column.value">
           #{item.isQuit,jdbcType=INTEGER}
+        </if>
+        <if test="'is_handle'.toString() == column.value">
+          #{item.isHandle,jdbcType=BIT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
@@ -397,11 +656,12 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'data'.toString() == column.value">
-          #{item.data,jdbcType=LONGVARCHAR}
+        <if test="'slash_data'.toString() == column.value">
+          #{item.slashData,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

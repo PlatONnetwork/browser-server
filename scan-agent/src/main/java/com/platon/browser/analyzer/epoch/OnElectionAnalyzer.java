@@ -150,7 +150,6 @@ public class OnElectionAnalyzer {
             customStaking.setSlashAmount(slashAmount);
             desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(slashAmount.toString()).append("|1");
             NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-            nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
             nodeOpt.setNodeId(staking.getNodeId());
             nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
             nodeOpt.setBNum(bNum.longValue());

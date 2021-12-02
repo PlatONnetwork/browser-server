@@ -7,6 +7,7 @@ import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.service.account.AccountService;
 import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
 import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
@@ -19,6 +20,7 @@ import com.platon.browser.utils.CalculateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -62,6 +64,9 @@ public class NetworkStatUpdateTask {
 
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
+
+    @Resource
+    private NOptBakMapper nOptBakMapper;
 
     @Scheduled(cron = "0/5  * * * * ?")
     public void networkStatUpdate() {
@@ -109,6 +114,8 @@ public class NetworkStatUpdateTask {
         int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
         //获取提案总数
         int proposalQty = statisticBusinessMapper.getProposalQty();
+        //获取节点操作数
+        long nodeOptSeq = nOptBakMapper.countByExample(null);
         NetworkStat networkStat = networkStatCache.getNetworkStat();
         networkStat.setTxQty(totalCount.intValue());
         networkStat.setErc20TxQty(erc20Count.intValue());
@@ -116,6 +123,7 @@ public class NetworkStatUpdateTask {
         networkStat.setAddressQty(addressQty);
         networkStat.setDoingProposalQty(doingProposalQty);
         networkStat.setProposalQty(proposalQty);
+        networkStat.setNodeOptSeq(nodeOptSeq);
     }
 
     protected void start() {

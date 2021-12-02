@@ -53,7 +53,6 @@ public class ProposalVoteConverterTest extends AgentTestBase {
                 .build();
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
         when(proposalMapper.selectByPrimaryKey(anyString())).thenReturn(proposalList.get(0));
-        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);
     }
 
     @Test

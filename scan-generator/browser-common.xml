@@ -42,7 +42,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="point_log" domainObjectName="PointLog">
+        <table tableName="slash" domainObjectName="Slash">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>

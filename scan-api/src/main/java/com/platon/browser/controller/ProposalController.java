@@ -8,7 +8,7 @@ import com.platon.browser.response.RespPage;
 import com.platon.browser.response.proposal.ProposalDetailsResp;
 import com.platon.browser.response.proposal.ProposalListResp;
 import com.platon.browser.response.proposal.VoteListResp;
-import com.platon.browser.service.ProposalService;
+import com.platon.browser.service.ProposalInfoService;
 import com.platon.browser.service.VoteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +32,7 @@ import javax.validation.Valid;
 public class ProposalController {
 
     @Resource
-    private ProposalService proposalService;
+    private ProposalInfoService proposalInfoService;
 
     @Resource
     private VoteService voteService;
@@ -46,7 +46,7 @@ public class ProposalController {
      */
     @PostMapping("proposal/proposalList")
     public Mono<RespPage<ProposalListResp>> proposalList(@Valid @RequestBody(required = false) PageReq req) {
-        return Mono.just(proposalService.list(req));
+        return Mono.just(proposalInfoService.list(req));
     }
 
     /**
@@ -58,7 +58,7 @@ public class ProposalController {
      */
     @PostMapping("proposal/proposalDetails")
     public Mono<BaseResp<ProposalDetailsResp>> proposalDetails(@Valid @RequestBody ProposalDetailRequest req) {
-        return Mono.just(proposalService.get(req));
+        return Mono.just(proposalInfoService.get(req));
     }
 
     /**

@@ -41,17 +41,6 @@ public class NetworkStatCache {
     }
 
     /**
-     * 获得操作日志需要
-     *
-     * @return
-     */
-    public long getAndIncrementNodeOptSeq() {
-        long seq = this.networkStat.getNodeOptSeq() == null ? 1 : this.networkStat.getNodeOptSeq() + 1;
-        this.networkStat.setNodeOptSeq(seq);
-        return seq;
-    }
-
-    /**
      * 基于任务更新网络统计信息
      *
      * @param turnValue:

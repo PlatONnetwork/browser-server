@@ -14,16 +14,17 @@ import javax.annotation.Resource;
 
 /**
  * @description: 提案服务
- * @author: chendongming@matrixelements.com
  * @create: 2019-11-26 11:08:25
  **/
 @Slf4j
 @Service
 public class ProposalService {
+
     @Resource
-    private PlatOnClient client;
+    private PlatOnClient platOnClient;
+
     @Resource
-    private SpecialApi sca;
+    private SpecialApi specialApi;
 
     /**
      * 取提案参与者统计信息
@@ -33,8 +34,8 @@ public class ProposalService {
      * @return
      * @throws Exception
      */
-    public ProposalParticipantStat getProposalParticipantStat (String proposalHash, String blockHash ) throws ContractInvokeException, BlankResponseException {
-        return sca.getProposalParticipants(client.getWeb3jWrapper().getWeb3j(), proposalHash, blockHash);
+    public ProposalParticipantStat getProposalParticipantStat(String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
+        return specialApi.getProposalParticipants(platOnClient.getWeb3jWrapper().getWeb3j(), proposalHash, blockHash);
     }
 
     /**
@@ -44,11 +45,12 @@ public class ProposalService {
      * @return
      * @throws Exception
      */
-    public TallyResult getTallyResult (String proposalHash ) throws Exception {
-        CallResponse<TallyResult> result = client.getProposalContract().getTallyResult(proposalHash).send();
-        if(result.getData()==null){
-            log.warn("提案["+proposalHash+"]的投票结果为空!");
+    public TallyResult getTallyResult(String proposalHash) throws Exception {
+        CallResponse<TallyResult> result = platOnClient.getProposalContract().getTallyResult(proposalHash).send();
+        if (result.getData() == null) {
+            log.warn("提案[" + proposalHash + "]的投票结果为空!");
         }
         return result.getData();
     }
+
 }

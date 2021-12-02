@@ -102,7 +102,6 @@ public class ProposalVoteAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 .replace("VERSION", proposal.getNewVersion() == null ? "" : proposal.getNewVersion());
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getVerifier());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.VOTE.getCode()));
         nodeOpt.setDesc(desc);

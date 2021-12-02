@@ -54,7 +54,6 @@ public class ProposalParamConverterTest extends AgentTestBase {
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("600");
         when(chainConfig.getProposalUrlTemplate()).thenReturn(blockChainConfig.getProposalUrlTemplate());
         when(chainConfig.getProposalPipNumTemplate()).thenReturn(blockChainConfig.getProposalPipNumTemplate());
-        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
                 .nodeName("integration-node1")

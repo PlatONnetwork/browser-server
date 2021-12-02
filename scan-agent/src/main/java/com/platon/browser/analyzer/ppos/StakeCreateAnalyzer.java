@@ -101,7 +101,6 @@ public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
         updateNodeCache(HexUtil.prefix(txParam.getNodeId()), txParam.getNodeName(), stakingBlockNum);
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.CREATE.getCode()));
         nodeOpt.setTxHash(tx.getHash());

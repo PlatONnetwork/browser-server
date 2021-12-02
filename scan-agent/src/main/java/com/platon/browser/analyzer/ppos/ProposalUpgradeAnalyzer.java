@@ -88,7 +88,6 @@ public class ProposalUpgradeAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 .replace("VERSION", businessParam.getNewVersion());
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getVerifier());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
         nodeOpt.setDesc(desc);
