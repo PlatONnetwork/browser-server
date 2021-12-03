@@ -2,11 +2,14 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.entity.PointLog;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.PointLogMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
@@ -60,6 +63,9 @@ public class AddressUpdateTask {
 
     @Resource
     private EsTransactionRepository esTransactionRepository;
+
+    @Resource
+    private PointLogMapper pointLogMapper;
 
     @XxlJob("addressUpdateJobHandler")
     public void addressUpdate() {
@@ -193,10 +199,21 @@ public class AddressUpdateTask {
 
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateQty() throws IOException {
-        int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
-        long minNum = 0;
-        long maxNum = minNum + batchSize;
+        int batchSize = 100;
         int pageSize = 5000;
+        String parm = XxlJobHelper.getJobParam();
+        if (StrUtil.isNotBlank(parm)) {
+            try {
+                String[] strParm = StrUtil.split(parm, ",");
+                batchSize = Convert.toInt(strParm[0]);
+                pageSize = Convert.toInt(strParm[1]);
+            } catch (Exception e) {
+                log.warn("参数获取异常，将采用默认值");
+            }
+        }
+        PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
+        long minNum = Convert.toInt(pointLog.getPosition(), 0);
+        long maxNum = minNum + batchSize;
         List<Transaction> transactionList = getTransactionList(minNum, maxNum, pageSize);
         if (CollUtil.isNotEmpty(transactionList)) {
             Map<String, AddressQty> map = new HashMap();
@@ -266,6 +283,9 @@ public class AddressUpdateTask {
             });
             //TODO 批量入库
 
+            Transaction transaction = CollUtil.getLast(transactionList);
+            pointLog.setPosition(transaction.getNum().toString());
+            pointLogMapper.updateByPrimaryKeySelective(pointLog);
         }
     }
 
@@ -281,6 +301,7 @@ public class AddressUpdateTask {
 
     /**
      * 获取es信息 (minNum,maxNum]
+     * minNum到maxNum区块之间的交易数要小于pageSize
      *
      * @param minNum:
      * @param maxNum:

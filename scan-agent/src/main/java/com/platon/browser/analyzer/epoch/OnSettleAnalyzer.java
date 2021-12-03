@@ -3,7 +3,6 @@ package com.platon.browser.analyzer.epoch;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomGasEstimateLogMapper;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
@@ -54,9 +53,6 @@ public class OnSettleAnalyzer {
 
     @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     @Resource
     private RestrictingMinimumReleaseParamService restrictingMinimumReleaseParamService;

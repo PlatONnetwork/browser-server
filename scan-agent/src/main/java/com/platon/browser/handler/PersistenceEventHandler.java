@@ -119,25 +119,14 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             transactionStage.clear();
             delegationRewardStage.clear();
 
-            // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
-            Long txMaxId = 0L;
-            List<Transaction> transactions = event.getTransactions();
-            if (!transactions.isEmpty()) {
-                for (Transaction tx : transactions) {
-                    if (tx.getId() > txMaxId) txMaxId = tx.getId();
-                }
-            }
-            BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
-
             maxBlockNumber = event.getBlock().getNum();
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);
         } catch (Exception e) {
-            log.error("", e);
+            log.error("数据入库异常", e);
             throw e;
         }
-
     }
 
     /**

@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomTxBakMapper">
-  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+  <insert id="batchInsertOrUpdateSelective" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     replace into tx_bak (
-    <foreach collection="selective" item="column" separator=",">
-      ${column.escapedColumnName}
-    </foreach>
+        `hash`,`num`,`info`
     )
     values
     <foreach collection="list" item="item" separator=",">
       (
-      <foreach collection="selective" item="column" separator=",">
-        <if test="'hash'.toString() == column.value">
-          #{item.hash,jdbcType=VARCHAR}
-        </if>
-        <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=BIGINT}
-        </if>
-        <if test="'num'.toString() == column.value">
-          #{item.num,jdbcType=BIGINT}
-        </if>
-        <if test="'info'.toString() == column.value">
-          #{item.info,jdbcType=LONGVARCHAR}
-        </if>
-      </foreach>
+      <if test="item.hash !=null">
+        #{item.hash,jdbcType=VARCHAR},
+      </if>
+      <if test="item.num !=null">
+        #{item.num,jdbcType=BIGINT},
+      </if>
+      <if test="item.info !=null">
+        #{item.info,jdbcType=LONGVARCHAR}
+      </if>
       )
     </foreach>
   </insert>

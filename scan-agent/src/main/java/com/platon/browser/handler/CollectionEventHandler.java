@@ -8,15 +8,11 @@ import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
 import com.platon.browser.dao.custommapper.CustomTxBakMapper;
 import com.platon.browser.dao.entity.NOptBak;
-import com.platon.browser.dao.entity.TxBak;
-import com.platon.browser.dao.entity.TxBakExample;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -24,7 +20,6 @@ import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.ppos.PPOSService;
 import com.platon.browser.service.statistic.StatisticService;
-import com.platon.browser.utils.BakDataDeleteUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -60,13 +55,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private ComplementEventPublisher complementEventPublisher;
 
     @Resource
-    private NetworkStatCache networkStatCache;
-
-    @Resource
     private CustomNOptBakMapper customNOptBakMapper;
-
-    @Resource
-    private TxBakMapper txBakMapper;
 
     @Resource
     private NodeMapper nodeMapper;
@@ -85,8 +74,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     // 交易序号id
     private long transactionId = 0;
-
-    private long txDeleteBatchCount = 0;
 
     /**
      * 重试次数
@@ -110,30 +97,22 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private void exec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         // 确保event是原始副本，重试机制每一次使用的都是copyEvent
         CollectionEvent copyEvent = copyCollectionEvent(event);
-        // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 START
-        Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
-        List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
-        for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
-            CollectionTransaction transaction = transactionAnalyzer.analyze(copyEvent.getBlock(), tr, receiptMap.get(tr.getHash()));
-            // 把解析好的交易添加到当前区块的交易列表
-            copyEvent.getBlock().getTransactions().add(transaction);
-            copyEvent.getTransactions().add(transaction);
-            // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
-            copyEvent.getBlock().setErc20TxQty(copyEvent.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
-            copyEvent.getBlock().setErc721TxQty(copyEvent.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
-        }
-        // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 END
-
-        // 使用已入库的交易数量初始化交易ID初始值
-        if (transactionId == 0) transactionId = networkStatCache.getNetworkStat().getTxQty();
-
         try {
+            Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
+            List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
+            for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
+                CollectionTransaction transaction = transactionAnalyzer.analyze(copyEvent.getBlock(), tr, receiptMap.get(tr.getHash()));
+                // 把解析好的交易添加到当前区块的交易列表
+                copyEvent.getBlock().getTransactions().add(transaction);
+                copyEvent.getTransactions().add(transaction);
+                // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
+                copyEvent.getBlock().setErc20TxQty(copyEvent.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
+                copyEvent.getBlock().setErc721TxQty(copyEvent.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
+            }
+
             List<Transaction> transactions = copyEvent.getTransactions();
             // 确保交易从小到大的索引顺序
             transactions.sort(Comparator.comparing(Transaction::getIndex));
-            for (Transaction tx : transactions) {
-                tx.setId(++transactionId);
-            }
 
             // 根据区块号解析出业务参数
             List<NodeOpt> nodeOpts1 = blockService.analyze(copyEvent);
@@ -141,30 +120,19 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             TxAnalyseResult txAnalyseResult = pposService.analyze(copyEvent);
             // 统计业务参数
             statisticService.analyze(copyEvent);
-            if (!txAnalyseResult.getNodeOptList().isEmpty()) nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
-            txDeleteBatchCount++;
-
-            if (txDeleteBatchCount >= 10) {
-                // 删除小于最高ID的交易备份
-                TxBakExample txBakExample = new TxBakExample();
-                txBakExample.createCriteria().andIdLessThanOrEqualTo(BakDataDeleteUtil.getTxBakMaxId());
-                int txCount = txBakMapper.deleteByExample(txBakExample);
-                log.debug("清除交易备份记录({})条", txCount);
-                txDeleteBatchCount = 0;
-            }
-            // 交易入库mysql
-            if (!transactions.isEmpty()) {
-                List<TxBak> baks = new ArrayList<>();
-                transactions.forEach(tx -> {
-                    TxBak bak = new TxBak();
-                    BeanUtils.copyProperties(tx, bak);
-                    baks.add(bak);
-                });
-                customTxBakMapper.batchInsertOrUpdateSelective(baks, TxBak.Column.values());
+            // 汇总操作记录
+            if (CollUtil.isNotEmpty(txAnalyseResult.getNodeOptList())) {
+                nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
             }
 
-            // 操作日志入库mysql
+            // 交易入库mysql，因为缓存无法实现自增id，不再删除操作日志表
+            if (CollUtil.isNotEmpty(transactions)) {
+                // 依赖于数据库的自增id
+                customTxBakMapper.batchInsertOrUpdateSelective(transactions);
+            }
+
+            // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不在由环形队列入库，不再删除操作日志表
             if (!nodeOpts1.isEmpty()) {
                 List<NOptBak> baks = new ArrayList<>();
                 nodeOpts1.forEach(no -> {
@@ -211,12 +179,11 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         copyEvent.setTraceId(event.getTraceId());
         if (retryCount.incrementAndGet() > 1) {
             initNodeCache();
-            addressCache.cleanAll();
             List<String> txHashList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.warn("重试次数[{}],节点重新初始化，清除地址缓存，该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
+            log.warn("重试次数[{}],节点重新初始化，该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
                      retryCount.get(),
                      event.getBlock().getNum(),
                      JSONUtil.toJsonStr(txHashList),

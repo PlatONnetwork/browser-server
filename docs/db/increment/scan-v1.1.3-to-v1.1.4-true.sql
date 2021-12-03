@@ -1,5 +1,5 @@
 USE `scan_platon`;
-
+-- 确保show variables like 'innodb_autoinc_lock_mode';是1
 DROP TABLE IF EXISTS `point_log`;
 CREATE TABLE `point_log` (
                              `id` int(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
@@ -11,6 +11,7 @@ CREATE TABLE `point_log` (
                              PRIMARY KEY (`id`)
 ) COMMENT='断点统计表';
 INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (1, 1, 'n_opt_bak', '0', '2021-12-01 07:50:41', '2021-12-01 07:50:41');
+INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (2, 2, 'browser_platon_transaction', '0', '2021-12-03 06:33:27', '2021-12-03 06:33:27');
 
 DROP TABLE IF EXISTS `slash`;
 CREATE TABLE `slash` (
