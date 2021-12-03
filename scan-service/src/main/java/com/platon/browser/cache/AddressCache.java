@@ -273,7 +273,14 @@ public class AddressCache {
         log.info("当前erc721地址[{}]的交易数为[{}]", addr, address.getErc721TxQty());
     }
 
-    private Address createDefaultAddress(String addr) {
+    /**
+     * 创建默认的地址
+     *
+     * @param addr:
+     * @return: com.platon.browser.dao.entity.Address
+     * @date: 2021/12/2
+     */
+    public Address createDefaultAddress(String addr) {
         Address address = new Address();
         address.setAddress(addr);
         // 设置地址类型

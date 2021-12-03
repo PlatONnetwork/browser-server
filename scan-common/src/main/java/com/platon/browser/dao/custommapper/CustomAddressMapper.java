@@ -4,6 +4,7 @@ import com.platon.browser.bean.CustomAddressDetail;
 import com.platon.browser.bean.RecoveredDelegationAmount;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CustomAddressMapper {
@@ -24,5 +25,14 @@ public interface CustomAddressMapper {
      */
     List<String> findContractDestroy(@Param("type") Integer type);
 
+    /**
+     * 更新地址已领取委托奖励
+     *
+     * @param address:
+     * @param amount:
+     * @return: void
+     * @date: 2021/12/2
+     */
+    void updateAddressHaveReward(@Param("address") String address, @Param("amount") BigDecimal amount);
 
 }

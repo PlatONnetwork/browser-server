@@ -75,7 +75,6 @@ public class StatisticsNetworkAnalyzer {
         networkStat.setNodeId(block.getNodeId());
         networkStat.setNodeName(nodeCache.getNode(block.getNodeId()).getNodeName());
         networkStat.setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()));
-        networkStat.setNodeOptSeq(networkStat.getNodeOptSeq());
         setTotalIssueValue(block.getNum(), event.getEpochMessage().getSettleEpochRound(), networkStat);
         statisticBusinessMapper.networkChange(networkStat);
 

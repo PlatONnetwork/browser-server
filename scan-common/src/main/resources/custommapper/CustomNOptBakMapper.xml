@@ -42,4 +42,8 @@
       )
     </foreach>
   </insert>
+
+  <select id="getLastNodeOptSeq" resultType="long">
+    select id from n_opt_bak order by id limit 1;
+  </select>
 </mapper>

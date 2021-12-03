@@ -15,7 +15,6 @@ import com.platon.browser.dao.custommapper.CustomTxBakMapper;
 import com.platon.browser.dao.entity.NOptBak;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.entity.TxBakExample;
-import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -62,9 +61,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
     private NetworkStatCache networkStatCache;
-
-    @Resource
-    private NOptBakMapper nOptBakMapper;
 
     @Resource
     private CustomNOptBakMapper customNOptBakMapper;
@@ -215,11 +211,12 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         copyEvent.setTraceId(event.getTraceId());
         if (retryCount.incrementAndGet() > 1) {
             initNodeCache();
+            addressCache.cleanAll();
             List<String> txHashList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.warn("重试次数[{}],节点重新初始化，该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
+            log.warn("重试次数[{}],节点重新初始化，清除地址缓存，该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
                      retryCount.get(),
                      event.getBlock().getNum(),
                      JSONUtil.toJsonStr(txHashList),

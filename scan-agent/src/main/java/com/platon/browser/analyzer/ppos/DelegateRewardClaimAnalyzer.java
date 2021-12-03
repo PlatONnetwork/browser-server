@@ -1,12 +1,16 @@
 package com.platon.browser.analyzer.ppos;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.cache.AddressCache;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
-import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
-import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.cache.AddressCache;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateRewardClaimParam;
@@ -38,6 +42,12 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
     @Resource
     private CustomGasEstimateMapper customGasEstimateMapper;
 
+    @Resource
+    private AddressMapper addressMapper;
+
+    @Resource
+    private CustomAddressMapper customAddressMapper;
+
     /**
      * 领取奖励
      *
@@ -53,15 +63,13 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         // 补充节点名称
         updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
-            return null;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
-        DelegateRewardClaim businessParam = DelegateRewardClaim.builder()
-                .address(tx.getFrom()) // 领取者地址
-                .rewardList(txParam.getRewardList()) // 领取的奖励列表
-                .build();
+        DelegateRewardClaim businessParam = DelegateRewardClaim.builder().address(tx.getFrom()) // 领取者地址
+                                                               .rewardList(txParam.getRewardList()) // 领取的奖励列表
+                                                               .build();
 
         delegateBusinessMapper.claim(businessParam);
 
@@ -103,6 +111,8 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
             delegationReward.setExtra(JSON.toJSONString(extraList));
             delegationReward.setExtraClean(JSON.toJSONString(extraCleanList));
         }
+
+        updateAddressHaveReward(businessParam);
         addressCache.update(businessParam);
 
         // 直接入库到mysql数据库
@@ -110,6 +120,29 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         return delegationReward;
+    }
+
+    /**
+     * 更新地址已领取委托奖励
+     *
+     * @param businessParam:
+     * @return: void
+     * @date: 2021/12/2
+     */
+    private void updateAddressHaveReward(DelegateRewardClaim businessParam) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (Reward reward : businessParam.getRewardList()) {
+            totalAmount = totalAmount.add(reward.getReward());
+        }
+        Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getAddress());
+        if (ObjectUtil.isNull(addressInfo)) {
+            // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
+            Address address = addressCache.createDefaultAddress(businessParam.getAddress());
+            address.setHaveReward(totalAmount);
+            addressMapper.insertSelective(address);
+        } else {
+            customAddressMapper.updateAddressHaveReward(businessParam.getAddress(), totalAmount);
+        }
     }
 
 }

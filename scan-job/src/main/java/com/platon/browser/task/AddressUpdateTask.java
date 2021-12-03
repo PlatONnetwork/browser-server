@@ -1,21 +1,31 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AppStatusUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +57,9 @@ public class AddressUpdateTask {
 
     @Resource
     private AddressMapper addressMapper;
+
+    @Resource
+    private EsTransactionRepository esTransactionRepository;
 
     @XxlJob("addressUpdateJobHandler")
     public void addressUpdate() {
@@ -176,6 +189,120 @@ public class AddressUpdateTask {
         }
         log.error("地址余额执行");
         return stop;
+    }
+
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    public void updateQty() throws IOException {
+        int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        long minNum = 0;
+        long maxNum = minNum + batchSize;
+        int pageSize = 5000;
+        List<Transaction> transactionList = getTransactionList(minNum, maxNum, pageSize);
+        if (CollUtil.isNotEmpty(transactionList)) {
+            Map<String, AddressQty> map = new HashMap();
+            transactionList.forEach(transaction -> {
+                AddressQty from = getAddressQtyFromMap(map, transaction.getFrom());
+                AddressQty to = getAddressQtyFromMap(map, transaction.getTo());
+                from.setTxQty(from.getTxQty() + 1);
+                to.setTxQty(to.getTxQty() + 1);
+                switch (transaction.getType()) {
+                    case 0:
+                        from.setTransferQty(from.getTransferQty() + 1);
+                        to.setTransferQty(to.getTransferQty() + 1);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        break;
+                    case 21:
+                        break;
+                    case 1000:
+                        break;
+                    case 1001:
+                        break;
+                    case 1002:
+                        break;
+                    case 1003:
+                        break;
+                    case 1004:
+                        break;
+                    case 1005:
+                        break;
+                    case 2000:
+                        break;
+                    case 2001:
+                        break;
+                    case 2002:
+                        break;
+                    case 2003:
+                        break;
+                    case 2004:
+                        break;
+                    case 2005:
+                        break;
+                    case 3000:
+                        break;
+                    case 4000:
+                        break;
+                    case 5000:
+                        break;
+                    default:
+                        break;
+                }
+            });
+            //TODO 批量入库
+
+        }
+    }
+
+    private AddressQty getAddressQtyFromMap(Map<String, AddressQty> map, String address) {
+        if (map.containsKey(address)) {
+            return map.get(address);
+        } else {
+            AddressQty addressQty = AddressQty.builder().address(address).txQty(0).tokenQty(0).transferQty(0).delegateQty(0).stakingQty(0).proposalQty(0).erc721TxQty(0).erc20TxQty(0).build();
+            map.put(address, addressQty);
+            return addressQty;
+        }
+    }
+
+    /**
+     * 获取es信息 (minNum,maxNum]
+     *
+     * @param minNum:
+     * @param maxNum:
+     * @param pageSize: 每页大小
+     * @return: java.util.List<com.platon.browser.elasticsearch.dto.Transaction>
+     * @date: 2021/12/2
+     */
+    private List<Transaction> getTransactionList(long minNum, long maxNum, int pageSize) throws IOException {
+        try {
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setAsc("seq");
+            constructor.setResult(new String[]{"seq", "num", "hash", "type", "from", "to", "contractAddress"});
+            ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
+            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("num").gt(minNum).lte(maxNum));
+            constructor.must(esQueryBuilders);
+            constructor.setUnmappedType("long");
+            ESResult<Transaction> queryResultFromES = esTransactionRepository.search(constructor, Transaction.class, 1, pageSize);
+            return queryResultFromES.getRsData();
+        } catch (Exception e) {
+            log.error("更新地址交易数异常", e);
+            throw e;
+        }
     }
 
 }

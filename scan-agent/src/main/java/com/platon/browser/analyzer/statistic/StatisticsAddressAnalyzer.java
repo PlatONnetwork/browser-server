@@ -5,10 +5,10 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.param.statistic.AddressStatChange;
 import com.platon.browser.dao.param.statistic.AddressStatItem;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -38,23 +38,33 @@ public class StatisticsAddressAnalyzer {
 
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
-        log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})", block.getNum(),
-                event.getTransactions().size(), epochMessage.getConsensusEpochRound(), epochMessage.getSettleEpochRound(),
-                epochMessage.getIssueEpochRound());
+        log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",
+                  block.getNum(),
+                  event.getTransactions().size(),
+                  epochMessage.getConsensusEpochRound(),
+                  epochMessage.getSettleEpochRound(),
+                  epochMessage.getIssueEpochRound());
         // 使用缓存中的地址统计信息构造入库参数列表
         List<AddressStatItem> itemFromCache = new ArrayList<>();
         List<String> addresses = new ArrayList<>();
         this.addressCache.getAll().forEach(cache -> {
-            AddressStatItem item = AddressStatItem.builder().address(cache.getAddress()).type(cache.getType())
-                    .txQty(cache.getTxQty())
-                    .erc20TxQty(cache.getErc20TxQty())
-                    .erc721TxQty(cache.getErc721TxQty())
-                    .transferQty(cache.getTransferQty())
-                    .delegateQty(cache.getDelegateQty())
-                    .stakingQty(cache.getStakingQty()).proposalQty(cache.getProposalQty())
-                    .contractName(cache.getContractName()).contractCreate(cache.getContractCreate())
-                    .contractCreatehash(cache.getContractCreatehash()).contractDestroyHash(cache.getContractDestroyHash())
-                    .contractBin(cache.getContractBin()).haveReward(cache.getHaveReward()).build();
+            AddressStatItem item = AddressStatItem.builder()
+                                                  .address(cache.getAddress())
+                                                  .type(cache.getType())
+                                                  .txQty(cache.getTxQty())
+                                                  .erc20TxQty(cache.getErc20TxQty())
+                                                  .erc721TxQty(cache.getErc721TxQty())
+                                                  .transferQty(cache.getTransferQty())
+                                                  .delegateQty(cache.getDelegateQty())
+                                                  .stakingQty(cache.getStakingQty())
+                                                  .proposalQty(cache.getProposalQty())
+                                                  .contractName(cache.getContractName())
+                                                  .contractCreate(cache.getContractCreate())
+                                                  .contractCreatehash(cache.getContractCreatehash())
+                                                  .contractDestroyHash(cache.getContractDestroyHash())
+                                                  .contractBin(cache.getContractBin())
+                                                  .haveReward(cache.getHaveReward())
+                                                  .build();
             // 检查当前地址是否是普通合约地址
             ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(cache.getAddress());
             if (contractTypeEnum != null) {
@@ -76,8 +86,7 @@ public class StatisticsAddressAnalyzer {
             itemFromCache.add(item);
             addresses.add(cache.getAddress());
         });
-        // 清空地址缓存 ******************缓存清空操作在CollectionEventHandler的finally语句块执行，防止中间出错出现脏缓存*********************
-        // this.addressCache.cleanAll();
+
         // 从数据库中查询出与缓存中对应的地址信息
         AddressExample condition = new AddressExample();
         condition.createCriteria().andAddressIn(addresses);
@@ -108,28 +117,23 @@ public class StatisticsAddressAnalyzer {
                 fromCache.setHaveReward(fromDb.getHaveReward().add(fromCache.getHaveReward())); // 已领取委托奖励总额
                 // 合约创建人，数据库的值优先
                 String contractCreate = fromDb.getContractCreate();
-                if (StringUtils.isBlank(contractCreate))
-                    contractCreate = fromCache.getContractCreate();
+                if (StringUtils.isBlank(contractCreate)) contractCreate = fromCache.getContractCreate();
                 fromCache.setContractCreate(contractCreate);
                 // 合约创建交易hash，数据库的值优先
                 String contractCreateHash = fromDb.getContractCreatehash();
-                if (StringUtils.isBlank(contractCreateHash))
-                    contractCreateHash = fromCache.getContractCreatehash();
+                if (StringUtils.isBlank(contractCreateHash)) contractCreateHash = fromCache.getContractCreatehash();
                 fromCache.setContractCreatehash(contractCreateHash);
                 // 合约销毁交易hash，数据库的值优先
                 String contractDestroyHash = fromDb.getContractDestroyHash();
-                if (StringUtils.isBlank(contractDestroyHash))
-                    contractDestroyHash = fromCache.getContractDestroyHash();
+                if (StringUtils.isBlank(contractDestroyHash)) contractDestroyHash = fromCache.getContractDestroyHash();
                 fromCache.setContractDestroyHash(contractDestroyHash);
                 // 合约bin代码数据
                 String contractBin = fromDb.getContractBin();
-                if (StringUtils.isBlank(contractBin))
-                    contractBin = fromCache.getContractBin();
+                if (StringUtils.isBlank(contractBin)) contractBin = fromCache.getContractBin();
                 fromCache.setContractBin(contractBin);
                 // 合约名称
                 String contractName = fromCache.getContractName();
-                if (StringUtils.isBlank(contractName))
-                    contractName = fromDb.getContractName();
+                if (StringUtils.isBlank(contractName)) contractName = fromDb.getContractName();
                 fromCache.setContractName(contractName);
 
                 fromCache.setType(fromDb.getType()); // 不能让缓存覆盖数据库中的地址类型
@@ -146,13 +150,11 @@ public class StatisticsAddressAnalyzer {
                     item.setContractDestroyHash(tx.getHash());
                 }
             }
-
         });
 
         // 使用合并后的信息构造地址入库参数
         AddressStatChange addressStatChange = AddressStatChange.builder().addressStatItemList(itemFromCache).build();
         this.statisticBusinessMapper.addressChange(addressStatChange);
-
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
 

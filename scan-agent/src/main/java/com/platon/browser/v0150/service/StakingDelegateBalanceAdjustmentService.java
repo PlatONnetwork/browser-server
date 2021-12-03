@@ -1,7 +1,7 @@
 package com.platon.browser.v0150.service;
 
-import com.platon.browser.cache.AddressCache;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -30,28 +30,36 @@ import java.util.logging.SimpleFormatter;
 
 @Service
 public class StakingDelegateBalanceAdjustmentService {
+
     @Resource
     protected DelegationMapper delegationMapper;
+
     @Resource
     protected StakingMapper stakingMapper;
+
     @Resource
     protected NodeMapper nodeMapper;
+
     @Resource
     protected StakingDelegateBalanceAdjustmentMapper stakingDelegateBalanceAdjustmentMapper;
+
     @Resource
     protected BlockChainConfig chainConfig;
+
     @Resource
     protected V0150Config v0150Config;
+
     @Resource
-    protected AddressCache addressCache;
+    private CustomAddressMapper customAddressMapper;
 
     private static final Logger log = Logger.getLogger(StakingDelegateBalanceAdjustmentService.class.getName());
+
     @PostConstruct
-    private void init(){
+    private void init() {
         File logFile = new File(v0150Config.getAdjustLogFilePath());
-        if(logFile.exists()) {
+        if (logFile.exists()) {
             boolean deleted = logFile.delete();
-            if(!deleted) log.warning("删除日志文件失败！");
+            if (!deleted) log.warning("删除日志文件失败！");
         }
         try {
             log.setLevel(Level.INFO);
@@ -67,23 +75,24 @@ public class StakingDelegateBalanceAdjustmentService {
 
     /**
      * 验证调账参数，返回验证结果
+     *
      * @param adjustParams
      * @return
      */
     public void adjust(List<AdjustParam> adjustParams) throws BlockNumberException {
         ValidatedContext validatedContext = new ValidatedContext();
-        if(adjustParams.isEmpty()) return;
+        if (adjustParams.isEmpty()) return;
         // 针对每笔委托调账数据获取完整的【调账上下文数据】
         for (AdjustParam adjustParam : adjustParams) {
-            AbstractAdjustContext context=null;
-            if("staking".equals(adjustParam.getOptType())){
+            AbstractAdjustContext context = null;
+            if ("staking".equals(adjustParam.getOptType())) {
                 // 拼装质押调账需要的完整上下文数据
                 StakingAdjustContext sac = new StakingAdjustContext();
                 validatedContext.getStakingAdjustContextList().add(sac);
-                context=sac;
+                context = sac;
             }
 
-            if("delegate".equals(adjustParam.getOptType())){
+            if ("delegate".equals(adjustParam.getOptType())) {
                 // 根据<委托者地址,质押块高,节点ID>找到对应的委托信息
                 DelegationKey delegationKey = new DelegationKey();
                 delegationKey.setDelegateAddr(adjustParam.getAddr());
@@ -94,10 +103,10 @@ public class StakingDelegateBalanceAdjustmentService {
                 DelegateAdjustContext dac = new DelegateAdjustContext();
                 dac.setDelegation(delegation);
                 validatedContext.getDelegateAdjustContextList().add(dac);
-                context=dac;
+                context = dac;
             }
 
-            if(context!=null){
+            if (context != null) {
                 context.setChainConfig(chainConfig);
                 context.setAdjustParam(adjustParam);
                 // 根据<质押块高,节点ID>找到对应的质押信息
@@ -113,51 +122,42 @@ public class StakingDelegateBalanceAdjustmentService {
                 context.validate();
 
                 String adjustMsg;
-                if("delegate".equals(adjustParam.getOptType())){
+                if ("delegate".equals(adjustParam.getOptType())) {
                     // 委托调账
-                    if(StringUtils.isBlank(context.errorInfo())){
+                    if (StringUtils.isBlank(context.errorInfo())) {
                         AdjustParam param = context.getAdjustParam();
                         // 调账上下文没有错误信息，则执行调账操作
                         stakingDelegateBalanceAdjustmentMapper.adjustDelegateData(param);
 
                         // 更新缓存中的委托者地址已领取奖励
-                        Delegation delegation = ((DelegateAdjustContext)context).getDelegation();
-                        DelegateExit delegateExit= DelegateExit.builder()
-                                .txFrom(delegation.getDelegateAddr())
-                                .delegateReward(param.getReward())
-                                .build();
-                        addressCache.update(delegateExit);
-
-                        StringBuilder sb = new StringBuilder("============ ")
-                                .append(context.getAdjustParam().getOptType())
-                                .append("调账成功 ============\n")
-                                .append(context.contextInfo());
+                        Delegation delegation = ((DelegateAdjustContext) context).getDelegation();
+                        DelegateExit delegateExit = DelegateExit.builder().txFrom(delegation.getDelegateAddr()).delegateReward(param.getReward()).build();
+                        customAddressMapper.updateAddressHaveReward(delegateExit.getTxFrom(), delegateExit.getDelegateReward());
+                        StringBuilder sb = new StringBuilder("============ ").append(context.getAdjustParam().getOptType()).append("调账成功 ============\n").append(context.contextInfo());
                         adjustMsg = sb.toString();
                         log.info(adjustMsg);
-                    }else{
+                    } else {
                         // 调账上下文有错误信息，调账参数打印到错误文件
                         adjustMsg = context.errorInfo();
                         log.warning(adjustMsg);
                     }
                 }
 
-                if("staking".equals(adjustParam.getOptType())){
-                    if(StringUtils.isBlank(context.errorInfo())){
+                if ("staking".equals(adjustParam.getOptType())) {
+                    if (StringUtils.isBlank(context.errorInfo())) {
                         // 调账上下文没有错误信息，则执行调账操作
                         stakingDelegateBalanceAdjustmentMapper.adjustStakingData(context.getAdjustParam());
-                        StringBuilder sb = new StringBuilder("============ ")
-                                .append(context.getAdjustParam().getOptType())
-                                .append("调账成功 ============\n")
-                                .append(context.contextInfo());
-                        adjustMsg=sb.toString();
+                        StringBuilder sb = new StringBuilder("============ ").append(context.getAdjustParam().getOptType()).append("调账成功 ============\n").append(context.contextInfo());
+                        adjustMsg = sb.toString();
                         log.info(adjustMsg);
-                    }else{
+                    } else {
                         // 调账上下文有错误信息，调账参数打印到错误文件
-                        adjustMsg=context.errorInfo();
+                        adjustMsg = context.errorInfo();
                         log.warning(adjustMsg);
                     }
                 }
             }
         }
     }
+
 }
