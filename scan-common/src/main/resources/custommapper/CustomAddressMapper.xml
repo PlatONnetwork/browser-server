@@ -96,4 +96,9 @@
         update address set `have_reward` = `have_reward` + #{amount} where `address` = #{address};
     </update>
 
+    <update id="batchUpdateAddressErcQty">
+        <foreach collection="list" item="item">
+            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{erc721TxQty} where address = #{contract};
+        </foreach>
+    </update>
 </mapper>

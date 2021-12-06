@@ -12,6 +12,9 @@ CREATE TABLE `point_log` (
 ) COMMENT='断点统计表';
 INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (1, 1, 'n_opt_bak', '0', '2021-12-01 07:50:41', '2021-12-01 07:50:41');
 INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (2, 2, 'browser_platon_transaction', '0', '2021-12-03 06:33:27', '2021-12-03 06:33:27');
+INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (3, 2, 'browser_platon_erc20_tx', '0', '2021-12-06 02:47:26', '2021-12-06 02:47:26');
+INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (4, 2, 'browser_platon_erc721_tx', '0', '2021-12-06 02:47:41', '2021-12-06 02:47:41');
+
 
 DROP TABLE IF EXISTS `slash`;
 CREATE TABLE `slash` (

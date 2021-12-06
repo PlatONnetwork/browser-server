@@ -12,7 +12,6 @@ CREATE TABLE `address` (
                            `delegate_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '委托的金额(von)',
                            `redeemed_value` decimal(65,0) NOT NULL DEFAULT '0' COMMENT '赎回中的质押金额(von)',
                            `tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT '交易总数',
-                           `token_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
                            `transfer_qty` int(11) NOT NULL DEFAULT '0' COMMENT '转账交易总数',
                            `delegate_qty` int(11) NOT NULL DEFAULT '0' COMMENT '委托交易总数',
                            `staking_qty` int(11) NOT NULL DEFAULT '0' COMMENT '质押交易总数',
