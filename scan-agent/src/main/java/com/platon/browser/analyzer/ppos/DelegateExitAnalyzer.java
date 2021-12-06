@@ -234,7 +234,6 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
         }
 
         updateAddressHaveReward(businessParam);
-        addressCache.update(businessParam);
 
         if (isRefundAll) {
             // 1. 全部赎回： 删除对应记录

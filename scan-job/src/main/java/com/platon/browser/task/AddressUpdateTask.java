@@ -201,22 +201,9 @@ public class AddressUpdateTask {
 
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateQty() throws IOException {
-        int batchSize = 100;
-        int pageSize = 5000;
-        String parm = XxlJobHelper.getJobParam();
-        if (StrUtil.isNotBlank(parm)) {
-            try {
-                String[] strParm = StrUtil.split(parm, ",");
-                batchSize = Convert.toInt(strParm[0]);
-                pageSize = Convert.toInt(strParm[1]);
-            } catch (Exception e) {
-                log.warn("参数获取异常，将采用默认值");
-            }
-        }
+        int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
         PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
-        long minNum = Convert.toInt(pointLog.getPosition(), 0);
-        long maxNum = minNum + batchSize;
-        List<Transaction> transactionList = getTransactionList(minNum, maxNum, pageSize);
+        List<Transaction> transactionList = getTransactionList(Convert.toLong(pointLog.getPosition()), pageSize);
         if (CollUtil.isNotEmpty(transactionList)) {
             Map<String, AddressQty> map = new HashMap();
             transactionList.forEach(transaction -> {
@@ -298,12 +285,8 @@ public class AddressUpdateTask {
                         break;
                 }
             });
-            //TODO 批量入库
-            if (CollUtil.isNotEmpty(map.values())) {
-                customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
-            }
-            Transaction transaction = CollUtil.getLast(transactionList);
-            pointLog.setPosition(transaction.getNum().toString());
+            customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
+            pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
         }
     }
@@ -319,28 +302,26 @@ public class AddressUpdateTask {
     }
 
     /**
-     * 获取es信息 (minNum,maxNum]
-     * minNum到maxNum区块之间的交易数要小于pageSize
+     * 获取交易列表
      *
-     * @param minNum:
-     * @param maxNum:
-     * @param pageSize: 每页大小
+     * @param maxId:
+     * @param pageSize:
      * @return: java.util.List<com.platon.browser.elasticsearch.dto.Transaction>
-     * @date: 2021/12/2
+     * @date: 2021/12/6
      */
-    private List<Transaction> getTransactionList(long minNum, long maxNum, int pageSize) throws IOException {
+    private List<Transaction> getTransactionList(long maxId, int pageSize) throws IOException {
         try {
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
             constructor.setAsc("id");
             constructor.setResult(new String[]{"seq", "num", "hash", "type", "from", "to", "contractAddress"});
             ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
-            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("id").gt(minNum).lte(maxNum));
+            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("id").gt(maxId));
             constructor.must(esQueryBuilders);
             constructor.setUnmappedType("long");
             ESResult<Transaction> queryResultFromES = esTransactionRepository.search(constructor, Transaction.class, 1, pageSize);
             return queryResultFromES.getRsData();
         } catch (Exception e) {
-            log.error("更新地址交易数异常", e);
+            log.error("获取交易列表异常", e);
             throw e;
         }
     }

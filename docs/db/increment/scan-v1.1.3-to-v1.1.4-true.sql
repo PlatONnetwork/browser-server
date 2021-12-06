@@ -4,16 +4,17 @@ DROP TABLE IF EXISTS `point_log`;
 CREATE TABLE `point_log` (
                              `id` int(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
                              `type` int(1) NOT NULL COMMENT '类型,1-mysql,2-es',
-                             `name` varchar(255) NOT NULL COMMENT '类型为1-表名，类型为2-索引名',
+                             `name` varchar(255) NOT NULL COMMENT '表名或索引名',
+                             `desc` varchar(255) NOT NULL COMMENT '用途描述',
                              `position` varchar(128) NOT NULL COMMENT '已统计的位置(MySQL为自增id,es为seq)',
                              `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                              `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                              PRIMARY KEY (`id`)
 ) COMMENT='断点统计表';
-INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (1, 1, 'n_opt_bak', '0', '2021-12-01 07:50:41', '2021-12-01 07:50:41');
-INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (2, 2, 'browser_platon_transaction', '0', '2021-12-03 06:33:27', '2021-12-03 06:33:27');
-INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (3, 2, 'browser_platon_erc20_tx', '0', '2021-12-06 02:47:26', '2021-12-06 02:47:26');
-INSERT INTO `point_log`(`id`, `type`, `name`, `position`, `create_time`, `update_time`) VALUES (4, 2, 'browser_platon_erc721_tx', '0', '2021-12-06 02:47:41', '2021-12-06 02:47:41');
+INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (1, 1, 'n_opt_bak', '节点操作迁移至es的断点记录', '0', '2021-12-01 07:50:41', '2021-12-01 07:50:41');
+INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (2, 2, 'browser_platon_transaction', '从es统计地址表交易数的断点记录', '0', '2021-12-03 06:33:27', '2021-12-03 06:33:27');
+INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (3, 2, 'browser_platon_erc20_tx', '从es统计地址表和token表交易数的断点记录', '0', '2021-12-06 02:47:26', '2021-12-06 02:47:26');
+INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (4, 2, 'browser_platon_erc721_tx', '从es统计地址表和token表交易数的断点记录', '0', '2021-12-06 02:47:41', '2021-12-06 02:47:41');
 
 
 DROP TABLE IF EXISTS `slash`;

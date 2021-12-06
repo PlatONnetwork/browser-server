@@ -2,7 +2,6 @@ package com.platon.browser.dao.custommapper;
 
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.param.BusinessParam;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.task.bean.NetworkStatistics;
 import org.apache.ibatis.annotations.Param;
@@ -10,20 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/*
- * @Auther: dongqile
- * @Date:  2019/10/31
- * @Description:
- */
 public interface StatisticBusinessMapper {
 
     /**
      * 地址数据变更
      *
-     * @param param
+     * @param list:
+     * @return: void
+     * @date: 2021/12/6
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    void addressChange(BusinessParam param);
+    void addressChange(List<Address> list);
 
     /**
      * 统计数据变更

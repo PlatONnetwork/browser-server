@@ -5,25 +5,14 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class PointLog {
-
-    /**
-     * 主键id
-     */
     private Integer id;
 
-    /**
-     * 类型,1-mysql,2-es
-     */
     private Integer type;
 
-    /**
-     * 类型为1-表名，类型为2-索引名
-     */
     private String name;
 
-    /**
-     * 已统计的位置(MySQL为自增id,es为seq)
-     */
+    private String desc;
+
     private String position;
 
     private Date createTime;
@@ -52,6 +41,14 @@ public class PointLog {
 
     public void setName(String name) {
         this.name = name == null ? null : name.trim();
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc == null ? null : desc.trim();
     }
 
     public String getPosition() {
@@ -89,6 +86,7 @@ public class PointLog {
         id("id", "id", "INTEGER", false),
         type("type", "type", "INTEGER", true),
         name("name", "name", "VARCHAR", true),
+        desc("desc", "desc", "VARCHAR", true),
         position("position", "position", "VARCHAR", true),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
@@ -234,7 +232,7 @@ public class PointLog {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column... excludes) {
+        public static Column[] excludes(Column ... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -257,5 +255,4 @@ public class PointLog {
             }
         }
     }
-
 }

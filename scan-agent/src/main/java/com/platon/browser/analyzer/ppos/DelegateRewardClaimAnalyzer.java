@@ -113,7 +113,6 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         }
 
         updateAddressHaveReward(businessParam);
-        addressCache.update(businessParam);
 
         // 直接入库到mysql数据库
         customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());

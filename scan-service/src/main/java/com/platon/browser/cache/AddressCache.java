@@ -2,14 +2,11 @@ package com.platon.browser.cache;
 
 import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.param.ppos.DelegateExit;
-import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.param.claim.Reward;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -160,32 +157,22 @@ public class AddressCache {
             address = this.createDefaultAddress(addr);
             this.addressMap.put(addr, address);
         }
-
-        address.setTxQty(address.getTxQty() + 1);
         switch (tx.getTypeEnum()) {
             case TRANSFER: // 转账交易
-                address.setTransferQty(address.getTransferQty() + 1);
-                break;
             case STAKE_CREATE:// 创建验证人
             case STAKE_INCREASE:// 增加自有质押
             case STAKE_MODIFY:// 编辑验证人
             case STAKE_EXIT:// 退出验证人
             case REPORT:// 举报验证人
-                address.setStakingQty(address.getStakingQty() + 1);
-                break;
             case DELEGATE_CREATE:// 发起委托
             case DELEGATE_EXIT:// 撤销委托
             case CLAIM_REWARDS:// 领取委托奖励
-                address.setDelegateQty(address.getDelegateQty() + 1);
-                break;
             case PROPOSAL_TEXT:// 创建文本提案
             case PROPOSAL_UPGRADE:// 创建升级提案
             case PROPOSAL_PARAMETER:// 创建参数提案
             case PROPOSAL_VOTE:// 提案投票
             case PROPOSAL_CANCEL:// 取消提案
             case VERSION_DECLARE:// 版本声明
-                address.setProposalQty(address.getProposalQty() + 1);
-                break;
             case EVM_CONTRACT_CREATE:
                 // 如果地址是EVM合约创建的回执里返回的合约地址
                 address.setContractCreatehash(tx.getHash());
@@ -231,46 +218,6 @@ public class AddressCache {
             address = this.createDefaultAddress(addr);
             this.addressMap.put(addr, address);
         }
-
-        address.setTxQty(address.getTxQty() + 1);
-    }
-
-    /**
-     * 把地址加入到缓存，并且交易数+1
-     *
-     * @param addr
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/4/14
-     */
-    public void updateErc20TxQty(String addr) {
-        if (addr == null) return;
-        Address address = this.addressMap.get(addr);
-        if (address == null) {
-            address = this.createDefaultAddress(addr);
-            this.addressMap.put(addr, address);
-        }
-        address.setErc20TxQty(address.getErc20TxQty() + 1);
-        log.info("当前erc20地址[{}]的交易数为[{}]", addr, address.getErc20TxQty());
-    }
-
-    /**
-     * 把地址加入到缓存，并且交易数+1
-     *
-     * @param addr
-     * @return void
-     * @author huangyongpeng@matrixelements.com
-     * @date 2021/4/14
-     */
-    public void updateErc721TxQty(String addr) {
-        if (addr == null) return;
-        Address address = this.addressMap.get(addr);
-        if (address == null) {
-            address = this.createDefaultAddress(addr);
-            this.addressMap.put(addr, address);
-        }
-        address.setErc721TxQty(address.getErc721TxQty() + 1);
-        log.info("当前erc721地址[{}]的交易数为[{}]", addr, address.getErc721TxQty());
     }
 
     /**
@@ -352,46 +299,6 @@ public class AddressCache {
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
             this.addressMap.put(contractDescEnum.getAddress(), this.createDefaultAddress(contractDescEnum.getAddress()));
         }
-    }
-
-    /**
-     * 领取奖励交易更新已领取的委托奖励字段
-     *
-     * @param drc
-     */
-    public void update(DelegateRewardClaim drc) {
-        // 统计当前交易from地址的【已领取委托奖励】
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (Reward reward : drc.getRewardList()) {
-            totalAmount = totalAmount.add(reward.getReward());
-        }
-        this.update(drc.getAddress(), totalAmount);
-    }
-
-    /**
-     * 撤销委托交易更新已领取的委托奖励字段
-     *
-     * @param de
-     */
-    public void update(DelegateExit de) {
-        this.update(de.getTxFrom(), de.getDelegateReward());
-    }
-
-    /**
-     * 更新地址已领取委托奖励
-     *
-     * @param address 地址
-     * @param amount  已领取委托奖励
-     * @return: void
-     * @date: 2021/6/29
-     */
-    public void update(String address, BigDecimal amount) {
-        Address cache = this.addressMap.get(address);
-        if (cache == null) {
-            cache = this.createDefaultAddress(address);
-            this.addressMap.put(address, cache);
-        }
-        cache.setHaveReward(cache.getHaveReward().add(amount));
     }
 
     /**
