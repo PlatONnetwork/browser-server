@@ -33,9 +33,6 @@ public class EsImportService {
     private EsTransactionService esTransactionService;
 
     @Resource
-    private EsNodeOptService esNodeOptService;
-
-    @Resource
     private EsDelegateRewardService esDelegateRewardService;
 
     @Resource
@@ -44,7 +41,7 @@ public class EsImportService {
     @Resource
     private EsErc721TxService esErc721TxService;
 
-    private static final int SERVICE_COUNT = 6;
+    private static final int SERVICE_COUNT = 5;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 

@@ -9,11 +9,9 @@ import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
-import com.platon.browser.utils.BakDataDeleteUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -76,9 +73,10 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         try {
-            log.info("当前区块[{}]有[{}]笔交易有[{}]笔委托奖励",
+            log.info("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
                      event.getBlock().getNum(),
                      CommonUtil.ofNullable(() -> event.getTransactions().size()).orElse(0),
+                     CommonUtil.ofNullable(() -> event.getNodeOpts().size()).orElse(0),
                      CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());

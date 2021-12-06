@@ -11,7 +11,6 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
-import com.platon.browser.utils.BakDataDeleteUtil;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
@@ -96,8 +95,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
 
             this.esImportService.batchImport(this.blocks, this.transactions, Collections.emptySet());
             this.redisImportService.batchImport(this.blocks, this.transactions, Collections.emptySet());
-            // 更新已处理的最大ID, 方便删除任务删除已用完的数据
-            BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
 
             this.clear();
             event.getCallback().call(block.getNum());

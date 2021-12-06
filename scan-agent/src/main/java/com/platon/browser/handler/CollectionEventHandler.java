@@ -72,9 +72,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     @Resource
     private TransactionAnalyzer transactionAnalyzer;
 
-    // 交易序号id
-    private long transactionId = 0;
-
     /**
      * 重试次数
      */
@@ -132,7 +129,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 customTxBakMapper.batchInsertOrUpdateSelective(transactions);
             }
 
-            // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不在由环形队列入库，不再删除操作日志表
+            // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不再由环形队列入库，不再删除操作日志表
             if (!nodeOpts1.isEmpty()) {
                 List<NOptBak> baks = new ArrayList<>();
                 nodeOpts1.forEach(no -> {
