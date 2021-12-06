@@ -2,6 +2,8 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
@@ -207,7 +209,7 @@ public class AddressUpdateTask {
      */
     @XxlJob("updateAddressQtyJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void updateQty() throws IOException {
+    public void updateQty() throws Exception {
         int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
         PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
         List<Transaction> transactionList = getTransactionList(Convert.toLong(pointLog.getPosition()), pageSize);
@@ -246,7 +248,9 @@ public class AddressUpdateTask {
                         break;
                     case ERC721_CONTRACT_CREATE:
                         from.setTxQty(from.getTxQty() + 1);
-                        contract.setTxQty(contract.getTxQty() + 1);
+                        if (ObjectUtil.isNotNull(contract)) {
+                            contract.setTxQty(contract.getTxQty() + 1);
+                        }
                         break;
                     case ERC721_CONTRACT_EXEC:
                         break;
@@ -299,6 +303,9 @@ public class AddressUpdateTask {
     }
 
     private AddressQty getAddressQtyFromMap(Map<String, AddressQty> map, String address) {
+        if (StrUtil.isBlank(address)) {
+            return null;
+        }
         if (map.containsKey(address)) {
             return map.get(address);
         } else {
@@ -320,7 +327,7 @@ public class AddressUpdateTask {
         try {
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
             constructor.setAsc("id");
-            constructor.setResult(new String[]{"seq", "num", "hash", "type", "from", "to", "contractAddress"});
+            constructor.setResult(new String[]{"seq", "id", "num", "hash", "type", "from", "to", "contractAddress"});
             ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
             esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("id").gt(maxId));
             constructor.must(esQueryBuilders);

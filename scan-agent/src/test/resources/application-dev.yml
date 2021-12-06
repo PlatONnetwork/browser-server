@@ -157,3 +157,19 @@ task:
   esRedisNotCatchupBatchSize: 10
   #已追上链,批量入ES和Redis的缓存大小
   esRedisCatchupBatchSize: 1
+xxl:
+  job:
+    admin:
+      #调度中心部署跟地址
+      addresses: http://192.168.120.150:8080/xxl-job-admin
+    #调度中心通讯TOKEN
+    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    executor:
+      #执行器AppName
+      appname: scan-agent
+      #执行器端口号
+      port: 9999
+      #执行器运行日志文件存储磁盘路径
+      logpath: ./logs/jobhandler
+      #执行器日志文件保存天数
+      logretentiondays: 90

@@ -6,6 +6,7 @@
     /*更新地址统计表: 以下相关字段的累加操作在Java代码中*/
     replace into `address` (
         `address`,
+		`type`,
         `contract_name`,
         `contract_create`,
         `contract_createHash`,
@@ -15,6 +16,7 @@
     <foreach collection="list" item="item" separator=",">
     (
         #{item.address},
+		#{item.type},
         #{item.contractName},
         #{item.contractCreate},
         #{item.contractCreatehash},

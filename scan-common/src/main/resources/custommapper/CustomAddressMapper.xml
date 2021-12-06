@@ -97,19 +97,19 @@
     </update>
 
     <update id="batchUpdateAddressErcQty">
-        <foreach collection="list" item="item">
-            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty} where address = #{item.contract};
+        <foreach collection="list" item="item" separator=";">
+            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty} where address = #{item.contract}
         </foreach>
     </update>
 
     <update id="batchUpdateAddressQty">
-        <foreach collection="list" item="item">
+        <foreach collection="list" item="item" separator=";">
             update address set
             tx_qty = tx_qty + #{item.txQty} ,
             transfer_qty = transfer_qty + #{item.tokenQty} ,
             delegate_qty = delegate_qty + #{item.delegateQty} ,
-            staking_qty = staking_qty + {item.stakingQty} ,
-            proposal_qty = proposal_qty + #{item.proposalQty} where address = #{item.address};
+            staking_qty = staking_qty + #{item.stakingQty} ,
+            proposal_qty = proposal_qty + #{item.proposalQty} where address = #{item.address}
         </foreach>
     </update>
 

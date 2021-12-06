@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
@@ -17,7 +18,9 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CalculateUtils;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import com.xxl.job.core.log.XxlJobFileAppender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -125,6 +128,14 @@ public class NetworkStatUpdateTask {
         networkStat.setDoingProposalQty(doingProposalQty);
         networkStat.setProposalQty(proposalQty);
         networkStat.setNodeOptSeq(nodeOptSeq);
+        XxlJobHelper.handleSuccess(StrUtil.format("交易总数为[{}],erc20交易数为[{}],erc721交易数为[{}],地址数为[{}],进行中提案总数为[{}],提案总数为[{}],节点操作数为[{}]",
+                                                  totalCount.intValue(),
+                                                  erc20Count.intValue(),
+                                                  erc721Count.intValue(),
+                                                  addressQty,
+                                                  doingProposalQty,
+                                                  proposalQty,
+                                                  nodeOptSeq));
     }
 
     protected void start() {

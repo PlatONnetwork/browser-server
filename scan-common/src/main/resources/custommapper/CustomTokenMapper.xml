@@ -129,8 +129,8 @@
     </select>
 
     <update id="batchUpdateTokenQty" parameterType="list">
-        <foreach collection="list" item="item">
-            update token set token_tx_qty = token_tx_qty + #{item.tokenTxQty} where address = #{contract};
+        <foreach collection="list" item="item" separator=";">
+            update token set token_tx_qty = token_tx_qty + #{item.tokenTxQty} where address = #{item.contract}
         </foreach>
     </update>
 </mapper>

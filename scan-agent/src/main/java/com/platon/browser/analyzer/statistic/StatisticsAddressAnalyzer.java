@@ -1,6 +1,9 @@
 package com.platon.browser.analyzer.statistic;
 
+import cn.hutool.core.collection.CollUtil;
+import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
@@ -8,6 +11,7 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.enums.ContractTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -42,44 +46,70 @@ public class StatisticsAddressAnalyzer {
         AddressExample condition = new AddressExample();
         condition.createCriteria().andAddressIn(addresses);
         List<Address> itemFromDb = addressMapper.selectByExampleWithBLOBs(condition);
-        // 查看交易列表中是否有bin属性为0x的交易,有则对to对应的合约地址进行设置
-        event.getTransactions().forEach(tx -> {
-            // 如果tx的bin为0x，表明这笔交易是销毁合约交易或调用已销毁合约交易, to地址必定是合约地址
-            if ("0x".equals(tx.getBin())) {
-                itemFromDb.forEach(address -> {
-                    if (address.getAddress().equalsIgnoreCase(tx.getTo())) {
-                        if (StringUtils.isBlank(address.getContractDestroyHash())) {
-                            // 如果当前地址缓存的销毁交易地址为空，则设置
-                            address.setContractDestroyHash(tx.getHash());
-                        }
+        // 初始化内置地址
+        if (CollUtil.isEmpty(itemFromDb)) {
+            addressCache.getAll().forEach(address -> {
+                ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(address.getAddress());
+                if (contractTypeEnum != null) {
+                    switch (contractTypeEnum) {
+                        case WASM:
+                            address.setType(CustomAddress.TypeEnum.WASM.getCode());
+                            break;
+                        case EVM:
+                            address.setType(CustomAddress.TypeEnum.EVM.getCode());
+                            break;
+                        case ERC20_EVM:
+                            address.setType(CustomAddress.TypeEnum.ERC20_EVM.getCode());
+                            break;
+                        case ERC721_EVM:
+                            address.setType(CustomAddress.TypeEnum.ERC721_EVM.getCode());
+                            break;
                     }
-                });
-            }
-        });
-        itemFromDb.forEach(address -> {
-            Address addCache = addressCache.getAddress(address.getAddress());
-            // 合约创建人，数据库的值优先
-            String contractCreate = address.getContractCreate();
-            if (StringUtils.isBlank(contractCreate)) contractCreate = addCache.getContractCreate();
-            address.setContractCreate(contractCreate);
-            // 合约创建交易hash，数据库的值优先
-            String contractCreateHash = address.getContractCreatehash();
-            if (StringUtils.isBlank(contractCreateHash)) contractCreateHash = addCache.getContractCreatehash();
-            address.setContractCreatehash(contractCreateHash);
-            // 合约销毁交易hash，数据库的值优先
-            String contractDestroyHash = address.getContractDestroyHash();
-            if (StringUtils.isBlank(contractDestroyHash)) contractDestroyHash = addCache.getContractDestroyHash();
-            address.setContractDestroyHash(contractDestroyHash);
-            // 合约bin代码数据
-            String contractBin = address.getContractBin();
-            if (StringUtils.isBlank(contractBin)) contractBin = addCache.getContractBin();
-            address.setContractBin(contractBin);
-            // 合约名称
-            String contractName = address.getContractName();
-            if (StringUtils.isBlank(contractName)) contractName = addCache.getContractName();
-            address.setContractName(contractName);
-        });
-        this.statisticBusinessMapper.addressChange(itemFromDb);
+                }
+            });
+            statisticBusinessMapper.addressChange(CollUtil.newArrayList(addressCache.getAll()));
+        } else {
+            // 查看交易列表中是否有bin属性为0x的交易,有则对to对应的合约地址进行设置
+            event.getTransactions().forEach(tx -> {
+                // 如果tx的bin为0x，表明这笔交易是销毁合约交易或调用已销毁合约交易, to地址必定是合约地址
+                if ("0x".equals(tx.getBin())) {
+                    itemFromDb.forEach(address -> {
+                        if (address.getAddress().equalsIgnoreCase(tx.getTo())) {
+                            if (StringUtils.isBlank(address.getContractDestroyHash())) {
+                                // 如果当前地址缓存的销毁交易地址为空，则设置
+                                address.setContractDestroyHash(tx.getHash());
+                            }
+                        }
+                    });
+                }
+            });
+            itemFromDb.forEach(address -> {
+                Address addCache = addressCache.getAddress(address.getAddress());
+                // 合约创建人，数据库的值优先
+                String contractCreate = address.getContractCreate();
+                if (StringUtils.isBlank(contractCreate)) contractCreate = addCache.getContractCreate();
+                address.setContractCreate(contractCreate);
+                // 合约创建交易hash，数据库的值优先
+                String contractCreateHash = address.getContractCreatehash();
+                if (StringUtils.isBlank(contractCreateHash)) contractCreateHash = addCache.getContractCreatehash();
+                address.setContractCreatehash(contractCreateHash);
+                // 合约销毁交易hash，数据库的值优先
+                String contractDestroyHash = address.getContractDestroyHash();
+                if (StringUtils.isBlank(contractDestroyHash)) contractDestroyHash = addCache.getContractDestroyHash();
+                address.setContractDestroyHash(contractDestroyHash);
+                // 合约bin代码数据
+                String contractBin = address.getContractBin();
+                if (StringUtils.isBlank(contractBin)) contractBin = addCache.getContractBin();
+                address.setContractBin(contractBin);
+                // 合约名称
+                String contractName = address.getContractName();
+                if (StringUtils.isBlank(contractName)) contractName = addCache.getContractName();
+                address.setContractName(contractName);
+            });
+        }
+        if (CollUtil.isNotEmpty(itemFromDb)) {
+            statisticBusinessMapper.addressChange(itemFromDb);
+        }
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
 

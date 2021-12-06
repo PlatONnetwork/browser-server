@@ -74,7 +74,7 @@ xxl:
       #执行器AppName
       appname: scan-job
       #执行器端口号
-      port: 9999
+      port: 9997
       #执行器运行日志文件存储磁盘路径
       logpath: ./logs/jobhandler
       #执行器日志文件保存天数
