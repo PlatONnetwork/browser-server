@@ -75,6 +75,7 @@ public class NetworkStatUpdateTask {
 
     /**
      * 更新交易统计数
+     * 更新缓存，再由缓存更新到MySQL和Redis
      *
      * @param :
      * @return: void

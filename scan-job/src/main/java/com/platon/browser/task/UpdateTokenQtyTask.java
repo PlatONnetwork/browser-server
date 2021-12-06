@@ -15,6 +15,7 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class UpdateQtyTask {
+public class UpdateTokenQtyTask {
 
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
@@ -38,47 +39,48 @@ public class UpdateQtyTask {
     @Resource
     private CustomAddressMapper customAddressMapper;
 
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void update() throws Exception {
         try {
             Map<String, TokenQty> tokenMap = new HashMap<>();
             Map<String, AddressErcQty> addressMap = new HashMap<>();
             List<ErcTx> erc20List = getErcTxList(esErc20TxRepository, 0, 100, 5000);
             Map<String, List<ErcTx>> erc20Map = erc20List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
+            //累计token的erc20交易数
             for (Map.Entry<String, List<ErcTx>> entry : erc20Map.entrySet()) {
-                //累计token的erc20交易数
                 TokenQty tokenQty = getTokenQty(tokenMap, entry.getKey());
                 tokenQty.setErc20TxQty(entry.getValue().size());
-                for (ErcTx ercTx : entry.getValue()) {
-                    //累计地址的erc20交易数
-                    AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
-                    AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
-                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
-                        fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
-                        log.info("该erc20交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
-                    } else {
-                        fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
-                        toAddressErcQty.setErc20TxQty(toAddressErcQty.getErc20TxQty() + 1);
-                    }
-                }
             }
             List<ErcTx> erc721List = getErcTxList(esErc721TxRepository, 0, 100, 5000);
             Map<String, List<ErcTx>> erc721Map = erc721List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
+            //累计token的erc721交易数
             for (Map.Entry<String, List<ErcTx>> entry : erc721Map.entrySet()) {
-                //累计token的erc721交易数
                 TokenQty tokenQty = getTokenQty(tokenMap, entry.getKey());
                 tokenQty.setErc721TxQty(entry.getValue().size());
                 tokenQty.setTokenTxQty(tokenQty.getErc20TxQty() + tokenQty.getErc721TxQty());
-                for (ErcTx ercTx : entry.getValue()) {
-                    //累计地址的erc721交易数
-                    AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
-                    AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
-                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
-                        fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
-                        log.info("该erc721交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
-                    } else {
-                        fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
-                        toAddressErcQty.setErc721TxQty(toAddressErcQty.getErc721TxQty() + 1);
-                    }
+            }
+            //累计地址的erc20交易数
+            for (ErcTx ercTx : erc20List) {
+                AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
+                AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
+                if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
+                    fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
+                    log.info("该erc20交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
+                } else {
+                    fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
+                    toAddressErcQty.setErc20TxQty(toAddressErcQty.getErc20TxQty() + 1);
+                }
+            }
+            //累计地址的erc721交易数
+            for (ErcTx ercTx : erc721List) {
+                AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
+                AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
+                if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
+                    fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
+                    log.info("该erc721交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
+                } else {
+                    fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
+                    toAddressErcQty.setErc721TxQty(toAddressErcQty.getErc721TxQty() + 1);
                 }
             }
             if (CollUtil.isNotEmpty(tokenMap.values())) {

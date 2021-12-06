@@ -42,14 +42,4 @@ public class AddressQty {
      */
     private long proposalQty;
 
-    /**
-     * erc721 token对应的交易数
-     */
-    private long erc721TxQty;
-
-    /**
-     * erc20 token对应的交易数
-     */
-    private long erc20TxQty;
-
 }

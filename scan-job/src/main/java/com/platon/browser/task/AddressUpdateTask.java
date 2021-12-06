@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.AddressQty;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
@@ -27,11 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -66,6 +65,9 @@ public class AddressUpdateTask {
 
     @Resource
     private PointLogMapper pointLogMapper;
+
+    @Resource
+    private CustomAddressMapper customAddressMapper;
 
     @XxlJob("addressUpdateJobHandler")
     public void addressUpdate() {
@@ -218,71 +220,88 @@ public class AddressUpdateTask {
         if (CollUtil.isNotEmpty(transactionList)) {
             Map<String, AddressQty> map = new HashMap();
             transactionList.forEach(transaction -> {
+                AddressQty contract = getAddressQtyFromMap(map, transaction.getContractAddress());
                 AddressQty from = getAddressQtyFromMap(map, transaction.getFrom());
                 AddressQty to = getAddressQtyFromMap(map, transaction.getTo());
-                from.setTxQty(from.getTxQty() + 1);
-                to.setTxQty(to.getTxQty() + 1);
-                switch (transaction.getType()) {
-                    case 0:
+                Set<Integer> txType = Stream.of(Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode(),
+                                                Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode(),
+                                                Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode(),
+                                                Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()).collect(Collectors.toSet());
+                if (!txType.contains(transaction.getType())) {
+                    from.setTxQty(from.getTxQty() + 1);
+                    to.setTxQty(to.getTxQty() + 1);
+                }
+                switch (transaction.getTypeEnum()) {
+                    case TRANSFER:
                         from.setTransferQty(from.getTransferQty() + 1);
                         to.setTransferQty(to.getTransferQty() + 1);
                         break;
-                    case 1:
+                    case EVM_CONTRACT_CREATE:
                         break;
-                    case 2:
+                    case CONTRACT_EXEC:
                         break;
-                    case 3:
+                    case WASM_CONTRACT_CREATE:
                         break;
-                    case 4:
+                    case OTHERS:
                         break;
-                    case 5:
+                    case MPC:
                         break;
-                    case 6:
+                    case ERC20_CONTRACT_CREATE:
                         break;
-                    case 7:
+                    case ERC20_CONTRACT_EXEC:
                         break;
-                    case 8:
+                    case ERC721_CONTRACT_CREATE:
+                        from.setTxQty(from.getTxQty() + 1);
+                        contract.setTxQty(contract.getTxQty() + 1);
                         break;
-                    case 9:
+                    case ERC721_CONTRACT_EXEC:
                         break;
-                    case 21:
+                    case CONTRACT_EXEC_DESTROY:
                         break;
-                    case 1000:
+                    case STAKE_CREATE:
                         break;
-                    case 1001:
+                    case STAKE_MODIFY:
                         break;
-                    case 1002:
+                    case STAKE_INCREASE:
                         break;
-                    case 1003:
+                    case STAKE_EXIT:
                         break;
-                    case 1004:
+                    case DELEGATE_CREATE:
                         break;
-                    case 1005:
+                    case DELEGATE_EXIT:
                         break;
-                    case 2000:
+                    case PROPOSAL_TEXT:
                         break;
-                    case 2001:
+                    case PROPOSAL_UPGRADE:
                         break;
-                    case 2002:
+                    case PROPOSAL_PARAMETER:
                         break;
-                    case 2003:
+                    case PROPOSAL_VOTE:
                         break;
-                    case 2004:
+                    case VERSION_DECLARE:
+                        from.setProposalQty(from.getProposalQty() + 1);
+                        to.setProposalQty(to.getProposalQty() + 1);
                         break;
-                    case 2005:
+                    case PROPOSAL_CANCEL:
                         break;
-                    case 3000:
+                    case REPORT:
+                        from.setStakingQty(from.getStakingQty() + 1);
+                        to.setStakingQty(to.getStakingQty() + 1);
                         break;
-                    case 4000:
+                    case RESTRICTING_CREATE:
                         break;
-                    case 5000:
+                    case CLAIM_REWARDS:
+                        from.setDelegateQty(from.getDelegateQty() + 1);
+                        to.setDelegateQty(to.getDelegateQty() + 1);
                         break;
                     default:
                         break;
                 }
             });
             //TODO 批量入库
-
+            if (CollUtil.isNotEmpty(map.values())) {
+                customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
+            }
             Transaction transaction = CollUtil.getLast(transactionList);
             pointLog.setPosition(transaction.getNum().toString());
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
@@ -293,7 +312,7 @@ public class AddressUpdateTask {
         if (map.containsKey(address)) {
             return map.get(address);
         } else {
-            AddressQty addressQty = AddressQty.builder().address(address).txQty(0).tokenQty(0).transferQty(0).delegateQty(0).stakingQty(0).proposalQty(0).erc721TxQty(0).erc20TxQty(0).build();
+            AddressQty addressQty = AddressQty.builder().address(address).txQty(0).tokenQty(0).transferQty(0).delegateQty(0).stakingQty(0).proposalQty(0).build();
             map.put(address, addressQty);
             return addressQty;
         }
@@ -312,10 +331,10 @@ public class AddressUpdateTask {
     private List<Transaction> getTransactionList(long minNum, long maxNum, int pageSize) throws IOException {
         try {
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-            constructor.setAsc("seq");
+            constructor.setAsc("id");
             constructor.setResult(new String[]{"seq", "num", "hash", "type", "from", "to", "contractAddress"});
             ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
-            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("num").gt(minNum).lte(maxNum));
+            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("id").gt(minNum).lte(maxNum));
             constructor.must(esQueryBuilders);
             constructor.setUnmappedType("long");
             ESResult<Transaction> queryResultFromES = esTransactionRepository.search(constructor, Transaction.class, 1, pageSize);
