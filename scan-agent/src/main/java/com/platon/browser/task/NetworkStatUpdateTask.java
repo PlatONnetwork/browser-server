@@ -17,6 +17,7 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CalculateUtils;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -81,8 +82,8 @@ public class NetworkStatUpdateTask {
      * @return: void
      * @date: 2021/12/1
      */
-    @Scheduled(cron = "0 */1 * * * ?")
-    public void updateQty() {
+    @XxlJob("updateNetworkQtyJobHandler")
+    public void updateNetworkQty() {
         ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
         //获取es交易数
         Long totalCount = 0L;
