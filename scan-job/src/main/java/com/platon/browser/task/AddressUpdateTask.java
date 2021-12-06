@@ -2,7 +2,6 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
@@ -199,6 +198,14 @@ public class AddressUpdateTask {
         return stop;
     }
 
+    /**
+     * 更新地址交易数
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/6
+     */
+    @XxlJob("updateAddressQtyJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateQty() throws IOException {
         int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
