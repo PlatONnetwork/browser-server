@@ -130,16 +130,10 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             }
 
             // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不再由环形队列入库，不再删除操作日志表
-            if (!nodeOpts1.isEmpty()) {
-                List<NOptBak> baks = new ArrayList<>();
-                nodeOpts1.forEach(no -> {
-                    NOptBak bak = new NOptBak();
-                    BeanUtils.copyProperties(no, bak);
-                    baks.add(bak);
-                });
-                customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.excludes(NOptBak.Column.id));
+            if (CollUtil.isNotEmpty(nodeOpts1)) {
+                // 依赖于数据库的自增id
+                customNOptBakMapper.batchInsertOrUpdateSelective(nodeOpts1);
             }
-
             complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
             // 释放对象引用
             event.releaseRef();
