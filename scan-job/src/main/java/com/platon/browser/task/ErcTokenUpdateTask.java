@@ -20,6 +20,7 @@ import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.PointLogMapper;
 import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
@@ -47,6 +48,7 @@ import okhttp3.Response;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -101,6 +103,9 @@ public class ErcTokenUpdateTask {
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
 
+    @Resource
+    private PointLogMapper pointLogMapper;
+
     private static final int TOKEN_BATCH_SIZE = 10;
 
     private static final ExecutorService TOKEN_UPDATE_POOL = Executors.newFixedThreadPool(TOKEN_BATCH_SIZE);
@@ -123,20 +128,6 @@ public class ErcTokenUpdateTask {
     @Setter
     private AtomicLong tokenInventoryPage = new AtomicLong(0);
 
-    /**
-     * TokenHolderERC20更新标识
-     */
-    @Getter
-    @Setter
-    private volatile Long erc20TxSeq = 0L;
-
-    /**
-     * TokenHolderERC721更新标识
-     */
-    @Getter
-    @Setter
-    private volatile Long erc721TxSeq = 0L;
-
     private final Lock lock = new ReentrantLock();
 
     private final Lock tokenInventoryLock = new ReentrantLock();
@@ -155,8 +146,10 @@ public class ErcTokenUpdateTask {
         lock.lock();
         try {
             updateTokenTotalSupply();
+            XxlJobHelper.handleSuccess("全量更新token的总供应量成功");
         } catch (Exception e) {
             log.warn("全量更新token的总供应量异常", e);
+            throw e;
         } finally {
             lock.unlock();
         }
@@ -174,15 +167,13 @@ public class ErcTokenUpdateTask {
     public void incrementUpdateTokenHolderBalance() {
         if (tokenHolderLock.tryLock()) {
             try {
-                incrementUpdateTokenHolderBalance(esErc20TxRepository, ErcTypeEnum.ERC20, this.getErc20TxSeq());
-                incrementUpdateTokenHolderBalance(esErc721TxRepository, ErcTypeEnum.ERC721, this.getErc721TxSeq());
+                incrementUpdateTokenHolderBalance(esErc20TxRepository, ErcTypeEnum.ERC20);
+                incrementUpdateTokenHolderBalance(esErc721TxRepository, ErcTypeEnum.ERC721);
             } catch (Exception e) {
                 log.error("增量更新token持有者余额异常", e);
             } finally {
                 tokenHolderLock.unlock();
             }
-        } else {
-            log.warn("本次增量更新token持有者余额抢不到锁,erc20TxSeq:{},erc721TxSeq:{}", erc20TxSeq, erc721TxSeq);
         }
     }
 
@@ -326,7 +317,6 @@ public class ErcTokenUpdateTask {
         // 从缓存中获取Token更新参数，并构造批次列表
         List<ErcToken> batch = new ArrayList<>();
         batchList.add(batch);
-
         List<ErcToken> tokens = getErcTokens();
         for (ErcToken token : tokens) {
             if (token.isDirty()) {
@@ -363,7 +353,7 @@ public class ErcTokenUpdateTask {
                                 updateParams.add(token);
                             }
                         } catch (Exception e) {
-                            log.error("异常更新ERC token的总供应量", e);
+                            log.error("查询总供应量异常", e);
                         } finally {
                             latch.countDown();
                         }
@@ -384,13 +374,17 @@ public class ErcTokenUpdateTask {
         updateTokenHolderCount();
     }
 
-    private void incrementUpdateTokenHolderBalance(AbstractEsRepository abstractEsRepository, ErcTypeEnum typeEnum, Long txSeq) {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
-        }
+    /**
+     * 获取erc交易
+     *
+     * @param abstractEsRepository:
+     * @param txSeq:
+     * @param pageSize:
+     * @return: java.util.List<com.platon.browser.elasticsearch.dto.ErcTx>
+     * @date: 2021/12/7
+     */
+    private List<ErcTx> getErcList(AbstractEsRepository abstractEsRepository, Long txSeq, int pageSize) throws Exception {
         try {
-            List<TokenHolder> updateParams = new ArrayList<>();
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
             ESResult<ErcTx> queryResultFromES = new ESResult<>();
             constructor.setAsc("seq");
@@ -399,18 +393,33 @@ public class ErcTokenUpdateTask {
             esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("seq").gt(txSeq));
             constructor.must(esQueryBuilders);
             constructor.setUnmappedType("long");
-            queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, 5000);
-            List<ErcTx> list = queryResultFromES.getRsData();
+            queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, pageSize);
+            return queryResultFromES.getRsData();
+        } catch (Exception e) {
+            log.error("获取erc交易异常", e);
+            throw e;
+        }
+    }
+
+    private void incrementUpdateTokenHolderBalance(AbstractEsRepository abstractEsRepository, ErcTypeEnum typeEnum) throws Exception {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+        try {
+            PointLog pointLog = null;
+            if (typeEnum == ErcTypeEnum.ERC20) {
+                pointLog = pointLogMapper.selectByPrimaryKey(5);
+            } else if (typeEnum == ErcTypeEnum.ERC721) {
+                pointLog = pointLogMapper.selectByPrimaryKey(6);
+            }
+            List<TokenHolder> updateParams = new ArrayList<>();
+            List<ErcTx> list = getErcList(abstractEsRepository, Convert.toLong(pointLog.getPosition()), Convert.toInt(XxlJobHelper.getJobParam(), 500));
             if (CollUtil.isEmpty(list)) {
                 return;
             }
             HashMap<String, HashSet<String>> map = new HashMap();
             list.sort(Comparator.comparing(ErcTx::getSeq));
-            if (typeEnum == ErcTypeEnum.ERC20) {
-                this.setErc20TxSeq(list.get(list.size() - 1).getSeq());
-            } else if (typeEnum == ErcTypeEnum.ERC721) {
-                this.setErc721TxSeq(list.get(list.size() - 1).getSeq());
-            }
             list.forEach(v -> {
                 if (map.containsKey(v.getContract())) {
                     // 判断是否是0地址
@@ -432,7 +441,6 @@ public class ErcTokenUpdateTask {
                     map.put(v.getContract(), addressSet);
                 }
             });
-
             // 过滤销毁的合约
             HashMap<String, HashSet<String>> res = subtractToMap(map, getDestroyContracts());
             if (MapUtil.isNotEmpty(res)) {
@@ -462,8 +470,12 @@ public class ErcTokenUpdateTask {
             if (!updateParams.isEmpty()) {
                 customTokenHolderMapper.batchUpdate(updateParams);
             }
+            pointLog.setPosition(CollUtil.getLast(list).getSeq().toString());
+            pointLogMapper.updateByPrimaryKeySelective(pointLog);
+            XxlJobHelper.handleSuccess("更新token持有者余额成功");
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
+            throw e;
         }
     }
 
