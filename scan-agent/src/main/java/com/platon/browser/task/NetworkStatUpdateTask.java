@@ -20,9 +20,7 @@ import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CalculateUtils;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import com.xxl.job.core.log.XxlJobFileAppender;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
