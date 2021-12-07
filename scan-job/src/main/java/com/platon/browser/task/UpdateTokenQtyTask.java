@@ -15,6 +15,7 @@ import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
+import com.platon.browser.utils.AddressUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -74,12 +75,20 @@ public class UpdateTokenQtyTask {
                 for (ErcTx ercTx : erc20List) {
                     AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
                     AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
-                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
+                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo()) && !AddressUtil.isAddrZero(ercTx.getFrom())) {
                         fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
                         log.info("该erc20交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
                     } else {
-                        fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
-                        toAddressErcQty.setErc20TxQty(toAddressErcQty.getErc20TxQty() + 1);
+                        if (!AddressUtil.isAddrZero(fromAddressErcQty.getAddress())) {
+                            fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
+                        } else {
+                            log.info("该erc20交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
+                        }
+                        if (!AddressUtil.isAddrZero(toAddressErcQty.getAddress())) {
+                            toAddressErcQty.setErc20TxQty(toAddressErcQty.getErc20TxQty() + 1);
+                        } else {
+                            log.info("该erc20交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
+                        }
                     }
                 }
                 //记录最大的seq
@@ -99,12 +108,20 @@ public class UpdateTokenQtyTask {
                 for (ErcTx ercTx : erc721List) {
                     AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
                     AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
-                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo())) {
+                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo()) && !AddressUtil.isAddrZero(ercTx.getFrom())) {
                         fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
                         log.info("该erc721交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
                     } else {
-                        fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
-                        toAddressErcQty.setErc721TxQty(toAddressErcQty.getErc721TxQty() + 1);
+                        if (!AddressUtil.isAddrZero(fromAddressErcQty.getAddress())) {
+                            fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
+                        } else {
+                            log.info("该erc721交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
+                        }
+                        if (!AddressUtil.isAddrZero(toAddressErcQty.getAddress())) {
+                            toAddressErcQty.setErc721TxQty(toAddressErcQty.getErc721TxQty() + 1);
+                        } else {
+                            log.info("该erc721交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
+                        }
                     }
                 }
                 //记录最大的seq
