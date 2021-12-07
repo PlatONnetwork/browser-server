@@ -203,7 +203,6 @@ public class AddressUpdateTask {
         if (!updateAddressList.isEmpty()) {
             statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
         }
-        log.error("地址余额执行");
         return stop;
     }
 

@@ -22,19 +22,58 @@ spring:
       password: changeme
 #PlatOn相关配置
 platon:
-  #链id
-  chainId: 100
+  # 地址HRP前缀
+  addressPrefix: lat
+  # 金额显示单位
+  valueUnit: LAT
+  # 交易输入参数并行解码线程数
+  txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
-    protocol: HTTP
-    addresses: 192.168.120.151:6789,192.168.120.151:6790
-  #区块最大Gas限制
-  maxBlockGasLimit: 201600000
+    protocol: WS
+    addresses: 192.168.120.151:7789,192.168.120.151:7790
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #PlatON初始总发行量(ATP)
+  initIssueAmount: 10000000000
+  #每年固定增发比例
+  addIssueRate: 0.025
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
+  #每个共识轮中回退多少个块是选举下一轮验证人的时机
+  electionBackwardBlockCount: 20
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
+  foundationSubsidies: {
+    '1':62215742.00000000,
+    '2':55965742.00000000,
+    '3':49559492.00000000,
+    '4':42993086.00000000,
+    '5':36262520.00000000,
+    '6':29363689.00000000,
+    '7':22292388.00000000,
+    '8':15044304.00000000,
+    '9':7615018.00000000
+  }
   # 初始内置节点默认质押金额(ATP)
   defaultStakingLockedAmount: 150000
-  # 交易输入参数并行解码线程数
-  txLogDecodeThreadNum: 200
+  #区块最大Gas限制
+  maxBlockGasLimit: 201600000
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
+  #提案pip_num参数模板
+  proposalPipNumTemplate: PIP-%s
+  #keysBase网址
+  keyBase: https://keybase.io/
+  #keyBase api
+  keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
+  #链id
+  chainId: 100
+  #同步时的索引查询分页参数配置
+  paging:
+    erc20-transaction:
+      pageSize: 2000
+      pageCount: 250
   #Es索引命名空间
   es-namespace: browser_${profile}
 task:

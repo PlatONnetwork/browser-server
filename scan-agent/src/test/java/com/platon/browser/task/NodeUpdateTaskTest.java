@@ -27,15 +27,15 @@ import static org.mockito.Mockito.*;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class NodeUpdateTaskTest extends AgentTestData {
+
     @Mock
     private BlockChainConfig chainConfig;
+
     @Mock
     private NodeMapper nodeMapper;
+
     @Mock
     private StakeBusinessMapper stakeBusinessMapper;
-    @InjectMocks
-    @Spy
-    private NodeUpdateTask target;
 
     @Before
     public void setup() {
@@ -43,17 +43,8 @@ public class NodeUpdateTaskTest extends AgentTestData {
         when(chainConfig.getKeyBaseApi()).thenReturn("_/api/1.0/user/autocomplete.json?q=");
         Page<Node> page = new Page<>();
         page.addAll(nodeList);
-        nodeList.forEach(n->n.setExternalId("5FD68B690010632B"));
+        nodeList.forEach(n -> n.setExternalId("5FD68B690010632B"));
         when(nodeMapper.selectByExample(any())).thenReturn(page);
     }
 
-    @Test
-    public void test() {
-        AppStatusUtil.setStatus(AppStatus.RUNNING);
-        target.nodeUpdate();
-        verify(target, times(1)).nodeUpdate();
-
-        doThrow(new RuntimeException("")).when(chainConfig).getKeyBase();
-        target.nodeUpdate();
-    }
 }
