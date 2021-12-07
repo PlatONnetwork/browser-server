@@ -98,7 +98,7 @@
 
     <update id="batchUpdateAddressErcQty">
         <foreach collection="list" item="item" separator=";">
-            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty} where address = #{item.contract}
+            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty} where address = #{item.address}
         </foreach>
     </update>
 

@@ -429,6 +429,7 @@ CREATE TABLE `token_holder` (
 
 DROP TABLE IF EXISTS `token_inventory`;
 CREATE TABLE `token_inventory` (
+                                   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增id',
                                    `token_address` varchar(64) NOT NULL COMMENT '合约地址',
                                    `token_id` varchar(128) NOT NULL COMMENT 'token id',
                                    `owner` varchar(64) NOT NULL COMMENT 'token id 对应持有者地址',
@@ -441,7 +442,6 @@ CREATE TABLE `token_inventory` (
                                    `token_owner_tx_qty` int(11) DEFAULT '0' COMMENT 'owner对该tokenaddress和tokenid的对应交易数',
                                    `small_image` varchar(256) DEFAULT NULL COMMENT '缩略图',
                                    `medium_image` varchar(256) DEFAULT NULL COMMENT '中等缩略图',
-                                   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增id',
                                    PRIMARY KEY (`id`),
                                    UNIQUE KEY `token_address` (`token_address`,`token_id`)
 );
