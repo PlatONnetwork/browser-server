@@ -38,8 +38,14 @@ public class NetworkStat {
 
     private BigDecimal availableStaking;
 
+    /**
+     * 实时质押委托总数
+     */
     private BigDecimal stakingDelegationValue;
 
+    /**
+     * 实时质押总数
+     */
     private BigDecimal stakingValue;
 
     private Integer doingProposalQty;

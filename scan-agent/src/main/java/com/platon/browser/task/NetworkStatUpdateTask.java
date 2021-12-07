@@ -71,7 +71,7 @@ public class NetworkStatUpdateTask {
     @Resource
     private CustomNOptBakMapper customNOptBakMapper;
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @XxlJob("networkStatUpdateJobHandler")
     public void networkStatUpdate() {
         // 只有程序正常运行才执行任务
         if (AppStatusUtil.isRunning()) start();
@@ -87,55 +87,60 @@ public class NetworkStatUpdateTask {
      */
     @XxlJob("updateNetworkQtyJobHandler")
     public void updateNetworkQty() {
-        ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
-        //获取es交易数
-        Long totalCount = 0L;
         try {
-            ESResult<?> totalCountRes = esTransactionRepository.Count(count);
-            totalCount = totalCountRes.getTotal();
+            ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
+            //获取es交易数
+            Long totalCount = 0L;
+            try {
+                ESResult<?> totalCountRes = esTransactionRepository.Count(count);
+                totalCount = totalCountRes.getTotal();
+            } catch (Exception e) {
+                log.error("获取es交易数异常", e);
+            }
+            //获取erc20交易数
+            Long erc20Count = 0L;
+            try {
+                ESResult<?> erc20Res = esErc20TxRepository.Count(count);
+                erc20Count = erc20Res.getTotal();
+            } catch (Exception e) {
+                log.error("获取erc20交易数异常", e);
+            }
+            //获取erc721交易数
+            Long erc721Count = 0L;
+            try {
+                ESResult<?> erc721Res = esErc721TxRepository.Count(count);
+                erc721Count = erc721Res.getTotal();
+            } catch (Exception e) {
+                log.error("获取erc721交易数异常", e);
+            }
+            //获得地址数统计
+            int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
+            //获得进行中的提案
+            int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
+            //获取提案总数
+            int proposalQty = statisticBusinessMapper.getProposalQty();
+            //获取节点操作数
+            long nodeOptSeq = customNOptBakMapper.getLastNodeOptSeq();
+            NetworkStat networkStat = networkStatCache.getNetworkStat();
+            networkStat.setTxQty(totalCount.intValue());
+            networkStat.setErc20TxQty(erc20Count.intValue());
+            networkStat.setErc721TxQty(erc721Count.intValue());
+            networkStat.setAddressQty(addressQty);
+            networkStat.setDoingProposalQty(doingProposalQty);
+            networkStat.setProposalQty(proposalQty);
+            networkStat.setNodeOptSeq(nodeOptSeq);
+            XxlJobHelper.handleSuccess(StrUtil.format("更新交易统计数成功，交易总数为[{}],erc20交易数为[{}],erc721交易数为[{}],地址数为[{}],进行中提案总数为[{}],提案总数为[{}],节点操作数为[{}]",
+                                                      totalCount.intValue(),
+                                                      erc20Count.intValue(),
+                                                      erc721Count.intValue(),
+                                                      addressQty,
+                                                      doingProposalQty,
+                                                      proposalQty,
+                                                      nodeOptSeq));
         } catch (Exception e) {
-            log.error("获取es交易数异常", e);
+            log.error("更新交易统计数异常", e);
+            throw e;
         }
-        //获取erc20交易数
-        Long erc20Count = 0L;
-        try {
-            ESResult<?> erc20Res = esErc20TxRepository.Count(count);
-            erc20Count = erc20Res.getTotal();
-        } catch (Exception e) {
-            log.error("获取erc20交易数异常", e);
-        }
-        //获取erc721交易数
-        Long erc721Count = 0L;
-        try {
-            ESResult<?> erc721Res = esErc721TxRepository.Count(count);
-            erc721Count = erc721Res.getTotal();
-        } catch (Exception e) {
-            log.error("获取erc721交易数异常", e);
-        }
-        //获得地址数统计
-        int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
-        //获得进行中的提案
-        int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-        //获取提案总数
-        int proposalQty = statisticBusinessMapper.getProposalQty();
-        //获取节点操作数
-        long nodeOptSeq = customNOptBakMapper.getLastNodeOptSeq();
-        NetworkStat networkStat = networkStatCache.getNetworkStat();
-        networkStat.setTxQty(totalCount.intValue());
-        networkStat.setErc20TxQty(erc20Count.intValue());
-        networkStat.setErc721TxQty(erc721Count.intValue());
-        networkStat.setAddressQty(addressQty);
-        networkStat.setDoingProposalQty(doingProposalQty);
-        networkStat.setProposalQty(proposalQty);
-        networkStat.setNodeOptSeq(nodeOptSeq);
-        XxlJobHelper.handleSuccess(StrUtil.format("交易总数为[{}],erc20交易数为[{}],erc721交易数为[{}],地址数为[{}],进行中提案总数为[{}],提案总数为[{}],节点操作数为[{}]",
-                                                  totalCount.intValue(),
-                                                  erc20Count.intValue(),
-                                                  erc721Count.intValue(),
-                                                  addressQty,
-                                                  doingProposalQty,
-                                                  proposalQty,
-                                                  nodeOptSeq));
     }
 
     protected void start() {
@@ -150,11 +155,21 @@ public class NetworkStatUpdateTask {
             BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat.getIssueRates(), chainConfig, inciteBalance);
             //获得节点相关的网络统计
             NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
+            //实时质押委托总数
             BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();
+            //实时质押总数
             BigDecimal stakingValue = networkStatistics.getStakingValue() == null ? BigDecimal.ZERO : networkStatistics.getStakingValue();
             networkStatCache.updateByTask(turnValue, availableStaking, totalValue, stakingValue);
+            String msg = StrUtil.format("网络统计任务成功，流通量[{}]，可使用质押量[{}]，实时质押委托总数[{}],实时质押总数[{}]",
+                                        turnValue.toPlainString(),
+                                        availableStaking.toPlainString(),
+                                        totalValue.toPlainString(),
+                                        stakingValue.toPlainString());
+            XxlJobHelper.log(msg);
+            XxlJobHelper.handleSuccess(msg);
         } catch (Exception e) {
             log.error("网络统计任务出错:", e);
+            throw e;
         }
     }
 

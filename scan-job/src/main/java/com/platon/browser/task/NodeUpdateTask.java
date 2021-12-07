@@ -13,11 +13,12 @@ import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.HttpUtil;
 import com.platon.browser.utils.KeyBaseAnalysis;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -45,27 +46,31 @@ public class NodeUpdateTask {
 
     @Resource
     private SpecialApi specialApi;
-    
+
+    /**
+     * 节点表补充
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/7
+     */
     @XxlJob("nodeUpdateJobHandler")
-    public void nodeUpdate() {
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    public void nodeUpdate() throws Exception {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) return;
         try {
             //查询待补充的质押信息
             List<Node> nodeList = nodeMapper.selectByExample(null);
-
             Map<String, Optional<KeyBaseUserInfo>> cache = new HashMap<>();
             List<Node> updateNodeList = new ArrayList<>();
-
             // 查询节点版本号列表
             List<NodeVersion> versionList = specialApi.getNodeVersionList(platOnClient.getWeb3jWrapper().getWeb3j());
             Map<String, NodeVersion> versionMap = new HashMap<>();
             versionList.forEach(v -> versionMap.put(v.getNodeId(), v));
-
             // 请求URL前缀
             String prefix = chainConfig.getKeyBase().concat(chainConfig.getKeyBaseApi());
             nodeList.forEach(node -> {
-
                 // 更新keybase相关信息
                 if (node.getExternalId().trim().length() == 16) {
                     Optional<KeyBaseUserInfo> optional = cache.computeIfAbsent(node.getExternalId(), key -> {
@@ -78,7 +83,6 @@ public class NodeUpdateTask {
                             return Optional.ofNullable(null);
                         }
                     });
-
                     optional.ifPresent(keyBaseUser -> {
                         boolean hasChange = false;
                         try {
@@ -96,13 +100,11 @@ public class NodeUpdateTask {
                         } catch (Exception e) {
                             log.error("get keybase error:keyBaseUser={}", JSONObject.toJSONString(keyBaseUser), e);
                         }
-
                         if (hasChange) {
                             updateNodeList.add(node);
                         }
                     });
                 }
-
                 // 更新节点版本号相关信息
                 NodeVersion version = versionMap.get(node.getNodeId());
                 if (version != null && (!version.getBigVersion().equals(node.getBigVersion()) || !version.getProgramVersion().equals(node.getProgramVersion()))) {
@@ -111,12 +113,13 @@ public class NodeUpdateTask {
                     updateNodeList.add(node);
                 }
             });
-
             if (!updateNodeList.isEmpty()) {
                 stakeBusinessMapper.updateNodeForTask(updateNodeList);
             }
+            XxlJobHelper.handleSuccess("节点表补充成功");
         } catch (Exception e) {
-            log.error("on NodeUpdateTask error", e);
+            log.error("节点表补充异常", e);
+            throw e;
         }
     }
 

@@ -45,8 +45,8 @@ public class NetworkStatCache {
      *
      * @param turnValue:
      * @param availableStaking:
-     * @param totalValue:
-     * @param stakingValue:
+     * @param totalValue: 实时质押委托总数
+     * @param stakingValue: 实时质押总数
      * @return: void
      * @date: 2021/11/24
      */

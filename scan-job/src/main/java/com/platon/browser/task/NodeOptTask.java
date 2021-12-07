@@ -57,6 +57,7 @@ public class NodeOptTask {
                 pointLog.setPosition(lastNOptBak.getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
             }
+            XxlJobHelper.handleSuccess("节点操作备份表迁移到ES成功");
         } catch (Exception e) {
             log.error("节点操作备份表迁移到ES异常", e);
             throw e;

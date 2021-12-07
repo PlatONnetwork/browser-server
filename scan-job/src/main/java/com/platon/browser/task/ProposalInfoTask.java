@@ -12,9 +12,11 @@ import com.platon.browser.service.StatisticCacheService;
 import com.platon.browser.service.proposal.ProposalService;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -45,13 +47,17 @@ public class ProposalInfoTask {
     private StatisticCacheService statisticCacheService;
 
     @XxlJob("proposalInfoJobHandler")
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void proposalInfo() {
-        // 只有程序正常运行才执行任务
-        if (AppStatusUtil.isRunning()) start();
+        try {
+            if (AppStatusUtil.isRunning()) start();
+        } catch (Exception e) {
+            log.error("提案投票信息更新异常", e);
+            throw e;
+        }
     }
 
     protected void start() {
-
         //数据库获取信息未完成同步信息的提案
         ProposalExample proposalExample = new ProposalExample();
         //针对提案信息只需要更新状态为
@@ -66,7 +72,6 @@ public class ProposalInfoTask {
         List<Proposal> proposals = proposalMapper.selectByExample(proposalExample);
         //如果已经补充则无需补充
         if (proposals.isEmpty()) return;
-
         for (Proposal proposal : proposals) {
             try {
                 NetworkStat networkStatCache = statisticCacheService.getNetworkStatCache();
@@ -77,8 +82,6 @@ public class ProposalInfoTask {
                     // 有变更
                     proposal.setAccuVerifiers(pps.getVoterCount());
                 }
-
-
                 /**
                  * 当同步区块号小于结束区块且相应的取消提案未成功时候则跳过更新状态，防止追块时候提案提前结束造成数据错误
                  */
@@ -104,6 +107,7 @@ public class ProposalInfoTask {
             }
         }
         customProposalMapper.updateProposalInfoList(proposals);
+        XxlJobHelper.handleSuccess("提案投票信息更新成功");
     }
 
 }

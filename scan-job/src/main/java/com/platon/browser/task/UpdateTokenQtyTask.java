@@ -139,8 +139,9 @@ public class UpdateTokenQtyTask {
             if (CollUtil.isNotEmpty(erc721List)) {
                 pointLogMapper.updateByPrimaryKeySelective(erc721PointLog);
             }
+            XxlJobHelper.handleSuccess("更新erc交易数成功");
         } catch (Exception e) {
-            log.error("更新交易数异常", e);
+            log.error("更新erc交易数异常", e);
             throw e;
         }
     }
