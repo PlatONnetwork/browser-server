@@ -51,7 +51,6 @@ public class StakingMigrateTask {
                 });
                 customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
-            log.error("StakingMigrateTask执行");
             log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
         } catch (Exception e) {
             log.error("", e);

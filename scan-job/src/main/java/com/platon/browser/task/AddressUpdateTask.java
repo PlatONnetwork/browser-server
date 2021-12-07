@@ -70,20 +70,28 @@ public class AddressUpdateTask {
     @Resource
     private CustomAddressMapper customAddressMapper;
 
+    /**
+     * 地址表信息补充
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/7
+     */
     @XxlJob("addressUpdateJobHandler")
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void addressUpdate() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) return;
-
         try {
             int start = 0;
             int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 1000);
             while (!batchUpdate(start, batchSize)) {
                 start += batchSize;
             }
-
+            XxlJobHelper.handleSuccess("地址表信息补充成功");
         } catch (Exception e) {
-            log.error("on AddressUpdateTask error", e);
+            log.error("地址表信息补充异常", e);
+            throw e;
         }
     }
 
@@ -94,7 +102,6 @@ public class AddressUpdateTask {
      * @param size  执行的批次
      * @return
      */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
     protected boolean batchUpdate(int start, int size) {
         boolean stop = false;
 
@@ -210,95 +217,100 @@ public class AddressUpdateTask {
     @XxlJob("updateAddressQtyJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateQty() throws Exception {
-        int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
-        PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
-        List<Transaction> transactionList = getTransactionList(Convert.toLong(pointLog.getPosition()), pageSize);
-        if (CollUtil.isNotEmpty(transactionList)) {
-            Map<String, AddressQty> map = new HashMap();
-            transactionList.forEach(transaction -> {
-                AddressQty contract = getAddressQtyFromMap(map, transaction.getContractAddress());
-                AddressQty from = getAddressQtyFromMap(map, transaction.getFrom());
-                AddressQty to = getAddressQtyFromMap(map, transaction.getTo());
-                Set<Integer> txType = Stream.of(Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode(),
-                                                Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode(),
-                                                Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode(),
-                                                Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()).collect(Collectors.toSet());
-                if (!txType.contains(transaction.getType())) {
-                    from.setTxQty(from.getTxQty() + 1);
-                    to.setTxQty(to.getTxQty() + 1);
-                }
-                switch (transaction.getTypeEnum()) {
-                    case TRANSFER:
-                        from.setTransferQty(from.getTransferQty() + 1);
-                        to.setTransferQty(to.getTransferQty() + 1);
-                        break;
-                    case EVM_CONTRACT_CREATE:
-                        break;
-                    case CONTRACT_EXEC:
-                        break;
-                    case WASM_CONTRACT_CREATE:
-                        break;
-                    case OTHERS:
-                        break;
-                    case MPC:
-                        break;
-                    case ERC20_CONTRACT_CREATE:
-                        break;
-                    case ERC20_CONTRACT_EXEC:
-                        break;
-                    case ERC721_CONTRACT_CREATE:
+        try {
+            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
+            List<Transaction> transactionList = getTransactionList(Convert.toLong(pointLog.getPosition()), pageSize);
+            if (CollUtil.isNotEmpty(transactionList)) {
+                Map<String, AddressQty> map = new HashMap();
+                transactionList.forEach(transaction -> {
+                    AddressQty contract = getAddressQtyFromMap(map, transaction.getContractAddress());
+                    AddressQty from = getAddressQtyFromMap(map, transaction.getFrom());
+                    AddressQty to = getAddressQtyFromMap(map, transaction.getTo());
+                    Set<Integer> txType = Stream.of(Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode(),
+                                                    Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode(),
+                                                    Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode(),
+                                                    Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()).collect(Collectors.toSet());
+                    if (!txType.contains(transaction.getType())) {
                         from.setTxQty(from.getTxQty() + 1);
-                        if (ObjectUtil.isNotNull(contract)) {
-                            contract.setTxQty(contract.getTxQty() + 1);
-                        }
-                        break;
-                    case ERC721_CONTRACT_EXEC:
-                        break;
-                    case CONTRACT_EXEC_DESTROY:
-                        break;
-                    case STAKE_CREATE:
-                        break;
-                    case STAKE_MODIFY:
-                        break;
-                    case STAKE_INCREASE:
-                        break;
-                    case STAKE_EXIT:
-                        break;
-                    case DELEGATE_CREATE:
-                        break;
-                    case DELEGATE_EXIT:
-                        break;
-                    case PROPOSAL_TEXT:
-                        break;
-                    case PROPOSAL_UPGRADE:
-                        break;
-                    case PROPOSAL_PARAMETER:
-                        break;
-                    case PROPOSAL_VOTE:
-                        break;
-                    case VERSION_DECLARE:
-                        from.setProposalQty(from.getProposalQty() + 1);
-                        to.setProposalQty(to.getProposalQty() + 1);
-                        break;
-                    case PROPOSAL_CANCEL:
-                        break;
-                    case REPORT:
-                        from.setStakingQty(from.getStakingQty() + 1);
-                        to.setStakingQty(to.getStakingQty() + 1);
-                        break;
-                    case RESTRICTING_CREATE:
-                        break;
-                    case CLAIM_REWARDS:
-                        from.setDelegateQty(from.getDelegateQty() + 1);
-                        to.setDelegateQty(to.getDelegateQty() + 1);
-                        break;
-                    default:
-                        break;
-                }
-            });
-            customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
-            pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
-            pointLogMapper.updateByPrimaryKeySelective(pointLog);
+                        to.setTxQty(to.getTxQty() + 1);
+                    }
+                    switch (transaction.getTypeEnum()) {
+                        case TRANSFER:
+                            from.setTransferQty(from.getTransferQty() + 1);
+                            to.setTransferQty(to.getTransferQty() + 1);
+                            break;
+                        case EVM_CONTRACT_CREATE:
+                            break;
+                        case CONTRACT_EXEC:
+                            break;
+                        case WASM_CONTRACT_CREATE:
+                            break;
+                        case OTHERS:
+                            break;
+                        case MPC:
+                            break;
+                        case ERC20_CONTRACT_CREATE:
+                            break;
+                        case ERC20_CONTRACT_EXEC:
+                            break;
+                        case ERC721_CONTRACT_CREATE:
+                            from.setTxQty(from.getTxQty() + 1);
+                            if (ObjectUtil.isNotNull(contract)) {
+                                contract.setTxQty(contract.getTxQty() + 1);
+                            }
+                            break;
+                        case ERC721_CONTRACT_EXEC:
+                            break;
+                        case CONTRACT_EXEC_DESTROY:
+                            break;
+                        case STAKE_CREATE:
+                            break;
+                        case STAKE_MODIFY:
+                            break;
+                        case STAKE_INCREASE:
+                            break;
+                        case STAKE_EXIT:
+                            break;
+                        case DELEGATE_CREATE:
+                            break;
+                        case DELEGATE_EXIT:
+                            break;
+                        case PROPOSAL_TEXT:
+                            break;
+                        case PROPOSAL_UPGRADE:
+                            break;
+                        case PROPOSAL_PARAMETER:
+                            break;
+                        case PROPOSAL_VOTE:
+                            break;
+                        case VERSION_DECLARE:
+                            from.setProposalQty(from.getProposalQty() + 1);
+                            to.setProposalQty(to.getProposalQty() + 1);
+                            break;
+                        case PROPOSAL_CANCEL:
+                            break;
+                        case REPORT:
+                            from.setStakingQty(from.getStakingQty() + 1);
+                            to.setStakingQty(to.getStakingQty() + 1);
+                            break;
+                        case RESTRICTING_CREATE:
+                            break;
+                        case CLAIM_REWARDS:
+                            from.setDelegateQty(from.getDelegateQty() + 1);
+                            to.setDelegateQty(to.getDelegateQty() + 1);
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
+                pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
+                pointLogMapper.updateByPrimaryKeySelective(pointLog);
+            }
+        } catch (Exception e) {
+            log.error("更新地址交易数异常", e);
+            throw e;
         }
     }
 
