@@ -167,19 +167,3 @@ limit:
 output:
   file:
     url: /var/tmp
-xxl:
-  job:
-    admin:
-      #调度中心部署跟地址
-      addresses: http://192.168.120.144:18080/xxl-job-admin
-    #调度中心通讯TOKEN
-    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
-    executor:
-      #执行器AppName
-      appname: scan-api
-      #执行器端口号
-      port: 9998
-      #执行器运行日志文件存储磁盘路径
-      logpath: ./logs/jobhandler
-      #执行器日志文件保存天数
-      logretentiondays: 90
