@@ -1,0 +1,124 @@
+#1.1.4配置已经迁移到apollo，以下配置为模板
+profile: platon
+spring:
+  application:
+    name: scan-agent
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+  elasticsearch:
+    high-level-client:
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
+      password: changeme
+      port: 9200
+      schema: http
+      username: elastic
+    index:
+      blockIndexName: ${platon.es-namespace}_block
+      delegationIndexName: ${platon.es-namespace}_delegation
+      delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
+      erc20TxIndexName: ${platon.es-namespace}_erc20_tx
+      erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+      nodeOptIndexName: ${platon.es-namespace}_nodeopt
+      transactionIndexName: ${platon.es-namespace}_transaction
+      transferTxIndexName: ${platon.es-namespace}_transfer_tx
+  redis:
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+    database: 0
+    key:
+      blocks: ${platon.redis-namespace}:blocks
+      erc20Tx: ${platon.redis-namespace}:erc20Tx
+      erc721Tx: ${platon.redis-namespace}:erc721Tx
+      max-item: 500000
+      networkStat: ${platon.redis-namespace}:networkStat
+      transactions: ${platon.redis-namespace}:transactions
+      transferTx: ${platon.redis-namespace}:transferTx
+    password: platscan
+task:
+  address-batch-size: 1000
+  addressBatchSize: 1000
+  esRedisCatchupBatchSize: 1
+  esRedisNotCatchupBatchSize: 10
+  gapForAdjust: 20
+v0150:
+  adjustLogFilePath: ./logs/staking-delegate-adjust.log
+  adjustmentActiveVersion: 3840
+  adjustmentPipId: 14
+  restrictingMinimumReleaseActiveVersion: 3584
+version: 1.1.4
+xxl:
+  job:
+    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    admin:
+      addresses: http://192.168.120.144:18080/xxl-job-admin
+    executor:
+      appname: scan-agent
+      logpath: ./logs/jobhandler
+      logretentiondays: 90
+      port: 9999
+disruptor:
+  queue:
+    blockBufferSize: 1024
+    collectionBufferSize: 1024
+    complementBufferSize: 1024
+    gasEstimateBufferSize: 1024
+    persistenceBatchSize: 5
+    persistenceBufferSize: 1024
+jasypt:
+  encryptor:
+    password: my123456
+logging:
+  level:
+    com:
+      platon:
+        browser: info
+        browser.bootstrap: info
+        browser.collection: info
+        browser.persistence.handler: info
+        browser.task: info
+    org:
+      springframework: info
+      springframework.retry: info
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
+  type-aliases-package: com.platon.browser.dao.entity
+platon:
+  addIssueRate: 0.025
+  addressPrefix: lat
+  chainId: 100
+  defaultStakingLockedAmount: 150000
+  electionBackwardBlockCount: 20
+  es-namespace: browser_${profile}
+  foundationSubsidies:
+    '1': 6.2215742E7
+    '2': 5.5965742E7
+    '3': 4.9559492E7
+    '4': 4.2993086E7
+    '5': 3.626252E7
+    '6': 2.9363689E7
+    '7': 2.2292388E7
+    '8': 1.5044304E7
+    '9': 7615018.0
+  incentiveRateFromIssue: 0.8
+  initIssueAmount: 10000000000
+  keyBase: https://keybase.io/
+  keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
+  maxBlockGasLimit: 201600000
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  paging:
+    erc20-transaction:
+      pageCount: 250
+      pageSize: 2000
+  proposalPipNumTemplate: PIP-%s
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
+  redis-namespace: browser:${profile}
+  txLogDecodeThreadNum: 200
+  valueUnit: LAT
+  web3j:
+    addresses: 192.168.120.151:7789,192.168.120.151:7790
+    protocol: WS
