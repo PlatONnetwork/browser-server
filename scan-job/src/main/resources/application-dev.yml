@@ -1,36 +1,14 @@
 #1.1.4配置已经迁移到apollo，以下配置为模板
 profile: platon
-recaptchaUrl: https://recaptcha.net/recaptcha/api/siteverify?secret=6Lf8KLcUAAAAAPyHZfa7oeWjdMSyvgDHUUeYf01Z&response=%s
-server:
-  port: 40010
-  servlet:
-    context-path: /browser-server
-  tomcat:
-    max-connections: 20000
-    threads:
-      max: 2000
-      min-spare: 800
 spring:
   application:
-    name: scan-api
+    name: scan-job
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    initialSize: 5
-    maxActive: 100
-    maxPoolPreparedStatementPerConnectionSize: 100
-    maxWait: 60000
-    minEvictableIdleTimeMillis: 30000
-    minIdle: 10
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    poolPreparedStatements: true
-    testOnBorrow: false
-    testOnReturn: false
-    testWhileIdle: true
-    timeBetweenEvictionRunsMillis: 60000
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/scan_platonhyp?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    validationQuery: select 'x'
   elasticsearch:
     high-level-client:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
@@ -47,58 +25,33 @@ spring:
       nodeOptIndexName: ${platon.es-namespace}_nodeopt
       transactionIndexName: ${platon.es-namespace}_transaction
       transferTxIndexName: ${platon.es-namespace}_transfer_tx
-  messages:
-    basename: messages
-  profiles:
-    active: test
-  redis:
-    cluster:
-      max-redirects: 3
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-    key:
-      blocks: ${platon.redis-namespace}:blocks
-      erc20Tx: ${platon.redis-namespace}:erc20Tx
-      erc721Tx: ${platon.redis-namespace}:erc721Tx
-      max-item: 500000
-      networkStat: ${platon.redis-namespace}:networkStat
-      transactions: ${platon.redis-namespace}:transactions
-      transferTx: ${platon.redis-namespace}:transferTx
-    password: platscan
-  session:
-    timeout: 1800
-version: 1.1.4
+task:
+  maxAddressCount: 5004
+  maxBatchSize: 100
 xxl:
   job:
     accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
     admin:
-      addresses: http://192.168.120.150:8080/xxl-job-admin
+      addresses: http://192.168.120.144:18080/xxl-job-admin
     executor:
-      appname: scan-api
+      appname: scan-job
       logpath: ./logs/jobhandler
       logretentiondays: 90
-      port: 9998
+      port: 9997
 jasypt:
   encryptor:
     password: my123456
-limit:
-  num: 10
 logging:
   level:
     com:
       platon:
-        browser: info
-        browser.client: info
-        browser.dao: info
-        browser.service: info
-        browser.task: info
+        browser:
+          task: debug
     org:
-      springframework: info
+      springframework: error
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
   type-aliases-package: com.platon.browser.dao.entity
-output:
-  file:
-    url: ./
 platon:
   addIssueRate: 0.025
   addressPrefix: lat
@@ -122,12 +75,14 @@ platon:
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   maxBlockGasLimit: 201600000
   maxSettlePeriodCount4AnnualizedRateStat: 4
+  paging:
+    erc20-transaction:
+      pageCount: 250
+      pageSize: 2000
+  proposalPipNumTemplate: PIP-%s
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
-  redis-namespace: browser:${profile}
   txLogDecodeThreadNum: 200
   valueUnit: LAT
   web3j:
     addresses: 192.168.120.151:7789,192.168.120.151:7790
     protocol: WS
-  zeroBlockNumber:
-    wait-time: 60

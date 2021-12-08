@@ -1,5 +1,6 @@
 package com.platon.browser;
 
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bootstrap.bean.InitializationResult;
@@ -29,6 +30,7 @@ import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
+@EnableApolloConfig
 @EnableRetry
 @Configuration
 @EnableScheduling
