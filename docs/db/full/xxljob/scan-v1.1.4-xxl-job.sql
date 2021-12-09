@@ -2,8 +2,8 @@
 # XXL-JOB v2.3.1-SNAPSHOT
 # Copyright (c) 2015-present, xuxueli.
 
-CREATE database if NOT EXISTS `platon_xxl_job` default character set utf8mb4 collate utf8mb4_unicode_ci;
-use `platon_xxl_job`;
+CREATE database if NOT EXISTS `xxl_job` default character set utf8mb4 collate utf8mb4_unicode_ci;
+use `xxl_job`;
 
 SET NAMES utf8mb4;
 
@@ -118,9 +118,8 @@ INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_ti
 INSERT INTO `xxl_job_user`(`id`, `username`, `password`, `role`, `permission`) VALUES (1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', 1, NULL);
 INSERT INTO `xxl_job_lock` ( `lock_name`) VALUES ( 'schedule_lock');
 
-INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (2, 'scan-job', 'scan-job定时任务', 0, NULL, '2021-11-30 10:54:54');
-INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (3, 'scan-agent', 'agent定时任务', 0, NULL, '2021-11-30 10:54:54');
-INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (4, 'scan-api', 'scan-api定时任务', 0, NULL, '2021-11-30 10:54:54');
+INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (2, 'platon-scan-job', 'scan-job定时任务', 0, NULL, '2021-12-09 09:53:38');
+INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`) VALUES (3, 'platon-scan-agent', 'agent定时任务', 0, NULL, '2021-12-09 09:53:38');
 
 INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (3, 2, '质押表中的历史数据迁移至数据库任务', '2021-11-29 14:37:06', '2021-11-29 15:17:47', 'admin', '', 'CRON', '0/30  * * * * ?', 'DO_NOTHING', 'FIRST', 'stakingMigrateJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-29 14:37:06', '', 0, 0, 0);
 INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (4, 2, '提案详情更新任务', '2021-11-29 14:38:46', '2021-11-30 10:48:55', 'admin', '', 'CRON', '0/15  * * * * ?', 'DO_NOTHING', 'FIRST', 'proposalDetailUpdateJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-29 14:38:46', '', 0, 0, 0);

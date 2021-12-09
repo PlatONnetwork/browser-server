@@ -1,3 +1,8 @@
+# 指定环境
+env: DEV
+app:
+  # 应用ID
+  id: scan-api
 apollo:
   access-key:
     # 配置访问密钥
@@ -20,15 +25,10 @@ apollo:
     order:
       # 设置内存中的配置项是否保持和页面上的顺序一致
       enable: true
-app:
-  # 应用ID
-  id: scan-api
-# 指定环境
-env: DEV
 #日志配置
 logging:
   file:
-    name: ./logs/scan-api.log
+    name: ./logs/${app.id}.log
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
@@ -37,7 +37,7 @@ logging:
       # 日志文件大小上限，达到该上限后，会自动压缩
       max-file-size: 200MB
       # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
-      file-name-pattern: ./logs/scan-api-%d{yyyy-MM-dd}-%i.log.gz
+      file-name-pattern: ./logs/${app.id}-%d{yyyy-MM-dd}-%i.log.gz
       # 日志文件保存的天数
       max-history: 7
       # 是否在应用启动时进行归档管理
