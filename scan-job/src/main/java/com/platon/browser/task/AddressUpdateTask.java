@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
@@ -219,7 +220,9 @@ public class AddressUpdateTask {
         try {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
-            List<Transaction> transactionList = getTransactionList(Convert.toLong(pointLog.getPosition()), pageSize);
+            long oldPosition = Convert.toLong(pointLog.getPosition());
+            XxlJobHelper.log("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
+            List<Transaction> transactionList = getTransactionList(oldPosition, pageSize);
             if (CollUtil.isNotEmpty(transactionList)) {
                 Map<String, AddressQty> map = new HashMap();
                 transactionList.forEach(transaction -> {
@@ -306,6 +309,9 @@ public class AddressUpdateTask {
                 customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
                 pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
+                XxlJobHelper.log("更新地址交易数，断点为[{}]->[{}]，修改数据为{}", oldPosition, pointLog.getPosition(), JSONUtil.toJsonStr(CollUtil.newArrayList(map.values())));
+            } else {
+                XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", pointLog.getPosition()));
             }
         } catch (Exception e) {
             log.error("更新地址交易数异常", e);

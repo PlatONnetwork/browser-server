@@ -45,10 +45,12 @@ public class NodeOptTask {
         try {
             int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 10);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(1);
+            long oldPosition = Convert.toLong(pointLog.getPosition());
+            XxlJobHelper.log("当前页数为[{}]，断点为[{}]", batchSize, oldPosition);
             NOptBakExample nOptBakExample = new NOptBakExample();
             nOptBakExample.setOrderByClause("id");
-            long maxPosition = Convert.toInt(pointLog.getPosition(), 0) + batchSize;
-            nOptBakExample.createCriteria().andIdGreaterThan(Convert.toLong(pointLog.getPosition())).andIdLessThanOrEqualTo(maxPosition);
+            long maxPosition = Convert.toInt(pointLog.getPosition()) + batchSize;
+            nOptBakExample.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(maxPosition);
             List<NOptBak> nOptBakList = nOptBakMapper.selectByExample(nOptBakExample);
             if (CollUtil.isNotEmpty(nOptBakList)) {
                 Set<NOptBak> nodeOpts = new HashSet<>(nOptBakList);
@@ -56,6 +58,9 @@ public class NodeOptTask {
                 NOptBak lastNOptBak = CollUtil.getLast(nOptBakList);
                 pointLog.setPosition(lastNOptBak.getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
+                XxlJobHelper.log("节点操作备份表迁移到ES成功，断点[{}]->[{}]", oldPosition, pointLog.getPosition());
+            } else {
+                XxlJobHelper.log("当前断点[{}]未找到节点备份信息", oldPosition);
             }
             XxlJobHelper.handleSuccess("节点操作备份表迁移到ES成功");
         } catch (Exception e) {
