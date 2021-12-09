@@ -18,11 +18,6 @@ public class AddressQty {
     private long txQty;
 
     /**
-     * token对应的交易数
-     */
-    private long tokenQty;
-
-    /**
      * 转账交易总数
      */
     private long transferQty;
