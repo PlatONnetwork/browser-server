@@ -320,7 +320,7 @@ public class AddressUpdateTask {
         if (map.containsKey(address)) {
             return map.get(address);
         } else {
-            AddressQty addressQty = AddressQty.builder().address(address).txQty(0).tokenQty(0).transferQty(0).delegateQty(0).stakingQty(0).proposalQty(0).build();
+            AddressQty addressQty = AddressQty.builder().address(address).txQty(0).transferQty(0).delegateQty(0).stakingQty(0).proposalQty(0).build();
             map.put(address, addressQty);
             return addressQty;
         }
