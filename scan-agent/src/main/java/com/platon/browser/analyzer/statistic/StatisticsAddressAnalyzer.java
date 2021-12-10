@@ -1,6 +1,7 @@
 package com.platon.browser.analyzer.statistic;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
 import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.CustomAddress;
@@ -67,7 +68,9 @@ public class StatisticsAddressAnalyzer {
                     }
                 }
             });
-            statisticBusinessMapper.addressChange(CollUtil.newArrayList(addressCache.getAll()));
+            List<Address> list = CollUtil.newArrayList(addressCache.getAll());
+            statisticBusinessMapper.addressChange(list);
+            log.info("初始化内置地址入库:{}", JSONUtil.toJsonStr(list));
         } else {
             // 查看交易列表中是否有bin属性为0x的交易,有则对to对应的合约地址进行设置
             event.getTransactions().forEach(tx -> {
@@ -107,8 +110,36 @@ public class StatisticsAddressAnalyzer {
                 address.setContractName(contractName);
             });
         }
+        List<String> dbList = itemFromDb.stream().map(Address::getAddress).collect(Collectors.toList());
+        // 新增的地址
+        List<String> newAddressList = CollUtil.subtractToList(addresses, dbList);
+        if (CollUtil.isNotEmpty(newAddressList)) {
+            addressCache.getAll().forEach(address -> {
+                ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(address.getAddress());
+                if (contractTypeEnum != null) {
+                    switch (contractTypeEnum) {
+                        case WASM:
+                            address.setType(CustomAddress.TypeEnum.WASM.getCode());
+                            break;
+                        case EVM:
+                            address.setType(CustomAddress.TypeEnum.EVM.getCode());
+                            break;
+                        case ERC20_EVM:
+                            address.setType(CustomAddress.TypeEnum.ERC20_EVM.getCode());
+                            break;
+                        case ERC721_EVM:
+                            address.setType(CustomAddress.TypeEnum.ERC721_EVM.getCode());
+                            break;
+                    }
+                }
+            });
+            newAddressList.forEach(address -> {
+                itemFromDb.add(addressCache.getAddress(address));
+            });
+        }
         if (CollUtil.isNotEmpty(itemFromDb)) {
             statisticBusinessMapper.addressChange(itemFromDb);
+            log.info("更新或新增地址[{}]", JSONUtil.toJsonStr(itemFromDb));
         }
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
