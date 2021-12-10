@@ -296,6 +296,8 @@ public class AddressUpdateTask {
                             to.setProposalQty(to.getProposalQty() + 1);
                             break;
                         case VERSION_DECLARE:
+                            from.setProposalQty(from.getProposalQty() + 1);
+                            to.setProposalQty(to.getProposalQty() + 1);
                             break;
                         case PROPOSAL_CANCEL:
                             from.setProposalQty(from.getProposalQty() + 1);
