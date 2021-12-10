@@ -604,6 +604,7 @@ public class ErcTokenUpdateTask {
         PointLog pointLog = pointLogMapper.selectByPrimaryKey(7);
         int oldPosition = Convert.toInt(pointLog.getPosition());
         int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        XxlJobHelper.log("当前页数为[{}]，断点为[{}]", batchSize, oldPosition);
         try {
             TokenInventoryExample condition = new TokenInventoryExample();
             condition.setOrderByClause("id");
