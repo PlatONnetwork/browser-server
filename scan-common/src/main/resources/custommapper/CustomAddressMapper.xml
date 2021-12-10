@@ -109,7 +109,8 @@
             transfer_qty = transfer_qty + #{item.transferQty} ,
             delegate_qty = delegate_qty + #{item.delegateQty} ,
             staking_qty = staking_qty + #{item.stakingQty} ,
-            proposal_qty = proposal_qty + #{item.proposalQty} where address = #{item.address}
+            proposal_qty = proposal_qty + #{item.proposalQty}
+            where address = #{item.address}
         </foreach>
     </update>
 

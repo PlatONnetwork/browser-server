@@ -48,7 +48,6 @@ import okhttp3.Response;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -114,20 +113,6 @@ public class ErcTokenUpdateTask {
 
     private static final ExecutorService HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
 
-    /**
-     * token更新标识位
-     */
-    @Getter
-    @Setter
-    private volatile long tokenCreateTime = 0L;
-
-    /**
-     * tokenInventory更新标识位
-     */
-    @Getter
-    @Setter
-    private AtomicLong tokenInventoryPage = new AtomicLong(0);
-
     private final Lock lock = new ReentrantLock();
 
     private final Lock tokenInventoryLock = new ReentrantLock();
@@ -146,7 +131,6 @@ public class ErcTokenUpdateTask {
         lock.lock();
         try {
             updateTokenTotalSupply();
-            XxlJobHelper.handleSuccess("全量更新token的总供应量成功");
         } catch (Exception e) {
             log.warn("全量更新token的总供应量异常", e);
             throw e;
@@ -196,6 +180,7 @@ public class ErcTokenUpdateTask {
                 TokenHolderExample condition = new TokenHolderExample();
                 condition.setOrderByClause(" token_address asc, address asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
                 batch = tokenHolderMapper.selectByExample(condition);
+                List<ErcToken> ercTokens = getErcTokens();
                 // 过滤销毁的合约
                 List<TokenHolder> res = subtractToList(batch, getDestroyContracts());
                 List<TokenHolder> updateParams = new ArrayList<>();
@@ -205,7 +190,6 @@ public class ErcTokenUpdateTask {
                         HOLDER_UPDATE_POOL.submit(() -> {
                             try {
                                 // 查询余额并回填
-                                List<ErcToken> ercTokens = getErcTokens();
                                 ErcToken token = CollUtil.findOne(ercTokens, ercToken -> ercToken.getAddress().equalsIgnoreCase(holder.getTokenAddress()));
                                 if (token != null) {
                                     BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress());
@@ -213,9 +197,12 @@ public class ErcTokenUpdateTask {
                                         log.info("token[{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]", holder.getTokenAddress(), holder.getAddress(), holder.getBalance(), balance.toString());
                                         // 余额有变动才加入更新列表，避免频繁访问表
                                         holder.setBalance(balance.toString());
-                                        holder.setUpdateTime(DateUtil.date());
                                         updateParams.add(holder);
                                     }
+                                } else {
+                                    String msg = StrUtil.format("找不到对应的token[{}]", holder.getTokenAddress());
+                                    XxlJobHelper.log(msg);
+                                    log.error(msg);
                                 }
                             } catch (Exception e) {
                                 log.warn(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
@@ -230,11 +217,13 @@ public class ErcTokenUpdateTask {
                         log.error("", e);
                     }
                 }
-                if (!updateParams.isEmpty()) {
+                if (CollUtil.isNotEmpty(updateParams)) {
                     customTokenHolderMapper.batchUpdate(updateParams);
+                    XxlJobHelper.log("更新token持有者余额{}", JSONUtil.toJsonStr(updateParams));
                 }
                 page++;
             } while (!batch.isEmpty());
+            XxlJobHelper.log("全量更新token持有者余额成功");
         } catch (Exception e) {
             log.error("更新地址代币余额异常", e);
         } finally {
@@ -274,14 +263,14 @@ public class ErcTokenUpdateTask {
     public void incrementUpdateTokenInventory() {
         if (tokenInventoryLock.tryLock()) {
             try {
-                cronIncrementUpdateTokenInventory(tokenInventoryPage.intValue());
+                cronIncrementUpdateTokenInventory();
             } catch (Exception e) {
                 log.warn("增量更新token库存信息异常", e);
             } finally {
                 tokenInventoryLock.unlock();
             }
         } else {
-            log.warn("该次token库存增量更新抢不到锁，增量更新的标记为{}", tokenInventoryPage);
+            log.warn("该次token库存增量更新抢不到锁");
         }
     }
 
@@ -314,7 +303,6 @@ public class ErcTokenUpdateTask {
         }
         Set<ErcToken> updateParams = new ConcurrentHashSet<>();
         List<List<ErcToken>> batchList = new ArrayList<>();
-        // 从缓存中获取Token更新参数，并构造批次列表
         List<ErcToken> batch = new ArrayList<>();
         batchList.add(batch);
         List<ErcToken> tokens = getErcTokens();
@@ -346,7 +334,8 @@ public class ErcTokenUpdateTask {
                             BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
                             totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
                             if (ObjectUtil.isNull(token.getTotalSupply()) || !token.getTotalSupply().equalsIgnoreCase(totalSupply.toString())) {
-                                log.info("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply.toString());
+                                XxlJobHelper.log("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply);
+                                log.info("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply);
                                 // 有变动添加到更新列表中
                                 token.setTotalSupply(totalSupply.toString());
                                 token.setUpdateTime(new Date());
@@ -371,6 +360,7 @@ public class ErcTokenUpdateTask {
             customTokenMapper.batchInsertOrUpdateSelective(new ArrayList<>(updateParams), Token.Column.values());
             updateParams.forEach(token -> token.setDirty(false));
         }
+        XxlJobHelper.log("全量更新token的总供应量成功");
         updateTokenHolderCount();
     }
 
@@ -414,7 +404,10 @@ public class ErcTokenUpdateTask {
                 pointLog = pointLogMapper.selectByPrimaryKey(6);
             }
             List<TokenHolder> updateParams = new ArrayList<>();
-            List<ErcTx> list = getErcList(abstractEsRepository, Convert.toLong(pointLog.getPosition()), Convert.toInt(XxlJobHelper.getJobParam(), 500));
+            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            long oldPosition = Convert.toLong(pointLog.getPosition());
+            XxlJobHelper.log("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
+            List<ErcTx> list = getErcList(abstractEsRepository, Convert.toLong(pointLog.getPosition()), pageSize);
             if (CollUtil.isEmpty(list)) {
                 return;
             }
@@ -455,24 +448,28 @@ public class ErcTokenUpdateTask {
                             holder.setBalance(balance.toString());
                             holder.setUpdateTime(DateUtil.date());
                             updateParams.add(holder);
-                            log.info("token[{}]address[{}]查询到余额[{}]", contract, address, balance.toString());
+                            log.info("token[{}]address[{}]查询到余额[{}]", contract, address, balance);
                             try {
                                 TimeUnit.MILLISECONDS.sleep(100);
                             } catch (InterruptedException interruptedException) {
                                 interruptedException.printStackTrace();
                             }
                         } catch (Exception e) {
-                            log.warn(StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address), e);
+                            String msg = StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address);
+                            XxlJobHelper.log(msg);
+                            log.warn(msg, e);
                         }
                     });
                 });
             }
-            if (!updateParams.isEmpty()) {
+            if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
+                XxlJobHelper.log("更新token持有者余额{}", JSONUtil.toJsonStr(updateParams));
             }
-            pointLog.setPosition(CollUtil.getLast(list).getSeq().toString());
+            String newPosition = CollUtil.getLast(list).getSeq().toString();
+            pointLog.setPosition(newPosition);
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
-            XxlJobHelper.handleSuccess("更新token持有者余额成功");
+            XxlJobHelper.log("更新token持有者余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
             throw e;
@@ -561,7 +558,9 @@ public class ErcTokenUpdateTask {
                                 }
                             } else {
                                 errorNum.getAndIncrement();
-                                log.warn("请求TokenURI为空,当前标识为:{},token_address：{},token_id:{}", finalPage, inventory.getTokenAddress(), inventory.getTokenId());
+                                String msg = StrUtil.format("请求TokenURI为空,当前标识为:{},token_address：{},token_id:{}", finalPage, inventory.getTokenAddress(), inventory.getTokenId());
+                                XxlJobHelper.log(msg);
+                                log.warn(msg);
                             }
                         } catch (Exception e) {
                             errorNum.getAndIncrement();
@@ -572,8 +571,11 @@ public class ErcTokenUpdateTask {
                 if (CollUtil.isNotEmpty(updateParams)) {
                     updateNum = updateParams.size();
                     customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
+                    XxlJobHelper.log("全量更新token库存信息{}", JSONUtil.toJsonStr(updateParams));
                 }
-                log.info("全量更新token库存信息:当前标识为:{},查询到的条数为{},已更新的条数为:{},失败的条数为:{}", page, batchNum, updateNum, errorNum.get());
+                String msg = StrUtil.format("全量更新token库存信息:当前标识为:{},查询到的条数为{},已更新的条数为:{},失败的条数为:{}", page, batchNum, updateNum, errorNum.get());
+                XxlJobHelper.log(msg);
+                log.info(msg);
             } catch (Exception e) {
                 log.error(StrUtil.format("全量更新token库存信息异常,当前标识为:{}", page), e);
             } finally {
@@ -585,11 +587,10 @@ public class ErcTokenUpdateTask {
     /**
      * 更新token库存信息=>增量更新
      *
-     * @param pageNum 当前页码
      * @return void
      * @date 2021/4/26
      */
-    private void cronIncrementUpdateTokenInventory(int pageNum) {
+    private void cronIncrementUpdateTokenInventory() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -600,83 +601,98 @@ public class ErcTokenUpdateTask {
         int batchNum = 0;
         // 当前失败的条数
         AtomicInteger errorNum = new AtomicInteger(0);
+        PointLog pointLog = pointLogMapper.selectByPrimaryKey(7);
+        int oldPosition = Convert.toInt(pointLog.getPosition());
         int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
         try {
             TokenInventoryExample condition = new TokenInventoryExample();
-            condition.setOrderByClause(" id asc limit " + pageNum * batchSize + "," + batchSize);
+            condition.setOrderByClause("id");
+            condition.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(oldPosition + batchSize);
             // 分页更新token库存相关信息
             List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
-            List<TokenInventory> res = tokenInventorySubtractToList(batch, getDestroyContracts());
-            batchNum = CommonUtil.ofNullable(() -> res.size()).orElse(0);
-            List<TokenInventory> updateParams = new ArrayList<>();
-            if (CollUtil.isNotEmpty(res)) {
-                res.forEach(inventory -> {
-                    String tokenURI = "";
-                    try {
-                        tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
-                        if (StrUtil.isNotBlank(tokenURI)) {
-                            Request request = new Request.Builder().url(tokenURI).build();
-                            String resp = "";
-                            Response response = CustomHttpClient.client.newCall(request).execute();
-                            if (response.code() == 200) {
-                                resp = response.body().string();
-                                TokenInventory newTi = JSONUtil.toBean(resp, TokenInventory.class);
-                                newTi.setTokenId(inventory.getTokenId());
-                                newTi.setTokenAddress(inventory.getTokenAddress());
-                                boolean changed = false;
-                                // 只要有一个属性变动就添加到更新列表中
-                                if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
-                                    inventory.setImage(newTi.getImage());
-                                    changed = true;
-                                }
-                                if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
-                                    inventory.setDescription(newTi.getDescription());
-                                    changed = true;
-                                }
-                                if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
-                                    inventory.setName(newTi.getName());
-                                    changed = true;
-                                }
-                                if (changed) {
-                                    log.info("token[{}]库存有属性变动需要更新,tokenURL[{}],tokenName[{}],tokenDesc[{}],tokenImage[{}]",
-                                             inventory.getTokenAddress(),
-                                             tokenURI,
-                                             inventory.getName(),
-                                             inventory.getDescription(),
-                                             inventory.getImage());
-                                    updateParams.add(inventory);
+            if (CollUtil.isNotEmpty(batch)) {
+                List<TokenInventory> res = tokenInventorySubtractToList(batch, getDestroyContracts());
+                List<TokenInventory> updateParams = new ArrayList<>();
+                if (CollUtil.isNotEmpty(res)) {
+                    batchNum = res.size();
+                    res.forEach(inventory -> {
+                        String tokenURI = "";
+                        try {
+                            tokenURI = ercServiceImpl.getTokenURI(inventory.getTokenAddress(), new BigInteger(inventory.getTokenId()));
+                            if (StrUtil.isNotBlank(tokenURI)) {
+                                Request request = new Request.Builder().url(tokenURI).build();
+                                String resp = "";
+                                Response response = CustomHttpClient.client.newCall(request).execute();
+                                if (response.code() == 200) {
+                                    resp = response.body().string();
+                                    TokenInventory newTi = JSONUtil.toBean(resp, TokenInventory.class);
+                                    newTi.setTokenId(inventory.getTokenId());
+                                    newTi.setTokenAddress(inventory.getTokenAddress());
+                                    boolean changed = false;
+                                    // 只要有一个属性变动就添加到更新列表中
+                                    if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
+                                        inventory.setImage(newTi.getImage());
+                                        changed = true;
+                                    }
+                                    if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
+                                        inventory.setDescription(newTi.getDescription());
+                                        changed = true;
+                                    }
+                                    if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
+                                        inventory.setName(newTi.getName());
+                                        changed = true;
+                                    }
+                                    if (changed) {
+                                        updateParams.add(inventory);
+                                        String msg = StrUtil.format("token[{}]库存有属性变动需要更新,tokenURL[{}],tokenName[{}],tokenDesc[{}],tokenImage[{}]",
+                                                                    inventory.getTokenAddress(),
+                                                                    tokenURI,
+                                                                    inventory.getName(),
+                                                                    inventory.getDescription(),
+                                                                    inventory.getImage());
+                                        XxlJobHelper.log(msg);
+                                        log.info(msg);
+                                    }
+                                } else {
+                                    errorNum.getAndIncrement();
+                                    String msg = StrUtil.format("http请求异常：http状态码:{},http消息:{},断点:{},token_address:{}, token_id:{}, tokenURI:{}",
+                                                                response.code(),
+                                                                response.message(),
+                                                                oldPosition,
+                                                                inventory.getTokenAddress(),
+                                                                inventory.getTokenId(),
+                                                                tokenURI);
+                                    XxlJobHelper.log(msg);
+                                    log.warn(msg);
                                 }
                             } else {
                                 errorNum.getAndIncrement();
-                                log.warn("http请求异常：http状态码:{},http消息:{},当前标识为:{},token_address:{}, token_id:{}, tokenURI:{}",
-                                         response.code(),
-                                         response.message(),
-                                         pageNum,
-                                         inventory.getTokenAddress(),
-                                         inventory.getTokenId(),
-                                         tokenURI);
+                                String msg = StrUtil.format("请求TokenURI为空,断点:{},token_address：{},token_id:{}", oldPosition, inventory.getTokenAddress(), inventory.getTokenId());
+                                XxlJobHelper.log(msg);
+                                log.warn(msg);
                             }
-                        } else {
+                        } catch (Exception e) {
                             errorNum.getAndIncrement();
-                            log.warn("请求TokenURI为空,当前标识为:{},token_address：{},token_id:{}", pageNum, inventory.getTokenAddress(), inventory.getTokenId());
+                            log.warn(StrUtil.format("增量更新token库存信息异常,断点:{},token_address：{},token_id:{},tokenURI:{}", oldPosition, inventory.getTokenAddress(), inventory.getTokenId(), tokenURI), e);
                         }
-                    } catch (Exception e) {
-                        errorNum.getAndIncrement();
-                        log.warn(StrUtil.format("增量更新token库存信息异常,当前标识为:{},token_address：{},token_id:{},tokenURI:{}", pageNum, inventory.getTokenAddress(), inventory.getTokenId(), tokenURI), e);
-                    }
-                });
+                    });
+                }
+                if (CollUtil.isNotEmpty(updateParams)) {
+                    updateNum = updateParams.size();
+                    customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
+                }
+                TokenInventory lastTokenInventory = CollUtil.getLast(batch);
+                String newPosition = Convert.toStr(lastTokenInventory.getId());
+                pointLog.setPosition(newPosition);
+                pointLogMapper.updateByPrimaryKeySelective(pointLog);
+                String msg = StrUtil.format("增量更新token库存信息:断点为[{}]->[{}],查询到的条数为:{},已更新的条数为:{},失败的条数为:{}", oldPosition, newPosition, batchNum, updateNum, errorNum.get());
+                XxlJobHelper.log(msg);
+                log.info(msg);
+            } else {
+                XxlJobHelper.log("增量更新token库存信息完成，未找到数据，断点为[{}]", oldPosition);
             }
-            if (CollUtil.isNotEmpty(updateParams)) {
-                updateNum = updateParams.size();
-                customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
-            }
-            log.info("增量更新token库存信息:当前标识为:{},查询到的条数为:{},已更新的条数为:{},失败的条数为:{}", pageNum, batchNum, updateNum, errorNum.get());
         } catch (Exception e) {
-            log.error(StrUtil.format("增量更新token库存信息异常,当前标识为:{}", pageNum), e);
-        } finally {
-            if (batchNum == batchSize) {
-                tokenInventoryPage.incrementAndGet();
-            }
+            log.error(StrUtil.format("增量更新token库存信息异常,断点:{}", oldPosition), e);
         }
     }
 
@@ -826,6 +842,7 @@ public class ErcTokenUpdateTask {
                     if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
                         token.setHolder(tokenHolderCount.getTokenHolderCount());
                         updateTokenList.add(token);
+                        XxlJobHelper.log("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
                     }
                 });
             });
@@ -834,6 +851,7 @@ public class ErcTokenUpdateTask {
             customTokenMapper.batchInsertOrUpdateSelective(updateTokenList, Token.Column.values());
             log.info("更新token对应的持有人的数量{}", JSONUtil.toJsonStr(updateTokenList));
         }
+        XxlJobHelper.log("更新token对应的持有人的数量完成");
     }
 
     private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {

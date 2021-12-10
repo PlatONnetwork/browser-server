@@ -226,17 +226,10 @@ public class AddressUpdateTask {
             if (CollUtil.isNotEmpty(transactionList)) {
                 Map<String, AddressQty> map = new HashMap();
                 transactionList.forEach(transaction -> {
-                    AddressQty contract = getAddressQtyFromMap(map, transaction.getContractAddress());
                     AddressQty from = getAddressQtyFromMap(map, transaction.getFrom());
                     AddressQty to = getAddressQtyFromMap(map, transaction.getTo());
-                    Set<Integer> txType = Stream.of(Transaction.TypeEnum.EVM_CONTRACT_CREATE.getCode(),
-                                                    Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode(),
-                                                    Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode(),
-                                                    Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode()).collect(Collectors.toSet());
-                    if (!txType.contains(transaction.getType())) {
-                        from.setTxQty(from.getTxQty() + 1);
-                        to.setTxQty(to.getTxQty() + 1);
-                    }
+                    from.setTxQty(from.getTxQty() + 1);
+                    to.setTxQty(to.getTxQty() + 1);
                     switch (transaction.getTypeEnum()) {
                         case TRANSFER:
                             from.setTransferQty(from.getTransferQty() + 1);
@@ -257,44 +250,58 @@ public class AddressUpdateTask {
                         case ERC20_CONTRACT_EXEC:
                             break;
                         case ERC721_CONTRACT_CREATE:
-                            from.setTxQty(from.getTxQty() + 1);
-                            if (ObjectUtil.isNotNull(contract)) {
-                                contract.setTxQty(contract.getTxQty() + 1);
-                            }
                             break;
                         case ERC721_CONTRACT_EXEC:
                             break;
                         case CONTRACT_EXEC_DESTROY:
                             break;
                         case STAKE_CREATE:
+                            from.setStakingQty(from.getStakingQty() + 1);
+                            to.setStakingQty(to.getStakingQty() + 1);
                             break;
                         case STAKE_MODIFY:
+                            from.setStakingQty(from.getStakingQty() + 1);
+                            to.setStakingQty(to.getStakingQty() + 1);
                             break;
                         case STAKE_INCREASE:
+                            from.setStakingQty(from.getStakingQty() + 1);
+                            to.setStakingQty(to.getStakingQty() + 1);
                             break;
                         case STAKE_EXIT:
+                            from.setStakingQty(from.getStakingQty() + 1);
+                            to.setStakingQty(to.getStakingQty() + 1);
                             break;
                         case DELEGATE_CREATE:
+                            from.setDelegateQty(from.getDelegateQty() + 1);
+                            to.setDelegateQty(to.getDelegateQty() + 1);
                             break;
                         case DELEGATE_EXIT:
+                            from.setDelegateQty(from.getDelegateQty() + 1);
+                            to.setDelegateQty(to.getDelegateQty() + 1);
                             break;
                         case PROPOSAL_TEXT:
-                            break;
-                        case PROPOSAL_UPGRADE:
-                            break;
-                        case PROPOSAL_PARAMETER:
-                            break;
-                        case PROPOSAL_VOTE:
-                            break;
-                        case VERSION_DECLARE:
                             from.setProposalQty(from.getProposalQty() + 1);
                             to.setProposalQty(to.getProposalQty() + 1);
                             break;
+                        case PROPOSAL_UPGRADE:
+                            from.setProposalQty(from.getProposalQty() + 1);
+                            to.setProposalQty(to.getProposalQty() + 1);
+                            break;
+                        case PROPOSAL_PARAMETER:
+                            from.setProposalQty(from.getProposalQty() + 1);
+                            to.setProposalQty(to.getProposalQty() + 1);
+                            break;
+                        case PROPOSAL_VOTE:
+                            from.setProposalQty(from.getProposalQty() + 1);
+                            to.setProposalQty(to.getProposalQty() + 1);
+                            break;
+                        case VERSION_DECLARE:
+                            break;
                         case PROPOSAL_CANCEL:
+                            from.setProposalQty(from.getProposalQty() + 1);
+                            to.setProposalQty(to.getProposalQty() + 1);
                             break;
                         case REPORT:
-                            from.setStakingQty(from.getStakingQty() + 1);
-                            to.setStakingQty(to.getStakingQty() + 1);
                             break;
                         case RESTRICTING_CREATE:
                             break;
@@ -306,12 +313,13 @@ public class AddressUpdateTask {
                             break;
                     }
                 });
-                customAddressMapper.batchUpdateAddressQty(CollUtil.newArrayList(map.values()));
+                List<AddressQty> list = CollUtil.newArrayList(map.values());
+                customAddressMapper.batchUpdateAddressQty(list);
                 pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
-                XxlJobHelper.log("更新地址交易数，断点为[{}]->[{}]，修改数据为{}", oldPosition, pointLog.getPosition(), JSONUtil.toJsonStr(CollUtil.newArrayList(map.values())));
+                XxlJobHelper.log("更新地址交易数，断点为[{}]->[{}]，更新地址数为[{}],修改数据为{}", oldPosition, pointLog.getPosition(), list.size(), JSONUtil.toJsonStr(list));
             } else {
-                XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", pointLog.getPosition()));
+                XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
             }
         } catch (Exception e) {
             log.error("更新地址交易数异常", e);

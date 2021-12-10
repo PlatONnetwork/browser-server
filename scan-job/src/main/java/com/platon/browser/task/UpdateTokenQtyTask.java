@@ -109,7 +109,6 @@ public class UpdateTokenQtyTask {
                 for (Map.Entry<String, List<ErcTx>> entry : erc721Map.entrySet()) {
                     TokenQty tokenQty = getTokenQty(tokenMap, entry.getKey());
                     tokenQty.setErc721TxQty(entry.getValue().size());
-                    tokenQty.setTokenTxQty(tokenQty.getErc20TxQty() + tokenQty.getErc721TxQty());
                 }
                 //累计地址的erc721交易数
                 for (ErcTx ercTx : erc721List) {
@@ -137,12 +136,17 @@ public class UpdateTokenQtyTask {
                 XxlJobHelper.log("当前erc721断点[{}]未找到erc721交易", oldErc721Position);
             }
             if (CollUtil.isNotEmpty(tokenMap.values())) {
-                customTokenMapper.batchUpdateTokenQty(CollUtil.newArrayList(tokenMap.values()));
-                XxlJobHelper.log("更新token表的erc交易数，修改数据为{}", JSONUtil.toJsonStr(CollUtil.newArrayList(tokenMap.values())));
+                for (Map.Entry<String, TokenQty> entry : tokenMap.entrySet()) {
+                    entry.getValue().setTokenTxQty(entry.getValue().getErc20TxQty() + entry.getValue().getErc721TxQty());
+                }
+                List<TokenQty> list = CollUtil.newArrayList(tokenMap.values());
+                customTokenMapper.batchUpdateTokenQty(list);
+                XxlJobHelper.log("更新token表的erc交易数，涉及的token数为[{}]，修改数据为{}", list.size(), JSONUtil.toJsonStr(list));
             }
             if (CollUtil.isNotEmpty(addressMap.values())) {
-                customAddressMapper.batchUpdateAddressErcQty(CollUtil.newArrayList(addressMap.values()));
-                XxlJobHelper.log("更新地址表的erc交易数，修改数据为{}", JSONUtil.toJsonStr(CollUtil.newArrayList(addressMap.values())));
+                List<AddressErcQty> list = CollUtil.newArrayList(addressMap.values());
+                customAddressMapper.batchUpdateAddressErcQty(list);
+                XxlJobHelper.log("更新地址表的erc交易数，涉及的地址数为[{}]，修改数据为{}", list.size(), JSONUtil.toJsonStr(list));
             }
             if (CollUtil.isNotEmpty(erc20List)) {
                 pointLogMapper.updateByPrimaryKeySelective(erc20PointLog);

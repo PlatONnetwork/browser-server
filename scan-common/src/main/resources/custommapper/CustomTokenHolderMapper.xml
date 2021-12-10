@@ -108,7 +108,7 @@
 
     <update id="batchUpdate">
         <foreach collection="list" item="item" separator=";">
-        update token_holder set balance=#{item.balance},update_time=#{item.updateTime} where token_address=#{item.tokenAddress} and address=#{item.address}
+        update token_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and address=#{item.address}
         </foreach>
     </update>
 
