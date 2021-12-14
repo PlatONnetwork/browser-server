@@ -3,7 +3,6 @@ package com.platon.browser.task;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.ObjectUtil;
@@ -198,6 +197,7 @@ public class ErcTokenUpdateTask {
                                     log.error(msg);
                                 }
                             } catch (Exception e) {
+                                XxlJobHelper.log(StrUtil.format("查询token holder的余额失败，合约[{}]地址[{}]", holder.getTokenAddress(), holder.getAddress()));
                                 log.warn(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
                             } finally {
                                 latch.countDown();
@@ -398,10 +398,10 @@ public class ErcTokenUpdateTask {
             List<TokenHolder> updateParams = new ArrayList<>();
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
             long oldPosition = Convert.toLong(pointLog.getPosition());
-            TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
+            TaskUtil.console("[{}]当前页数为[{}]，断点为[{}]", typeEnum.getDesc(), pageSize, oldPosition);
             List<ErcTx> list = getErcList(abstractEsRepository, Convert.toLong(pointLog.getPosition()), pageSize);
             if (CollUtil.isEmpty(list)) {
-                TaskUtil.console("该断点[{}]未找到交易", oldPosition);
+                TaskUtil.console("[{}]该断点[{}]未找到交易", typeEnum.getDesc(), oldPosition);
                 return;
             }
             HashMap<String, HashSet<String>> map = new HashMap();
@@ -440,14 +440,14 @@ public class ErcTokenUpdateTask {
                             holder.setAddress(address);
                             holder.setBalance(balance.toString());
                             updateParams.add(holder);
-                            log.info("token holder查询到余额[{}]，合约[{}]地址[{}]", balance, contract, address);
+                            log.info("[{}] token holder查询到余额[{}]，合约[{}]地址[{}]", typeEnum.getDesc(), balance, contract, address);
                             try {
                                 TimeUnit.MILLISECONDS.sleep(100);
                             } catch (InterruptedException interruptedException) {
                                 interruptedException.printStackTrace();
                             }
                         } catch (Exception e) {
-                            String msg = StrFormatter.format("查询token holder的余额失败,contract:{},address:{}", contract, address);
+                            String msg = StrFormatter.format("查询[{}] token holder的余额失败,contract:{},address:{}", typeEnum.getDesc(), contract, address);
                             XxlJobHelper.log(msg);
                             log.warn(msg, e);
                         }
@@ -456,12 +456,12 @@ public class ErcTokenUpdateTask {
             }
             if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
-                TaskUtil.console("更新token holder的余额{}", JSONUtil.toJsonStr(updateParams));
+                TaskUtil.console("更新[{}] token holder的余额{}", typeEnum.getDesc(), JSONUtil.toJsonStr(updateParams));
             }
             String newPosition = CollUtil.getLast(list).getSeq().toString();
             pointLog.setPosition(newPosition);
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
-            XxlJobHelper.log("更新token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
+            XxlJobHelper.log("更新[{}] token holder的余额成功，断点为[{}]->[{}]", typeEnum.getDesc(), oldPosition, newPosition);
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
             throw e;
