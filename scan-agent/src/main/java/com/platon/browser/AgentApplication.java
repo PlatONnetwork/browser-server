@@ -81,7 +81,7 @@ public class AgentApplication implements ApplicationRunner {
         AppStatusUtil.setStatus(AppStatus.BOOTING);
         retryableClient.zeroBlockNumberWait();
         InitializationResult initialResult = initializationService.init(traceId);
-//        consistencyService.post(traceId);
+        consistencyService.post(traceId);
         // 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
         // 已采最高块号
@@ -89,7 +89,6 @@ public class AgentApplication implements ApplicationRunner {
         // 前一个块号
         long preBlockNum;
         CommonUtil.removeTraceId();
-        collectedNumber = 7000;
         // 进入区块采集主流程
         while (true) {
             try {

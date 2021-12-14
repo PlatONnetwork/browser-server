@@ -33,6 +33,7 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -211,7 +212,7 @@ public class ErcTokenUpdateTask {
                 }
                 if (CollUtil.isNotEmpty(updateParams)) {
                     customTokenHolderMapper.batchUpdate(updateParams);
-                    XxlJobHelper.log("更新token持有者余额{}", JSONUtil.toJsonStr(updateParams));
+                    TaskUtil.console("更新token持有者余额{}", JSONUtil.toJsonStr(updateParams));
                 }
                 page++;
             } while (!batch.isEmpty());
@@ -326,14 +327,13 @@ public class ErcTokenUpdateTask {
                             BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress());
                             totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
                             if (ObjectUtil.isNull(token.getTotalSupply()) || !token.getTotalSupply().equalsIgnoreCase(totalSupply.toString())) {
-                                XxlJobHelper.log("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply);
-                                log.info("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply);
+                                TaskUtil.console("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply);
                                 // 有变动添加到更新列表中
                                 token.setTotalSupply(totalSupply.toString());
-                                token.setUpdateTime(new Date());
                                 updateParams.add(token);
                             }
                         } catch (Exception e) {
+                            XxlJobHelper.log(StrUtil.format("该token[{}]查询总供应量异常", token.getAddress()));
                             log.error("查询总供应量异常", e);
                         } finally {
                             latch.countDown();
@@ -398,9 +398,10 @@ public class ErcTokenUpdateTask {
             List<TokenHolder> updateParams = new ArrayList<>();
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
             long oldPosition = Convert.toLong(pointLog.getPosition());
-            XxlJobHelper.log("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
+            TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
             List<ErcTx> list = getErcList(abstractEsRepository, Convert.toLong(pointLog.getPosition()), pageSize);
             if (CollUtil.isEmpty(list)) {
+                TaskUtil.console("该断点[{}]未找到交易", oldPosition);
                 return;
             }
             HashMap<String, HashSet<String>> map = new HashMap();
@@ -438,16 +439,15 @@ public class ErcTokenUpdateTask {
                             holder.setTokenAddress(contract);
                             holder.setAddress(address);
                             holder.setBalance(balance.toString());
-                            holder.setUpdateTime(DateUtil.date());
                             updateParams.add(holder);
-                            log.info("token[{}]address[{}]查询到余额[{}]", contract, address, balance);
+                            log.info("token holder查询到余额[{}]，合约[{}]地址[{}]", balance, contract, address);
                             try {
                                 TimeUnit.MILLISECONDS.sleep(100);
                             } catch (InterruptedException interruptedException) {
                                 interruptedException.printStackTrace();
                             }
                         } catch (Exception e) {
-                            String msg = StrFormatter.format("查询地址余额失败,contract:{},address:{}", contract, address);
+                            String msg = StrFormatter.format("查询token holder的余额失败,contract:{},address:{}", contract, address);
                             XxlJobHelper.log(msg);
                             log.warn(msg, e);
                         }
@@ -456,12 +456,12 @@ public class ErcTokenUpdateTask {
             }
             if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
-                XxlJobHelper.log("更新token持有者余额{}", JSONUtil.toJsonStr(updateParams));
+                TaskUtil.console("更新token holder的余额{}", JSONUtil.toJsonStr(updateParams));
             }
             String newPosition = CollUtil.getLast(list).getSeq().toString();
             pointLog.setPosition(newPosition);
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
-            XxlJobHelper.log("更新token持有者余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
+            XxlJobHelper.log("更新token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
             throw e;
@@ -835,14 +835,13 @@ public class ErcTokenUpdateTask {
                     if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
                         token.setHolder(tokenHolderCount.getTokenHolderCount());
                         updateTokenList.add(token);
-                        XxlJobHelper.log("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
+                        TaskUtil.console("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
                     }
                 });
             });
         }
         if (CollUtil.isNotEmpty(updateTokenList)) {
             customTokenMapper.batchUpdateTokenHolder(updateTokenList);
-            log.info("更新token对应的持有人的数量{}", JSONUtil.toJsonStr(updateTokenList));
         }
         XxlJobHelper.log("更新token对应的持有人的数量完成");
     }

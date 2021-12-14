@@ -17,6 +17,7 @@ import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.utils.AddressUtil;
+import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -65,9 +66,10 @@ public class UpdateTokenQtyTask {
             Map<String, AddressErcQty> addressMap = new HashMap<>();
             PointLog erc20PointLog = pointLogMapper.selectByPrimaryKey(3);
             long oldErc20Position = Convert.toLong(erc20PointLog.getPosition());
-            XxlJobHelper.log("当前页数为[{}]，erc20断点为[{}]", pageSize, oldErc20Position);
+            TaskUtil.console("当前页数为[{}]，erc20断点为[{}]", pageSize, oldErc20Position);
             List<ErcTx> erc20List = getErcTxList(esErc20TxRepository, oldErc20Position, pageSize);
             if (CollUtil.isNotEmpty(erc20List)) {
+                TaskUtil.console("找到20交易[{}]条", erc20List.size());
                 Map<String, List<ErcTx>> erc20Map = erc20List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
                 //累计token的erc20交易数
                 for (Map.Entry<String, List<ErcTx>> entry : erc20Map.entrySet()) {
@@ -80,30 +82,31 @@ public class UpdateTokenQtyTask {
                     AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
                     if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo()) && !AddressUtil.isAddrZero(ercTx.getFrom())) {
                         fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
-                        log.info("该erc20交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
+                        TaskUtil.console("该erc20交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
                     } else {
                         if (!AddressUtil.isAddrZero(fromAddressErcQty.getAddress())) {
                             fromAddressErcQty.setErc20TxQty(fromAddressErcQty.getErc20TxQty() + 1);
                         } else {
-                            log.info("该erc20交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
+                            TaskUtil.console("该erc20交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
                         }
                         if (!AddressUtil.isAddrZero(toAddressErcQty.getAddress())) {
                             toAddressErcQty.setErc20TxQty(toAddressErcQty.getErc20TxQty() + 1);
                         } else {
-                            log.info("该erc20交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
+                            TaskUtil.console("该erc20交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
                         }
                     }
                 }
                 //记录最大的seq
                 erc20PointLog.setPosition(CollUtil.getLast(erc20List).getSeq().toString());
             } else {
-                XxlJobHelper.log("当前erc20断点[{}]未找到erc20交易", oldErc20Position);
+                TaskUtil.console("当前erc20断点[{}]未找到erc20交易", oldErc20Position);
             }
             PointLog erc721PointLog = pointLogMapper.selectByPrimaryKey(4);
             long oldErc721Position = Convert.toLong(erc721PointLog.getPosition());
-            XxlJobHelper.log("当前页码为[{}]，erc721断点为[{}]", pageSize, oldErc721Position);
+            TaskUtil.console("当前页码为[{}]，erc721断点为[{}]", pageSize, oldErc721Position);
             List<ErcTx> erc721List = getErcTxList(esErc721TxRepository, oldErc721Position, pageSize);
             if (CollUtil.isNotEmpty(erc721List)) {
+                TaskUtil.console("找到721交易[{}]条", erc721List.size());
                 Map<String, List<ErcTx>> erc721Map = erc721List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
                 //累计token的erc721交易数
                 for (Map.Entry<String, List<ErcTx>> entry : erc721Map.entrySet()) {
@@ -116,24 +119,24 @@ public class UpdateTokenQtyTask {
                     AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
                     if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo()) && !AddressUtil.isAddrZero(ercTx.getFrom())) {
                         fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
-                        log.info("该erc721交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
+                        TaskUtil.console("该erc721交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
                     } else {
                         if (!AddressUtil.isAddrZero(fromAddressErcQty.getAddress())) {
                             fromAddressErcQty.setErc721TxQty(fromAddressErcQty.getErc721TxQty() + 1);
                         } else {
-                            log.info("该erc721交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
+                            TaskUtil.console("该erc721交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
                         }
                         if (!AddressUtil.isAddrZero(toAddressErcQty.getAddress())) {
                             toAddressErcQty.setErc721TxQty(toAddressErcQty.getErc721TxQty() + 1);
                         } else {
-                            log.info("该erc721交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
+                            TaskUtil.console("该erc721交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
                         }
                     }
                 }
                 //记录最大的seq
                 erc721PointLog.setPosition(CollUtil.getLast(erc721List).getSeq().toString());
             } else {
-                XxlJobHelper.log("当前erc721断点[{}]未找到erc721交易", oldErc721Position);
+                TaskUtil.console("当前erc721断点[{}]未找到erc721交易", oldErc721Position);
             }
             if (CollUtil.isNotEmpty(tokenMap.values())) {
                 for (Map.Entry<String, TokenQty> entry : tokenMap.entrySet()) {
@@ -141,21 +144,20 @@ public class UpdateTokenQtyTask {
                 }
                 List<TokenQty> list = CollUtil.newArrayList(tokenMap.values());
                 customTokenMapper.batchUpdateTokenQty(list);
-                XxlJobHelper.log("更新token表的erc交易数，涉及的token数为[{}]，修改数据为{}", list.size(), JSONUtil.toJsonStr(list));
+                TaskUtil.console("更新token表的erc交易数，涉及的token数为[{}]，修改数据为{}", list.size(), JSONUtil.toJsonStr(list));
             }
             if (CollUtil.isNotEmpty(addressMap.values())) {
                 List<AddressErcQty> list = CollUtil.newArrayList(addressMap.values());
                 customAddressMapper.batchUpdateAddressErcQty(list);
-                XxlJobHelper.log("更新地址表的erc交易数，涉及的地址数为[{}]，修改数据为{}", list.size(), JSONUtil.toJsonStr(list));
+                TaskUtil.console("更新地址表的erc交易数，涉及的address数为[{}]，修改数据为{}", list.size(), JSONUtil.toJsonStr(list));
             }
             if (CollUtil.isNotEmpty(erc20List)) {
                 pointLogMapper.updateByPrimaryKeySelective(erc20PointLog);
-                XxlJobHelper.log("更新erc交易数，erc20断点为[{}]->[{}]", oldErc20Position, erc20PointLog.getPosition());
+                TaskUtil.console("更新erc交易数，erc20断点为[{}]->[{}]", oldErc20Position, erc20PointLog.getPosition());
             }
             if (CollUtil.isNotEmpty(erc721List)) {
                 pointLogMapper.updateByPrimaryKeySelective(erc721PointLog);
-                XxlJobHelper.log("更新erc交易数，erc721断点为[{}]->[{}]", oldErc721Position, erc721PointLog.getPosition());
-
+                TaskUtil.console("更新erc交易数，erc721断点为[{}]->[{}]", oldErc721Position, erc721PointLog.getPosition());
             }
             XxlJobHelper.handleSuccess("更新erc交易数成功");
         } catch (Exception e) {

@@ -1,6 +1,5 @@
 package com.platon.browser.cache;
 
-import com.platon.browser.bean.ComplementInfo;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.AddressTypeEnum;
@@ -95,27 +94,6 @@ public class AddressCache {
     }
 
     // 先初始化合约map，防止后续合约交易找不到对应的合约而统计错误
-    public void updateFirst(String addr, ComplementInfo ci) {
-        Address address = this.addressMap.get(addr);
-        if (address == null) {
-            address = this.createDefaultAddress(addr);
-            switch (ContractTypeEnum.getEnum(ci.getContractType())) {
-                case EVM:
-                    address.setType(AddressTypeEnum.EVM_CONTRACT.getCode());
-                    this.evmContractAddressCache.add(addr);
-                    break;
-                case WASM:
-                    address.setType(AddressTypeEnum.WASM_CONTRACT.getCode());
-                    this.wasmContractAddressCache.add(addr);
-                    break;
-                default:
-                    break;
-            }
-            this.addressMap.put(addr, address);
-        }
-    }
-
-    // 先初始化合约map，防止后续合约交易找不到对应的合约而统计错误
     public void updateFirst(String addr, ContractTypeEnum contractTypeEnum) {
         Address address = this.addressMap.get(addr);
         if (address == null) {
@@ -150,7 +128,7 @@ public class AddressCache {
         this.addressMap.clear();
     }
 
-    private void updateAddress(Transaction tx, String addr) {
+    public void updateAddress(Transaction tx, String addr) {
         if (addr == null) return;
         Address address = this.addressMap.get(addr);
         if (address == null) {
@@ -311,6 +289,17 @@ public class AddressCache {
     public Address getAddress(String address) {
         Address cache = this.addressMap.get(address);
         return cache;
+    }
+
+    /**
+     * 添加地址
+     *
+     * @param address:
+     * @return: void
+     * @date: 2021/12/14
+     */
+    public void addAddress(Address address) {
+        this.addressMap.put(address.getAddress(), address);
     }
 
 }

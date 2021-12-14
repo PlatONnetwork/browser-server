@@ -3,6 +3,7 @@ package com.platon.browser.utils;
 import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,26 +33,13 @@ public class CalculateUtils {
     /**
      * 计算可使用质押量
      *
-     * @param issueRates:
-     * @param chainConfig:
+     * @param networkStat:
      * @param incentivePoolAccountBalance:
      * @return: java.math.BigDecimal
-     * @date: 2021/11/25
+     * @date: 2021/12/14
      */
-    public static BigDecimal calculationAvailableValue(String issueRates, BlockChainConfig chainConfig, BigDecimal incentivePoolAccountBalance) {
-        //获取初始发行金额
-        BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
-        initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.KPVON);
-
-        //获取增发比例
-        //年份增发量 = (1+增发比例)的增发年份次方
-        BigDecimal circulationByYear = BigDecimal.ONE;
-        for (String rate : issueRates.split(Browser.HTTP_SPILT)) {
-            circulationByYear = circulationByYear.multiply(BigDecimal.ONE.add(new BigDecimal(rate)));
-        }
-        //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
-        // 发行量
-        return initIssueAmount.multiply(circulationByYear).subtract(incentivePoolAccountBalance);
+    public static BigDecimal calculationAvailableValue(NetworkStat networkStat, BigDecimal incentivePoolAccountBalance) {
+        return networkStat.getIssueValue().subtract(incentivePoolAccountBalance);
     }
 
     /**

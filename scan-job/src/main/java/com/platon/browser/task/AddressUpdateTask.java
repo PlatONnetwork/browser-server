@@ -20,6 +20,7 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -221,7 +222,7 @@ public class AddressUpdateTask {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
             long oldPosition = Convert.toLong(pointLog.getPosition());
-            XxlJobHelper.log("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
+            TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
             List<Transaction> transactionList = getTransactionList(oldPosition, pageSize);
             if (CollUtil.isNotEmpty(transactionList)) {
                 Map<String, AddressQty> map = new HashMap();
@@ -319,7 +320,7 @@ public class AddressUpdateTask {
                 customAddressMapper.batchUpdateAddressQty(list);
                 pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
-                XxlJobHelper.log("更新地址交易数，断点为[{}]->[{}]，更新地址数为[{}],修改数据为{}", oldPosition, pointLog.getPosition(), list.size(), JSONUtil.toJsonStr(list));
+                TaskUtil.console("更新地址交易数，断点为[{}]->[{}]，更新地址数为[{}],修改数据为{}", oldPosition, pointLog.getPosition(), list.size(), JSONUtil.toJsonStr(list));
             } else {
                 XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
             }

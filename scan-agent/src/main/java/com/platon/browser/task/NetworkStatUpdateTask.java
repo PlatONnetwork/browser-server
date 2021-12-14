@@ -150,7 +150,7 @@ public class NetworkStatUpdateTask {
             //计算流通量
             BigDecimal turnValue = getCirculationValue(networkStat);
             //计算可使用质押量
-            BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat.getIssueRates(), chainConfig, inciteBalance);
+            BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat, inciteBalance);
             //获得节点相关的网络统计
             NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
             //实时质押委托总数

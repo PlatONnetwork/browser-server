@@ -139,7 +139,4 @@
         </foreach>
     </update>
 
-    <insert id="batchInsert">
-
-    </insert>
 </mapper>

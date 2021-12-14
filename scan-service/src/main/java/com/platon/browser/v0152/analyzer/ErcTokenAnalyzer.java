@@ -9,11 +9,14 @@ import com.platon.browser.bean.ErcToken;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ErcTypeEnum;
+import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.bean.ErcTxInfo;
@@ -172,8 +175,32 @@ public class ErcTokenAnalyzer {
                                .contract(token.getAddress())
                                .build();
             txList.add(ercTx);
+            addAddressCache(event.getFrom(), event.getTo());
         });
         return txList;
+    }
+
+    /**
+     * 真实交易的from和to地址添加到缓存，然后入库
+     *
+     * @param from:
+     * @param to:
+     * @return: void
+     * @date: 2021/12/14
+     */
+    private void addAddressCache(String from, String to) {
+        Address fromAddress = addressCache.getAddress(from);
+        if (fromAddress == null && !AddressUtil.isAddrZero(from)) {
+            fromAddress = addressCache.createDefaultAddress(from);
+            fromAddress.setType(addressCache.getTypeData(from));
+            addressCache.addAddress(fromAddress);
+        }
+        Address toAddress = addressCache.getAddress(to);
+        if (toAddress == null && !AddressUtil.isAddrZero(to)) {
+            toAddress = addressCache.createDefaultAddress(to);
+            toAddress.setType(addressCache.getTypeData(to));
+            addressCache.addAddress(toAddress);
+        }
     }
 
     /**
