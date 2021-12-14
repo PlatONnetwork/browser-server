@@ -10,10 +10,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.Page;
-import com.platon.browser.bean.CustomTokenHolder;
-import com.platon.browser.bean.DestroyContract;
-import com.platon.browser.bean.Erc721ContractDestroyBalanceVO;
-import com.platon.browser.bean.TokenHolderCount;
+import com.platon.browser.bean.*;
 import com.platon.browser.bean.http.CustomHttpClient;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
@@ -26,6 +23,7 @@ import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.AddressTypeEnum;
+import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.service.elasticsearch.AbstractEsRepository;
 import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
 import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
@@ -35,13 +33,8 @@ import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
-import com.platon.browser.utils.CommonUtil;
-import com.platon.browser.v0152.bean.ErcToken;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -58,7 +51,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -357,7 +349,7 @@ public class ErcTokenUpdateTask {
         });
         if (!updateParams.isEmpty()) {
             // 批量更新总供应量有变动的记录
-            customTokenMapper.batchInsertOrUpdateSelective(new ArrayList<>(updateParams), Token.Column.values());
+            customTokenMapper.batchUpdateTokenTotalSupply(new ArrayList<>(updateParams));
             updateParams.forEach(token -> token.setDirty(false));
         }
         XxlJobHelper.log("全量更新token的总供应量成功");
@@ -849,7 +841,7 @@ public class ErcTokenUpdateTask {
             });
         }
         if (CollUtil.isNotEmpty(updateTokenList)) {
-            customTokenMapper.batchInsertOrUpdateSelective(updateTokenList, Token.Column.values());
+            customTokenMapper.batchUpdateTokenHolder(updateTokenList);
             log.info("更新token对应的持有人的数量{}", JSONUtil.toJsonStr(updateTokenList));
         }
         XxlJobHelper.log("更新token对应的持有人的数量完成");

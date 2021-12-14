@@ -2,12 +2,12 @@ package com.platon.browser.v0152.service;
 
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.crypto.Credentials;
 import com.platon.crypto.Keys;
 import com.platon.protocol.core.DefaultBlockParameter;

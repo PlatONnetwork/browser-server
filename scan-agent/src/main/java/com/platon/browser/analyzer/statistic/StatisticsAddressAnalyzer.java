@@ -7,6 +7,7 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,9 @@ public class StatisticsAddressAnalyzer {
     @Resource
     private AddressMapper addressMapper;
 
+    @Resource
+    private CustomAddressMapper customAddressMapper;
+
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
         log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",
@@ -47,8 +52,8 @@ public class StatisticsAddressAnalyzer {
         AddressExample condition = new AddressExample();
         condition.createCriteria().andAddressIn(addresses);
         List<Address> itemFromDb = addressMapper.selectByExampleWithBLOBs(condition);
-        // 初始化内置地址
-        if (CollUtil.isEmpty(itemFromDb)) {
+        // 0区块初始化内置地址
+        if (block.getNum().compareTo(0L) == 0 && CollUtil.isEmpty(itemFromDb)) {
             addressCache.getAll().forEach(address -> {
                 ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(address.getAddress());
                 if (contractTypeEnum != null) {
@@ -70,8 +75,9 @@ public class StatisticsAddressAnalyzer {
             });
             List<Address> list = CollUtil.newArrayList(addressCache.getAll());
             statisticBusinessMapper.addressChange(list);
-            log.info("初始化内置地址入库:{}", JSONUtil.toJsonStr(list));
-        } else {
+            log.info("初始化内置地址入库成功:{}", JSONUtil.toJsonStr(list));
+            return;
+        } else if (CollUtil.isNotEmpty(itemFromDb)) {
             // 查看交易列表中是否有bin属性为0x的交易,有则对to对应的合约地址进行设置
             event.getTransactions().forEach(tx -> {
                 // 如果tx的bin为0x，表明这笔交易是销毁合约交易或调用已销毁合约交易, to地址必定是合约地址
@@ -88,6 +94,10 @@ public class StatisticsAddressAnalyzer {
             });
             itemFromDb.forEach(address -> {
                 Address addCache = addressCache.getAddress(address.getAddress());
+                // 合约名称
+                String contractName = address.getContractName();
+                if (StringUtils.isBlank(contractName)) contractName = addCache.getContractName();
+                address.setContractName(contractName);
                 // 合约创建人，数据库的值优先
                 String contractCreate = address.getContractCreate();
                 if (StringUtils.isBlank(contractCreate)) contractCreate = addCache.getContractCreate();
@@ -104,15 +114,16 @@ public class StatisticsAddressAnalyzer {
                 String contractBin = address.getContractBin();
                 if (StringUtils.isBlank(contractBin)) contractBin = addCache.getContractBin();
                 address.setContractBin(contractBin);
-                // 合约名称
-                String contractName = address.getContractName();
-                if (StringUtils.isBlank(contractName)) contractName = addCache.getContractName();
-                address.setContractName(contractName);
             });
+            int i = customAddressMapper.batchUpdateAddressInfo(itemFromDb);
+            if (i > 0) {
+                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", i, JSONUtil.toJsonStr(itemFromDb));
+            }
         }
+        // 对比缓存和数据的数据，取出缓存中新增的地址
         List<String> dbList = itemFromDb.stream().map(Address::getAddress).collect(Collectors.toList());
-        // 新增的地址
         List<String> newAddressList = CollUtil.subtractToList(addresses, dbList);
+        List<Address> newAddrList = new ArrayList<>();
         if (CollUtil.isNotEmpty(newAddressList)) {
             addressCache.getAll().forEach(address -> {
                 ContractTypeEnum contractTypeEnum = TransactionAnalyzer.getGeneralContractAddressCache().get(address.getAddress());
@@ -134,12 +145,12 @@ public class StatisticsAddressAnalyzer {
                 }
             });
             newAddressList.forEach(address -> {
-                itemFromDb.add(addressCache.getAddress(address));
+                newAddrList.add(addressCache.getAddress(address));
             });
         }
-        if (CollUtil.isNotEmpty(itemFromDb)) {
-            statisticBusinessMapper.addressChange(itemFromDb);
-            log.info("更新或新增地址[{}]", JSONUtil.toJsonStr(itemFromDb));
+        if (CollUtil.isNotEmpty(newAddrList)) {
+            statisticBusinessMapper.addressChange(newAddrList);
+            log.info("新增地址成功{}", JSONUtil.toJsonStr(newAddrList));
         }
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }

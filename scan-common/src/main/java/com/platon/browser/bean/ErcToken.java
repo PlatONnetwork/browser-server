@@ -1,7 +1,7 @@
-package com.platon.browser.v0152.bean;
+package com.platon.browser.bean;
 
 import com.platon.browser.dao.entity.Token;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.platon.browser.enums.ErcTypeEnum;
 import lombok.Data;
 
 import java.util.Date;

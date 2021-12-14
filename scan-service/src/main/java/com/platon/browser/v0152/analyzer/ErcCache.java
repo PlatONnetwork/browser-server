@@ -1,10 +1,10 @@
 package com.platon.browser.v0152.analyzer;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
+import com.platon.browser.bean.ErcToken;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.TokenMapper;
-import com.platon.browser.v0152.bean.ErcToken;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.platon.browser.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,6 @@ public class ErcCache {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     public void init() {

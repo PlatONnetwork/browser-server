@@ -72,7 +72,7 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
+    public void test() throws Exception {
         CompletableFuture<PlatonBlock> blockCF = getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF = getReceiptAsync(7000L);
         BootstrapEvent bootstrapEvent = new BootstrapEvent();

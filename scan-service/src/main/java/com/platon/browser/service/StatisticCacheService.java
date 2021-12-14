@@ -7,7 +7,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
+import com.platon.browser.enums.ErcTypeEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;

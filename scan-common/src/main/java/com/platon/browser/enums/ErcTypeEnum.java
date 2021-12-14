@@ -1,4 +1,4 @@
-package com.platon.browser.v0152.enums;
+package com.platon.browser.enums;
 
 /**
  * @Auther: dongqile

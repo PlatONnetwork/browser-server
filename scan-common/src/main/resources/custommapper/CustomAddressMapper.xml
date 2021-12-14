@@ -114,4 +114,32 @@
         </foreach>
     </update>
 
+    <update id="batchUpdateAddressInfo">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE address t
+            SET
+            <if test="item.contractName!=null">
+                t.`contract_name` = #{item.contractName} ,
+            </if>
+            <if test="item.contractCreate!=null">
+                t.`contract_create` = #{item.contractCreate} ,
+            </if>
+            <if test="item.contractCreatehash!=null">
+                t.`contract_createHash` = #{item.contractCreatehash} ,
+            </if>
+            <if test="item.contractDestroyHash!=null">
+                t.`contract_destroy_hash` = #{item.contractDestroyHash} ,
+            </if>
+            <if test="item.contractBin!=null">
+                t.`contract_bin` = #{item.contractBin} ,
+            </if>
+            t.`type` = #{item.type}
+            WHERE
+            t.`address` = #{item.address}
+        </foreach>
+    </update>
+
+    <insert id="batchInsert">
+
+    </insert>
 </mapper>

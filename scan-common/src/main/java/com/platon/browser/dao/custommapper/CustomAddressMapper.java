@@ -4,6 +4,7 @@ import com.platon.browser.bean.AddressErcQty;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.bean.CustomAddressDetail;
 import com.platon.browser.bean.RecoveredDelegationAmount;
+import com.platon.browser.dao.entity.Address;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -54,5 +55,14 @@ public interface CustomAddressMapper {
      * @date: 2021/12/6
      */
     int batchUpdateAddressQty(@Param("list") List<AddressQty> list);
+
+    /**
+     * 批量更新地址信息
+     *
+     * @param list:
+     * @return: int
+     * @date: 2021/12/13
+     */
+    int batchUpdateAddressInfo(@Param("list") List<Address> list);
 
 }
