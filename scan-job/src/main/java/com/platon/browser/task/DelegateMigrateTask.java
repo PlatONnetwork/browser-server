@@ -32,6 +32,14 @@ public class DelegateMigrateTask {
     @Resource
     private EsDelegationService esDelegationService;
 
+    /**
+     * 委托表中的历史数据迁移至ES任务
+     * 每30秒执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/15
+     */
     @Transactional(rollbackFor = {Exception.class, Error.class})
     @XxlJob("delegateMigrateJobHandler")
     public void delegateMigrate() throws Exception {

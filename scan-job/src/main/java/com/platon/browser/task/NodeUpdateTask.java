@@ -49,6 +49,7 @@ public class NodeUpdateTask {
 
     /**
      * 节点表补充
+     * 每5秒执行一次
      *
      * @param :
      * @return: void

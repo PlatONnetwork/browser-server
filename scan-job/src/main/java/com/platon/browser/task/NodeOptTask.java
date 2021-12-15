@@ -34,6 +34,7 @@ public class NodeOptTask {
 
     /**
      * 节点操作备份表迁移到ES任务
+     * 每10分钟执行一次
      *
      * @param :
      * @return: void

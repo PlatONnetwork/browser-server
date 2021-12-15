@@ -69,6 +69,14 @@ public class NetworkStatUpdateTask {
     @Resource
     private CustomNOptBakMapper customNOptBakMapper;
 
+    /**
+     * 网络统计相关信息更新任务
+     * 每5秒执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/15
+     */
     @XxlJob("networkStatUpdateJobHandler")
     public void networkStatUpdate() {
         // 只有程序正常运行才执行任务
@@ -78,6 +86,7 @@ public class NetworkStatUpdateTask {
     /**
      * 更新交易统计数
      * 更新缓存，再由缓存更新到MySQL和Redis
+     * 每1分钟执行一次
      *
      * @param :
      * @return: void

@@ -155,7 +155,7 @@ public class ErcTokenUpdateTask {
 
     /**
      * 全量更新token持有者余额
-     * 每天00:00:00运行一次
+     * 每天00:00:00执行一次
      */
     @XxlJob("totalUpdateTokenHolderBalanceJobHandler")
     public void totalUpdateTokenHolderBalance() {
@@ -226,7 +226,7 @@ public class ErcTokenUpdateTask {
 
     /**
      * 全量更新token库存信息
-     * 每天凌晨1点更新
+     * 每天凌晨1点执行一次
      *
      * @param
      * @return void
@@ -246,7 +246,7 @@ public class ErcTokenUpdateTask {
 
     /**
      * 增量更新token库存信息
-     * 每1分钟更新
+     * 每1分钟执行一次
      *
      * @param
      * @return void
@@ -269,6 +269,7 @@ public class ErcTokenUpdateTask {
 
     /**
      * 销毁的721合约更新余额
+     * 每10分钟执行一次
      *
      * @param :
      * @return: void

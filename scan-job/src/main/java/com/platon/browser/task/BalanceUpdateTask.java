@@ -41,6 +41,7 @@ public class BalanceUpdateTask {
 
     /**
      * 更新基金会账户余额
+     * 每6分钟执行一次
      */
     @XxlJob("balanceUpdateJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
@@ -56,6 +57,7 @@ public class BalanceUpdateTask {
 
     /**
      * 更新内置合约账户余额
+     * 每10秒执行一次
      */
     @XxlJob("updateContractAccountJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})

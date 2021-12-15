@@ -74,6 +74,7 @@ public class AddressUpdateTask {
 
     /**
      * 地址表信息补充
+     * 每5秒执行一次
      *
      * @param :
      * @return: void
@@ -210,6 +211,7 @@ public class AddressUpdateTask {
 
     /**
      * 更新地址交易数
+     * 每30秒执行一次
      *
      * @param :
      * @return: void

@@ -52,6 +52,7 @@ public class UpdateTokenQtyTask {
 
     /**
      * 更新erc交易数
+     * 每5分钟执行一次
      *
      * @param :
      * @return: void

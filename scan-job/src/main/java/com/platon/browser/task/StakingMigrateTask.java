@@ -33,6 +33,14 @@ public class StakingMigrateTask {
     @Resource
     private CustomStakingHistoryMapper customStakingHistoryMapper;
 
+    /**
+     * 质押表中的历史数据迁移至数据库任务
+     * 每30秒执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/15
+     */
     @XxlJob("stakingMigrateJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     void stakingMigrate() {

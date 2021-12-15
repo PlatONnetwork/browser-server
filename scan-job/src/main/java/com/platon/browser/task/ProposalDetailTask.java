@@ -40,6 +40,7 @@ public class ProposalDetailTask {
      * 1.查询数据库未同步完成的提案信息
      * 2.根据proposalId查询keybase上信息
      * 3.查询到的信息更新并修改数据库
+     * 每15秒执行一次
      */
     @XxlJob("proposalDetailUpdateJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})

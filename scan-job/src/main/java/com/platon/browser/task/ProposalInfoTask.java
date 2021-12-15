@@ -46,6 +46,14 @@ public class ProposalInfoTask {
     @Resource
     private StatisticCacheService statisticCacheService;
 
+    /**
+     * 提案信息更新任务
+     * 每15秒执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/15
+     */
     @XxlJob("proposalInfoJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void proposalInfo() {
