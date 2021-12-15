@@ -94,7 +94,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
         event.setTransactions(new ArrayList<>(transactionList));
-        when(customTxBakMapper.batchInsertOrUpdateSelective(any(), any())).thenReturn(100);
+//        when(customTxBakMapper.batchInsertOrUpdateSelective(any(), any())).thenReturn(100);
         target.onEvent(event, 33, false);
         verify(target, times(1)).onEvent(any(), anyLong(), anyBoolean());
 

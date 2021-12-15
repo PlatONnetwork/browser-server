@@ -2,7 +2,6 @@ package com.platon.browser.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.AddressQty;
@@ -19,6 +18,7 @@ import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.task.bean.AddressStatistics;
+import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -227,102 +226,23 @@ public class AddressUpdateTask {
             TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
             List<Transaction> transactionList = getTransactionList(oldPosition, pageSize);
             if (CollUtil.isNotEmpty(transactionList)) {
-                Map<String, AddressQty> map = new HashMap();
+                Map<String, AddressQty> map = checkAddress(transactionList);
+                TaskUtil.console("更新前的数据为{}", JSONUtil.toJsonStr(map.values()));
                 transactionList.forEach(transaction -> {
-                    AddressQty from = getAddressQtyFromMap(map, transaction.getFrom());
-                    AddressQty to = getAddressQtyFromMap(map, transaction.getTo());
-                    from.setTxQty(from.getTxQty() + 1);
-                    to.setTxQty(to.getTxQty() + 1);
-                    switch (transaction.getTypeEnum()) {
-                        case TRANSFER:
-                            from.setTransferQty(from.getTransferQty() + 1);
-                            to.setTransferQty(to.getTransferQty() + 1);
-                            break;
-                        case EVM_CONTRACT_CREATE:
-                            break;
-                        case CONTRACT_EXEC:
-                            break;
-                        case WASM_CONTRACT_CREATE:
-                            break;
-                        case OTHERS:
-                            break;
-                        case MPC:
-                            break;
-                        case ERC20_CONTRACT_CREATE:
-                            break;
-                        case ERC20_CONTRACT_EXEC:
-                            break;
-                        case ERC721_CONTRACT_CREATE:
-                            break;
-                        case ERC721_CONTRACT_EXEC:
-                            break;
-                        case CONTRACT_EXEC_DESTROY:
-                            break;
-                        case STAKE_CREATE:
-                            from.setStakingQty(from.getStakingQty() + 1);
-                            to.setStakingQty(to.getStakingQty() + 1);
-                            break;
-                        case STAKE_MODIFY:
-                            from.setStakingQty(from.getStakingQty() + 1);
-                            to.setStakingQty(to.getStakingQty() + 1);
-                            break;
-                        case STAKE_INCREASE:
-                            from.setStakingQty(from.getStakingQty() + 1);
-                            to.setStakingQty(to.getStakingQty() + 1);
-                            break;
-                        case STAKE_EXIT:
-                            from.setStakingQty(from.getStakingQty() + 1);
-                            to.setStakingQty(to.getStakingQty() + 1);
-                            break;
-                        case DELEGATE_CREATE:
-                            from.setDelegateQty(from.getDelegateQty() + 1);
-                            to.setDelegateQty(to.getDelegateQty() + 1);
-                            break;
-                        case DELEGATE_EXIT:
-                            from.setDelegateQty(from.getDelegateQty() + 1);
-                            to.setDelegateQty(to.getDelegateQty() + 1);
-                            break;
-                        case PROPOSAL_TEXT:
-                            from.setProposalQty(from.getProposalQty() + 1);
-                            to.setProposalQty(to.getProposalQty() + 1);
-                            break;
-                        case PROPOSAL_UPGRADE:
-                            from.setProposalQty(from.getProposalQty() + 1);
-                            to.setProposalQty(to.getProposalQty() + 1);
-                            break;
-                        case PROPOSAL_PARAMETER:
-                            from.setProposalQty(from.getProposalQty() + 1);
-                            to.setProposalQty(to.getProposalQty() + 1);
-                            break;
-                        case PROPOSAL_VOTE:
-                            from.setProposalQty(from.getProposalQty() + 1);
-                            to.setProposalQty(to.getProposalQty() + 1);
-                            break;
-                        case VERSION_DECLARE:
-                            from.setProposalQty(from.getProposalQty() + 1);
-                            to.setProposalQty(to.getProposalQty() + 1);
-                            break;
-                        case PROPOSAL_CANCEL:
-                            from.setProposalQty(from.getProposalQty() + 1);
-                            to.setProposalQty(to.getProposalQty() + 1);
-                            break;
-                        case REPORT:
-                            break;
-                        case RESTRICTING_CREATE:
-                            break;
-                        case CLAIM_REWARDS:
-                            from.setDelegateQty(from.getDelegateQty() + 1);
-                            to.setDelegateQty(to.getDelegateQty() + 1);
-                            break;
-                        default:
-                            break;
+                    if (!AddressUtil.isAddrZero(transaction.getFrom())) {
+                        AddressQty from = map.get(transaction.getFrom());
+                        addQty(transaction.getTypeEnum(), from);
+                    }
+                    if (!AddressUtil.isAddrZero(transaction.getTo())) {
+                        AddressQty to = map.get(transaction.getTo());
+                        addQty(transaction.getTypeEnum(), to);
                     }
                 });
                 List<AddressQty> list = CollUtil.newArrayList(map.values());
                 customAddressMapper.batchUpdateAddressQty(list);
                 pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
-                TaskUtil.console("更新地址交易数，断点为[{}]->[{}]，更新地址数为[{}],修改数据为{}", oldPosition, pointLog.getPosition(), list.size(), JSONUtil.toJsonStr(list));
+                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新地址数为[{}],修改数据为{}", oldPosition, pointLog.getPosition(), list.size(), JSONUtil.toJsonStr(list));
             } else {
                 XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
             }
@@ -330,6 +250,126 @@ public class AddressUpdateTask {
             log.error("更新地址交易数异常", e);
             throw e;
         }
+    }
+
+    /**
+     * 地址增加交易数
+     *
+     * @param typeEnum:
+     * @param addressQty:
+     * @return: void
+     * @date: 2021/12/15
+     */
+    private void addQty(Transaction.TypeEnum typeEnum, AddressQty addressQty) {
+        addressQty.setTxQty(addressQty.getTxQty() + 1);
+        switch (typeEnum) {
+            case TRANSFER:
+                addressQty.setTransferQty(addressQty.getTransferQty() + 1);
+                break;
+            case EVM_CONTRACT_CREATE:
+                break;
+            case CONTRACT_EXEC:
+                break;
+            case WASM_CONTRACT_CREATE:
+                break;
+            case OTHERS:
+                break;
+            case MPC:
+                break;
+            case ERC20_CONTRACT_CREATE:
+                break;
+            case ERC20_CONTRACT_EXEC:
+                break;
+            case ERC721_CONTRACT_CREATE:
+                break;
+            case ERC721_CONTRACT_EXEC:
+                break;
+            case CONTRACT_EXEC_DESTROY:
+                break;
+            case STAKE_CREATE:
+                addressQty.setStakingQty(addressQty.getStakingQty() + 1);
+                break;
+            case STAKE_MODIFY:
+                addressQty.setStakingQty(addressQty.getStakingQty() + 1);
+                break;
+            case STAKE_INCREASE:
+                addressQty.setStakingQty(addressQty.getStakingQty() + 1);
+                break;
+            case STAKE_EXIT:
+                addressQty.setStakingQty(addressQty.getStakingQty() + 1);
+                break;
+            case DELEGATE_CREATE:
+                addressQty.setDelegateQty(addressQty.getDelegateQty() + 1);
+                break;
+            case DELEGATE_EXIT:
+                addressQty.setDelegateQty(addressQty.getDelegateQty() + 1);
+                break;
+            case PROPOSAL_TEXT:
+                addressQty.setProposalQty(addressQty.getProposalQty() + 1);
+                break;
+            case PROPOSAL_UPGRADE:
+                addressQty.setProposalQty(addressQty.getProposalQty() + 1);
+                break;
+            case PROPOSAL_PARAMETER:
+                addressQty.setProposalQty(addressQty.getProposalQty() + 1);
+                break;
+            case PROPOSAL_VOTE:
+                addressQty.setProposalQty(addressQty.getProposalQty() + 1);
+                break;
+            case VERSION_DECLARE:
+                addressQty.setProposalQty(addressQty.getProposalQty() + 1);
+                break;
+            case PROPOSAL_CANCEL:
+                addressQty.setProposalQty(addressQty.getProposalQty() + 1);
+                break;
+            case REPORT:
+                break;
+            case RESTRICTING_CREATE:
+                break;
+            case CLAIM_REWARDS:
+                addressQty.setDelegateQty(addressQty.getDelegateQty() + 1);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 校验地址
+     *
+     * @param transactionList:
+     * @return: java.util.Map<java.lang.String, com.platon.browser.bean.AddressQty>
+     * @date: 2021/12/15
+     */
+    private Map<String, AddressQty> checkAddress(List<Transaction> transactionList) throws Exception {
+        Set<String> addressSet = new HashSet<>();
+        Set<String> froms = transactionList.stream().map(Transaction::getFrom).filter(from -> !AddressUtil.isAddrZero(from)).collect(Collectors.toSet());
+        Set<String> tos = transactionList.stream().map(Transaction::getTo).filter(to -> !AddressUtil.isAddrZero(to)).collect(Collectors.toSet());
+        addressSet.addAll(froms);
+        addressSet.addAll(tos);
+        AddressExample example = new AddressExample();
+        example.createCriteria().andAddressIn(new ArrayList<>(addressSet));
+        List<Address> addressList = addressMapper.selectByExample(example);
+        if (addressList.size() != addressSet.size()) {
+            Set<String> address1 = addressList.stream().map(Address::getAddress).collect(Collectors.toSet());
+            String msg = StrUtil.format("交易解出来的地址在数据库查找不到，缺失的地址为{}", JSONUtil.toJsonStr(CollUtil.subtractToList(addressSet, address1)));
+            XxlJobHelper.log(msg);
+            log.error(msg);
+            throw new Exception("更新地址交易数异常");
+        }
+        Map<String, AddressQty> map = new HashMap();
+        addressList.forEach(address -> {
+            AddressQty addressQty = AddressQty.builder()
+                                              .address(address.getAddress())
+                                              .txQty(address.getTxQty())
+                                              .transferQty(address.getTransferQty())
+                                              .delegateQty(address.getDelegateQty())
+                                              .stakingQty(address.getStakingQty())
+                                              .proposalQty(address.getProposalQty())
+                                              .build();
+            map.put(address.getAddress(), addressQty);
+        });
+        return map;
     }
 
     private AddressQty getAddressQtyFromMap(Map<String, AddressQty> map, String address) {
