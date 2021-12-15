@@ -242,7 +242,8 @@ public class AddressUpdateTask {
                 customAddressMapper.batchUpdateAddressQty(list);
                 pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
-                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新地址数为[{}],修改数据为{}", oldPosition, pointLog.getPosition(), list.size(), JSONUtil.toJsonStr(list));
+                TaskUtil.console("更新后的数据为{}", JSONUtil.toJsonStr(map.values()));
+                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新地址数为[{}]", oldPosition, pointLog.getPosition(), list.size());
             } else {
                 XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
             }
