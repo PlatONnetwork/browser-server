@@ -2,23 +2,28 @@ package com.platon.browser.dao.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class TxBak {
+    private Long id;
+
     private String hash;
 
-    private Long id;
+    private Integer txType;
 
     private Long num;
 
+    private String fromAddress;
+
+    private String toAddress;
+
+    private String contractAddress;
+
+    private Date createTime;
+
+    private Date updateTime;
+
     private String info;
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash == null ? null : hash.trim();
-    }
 
     public Long getId() {
         return id;
@@ -28,12 +33,68 @@ public class TxBak {
         this.id = id;
     }
 
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash == null ? null : hash.trim();
+    }
+
+    public Integer getTxType() {
+        return txType;
+    }
+
+    public void setTxType(Integer txType) {
+        this.txType = txType;
+    }
+
     public Long getNum() {
         return num;
     }
 
     public void setNum(Long num) {
         this.num = num;
+    }
+
+    public String getFromAddress() {
+        return fromAddress;
+    }
+
+    public void setFromAddress(String fromAddress) {
+        this.fromAddress = fromAddress == null ? null : fromAddress.trim();
+    }
+
+    public String getToAddress() {
+        return toAddress;
+    }
+
+    public void setToAddress(String toAddress) {
+        this.toAddress = toAddress == null ? null : toAddress.trim();
+    }
+
+    public String getContractAddress() {
+        return contractAddress;
+    }
+
+    public void setContractAddress(String contractAddress) {
+        this.contractAddress = contractAddress == null ? null : contractAddress.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getInfo() {
@@ -52,9 +113,15 @@ public class TxBak {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        hash("hash", "hash", "VARCHAR", false),
         id("id", "id", "BIGINT", false),
+        hash("hash", "hash", "VARCHAR", false),
+        txType("tx_type", "txType", "INTEGER", false),
         num("num", "num", "BIGINT", false),
+        fromAddress("from_address", "fromAddress", "VARCHAR", false),
+        toAddress("to_address", "toAddress", "VARCHAR", false),
+        contractAddress("contract_address", "contractAddress", "VARCHAR", false),
+        createTime("create_time", "createTime", "TIMESTAMP", false),
+        updateTime("update_time", "updateTime", "TIMESTAMP", false),
         info("info", "info", "LONGVARCHAR", false);
 
         /**

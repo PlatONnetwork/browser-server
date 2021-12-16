@@ -10,7 +10,7 @@ public interface TxBakMapper {
 
     int deleteByExample(TxBakExample example);
 
-    int deleteByPrimaryKey(String hash);
+    int deleteByPrimaryKey(Long id);
 
     int insert(TxBak record);
 
@@ -20,7 +20,7 @@ public interface TxBakMapper {
 
     List<TxBak> selectByExample(TxBakExample example);
 
-    TxBak selectByPrimaryKey(String hash);
+    TxBak selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") TxBak record, @Param("example") TxBakExample example);
 

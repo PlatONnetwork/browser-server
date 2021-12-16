@@ -226,24 +226,38 @@ public class AddressUpdateTask {
             TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
             List<Transaction> transactionList = getTransactionList(oldPosition, pageSize);
             if (CollUtil.isNotEmpty(transactionList)) {
+                String minId = CollUtil.getFirst(transactionList).getId().toString();
+                String maxId = CollUtil.getLast(transactionList).getId().toString();
+                pointLog.setPosition(maxId);
+                TaskUtil.console("查找到交易数[{}],交易id为[{}-{}]", transactionList.size(), minId, maxId);
                 Map<String, AddressQty> map = checkAddress(transactionList);
                 TaskUtil.console("更新前的数据为{}", JSONUtil.toJsonStr(map.values()));
-                transactionList.forEach(transaction -> {
+                for (Transaction transaction : transactionList) {
+                    TaskUtil.console("交易{}", transaction.getHash());
+                    if ("lat12ve9py9hg5m2nfxelj06nq6frdgzft62zf64xt".equalsIgnoreCase(transaction.getFrom())) {
+                        TaskUtil.console("==={}", transaction.getHash());
+                    }
+                    if ("lat12ve9py9hg5m2nfxelj06nq6frdgzft62zf64xt".equalsIgnoreCase(transaction.getTo())) {
+                        TaskUtil.console("==={}", transaction.getHash());
+                    }
                     if (!AddressUtil.isAddrZero(transaction.getFrom())) {
                         AddressQty from = map.get(transaction.getFrom());
                         addQty(transaction.getTypeEnum(), from);
+                    } else {
+                        TaskUtil.console("交易[{}]from[{}]为零地址", transaction.getHash(), transaction.getFrom());
                     }
                     if (!AddressUtil.isAddrZero(transaction.getTo())) {
                         AddressQty to = map.get(transaction.getTo());
                         addQty(transaction.getTypeEnum(), to);
+                    } else {
+                        TaskUtil.console("交易[{}]to[{}]为零地址", transaction.getHash(), transaction.getTo());
                     }
-                });
+                }
                 List<AddressQty> list = CollUtil.newArrayList(map.values());
                 customAddressMapper.batchUpdateAddressQty(list);
-                pointLog.setPosition(CollUtil.getLast(transactionList).getId().toString());
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
                 TaskUtil.console("更新后的数据为{}", JSONUtil.toJsonStr(map.values()));
-                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新地址数为[{}]", oldPosition, pointLog.getPosition(), list.size());
+                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新的地址数为[{}]", oldPosition, pointLog.getPosition(), list.size());
             } else {
                 XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
             }
@@ -352,8 +366,10 @@ public class AddressUpdateTask {
         example.createCriteria().andAddressIn(new ArrayList<>(addressSet));
         List<Address> addressList = addressMapper.selectByExample(example);
         if (addressList.size() != addressSet.size()) {
+            // 逻辑上是地址先入库MySQL，交易再入ES，所以不会出现查找不到的问题
+            // 现实中因为入库线程异步的问题，极端情况下可能存在查找不到的问题
             Set<String> address1 = addressList.stream().map(Address::getAddress).collect(Collectors.toSet());
-            String msg = StrUtil.format("交易解出来的地址在数据库查找不到，缺失的地址为{}", JSONUtil.toJsonStr(CollUtil.subtractToList(addressSet, address1)));
+            String msg = StrUtil.format("es交易解出来的地址在数据库查找不到，缺失的地址为{}", JSONUtil.toJsonStr(CollUtil.subtractToList(addressSet, address1)));
             XxlJobHelper.log(msg);
             log.error(msg);
             throw new Exception("更新地址交易数异常");

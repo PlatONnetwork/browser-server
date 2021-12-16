@@ -3,20 +3,18 @@
 <mapper namespace="com.platon.browser.dao.custommapper.CustomTxBakMapper">
   <insert id="batchInsertOrUpdateSelective" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     replace into tx_bak (
-        `hash`,`num`,`info`
+        `hash`,`tx_type`,`num`,`info`,`from_address`,`to_address`,`contract_address`
     )
     values
     <foreach collection="list" item="item" separator=",">
       (
-      <if test="item.hash !=null">
-        #{item.hash,jdbcType=VARCHAR},
-      </if>
-      <if test="item.num !=null">
-        #{item.num,jdbcType=BIGINT},
-      </if>
-      <if test="item.info !=null">
-        #{item.info,jdbcType=LONGVARCHAR}
-      </if>
+      #{item.hash,jdbcType=VARCHAR},
+      #{item.type},
+      #{item.num,jdbcType=BIGINT},
+      #{item.info,jdbcType=LONGVARCHAR},
+      #{item.from},
+      #{item.to},
+      #{item.contractAddress}
       )
     </foreach>
   </insert>

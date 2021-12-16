@@ -2,9 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.TxBakMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TxBak">
-    <id column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="id" jdbcType="BIGINT" property="id" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="hash" jdbcType="VARCHAR" property="hash" />
+    <result column="tx_type" jdbcType="INTEGER" property="txType" />
     <result column="num" jdbcType="BIGINT" property="num" />
+    <result column="from_address" jdbcType="VARCHAR" property="fromAddress" />
+    <result column="to_address" jdbcType="VARCHAR" property="toAddress" />
+    <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxBak">
     <result column="info" jdbcType="LONGVARCHAR" property="info" />
@@ -68,7 +74,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, id, num
+    id, hash, tx_type, num, from_address, to_address, contract_address, create_time, 
+    update_time
   </sql>
   <sql id="Blob_Column_List">
     info
@@ -103,17 +110,17 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from tx_bak
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from tx_bak
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TxBakExample">
     delete from tx_bak
@@ -122,36 +129,76 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.TxBak">
-    insert into tx_bak (hash, id, num, 
+    insert into tx_bak (id, hash, tx_type, 
+      num, from_address, to_address, 
+      contract_address, create_time, update_time, 
       info)
-    values (#{hash,jdbcType=VARCHAR}, #{id,jdbcType=BIGINT}, #{num,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{txType,jdbcType=INTEGER}, 
+      #{num,jdbcType=BIGINT}, #{fromAddress,jdbcType=VARCHAR}, #{toAddress,jdbcType=VARCHAR}, 
+      #{contractAddress,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{info,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TxBak">
     insert into tx_bak
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="hash != null">
-        hash,
-      </if>
       <if test="id != null">
         id,
       </if>
+      <if test="hash != null">
+        hash,
+      </if>
+      <if test="txType != null">
+        tx_type,
+      </if>
       <if test="num != null">
         num,
+      </if>
+      <if test="fromAddress != null">
+        from_address,
+      </if>
+      <if test="toAddress != null">
+        to_address,
+      </if>
+      <if test="contractAddress != null">
+        contract_address,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
       </if>
       <if test="info != null">
         info,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="hash != null">
-        #{hash,jdbcType=VARCHAR},
-      </if>
       <if test="id != null">
         #{id,jdbcType=BIGINT},
       </if>
+      <if test="hash != null">
+        #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="txType != null">
+        #{txType,jdbcType=INTEGER},
+      </if>
       <if test="num != null">
         #{num,jdbcType=BIGINT},
+      </if>
+      <if test="fromAddress != null">
+        #{fromAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="toAddress != null">
+        #{toAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="contractAddress != null">
+        #{contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="info != null">
         #{info,jdbcType=LONGVARCHAR},
@@ -167,14 +214,32 @@
   <update id="updateByExampleSelective" parameterType="map">
     update tx_bak
     <set>
-      <if test="record.hash != null">
-        hash = #{record.hash,jdbcType=VARCHAR},
-      </if>
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
       </if>
+      <if test="record.hash != null">
+        hash = #{record.hash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.txType != null">
+        tx_type = #{record.txType,jdbcType=INTEGER},
+      </if>
       <if test="record.num != null">
         num = #{record.num,jdbcType=BIGINT},
+      </if>
+      <if test="record.fromAddress != null">
+        from_address = #{record.fromAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.toAddress != null">
+        to_address = #{record.toAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractAddress != null">
+        contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.info != null">
         info = #{record.info,jdbcType=LONGVARCHAR},
@@ -186,9 +251,15 @@
   </update>
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update tx_bak
-    set hash = #{record.hash,jdbcType=VARCHAR},
-      id = #{record.id,jdbcType=BIGINT},
+    set id = #{record.id,jdbcType=BIGINT},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      tx_type = #{record.txType,jdbcType=INTEGER},
       num = #{record.num,jdbcType=BIGINT},
+      from_address = #{record.fromAddress,jdbcType=VARCHAR},
+      to_address = #{record.toAddress,jdbcType=VARCHAR},
+      contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       info = #{record.info,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -196,9 +267,15 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update tx_bak
-    set hash = #{record.hash,jdbcType=VARCHAR},
-      id = #{record.id,jdbcType=BIGINT},
-      num = #{record.num,jdbcType=BIGINT}
+    set id = #{record.id,jdbcType=BIGINT},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      tx_type = #{record.txType,jdbcType=INTEGER},
+      num = #{record.num,jdbcType=BIGINT},
+      from_address = #{record.fromAddress,jdbcType=VARCHAR},
+      to_address = #{record.toAddress,jdbcType=VARCHAR},
+      contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -206,30 +283,60 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TxBak">
     update tx_bak
     <set>
-      <if test="id != null">
-        id = #{id,jdbcType=BIGINT},
+      <if test="hash != null">
+        hash = #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="txType != null">
+        tx_type = #{txType,jdbcType=INTEGER},
       </if>
       <if test="num != null">
         num = #{num,jdbcType=BIGINT},
+      </if>
+      <if test="fromAddress != null">
+        from_address = #{fromAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="toAddress != null">
+        to_address = #{toAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="contractAddress != null">
+        contract_address = #{contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="info != null">
         info = #{info,jdbcType=LONGVARCHAR},
       </if>
     </set>
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TxBak">
     update tx_bak
-    set id = #{id,jdbcType=BIGINT},
+    set hash = #{hash,jdbcType=VARCHAR},
+      tx_type = #{txType,jdbcType=INTEGER},
       num = #{num,jdbcType=BIGINT},
+      from_address = #{fromAddress,jdbcType=VARCHAR},
+      to_address = #{toAddress,jdbcType=VARCHAR},
+      contract_address = #{contractAddress,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
       info = #{info,jdbcType=LONGVARCHAR}
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TxBak">
     update tx_bak
-    set id = #{id,jdbcType=BIGINT},
-      num = #{num,jdbcType=BIGINT}
-    where hash = #{hash,jdbcType=VARCHAR}
+    set hash = #{hash,jdbcType=VARCHAR},
+      tx_type = #{txType,jdbcType=INTEGER},
+      num = #{num,jdbcType=BIGINT},
+      from_address = #{fromAddress,jdbcType=VARCHAR},
+      to_address = #{toAddress,jdbcType=VARCHAR},
+      contract_address = #{contractAddress,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -238,11 +345,14 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into tx_bak
-    (hash, id, num, info)
+    (id, hash, tx_type, num, from_address, to_address, contract_address, create_time, 
+      update_time, info)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.id,jdbcType=BIGINT}, #{item.num,jdbcType=BIGINT}, 
-        #{item.info,jdbcType=LONGVARCHAR})
+      (#{item.id,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.txType,jdbcType=INTEGER}, 
+        #{item.num,jdbcType=BIGINT}, #{item.fromAddress,jdbcType=VARCHAR}, #{item.toAddress,jdbcType=VARCHAR}, 
+        #{item.contractAddress,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.info,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -260,14 +370,32 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
-        <if test="'hash'.toString() == column.value">
-          #{item.hash,jdbcType=VARCHAR}
-        </if>
         <if test="'id'.toString() == column.value">
           #{item.id,jdbcType=BIGINT}
         </if>
+        <if test="'hash'.toString() == column.value">
+          #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'tx_type'.toString() == column.value">
+          #{item.txType,jdbcType=INTEGER}
+        </if>
         <if test="'num'.toString() == column.value">
           #{item.num,jdbcType=BIGINT}
+        </if>
+        <if test="'from_address'.toString() == column.value">
+          #{item.fromAddress,jdbcType=VARCHAR}
+        </if>
+        <if test="'to_address'.toString() == column.value">
+          #{item.toAddress,jdbcType=VARCHAR}
+        </if>
+        <if test="'contract_address'.toString() == column.value">
+          #{item.contractAddress,jdbcType=VARCHAR}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'info'.toString() == column.value">
           #{item.info,jdbcType=LONGVARCHAR}
@@ -276,4 +404,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

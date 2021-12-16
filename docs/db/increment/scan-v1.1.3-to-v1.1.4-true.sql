@@ -46,3 +46,48 @@ CREATE TABLE `slash` (
                               `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                               PRIMARY KEY (`id`)
 ) COMMENT='惩罚记录表';
+
+DROP TABLE IF EXISTS `tx_bak`;
+CREATE TABLE `tx_bak` (
+                          `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+                          `hash` varchar(72) NOT NULL COMMENT '交易Hash',
+                          `tx_type` int(10) NOT NULL COMMENT '交易类型',
+                          `num` bigint(20) NOT NULL COMMENT '区块号',
+                          `info` text COMMENT '交易信息',
+                          `from_address` varchar(42) NOT NULL COMMENT 'from地址',
+                          `to_address` varchar(42) NOT NULL COMMENT 'to地址',
+                          `contract_address` varchar(42) DEFAULT NULL COMMENT '合约地址',
+                          `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                          `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                          PRIMARY KEY (`id`),
+                          KEY `block_number` (`num`) USING BTREE,
+                          KEY `id` (`id`)
+) COMMENT='交易备份表';
+
+DROP TABLE IF EXISTS `tx_20_bak`;
+CREATE TABLE `tx_20_bak` (
+                             `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+                             `seq` bigint(20) NOT NULL COMMENT 'seq',
+                             `hash` varchar(72) NOT NULL COMMENT '交易hash',
+                             `contract_address` varchar(42) NOT NULL COMMENT '合约地址',
+                             `from_address` varchar(42) NOT NULL COMMENT 'from地址',
+                             `to_address` varchar(42) NOT NULL COMMENT 'to地址',
+                             `value` varchar(100) NOT NULL COMMENT '值',
+                             `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                             `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                             PRIMARY KEY (`id`) USING BTREE
+) COMMENT='erc20交易备份表';
+
+DROP TABLE IF EXISTS `tx_721_bak`;
+CREATE TABLE `tx_721_bak` (
+                             `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+                             `seq` bigint(20) NOT NULL COMMENT 'seq',
+                             `hash` varchar(72) NOT NULL COMMENT '交易hash',
+                             `contract_address` varchar(42) NOT NULL COMMENT '合约地址',
+                             `from_address` varchar(42) NOT NULL COMMENT 'from地址',
+                             `to_address` varchar(42) NOT NULL COMMENT 'to地址',
+                             `value` varchar(100) NOT NULL COMMENT '值',
+                             `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                             `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                             PRIMARY KEY (`id`) USING BTREE
+) COMMENT='erc721交易备份表';

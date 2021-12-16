@@ -10,9 +10,12 @@ import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
+import com.platon.browser.dao.custommapper.CustomTx20BakMapper;
+import com.platon.browser.dao.custommapper.CustomTx721BakMapper;
 import com.platon.browser.dao.custommapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.publisher.ComplementEventPublisher;
@@ -26,9 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -68,6 +69,12 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
     private TransactionAnalyzer transactionAnalyzer;
+
+    @Resource
+    private CustomTx20BakMapper customTx20BakMapper;
+
+    @Resource
+    private CustomTx721BakMapper customTx721BakMapper;
 
     /**
      * 重试次数
@@ -124,6 +131,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             if (CollUtil.isNotEmpty(transactions)) {
                 // 依赖于数据库的自增id
                 customTxBakMapper.batchInsertOrUpdateSelective(transactions);
+                addTxErc20Bak(transactions);
+                addTxErc721Bak(transactions);
             }
 
             // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不再由环形队列入库，不再删除操作日志表
@@ -192,6 +201,44 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         nodeCache.cleanNodeCache();
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
         nodeCache.init(nodeList);
+    }
+
+    /**
+     * erc20交易入库
+     *
+     * @param transactions:
+     * @return: void
+     * @date: 2021/12/16
+     */
+    private void addTxErc20Bak(List<Transaction> transactions) {
+        Set<ErcTx> erc20Set = new HashSet<>();
+        transactions.forEach(transaction -> {
+            if (CollUtil.isNotEmpty(transaction.getErc20TxList())) {
+                erc20Set.addAll(transaction.getErc20TxList());
+            }
+        });
+        if (CollUtil.isNotEmpty(erc20Set)) {
+            customTx20BakMapper.batchInsert(erc20Set);
+        }
+    }
+
+    /**
+     * erc721交易入库
+     *
+     * @param transactions:
+     * @return: void
+     * @date: 2021/12/16
+     */
+    private void addTxErc721Bak(List<Transaction> transactions) {
+        Set<ErcTx> erc721Set = new HashSet<>();
+        transactions.forEach(transaction -> {
+            if (CollUtil.isNotEmpty(transaction.getErc721TxList())) {
+                erc721Set.addAll(transaction.getErc721TxList());
+            }
+        });
+        if (CollUtil.isNotEmpty(erc721Set)) {
+            customTx721BakMapper.batchInsert(erc721Set);
+        }
     }
 
 }

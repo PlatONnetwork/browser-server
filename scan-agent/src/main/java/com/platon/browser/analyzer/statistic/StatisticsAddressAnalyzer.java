@@ -74,7 +74,7 @@ public class StatisticsAddressAnalyzer {
                 }
             });
             List<Address> list = CollUtil.newArrayList(addressCache.getAll());
-            statisticBusinessMapper.addressChange(list);
+            statisticBusinessMapper.batchInsert(list);
             log.info("初始化内置地址入库成功:{}", JSONUtil.toJsonStr(list));
             return;
         } else if (CollUtil.isNotEmpty(itemFromDb)) {
@@ -149,7 +149,7 @@ public class StatisticsAddressAnalyzer {
             });
         }
         if (CollUtil.isNotEmpty(newAddrList)) {
-            statisticBusinessMapper.addressChange(newAddrList);
+            statisticBusinessMapper.batchInsert(newAddrList);
             log.info("新增地址成功{}", JSONUtil.toJsonStr(newAddrList));
         }
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);

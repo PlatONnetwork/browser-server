@@ -22,6 +22,15 @@ public interface StatisticBusinessMapper {
     void addressChange(List<Address> list);
 
     /**
+     * 批量新增地址
+     *
+     * @param list:
+     * @return: int
+     * @date: 2021/12/15
+     */
+    int batchInsert(List<Address> list);
+
+    /**
      * 统计数据变更
      *
      * @param param

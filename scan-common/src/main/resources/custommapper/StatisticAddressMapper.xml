@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.StatisticBusinessMapper">
 
-	<update id="addressChange" parameterType="list">
+<update id="addressChange" parameterType="list">
     /*更新地址统计表: 以下相关字段的累加操作在Java代码中*/
     replace into `address` (
         `address`,
@@ -25,6 +25,28 @@
     )
     </foreach>
 </update>
+	<insert id="batchInsert" parameterType="list">
+		insert into `address` (
+		`address`,
+		`type`,
+		`contract_name`,
+		`contract_create`,
+		`contract_createHash`,
+		`contract_destroy_hash`,
+		`contract_bin`
+		) values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.address},
+			#{item.type},
+			#{item.contractName},
+			#{item.contractCreate},
+			#{item.contractCreatehash},
+			#{item.contractDestroyHash},
+			#{item.contractBin}
+			)
+		</foreach>
+	</insert>
 
 <select id="getAddressStatisticsFromStaking"  resultType="com.platon.browser.task.bean.AddressStatistics">
 	select
