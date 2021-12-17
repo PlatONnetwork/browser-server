@@ -42,7 +42,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="tx_721_bak" domainObjectName="Tx721Bak">
+        <table tableName="tx_erc_20_bak" domainObjectName="TxErc20Bak">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>

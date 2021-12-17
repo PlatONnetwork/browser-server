@@ -7,21 +7,16 @@ import com.platon.browser.bean.AddressErcQty;
 import com.platon.browser.bean.TokenQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
-import com.platon.browser.dao.entity.PointLog;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.PointLogMapper;
+import com.platon.browser.dao.mapper.TxErc20BakMapper;
+import com.platon.browser.dao.mapper.TxErc721BakMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.service.elasticsearch.AbstractEsRepository;
-import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
-import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +31,6 @@ import java.util.stream.Collectors;
 public class UpdateTokenQtyTask {
 
     @Resource
-    private EsErc20TxRepository esErc20TxRepository;
-
-    @Resource
-    private EsErc721TxRepository esErc721TxRepository;
-
-    @Resource
     private CustomTokenMapper customTokenMapper;
 
     @Resource
@@ -49,6 +38,12 @@ public class UpdateTokenQtyTask {
 
     @Resource
     private PointLogMapper pointLogMapper;
+
+    @Resource
+    private TxErc20BakMapper txErc20BakMapper;
+
+    @Resource
+    private TxErc721BakMapper txErc721BakMapper;
 
     /**
      * 更新erc交易数
@@ -68,7 +63,10 @@ public class UpdateTokenQtyTask {
             PointLog erc20PointLog = pointLogMapper.selectByPrimaryKey(3);
             long oldErc20Position = Convert.toLong(erc20PointLog.getPosition());
             TaskUtil.console("当前页数为[{}]，erc20断点为[{}]", pageSize, oldErc20Position);
-            List<ErcTx> erc20List = getErcTxList(esErc20TxRepository, oldErc20Position, pageSize);
+            TxErc20BakExample txErc20BakExample = new TxErc20BakExample();
+            txErc20BakExample.setOrderByClause("id");
+            txErc20BakExample.createCriteria().andIdGreaterThan(oldErc20Position).andIdLessThanOrEqualTo(oldErc20Position + pageSize);
+            List<TxErc20Bak> erc20List = txErc20BakMapper.selectByExample(txErc20BakExample);
             if (CollUtil.isNotEmpty(erc20List)) {
                 TaskUtil.console("找到20交易[{}]条", erc20List.size());
                 Map<String, List<ErcTx>> erc20Map = erc20List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
@@ -105,7 +103,10 @@ public class UpdateTokenQtyTask {
             PointLog erc721PointLog = pointLogMapper.selectByPrimaryKey(4);
             long oldErc721Position = Convert.toLong(erc721PointLog.getPosition());
             TaskUtil.console("当前页码为[{}]，erc721断点为[{}]", pageSize, oldErc721Position);
-            List<ErcTx> erc721List = getErcTxList(esErc721TxRepository, oldErc721Position, pageSize);
+            TxErc721BakExample txErc721BakExample = new TxErc721BakExample();
+            txErc721BakExample.setOrderByClause("id");
+            txErc721BakExample.createCriteria().andIdGreaterThan(oldErc721Position).andIdLessThanOrEqualTo(oldErc721Position + pageSize);
+            List<TxErc721Bak> erc721List = txErc721BakMapper.selectByExample(txErc721BakExample);
             if (CollUtil.isNotEmpty(erc721List)) {
                 TaskUtil.console("找到721交易[{}]条", erc721List.size());
                 Map<String, List<ErcTx>> erc721Map = erc721List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
@@ -200,32 +201,6 @@ public class UpdateTokenQtyTask {
             TokenQty tokenQty = TokenQty.builder().contract(contract).tokenTxQty(0).erc20TxQty(0).erc721TxQty(0).build();
             tokenMap.put(contract, tokenQty);
             return tokenQty;
-        }
-    }
-
-    /**
-     * 获取es信息
-     *
-     * @param abstractEsRepository:
-     * @param maxSeq:
-     * @param pageSize:
-     * @return: java.util.List<com.platon.browser.elasticsearch.dto.ErcTx>
-     * @date: 2021/12/6
-     */
-    private List<ErcTx> getErcTxList(AbstractEsRepository abstractEsRepository, long maxSeq, int pageSize) throws Exception {
-        try {
-            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-            constructor.setAsc("seq");
-            constructor.setResult(new String[]{"seq", "name", "contract", "hash", "from", "to", "value", "bn"});
-            ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
-            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("seq").gt(maxSeq));
-            constructor.must(esQueryBuilders);
-            constructor.setUnmappedType("long");
-            ESResult<ErcTx> queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, pageSize);
-            return queryResultFromES.getRsData();
-        } catch (Exception e) {
-            log.error("获取交易列表异常", e);
-            throw e;
         }
     }
 

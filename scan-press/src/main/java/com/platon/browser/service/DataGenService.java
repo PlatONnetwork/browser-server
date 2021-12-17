@@ -504,7 +504,6 @@ public class DataGenService {
         ercTx.setBTime(new Date());
         ercTx.setToType(tx.getToType());
         ercTx.setFromType(1);
-        ercTx.setRemark("");
         ercTx.setTxFee("9744300");
         return ercTx;
     }

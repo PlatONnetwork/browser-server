@@ -7,16 +7,11 @@ import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.entity.PointLog;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.PointLogMapper;
+import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.service.elasticsearch.EsTransactionRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
@@ -24,12 +19,10 @@ import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,13 +56,13 @@ public class AddressUpdateTask {
     private AddressMapper addressMapper;
 
     @Resource
-    private EsTransactionRepository esTransactionRepository;
-
-    @Resource
     private PointLogMapper pointLogMapper;
 
     @Resource
     private CustomAddressMapper customAddressMapper;
+
+    @Resource
+    private TxBakMapper txBakMapper;
 
     /**
      * 地址表信息补充
@@ -224,40 +217,33 @@ public class AddressUpdateTask {
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
             long oldPosition = Convert.toLong(pointLog.getPosition());
             TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
-            List<Transaction> transactionList = getTransactionList(oldPosition, pageSize);
+            List<TxBak> transactionList = getTransactionList(oldPosition, pageSize);
             if (CollUtil.isNotEmpty(transactionList)) {
                 String minId = CollUtil.getFirst(transactionList).getId().toString();
                 String maxId = CollUtil.getLast(transactionList).getId().toString();
                 pointLog.setPosition(maxId);
-                TaskUtil.console("查找到交易数[{}],交易id为[{}-{}]", transactionList.size(), minId, maxId);
+                TaskUtil.console("查找到[{}]条交易,交易id为[{}-{}]", transactionList.size(), minId, maxId);
                 Map<String, AddressQty> map = checkAddress(transactionList);
                 TaskUtil.console("更新前的数据为{}", JSONUtil.toJsonStr(map.values()));
-                for (Transaction transaction : transactionList) {
-                    TaskUtil.console("交易{}", transaction.getHash());
-                    if ("lat12ve9py9hg5m2nfxelj06nq6frdgzft62zf64xt".equalsIgnoreCase(transaction.getFrom())) {
-                        TaskUtil.console("==={}", transaction.getHash());
-                    }
-                    if ("lat12ve9py9hg5m2nfxelj06nq6frdgzft62zf64xt".equalsIgnoreCase(transaction.getTo())) {
-                        TaskUtil.console("==={}", transaction.getHash());
-                    }
-                    if (!AddressUtil.isAddrZero(transaction.getFrom())) {
-                        AddressQty from = map.get(transaction.getFrom());
-                        addQty(transaction.getTypeEnum(), from);
+                for (TxBak txBak : transactionList) {
+                    if (!AddressUtil.isAddrZero(txBak.getFromAddress())) {
+                        AddressQty from = map.get(txBak.getFromAddress());
+                        addQty(Transaction.TypeEnum.getEnum(txBak.getTxType()), from);
                     } else {
-                        TaskUtil.console("交易[{}]from[{}]为零地址", transaction.getHash(), transaction.getFrom());
+                        TaskUtil.console("交易[{}]from[{}]为零地址", txBak.getHash(), txBak.getFromAddress());
                     }
-                    if (!AddressUtil.isAddrZero(transaction.getTo())) {
-                        AddressQty to = map.get(transaction.getTo());
-                        addQty(transaction.getTypeEnum(), to);
+                    if (!AddressUtil.isAddrZero(txBak.getToAddress())) {
+                        AddressQty to = map.get(txBak.getToAddress());
+                        addQty(Transaction.TypeEnum.getEnum(txBak.getTxType()), to);
                     } else {
-                        TaskUtil.console("交易[{}]to[{}]为零地址", transaction.getHash(), transaction.getTo());
+                        TaskUtil.console("交易[{}]to[{}]为零地址", txBak.getHash(), txBak.getToAddress());
                     }
                 }
                 List<AddressQty> list = CollUtil.newArrayList(map.values());
                 customAddressMapper.batchUpdateAddressQty(list);
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
                 TaskUtil.console("更新后的数据为{}", JSONUtil.toJsonStr(map.values()));
-                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新的地址数为[{}]", oldPosition, pointLog.getPosition(), list.size());
+                TaskUtil.console("更新地址交易数，断点(交易id)为[{}]->[{}]，更新[{}]个地址", oldPosition, pointLog.getPosition(), list.size());
             } else {
                 XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
             }
@@ -356,20 +342,18 @@ public class AddressUpdateTask {
      * @return: java.util.Map<java.lang.String, com.platon.browser.bean.AddressQty>
      * @date: 2021/12/15
      */
-    private Map<String, AddressQty> checkAddress(List<Transaction> transactionList) throws Exception {
+    private Map<String, AddressQty> checkAddress(List<TxBak> transactionList) throws Exception {
         Set<String> addressSet = new HashSet<>();
-        Set<String> froms = transactionList.stream().map(Transaction::getFrom).filter(from -> !AddressUtil.isAddrZero(from)).collect(Collectors.toSet());
-        Set<String> tos = transactionList.stream().map(Transaction::getTo).filter(to -> !AddressUtil.isAddrZero(to)).collect(Collectors.toSet());
+        Set<String> froms = transactionList.stream().map(TxBak::getFromAddress).filter(from -> !AddressUtil.isAddrZero(from)).collect(Collectors.toSet());
+        Set<String> tos = transactionList.stream().map(TxBak::getToAddress).filter(to -> !AddressUtil.isAddrZero(to)).collect(Collectors.toSet());
         addressSet.addAll(froms);
         addressSet.addAll(tos);
         AddressExample example = new AddressExample();
         example.createCriteria().andAddressIn(new ArrayList<>(addressSet));
         List<Address> addressList = addressMapper.selectByExample(example);
         if (addressList.size() != addressSet.size()) {
-            // 逻辑上是地址先入库MySQL，交易再入ES，所以不会出现查找不到的问题
-            // 现实中因为入库线程异步的问题，极端情况下可能存在查找不到的问题
             Set<String> address1 = addressList.stream().map(Address::getAddress).collect(Collectors.toSet());
-            String msg = StrUtil.format("es交易解出来的地址在数据库查找不到，缺失的地址为{}", JSONUtil.toJsonStr(CollUtil.subtractToList(addressSet, address1)));
+            String msg = StrUtil.format("交易解出来的地址在数据库查找不到，缺失的地址为{}", JSONUtil.toJsonStr(CollUtil.subtractToList(addressSet, address1)));
             XxlJobHelper.log(msg);
             log.error(msg);
             throw new Exception("更新地址交易数异常");
@@ -389,19 +373,6 @@ public class AddressUpdateTask {
         return map;
     }
 
-    private AddressQty getAddressQtyFromMap(Map<String, AddressQty> map, String address) {
-        if (StrUtil.isBlank(address)) {
-            return null;
-        }
-        if (map.containsKey(address)) {
-            return map.get(address);
-        } else {
-            AddressQty addressQty = AddressQty.builder().address(address).txQty(0).transferQty(0).delegateQty(0).stakingQty(0).proposalQty(0).build();
-            map.put(address, addressQty);
-            return addressQty;
-        }
-    }
-
     /**
      * 获取交易列表
      *
@@ -410,17 +381,13 @@ public class AddressUpdateTask {
      * @return: java.util.List<com.platon.browser.elasticsearch.dto.Transaction>
      * @date: 2021/12/6
      */
-    private List<Transaction> getTransactionList(long maxId, int pageSize) throws IOException {
+    private List<TxBak> getTransactionList(long maxId, int pageSize) throws Exception {
         try {
-            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-            constructor.setAsc("id");
-            constructor.setResult(new String[]{"seq", "id", "num", "hash", "type", "from", "to", "contractAddress"});
-            ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
-            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("id").gt(maxId));
-            constructor.must(esQueryBuilders);
-            constructor.setUnmappedType("long");
-            ESResult<Transaction> queryResultFromES = esTransactionRepository.search(constructor, Transaction.class, 1, pageSize);
-            return queryResultFromES.getRsData();
+            TxBakExample example = new TxBakExample();
+            example.createCriteria().andIdGreaterThan(maxId).andIdLessThanOrEqualTo(maxId + pageSize);
+            example.setOrderByClause("id");
+            List<TxBak> list = txBakMapper.selectByExample(example);
+            return list;
         } catch (Exception e) {
             log.error("获取交易列表异常", e);
             throw e;
