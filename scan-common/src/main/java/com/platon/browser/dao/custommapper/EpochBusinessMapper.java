@@ -17,24 +17,24 @@ public interface EpochBusinessMapper {
     /**
      * 新结算周期
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void settle ( BusinessParam param);
     /**
      * 更新Gas估算周期数
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateGasEstimate (@Param("list") List<GasEstimate> estimateList);
 
     /**
      * 新选举周期数据变更（结算&共识周期往前推20个块）
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void slashNode (BusinessParam param);
 
     /**
      * 新共识周期数据变更
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void consensus(BusinessParam param);
     
     /**

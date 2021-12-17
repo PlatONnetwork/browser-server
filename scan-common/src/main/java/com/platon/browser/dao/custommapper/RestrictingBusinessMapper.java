@@ -9,11 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @Description:
  */
 public interface RestrictingBusinessMapper {
+
     /**
      * 创建锁仓计划
+     *
      * @param param
      */
-    @Transactional
-    void create ( BusinessParam param );
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    void create(BusinessParam param);
 
 }

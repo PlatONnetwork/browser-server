@@ -1,5 +1,6 @@
 package com.platon.browser.cache;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.bean.ConfigChange;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -69,44 +70,37 @@ public class NetworkStatCache {
     /**
      * 基于任务更新网络统计信息
      *
-     * @param issueValue
-     * @param turnValue
-     * @param totalValue
-     * @param stakingValue
-     * @param addressQty
-     * @param doingProposalQty
+     * @param turnValue:
+     * @param availableStaking:
+     * @param totalValue:
+     * @param stakingValue:
+     * @param addressQty:
+     * @param doingProposalQty:
+     * @return: void
+     * @date: 2021/11/24
      */
-    public void updateByTask(BigDecimal issueValue, BigDecimal turnValue, BigDecimal availableStaking,
-                             BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty,
-                             BigDecimal stakingReward) {
-        this.networkStat.setIssueValue(issueValue);
-        this.networkStat.setTurnValue(turnValue);
+    public void updateByTask(BigDecimal turnValue, BigDecimal availableStaking, BigDecimal totalValue, BigDecimal stakingValue, int addressQty, int doingProposalQty) {
+        if (ObjectUtil.isNotNull(turnValue) && turnValue.compareTo(BigDecimal.ZERO) > 0) {
+            this.networkStat.setTurnValue(turnValue);
+        }
         this.networkStat.setAvailableStaking(availableStaking);
         this.networkStat.setStakingDelegationValue(totalValue);
         this.networkStat.setStakingValue(stakingValue);
         this.networkStat.setAddressQty(addressQty);
         this.networkStat.setDoingProposalQty(doingProposalQty);
-        this.networkStat.setStakingReward(stakingReward);
     }
 
     /**
      * 基于增发或结算周期变更更新网络统计信息
      */
     public void updateByEpochChange(ConfigChange configChange) {
-        if (configChange.getBlockReward() != null)
-            this.networkStat.setBlockReward(configChange.getBlockReward());
-        if (configChange.getYearStartNum() != null)
-            this.networkStat.setAddIssueBegin(configChange.getYearStartNum().longValue());
-        if (configChange.getYearEndNum() != null)
-            this.networkStat.setAddIssueEnd(configChange.getYearEndNum().longValue());
-        if (configChange.getSettleStakeReward() != null)
-            this.networkStat.setSettleStakingReward(configChange.getSettleStakeReward());
-        if (configChange.getStakeReward() != null)
-            this.networkStat.setStakingReward(configChange.getStakeReward());
-        if (configChange.getAvgPackTime() != null)
-            this.networkStat.setAvgPackTime(configChange.getAvgPackTime().longValue());
-        if (StringUtils.isNotBlank(configChange.getIssueRates()))
-            this.networkStat.setIssueRates(configChange.getIssueRates());
+        if (configChange.getBlockReward() != null) this.networkStat.setBlockReward(configChange.getBlockReward());
+        if (configChange.getYearStartNum() != null) this.networkStat.setAddIssueBegin(configChange.getYearStartNum().longValue());
+        if (configChange.getYearEndNum() != null) this.networkStat.setAddIssueEnd(configChange.getYearEndNum().longValue());
+        if (configChange.getSettleStakeReward() != null) this.networkStat.setSettleStakingReward(configChange.getSettleStakeReward());
+        if (configChange.getStakeReward() != null) this.networkStat.setStakingReward(configChange.getStakeReward());
+        if (configChange.getAvgPackTime() != null) this.networkStat.setAvgPackTime(configChange.getAvgPackTime().longValue());
+        if (StringUtils.isNotBlank(configChange.getIssueRates())) this.networkStat.setIssueRates(configChange.getIssueRates());
     }
 
     /**
@@ -114,7 +108,6 @@ public class NetworkStatCache {
      *
      * @param networkStat
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     public void init(NetworkStat networkStat) {

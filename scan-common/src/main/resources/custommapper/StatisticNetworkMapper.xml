@@ -45,7 +45,8 @@
         `avg_pack_time`,
         `issue_rates`,
         `erc20_tx_qty`,
-        `erc721_tx_qty`
+        `erc721_tx_qty`,
+        `year_num`
     )
     values
     (
@@ -74,7 +75,8 @@
         #{avgPackTime},
         #{issueRates},
         #{erc20TxQty},
-        #{erc721TxQty}
+        #{erc721TxQty},
+        #{yearNum}
     )
     on duplicate
     key update
@@ -102,7 +104,8 @@
         `avg_pack_time` = #{avgPackTime},
         `issue_rates` = #{issueRates},
         `erc20_tx_qty` = #{erc20TxQty},
-        `erc721_tx_qty` = #{erc721TxQty}
+        `erc721_tx_qty` = #{erc721TxQty},
+        `year_num` = #{yearNum}
         ;
 </update>
 </mapper>

@@ -10,12 +10,12 @@ public interface StakingDelegateBalanceAdjustmentMapper {
     /**
      * 质押相关表调账
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void adjustStakingData(@Param("adjustParam") AdjustParam adjustParam);
 
     /**
      * 委托相关表调账
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void adjustDelegateData(@Param("adjustParam") AdjustParam adjustParam);
 }

@@ -1,27 +1,28 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.protocol.Web3j;
+import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.bean.HistoryLowRateSlash;
+import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.custommapper.StakeBusinessMapper;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Election;
-import com.platon.browser.bean.CustomStaking;
-import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexUtil;
+import com.platon.protocol.Web3j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,24 +78,26 @@ public class OnElectionAnalyzer {
                 List<String> slashNodeIdList = new ArrayList<>();
                 // 统一节点ID格式： 0x开头
                 slashList.forEach(n -> slashNodeIdList.add(HexUtil.prefix(n.getNodeId())));
-                log.info("低出块节点：{}", slashNodeIdList);
+                log.info("特殊节点查询出来的低出块节点：{}", slashNodeIdList);
                 // 查询节点
                 StakingExample stakingExample = new StakingExample();
                 List<Integer> status = new ArrayList<>();
                 status.add(StatusEnum.CANDIDATE.getCode()); //候选中
                 status.add(StatusEnum.EXITING.getCode()); //退出中
-                stakingExample.createCriteria()
-                        .andStatusIn(status)
-                        .andNodeIdIn(slashNodeIdList);
+                stakingExample.createCriteria().andStatusIn(status).andNodeIdIn(slashNodeIdList);
                 List<Staking> slashStakingList = stakingMapper.selectByExample(stakingExample);
-                if (slashStakingList.isEmpty()) {
-                    log.info("特殊节点查询到的低出块率节点[" + slashNodeIdList + "]在staking表中查询不到对应的候选中节点数据!");
+                if (slashStakingList.isEmpty() || slashStakingList.size() < slashNodeIdList.size()) {
+                    log.warn("特殊节点查询到的低出块率节点[" + JSONUtil.toJsonStr(slashNodeIdList) + "]在staking表中查询不到对应的候选中节点数据!");
                 } else {
                     //处罚低出块率的节点;
                     BigInteger curSettleEpoch = EpochUtil.getEpoch(BigInteger.valueOf(block.getNum()), chainConfig.getSettlePeriodBlockCount());
                     List<NodeOpt> exceptionNodeOpts = slash(event, block, curSettleEpoch.intValue(), slashStakingList);
                     nodeOpts.addAll(exceptionNodeOpts);
-                    log.debug("被处罚节点列表[" + slashStakingList + "]");
+                    log.info("块高[{}]结算周期[{}]共识周期[{}]被处罚节点列表为：{}",
+                             block.getNum(),
+                             event.getEpochMessage().getSettleEpochRound(),
+                             event.getEpochMessage().getConsensusEpochRound(),
+                             JSONUtil.toJsonStr(slashStakingList));
                 }
             }
         } catch (Exception e) {
@@ -121,11 +123,9 @@ public class OnElectionAnalyzer {
             staking.setZeroProduceFreezeDuration(zeroProduceFreezeDuration.intValue());
         });
         //惩罚节点
-        Election election = Election.builder()
-                .settingEpoch(settleEpoch)
-                .zeroProduceFreezeEpoch(settleEpoch) // 记录零出块被惩罚时所在结算周期
-                .zeroProduceFreezeDuration(zeroProduceFreezeDuration.intValue()) //记录此刻的零出块锁定周期数
-                .build();
+        Election election = Election.builder().settingEpoch(settleEpoch).zeroProduceFreezeEpoch(settleEpoch) // 记录零出块被惩罚时所在结算周期
+                                    .zeroProduceFreezeDuration(zeroProduceFreezeDuration.intValue()) //记录此刻的零出块锁定周期数
+                                    .build();
 
         //节点操作日志
         BigInteger bNum = BigInteger.valueOf(block.getNum());
@@ -146,8 +146,7 @@ public class OnElectionAnalyzer {
             /**
              * 如果低出块惩罚不等于0的时候，需要配置惩罚金额
              */
-            BigDecimal slashAmount = event.getEpochMessage().getBlockReward()
-                    .multiply(chainConfig.getSlashBlockRewardCount());
+            BigDecimal slashAmount = event.getEpochMessage().getBlockReward().multiply(chainConfig.getSlashBlockRewardCount());
             customStaking.setSlashAmount(slashAmount);
             desc.append(chainConfig.getSlashBlockRewardCount().toString()).append("|").append(slashAmount.toString()).append("|1");
             NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
@@ -178,6 +177,11 @@ public class OnElectionAnalyzer {
                     election.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
                     election.setUnStakeEndBlock(unStakeEndBlock);
                     exitingNodes.add(customStaking);
+                    log.info("块高[{}]结算周期[{}]共识周期[{}]，节点[{}]扣除处罚金额后【犹豫+锁定】质押金小于质押门槛，节点置为退出中",
+                             event.getBlock().getNum(),
+                             event.getEpochMessage().getSettleEpochRound(),
+                             event.getEpochMessage().getConsensusEpochRound(),
+                             customStaking.getNodeId());
                 } else {
                     customStaking.setStatus(StatusEnum.LOCKED.getCode());
                     // 锁定节点

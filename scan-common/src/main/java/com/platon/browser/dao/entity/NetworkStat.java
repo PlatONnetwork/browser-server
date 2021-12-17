@@ -23,8 +23,14 @@ public class NetworkStat {
 
     private Integer maxTps;
 
+    /**
+     * 发行量
+     */
     private BigDecimal issueValue;
 
+    /**
+     * 流通量
+     */
     private BigDecimal turnValue;
 
     private BigDecimal availableStaking;
@@ -68,6 +74,11 @@ public class NetworkStat {
      * 整个链的erc20交易数
      */
     private Integer erc20TxQty;
+
+    /**
+     * 年份
+     */
+    private Integer yearNum;
 
     private String issueRates;
 
@@ -295,6 +306,14 @@ public class NetworkStat {
         this.erc20TxQty = erc20TxQty;
     }
 
+    public Integer getYearNum() {
+        return yearNum;
+    }
+
+    public void setYearNum(Integer yearNum) {
+        this.yearNum = yearNum;
+    }
+
     public String getIssueRates() {
         return issueRates;
     }
@@ -339,6 +358,7 @@ public class NetworkStat {
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),
         erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
         erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
+        yearNum("year_num", "yearNum", "INTEGER", false),
         issueRates("issue_rates", "issueRates", "LONGVARCHAR", false);
 
         /**

@@ -132,8 +132,6 @@ public class ApiTestMockBase extends ApiTestData {
         when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatList.get(0));
         when(commonService.getIssueValue()).thenReturn(BigDecimal.valueOf(1));
         when(commonService.getCirculationValue()).thenReturn(BigDecimal.valueOf(1));
-        when(commonService.getStakingDenominator()).thenReturn(BigDecimal.valueOf(1));
-        when(commonService.getTotalStakingValue()).thenReturn(BigDecimal.valueOf(1));
     }
 
 }

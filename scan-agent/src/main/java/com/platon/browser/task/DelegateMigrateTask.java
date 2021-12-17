@@ -31,7 +31,7 @@ public class DelegateMigrateTask {
     @Resource
     private EsDelegationService esDelegationService;
 
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     @Scheduled(cron = "0/30  * * * * ?")
     public void delegateMigrate() {
         // 只有程序正常运行才执行任务

@@ -1,14 +1,12 @@
 package com.platon.browser.handler;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.TransactionAnalyzer;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.bean.Receipt;
-import com.platon.browser.bean.TxAnalyseResult;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
@@ -16,6 +14,7 @@ import com.platon.browser.dao.custommapper.CustomTxBakMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.publisher.ComplementEventPublisher;
@@ -90,7 +89,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      */
     private AtomicLong retryCount = new AtomicLong(0);
 
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
@@ -105,17 +104,19 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     }
 
     private void exec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
-        resetBlock(event);
+        // 确保event是原始副本，重试机制每一次使用的都是copyEvent
+        CollectionEvent copyEvent = copyCollectionEvent(event);
         // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 START
-        Map<String, Receipt> receiptMap = event.getBlock().getReceiptMap();
-        List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = event.getBlock().getOriginTransactions();
+        Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
+        List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
         for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
-            CollectionTransaction transaction = transactionAnalyzer.analyze(event.getBlock(), tr, receiptMap.get(tr.getHash()));
+            CollectionTransaction transaction = transactionAnalyzer.analyze(copyEvent.getBlock(), tr, receiptMap.get(tr.getHash()));
             // 把解析好的交易添加到当前区块的交易列表
-            event.getBlock().getTransactions().add(transaction);
+            copyEvent.getBlock().getTransactions().add(transaction);
+            copyEvent.getTransactions().add(transaction);
             // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
-            event.getBlock().setErc20TxQty(event.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
-            event.getBlock().setErc721TxQty(event.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
+            copyEvent.getBlock().setErc20TxQty(copyEvent.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
+            copyEvent.getBlock().setErc721TxQty(copyEvent.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
         }
         // 之前在BlockEventHandler中的交易分析逻辑挪至当前位置 END
 
@@ -123,7 +124,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         if (transactionId == 0) transactionId = networkStatCache.getNetworkStat().getTxQty();
 
         try {
-            List<Transaction> transactions = event.getTransactions();
+            List<Transaction> transactions = copyEvent.getTransactions();
             // 确保交易从小到大的索引顺序
             transactions.sort(Comparator.comparing(Transaction::getIndex));
             for (Transaction tx : transactions) {
@@ -131,11 +132,11 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             }
 
             // 根据区块号解析出业务参数
-            List<NodeOpt> nodeOpts1 = blockService.analyze(event);
+            List<NodeOpt> nodeOpts1 = blockService.analyze(copyEvent);
             // 根据交易解析出业务参数
-            TxAnalyseResult txAnalyseResult = pposService.analyze(event);
+            TxAnalyseResult txAnalyseResult = pposService.analyze(copyEvent);
             // 统计业务参数
-            statisticService.analyze(event);
+            statisticService.analyze(copyEvent);
             if (!txAnalyseResult.getNodeOptList().isEmpty()) nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
 
             txDeleteBatchCount++;
@@ -178,15 +179,16 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 });
                 customNOptBakMapper.batchInsertOrUpdateSelective(baks, NOptBak.Column.values());
             }
-            complementEventPublisher.publish(event.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
+
+            complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);
         } catch (Exception e) {
-            log.error(StrUtil.format("区块[{}]解析交易异常", event.getBlock().getNum()), e);
+            log.error(StrUtil.format("区块[{}]解析交易异常", copyEvent.getBlock().getNum()), e);
             throw e;
         } finally {
-            log.info("清除地址缓存[addressCache]数据[{}]条,addressCache:({})",
+            log.info("清除地址缓存[addressCache]数据[{}]条,addressCache:{}",
                      addressCache.getAll().size(),
                      JSONUtil.toJsonStr(addressCache.getAll().stream().map(Address::getAddress).collect(Collectors.toList())));
             // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
@@ -198,24 +200,36 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     }
 
     /**
-     * 避免重试机制会重复统计
+     * 模拟深拷贝
+     * 因为CollectionEvent引用了第三方的jar对象，没有实现系列化接口，没法做深拷贝
      *
      * @param event:
-     * @return: void
-     * @date: 2021/10/18
+     * @return: com.platon.browser.bean.CollectionEvent
+     * @date: 2021/11/22
      */
-    private void resetBlock(CollectionEvent event) {
-        if (CollUtil.isNotEmpty(event.getBlock().getTransactions())) {
-            event.getBlock().getTransactions().clear();
-        }
+    private CollectionEvent copyCollectionEvent(CollectionEvent event) {
+        CollectionEvent copyEvent = new CollectionEvent();
+        Block block = new Block();
+        BeanUtil.copyProperties(event.getBlock(), block);
+        copyEvent.setBlock(block);
+        copyEvent.getTransactions().addAll(event.getTransactions());
+        EpochMessage epochMessage = EpochMessage.newInstance();
+        BeanUtil.copyProperties(event.getEpochMessage(), epochMessage);
+        copyEvent.setEpochMessage(epochMessage);
+        copyEvent.setTraceId(event.getTraceId());
         if (retryCount.incrementAndGet() > 1) {
-            event.getBlock().setErc20TxQty(0).setErc721TxQty(0).setTxFee("0").setDQty(0).setPQty(0).setSQty(0).setTranQty(0).setTxQty(0);
             List<String> txHashList = CollUtil.newArrayList();
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.error("重试次数[{}],该区块[{}]交易列表{}重复处理，可能会引起数据重复统计，event对象数据为[{}]", retryCount.get(), event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList), JSONUtil.toJsonStr(event));
+            log.warn("重试次数[{}],该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
+                     retryCount.get(),
+                     event.getBlock().getNum(),
+                     JSONUtil.toJsonStr(txHashList),
+                     JSONUtil.toJsonStr(event),
+                     JSONUtil.toJsonStr(copyEvent));
         }
+        return copyEvent;
     }
 
 }

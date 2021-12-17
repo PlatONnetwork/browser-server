@@ -15,6 +15,6 @@ public interface CustomConfigMapper {
     /**
      * 配置值轮换：value旧值覆盖到stale_value，参数中的新值覆盖value
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void rotateConfig(@Param("list") List<Config> configList);
 }

@@ -94,7 +94,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                     blockNums = blockStage.stream().map(Block::getNum).sorted().collect(Collectors.toList());
                 }
                 // ES的id是用hash做key，重复入库会覆盖
-                // redis是上游做了去重，如果入库时重试，是没有实现去重机制的
                 log.error("相关区块[{}]的数据重复入库，可能引起数据重复入库，重试次数[{}]", JSONUtil.toJsonStr(blockNums), retryCount.get());
             }
 

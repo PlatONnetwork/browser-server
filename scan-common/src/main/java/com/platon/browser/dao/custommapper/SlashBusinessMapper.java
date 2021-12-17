@@ -17,19 +17,19 @@ public interface SlashBusinessMapper {
     /**
      * 双签举报
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void slashNode(BusinessParam param);
     /**
      * 新选举周期更新节点提取质押需要经过的周期数
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateUnStakeFreezeDuration (BusinessParam param);
 
     /**
      * 把节点标记为双签异常
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void setException(@Param("nodeId") String nodeId,@Param("stakingBlockNum") long blockNum);
 
     /**
