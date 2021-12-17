@@ -20,32 +20,17 @@ import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsNodeOptServiceTest extends AgentTestBase {
+
     @Mock
     private EsNodeOptRepository ESNodeOptRepository;
+
     @Spy
     private EsNodeOptService target;
 
     @Before
-    public void setup(){
+    public void setup() {
         ReflectionTestUtils.setField(target, "ESNodeOptRepository", ESNodeOptRepository);
     }
 
-    /**
-     * 根据区块号获取激励池余额
-     */
-    @Test(expected = Exception.class)
-    public void save() throws IOException {
-        target.save(Collections.emptySet());
-        Set<NodeOpt> data = new HashSet<>();
-        NodeOpt nodeOpt = new NodeOpt();
-        nodeOpt.setId(888L);
-        data.add(nodeOpt);
-        target.save(data);
 
-        data.clear();
-        data.add(new NodeOpt());
-        target.save(data);
-        doThrow(new RuntimeException("")).when(ESNodeOptRepository).bulkAddOrUpdate(anyMap());
-        target.save(data);
-    }
 }

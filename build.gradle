@@ -109,6 +109,7 @@ subprojects {
 
         // 复制配置文件
         task copyConf(type: Copy) {
+            from('src/main/resources/application-platon.yml')
             from('jasypt.properties')
             from('status.hook')
             from("build/libs/${packageName}.jar")
@@ -163,7 +164,7 @@ subprojects {
                     desFile.write(tpl.text
                             .replace('_PROJECT_NAME_', "scan-api")
                             .replace('_VERSION_', "$projectVersion")
-                            .replace('_PROFILE_', "dev")
+                            .replace('_PROFILE_', "platon")
                             .replace('_DB_HOST_', "$dbHost")
                             .replace('_DB_USER_', "$dbUser")
                             .replace('_DB_PASS_', "$dbPass")
@@ -175,7 +176,7 @@ subprojects {
                     desFile.write(tpl.text
                             .replace('_PROJECT_NAME_', "scan-agent")
                             .replace('_VERSION_', "$projectVersion")
-                            .replace('_PROFILE_', "dev")
+                            .replace('_PROFILE_', "platon")
                             .replace('_DB_HOST_', "$dbHost")
                             .replace('_DB_USER_', "$dbUser")
                             .replace('_DB_PASS_', "$dbPass")
