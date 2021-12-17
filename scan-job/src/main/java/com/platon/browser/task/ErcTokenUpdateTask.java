@@ -459,7 +459,7 @@ public class ErcTokenUpdateTask {
                 customTokenHolderMapper.batchUpdate(updateParams);
                 TaskUtil.console("更新[erc20] token holder的余额{}", JSONUtil.toJsonStr(updateParams));
             }
-            String newPosition = CollUtil.getLast(list).getSeq().toString();
+            String newPosition = CollUtil.getLast(list).getId().toString();
             pointLog.setPosition(newPosition);
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
             XxlJobHelper.log("更新[erc20] token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
@@ -549,7 +549,7 @@ public class ErcTokenUpdateTask {
                 customTokenHolderMapper.batchUpdate(updateParams);
                 TaskUtil.console("更新[erc721] token holder的余额{}", JSONUtil.toJsonStr(updateParams));
             }
-            String newPosition = CollUtil.getLast(list).getSeq().toString();
+            String newPosition = CollUtil.getLast(list).getId().toString();
             pointLog.setPosition(newPosition);
             pointLogMapper.updateByPrimaryKeySelective(pointLog);
             XxlJobHelper.log("更新[erc721] token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);

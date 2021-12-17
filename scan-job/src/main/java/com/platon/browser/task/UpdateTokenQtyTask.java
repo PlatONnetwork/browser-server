@@ -96,7 +96,7 @@ public class UpdateTokenQtyTask {
                     }
                 }
                 //记录最大的seq
-                erc20PointLog.setPosition(CollUtil.getLast(erc20List).getSeq().toString());
+                erc20PointLog.setPosition(CollUtil.getLast(erc20List).getId().toString());
             } else {
                 TaskUtil.console("当前erc20断点[{}]未找到erc20交易", oldErc20Position);
             }
@@ -136,7 +136,7 @@ public class UpdateTokenQtyTask {
                     }
                 }
                 //记录最大的seq
-                erc721PointLog.setPosition(CollUtil.getLast(erc721List).getSeq().toString());
+                erc721PointLog.setPosition(CollUtil.getLast(erc721List).getId().toString());
             } else {
                 TaskUtil.console("当前erc721断点[{}]未找到erc721交易", oldErc721Position);
             }
