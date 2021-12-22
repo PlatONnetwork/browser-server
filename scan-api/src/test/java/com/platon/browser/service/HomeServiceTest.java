@@ -1,7 +1,12 @@
 package com.platon.browser.service;
 
 
+import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.ApiTestMockBase;
+import com.platon.browser.bean.CountBalance;
+import com.platon.browser.bean.StakingBO;
+import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.BlockStatisticNewResp;
 import com.platon.browser.response.home.ChainStatisticNewResp;
@@ -11,12 +16,16 @@ import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -28,9 +37,13 @@ public class HomeServiceTest extends ApiTestMockBase {
     @Spy
     private HomeService target;
 
-    @Spy
-    private CommonService service;
+    @Mock
+    private CommonService commonService;
 
+    @Mock
+    private StatisticCacheService statisticCacheService;
+    @Mock
+    private CustomInternalAddressMapper customInternalAddressMapper;
     @Before
     public void setup() {
         ReflectionTestUtils.setField(target, "statisticCacheService", statisticCacheService);
@@ -42,6 +55,22 @@ public class HomeServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target, "commonService", commonService);
         ReflectionTestUtils.setField(target, "customNodeMapper", customNodeMapper);
         ReflectionTestUtils.setField(target, "networkParams", networkParams);
+        ReflectionTestUtils.setField(commonService, "customInternalAddressMapper", customInternalAddressMapper);
+        NetworkStat networkStatRedis = new NetworkStat();
+        networkStatRedis.setCurNumber(1000L);
+        networkStatRedis.setIssueValue(BigDecimal.valueOf(1000000L));
+        when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatRedis);
+        StakingBO bo = new StakingBO();
+        bo.setTotalStakingValue(BigDecimal.ONE);
+        bo.setStakingDenominator(BigDecimal.ONE);
+        when(commonService.getTotalStakingValueAndStakingDenominator(any())).thenReturn(bo);
+        CountBalance countBalance=new CountBalance();
+        List<CountBalance> list =new ArrayList<>();
+        countBalance.setType(1);
+        countBalance.setFree(BigDecimal.ONE);
+        countBalance.setLocked(BigDecimal.ONE);
+        list.add(countBalance );
+        when(customInternalAddressMapper.countBalance()).thenReturn(list);
     }
 
     @Test
@@ -97,7 +126,7 @@ public class HomeServiceTest extends ApiTestMockBase {
     public void testCommonService() throws IOException {
         //service.getNodeName("0x", "test");
         when(customNodeMapper.findNameById("0x")).thenReturn("test");
-        service.getNodeName("0x", "test");
+        commonService.getNodeName("0x", "test");
     }
 
 }

@@ -7,22 +7,22 @@ import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.custommapper.CustomDelegationMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomStakingMapper;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.request.staking.*;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.DelegationListByAddressResp;
 import com.platon.browser.response.staking.DelegationListByStakingResp;
 import com.platon.browser.response.staking.StakingStatisticNewResp;
+import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -68,6 +67,10 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
     @Mock
     private AddressMapper addressMapper;
 
+    @Mock
+    private NodeMapper nodeMapper;
+    @Mock
+    private StatisticCacheService statisticCacheService;
     @Before
     public void setup() {
         ReflectionTestUtils.setField(this.target, "statisticCacheService", this.statisticCacheService);
@@ -81,6 +84,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(this.target, "customNodeMapper", this.customNodeMapper);
         ReflectionTestUtils.setField(target, "commonService", commonService);
         ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
+        ReflectionTestUtils.setField(target, "nodeMapper", nodeMapper);
     }
 
     @Test
@@ -94,7 +98,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         this.target.historyStakingList(req);
         AliveStakingListReq aliveStakingListReq = new AliveStakingListReq();
         aliveStakingListReq.setQueryStatus("all");
-        this.target.aliveStakingList(aliveStakingListReq);
+//        this.target.aliveStakingList(aliveStakingListReq);
 
         LockedStakingListReq lockedStakingListReq = new LockedStakingListReq();
         lockedStakingListReq.setKey("test");
@@ -127,11 +131,12 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setJoinTime(new Date());
         staking.setDeleAnnualizedRate(120.00);
         staking.setBigVersion(1792);
+        staking.setProgramVersion(1792);
         when(nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
         Address address = new Address();
         address.setType(1);
         when(addressMapper.selectByPrimaryKey(any())).thenReturn(address);
-        NetworkStat networkStatRedis =new NetworkStat();
+        NetworkStat networkStatRedis = new NetworkStat();
         networkStatRedis.setCurNumber(1000L);
         networkStatRedis.setNodeId("sfadafw55");
         when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatRedis);
@@ -178,6 +183,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
 
     @Test
     public void testStakingStatisticNew() {
+        when(statisticCacheService.getNetworkStatCache()).thenReturn(null);
         when(this.customStakingMapper.selectCountByActive()).thenReturn(10);
         StakingStatisticNewResp resp = this.target.stakingStatisticNew();
         assertNotNull(resp);
@@ -185,6 +191,9 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
 
     @Test
     public void testDelegationListByStaking() {
+        Node node = new Node();
+        node.setStatDelegateValue(BigDecimal.ONE);
+        when(nodeMapper.selectByPrimaryKey(any())).thenReturn(node);
         DelegationListByStakingReq req = new DelegationListByStakingReq();
         Page<DelegationStaking> delegationStakingPage = new Page<DelegationStaking>();
         List<DelegationStaking> delegationStakings = new ArrayList<DelegationStaking>();

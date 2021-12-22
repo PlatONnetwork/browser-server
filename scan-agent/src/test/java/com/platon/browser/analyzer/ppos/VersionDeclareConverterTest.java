@@ -2,6 +2,7 @@ package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.CollectionTransaction;
+import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Resource;
 import java.math.BigInteger;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -30,6 +32,8 @@ public class VersionDeclareConverterTest extends AgentTestBase {
 
     @Mock
     private NodeCache nodeCache;
+    @Mock
+    private NetworkStatCache networkStatCache;
     @InjectMocks
     @Spy
     private VersionDeclareAnalyzer target;
@@ -42,6 +46,7 @@ public class VersionDeclareConverterTest extends AgentTestBase {
                 .stakingBlockNum(new BigInteger("88602"))
                 .build();
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
+        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
     }
 
     @Test

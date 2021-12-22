@@ -3,6 +3,7 @@ package com.platon.browser.analyzer.epoch;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -38,6 +40,8 @@ public class OnSettleAnalyzerTest extends AgentTestBase {
     private GasEstimateEventPublisher gasEstimateEventPublisher;
     @Mock
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
+    @Mock
+    private GasEstimateLogMapper gasEstimateLogMapper;
     @InjectMocks
     @Spy
     private OnSettleAnalyzer target;
