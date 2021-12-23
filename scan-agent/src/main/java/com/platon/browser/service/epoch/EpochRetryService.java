@@ -205,6 +205,7 @@ public class EpochRetryService {
             epochChanges.offer(configChange);
             applyConfigChange();
         } catch (Exception e) {
+            log.error("结算周期变更异常，即将重试", e);
             platOnClient.updateCurrentWeb3jWrapper();
             throw new BusinessException(e.getMessage());
         }
