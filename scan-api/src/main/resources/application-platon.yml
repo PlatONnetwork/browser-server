@@ -6,7 +6,7 @@ app:
 apollo:
   access-key:
     # 配置访问密钥
-    secret: 76a3bf9547824141ba04e07875340c8e
+    secret: 2b61c16f7d2542eb965a470ba543a216
   bootstrap:
     # 是否开启 Apollo
     enabled: true
@@ -18,7 +18,7 @@ apollo:
   # Apollo 配置中心地址，多个地址以逗号隔开
   # meta和env推荐使用VM参数指定 -Dapollo.configService=http://192.168.9.149:8080 -Denv=DEV
   # apollo.configService的优先级比apollo.meta高,configService会覆盖meta
-  meta: http://192.168.16.185:8080
+  meta: http://10.0.0.34:8080
   # 配置本地配置缓存目录
   cacheDir: ./apolloCache/data/
   property:
