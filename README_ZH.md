@@ -54,4 +54,15 @@ gradlew clean buildTar -x test -b scan-api/build.gradle
 MySQL 5.7  
 redis 4.0 
 elasticsearch 7.4 
+apollo 1.9.1
+xxljob 2.3.0
+```
+
+## 关于apollo启动
+
+```bash
+scan-agent,scan-api,scan-job
+1-apollo方式:application.yaml+application-platon.yml
+2-非apollo方式:application-apollo.yml
+以上两种配置方式选择一个即可
 ```
