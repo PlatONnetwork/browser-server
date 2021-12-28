@@ -42,7 +42,6 @@ def recursiveCopy(startDir, replaceDir) {
             recursiveCopy(conf.path, replaceDir)
         } else {
             def classPathFile = file(conf.path.replace(replaceDir, 'scan-api/build/resources/main/public'))
-            def gg = replaceDir
             def ss = conf.path.replace(replaceDir, 'scan-api/build/package/public')
             def packagePathFile = file(ss)
             def outPathFile = file(conf.path.replace(replaceDir, 'scan-api/build/distributions/public'))
@@ -110,7 +109,8 @@ subprojects {
         // 复制配置文件
         task copyConf(type: Copy) {
             from('src/main/resources/application-platon.yml')
-            from('jasypt.properties')
+            from('src/main/resources/application-apollo.yml')
+            from('../jasypt.properties')
             from('status.hook')
             from("build/libs/${packageName}.jar")
             into('build/package')

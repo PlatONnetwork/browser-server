@@ -14,6 +14,7 @@ def packageName = "${project.name}-${version}"
 // 复制配置文件
 task copyConf(type: Copy) {
     from('src/main/resources/application-platon.yml')
+    from('src/main/resources/application-platon.yml')
     from('release/start.sh')
     from('release/stop.sh')
     from('jasypt.properties')
@@ -60,6 +61,7 @@ task deployToTestEnv(dependsOn:['build'],group: 'deploy') {
             session(remotes.platonEnv) {
                 execute "mkdir -p $deployDir && rm -rf $deployDir/${project.name}*.jar"
                 put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
+                put from: "${projectDir}/src/main/resources/application-platon.yml", into: "$deployDir"
                 put from: "${projectDir}/src/main/resources/application-platon.yml", into: "$deployDir"
                 put from: "${projectDir}/release/start.sh", into: "$deployDir"
                 put from: "${projectDir}/release/stop.sh", into: "$deployDir"

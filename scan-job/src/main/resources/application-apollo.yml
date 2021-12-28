@@ -1,136 +1,27 @@
-#1.1.4配置已经迁移到apollo，以下为完整的配置模板，不想使用apollo，可使用以下配置即可
-spring:
-  application.name: scan-job
-  #数据源配置
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
-  #ES索引配置
-  elasticsearch:
-    high-level-client:
-      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
-      port: 9200
-      schema: http
-      username: elastic
-      password: changeme
-    index:
-      blockIndexName: ${platon.es-namespace}_block
-      transactionIndexName: ${platon.es-namespace}_transaction
-      delegationIndexName: ${platon.es-namespace}_delegation
-      nodeOptIndexName: ${platon.es-namespace}_nodeopt
-      delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
-      transferTxIndexName: ${platon.es-namespace}_transfer_tx
-      erc20TxIndexName: ${platon.es-namespace}_erc20_tx
-      erc721TxIndexName: ${platon.es-namespace}_erc721_tx
-# MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
-mybatis:
-  mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
-  # 实体类别名配置（注意：对应实体类的路径）
-  type-aliases-package: com.platon.browser.dao.entity
-# 当前激活的配置名称(请不要修改)
-profile: platon
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-#PlatOn相关配置
-platon:
-  # 地址HRP前缀
-  addressPrefix: lat
-  # 金额显示单位
-  valueUnit: LAT
-  # 交易输入参数并行解码线程数
-  txLogDecodeThreadNum: 200
-  # Web3j访问地址
-  web3j:
-    #HTTP或WS
-    protocol: WS
-    addresses: 192.168.120.151:7789,192.168.120.151:7790
-  # 质押节点统计年化率最多取多少个连续周期
-  maxSettlePeriodCount4AnnualizedRateStat: 4
-  #PlatON初始总发行量(ATP)
-  initIssueAmount: 10000000000
-  #每年固定增发比例
-  addIssueRate: 0.025
-  #每年增发分配给激励池的比例
-  incentiveRateFromIssue: 0.8
-  #每个共识轮中回退多少个块是选举下一轮验证人的时机
-  electionBackwardBlockCount: 20
-  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
-  foundationSubsidies: {
-    '1':62215742.00000000,
-    '2':55965742.00000000,
-    '3':49559492.00000000,
-    '4':42993086.00000000,
-    '5':36262520.00000000,
-    '6':29363689.00000000,
-    '7':22292388.00000000,
-    '8':15044304.00000000,
-    '9':7615018.00000000
-  }
-  # 初始内置节点默认质押金额(ATP)
-  defaultStakingLockedAmount: 150000
-  #区块最大Gas限制
-  maxBlockGasLimit: 201600000
-  #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
-  #提案pip_num参数模板
-  proposalPipNumTemplate: PIP-%s
-  #keysBase网址
-  keyBase: https://keybase.io/
-  #keyBase api
-  keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
-  #链id
-  chainId: 100
-  #同步时的索引查询分页参数配置
-  paging:
-    erc20-transaction:
-      pageSize: 2000
-      pageCount: 250
-  #Es索引命名空间
-  es-namespace: browser_${profile}
-task:
-  #允许更新的最大地址数量
-  maxAddressCount: 5004
-  #每次批量查询锁仓余额的最大数量
-  maxBatchSize: 100
-#日志配置
-logging:
-  #日志级别
-  level:
-    org.springframework: error
-    com.platon.browser.task: debug
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-  logback:
-    rollingpolicy:
-      # 日志文件大小上限，达到该上限后，会自动压缩
-      max-file-size: 200MB
-      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
-      file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
-      # 日志文件保存的天数
-      max-history: 90
-      # 是否在应用启动时进行归档管理
-      clean-history-on-start: true
-xxl:
-  job:
-    admin:
-      #调度中心部署跟地址
-      addresses: http://192.168.120.144:18080/xxl-job-admin
-    #调度中心通讯TOKEN
-    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
-    executor:
-      #执行器AppName
-      appname: scan-job
-      #执行器端口号
-      port: 9997
-      #执行器运行日志文件存储磁盘路径
-      logpath: ./logs/jobhandler
-      #执行器日志文件保存天数
-      logretentiondays: 90
+# 指定环境
+env: DEV
+app:
+  # 应用ID
+  id: platon-scan-job
+apollo:
+  access-key:
+    # 配置访问密钥
+    secret: fad4f421a3664922a1dd39112415f43c
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: true
+    eagerLoad:
+      # 开启后，Apollo的配置会先于logback的配置加载
+      enable: true
+      # 指定使用哪个 Namespace 的配置，默认 application
+    namespaces: application,platon
+  # Apollo 配置中心地址，多个地址以逗号隔开
+  # meta和env推荐使用VM参数指定 -Dapollo.configService=http://192.168.9.149:8080 -Denv=DEV
+  # apollo.configService的优先级比apollo.meta高,configService会覆盖meta
+  meta: http://10.0.0.34:8080
+  # 配置本地配置缓存目录
+  cacheDir: ./apolloCache/data/
+  property:
+    order:
+      # 设置内存中的配置项是否保持和页面上的顺序一致
+      enable: true
