@@ -61,7 +61,7 @@ xxljob 2.3.0
 
 ```bash
 scan-agent,scan-api,scan-job
-1-about apollo:application.yaml+application-apollo.yml
+1-about apollo:application-apollo.yml
 2-no apollo:application-platon.yml
 Choose one of the above two configuration methods
 ```
