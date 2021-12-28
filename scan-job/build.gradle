@@ -62,7 +62,7 @@ task deployToTestEnv(dependsOn:['build'],group: 'deploy') {
                 execute "mkdir -p $deployDir && rm -rf $deployDir/${project.name}*.jar"
                 put from: "${buildDir}/libs/${packageName}.jar", into: "$deployDir"
                 put from: "${projectDir}/src/main/resources/application-platon.yml", into: "$deployDir"
-                put from: "${projectDir}/src/main/resources/application-platon.yml", into: "$deployDir"
+                put from: "${projectDir}/src/main/resources/application-apollo.yml", into: "$deployDir"
                 put from: "${projectDir}/release/start.sh", into: "$deployDir"
                 put from: "${projectDir}/release/stop.sh", into: "$deployDir"
                 put from: "${projectDir}/jasypt.properties", into: "$deployDir"
