@@ -1,8 +1,6 @@
 #1.1.4配置已经迁移到apollo，以下为完整的配置模板，不想使用apollo，可使用以下配置即可
 #Spring应用配置
 spring:
-  profiles:
-    active: test
   application:
     name: scan-api
   session:
