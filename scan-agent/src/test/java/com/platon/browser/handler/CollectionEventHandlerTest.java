@@ -73,8 +73,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "txDeleteBatchCount", 100);
-        ReflectionTestUtils.setField(target, "optDeleteBatchCount", 100);
+
         NetworkStat networkStat = mock(NetworkStat.class);
         when(networkStatCache.getNetworkStat()).thenReturn(networkStat);
         when(networkStat.getTxQty()).thenReturn(1000);

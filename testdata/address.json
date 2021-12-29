@@ -19,12 +19,14 @@
     "delegate_released": 0,
     "contract_name": "staking",
     "contract_create": "system",
-    "contract_createHash": "",
+    "contract_createHash": "aaaaaa",
     "create_time": "2019-11-13 19:01:31",
     "update_time": "2019-11-13 19:01:31",
     "have_reward": 333,
     "erc721_tx_qty": 20,
-    "erc20_tx_qty": 10
+    "erc20_tx_qty": 10,
+    "contract_destroy_hash": "aaaaa",
+    "contract_bin": "aaa"
   },
   {
     "address": "lat1zqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq93t3hkm",
@@ -46,12 +48,14 @@
     "delegate_released": 0,
     "contract_name": "proposal",
     "contract_create": "system",
-    "contract_createHash": "",
+    "contract_createHash": "aaaaa",
     "create_time": "2019-11-13 19:01:25",
     "update_time": "2019-11-13 19:01:25",
     "have_reward": 333,
     "erc721_tx_qty": 20,
-    "erc20_tx_qty": 10
+    "erc20_tx_qty": 10,
+    "contract_destroy_hash": "aaaaa",
+    "contract_bin": "aaa"
   },
   {
     "address": "lat196278ns22j23awdfj9f2d4vz0pedld8anl5k3a",
@@ -71,14 +75,16 @@
     "delegate_hes": 0,
     "delegate_locked": 0,
     "delegate_released": 0,
-    "contract_name": "",
-    "contract_create": "",
-    "contract_createHash": "",
+    "contract_name": "aaaa",
+    "contract_create": "aaa",
+    "contract_createHash": "aaaa",
     "create_time": "2019-11-13 19:01:31",
     "update_time": "2019-11-13 19:01:35",
     "have_reward": 333,
     "erc721_tx_qty": 20,
-    "erc20_tx_qty": 10
+    "erc20_tx_qty": 10,
+    "contract_destroy_hash": "aaaaa",
+    "contract_bin": "aaa"
   },
   {
     "address": "lax1vr8v48qjjrh9dwvdfctqauz98a7yp5se77fm2e",
@@ -98,14 +104,16 @@
     "delegate_hes": 0,
     "delegate_locked": 65000000000000000000000,
     "delegate_released": 0,
-    "contract_name": "",
-    "contract_create": "",
-    "contract_createHash": "",
+    "contract_name": "aaa",
+    "contract_create": "aaa",
+    "contract_createHash": "aaaaaa",
     "create_time": "2019-11-13 19:00:08",
     "update_time": "2019-11-13 19:00:10",
     "have_reward": 333,
     "erc721_tx_qty": 20,
-    "erc20_tx_qty": 10
+    "erc20_tx_qty": 10,
+    "contract_destroy_hash": "aaaaa",
+    "contract_bin": "aaa"
   },
   {
     "address": "lat1w7uuzedjprdvfz2d420a74vw2k6n35zym805g4",
@@ -125,14 +133,16 @@
     "delegate_hes": 0,
     "delegate_locked": 0,
     "delegate_released": 0,
-    "contract_name": "",
-    "contract_create": "",
-    "contract_createHash": "",
+    "contract_name": "aaa",
+    "contract_create": "aaa",
+    "contract_createHash": "aaaaa",
     "create_time": "2019-11-13 19:01:25",
     "update_time": "2019-11-13 20:59:10",
     "have_reward": 333,
     "erc721_tx_qty": 20,
-    "erc20_tx_qty": 10
+    "erc20_tx_qty": 10,
+    "contract_destroy_hash": "aaaaa",
+    "contract_bin": "aaa"
   },
   {
     "address": "lat10np85x9huvu8rt85ekpws7wr4vjx9j4fypcxys",
@@ -152,13 +162,15 @@
     "delegate_hes": 0,
     "delegate_locked": 1000123456789000000000,
     "delegate_released": 0,
-    "contract_name": "",
-    "contract_create": "",
-    "contract_createHash": "",
+    "contract_name": "aaaa",
+    "contract_create": "aa",
+    "contract_createHash": "aaaaaaa",
     "create_time": "2019-11-13 19:01:31",
     "update_time": "2019-11-13 19:01:35",
     "have_reward": 333,
     "erc721_tx_qty": 20,
-    "erc20_tx_qty": 10
+    "erc20_tx_qty": 10,
+    "contract_destroy_hash": "aaaaa",
+    "contract_bin": "aaa"
   }
 ]

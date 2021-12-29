@@ -3,6 +3,7 @@ package com.platon.browser.analyzer.epoch;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
@@ -27,27 +28,36 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class OnSettleAnalyzerTest extends AgentTestBase {
-	
+
     @Mock
     private BlockChainConfig chainConfig;
+
     @Mock
     private EpochBusinessMapper epochBusinessMapper;
+
     @Mock
     private StakingMapper stakingMapper;
+
     @Mock
     private GasEstimateEventPublisher gasEstimateEventPublisher;
+
     @Mock
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
+
     @InjectMocks
     @Spy
     private OnSettleAnalyzer target;
 
+    @Mock
+    private GasEstimateLogMapper gasEstimateLogMapper;
+
     @Before
-    public void setup()throws Exception{
+    public void setup() throws Exception {
         when(chainConfig.getUnStakeRefundSettlePeriodCount()).thenReturn(blockChainConfig.getUnStakeRefundSettlePeriodCount());
         when(chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat()).thenReturn(blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat());
         when(chainConfig.getSettlePeriodCountPerIssue()).thenReturn(blockChainConfig.getSettlePeriodCountPerIssue());
-        when(stakingMapper.selectByExampleWithBLOBs(any())).thenReturn(new ArrayList <>(stakingList));
+        when(stakingMapper.selectByExampleWithBLOBs(any())).thenReturn(new ArrayList<>(stakingList));
+        when(gasEstimateLogMapper.deleteByPrimaryKey(any())).thenReturn(1);
     }
 
     @Test
@@ -63,7 +73,7 @@ public class OnSettleAnalyzerTest extends AgentTestBase {
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
-        target.analyze(collectionEvent,block);
+        target.analyze(collectionEvent, block);
     }
 
 

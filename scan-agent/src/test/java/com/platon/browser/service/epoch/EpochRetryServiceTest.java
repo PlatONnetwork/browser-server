@@ -106,20 +106,20 @@ public class EpochRetryServiceTest extends AgentTestBase {
         verify(target, times(1)).consensusChange(any(BigInteger.class));
     }
 
-    /**
-     * 测试结算周期变更
-     */
-    @Test
-    public void settlementEpochChange() throws Exception {
-        target.issueChange(BigInteger.valueOf(321));
-        target.settlementChange(BigInteger.valueOf(321));
-        BigDecimal stakeReward=chainConfig.getStakeRewardRate()
-                .multiply(BigDecimal.ONE)
-                .divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR)
-                .divide(BigDecimal.valueOf(curVerifiers.size()),0, RoundingMode.FLOOR);
-        //assertEquals(stakeReward.intValue(),target.getStakeReward().intValue());
-        verify(target, times(1)).settlementChange(any(BigInteger.class));
-    }
+//    /**
+//     * 测试结算周期变更
+//     */
+//    @Test
+//    public void settlementEpochChange() throws Exception {
+//        target.issueChange(BigInteger.valueOf(321));
+//        target.settlementChange(BigInteger.valueOf(321));
+//        BigDecimal stakeReward=chainConfig.getStakeRewardRate()
+//                .multiply(BigDecimal.ONE)
+//                .divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR)
+//                .divide(BigDecimal.valueOf(curVerifiers.size()),0, RoundingMode.FLOOR);
+//        //assertEquals(stakeReward.intValue(),target.getStakeReward().intValue());
+//        verify(target, times(1)).settlementChange(any(BigInteger.class));
+//    }
 
     /**
      * 测试取候选人列表

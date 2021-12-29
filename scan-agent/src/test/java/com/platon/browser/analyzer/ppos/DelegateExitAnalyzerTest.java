@@ -6,10 +6,13 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -23,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -71,7 +75,10 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
     @InjectMocks
     @Spy
     private DelegateExitAnalyzer target;
-
+    @Mock
+    private AddressMapper addressMapper;
+    @Mock
+    private CustomAddressMapper customAddressMapper;
     @Before
     public void setup() throws Exception {
         NodeItem nodeItem = NodeItem.builder()
@@ -83,7 +90,8 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
         when(this.stakingMapper.selectByPrimaryKey(any())).thenReturn(this.stakingList.get(0));
         this.blockChainConfig.getDelegateThreshold();
         when(this.chainConfig.getDelegateThreshold()).thenReturn(this.blockChainConfig.getDelegateThreshold());
-
+        Address addressInfo =new Address();
+        when(addressMapper.selectByPrimaryKey(any())).thenReturn(addressInfo);
     }
 
     @Test

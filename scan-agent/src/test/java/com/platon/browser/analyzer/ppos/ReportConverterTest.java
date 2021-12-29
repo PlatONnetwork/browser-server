@@ -7,6 +7,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.SlashBusinessMapper;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.ppos.StakeEpochService;
@@ -51,6 +52,9 @@ public class ReportConverterTest extends AgentTestBase {
     @Spy
     private ReportAnalyzer target;
 
+    @Mock
+    private SlashMapper slashMapper;
+
     @Before
     public void setup() throws Exception {
         NodeItem nodeItem = NodeItem.builder()
@@ -64,6 +68,7 @@ public class ReportConverterTest extends AgentTestBase {
         when(chainConfig.getDuplicateSignRewardRate()).thenReturn(blockChainConfig.getDuplicateSignRewardRate());
         when(stakeEpochService.getUnStakeEndBlock(anyString(), any(BigInteger.class), anyBoolean())).thenReturn(BigInteger.TEN);
         when(stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);
+        when(slashMapper.insert(any())).thenReturn(1);
     }
 
     @Test

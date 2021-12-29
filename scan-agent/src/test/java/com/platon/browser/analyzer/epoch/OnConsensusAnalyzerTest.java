@@ -7,7 +7,9 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.custommapper.SlashBusinessMapper;
+import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.ppos.Report;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -22,6 +24,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -58,6 +61,9 @@ public class OnConsensusAnalyzerTest extends AgentTestBase {
     @Spy
     private OnConsensusAnalyzer target;
 
+    @Mock
+    private SlashMapper slashMapper;
+
     @Before
     public void setup() throws Exception {
         when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(blockChainConfig.getConsensusPeriodBlockCount());
@@ -74,6 +80,8 @@ public class OnConsensusAnalyzerTest extends AgentTestBase {
         reportList.add(report);
         when(stakingMapper.selectByPrimaryKey(any())).thenReturn(data);
         when(chainConfig.getDuplicateSignSlashRate()).thenReturn(BigDecimal.TEN);
+        List<Slash> reportedNodeIdList =new ArrayList<>();
+        when(slashMapper.selectByExampleWithBLOBs(any())).thenReturn(reportedNodeIdList);
     }
 
     @Test
