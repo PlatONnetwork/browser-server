@@ -56,6 +56,14 @@ public class EpochRetryService {
     private SpecialApi specialApi;
 
     // 注意：以下所有属性在其所属周期内都是不变的，只有在各自周期变更时才更新各自的值
+    // ******* 增发周期相关属性 START *******
+    @Getter
+    private BigDecimal blockReward = BigDecimal.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
+
+    @Getter
+    private BigDecimal settleStakeReward = BigDecimal.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
+
+    // ******* 增发周期相关属性 END *******
     // ******* 共识周期相关属性 START *******
     @Getter
     private final List<Node> preValidators = new ArrayList<>(); // 前一共识周期验证人列表
@@ -76,6 +84,10 @@ public class EpochRetryService {
 
     @Getter
     private BigDecimal stakeReward = BigDecimal.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
+
+    @Getter
+    private BigDecimal preStakeReward = BigDecimal.ZERO; // 前一结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
+    // ******* 结算周期相关属性 END *******
 
     @Resource
     private NetworkStatCache networkStatCache;
@@ -191,6 +203,12 @@ public class EpochRetryService {
             BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getSettlePeriodBlockCount());
             // 从特殊接口获取
             EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
+            // 区块奖励
+            blockReward = epochInfo.getPackageReward();
+            // 当前增发周期内每个结算周期的质押奖励
+            settleStakeReward = epochInfo.getStakingReward();
+            // 前一结算周期质押奖励轮换
+            preStakeReward = stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = handleStakeReward(currentBlockNumber, preSettleEpochLastBlockNumber, currentEpoch, epochInfo.getCurStakingReward());
             ConfigChange configChange = new ConfigChange();
