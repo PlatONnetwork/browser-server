@@ -137,20 +137,24 @@ public class AddressCache {
         }
         switch (tx.getTypeEnum()) {
             case TRANSFER: // 转账交易
+                break;
             case STAKE_CREATE:// 创建验证人
             case STAKE_INCREASE:// 增加自有质押
             case STAKE_MODIFY:// 编辑验证人
             case STAKE_EXIT:// 退出验证人
             case REPORT:// 举报验证人
+                break;
             case DELEGATE_CREATE:// 发起委托
             case DELEGATE_EXIT:// 撤销委托
             case CLAIM_REWARDS:// 领取委托奖励
+                break;
             case PROPOSAL_TEXT:// 创建文本提案
             case PROPOSAL_UPGRADE:// 创建升级提案
             case PROPOSAL_PARAMETER:// 创建参数提案
             case PROPOSAL_VOTE:// 提案投票
             case PROPOSAL_CANCEL:// 取消提案
             case VERSION_DECLARE:// 版本声明
+                break;
             case EVM_CONTRACT_CREATE:
                 // 如果地址是EVM合约创建的回执里返回的合约地址
                 address.setContractCreatehash(tx.getHash());
