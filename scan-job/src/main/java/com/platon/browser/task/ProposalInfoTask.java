@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.bean.ProposalParticipantStat;
 import com.platon.browser.dao.custommapper.CustomProposalMapper;
@@ -8,9 +9,9 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.service.StatisticCacheService;
 import com.platon.browser.service.proposal.ProposalService;
 import com.platon.browser.utils.AppStatusUtil;
+import com.platon.browser.utils.TaskUtil;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -42,9 +43,6 @@ public class ProposalInfoTask {
 
     @Resource
     private NetworkStatMapper networkStatMapper;
-
-    @Resource
-    private StatisticCacheService statisticCacheService;
 
     /**
      * 提案信息更新任务
@@ -82,18 +80,23 @@ public class ProposalInfoTask {
         if (proposals.isEmpty()) return;
         for (Proposal proposal : proposals) {
             try {
-                NetworkStat networkStatCache = statisticCacheService.getNetworkStatCache();
+                List<NetworkStat> networkStat = networkStatMapper.selectByExample(null);
                 //发送rpc请求查询提案结果
-                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStatCache.getCurBlockHash());
+                ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStat.get(0).getCurBlockHash());
                 //设置参与人数
                 if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
+                    TaskUtil.console("当前块高[{}],提案结束块高[{}],提案投票[{}]的验证人总数[{}]->[{}]更新",
+                                     networkStat.get(0).getCurNumber(),
+                                     proposal.getEndVotingBlock(),
+                                     proposal.getHash(),
+                                     proposal.getAccuVerifiers(),
+                                     pps.getVoterCount());
                     // 有变更
                     proposal.setAccuVerifiers(pps.getVoterCount());
                 }
                 /**
                  * 当同步区块号小于结束区块且相应的取消提案未成功时候则跳过更新状态，防止追块时候提案提前结束造成数据错误
                  */
-                List<NetworkStat> networkStat = networkStatMapper.selectByExample(null);
                 ProposalExample pe = new ProposalExample();
                 proposalExample.createCriteria().andCanceledPipIdEqualTo(proposal.getHash());
                 proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.PASS.getCode());
@@ -106,12 +109,14 @@ public class ProposalInfoTask {
                     //设置状态
                     int status = tallyResult.getStatus();
                     if (status != proposal.getStatus()) {
+                        TaskUtil.console("提案投票[{}]状态[{}]->[{}]更新", proposal.getHash(), proposal.getStatus(), status);
                         // 有变更
                         proposal.setStatus(status);
                     }
                 }
             } catch (Exception e) {
-                log.error("提案投票信息更新出错:", e);
+                XxlJobHelper.log(StrUtil.format("提案投票信息[{}]更新出错:{}", proposal.getHash(), e.getMessage()));
+                log.error("提案投票信息更新出错", e);
             }
         }
         customProposalMapper.updateProposalInfoList(proposals);
