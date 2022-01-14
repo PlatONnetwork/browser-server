@@ -229,25 +229,23 @@ public class InitializationService {
 
         // 配置中的默认内置节点信息
         Map<String, CustomStaking> defaultStakingMap = new HashMap<>();
-        chainConfig.getDefaultStakingList()
-                .forEach(staking -> defaultStakingMap.put(staking.getNodeId(), staking));
+        chainConfig.getDefaultStakingList().forEach(staking -> defaultStakingMap.put(staking.getNodeId(), staking));
 
         List<Node> nodeList = epochRetryService.getPreVerifiers();
         for (int index = 0; index < nodeList.size(); index++) {
             Node v = nodeList.get(index);
             CustomStaking staking = new CustomStaking();
             staking.updateWithVerifier(v);
+            staking.setStakingTxIndex(index);
             staking.setStakingReductionEpoch(BigInteger.ONE.intValue()); // 提前设置验证轮数
             staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
             staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
             staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-            if (validatorSet.contains(v.getNodeId()))
-                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+            if (validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 
-            if (StringUtils.isBlank(staking.getNodeName()))
-                staking.setNodeName("platon.node." + (index + 1));
+            if (StringUtils.isBlank(staking.getNodeName())) staking.setNodeName("platon.node." + (index + 1));
 
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
             AnnualizedRateInfo ari = new AnnualizedRateInfo();
@@ -255,16 +253,16 @@ public class InitializationService {
             List<PeriodValueElement> stakeCosts = new ArrayList<>();
             stakeCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
             BigDecimal stakeCostVal = staking.getStakingLocked() // 锁定的质押金
-                    .add(staking.getStakingHes()) // 犹豫期的质押金
-                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
-                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
+                                             .add(staking.getStakingHes()) // 犹豫期的质押金
+                                             .add(staking.getStatDelegateHes()) // 犹豫期的委托金
+                                             .add(staking.getStatDelegateLocked()); // 锁定的委托金
             stakeCosts.add(new PeriodValueElement().setPeriod(1L).setValue(stakeCostVal));
             ari.setStakeCost(stakeCosts);
             // |- 委托的成本
             List<PeriodValueElement> delegateCosts = new ArrayList<>();
             delegateCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
             BigDecimal delegateCostVal = staking.getStatDelegateLocked() // 锁定的委托金
-                    .add(staking.getStatDelegateHes()); // 犹豫期的委托金
+                                                .add(staking.getStatDelegateHes()); // 犹豫期的委托金
             delegateCosts.add(new PeriodValueElement().setPeriod(1L).setValue(delegateCostVal));
             ari.setDelegateCost(delegateCosts);
 
@@ -280,8 +278,7 @@ public class InitializationService {
             staking.setTotalDeleReward(BigDecimal.ZERO);
             staking.setExceptionStatus(1);
 
-            BigInteger curSettleEpochRound =
-                    EpochUtil.getEpoch(BigInteger.ONE, chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
+            BigInteger curSettleEpochRound = EpochUtil.getEpoch(BigInteger.ONE, chainConfig.getSettlePeriodBlockCount()); // 当前块所处的结算周期轮数
             // 更新解质押到账需要经过的结算周期数
             BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();
             // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
@@ -295,6 +292,7 @@ public class InitializationService {
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();
             node.updateWithCustomStaking(staking);
+            node.setStakingTxIndex(index);
             node.setTotalValue(staking.getStakingLocked());
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
             node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
@@ -307,10 +305,8 @@ public class InitializationService {
 
         // 入库
         List<com.platon.browser.dao.entity.Node> returnData = new ArrayList<>(nodes);
-        if (!nodes.isEmpty())
-            nodeMapper.batchInsert(returnData);
-        if (!stakingList.isEmpty())
-            stakingMapper.batchInsert(new ArrayList<>(stakingList));
+        if (!nodes.isEmpty()) nodeMapper.batchInsert(returnData);
+        if (!stakingList.isEmpty()) stakingMapper.batchInsert(new ArrayList<>(stakingList));
         return returnData;
     }
 
