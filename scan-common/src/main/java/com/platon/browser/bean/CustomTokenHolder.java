@@ -2,7 +2,7 @@ package com.platon.browser.bean;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 public class CustomTokenHolder {
@@ -26,5 +26,7 @@ public class CustomTokenHolder {
     private Integer txCount;
 
     private String tokenId;
+
+    private Date createTime;
 
 }

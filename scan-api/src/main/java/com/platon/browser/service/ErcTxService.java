@@ -396,12 +396,10 @@ public class ErcTxService {
                 }
             });
         }
-        listResps.sort(new Comparator<QueryHolderTokenListResp>() {
-            @Override
-            public int compare(QueryHolderTokenListResp o1, QueryHolderTokenListResp o2) {
-                return o1.getIsContractDestroy() - o2.getIsContractDestroy();
-            }
-        });
+        listResps.sort(Comparator.comparing(QueryHolderTokenListResp::getIsContractDestroy)
+                                 .thenComparing(QueryHolderTokenListResp::getName)
+                                 .thenComparing(QueryHolderTokenListResp::getTxCount)
+                                 .thenComparing(QueryHolderTokenListResp::getCreateTime));
         result.init(ids, listResps);
         return result;
     }
