@@ -399,7 +399,7 @@ public class ErcTxService {
         listResps.sort(Comparator.comparing(QueryHolderTokenListResp::getIsContractDestroy)
                                  .thenComparing(QueryHolderTokenListResp::getName)
                                  .thenComparing(QueryHolderTokenListResp::getTxCount)
-                                 .thenComparing(QueryHolderTokenListResp::getCreateTime));
+                                 .thenComparing((o1, o2) -> cn.hutool.core.date.DateUtil.compare(o2.getCreateTime(), o1.getCreateTime())));
         result.init(ids, listResps);
         return result;
     }

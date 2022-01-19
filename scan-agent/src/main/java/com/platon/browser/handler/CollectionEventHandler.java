@@ -119,14 +119,10 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             List<NodeOpt> nodeOpts1 = blockService.analyze(copyEvent);
             // 根据交易解析出业务参数
             TxAnalyseResult txAnalyseResult = pposService.analyze(copyEvent);
-            // 统计业务参数
-            statisticService.analyze(copyEvent);
-
             // 汇总操作记录
             if (CollUtil.isNotEmpty(txAnalyseResult.getNodeOptList())) {
                 nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
             }
-
             // 交易入库mysql，因为缓存无法实现自增id，不再删除操作日志表
             if (CollUtil.isNotEmpty(transactions)) {
                 // 依赖于数据库的自增id
@@ -134,12 +130,13 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 addTxErc20Bak(transactions);
                 addTxErc721Bak(transactions);
             }
-
             // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不再由环形队列入库，不再删除操作日志表
             if (CollUtil.isNotEmpty(nodeOpts1)) {
                 // 依赖于数据库的自增id
                 customNOptBakMapper.batchInsertOrUpdateSelective(nodeOpts1);
             }
+            // 统计业务参数，以MySQL数据库块高为准，所以必须保证块高是最后入库
+            statisticService.analyze(copyEvent);
             complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
             // 释放对象引用
             event.releaseRef();

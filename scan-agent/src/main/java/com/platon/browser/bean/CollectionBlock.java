@@ -18,10 +18,19 @@ public class CollectionBlock extends Block {
     public static CollectionBlock newInstance() {
         CollectionBlock block = new CollectionBlock();
         Date date = new Date();
-        block.setCreTime(date).setUpdTime(date).setDQty(0).setPQty(0).setSQty(0).setTranQty(0).setTxQty(0)
-                .setReward(BigDecimal.ZERO.toString()).setGasLimit(BigDecimal.ZERO.toString())
-                .setGasUsed(BigDecimal.ZERO.toString()).setTxFee(BigDecimal.ZERO.toString()).setSize(0)
-                .setTxGasLimit(BigDecimal.ZERO.toString());
+        block.setCreTime(date)
+             .setUpdTime(date)
+             .setDQty(0)
+             .setPQty(0)
+             .setSQty(0)
+             .setTranQty(0)
+             .setTxQty(0)
+             .setReward(BigDecimal.ZERO.toString())
+             .setGasLimit(BigDecimal.ZERO.toString())
+             .setGasUsed(BigDecimal.ZERO.toString())
+             .setTxFee(BigDecimal.ZERO.toString())
+             .setSize(0)
+             .setTxGasLimit(BigDecimal.ZERO.toString());
         return block;
     }
 

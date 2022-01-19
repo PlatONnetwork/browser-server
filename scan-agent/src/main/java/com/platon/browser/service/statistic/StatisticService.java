@@ -68,11 +68,11 @@ public class StatisticService {
             }
             return;
         }
-        this.statisticsNetworkAnalyzer.analyze(event, block, epochMessage);
         // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行地址入库操作
-        if (!addressList.isEmpty()) {
+        if (CollUtil.isNotEmpty(addressList)) {
             this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
         }
+        this.statisticsNetworkAnalyzer.analyze(event, block, epochMessage);
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
 

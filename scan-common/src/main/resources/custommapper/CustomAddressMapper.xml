@@ -118,19 +118,19 @@
         <foreach collection="list" item="item" separator=";">
             UPDATE address t
             SET
-            <if test="item.contractName!=null">
+            <if test="item.contractName!=null and item.contractName!=''">
                 t.`contract_name` = #{item.contractName} ,
             </if>
-            <if test="item.contractCreate!=null">
+            <if test="item.contractCreate!=null and item.contractCreate!=''">
                 t.`contract_create` = #{item.contractCreate} ,
             </if>
-            <if test="item.contractCreatehash!=null">
+            <if test="item.contractCreatehash!=null and item.contractCreatehash!=''">
                 t.`contract_createHash` = #{item.contractCreatehash} ,
             </if>
-            <if test="item.contractDestroyHash!=null">
+            <if test="item.contractDestroyHash!=null and item.contractDestroyHash!=''">
                 t.`contract_destroy_hash` = #{item.contractDestroyHash} ,
             </if>
-            <if test="item.contractBin!=null">
+            <if test="item.contractBin!=null and item.contractBin!=''">
                 t.`contract_bin` = #{item.contractBin} ,
             </if>
             t.`type` = #{item.type}

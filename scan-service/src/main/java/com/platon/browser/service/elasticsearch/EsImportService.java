@@ -1,5 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.CommonUtil;
@@ -15,6 +16,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -45,14 +48,26 @@ public class EsImportService {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
+    /**
+     * 重试次数
+     */
+    private AtomicLong retryCount = new AtomicLong(0);
+
+    /**
+     * 是否需要重试
+     */
+    private AtomicBoolean isRetry = new AtomicBoolean(false);
+
     private <T> void submit(EsService<T> service, Set<T> data, CountDownLatch latch, ESKeyEnum eSKeyEnum, String traceId) {
         EXECUTOR.submit(() -> {
             try {
                 CommonUtil.putTraceId(traceId);
                 service.save(data);
                 statisticsLog(data, eSKeyEnum);
+                isRetry.set(false);
             } catch (IOException e) {
-                log.error("ES批量入库", e);
+                isRetry.set(true);
+                log.error(StrUtil.format("ES[{}]批量入库异常", eSKeyEnum.name()), e);
             } finally {
                 latch.countDown();
                 CommonUtil.removeTraceId();
@@ -82,6 +97,12 @@ public class EsImportService {
             submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx, CommonUtil.getTraceId());
             submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx, CommonUtil.getTraceId());
             latch.await();
+            if (isRetry.get()) {
+                LongSummaryStatistics blockSum = blocks.stream().collect(Collectors.summarizingLong(Block::getNum));
+                throw new Exception(StrUtil.format("ES相关区块[{}]-[{}]信息批量入库异常，重试[{}]次", blockSum.getMin(), blockSum.getMax(), retryCount.incrementAndGet()));
+            } else {
+                retryCount.set(0);
+            }
             log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
             log.error("入库ES异常", e);
