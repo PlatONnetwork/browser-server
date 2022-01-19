@@ -2,227 +2,96 @@ package com.platon.browser.dao.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
-public class TxBak {
-    private Long id;
+public class TxBakWithBLOBs extends TxBak {
+    private String input;
 
-    private String hash;
+    private String info;
 
-    private String bHash;
+    private String erc721TxInfo;
 
-    private Long num;
+    private String erc20TxInfo;
 
-    private Integer index;
+    private String transferTxInfo;
 
-    private Date time;
+    private String pposTxInfo;
 
-    private String nonce;
+    private String failReason;
 
-    private Integer status;
+    private String method;
 
-    private String gasPrice;
+    private String bin;
 
-    private String gasUsed;
-
-    private String gasLimit;
-
-    private String from;
-
-    private String to;
-
-    private String value;
-
-    private Integer type;
-
-    private String cost;
-
-    private Integer toType;
-
-    private Long seq;
-
-    private Date creTime;
-
-    private Date updTime;
-
-    private Integer contractType;
-
-    private String contractAddress;
-
-    public Long getId() {
-        return id;
+    public String getInput() {
+        return input;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setInput(String input) {
+        this.input = input == null ? null : input.trim();
     }
 
-    public String getHash() {
-        return hash;
+    public String getInfo() {
+        return info;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash == null ? null : hash.trim();
+    public void setInfo(String info) {
+        this.info = info == null ? null : info.trim();
     }
 
-    public String getbHash() {
-        return bHash;
+    public String getErc721TxInfo() {
+        return erc721TxInfo;
     }
 
-    public void setbHash(String bHash) {
-        this.bHash = bHash == null ? null : bHash.trim();
+    public void setErc721TxInfo(String erc721TxInfo) {
+        this.erc721TxInfo = erc721TxInfo == null ? null : erc721TxInfo.trim();
     }
 
-    public Long getNum() {
-        return num;
+    public String getErc20TxInfo() {
+        return erc20TxInfo;
     }
 
-    public void setNum(Long num) {
-        this.num = num;
+    public void setErc20TxInfo(String erc20TxInfo) {
+        this.erc20TxInfo = erc20TxInfo == null ? null : erc20TxInfo.trim();
     }
 
-    public Integer getIndex() {
-        return index;
+    public String getTransferTxInfo() {
+        return transferTxInfo;
     }
 
-    public void setIndex(Integer index) {
-        this.index = index;
+    public void setTransferTxInfo(String transferTxInfo) {
+        this.transferTxInfo = transferTxInfo == null ? null : transferTxInfo.trim();
     }
 
-    public Date getTime() {
-        return time;
+    public String getPposTxInfo() {
+        return pposTxInfo;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setPposTxInfo(String pposTxInfo) {
+        this.pposTxInfo = pposTxInfo == null ? null : pposTxInfo.trim();
     }
 
-    public String getNonce() {
-        return nonce;
+    public String getFailReason() {
+        return failReason;
     }
 
-    public void setNonce(String nonce) {
-        this.nonce = nonce == null ? null : nonce.trim();
+    public void setFailReason(String failReason) {
+        this.failReason = failReason == null ? null : failReason.trim();
     }
 
-    public Integer getStatus() {
-        return status;
+    public String getMethod() {
+        return method;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setMethod(String method) {
+        this.method = method == null ? null : method.trim();
     }
 
-    public String getGasPrice() {
-        return gasPrice;
+    public String getBin() {
+        return bin;
     }
 
-    public void setGasPrice(String gasPrice) {
-        this.gasPrice = gasPrice == null ? null : gasPrice.trim();
-    }
-
-    public String getGasUsed() {
-        return gasUsed;
-    }
-
-    public void setGasUsed(String gasUsed) {
-        this.gasUsed = gasUsed == null ? null : gasUsed.trim();
-    }
-
-    public String getGasLimit() {
-        return gasLimit;
-    }
-
-    public void setGasLimit(String gasLimit) {
-        this.gasLimit = gasLimit == null ? null : gasLimit.trim();
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from == null ? null : from.trim();
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to == null ? null : to.trim();
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value == null ? null : value.trim();
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public String getCost() {
-        return cost;
-    }
-
-    public void setCost(String cost) {
-        this.cost = cost == null ? null : cost.trim();
-    }
-
-    public Integer getToType() {
-        return toType;
-    }
-
-    public void setToType(Integer toType) {
-        this.toType = toType;
-    }
-
-    public Long getSeq() {
-        return seq;
-    }
-
-    public void setSeq(Long seq) {
-        this.seq = seq;
-    }
-
-    public Date getCreTime() {
-        return creTime;
-    }
-
-    public void setCreTime(Date creTime) {
-        this.creTime = creTime;
-    }
-
-    public Date getUpdTime() {
-        return updTime;
-    }
-
-    public void setUpdTime(Date updTime) {
-        this.updTime = updTime;
-    }
-
-    public Integer getContractType() {
-        return contractType;
-    }
-
-    public void setContractType(Integer contractType) {
-        this.contractType = contractType;
-    }
-
-    public String getContractAddress() {
-        return contractAddress;
-    }
-
-    public void setContractAddress(String contractAddress) {
-        this.contractAddress = contractAddress == null ? null : contractAddress.trim();
+    public void setBin(String bin) {
+        this.bin = bin == null ? null : bin.trim();
     }
 
     /**

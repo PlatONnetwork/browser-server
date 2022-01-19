@@ -18,6 +18,9 @@
     <result column="b_time" jdbcType="TIMESTAMP" property="bTime" />
     <result column="tx_fee" jdbcType="VARCHAR" property="txFee" />
   </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxErc20Bak">
+    <result column="remark" jdbcType="LONGVARCHAR" property="remark" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -80,6 +83,25 @@
     id, seq, `name`, symbol, `decimal`, contract, hash, `from`, from_type, `to`, to_type, 
     `value`, bn, b_time, tx_fee
   </sql>
+  <sql id="Blob_Column_List">
+    remark
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TxErc20BakExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tx_erc_20_bak
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TxErc20BakExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -94,9 +116,11 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from tx_erc_20_bak
     where id = #{id,jdbcType=BIGINT}
   </select>
@@ -115,12 +139,14 @@
       symbol, `decimal`, contract, 
       hash, `from`, from_type, 
       `to`, to_type, `value`, 
-      bn, b_time, tx_fee)
+      bn, b_time, tx_fee, 
+      remark)
     values (#{id,jdbcType=BIGINT}, #{seq,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, 
       #{symbol,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, #{contract,jdbcType=VARCHAR}, 
       #{hash,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, #{fromType,jdbcType=INTEGER}, 
       #{to,jdbcType=VARCHAR}, #{toType,jdbcType=INTEGER}, #{value,jdbcType=VARCHAR}, 
-      #{bn,jdbcType=BIGINT}, #{bTime,jdbcType=TIMESTAMP}, #{txFee,jdbcType=VARCHAR})
+      #{bn,jdbcType=BIGINT}, #{bTime,jdbcType=TIMESTAMP}, #{txFee,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TxErc20Bak">
     insert into tx_erc_20_bak
@@ -170,6 +196,9 @@
       <if test="txFee != null">
         tx_fee,
       </if>
+      <if test="remark != null">
+        remark,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -216,6 +245,9 @@
       </if>
       <if test="txFee != null">
         #{txFee,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -273,7 +305,32 @@
       <if test="record.txFee != null">
         tx_fee = #{record.txFee,jdbcType=VARCHAR},
       </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update tx_erc_20_bak
+    set id = #{record.id,jdbcType=BIGINT},
+      seq = #{record.seq,jdbcType=BIGINT},
+      `name` = #{record.name,jdbcType=VARCHAR},
+      symbol = #{record.symbol,jdbcType=VARCHAR},
+      `decimal` = #{record.decimal,jdbcType=INTEGER},
+      contract = #{record.contract,jdbcType=VARCHAR},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      `from` = #{record.from,jdbcType=VARCHAR},
+      from_type = #{record.fromType,jdbcType=INTEGER},
+      `to` = #{record.to,jdbcType=VARCHAR},
+      to_type = #{record.toType,jdbcType=INTEGER},
+      `value` = #{record.value,jdbcType=VARCHAR},
+      bn = #{record.bn,jdbcType=BIGINT},
+      b_time = #{record.bTime,jdbcType=TIMESTAMP},
+      tx_fee = #{record.txFee,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -344,7 +401,29 @@
       <if test="txFee != null">
         tx_fee = #{txFee,jdbcType=VARCHAR},
       </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TxErc20Bak">
+    update tx_erc_20_bak
+    set seq = #{seq,jdbcType=BIGINT},
+      `name` = #{name,jdbcType=VARCHAR},
+      symbol = #{symbol,jdbcType=VARCHAR},
+      `decimal` = #{decimal,jdbcType=INTEGER},
+      contract = #{contract,jdbcType=VARCHAR},
+      hash = #{hash,jdbcType=VARCHAR},
+      `from` = #{from,jdbcType=VARCHAR},
+      from_type = #{fromType,jdbcType=INTEGER},
+      `to` = #{to,jdbcType=VARCHAR},
+      to_type = #{toType,jdbcType=INTEGER},
+      `value` = #{value,jdbcType=VARCHAR},
+      bn = #{bn,jdbcType=BIGINT},
+      b_time = #{bTime,jdbcType=TIMESTAMP},
+      tx_fee = #{txFee,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TxErc20Bak">
@@ -373,15 +452,15 @@
     -->
     insert into tx_erc_20_bak
     (id, seq, `name`, symbol, `decimal`, contract, hash, `from`, from_type, `to`, to_type, 
-      `value`, bn, b_time, tx_fee)
+      `value`, bn, b_time, tx_fee, remark)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.seq,jdbcType=BIGINT}, #{item.name,jdbcType=VARCHAR}, 
         #{item.symbol,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, #{item.contract,jdbcType=VARCHAR}, 
         #{item.hash,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR}, #{item.fromType,jdbcType=INTEGER}, 
         #{item.to,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.value,jdbcType=VARCHAR}, 
-        #{item.bn,jdbcType=BIGINT}, #{item.bTime,jdbcType=TIMESTAMP}, #{item.txFee,jdbcType=VARCHAR}
-        )
+        #{item.bn,jdbcType=BIGINT}, #{item.bTime,jdbcType=TIMESTAMP}, #{item.txFee,jdbcType=VARCHAR}, 
+        #{item.remark,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -444,8 +523,12 @@
         <if test="'tx_fee'.toString() == column.value">
           #{item.txFee,jdbcType=VARCHAR}
         </if>
+        <if test="'remark'.toString() == column.value">
+          #{item.remark,jdbcType=LONGVARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

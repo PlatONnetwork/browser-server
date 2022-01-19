@@ -16,15 +16,21 @@ public interface TxErc721BakMapper {
 
     int insertSelective(TxErc721Bak record);
 
+    List<TxErc721Bak> selectByExampleWithBLOBs(TxErc721BakExample example);
+
     List<TxErc721Bak> selectByExample(TxErc721BakExample example);
 
     TxErc721Bak selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") TxErc721Bak record, @Param("example") TxErc721BakExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") TxErc721Bak record, @Param("example") TxErc721BakExample example);
+
     int updateByExample(@Param("record") TxErc721Bak record, @Param("example") TxErc721BakExample example);
 
     int updateByPrimaryKeySelective(TxErc721Bak record);
+
+    int updateByPrimaryKeyWithBLOBs(TxErc721Bak record);
 
     int updateByPrimaryKey(TxErc721Bak record);
 

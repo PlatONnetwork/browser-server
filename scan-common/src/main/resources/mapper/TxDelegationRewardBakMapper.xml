@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.TxDelegationRewardBakMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TxDelegationRewardBak">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="hash" jdbcType="VARCHAR" property="hash" />
+    <result column="bn" jdbcType="BIGINT" property="bn" />
+    <result column="addr" jdbcType="VARCHAR" property="addr" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="cre_time" jdbcType="TIMESTAMP" property="creTime" />
+    <result column="upd_time" jdbcType="TIMESTAMP" property="updTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxDelegationRewardBakWithBLOBs">
+    <result column="extra" jdbcType="LONGVARCHAR" property="extra" />
+    <result column="extra_clean" jdbcType="LONGVARCHAR" property="extraClean" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, hash, bn, addr, `time`, cre_time, upd_time
+  </sql>
+  <sql id="Blob_Column_List">
+    extra, extra_clean
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tx_delegation_reward_bak
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tx_delegation_reward_bak
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tx_delegation_reward_bak
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from tx_delegation_reward_bak
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakExample">
+    delete from tx_delegation_reward_bak
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakWithBLOBs">
+    insert into tx_delegation_reward_bak (id, hash, bn, addr, 
+      `time`, cre_time, upd_time, 
+      extra, extra_clean)
+    values (#{id,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{bn,jdbcType=BIGINT}, #{addr,jdbcType=VARCHAR}, 
+      #{time,jdbcType=TIMESTAMP}, #{creTime,jdbcType=TIMESTAMP}, #{updTime,jdbcType=TIMESTAMP}, 
+      #{extra,jdbcType=LONGVARCHAR}, #{extraClean,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakWithBLOBs">
+    insert into tx_delegation_reward_bak
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="hash != null">
+        hash,
+      </if>
+      <if test="bn != null">
+        bn,
+      </if>
+      <if test="addr != null">
+        addr,
+      </if>
+      <if test="time != null">
+        `time`,
+      </if>
+      <if test="creTime != null">
+        cre_time,
+      </if>
+      <if test="updTime != null">
+        upd_time,
+      </if>
+      <if test="extra != null">
+        extra,
+      </if>
+      <if test="extraClean != null">
+        extra_clean,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="hash != null">
+        #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="bn != null">
+        #{bn,jdbcType=BIGINT},
+      </if>
+      <if test="addr != null">
+        #{addr,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creTime != null">
+        #{creTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updTime != null">
+        #{updTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="extra != null">
+        #{extra,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="extraClean != null">
+        #{extraClean,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakExample" resultType="java.lang.Long">
+    select count(*) from tx_delegation_reward_bak
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update tx_delegation_reward_bak
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.hash != null">
+        hash = #{record.hash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bn != null">
+        bn = #{record.bn,jdbcType=BIGINT},
+      </if>
+      <if test="record.addr != null">
+        addr = #{record.addr,jdbcType=VARCHAR},
+      </if>
+      <if test="record.time != null">
+        `time` = #{record.time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.creTime != null">
+        cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updTime != null">
+        upd_time = #{record.updTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.extra != null">
+        extra = #{record.extra,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.extraClean != null">
+        extra_clean = #{record.extraClean,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update tx_delegation_reward_bak
+    set id = #{record.id,jdbcType=BIGINT},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      bn = #{record.bn,jdbcType=BIGINT},
+      addr = #{record.addr,jdbcType=VARCHAR},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
+      cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      upd_time = #{record.updTime,jdbcType=TIMESTAMP},
+      extra = #{record.extra,jdbcType=LONGVARCHAR},
+      extra_clean = #{record.extraClean,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update tx_delegation_reward_bak
+    set id = #{record.id,jdbcType=BIGINT},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      bn = #{record.bn,jdbcType=BIGINT},
+      addr = #{record.addr,jdbcType=VARCHAR},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
+      cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      upd_time = #{record.updTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakWithBLOBs">
+    update tx_delegation_reward_bak
+    <set>
+      <if test="hash != null">
+        hash = #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="bn != null">
+        bn = #{bn,jdbcType=BIGINT},
+      </if>
+      <if test="addr != null">
+        addr = #{addr,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        `time` = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creTime != null">
+        cre_time = #{creTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updTime != null">
+        upd_time = #{updTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="extra != null">
+        extra = #{extra,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="extraClean != null">
+        extra_clean = #{extraClean,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBakWithBLOBs">
+    update tx_delegation_reward_bak
+    set hash = #{hash,jdbcType=VARCHAR},
+      bn = #{bn,jdbcType=BIGINT},
+      addr = #{addr,jdbcType=VARCHAR},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      cre_time = #{creTime,jdbcType=TIMESTAMP},
+      upd_time = #{updTime,jdbcType=TIMESTAMP},
+      extra = #{extra,jdbcType=LONGVARCHAR},
+      extra_clean = #{extraClean,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TxDelegationRewardBak">
+    update tx_delegation_reward_bak
+    set hash = #{hash,jdbcType=VARCHAR},
+      bn = #{bn,jdbcType=BIGINT},
+      addr = #{addr,jdbcType=VARCHAR},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      cre_time = #{creTime,jdbcType=TIMESTAMP},
+      upd_time = #{updTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <insert id="batchInsert" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into tx_delegation_reward_bak
+    (id, hash, bn, addr, `time`, cre_time, upd_time, extra, extra_clean)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.id,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.bn,jdbcType=BIGINT}, 
+        #{item.addr,jdbcType=VARCHAR}, #{item.time,jdbcType=TIMESTAMP}, #{item.creTime,jdbcType=TIMESTAMP}, 
+        #{item.updTime,jdbcType=TIMESTAMP}, #{item.extra,jdbcType=LONGVARCHAR}, #{item.extraClean,jdbcType=LONGVARCHAR}
+        )
+    </foreach>
+  </insert>
+  <insert id="batchInsertSelective" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into tx_delegation_reward_bak (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'id'.toString() == column.value">
+          #{item.id,jdbcType=BIGINT}
+        </if>
+        <if test="'hash'.toString() == column.value">
+          #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'bn'.toString() == column.value">
+          #{item.bn,jdbcType=BIGINT}
+        </if>
+        <if test="'addr'.toString() == column.value">
+          #{item.addr,jdbcType=VARCHAR}
+        </if>
+        <if test="'time'.toString() == column.value">
+          #{item.time,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'cre_time'.toString() == column.value">
+          #{item.creTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'upd_time'.toString() == column.value">
+          #{item.updTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'extra'.toString() == column.value">
+          #{item.extra,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'extra_clean'.toString() == column.value">
+          #{item.extraClean,jdbcType=LONGVARCHAR}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+
+</mapper>

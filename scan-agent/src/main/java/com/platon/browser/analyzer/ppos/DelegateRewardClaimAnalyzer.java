@@ -104,6 +104,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
             // 如果总奖励大于零，则记录领取明细
             delegationReward = new DelegationReward();
             delegationReward.setHash(tx.getHash());
+            delegationReward.setBn(tx.getNum());
             delegationReward.setAddr(tx.getFrom());
             delegationReward.setTime(tx.getTime());
             delegationReward.setCreTime(new Date());

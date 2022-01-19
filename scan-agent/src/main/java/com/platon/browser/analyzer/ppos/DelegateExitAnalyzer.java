@@ -205,6 +205,7 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
             // 如果委托奖励为0，则无需记录领取记录
             DelegationReward delegationReward = new DelegationReward();
             delegationReward.setHash(tx.getHash());
+            delegationReward.setBn(tx.getNum());
             delegationReward.setAddr(tx.getFrom());
             delegationReward.setTime(tx.getTime());
             delegationReward.setCreTime(new Date());

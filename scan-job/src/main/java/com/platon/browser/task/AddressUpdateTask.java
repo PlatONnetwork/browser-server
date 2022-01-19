@@ -226,17 +226,17 @@ public class AddressUpdateTask {
                 Map<String, AddressQty> map = checkAddress(transactionList);
                 TaskUtil.console("更新前的数据为{}", JSONUtil.toJsonStr(map.values()));
                 for (TxBak txBak : transactionList) {
-                    if (!AddressUtil.isAddrZero(txBak.getFromAddress())) {
-                        AddressQty from = map.get(txBak.getFromAddress());
-                        addQty(Transaction.TypeEnum.getEnum(txBak.getTxType()), from);
+                    if (!AddressUtil.isAddrZero(txBak.getFrom())) {
+                        AddressQty from = map.get(txBak.getFrom());
+                        addQty(Transaction.TypeEnum.getEnum(txBak.getType()), from);
                     } else {
-                        TaskUtil.console("交易[{}]from[{}]为零地址", txBak.getHash(), txBak.getFromAddress());
+                        TaskUtil.console("交易[{}]from[{}]为零地址", txBak.getHash(), txBak.getFrom());
                     }
-                    if (!AddressUtil.isAddrZero(txBak.getToAddress())) {
-                        AddressQty to = map.get(txBak.getToAddress());
-                        addQty(Transaction.TypeEnum.getEnum(txBak.getTxType()), to);
+                    if (!AddressUtil.isAddrZero(txBak.getTo())) {
+                        AddressQty to = map.get(txBak.getTo());
+                        addQty(Transaction.TypeEnum.getEnum(txBak.getType()), to);
                     } else {
-                        TaskUtil.console("交易[{}]to[{}]为零地址", txBak.getHash(), txBak.getToAddress());
+                        TaskUtil.console("交易[{}]to[{}]为零地址", txBak.getHash(), txBak.getTo());
                     }
                 }
                 List<AddressQty> list = CollUtil.newArrayList(map.values());
@@ -344,8 +344,8 @@ public class AddressUpdateTask {
      */
     private Map<String, AddressQty> checkAddress(List<TxBak> transactionList) throws Exception {
         Set<String> addressSet = new HashSet<>();
-        Set<String> froms = transactionList.stream().map(TxBak::getFromAddress).filter(from -> !AddressUtil.isAddrZero(from)).collect(Collectors.toSet());
-        Set<String> tos = transactionList.stream().map(TxBak::getToAddress).filter(to -> !AddressUtil.isAddrZero(to)).collect(Collectors.toSet());
+        Set<String> froms = transactionList.stream().map(TxBak::getFrom).filter(from -> !AddressUtil.isAddrZero(from)).collect(Collectors.toSet());
+        Set<String> tos = transactionList.stream().map(TxBak::getTo).filter(to -> !AddressUtil.isAddrZero(to)).collect(Collectors.toSet());
         addressSet.addAll(froms);
         addressSet.addAll(tos);
         AddressExample example = new AddressExample();

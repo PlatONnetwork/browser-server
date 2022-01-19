@@ -9,15 +9,9 @@ import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
-import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
-import com.platon.browser.dao.custommapper.CustomTx20BakMapper;
-import com.platon.browser.dao.custommapper.CustomTx721BakMapper;
-import com.platon.browser.dao.custommapper.CustomTxBakMapper;
+import com.platon.browser.dao.custommapper.*;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.ppos.PPOSService;
@@ -76,6 +70,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     @Resource
     private CustomTx721BakMapper customTx721BakMapper;
 
+    @Resource
+    private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
+
     /**
      * 重试次数
      */
@@ -130,6 +127,11 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 addTxErc20Bak(transactions);
                 addTxErc721Bak(transactions);
             }
+            List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
+            // 委托奖励交易入库
+            if (CollUtil.isNotEmpty(delegationRewardList)) {
+                customTxDelegationRewardBakMapper.batchInsert(delegationRewardList);
+            }
             // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不再由环形队列入库，不再删除操作日志表
             if (CollUtil.isNotEmpty(nodeOpts1)) {
                 // 依赖于数据库的自增id
@@ -137,7 +139,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             }
             // 统计业务参数，以MySQL数据库块高为准，所以必须保证块高是最后入库
             statisticService.analyze(copyEvent);
-            complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, txAnalyseResult.getDelegationRewardList(), event.getTraceId());
+            complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, delegationRewardList, event.getTraceId());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);
