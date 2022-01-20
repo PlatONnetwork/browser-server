@@ -105,6 +105,30 @@ public class RedisImportService {
         }
     }
 
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<ErcTx> erc20TxList, Set<ErcTx> erc721TxList) throws Exception {
+        log.debug("Redis批量导入:{}(blocks({}),transactions({})", Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size());
+        long startTime = System.currentTimeMillis();
+        try {
+            CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
+            submit(redisBlockService, blocks, false, latch, RedisKeyEnum.Block, CommonUtil.getTraceId());
+            submit(redisTransactionService, transactions, false, latch, RedisKeyEnum.Transaction, CommonUtil.getTraceId());
+            submit(redisErc20TxService, erc20TxList, false, latch, RedisKeyEnum.Erc20Tx, CommonUtil.getTraceId());
+            submit(redisErc721TxService, erc721TxList, false, latch, RedisKeyEnum.Erc721Tx, CommonUtil.getTraceId());
+            latch.await();
+            if (isRetry.get()) {
+                LongSummaryStatistics blockSum = blocks.stream().collect(Collectors.summarizingLong(Block::getNum));
+                throw new Exception(StrUtil.format("redis相关区块[{}]-[{}]信息批量入库异常，重试[{}]次", blockSum.getMin(), blockSum.getMax(), retryCount.incrementAndGet()));
+            } else {
+                retryCount.set(0);
+            }
+            log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        } catch (Exception e) {
+            log.error("redis批量入库异常", e);
+            throw e;
+        }
+    }
+
     /**
      * 取erc20交易列表
      */

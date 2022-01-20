@@ -1,22 +1,28 @@
 package com.platon.browser.bootstrap.service;
 
 
+import cn.hutool.core.bean.BeanUtil;
+import com.platon.browser.analyzer.BlockAnalyzer;
+import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.ReceiptResult;
-import com.platon.browser.bootstrap.BootstrapEventPublisher;
-import com.platon.browser.bootstrap.ShutdownCallback;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.bootstrap.bean.SyncData;
+import com.platon.browser.config.DisruptorConfig;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.receipt.ReceiptService;
-import com.platon.browser.utils.SleepUtil;
+import com.platon.browser.service.redis.RedisImportService;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,7 +38,22 @@ public class ConsistencyService {
     private NetworkStatMapper networkStatMapper;
 
     @Resource
-    private EsBlockRepository ESBlockRepository;
+    private TxBakMapper txBakMapper;
+
+    @Resource
+    private TxDelegationRewardBakMapper txDelegationRewardBakMapper;
+
+    @Resource
+    private TxErc20BakMapper txErc20BakMapper;
+
+    @Resource
+    private TxErc721BakMapper txErc721BakMapper;
+
+    @Resource
+    private EsImportService esImportService;
+
+    @Resource
+    private RedisImportService redisImportService;
 
     @Resource
     private BlockService blockService;
@@ -41,10 +62,10 @@ public class ConsistencyService {
     private ReceiptService receiptService;
 
     @Resource
-    private BootstrapEventPublisher bootstrapEventPublisher;
+    private DisruptorConfig disruptorConfig;
 
-    private ShutdownCallback shutdownCallback = new ShutdownCallback();
-
+    @Resource
+    private BlockAnalyzer blockAnalyzer;
 
     /**
      * 开机自检,一致性开机自检子流程,检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
@@ -54,54 +75,142 @@ public class ConsistencyService {
      * @date 2021/4/19
      */
     @Transactional(rollbackFor = Exception.class)
-    public void post(String traceId) throws IOException {
+    public void post(String traceId) throws Exception {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if (networkStat == null) {
             return;
         }
-
         // mysql中的最高块号
         long mysqlMaxBlockNum = networkStat.getCurNumber();
-        log.warn("MYSQL最高区块号:{}", mysqlMaxBlockNum);
-        // mysql中的最高交易序号ID
-        long mysqlTransactionId = networkStat.getTxQty();
-        log.warn("MYSQL最高交易序号:{}", mysqlTransactionId);
-        // 计算同步开始区块号
-        long esMaxBlockNum = mysqlMaxBlockNum;
-        boolean exist = false;
-        while (!exist) {
-            exist = ESBlockRepository.exists(String.valueOf(esMaxBlockNum));
-            if (!exist) {
-                esMaxBlockNum--;
-                // 小于等于0时需要退出
-                if (esMaxBlockNum <= 0) {
-                    exist = true;
-                }
-            }
+        // 开始补的块高，重复的数据，Redis会过滤，ES会覆盖
+        long startBlockNum = 1;
+        if (mysqlMaxBlockNum > disruptorConfig.getPersistenceBatchSize()) {
+            startBlockNum = mysqlMaxBlockNum - disruptorConfig.getPersistenceBatchSize();
         }
-        log.warn("ES区块索引最高区块号:{}", esMaxBlockNum);
-
-        if (esMaxBlockNum >= mysqlMaxBlockNum) {
-            log.warn("MYSQL/ES/REDIS中的数据已同步!");
-            return;
-        }
-
-        long startBlockNum = esMaxBlockNum + 1;
-        log.warn("MYSQL/ES/REDIS数据同步区间:[{},{}]", startBlockNum, mysqlMaxBlockNum);
+        log.info("MYSQL/ES/REDIS数据同步区间:[{},{}]", startBlockNum, mysqlMaxBlockNum);
         // 补充 [startBlockNum,mysqlMaxBlockNum] 闭区间内的区块和交易信息到ES和Redis
-        shutdownCallback.setEndBlockNum(mysqlMaxBlockNum);
-        if (startBlockNum <= 0) startBlockNum = 1;
-        if (startBlockNum > mysqlMaxBlockNum) return;
-        for (long number = startBlockNum; number <= mysqlMaxBlockNum; number++) {
+        SyncData syncData = new SyncData();
+        syncBlock(syncData, startBlockNum, mysqlMaxBlockNum);
+        syncTx(syncData, startBlockNum, mysqlMaxBlockNum);
+        syncDelegationRewardTx(syncData, startBlockNum, mysqlMaxBlockNum);
+        syncErc20Tx(syncData, startBlockNum, mysqlMaxBlockNum);
+        syncErc721Tx(syncData, startBlockNum, mysqlMaxBlockNum);
+        syncDataToESAndRedis(syncData);
+        log.info("MYSQL/ES/REDIS中的数据同步完成!");
+    }
+
+    /**
+     * 同步mysql的区块信息到es和Redis
+     *
+     * @param syncData:      同步数据对象
+     * @param startBlockNum: 开始块高
+     * @param endBlockNum:   结束块高
+     * @return: void
+     * @date: 2022/1/19
+     */
+    private void syncBlock(SyncData syncData, long startBlockNum, long endBlockNum) throws Exception {
+        for (long number = startBlockNum; number <= endBlockNum; number++) {
             // 异步获取区块
             CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(number);
             // 异步获取交易回执
             CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(number);
-            bootstrapEventPublisher.publish(blockCF, receiptCF, shutdownCallback, traceId);
+            PlatonBlock.Block rawBlock = blockCF.get().getBlock();
+            ReceiptResult receiptResult = receiptCF.get();
+            CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
+            syncData.getBlockSet().add(block);
         }
-        while (!shutdownCallback.isDone()) SleepUtil.sleep(1L);
-        bootstrapEventPublisher.shutdown();
-        log.warn("MYSQL/ES/REDIS中的数据同步完成!");
+    }
+
+    /**
+     * 同步mysql的交易信息到es和Redis
+     *
+     * @param syncData:      同步数据对象
+     * @param startBlockNum: 开始块高
+     * @param endBlockNum:   结束块高
+     * @return: void
+     * @date: 2022/1/19
+     */
+    private void syncTx(SyncData syncData, long startBlockNum, long endBlockNum) {
+        TxBakExample example = new TxBakExample();
+        example.createCriteria().andNumGreaterThanOrEqualTo(startBlockNum).andNumLessThanOrEqualTo(endBlockNum);
+        List<TxBak> TxBakList = txBakMapper.selectByExample(example);
+        for (TxBak txBak : TxBakList) {
+            Transaction transaction = new Transaction();
+            BeanUtil.copyProperties(txBak, transaction);
+            syncData.getTxBakSet().add(transaction);
+        }
+    }
+
+    /**
+     * 同步mysql的领取交易信息到es和Redis
+     *
+     * @param syncData:
+     * @param startBlockNum:
+     * @param endBlockNum:
+     * @return: void
+     * @date: 2022/1/20
+     */
+    private void syncDelegationRewardTx(SyncData syncData, long startBlockNum, long endBlockNum) {
+        TxDelegationRewardBakExample example = new TxDelegationRewardBakExample();
+        example.createCriteria().andBnGreaterThanOrEqualTo(startBlockNum).andBnLessThanOrEqualTo(endBlockNum);
+        List<TxDelegationRewardBak> txDelegationRewardBakList = txDelegationRewardBakMapper.selectByExample(example);
+        for (TxDelegationRewardBak txDelegationRewardBak : txDelegationRewardBakList) {
+            DelegationReward delegationReward = new DelegationReward();
+            BeanUtil.copyProperties(txDelegationRewardBak, delegationReward);
+            syncData.getDelegationRewardBakSet().add(delegationReward);
+        }
+    }
+
+    /**
+     * 同步mysql的erc20交易信息到es和Redis
+     *
+     * @param syncData:
+     * @param startBlockNum:
+     * @param endBlockNum:
+     * @return: void
+     * @date: 2022/1/20
+     */
+    private void syncErc20Tx(SyncData syncData, long startBlockNum, long endBlockNum) {
+        TxErc20BakExample example = new TxErc20BakExample();
+        example.createCriteria().andBnGreaterThanOrEqualTo(startBlockNum).andBnLessThanOrEqualTo(endBlockNum);
+        List<TxErc20Bak> txErc20BakList = txErc20BakMapper.selectByExample(example);
+        for (TxErc20Bak txErc20Bak : txErc20BakList) {
+            ErcTx ercTx = new ErcTx();
+            BeanUtil.copyProperties(txErc20Bak, ercTx);
+            syncData.getErc20BakSet().add(ercTx);
+        }
+    }
+
+    /**
+     * 同步mysql的erc721交易信息到es和Redis
+     *
+     * @param syncData:
+     * @param startBlockNum:
+     * @param endBlockNum:
+     * @return: void
+     * @date: 2022/1/20
+     */
+    private void syncErc721Tx(SyncData syncData, long startBlockNum, long endBlockNum) {
+        TxErc721BakExample example = new TxErc721BakExample();
+        example.createCriteria().andBnGreaterThanOrEqualTo(startBlockNum).andBnLessThanOrEqualTo(endBlockNum);
+        List<TxErc721Bak> txErc721BakList = txErc721BakMapper.selectByExample(example);
+        for (TxErc721Bak txErc721Bak : txErc721BakList) {
+            ErcTx ercTx = new ErcTx();
+            BeanUtil.copyProperties(txErc721Bak, ercTx);
+            syncData.getErc20BakSet().add(ercTx);
+        }
+    }
+
+    /**
+     * 同步交易数据到es和Redis
+     *
+     * @param syncData:
+     * @return: void
+     * @date: 2022/1/20
+     */
+    private void syncDataToESAndRedis(SyncData syncData) throws Exception {
+        esImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getDelegationRewardBakSet());
+        redisImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet());
     }
 
 }
