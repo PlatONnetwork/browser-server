@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomTx721BakMapper">
-  <insert id="batchInsert" parameterType="collection" useGeneratedKeys="true" keyProperty="id">
-    insert into tx_erc_721_bak
-    ( `seq`, `name`, `symbol`, `decimal`,`contract`, `hash`,`from`,`from_type`,`to`,`to_type`,`value`,`bn`,`b_time`,`tx_fee`)
-    values
-    <foreach collection="set" item="item" separator=",">
-      (#{item.seq},
-      #{item.name},
-      #{item.symbol},
-      #{item.decimal},
-      #{item.contract},
-      #{item.hash},
-      #{item.from},
-      #{item.fromType},
-      #{item.to},
-      #{item.toType},
-      #{item.value},
-      #{item.bn},
-      #{item.bTime},
-      #{item.txFee}
-      )
-    </foreach>
-  </insert>
+    <insert id="batchInsert" parameterType="collection" useGeneratedKeys="true" keyProperty="id">
+        insert into tx_erc_721_bak
+        ( `seq`, `name`, `symbol`, `decimal`,`contract`, `hash`,`from`,`from_type`,`to`,`to_type`,`value`,`bn`,`b_time`,`tx_fee`)
+        values
+        <foreach collection="set" item="item" separator=",">
+            (#{item.seq},
+            #{item.name},
+            #{item.symbol},
+            #{item.decimal},
+            #{item.contract},
+            #{item.hash},
+            #{item.from},
+            #{item.fromType},
+            #{item.to},
+            #{item.toType},
+            #{item.value},
+            #{item.bn},
+            #{item.bTime},
+            #{item.txFee}
+            )
+        </foreach>
+    </insert>
+    <select id="findMaxId" resultType="long">
+        SELECT
+            IFNULL( max( id ), 0 )
+        FROM
+            tx_erc_721_bak;
+    </select>
 </mapper>

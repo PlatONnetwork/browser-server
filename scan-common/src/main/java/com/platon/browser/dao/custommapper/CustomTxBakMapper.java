@@ -9,4 +9,13 @@ public interface CustomTxBakMapper {
 
     int batchInsertOrUpdateSelective(@Param("list") List<Transaction> list);
 
+    /**
+     * 查找最大的id
+     *
+     * @param :
+     * @return: long
+     * @date: 2022/1/24
+     */
+    long findMaxId();
+
 }

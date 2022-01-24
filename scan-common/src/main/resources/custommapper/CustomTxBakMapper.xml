@@ -41,4 +41,12 @@
       )
     </foreach>
   </insert>
+
+  <select id="findMaxId" resultType="long">
+    SELECT
+      IFNULL( max( id ), 0 )
+    FROM
+      tx_bak;
+  </select>
+
 </mapper>

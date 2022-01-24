@@ -9,4 +9,6 @@ public interface CustomTx20BakMapper {
 
     int batchInsert(@Param("set") Set<ErcTx> set);
 
+    long findMaxId();
+
 }

@@ -2,18 +2,25 @@ package com.platon.browser.bootstrap.service;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bootstrap.bean.SyncData;
-import com.platon.browser.config.DisruptorConfig;
+import com.platon.browser.dao.custommapper.CustomTx20BakMapper;
+import com.platon.browser.dao.custommapper.CustomTx721BakMapper;
+import com.platon.browser.dao.custommapper.CustomTxBakMapper;
+import com.platon.browser.dao.custommapper.CustomTxDelegationRewardBakMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.block.BlockService;
-import com.platon.browser.service.elasticsearch.EsImportService;
+import com.platon.browser.service.elasticsearch.*;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.service.receipt.ReceiptService;
 import com.platon.browser.service.redis.RedisImportService;
 import com.platon.protocol.core.methods.response.PlatonBlock;
@@ -26,10 +33,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * @description: MySQL/ES/Redis启动一致性自检服务
- * @author: chendongming@matrixelements.com
- * @create: 2019-11-06 10:10:30
- **/
+ * MySQL/ES/Redis启动一致性自检服务
+ * 以MySQL的数据为基准，同步ES和Redis中缺失的部分数据
+ *
+ * @date: 2022/1/24
+ */
 @Slf4j
 @Service
 public class ConsistencyService {
@@ -41,13 +49,25 @@ public class ConsistencyService {
     private TxBakMapper txBakMapper;
 
     @Resource
+    private CustomTxBakMapper customTxBakMapper;
+
+    @Resource
     private TxDelegationRewardBakMapper txDelegationRewardBakMapper;
+
+    @Resource
+    private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
 
     @Resource
     private TxErc20BakMapper txErc20BakMapper;
 
     @Resource
+    private CustomTx20BakMapper customTx20BakMapper;
+
+    @Resource
     private TxErc721BakMapper txErc721BakMapper;
+
+    @Resource
+    private CustomTx721BakMapper customTx721BakMapper;
 
     @Resource
     private EsImportService esImportService;
@@ -62,10 +82,22 @@ public class ConsistencyService {
     private ReceiptService receiptService;
 
     @Resource
-    private DisruptorConfig disruptorConfig;
+    private BlockAnalyzer blockAnalyzer;
 
     @Resource
-    private BlockAnalyzer blockAnalyzer;
+    private EsBlockRepository esBlockRepository;
+
+    @Resource
+    private EsTransactionRepository esTransactionRepository;
+
+    @Resource
+    private EsDelegationRewardRepository esDelegationRewardRepository;
+
+    @Resource
+    private EsErc20TxRepository esErc20TxRepository;
+
+    @Resource
+    private EsErc721TxRepository esErc721TxRepository;
 
     /**
      * 开机自检,一致性开机自检子流程,检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
@@ -80,21 +112,12 @@ public class ConsistencyService {
         if (networkStat == null) {
             return;
         }
-        // mysql中的最高块号
-        long mysqlMaxBlockNum = networkStat.getCurNumber();
-        // 开始补的块高，重复的数据，Redis会过滤，ES会覆盖
-        long startBlockNum = 1;
-        if (mysqlMaxBlockNum > disruptorConfig.getPersistenceBatchSize()) {
-            startBlockNum = mysqlMaxBlockNum - disruptorConfig.getPersistenceBatchSize();
-        }
-        log.info("MYSQL/ES/REDIS数据同步区间:[{},{}]", startBlockNum, mysqlMaxBlockNum);
-        // 补充 [startBlockNum,mysqlMaxBlockNum] 闭区间内的区块和交易信息到ES和Redis
         SyncData syncData = new SyncData();
-        syncBlock(syncData, startBlockNum, mysqlMaxBlockNum);
-        syncTx(syncData, startBlockNum, mysqlMaxBlockNum);
-        syncDelegationRewardTx(syncData, startBlockNum, mysqlMaxBlockNum);
-        syncErc20Tx(syncData, startBlockNum, mysqlMaxBlockNum);
-        syncErc721Tx(syncData, startBlockNum, mysqlMaxBlockNum);
+        syncBlock(esBlockRepository, syncData, networkStat.getCurNumber());
+        syncTx(esTransactionRepository, syncData);
+        syncDelegationRewardTx(esDelegationRewardRepository, syncData);
+        syncErc20Tx(esErc20TxRepository, syncData);
+        syncErc721Tx(esErc721TxRepository, syncData);
         syncDataToESAndRedis(syncData);
         log.info("MYSQL/ES/REDIS中的数据同步完成!");
     }
@@ -102,102 +125,182 @@ public class ConsistencyService {
     /**
      * 同步mysql的区块信息到es和Redis
      *
-     * @param syncData:      同步数据对象
-     * @param startBlockNum: 开始块高
-     * @param endBlockNum:   结束块高
+     * @param abstractEsRepository:
+     * @param syncData:
+     * @param mysqlBlockNum:
      * @return: void
-     * @date: 2022/1/19
+     * @date: 2022/1/24
      */
-    private void syncBlock(SyncData syncData, long startBlockNum, long endBlockNum) throws Exception {
-        for (long number = startBlockNum; number <= endBlockNum; number++) {
-            // 异步获取区块
-            CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(number);
-            // 异步获取交易回执
-            CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(number);
-            PlatonBlock.Block rawBlock = blockCF.get().getBlock();
-            ReceiptResult receiptResult = receiptCF.get();
-            CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
-            syncData.getBlockSet().add(block);
+    private void syncBlock(AbstractEsRepository abstractEsRepository, SyncData syncData, long mysqlBlockNum) throws Exception {
+        ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+        constructor.setDesc("num");
+        constructor.setResult(new String[]{"nodeId", "hash", "num"});
+        constructor.setUnmappedType("long");
+        ESResult<Block> queryResultFromES = abstractEsRepository.search(constructor, Block.class, 1, 1);
+        List<Block> list = queryResultFromES.getRsData();
+        long esBlockNum = CollUtil.isNotEmpty(list) ? CollUtil.getFirst(list).getNum() : 0L;
+        if (mysqlBlockNum > esBlockNum) {
+            for (long number = esBlockNum; number <= mysqlBlockNum; number++) {
+                // 异步获取区块
+                CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(number);
+                // 异步获取交易回执
+                CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(number);
+                PlatonBlock.Block rawBlock = blockCF.get().getBlock();
+                ReceiptResult receiptResult = receiptCF.get();
+                CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
+                syncData.getBlockSet().add(block);
+            }
+            log.info("MYSQL/ES/REDIS块高数据同步区间:[{},{}]", esBlockNum, mysqlBlockNum);
+        } else {
+            log.info("MySQL没有块高数据需要同步");
         }
     }
 
     /**
      * 同步mysql的交易信息到es和Redis
      *
-     * @param syncData:      同步数据对象
-     * @param startBlockNum: 开始块高
-     * @param endBlockNum:   结束块高
+     * @param abstractEsRepository: es查询对象
+     * @param syncData:             同步数据对象
      * @return: void
-     * @date: 2022/1/19
+     * @date: 2022/1/24
      */
-    private void syncTx(SyncData syncData, long startBlockNum, long endBlockNum) {
-        TxBakExample example = new TxBakExample();
-        example.createCriteria().andNumGreaterThanOrEqualTo(startBlockNum).andNumLessThanOrEqualTo(endBlockNum);
-        List<TxBak> TxBakList = txBakMapper.selectByExample(example);
-        for (TxBak txBak : TxBakList) {
-            Transaction transaction = new Transaction();
-            BeanUtil.copyProperties(txBak, transaction);
-            syncData.getTxBakSet().add(transaction);
+    private void syncTx(AbstractEsRepository abstractEsRepository, SyncData syncData) throws Exception {
+        try {
+            long mysqlTxId = customTxBakMapper.findMaxId();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setDesc("id");
+            constructor.setResult(new String[]{"id", "seq", "hash", "num"});
+            constructor.setUnmappedType("long");
+            ESResult<TxBak> queryResultFromES = abstractEsRepository.search(constructor, TxBak.class, 1, 1);
+            List<TxBak> list = queryResultFromES.getRsData();
+            long esTxId = CollUtil.isNotEmpty(list) ? CollUtil.getFirst(list).getId() : 0L;
+            if (mysqlTxId > esTxId) {
+                TxBakExample example = new TxBakExample();
+                example.createCriteria().andIdGreaterThan(esTxId).andIdLessThanOrEqualTo(mysqlTxId);
+                List<TxBak> TxBakList = txBakMapper.selectByExample(example);
+                for (TxBak txBak : TxBakList) {
+                    Transaction transaction = new Transaction();
+                    BeanUtil.copyProperties(txBak, transaction);
+                    syncData.getTxBakSet().add(transaction);
+                }
+                log.info("MYSQL/ES/REDIS交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+            } else {
+                log.info("MySQL没有交易数据需要同步");
+            }
+        } catch (Exception e) {
+            log.error("同步交易数据异常", e);
+            throw new Exception("同步交易数据异常");
         }
     }
 
     /**
      * 同步mysql的领取交易信息到es和Redis
      *
+     * @param abstractEsRepository:
      * @param syncData:
-     * @param startBlockNum:
-     * @param endBlockNum:
      * @return: void
-     * @date: 2022/1/20
+     * @date: 2022/1/24
      */
-    private void syncDelegationRewardTx(SyncData syncData, long startBlockNum, long endBlockNum) {
-        TxDelegationRewardBakExample example = new TxDelegationRewardBakExample();
-        example.createCriteria().andBnGreaterThanOrEqualTo(startBlockNum).andBnLessThanOrEqualTo(endBlockNum);
-        List<TxDelegationRewardBak> txDelegationRewardBakList = txDelegationRewardBakMapper.selectByExample(example);
-        for (TxDelegationRewardBak txDelegationRewardBak : txDelegationRewardBakList) {
-            DelegationReward delegationReward = new DelegationReward();
-            BeanUtil.copyProperties(txDelegationRewardBak, delegationReward);
-            syncData.getDelegationRewardBakSet().add(delegationReward);
+    private void syncDelegationRewardTx(AbstractEsRepository abstractEsRepository, SyncData syncData) throws Exception {
+        try {
+            long mysqlTxId = customTxDelegationRewardBakMapper.findMaxId();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setDesc("id");
+            constructor.setResult(new String[]{"id", "hash", "bn"});
+            constructor.setUnmappedType("long");
+            ESResult<TxDelegationRewardBak> queryResultFromES = abstractEsRepository.search(constructor, TxDelegationRewardBak.class, 1, 1);
+            List<TxDelegationRewardBak> list = queryResultFromES.getRsData();
+            long esTxId = CollUtil.isNotEmpty(list) ? CollUtil.getFirst(list).getId() : 0L;
+            if (mysqlTxId > esTxId) {
+                TxDelegationRewardBakExample example = new TxDelegationRewardBakExample();
+                example.createCriteria().andIdGreaterThan(esTxId).andIdLessThanOrEqualTo(mysqlTxId);
+                List<TxDelegationRewardBak> txDelegationRewardBakList = txDelegationRewardBakMapper.selectByExample(example);
+                for (TxDelegationRewardBak txDelegationRewardBak : txDelegationRewardBakList) {
+                    DelegationReward delegationReward = new DelegationReward();
+                    BeanUtil.copyProperties(txDelegationRewardBak, delegationReward);
+                    syncData.getDelegationRewardBakSet().add(delegationReward);
+                }
+                log.info("MYSQL/ES/REDIS领取奖励交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+            } else {
+                log.info("MySQL没有领取奖励交易数据需要同步");
+            }
+        } catch (Exception e) {
+            log.error("MySQL同步领取奖励交易数据异常", e);
+            throw new Exception("MySQL同步领取奖励交易数据异常");
         }
     }
 
     /**
      * 同步mysql的erc20交易信息到es和Redis
      *
+     * @param abstractEsRepository:
      * @param syncData:
-     * @param startBlockNum:
-     * @param endBlockNum:
      * @return: void
-     * @date: 2022/1/20
+     * @date: 2022/1/24
      */
-    private void syncErc20Tx(SyncData syncData, long startBlockNum, long endBlockNum) {
-        TxErc20BakExample example = new TxErc20BakExample();
-        example.createCriteria().andBnGreaterThanOrEqualTo(startBlockNum).andBnLessThanOrEqualTo(endBlockNum);
-        List<TxErc20Bak> txErc20BakList = txErc20BakMapper.selectByExample(example);
-        for (TxErc20Bak txErc20Bak : txErc20BakList) {
-            ErcTx ercTx = new ErcTx();
-            BeanUtil.copyProperties(txErc20Bak, ercTx);
-            syncData.getErc20BakSet().add(ercTx);
+    private void syncErc20Tx(AbstractEsRepository abstractEsRepository, SyncData syncData) throws Exception {
+        try {
+            long mysqlTxId = customTx20BakMapper.findMaxId();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setDesc("id");
+            constructor.setResult(new String[]{"id", "seq", "hash", "bn"});
+            constructor.setUnmappedType("long");
+            ESResult<ErcTx> queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, 1);
+            List<ErcTx> list = queryResultFromES.getRsData();
+            long esTxId = CollUtil.isNotEmpty(list) ? CollUtil.getFirst(list).getId() : 0L;
+            if (mysqlTxId > esTxId) {
+                TxErc20BakExample example = new TxErc20BakExample();
+                example.createCriteria().andIdGreaterThan(esTxId).andIdLessThanOrEqualTo(mysqlTxId);
+                List<TxErc20Bak> txErc20BakList = txErc20BakMapper.selectByExample(example);
+                for (TxErc20Bak txErc20Bak : txErc20BakList) {
+                    ErcTx ercTx = new ErcTx();
+                    BeanUtil.copyProperties(txErc20Bak, ercTx);
+                    syncData.getErc20BakSet().add(ercTx);
+                }
+                log.info("MYSQL/ES/REDIS erc20交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+            } else {
+                log.info("MySQL没有erc20交易数据需要同步");
+            }
+        } catch (Exception e) {
+            log.error("MySQL同步erc20交易数据异常", e);
+            throw new Exception("MySQL同步erc20交易数据异常");
         }
     }
 
     /**
      * 同步mysql的erc721交易信息到es和Redis
      *
+     * @param abstractEsRepository:
      * @param syncData:
-     * @param startBlockNum:
-     * @param endBlockNum:
      * @return: void
-     * @date: 2022/1/20
+     * @date: 2022/1/24
      */
-    private void syncErc721Tx(SyncData syncData, long startBlockNum, long endBlockNum) {
-        TxErc721BakExample example = new TxErc721BakExample();
-        example.createCriteria().andBnGreaterThanOrEqualTo(startBlockNum).andBnLessThanOrEqualTo(endBlockNum);
-        List<TxErc721Bak> txErc721BakList = txErc721BakMapper.selectByExample(example);
-        for (TxErc721Bak txErc721Bak : txErc721BakList) {
-            ErcTx ercTx = new ErcTx();
-            BeanUtil.copyProperties(txErc721Bak, ercTx);
-            syncData.getErc20BakSet().add(ercTx);
+    private void syncErc721Tx(AbstractEsRepository abstractEsRepository, SyncData syncData) throws Exception {
+        try {
+            long mysqlTxId = customTx721BakMapper.findMaxId();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setDesc("id");
+            constructor.setResult(new String[]{"id", "seq", "hash", "bn"});
+            constructor.setUnmappedType("long");
+            ESResult<ErcTx> queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, 1);
+            List<ErcTx> list = queryResultFromES.getRsData();
+            long esTxId = CollUtil.isNotEmpty(list) ? CollUtil.getFirst(list).getId() : 0L;
+            if (mysqlTxId > esTxId) {
+                TxErc721BakExample example = new TxErc721BakExample();
+                example.createCriteria().andIdGreaterThan(esTxId).andIdLessThanOrEqualTo(mysqlTxId);
+                List<TxErc721Bak> txErc721BakList = txErc721BakMapper.selectByExample(example);
+                for (TxErc721Bak txErc721Bak : txErc721BakList) {
+                    ErcTx ercTx = new ErcTx();
+                    BeanUtil.copyProperties(txErc721Bak, ercTx);
+                    syncData.getErc20BakSet().add(ercTx);
+                }
+                log.info("MYSQL/ES/REDIS erc721交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+            } else {
+                log.info("MySQL没有erc721交易数据需要同步");
+            }
+        } catch (Exception e) {
+            log.error("MySQL同步erc721交易数据异常", e);
+            throw new Exception("MySQL同步erc721交易数据异常");
         }
     }
 

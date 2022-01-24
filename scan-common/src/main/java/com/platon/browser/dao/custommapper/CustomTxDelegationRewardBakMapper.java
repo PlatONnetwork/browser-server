@@ -9,4 +9,5 @@ public interface CustomTxDelegationRewardBakMapper {
 
     int batchInsert(@Param("list") List<DelegationReward> list);
 
+    long findMaxId();
 }

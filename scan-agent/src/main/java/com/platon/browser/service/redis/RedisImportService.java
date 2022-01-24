@@ -110,7 +110,7 @@ public class RedisImportService {
         log.debug("Redis批量导入:{}(blocks({}),transactions({})", Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size());
         long startTime = System.currentTimeMillis();
         try {
-            CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
+            CountDownLatch latch = new CountDownLatch(4);
             submit(redisBlockService, blocks, false, latch, RedisKeyEnum.Block, CommonUtil.getTraceId());
             submit(redisTransactionService, transactions, false, latch, RedisKeyEnum.Transaction, CommonUtil.getTraceId());
             submit(redisErc20TxService, erc20TxList, false, latch, RedisKeyEnum.Erc20Tx, CommonUtil.getTraceId());
