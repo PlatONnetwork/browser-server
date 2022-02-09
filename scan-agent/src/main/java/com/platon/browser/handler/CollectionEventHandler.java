@@ -210,14 +210,14 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      * @date: 2021/12/16
      */
     private void addTxErc20Bak(List<Transaction> transactions) {
-        Set<ErcTx> erc20Set = new HashSet<>();
+        List<ErcTx> erc20List = new ArrayList<>();
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc20TxList())) {
-                erc20Set.addAll(transaction.getErc20TxList());
+                erc20List.addAll(transaction.getErc20TxList());
             }
         });
-        if (CollUtil.isNotEmpty(erc20Set)) {
-            customTx20BakMapper.batchInsert(erc20Set);
+        if (CollUtil.isNotEmpty(erc20List)) {
+            customTx20BakMapper.batchInsert(erc20List);
         }
     }
 
@@ -229,14 +229,14 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      * @date: 2021/12/16
      */
     private void addTxErc721Bak(List<Transaction> transactions) {
-        Set<ErcTx> erc721Set = new HashSet<>();
+        List<ErcTx> erc721List = new ArrayList<>();
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc721TxList())) {
-                erc721Set.addAll(transaction.getErc721TxList());
+                erc721List.addAll(transaction.getErc721TxList());
             }
         });
-        if (CollUtil.isNotEmpty(erc721Set)) {
-            customTx721BakMapper.batchInsert(erc721Set);
+        if (CollUtil.isNotEmpty(erc721List)) {
+            customTx721BakMapper.batchInsert(erc721List);
         }
     }
 
