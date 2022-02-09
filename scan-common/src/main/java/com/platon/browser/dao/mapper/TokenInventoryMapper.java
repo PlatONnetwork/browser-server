@@ -1,5 +1,6 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryWithBLOBs;
@@ -17,9 +18,9 @@ public interface TokenInventoryMapper {
 
     int insertSelective(TokenInventoryWithBLOBs record);
 
-    List<TokenInventoryWithBLOBs> selectByExampleWithBLOBs(TokenInventoryExample example);
+    Page<TokenInventoryWithBLOBs> selectByExampleWithBLOBs(TokenInventoryExample example);
 
-    List<TokenInventory> selectByExample(TokenInventoryExample example);
+    Page<TokenInventory> selectByExample(TokenInventoryExample example);
 
     TokenInventoryWithBLOBs selectByPrimaryKey(Long id);
 

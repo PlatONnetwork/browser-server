@@ -138,3 +138,24 @@ CREATE TABLE `tx_delegation_reward_bak` (
                                             `extra_clean` longtext ,
                                             PRIMARY KEY (`id`)
 ) COMMENT='领取奖励备份表';
+
+DROP TABLE IF EXISTS `token_inventory`;
+CREATE TABLE `token_inventory` (
+                                   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+                                   `token_address` varchar(64) NOT NULL COMMENT '合约地址',
+                                   `token_id` varchar(128) NOT NULL COMMENT 'token id',
+                                   `owner` varchar(64) NOT NULL COMMENT 'token id 对应持有者地址',
+                                   `name` varchar(256) DEFAULT NULL COMMENT 'Identifies the asset to which this NFT represents',
+                                   `description` longtext COMMENT 'Describes the asset to which this NFT represents',
+                                   `image` varchar(256) DEFAULT NULL COMMENT 'A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.',
+                                   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                   `token_tx_qty` int(11) NOT NULL DEFAULT '0' COMMENT 'tokenaddress和tokenid的对应交易数',
+                                   `token_owner_tx_qty` int(11) DEFAULT '0' COMMENT 'owner对该tokenaddress和tokenid的对应交易数',
+                                   `small_image` varchar(256) DEFAULT NULL COMMENT '缩略图',
+                                   `medium_image` varchar(256) DEFAULT NULL COMMENT '中等缩略图',
+                                   `token_url` longtext COMMENT 'url',
+                                   `retry_num` int(10) NOT NULL DEFAULT '0' COMMENT '重试次数',
+                                   PRIMARY KEY (`id`),
+                                   UNIQUE KEY `token_address` (`token_address`,`token_id`)
+);

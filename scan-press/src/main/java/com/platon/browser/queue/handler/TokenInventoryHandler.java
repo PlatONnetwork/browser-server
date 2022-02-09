@@ -2,6 +2,7 @@ package com.platon.browser.queue.handler;
 
 import cn.hutool.core.collection.ListUtil;
 import com.platon.browser.dao.entity.TokenInventory;
+import com.platon.browser.dao.entity.TokenInventoryWithBLOBs;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.queue.event.TokenInventoryEvent;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public class TokenInventoryHandler extends AbstractHandler<TokenInventoryEvent> 
     @Value("${disruptor.queue.token-inventory.batch-size}")
     private volatile int batchSize;
 
-    private Set<TokenInventory> stage = new HashSet<>();
+    private Set<TokenInventoryWithBLOBs> stage = new HashSet<>();
 
     @PostConstruct
     private void init() {
