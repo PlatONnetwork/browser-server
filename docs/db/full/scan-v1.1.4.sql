@@ -478,6 +478,8 @@ CREATE TABLE `token_inventory` (
                                    `token_owner_tx_qty` int(11) DEFAULT '0' COMMENT 'owner对该tokenaddress和tokenid的对应交易数',
                                    `small_image` varchar(256) DEFAULT NULL COMMENT '缩略图',
                                    `medium_image` varchar(256) DEFAULT NULL COMMENT '中等缩略图',
+                                   `token_url` longtext COMMENT 'url',
+                                   `retry_num` int(10) NOT NULL DEFAULT '0' COMMENT '重试次数',
                                    PRIMARY KEY (`id`),
                                    UNIQUE KEY `token_address` (`token_address`,`token_id`)
 );

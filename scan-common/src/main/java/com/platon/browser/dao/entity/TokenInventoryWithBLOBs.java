@@ -2,137 +2,26 @@ package com.platon.browser.dao.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
-public class TokenInventory {
-    private Long id;
+public class TokenInventoryWithBLOBs extends TokenInventory {
+    private String description;
 
-    private String tokenAddress;
+    private String tokenUrl;
 
-    private String tokenId;
-
-    private String owner;
-
-    private String name;
-
-    private String image;
-
-    private Date createTime;
-
-    private Date updateTime;
-
-    private Integer tokenTxQty;
-
-    private Integer tokenOwnerTxQty;
-
-    private String smallImage;
-
-    private String mediumImage;
-
-    private Integer retryNum;
-
-    public Long getId() {
-        return id;
+    public String getDescription() {
+        return description;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 
-    public String getTokenAddress() {
-        return tokenAddress;
+    public String getTokenUrl() {
+        return tokenUrl;
     }
 
-    public void setTokenAddress(String tokenAddress) {
-        this.tokenAddress = tokenAddress == null ? null : tokenAddress.trim();
-    }
-
-    public String getTokenId() {
-        return tokenId;
-    }
-
-    public void setTokenId(String tokenId) {
-        this.tokenId = tokenId == null ? null : tokenId.trim();
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner == null ? null : owner.trim();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image == null ? null : image.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getTokenTxQty() {
-        return tokenTxQty;
-    }
-
-    public void setTokenTxQty(Integer tokenTxQty) {
-        this.tokenTxQty = tokenTxQty;
-    }
-
-    public Integer getTokenOwnerTxQty() {
-        return tokenOwnerTxQty;
-    }
-
-    public void setTokenOwnerTxQty(Integer tokenOwnerTxQty) {
-        this.tokenOwnerTxQty = tokenOwnerTxQty;
-    }
-
-    public String getSmallImage() {
-        return smallImage;
-    }
-
-    public void setSmallImage(String smallImage) {
-        this.smallImage = smallImage == null ? null : smallImage.trim();
-    }
-
-    public String getMediumImage() {
-        return mediumImage;
-    }
-
-    public void setMediumImage(String mediumImage) {
-        this.mediumImage = mediumImage == null ? null : mediumImage.trim();
-    }
-
-    public Integer getRetryNum() {
-        return retryNum;
-    }
-
-    public void setRetryNum(Integer retryNum) {
-        this.retryNum = retryNum;
+    public void setTokenUrl(String tokenUrl) {
+        this.tokenUrl = tokenUrl == null ? null : tokenUrl.trim();
     }
 
     /**

@@ -50,6 +50,12 @@
                 <if test="'id'.toString() == column.value">
                     #{item.id}
                 </if>
+                <if test="'token_url'.toString() == column.value">
+                    #{item.tokenUrl}
+                </if>
+                <if test="'retry_num'.toString() == column.value">
+                    #{item.retryNum}
+                </if>
             </foreach>
             )
         </foreach>

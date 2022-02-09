@@ -1,5 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.exception.BusinessException;
@@ -182,8 +183,12 @@ public class EsImportService {
     private <T> void statisticsLog(Set<T> data, ESKeyEnum eSKeyEnum) {
         try {
             if (eSKeyEnum.compareTo(ESKeyEnum.Block) == 0) {
-                LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
-                log.info("ES批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
+                if (CollUtil.isNotEmpty(data)) {
+                    LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
+                    log.info("ES批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
+                } else {
+                    log.info("ES批量入库成功统计:区块[{}]-[{}]", 0, 0);
+                }
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Transaction) == 0) {
                 log.info("ES批量入库成功统计:交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc20Tx) == 0) {

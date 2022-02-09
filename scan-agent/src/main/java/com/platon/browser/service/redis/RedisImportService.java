@@ -1,5 +1,6 @@
 package com.platon.browser.service.redis;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -168,8 +169,12 @@ public class RedisImportService {
     private <T> void statisticsLog(Set<T> data, RedisKeyEnum redisKeyEnum) {
         try {
             if (redisKeyEnum.compareTo(RedisKeyEnum.Block) == 0) {
-                LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
-                log.info("redis批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
+                if (CollUtil.isNotEmpty(data)) {
+                    LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
+                    log.info("redis批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
+                } else {
+                    log.info("redis批量入库成功统计:区块[{}]-[{}]", 0, 0);
+                }
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Transaction) == 0) {
                 log.info("redis批量入库成功统计:交易数[{}]", data.size());
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Erc20Tx) == 0) {

@@ -1,6 +1,5 @@
 package com.platon.browser.bootstrap.service;
 
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.analyzer.BlockAnalyzer;
@@ -34,7 +33,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * MySQL/ES/Redis启动一致性自检服务
- * 以MySQL的数据为基准，同步ES和Redis中缺失的部分数据
+ * 查询MySQL的最大id和ES的最大id做比较，以MySQL为准补充确实的数据
+ * 缺陷：es并没有事务保证，es批量插入并不会按照id大小顺序入库，一批数据入库可能MaxId先入库，此时agent停止，则会丢失数据（结合优雅停机，可以比较大限度的避免此情形）
  *
  * @date: 2022/1/24
  */

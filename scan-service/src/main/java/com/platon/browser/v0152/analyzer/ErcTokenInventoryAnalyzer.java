@@ -4,15 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.entity.TokenInventory;
+import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryKey;
+import com.platon.browser.dao.entity.TokenInventoryWithBLOBs;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,11 +34,14 @@ public class ErcTokenInventoryAnalyzer {
     @Resource
     private CustomTokenInventoryMapper customTokenInventoryMapper;
 
+    @Resource
+    private ErcServiceImpl ercServiceImpl;
+
     /**
      * 解析Token库存
      */
     public void analyze(String txHash, List<ErcTx> txList) {
-        List<TokenInventory> insertOrUpdate = new ArrayList<>();
+        List<TokenInventoryWithBLOBs> insertOrUpdate = new ArrayList<>();
         List<TokenInventoryKey> delTokenInventory = new ArrayList<>();
         Date date = new Date();
         if (CollUtil.isNotEmpty(txList)) {
@@ -46,18 +53,24 @@ public class ErcTokenInventoryAnalyzer {
                     // 仅打印日志而不能抛出异常来阻塞流程
                     log.warn("当前交易[{}]token[{}]不符合合约标准，tokenId[{}]过长，仅支持128位", txHash, tokenAddress, tokenId);
                 } else {
-                    TokenInventoryKey key = new TokenInventory();
-                    key.setTokenAddress(tokenAddress);
-                    key.setTokenId(tokenId);
-                    TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(key);
-                    if (tokenInventory == null) {
-                        tokenInventory = new TokenInventory();
-                        tokenInventory.setTokenAddress(key.getTokenAddress());
-                        tokenInventory.setTokenId(key.getTokenId());
+                    TokenInventoryExample example = new TokenInventoryExample();
+                    example.createCriteria().andTokenAddressEqualTo(tokenAddress).andTokenIdEqualTo(tokenId);
+                    List<TokenInventoryWithBLOBs> tokenInventoryWithBLOBs = tokenInventoryMapper.selectByExampleWithBLOBs(example);
+                    TokenInventoryWithBLOBs tokenInventory;
+                    // 不为空，交易次数加1
+                    if (CollUtil.isNotEmpty(tokenInventoryWithBLOBs) && tokenInventoryWithBLOBs.size() == 1) {
+                        tokenInventory = CollUtil.getFirst(tokenInventoryWithBLOBs);
+                        tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty() + 1);
+                    } else {
+                        // 为空，则新建对象
+                        tokenInventory = new TokenInventoryWithBLOBs();
+                        tokenInventory.setTokenAddress(tokenAddress);
+                        tokenInventory.setTokenId(tokenId);
                         tokenInventory.setCreateTime(date);
                         tokenInventory.setTokenTxQty(1);
-                    } else {
-                        tokenInventory.setTokenTxQty(tokenInventory.getTokenTxQty() + 1);
+                        tokenInventory.setRetryNum(0);
+                        String tokenURI = ercServiceImpl.getTokenURI(tokenAddress, new BigInteger(tokenId));
+                        tokenInventory.setTokenUrl(tokenURI);
                     }
                     if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {
                         int tokenOwnerTxQty = tokenInventory.getTokenOwnerTxQty() == null ? 0 : tokenInventory.getTokenOwnerTxQty();

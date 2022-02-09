@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.TokenInventoryMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TokenInventory">
-    <id column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
-    <id column="token_id" jdbcType="VARCHAR" property="tokenId" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
+    <result column="token_id" jdbcType="VARCHAR" property="tokenId" />
     <result column="owner" jdbcType="VARCHAR" property="owner" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="image" jdbcType="VARCHAR" property="image" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -14,7 +14,11 @@
     <result column="token_owner_tx_qty" jdbcType="INTEGER" property="tokenOwnerTxQty" />
     <result column="small_image" jdbcType="VARCHAR" property="smallImage" />
     <result column="medium_image" jdbcType="VARCHAR" property="mediumImage" />
-    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="retry_num" jdbcType="INTEGER" property="retryNum" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TokenInventoryWithBLOBs">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+    <result column="token_url" jdbcType="LONGVARCHAR" property="tokenUrl" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -75,9 +79,28 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    token_address, token_id, `owner`, `name`, description, image, create_time, update_time, 
-    token_tx_qty,token_owner_tx_qty,small_image,medium_image,id
+    id, token_address, token_id, `owner`, `name`, image, create_time, update_time, token_tx_qty, 
+    token_owner_tx_qty, small_image, medium_image, retry_num
   </sql>
+  <sql id="Blob_Column_List">
+    description, token_url
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TokenInventoryExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from token_inventory
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenInventoryExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -92,17 +115,17 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenInventoryKey" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from token_inventory
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenInventoryKey">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from token_inventory
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TokenInventoryExample">
     delete from token_inventory
@@ -110,20 +133,26 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.platon.browser.dao.entity.TokenInventory">
-    insert into token_inventory (token_address, token_id, `owner`, 
-      `name`, description, image, 
-      create_time, update_time, token_tx_qty,token_owner_tx_qty,small_image,medium_image
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.TokenInventoryWithBLOBs">
+    insert into token_inventory (id, token_address, token_id, 
+      `owner`, `name`, image, 
+      create_time, update_time, token_tx_qty, 
+      token_owner_tx_qty, small_image, medium_image, 
+      retry_num, description, token_url
       )
-    values (#{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, #{owner,jdbcType=VARCHAR},
-      #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER},
-      #{tokenOwnerTxQty,jdbcType=INTEGER},#{smallImage},#{mediumImage}
+    values (#{id,jdbcType=BIGINT}, #{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, 
+      #{owner,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
+      #{tokenOwnerTxQty,jdbcType=INTEGER}, #{smallImage,jdbcType=VARCHAR}, #{mediumImage,jdbcType=VARCHAR}, 
+      #{retryNum,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR}, #{tokenUrl,jdbcType=LONGVARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TokenInventory">
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TokenInventoryWithBLOBs">
     insert into token_inventory
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
       <if test="tokenAddress != null">
         token_address,
       </if>
@@ -135,9 +164,6 @@
       </if>
       <if test="name != null">
         `name`,
-      </if>
-      <if test="description != null">
-        description,
       </if>
       <if test="image != null">
         image,
@@ -154,14 +180,26 @@
       <if test="tokenOwnerTxQty != null">
         token_owner_tx_qty,
       </if>
-      <if test="small_image != null">
+      <if test="smallImage != null">
         small_image,
       </if>
-      <if test="medium_image != null">
+      <if test="mediumImage != null">
         medium_image,
+      </if>
+      <if test="retryNum != null">
+        retry_num,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="tokenUrl != null">
+        token_url,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
       <if test="tokenAddress != null">
         #{tokenAddress,jdbcType=VARCHAR},
       </if>
@@ -173,9 +211,6 @@
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="description != null">
-        #{description,jdbcType=VARCHAR},
       </if>
       <if test="image != null">
         #{image,jdbcType=VARCHAR},
@@ -193,10 +228,19 @@
         #{tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
       <if test="smallImage != null">
-        #{smallImage},
+        #{smallImage,jdbcType=VARCHAR},
       </if>
       <if test="mediumImage != null">
-        #{mediumImage},
+        #{mediumImage,jdbcType=VARCHAR},
+      </if>
+      <if test="retryNum != null">
+        #{retryNum,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="tokenUrl != null">
+        #{tokenUrl,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -209,6 +253,9 @@
   <update id="updateByExampleSelective" parameterType="map">
     update token_inventory
     <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
       <if test="record.tokenAddress != null">
         token_address = #{record.tokenAddress,jdbcType=VARCHAR},
       </if>
@@ -220,9 +267,6 @@
       </if>
       <if test="record.name != null">
         `name` = #{record.name,jdbcType=VARCHAR},
-      </if>
-      <if test="record.description != null">
-        description = #{record.description,jdbcType=VARCHAR},
       </if>
       <if test="record.image != null">
         image = #{record.image,jdbcType=VARCHAR},
@@ -240,45 +284,79 @@
         token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
       <if test="record.smallImage != null">
-        small_image = #{record.smallImage},
+        small_image = #{record.smallImage,jdbcType=VARCHAR},
       </if>
       <if test="record.mediumImage != null">
-        medium_image = #{record.mediumImage},
+        medium_image = #{record.mediumImage,jdbcType=VARCHAR},
+      </if>
+      <if test="record.retryNum != null">
+        retry_num = #{record.retryNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.tokenUrl != null">
+        token_url = #{record.tokenUrl,jdbcType=LONGVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByExample" parameterType="map">
+  <update id="updateByExampleWithBLOBs" parameterType="map">
     update token_inventory
-    set token_address = #{record.tokenAddress,jdbcType=VARCHAR},
+    set id = #{record.id,jdbcType=BIGINT},
+      token_address = #{record.tokenAddress,jdbcType=VARCHAR},
       token_id = #{record.tokenId,jdbcType=VARCHAR},
       `owner` = #{record.owner,jdbcType=VARCHAR},
       `name` = #{record.name,jdbcType=VARCHAR},
-      description = #{record.description,jdbcType=VARCHAR},
       image = #{record.image,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
       token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
-      small_image=#{smallImage},
-      medium_image=#{mediumImage}
+      small_image = #{record.smallImage,jdbcType=VARCHAR},
+      medium_image = #{record.mediumImage,jdbcType=VARCHAR},
+      retry_num = #{record.retryNum,jdbcType=INTEGER},
+      description = #{record.description,jdbcType=LONGVARCHAR},
+      token_url = #{record.tokenUrl,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TokenInventory">
+  <update id="updateByExample" parameterType="map">
+    update token_inventory
+    set id = #{record.id,jdbcType=BIGINT},
+      token_address = #{record.tokenAddress,jdbcType=VARCHAR},
+      token_id = #{record.tokenId,jdbcType=VARCHAR},
+      `owner` = #{record.owner,jdbcType=VARCHAR},
+      `name` = #{record.name,jdbcType=VARCHAR},
+      image = #{record.image,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
+      token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
+      small_image = #{record.smallImage,jdbcType=VARCHAR},
+      medium_image = #{record.mediumImage,jdbcType=VARCHAR},
+      retry_num = #{record.retryNum,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TokenInventoryWithBLOBs">
     update token_inventory
     <set>
+      <if test="tokenAddress != null">
+        token_address = #{tokenAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenId != null">
+        token_id = #{tokenId,jdbcType=VARCHAR},
+      </if>
       <if test="owner != null">
         `owner` = #{owner,jdbcType=VARCHAR},
       </if>
       <if test="name != null">
         `name` = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="description != null">
-        description = #{description,jdbcType=VARCHAR},
       </if>
       <if test="image != null">
         image = #{image,jdbcType=VARCHAR},
@@ -296,29 +374,56 @@
         token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
       <if test="smallImage != null">
-        small_image = #{smallImage},
+        small_image = #{smallImage,jdbcType=VARCHAR},
       </if>
       <if test="mediumImage != null">
-        medium_image = #{mediumImage},
+        medium_image = #{mediumImage,jdbcType=VARCHAR},
+      </if>
+      <if test="retryNum != null">
+        retry_num = #{retryNum,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="tokenUrl != null">
+        token_url = #{tokenUrl,jdbcType=LONGVARCHAR},
       </if>
     </set>
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenInventory">
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TokenInventoryWithBLOBs">
     update token_inventory
-    set `owner` = #{owner,jdbcType=VARCHAR},
+    set token_address = #{tokenAddress,jdbcType=VARCHAR},
+      token_id = #{tokenId,jdbcType=VARCHAR},
+      `owner` = #{owner,jdbcType=VARCHAR},
       `name` = #{name,jdbcType=VARCHAR},
-      description = #{description,jdbcType=VARCHAR},
       image = #{image,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
-      token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER}
-      small_image=#{smallImage},
-      medium_image=#{mediumImage}
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
+      token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
+      small_image = #{smallImage,jdbcType=VARCHAR},
+      medium_image = #{mediumImage,jdbcType=VARCHAR},
+      retry_num = #{retryNum,jdbcType=INTEGER},
+      description = #{description,jdbcType=LONGVARCHAR},
+      token_url = #{tokenUrl,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TokenInventory">
+    update token_inventory
+    set token_address = #{tokenAddress,jdbcType=VARCHAR},
+      token_id = #{tokenId,jdbcType=VARCHAR},
+      `owner` = #{owner,jdbcType=VARCHAR},
+      `name` = #{name,jdbcType=VARCHAR},
+      image = #{image,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
+      token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
+      small_image = #{smallImage,jdbcType=VARCHAR},
+      medium_image = #{mediumImage,jdbcType=VARCHAR},
+      retry_num = #{retryNum,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -327,15 +432,17 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into token_inventory
-    (token_address, token_id, `owner`, `name`, description, image, create_time, update_time, 
-      token_tx_qty,token_owner_tx_qty,small_image,medium_image)
+    (id, token_address, token_id, `owner`, `name`, image, create_time, update_time, token_tx_qty, 
+      token_owner_tx_qty, small_image, medium_image, retry_num, description, token_url
+      )
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, #{item.owner,jdbcType=VARCHAR},
-        #{item.name,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER},
-       #{item.tokenOwnerTxQty,jdbcType=INTEGER},#{item.smallImage},#{item.mediumImage}
-        )
+      (#{item.id,jdbcType=BIGINT}, #{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, 
+        #{item.owner,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
+        #{item.tokenOwnerTxQty,jdbcType=INTEGER}, #{item.smallImage,jdbcType=VARCHAR}, 
+        #{item.mediumImage,jdbcType=VARCHAR}, #{item.retryNum,jdbcType=INTEGER}, #{item.description,jdbcType=LONGVARCHAR}, 
+        #{item.tokenUrl,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -353,6 +460,9 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
+        <if test="'id'.toString() == column.value">
+          #{item.id,jdbcType=BIGINT}
+        </if>
         <if test="'token_address'.toString() == column.value">
           #{item.tokenAddress,jdbcType=VARCHAR}
         </if>
@@ -364,9 +474,6 @@
         </if>
         <if test="'name'.toString() == column.value">
           #{item.name,jdbcType=VARCHAR}
-        </if>
-        <if test="'description'.toString() == column.value">
-          #{item.description,jdbcType=VARCHAR}
         </if>
         <if test="'image'.toString() == column.value">
           #{item.image,jdbcType=VARCHAR}
@@ -384,13 +491,23 @@
           #{item.tokenOwnerTxQty,jdbcType=INTEGER}
         </if>
         <if test="'small_image'.toString() == column.value">
-          #{item.smallImage}
+          #{item.smallImage,jdbcType=VARCHAR}
         </if>
         <if test="'medium_image'.toString() == column.value">
-          #{item.mediumImage}
+          #{item.mediumImage,jdbcType=VARCHAR}
+        </if>
+        <if test="'retry_num'.toString() == column.value">
+          #{item.retryNum,jdbcType=INTEGER}
+        </if>
+        <if test="'description'.toString() == column.value">
+          #{item.description,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'token_url'.toString() == column.value">
+          #{item.tokenUrl,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

@@ -42,7 +42,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="tx_delegation_reward_bak" domainObjectName="TxDelegationRewardBak">
+        <table tableName="token_inventory" domainObjectName="TokenInventory">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>
