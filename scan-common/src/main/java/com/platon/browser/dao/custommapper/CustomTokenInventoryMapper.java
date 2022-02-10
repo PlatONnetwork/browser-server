@@ -19,4 +19,15 @@ public interface CustomTokenInventoryMapper {
 
     List<Erc721ContractDestroyBalanceVO> findErc721ContractDestroyBalance(@Param("tokenAddress") String tokenAddress);
 
+    /**
+     * 查找token_inventory中销毁的合约记录
+     *
+     * @param minId:
+     * @param maxId:
+     * @param retryNum:
+     * @return: java.util.List<com.platon.browser.dao.entity.TokenInventoryWithBLOBs>
+     * @date: 2022/2/10
+     */
+    List<TokenInventoryWithBLOBs> findDestroyContracts(@Param("minId") Long minId, @Param("maxId") Long maxId, @Param("retryNum") Integer retryNum);
+
 }

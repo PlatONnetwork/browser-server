@@ -286,6 +286,14 @@ public class ErcTokenUpdateTask {
         contractErc721DestroyUpdateBalance();
     }
 
+    @XxlJob("contractDestroyUpdateInfoJobHandler")
+    public void contractDestroyUpdateInfo() {
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+        updateTokenInventoryInfo();
+    }
+
     /**
      * 更新ERC20和Erc721Enumeration token的总供应量===》全量更新
      *
@@ -1023,6 +1031,135 @@ public class ErcTokenUpdateTask {
             }
         }
         return res;
+    }
+
+    /**
+     * 销毁的合约更新库存信息
+     *
+     * @param :
+     * @return: void
+     * @date: 2022/2/10
+     */
+    private void updateTokenInventoryInfo() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+        // 当前查询到的条数
+        int batchNum = 0;
+        // 当前失败的条数
+        AtomicInteger errorNum = new AtomicInteger(0);
+        // 当次更新的条数
+        AtomicInteger updateNum = new AtomicInteger(0);
+        PointLog pointLog = pointLogMapper.selectByPrimaryKey(8);
+        Long oldPosition = Convert.toLong(pointLog.getPosition());
+        int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        XxlJobHelper.log("当前页数为[{}]，断点为[{}]", batchSize, oldPosition);
+        try {
+            List<TokenInventoryWithBLOBs> batch = customTokenInventoryMapper.findDestroyContracts(oldPosition, oldPosition + batchSize, tokenRetryNum);
+            if (CollUtil.isNotEmpty(batch)) {
+                List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
+                if (CollUtil.isNotEmpty(batch)) {
+                    batchNum = batch.size();
+                    batch.forEach(inventory -> {
+                        try {
+                            if (StrUtil.isNotBlank(inventory.getTokenUrl())) {
+                                Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
+                                Response response = CustomHttpClient.client.newCall(request).execute();
+                                if (response.code() == 200) {
+                                    String resp = response.body().string();
+                                    TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);
+                                    newTi.setTokenId(inventory.getTokenId());
+                                    newTi.setTokenAddress(inventory.getTokenAddress());
+                                    boolean changed = false;
+                                    // 只要有一个属性变动就添加到更新列表中
+                                    if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
+                                        inventory.setImage(newTi.getImage());
+                                        changed = true;
+                                    }
+                                    if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
+                                        inventory.setDescription(newTi.getDescription());
+                                        changed = true;
+                                    }
+                                    if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
+                                        inventory.setName(newTi.getName());
+                                        changed = true;
+                                    }
+                                    if (changed) {
+                                        updateNum.getAndIncrement();
+                                        inventory.setRetryNum(0);
+                                        updateParams.add(inventory);
+                                        String msg = StrUtil.format("token[{}]库存有属性变动需要更新,tokenURL[{}],tokenName[{}],tokenDesc[{}],tokenImage[{}]",
+                                                                    inventory.getTokenAddress(),
+                                                                    inventory.getTokenUrl(),
+                                                                    inventory.getName(),
+                                                                    inventory.getDescription(),
+                                                                    inventory.getImage());
+                                        XxlJobHelper.log(msg);
+                                        log.info(msg);
+                                    }
+                                } else {
+                                    errorNum.getAndIncrement();
+                                    inventory.setRetryNum(inventory.getRetryNum() + 1);
+                                    updateParams.add(inventory);
+                                    String msg = StrUtil.format("http请求异常：http状态码:{},http消息:{},断点:{},token_address:{},token_id:{},tokenURI:{},重试次数:{}",
+                                                                response.code(),
+                                                                response.message(),
+                                                                oldPosition,
+                                                                inventory.getTokenAddress(),
+                                                                inventory.getTokenId(),
+                                                                inventory.getTokenUrl(),
+                                                                inventory.getRetryNum());
+                                    XxlJobHelper.log(msg);
+                                    log.warn(msg);
+                                }
+                            } else {
+                                errorNum.getAndIncrement();
+                                inventory.setRetryNum(inventory.getRetryNum() + 1);
+                                updateParams.add(inventory);
+                                String msg = StrUtil.format("请求TokenURI为空,断点:{},token_address：{},token_id:{},重试次数:{}",
+                                                            oldPosition,
+                                                            inventory.getTokenAddress(),
+                                                            inventory.getTokenId(),
+                                                            inventory.getRetryNum());
+                                XxlJobHelper.log(msg);
+                                log.warn(msg);
+                            }
+                        } catch (Exception e) {
+                            errorNum.getAndIncrement();
+                            inventory.setRetryNum(inventory.getRetryNum() + 1);
+                            updateParams.add(inventory);
+                            log.warn(StrUtil.format("销毁的合约-更新token库存信息异常,断点:{},token_address：{},token_id:{},tokenURI:{},重试次数:{}",
+                                                    oldPosition,
+                                                    inventory.getTokenAddress(),
+                                                    inventory.getTokenId(),
+                                                    inventory.getTokenUrl(),
+                                                    inventory.getRetryNum()), e);
+                        }
+                    });
+                }
+                if (CollUtil.isNotEmpty(updateParams)) {
+                    customTokenInventoryMapper.batchInsertOrUpdateSelective(updateParams, TokenInventory.Column.values());
+                }
+                TokenInventory lastTokenInventory = CollUtil.getLast(batch);
+                String newPosition = Convert.toStr(lastTokenInventory.getId());
+                pointLog.setPosition(newPosition);
+                pointLogMapper.updateByPrimaryKeySelective(pointLog);
+                String msg = StrUtil.format("销毁的合约-更新token库存信息:断点为[{}]->[{}],查询到的条数为:{},过滤后的条数:{},已更新的条数为:{},失败的条数为:{}",
+                                            oldPosition,
+                                            newPosition,
+                                            batch.size(),
+                                            batchNum,
+                                            updateNum.get(),
+                                            errorNum.get());
+                XxlJobHelper.log(msg);
+                log.info(msg);
+            } else {
+                XxlJobHelper.log("销毁的合约-更新token库存信息完成，未找到数据，断点为[{}]", oldPosition);
+            }
+        } catch (Exception e) {
+            log.error(StrUtil.format("销毁的合约-更新token库存信息异常,断点:{}", oldPosition), e);
+        }
     }
 
 }
