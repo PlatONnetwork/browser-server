@@ -40,7 +40,7 @@ public class ErcTokenInventoryAnalyzer {
     /**
      * 解析Token库存
      */
-    public void analyze(String txHash, List<ErcTx> txList) {
+    public void analyze(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
         List<TokenInventoryWithBLOBs> insertOrUpdate = new ArrayList<>();
         List<TokenInventoryKey> delTokenInventory = new ArrayList<>();
         Date date = new Date();
@@ -69,7 +69,7 @@ public class ErcTokenInventoryAnalyzer {
                         tokenInventory.setCreateTime(date);
                         tokenInventory.setTokenTxQty(1);
                         tokenInventory.setRetryNum(0);
-                        String tokenURI = ercServiceImpl.getTokenURI(tokenAddress, new BigInteger(tokenId));
+                        String tokenURI = ercServiceImpl.getTokenURI(tokenAddress, new BigInteger(tokenId), blockNumber);
                         tokenInventory.setTokenUrl(tokenURI);
                     }
                     if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {

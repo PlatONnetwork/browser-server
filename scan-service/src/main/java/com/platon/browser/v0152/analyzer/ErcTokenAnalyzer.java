@@ -274,7 +274,7 @@ public class ErcTokenAnalyzer {
                             }
                             txList = resolveErcTxFromEvent(token, tx, erc721TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc721TxList().addAll(txList);
-                            ercTokenInventoryAnalyzer.analyze(tx.getHash(), txList);
+                            ercTokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
                             break;
                     }
                     token.setUpdateTime(new Date());

@@ -162,4 +162,26 @@ public class ErcServiceImpl {
         return tokenURI;
     }
 
+    /**
+     * 获取TokenURI
+     *
+     * @param contractAddress 合约地址
+     * @param tokenId         token id
+     * @param blockNumber:    块高
+     * @return: java.lang.String
+     * @date: 2022/2/10
+     */
+    public String getTokenURI(String contractAddress, BigInteger tokenId, BigInteger blockNumber) {
+        String tokenURI = "";
+        try {
+            ErcContract ercContract = getErcContract(contractAddress, ErcTypeEnum.ERC721, blockNumber);
+            if (ObjectUtil.isNotNull(ercContract)) {
+                tokenURI = ercContract.getTokenURI(tokenId).send();
+            }
+        } catch (Exception e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
+        }
+        return tokenURI;
+    }
+
 }
