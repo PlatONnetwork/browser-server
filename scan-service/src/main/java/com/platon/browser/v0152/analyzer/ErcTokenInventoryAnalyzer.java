@@ -70,7 +70,11 @@ public class ErcTokenInventoryAnalyzer {
                         tokenInventory.setTokenTxQty(1);
                         tokenInventory.setRetryNum(0);
                         String tokenURI = ercServiceImpl.getTokenURI(tokenAddress, new BigInteger(tokenId), blockNumber);
-                        tokenInventory.setTokenUrl(tokenURI);
+                        if (StrUtil.isNotBlank(tokenURI)) {
+                            tokenInventory.setTokenUrl(tokenURI);
+                        } else {
+                            log.warn("当前块高[{}]获取合约[{}]tokenId[{}]的tokenUrl为空，请联系管理员处理", blockNumber, tokenAddress, tokenId);
+                        }
                     }
                     if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {
                         int tokenOwnerTxQty = tokenInventory.getTokenOwnerTxQty() == null ? 0 : tokenInventory.getTokenOwnerTxQty();
