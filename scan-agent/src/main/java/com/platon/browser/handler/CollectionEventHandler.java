@@ -23,7 +23,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -179,12 +182,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             if (CollUtil.isNotEmpty(event.getBlock().getOriginTransactions())) {
                 txHashList = event.getBlock().getOriginTransactions().stream().map(com.platon.protocol.core.methods.response.Transaction::getHash).collect(Collectors.toList());
             }
-            log.warn("重试次数[{}],节点重新初始化，该区块[{}]交易列表{}重复处理，event对象数据为[{}]，copyEvent对象数据为[{}]",
-                     retryCount.get(),
-                     event.getBlock().getNum(),
-                     JSONUtil.toJsonStr(txHashList),
-                     JSONUtil.toJsonStr(event),
-                     JSONUtil.toJsonStr(copyEvent));
+            log.warn("重试次数[{}],节点重新初始化，该区块[{}]交易列表{}重复处理", retryCount.get(), event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList));
         }
         return copyEvent;
     }

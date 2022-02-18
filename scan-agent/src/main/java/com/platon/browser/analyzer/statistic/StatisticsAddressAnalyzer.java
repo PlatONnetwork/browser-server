@@ -117,7 +117,7 @@ public class StatisticsAddressAnalyzer {
             });
             int i = customAddressMapper.batchUpdateAddressInfo(itemFromDb);
             if (i > 0) {
-                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", i, JSONUtil.toJsonStr(itemFromDb));
+                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", itemFromDb.size(), JSONUtil.toJsonStr(itemFromDb));
             }
         }
         // 对比缓存和数据的数据，取出缓存中新增的地址
