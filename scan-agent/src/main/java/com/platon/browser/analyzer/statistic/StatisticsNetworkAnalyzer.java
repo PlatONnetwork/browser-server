@@ -19,6 +19,7 @@ import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -62,6 +63,7 @@ public class StatisticsNetworkAnalyzer {
      */
     private AtomicLong retryCount = new AtomicLong(0);
 
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
         long startTime = System.currentTimeMillis();
         log.debug("区块入库统计：区块[{}],交易数[{}],共识周期轮数[{}],结算周期轮数[{}],增发周期轮数[{}]",

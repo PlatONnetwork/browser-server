@@ -14,6 +14,7 @@ import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -40,6 +41,7 @@ public class ErcTokenInventoryAnalyzer {
     /**
      * 解析Token库存
      */
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
         List<TokenInventoryWithBLOBs> insertOrUpdate = new ArrayList<>();
         List<TokenInventoryKey> delTokenInventory = new ArrayList<>();

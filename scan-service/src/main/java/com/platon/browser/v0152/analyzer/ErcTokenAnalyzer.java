@@ -26,6 +26,7 @@ import com.platon.protocol.core.methods.response.TransactionReceipt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -230,9 +231,9 @@ public class ErcTokenAnalyzer {
      * @return void
      * @date 2021/4/15
      */
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
         try {
-
             // 过滤交易回执日志，地址不能为空且在token缓存里的
             List<Log> tokenLogs = receipt.getLogs()
                                          .stream()
@@ -304,6 +305,7 @@ public class ErcTokenAnalyzer {
 
         } catch (Exception e) {
             log.error(StrUtil.format("当前交易[{}]解析ERC交易异常", tx.getHash()), e);
+            throw e;
         }
     }
 

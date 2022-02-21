@@ -133,7 +133,7 @@
             <if test="item.contractBin!=null and item.contractBin!=''">
                 t.`contract_bin` = #{item.contractBin} ,
             </if>
-            t.`type` = #{item.type}
+            t.`update_time` = #{item.updateTime}
             WHERE
             t.`address` = #{item.address}
         </foreach>
