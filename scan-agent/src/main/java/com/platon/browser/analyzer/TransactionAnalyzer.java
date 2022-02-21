@@ -32,6 +32,7 @@ import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -103,6 +104,7 @@ public class TransactionAnalyzer {
      * @return com.platon.browser.bean.CollectionTransaction
      * @date 2021/4/20
      */
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         CollectionTransaction result = CollectionTransaction.newInstance().updateWithBlock(collectionBlock).updateWithRawTransaction(rawTransaction);
         log.info("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());

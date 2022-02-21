@@ -9,6 +9,7 @@ import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -28,11 +29,22 @@ public class ErcTokenHolderAnalyzer {
     @Resource
     private CustomTokenHolderMapper customTokenHolderMapper;
 
-    private void resolveTokenHolder(
-            String tokenAddress,
-            String userAddress,
-            List<TokenHolder> insertOrUpdate
-    ) {
+    /**
+     * 解析Token Holder
+     */
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    public void analyze(List<ErcTx> txList) {
+        List<TokenHolder> insertOrUpdate = new ArrayList<>();
+        txList.forEach(tx -> {
+            resolveTokenHolder(tx.getContract(), tx.getFrom(), insertOrUpdate);
+            resolveTokenHolder(tx.getContract(), tx.getTo(), insertOrUpdate);
+        });
+        if (CollUtil.isNotEmpty(insertOrUpdate)) {
+            customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
+        }
+    }
+
+    private void resolveTokenHolder(String tokenAddress, String userAddress, List<TokenHolder> insertOrUpdate) {
         // 零地址不需要創建holder
         if (AddressUtil.isAddrZero(userAddress)) {
             log.warn("该地址[{}]为0地址，不创建token holder", userAddress);
@@ -57,20 +69,6 @@ public class ErcTokenHolderAnalyzer {
         log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
         tokenHolder.setUpdateTime(date);
         insertOrUpdate.add(tokenHolder);
-    }
-
-    /**
-     * 解析Token Holder
-     */
-    public void analyze(List<ErcTx> txList) {
-        List<TokenHolder> insertOrUpdate = new ArrayList<>();
-        txList.forEach(tx -> {
-            resolveTokenHolder(tx.getContract(), tx.getFrom(), insertOrUpdate);
-            resolveTokenHolder(tx.getContract(), tx.getTo(), insertOrUpdate);
-        });
-        if (CollUtil.isNotEmpty(insertOrUpdate)) {
-            customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
-        }
     }
 
 }
