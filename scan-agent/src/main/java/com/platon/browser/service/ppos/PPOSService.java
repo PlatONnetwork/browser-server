@@ -173,7 +173,6 @@ public class PPOSService {
             // 调用交易分析引擎分析交易，以补充相关数据
             NodeOpt nodeOpt = null;
             DelegationReward delegationReward = null;
-
             switch (tx.getTypeEnum()) {
                 case STAKE_CREATE:
                     nodeOpt = this.stakeCreateAnalyzer.analyze(event, tx);

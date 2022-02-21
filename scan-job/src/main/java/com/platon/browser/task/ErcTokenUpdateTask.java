@@ -613,7 +613,7 @@ public class ErcTokenUpdateTask {
                         try {
                             if (StrUtil.isNotBlank(inventory.getTokenUrl())) {
                                 Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                                Response response = CustomHttpClient.client.newCall(request).execute();
+                                Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute();
                                 if (response.code() == 200) {
                                     String resp = response.body().string();
                                     TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);
@@ -733,7 +733,7 @@ public class ErcTokenUpdateTask {
                         try {
                             if (StrUtil.isNotBlank(inventory.getTokenUrl())) {
                                 Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                                Response response = CustomHttpClient.client.newCall(request).execute();
+                                Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute();
                                 if (response.code() == 200) {
                                     String resp = response.body().string();
                                     TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);
@@ -1065,7 +1065,7 @@ public class ErcTokenUpdateTask {
                         try {
                             if (StrUtil.isNotBlank(inventory.getTokenUrl())) {
                                 Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                                Response response = CustomHttpClient.client.newCall(request).execute();
+                                Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute();
                                 if (response.code() == 200) {
                                     String resp = response.body().string();
                                     TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);

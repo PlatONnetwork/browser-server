@@ -63,8 +63,9 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         // 补充节点名称
         updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) return null;
-
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) {
+            return null;
+        }
         long startTime = System.currentTimeMillis();
 
         DelegateRewardClaim businessParam = DelegateRewardClaim.builder().address(tx.getFrom()) // 领取者地址
