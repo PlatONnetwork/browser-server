@@ -138,7 +138,7 @@ public class StatisticsAddressAnalyzer {
                     // 批量更新经常发生异常，采用单个更新，服务器压力偏大，但每次更新的地址数不多，故压力还好
                     addressMapper.updateByPrimaryKeySelective(address);
                 }
-                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", itemFromDb.size(), JSONUtil.toJsonStr(itemFromDb));
+                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", itemFromDb.size(), JSONUtil.toJsonStr(newItemFromDb));
             }
         }
         // 对比缓存和数据的数据，取出缓存中新增的地址
