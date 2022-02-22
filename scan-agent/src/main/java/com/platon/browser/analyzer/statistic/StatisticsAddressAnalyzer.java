@@ -129,7 +129,6 @@ public class StatisticsAddressAnalyzer {
                     flag = true;
                 }
                 if (flag) {
-                    indb.setUpdateTime(DateUtil.date());
                     newItemFromDb.add(indb);
                 }
             }
