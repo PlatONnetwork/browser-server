@@ -9,7 +9,6 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
-import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
@@ -38,9 +37,6 @@ public class StatisticsAddressAnalyzer {
 
     @Resource
     private AddressMapper addressMapper;
-
-    @Resource
-    private CustomAddressMapper customAddressMapper;
 
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) {
@@ -138,7 +134,10 @@ public class StatisticsAddressAnalyzer {
                 }
             }
             if (CollUtil.isNotEmpty(newItemFromDb)) {
-                customAddressMapper.batchUpdateAddressInfo(newItemFromDb);
+                for (Address address : newItemFromDb) {
+                    // 批量更新经常发生异常，采用单个更新，服务器压力偏大，但每次更新的地址数不多，故压力还好
+                    addressMapper.updateByPrimaryKeySelective(address);
+                }
                 log.info("批量更新地址信息成功，成功数:{}，数据为：{}", itemFromDb.size(), JSONUtil.toJsonStr(itemFromDb));
             }
         }
