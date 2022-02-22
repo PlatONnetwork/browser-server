@@ -93,7 +93,7 @@
     </select>
 
     <update id="updateAddressHaveReward">
-        update address set `have_reward` = `have_reward` + #{amount} where `address` = #{address};
+        update address set `have_reward` = `have_reward` + #{amount} where `address` = #{address}
     </update>
 
     <update id="batchUpdateAddressErcQty">
