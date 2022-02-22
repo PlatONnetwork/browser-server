@@ -282,7 +282,7 @@ public class StatisticService {
         updateNode.setNodeSettleStatisInfo(json);
         int res = nodeMapper.updateByPrimaryKeySelective(updateNode);
         if (res > 0) {
-            log.info("节点在最近[{}]个结算周期的出块统计信息[{}]更新成功", CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, json);
+            log.debug("节点在最近[{}]个结算周期的出块统计信息[{}]更新成功", CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, json);
         } else {
             log.error("节点在最近[{}]个结算周期的出块统计信息[{}]更新失败", CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, json);
         }
