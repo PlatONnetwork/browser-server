@@ -361,6 +361,7 @@ public class ErcTokenUpdateTask {
         if (!updateParams.isEmpty()) {
             // 批量更新总供应量有变动的记录
             customTokenMapper.batchUpdateTokenTotalSupply(new ArrayList<>(updateParams));
+            XxlJobHelper.handleSuccess("全量更新token的总供应量成功");
             updateParams.forEach(token -> token.setDirty(false));
         }
         XxlJobHelper.log("全量更新token的总供应量成功");
@@ -473,6 +474,7 @@ public class ErcTokenUpdateTask {
             if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
                 TaskUtil.console("更新[erc20] token holder的余额{}", JSONUtil.toJsonStr(updateParams));
+                XxlJobHelper.handleSuccess("更新[erc20] token holder的余额成功");
             }
             String newPosition = CollUtil.getLast(list).getId().toString();
             pointLog.setPosition(newPosition);
@@ -563,6 +565,7 @@ public class ErcTokenUpdateTask {
             if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
                 TaskUtil.console("更新[erc721] token holder的余额{}", JSONUtil.toJsonStr(updateParams));
+                XxlJobHelper.handleSuccess("更新[erc721] token holder的余额成功");
             }
             String newPosition = CollUtil.getLast(list).getId().toString();
             pointLog.setPosition(newPosition);
@@ -816,6 +819,7 @@ public class ErcTokenUpdateTask {
                 String msg = StrUtil.format("增量更新token库存信息:断点为[{}]->[{}],查询到的条数为:{},过滤后的条数:{},已更新的条数为:{},失败的条数为:{}", oldPosition, newPosition, batch.size(), batchNum, updateNum.get(), errorNum.get());
                 XxlJobHelper.log(msg);
                 log.info(msg);
+                XxlJobHelper.handleSuccess(msg);
             } else {
                 XxlJobHelper.log("增量更新token库存信息完成，未找到数据，断点为[{}]", oldPosition);
             }
@@ -1154,6 +1158,7 @@ public class ErcTokenUpdateTask {
                                             errorNum.get());
                 XxlJobHelper.log(msg);
                 log.info(msg);
+                XxlJobHelper.handleSuccess(msg);
             } else {
                 XxlJobHelper.log("销毁的合约-更新token库存信息完成，未找到数据，断点为[{}]", oldPosition);
             }
