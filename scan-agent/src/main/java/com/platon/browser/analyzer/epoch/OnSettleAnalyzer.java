@@ -16,7 +16,6 @@ import com.platon.browser.dao.param.epoch.Settle;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.publisher.GasEstimateEventPublisher;
 import com.platon.browser.utils.CalculateUtils;
 import com.platon.browser.v0150.service.RestrictingMinimumReleaseParamService;
 import com.platon.contracts.ppos.dto.resp.Node;
@@ -46,9 +45,6 @@ public class OnSettleAnalyzer {
     private StakingMapper stakingMapper;
 
     @Resource
-    private GasEstimateEventPublisher gasEstimateEventPublisher;
-
-    @Resource
     private CustomGasEstimateLogMapper customGasEstimateLogMapper;
 
     @Resource
@@ -61,7 +57,9 @@ public class OnSettleAnalyzer {
         long startTime = System.currentTimeMillis();
         // 操作日志列表
         List<NodeOpt> nodeOpts = new ArrayList<>();
-        if (block.getNum() == 1) return nodeOpts;
+        if (block.getNum() == 1) {
+            return nodeOpts;
+        }
 
         log.debug("Block Number:{}", block.getNum());
 
@@ -131,7 +129,7 @@ public class OnSettleAnalyzer {
 
             //当前质押是上轮结算周期验证人,发放本结算周期的质押奖励, 奖励金额暂存至stakeReward变量
             BigDecimal curSettleStakeReward = BigDecimal.ZERO;
-            if (settle.getPreVerifierSet().contains(staking.getNodeId())) {
+            if (settle.getCurVerifierSet().contains(staking.getNodeId())) {
                 curSettleStakeReward = settle.getStakingReward();
             }
 
@@ -227,9 +225,15 @@ public class OnSettleAnalyzer {
         // 解析年化率信息对象
         String ariString = staking.getAnnualizedRateInfo();
         AnnualizedRateInfo ari = StringUtils.isNotBlank(ariString) ? JSON.parseObject(ariString, AnnualizedRateInfo.class) : new AnnualizedRateInfo();
-        if (ari.getStakeProfit() == null) ari.setStakeProfit(new ArrayList<>());
-        if (ari.getStakeCost() == null) ari.setStakeCost(new ArrayList<>());
-        if (ari.getSlash() == null) ari.setSlash(new ArrayList<>());
+        if (ari.getStakeProfit() == null) {
+            ari.setStakeProfit(new ArrayList<>());
+        }
+        if (ari.getStakeCost() == null) {
+            ari.setStakeCost(new ArrayList<>());
+        }
+        if (ari.getSlash() == null) {
+            ari.setSlash(new ArrayList<>());
+        }
 
         // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的质押成本为0
         BigDecimal curSettleCost = BigDecimal.ZERO;
@@ -249,7 +253,9 @@ public class OnSettleAnalyzer {
         // 打地基 START -- 这样收益总和才有减数基础
         layFoundation(ari.getStakeProfit(), settle.getSettingEpoch());
 
-        if (ari.getSlash() == null) ari.setSlash(new ArrayList<>());
+        if (ari.getSlash() == null) {
+            ari.setSlash(new ArrayList<>());
+        }
         // 打地基 END
 
         // 默认节点在上一周期的收益为零
@@ -290,8 +296,12 @@ public class OnSettleAnalyzer {
         // 解析年化率信息对象
         String ariString = staking.getAnnualizedRateInfo();
         AnnualizedRateInfo ari = StringUtils.isNotBlank(ariString) ? JSON.parseObject(ariString, AnnualizedRateInfo.class) : new AnnualizedRateInfo();
-        if (ari.getDelegateProfit() == null) ari.setDelegateProfit(new ArrayList<>());
-        if (ari.getDelegateCost() == null) ari.setDelegateCost(new ArrayList<>());
+        if (ari.getDelegateProfit() == null) {
+            ari.setDelegateProfit(new ArrayList<>());
+        }
+        if (ari.getDelegateCost() == null) {
+            ari.setDelegateCost(new ArrayList<>());
+        }
 
         // 默认当前节点在下一轮结算周期不是验证人,其在下一轮结算周期的委托成本为0
         BigDecimal curDelegateCost = BigDecimal.ZERO;
