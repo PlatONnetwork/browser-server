@@ -245,16 +245,16 @@ public class EpochRetryService {
         BigInteger targetBlockNumber = preSettleEpochLastBlockNumber.compareTo(BigInteger.ZERO) == 0 ? BigInteger.ZERO : preSettleEpochLastBlockNumber;
         List<Node> lastNodes = specialApi.getHistoryVerifierList(platOnClient.getWeb3jWrapper().getWeb3j(), targetBlockNumber);
         // 计算当前结算周期内每个验证人的质押奖励,向下取整
-        BigDecimal stakeReward = totalStakeReward.divide(BigDecimal.valueOf(lastNodes.size())).setScale(0, BigDecimal.ROUND_DOWN);
+        BigDecimal stakeReward = totalStakeReward.divide(BigDecimal.valueOf(lastNodes.size()), 0, BigDecimal.ROUND_DOWN);
         log.info("当前块高[{}]第[{}]个结算周期，上一个结算周期最后一个块高[{}]，质押奖励[{}]=第[{}]个结算周期的总质押奖励[{}]/第[{}]个结算周期的验证人数量[{}]",
-                 currentBlockNumber,
-                 currentEpoch,
-                 targetBlockNumber,
-                 stakeReward.toPlainString(),
-                 currentEpoch.subtract(BigInteger.ONE),
-                 totalStakeReward.toPlainString(),
-                 currentEpoch.subtract(BigInteger.ONE),
-                 lastNodes.size());
+                currentBlockNumber,
+                currentEpoch,
+                targetBlockNumber,
+                stakeReward.toPlainString(),
+                currentEpoch.subtract(BigInteger.ONE),
+                totalStakeReward.toPlainString(),
+                currentEpoch.subtract(BigInteger.ONE),
+                lastNodes.size());
         return stakeReward;
     }
 
@@ -322,7 +322,8 @@ public class EpochRetryService {
                 chainConfig.setSettlePeriodCountPerIssue(chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount()));
             }
 
-            if (configChange.getSettleStakeReward() != null) summary.setSettleStakeReward(configChange.getSettleStakeReward());
+            if (configChange.getSettleStakeReward() != null)
+                summary.setSettleStakeReward(configChange.getSettleStakeReward());
             if (configChange.getBlockReward() != null) summary.setBlockReward(configChange.getBlockReward());
             if (configChange.getStakeReward() != null) summary.setStakeReward(configChange.getStakeReward());
             if (configChange.getAvgPackTime() != null) summary.setAvgPackTime(configChange.getAvgPackTime());
