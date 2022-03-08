@@ -22,14 +22,12 @@ import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -53,6 +51,7 @@ public class OnSettleAnalyzer {
     @Resource
     private RestrictingMinimumReleaseParamService restrictingMinimumReleaseParamService;
 
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public List<NodeOpt> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
         // 操作日志列表
@@ -73,12 +72,12 @@ public class OnSettleAnalyzer {
         }
 
         Settle settle = Settle.builder()
-                              .preVerifierSet(preVerifierMap.keySet())
-                              .curVerifierSet(curVerifierMap.keySet())
-                              .stakingReward(event.getEpochMessage().getPreStakeReward())
-                              .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                              .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
-                              .build();
+                .preVerifierSet(preVerifierMap.keySet())
+                .curVerifierSet(curVerifierMap.keySet())
+                .stakingReward(event.getEpochMessage().getStakeReward())
+                .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
+                .build();
 
         List<Integer> statusList = new ArrayList<>();
         statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
@@ -96,7 +95,6 @@ public class OnSettleAnalyzer {
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
             if (staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
-                    //(staking.getStakingReductionEpoch() + staking.getUnStakeFreezeDuration()) < settle.getSettingEpoch()
                     event.getBlock().getNum() >= staking.getUnStakeEndBlock() // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 staking.setStakingReduction(BigDecimal.ZERO);
@@ -119,28 +117,11 @@ public class OnSettleAnalyzer {
                 recoverLog(staking, settle.getSettingEpoch(), block, nodeOpts);
             }
 
-//            // 如果当前节点是因举报而被处罚[exception_status = 5], 则状态直接置为已退出【因为底层实际上已经没有这个节点了】
-//            if(staking.getExceptionStatus()== CustomStaking.ExceptionStatusEnum.MULTI_SIGN_SLASHED.getCode()&&
-//                    (staking.getStakingReductionEpoch() + staking.getUnStakeFreezeDuration()) < settle.getSettingEpoch()){
-//            	staking.setStakingReduction(BigDecimal.ZERO);
-//            	staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
-//            	exitedNodeIds.add(staking.getNodeId());
-//            }
-
             //当前质押是上轮结算周期验证人,发放本结算周期的质押奖励, 奖励金额暂存至stakeReward变量
             BigDecimal curSettleStakeReward = BigDecimal.ZERO;
-            if (settle.getCurVerifierSet().contains(staking.getNodeId())) {
+            if (settle.getPreVerifierSet().contains(staking.getNodeId())) {
                 curSettleStakeReward = settle.getStakingReward();
             }
-
-            // MySQL数据库会四舍五入取整
-            log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
-                     block.getNum(),
-                     event.getEpochMessage().getSettleEpochRound(),
-                     staking.getNodeId(),
-                     staking.getStakingRewardValue().add(curSettleStakeReward).setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(),
-                     staking.getStakingRewardValue().toPlainString(),
-                     curSettleStakeReward.toPlainString());
 
             //当前质押是下轮结算周期验证人
             if (settle.getCurVerifierSet().contains(staking.getNodeId())) {
@@ -179,6 +160,9 @@ public class OnSettleAnalyzer {
 
         epochBusinessMapper.settle(settle);
 
+        // 更新节点的质押奖励
+        updateStakingRewardValue(block.getNum() - 1, event.getEpochMessage().getSettleEpochRound().subtract(BigInteger.ONE), settle.getPreVerifierSet(), event.getEpochMessage().getStakeReward());
+
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k, v) -> {
             GasEstimate ge = new GasEstimate();
@@ -213,6 +197,41 @@ public class OnSettleAnalyzer {
     }
 
     /**
+     * 更新节点的质押奖励
+     *
+     * @param blockNum
+     * @param epoch
+     * @param preVerifierSet
+     * @param stakingRewardValue
+     * @return: void
+     * @date: 2022/3/8
+     */
+    private void updateStakingRewardValue(long blockNum, BigInteger epoch, Set<String> preVerifierSet, BigDecimal stakingRewardValue) {
+        if (CollUtil.isNotEmpty(preVerifierSet)) {
+            StakingExample example = new StakingExample();
+            example.createCriteria().andNodeIdIn(new ArrayList<>(preVerifierSet));
+            List<Staking> stakings = stakingMapper.selectByExampleWithBLOBs(example);
+            List<Staking> updateStakingList = new ArrayList<>();
+            for (Staking staking : stakings) {
+                Staking updateStaking = new Staking();
+                updateStaking.setNodeId(staking.getNodeId());
+                updateStaking.setStakingBlockNum(staking.getStakingBlockNum());
+                updateStaking.setStakingRewardValue(stakingRewardValue);
+                updateStakingList.add(updateStaking);
+                // MySQL数据库会四舍五入取整
+                log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
+                        blockNum,
+                        epoch,
+                        staking.getNodeId(),
+                        staking.getStakingRewardValue().add(updateStaking.getStakingRewardValue()).setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(),
+                        staking.getStakingRewardValue().toPlainString(),
+                        updateStaking.getStakingRewardValue().toPlainString());
+            }
+            epochBusinessMapper.settleForStakingValue(updateStakingList);
+        }
+    }
+
+    /**
      * 计算节点质押年化率
      *
      * @param staking
@@ -241,7 +260,7 @@ public class OnSettleAnalyzer {
         // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
         // 计算当前质押成本 成本暂时不需要委托
         curSettleCost = staking.getStakingLocked() // 锁定的质押金
-                               .add(staking.getStakingHes()); // 犹豫期的质押金
+                .add(staking.getStakingHes()); // 犹豫期的质押金
 //                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
 //                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
 
@@ -263,9 +282,9 @@ public class OnSettleAnalyzer {
         if (settle.getPreVerifierSet().contains(staking.getNodeId())) {
             // 如果当前节点在前一轮结算周期，则计算真实收益
             curSettleStakeProfit = staking.getStakingRewardValue() // 质押奖励
-                                          .add(staking.getBlockRewardValue()) // + 出块奖励
-                                          .add(staking.getFeeRewardValue()) // + 手续费奖励
-                                          .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
+                    .add(staking.getBlockRewardValue()) // + 出块奖励
+                    .add(staking.getFeeRewardValue()) // + 手续费奖励
+                    .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
         }
         // 轮换质押收益信息，把当前节点在上一周期的收益放入轮换信息里
         CalculateUtils.rotateProfit(ari.getStakeProfit(), curSettleStakeProfit, BigInteger.valueOf(settle.getSettingEpoch() - 1L), chainConfig);
@@ -358,9 +377,9 @@ public class OnSettleAnalyzer {
      */
     private void recoverLog(Staking staking, int settingEpoch, Block block, List<NodeOpt> nodeOpts) {
         String desc = NodeOpt.TypeEnum.UNLOCKED.getTpl()
-                                               .replace("LOCKED_EPOCH", staking.getZeroProduceFreezeEpoch().toString())
-                                               .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
-                                               .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
+                .replace("LOCKED_EPOCH", staking.getZeroProduceFreezeEpoch().toString())
+                .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
+                .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(staking.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.UNLOCKED.getCode()));
