@@ -42,11 +42,11 @@ public class StatisticsAddressAnalyzer {
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
         log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",
-                  block.getNum(),
-                  event.getTransactions().size(),
-                  epochMessage.getConsensusEpochRound(),
-                  epochMessage.getSettleEpochRound(),
-                  epochMessage.getIssueEpochRound());
+                block.getNum(),
+                event.getTransactions().size(),
+                epochMessage.getConsensusEpochRound(),
+                epochMessage.getSettleEpochRound(),
+                epochMessage.getIssueEpochRound());
         List<String> addresses = addressCache.getAll().stream().map(Address::getAddress).collect(Collectors.toList());
         // 从数据库中查询出与缓存中对应的地址信息
         AddressExample condition = new AddressExample();
@@ -137,7 +137,7 @@ public class StatisticsAddressAnalyzer {
                     // 批量更新经常发生异常，采用单个更新，服务器压力偏大，但每次更新的地址数不多，故压力还好
                     addressMapper.updateByPrimaryKeySelective(address);
                 }
-                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", itemFromDb.size(), JSONUtil.toJsonStr(newItemFromDb));
+                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", newItemFromDb.size(), JSONUtil.toJsonStr(newItemFromDb));
             }
         }
         // 对比缓存和数据的数据，取出缓存中新增的地址

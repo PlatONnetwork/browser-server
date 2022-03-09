@@ -137,4 +137,26 @@
         ORDER BY
         t1.id
     </select>
+
+    <update id="batchUpdateTokenInfo">
+        <foreach collection="list" item="item" separator=";">
+            update token_inventory
+            <set>
+                <if test="item.name != null">
+                    `name` = #{item.name,jdbcType=VARCHAR},
+                </if>
+                <if test="item.image != null">
+                    image = #{item.image,jdbcType=VARCHAR},
+                </if>
+                <if test="item.retryNum != null">
+                    retry_num = #{item.retryNum,jdbcType=INTEGER},
+                </if>
+                <if test="item.description != null">
+                    description = #{item.description,jdbcType=LONGVARCHAR},
+                </if>
+            </set>
+            where token_address = #{item.tokenAddress,jdbcType=VARCHAR} and token_id = #{item.tokenId,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
 </mapper>

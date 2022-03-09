@@ -30,4 +30,5 @@ public interface CustomTokenInventoryMapper {
      */
     List<TokenInventoryWithBLOBs> findDestroyContracts(@Param("minId") Long minId, @Param("maxId") Long maxId, @Param("retryNum") Integer retryNum);
 
+    void batchUpdateTokenInfo(@Param("list") List<TokenInventoryWithBLOBs> list);
 }
