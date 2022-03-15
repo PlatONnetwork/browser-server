@@ -137,8 +137,8 @@ public class TransactionUtil {
      * @throws BlankResponseException
      */
     public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi,
-        PlatOnClient platOnClient, CollectionTransaction contractInvokeTx, Receipt contractInvokeTxReceipt,
-        Logger logger) throws ContractInvokeException, BlankResponseException {
+                                                     PlatOnClient platOnClient, CollectionTransaction contractInvokeTx, Receipt contractInvokeTxReceipt,
+                                                     Logger logger) throws ContractInvokeException, BlankResponseException {
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
             List<PPosInvokeContractInput> inputs = specialApi
@@ -281,6 +281,9 @@ public class TransactionUtil {
         } else if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+        } else if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC1155_CONTRACT_CREATE.getCode());
+            ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
         } else if (contractTypeEnum == ContractTypeEnum.WASM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
@@ -329,8 +332,12 @@ public class TransactionUtil {
             ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             ci.setType(Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode());
         }
+        if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            ci.setToType(Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.ERC1155_CONTRACT_EXEC.getCode());
+        }
 
-        if("0x".equals(binCode)){
+        if ("0x".equals(binCode)) {
             // 如果交易的binCode属性为0x,则表明掉用了合约自毁方法, 交易类型设置为 合约销毁
             ci.setType(Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode());
         }
@@ -374,6 +381,11 @@ public class TransactionUtil {
         if (addressCache.isErc721ContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
+            return;
+        }
+        if (addressCache.isErc1155ContractAddress(toAddress)) {
+            ci.setToType(Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
+            ci.setContractType(ContractTypeEnum.ERC1155_EVM.getCode());
             return;
         }
         ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());

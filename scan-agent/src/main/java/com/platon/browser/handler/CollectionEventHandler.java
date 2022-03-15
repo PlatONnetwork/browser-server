@@ -23,10 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -74,6 +71,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private CustomTx721BakMapper customTx721BakMapper;
 
     @Resource
+    private CustomTx1155BakMapper customTx1155BakMapper;
+
+    @Resource
     private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
 
     /**
@@ -110,6 +110,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
                 copyEvent.getBlock().setErc20TxQty(copyEvent.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
                 copyEvent.getBlock().setErc721TxQty(copyEvent.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
+                copyEvent.getBlock().setErc1155TxQty(copyEvent.getBlock().getErc1155TxQty() + transaction.getErc1155TxList().size());
+
             }
 
             List<Transaction> transactions = copyEvent.getTransactions();
@@ -130,6 +132,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 customTxBakMapper.batchInsertOrUpdateSelective(transactions);
                 addTxErc20Bak(transactions);
                 addTxErc721Bak(transactions);
+                addTxErc1155Bak(transactions);
             }
             List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
             // 委托奖励交易入库
@@ -236,6 +239,25 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         });
         if (CollUtil.isNotEmpty(erc721List)) {
             customTx721BakMapper.batchInsert(erc721List);
+        }
+    }
+
+    /**
+     * erc1155交易入库
+     *
+     * @param transactions:
+     * @return: void
+     * @date: 2022/2/5
+     */
+    private void addTxErc1155Bak(List<Transaction> transactions) {
+        Set<ErcTx> erc1155Set = new HashSet<>();
+        transactions.forEach(transaction -> {
+            if (CollUtil.isNotEmpty(transaction.getErc1155TxList())) {
+                erc1155Set.addAll(transaction.getErc1155TxList());
+            }
+        });
+        if (CollUtil.isNotEmpty(erc1155Set)) {
+            customTx1155BakMapper.batchInsert(erc1155Set);
         }
     }
 

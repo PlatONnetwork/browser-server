@@ -32,6 +32,10 @@ public class Arc721Param {
     private Integer toType;
 
     /**
+     * tokenId
+     */
+    private  String tokenId;
+    /**
      * 内部交易value
      */
     private String innerValue;

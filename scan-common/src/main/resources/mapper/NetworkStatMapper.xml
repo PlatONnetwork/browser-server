@@ -28,6 +28,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="avg_pack_time" jdbcType="BIGINT" property="avgPackTime" />
+    <result column="erc1155_tx_qty" jdbcType="INTEGER" property="erc1155TxQty"/>
     <result column="erc721_tx_qty" jdbcType="INTEGER" property="erc721TxQty" />
     <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty" />
     <result column="year_num" jdbcType="INTEGER" property="yearNum" />
@@ -98,7 +99,7 @@
     turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
     proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
     add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time, 
-    erc721_tx_qty, erc20_tx_qty, year_num
+    erc1155_tx_qty, erc721_tx_qty, erc20_tx_qty, year_num
   </sql>
   <sql id="Blob_Column_List">
     issue_rates
@@ -160,7 +161,7 @@
       address_qty, block_reward, staking_reward, 
       settle_staking_reward, add_issue_begin, add_issue_end, 
       next_settle, node_opt_seq, create_time, 
-      update_time, avg_pack_time, erc721_tx_qty, 
+      update_time, avg_pack_time, erc1155_tx_qty, erc721_tx_qty,
       erc20_tx_qty, year_num, issue_rates
       )
     values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
@@ -171,7 +172,7 @@
       #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, 
       #{settleStakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
       #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT}, #{erc721TxQty,jdbcType=INTEGER}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT}, #{erc1155TxQty,jdbcType=INTEGER}, #{erc721TxQty,jdbcType=INTEGER},
       #{erc20TxQty,jdbcType=INTEGER}, #{yearNum,jdbcType=INTEGER}, #{issueRates,jdbcType=LONGVARCHAR}
       )
   </insert>
@@ -255,6 +256,9 @@
       </if>
       <if test="avgPackTime != null">
         avg_pack_time,
+      </if>
+      <if test="erc1155TxQty != null">
+        erc1155_tx_qty,
       </if>
       <if test="erc721TxQty != null">
         erc721_tx_qty,
@@ -347,6 +351,9 @@
       </if>
       <if test="avgPackTime != null">
         #{avgPackTime,jdbcType=BIGINT},
+      </if>
+      <if test="erc1155TxQty != null">
+        #{erc1155TxQty,jdbcType=INTEGER},
       </if>
       <if test="erc721TxQty != null">
         #{erc721TxQty,jdbcType=INTEGER},
@@ -449,6 +456,9 @@
       <if test="record.avgPackTime != null">
         avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
       </if>
+      <if test="record.erc1155TxQty != null">
+        erc1155_tx_qty = #{record.erc1155TxQty,jdbcType=INTEGER},
+      </if>
       <if test="record.erc721TxQty != null">
         erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
       </if>
@@ -494,6 +504,7 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
+      erc1155_tx_qty = #{record.erc1155TxQty,jdbcType=INTEGER},
       erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
       year_num = #{record.yearNum,jdbcType=INTEGER},
@@ -530,6 +541,7 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
+      erc1155_tx_qty = #{record.erc1155TxQty,jdbcType=INTEGER},
       erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
       year_num = #{record.yearNum,jdbcType=INTEGER}
@@ -615,6 +627,9 @@
       <if test="avgPackTime != null">
         avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
       </if>
+      <if test="erc1155TxQty != null">
+        erc1155_tx_qty = #{erc1155TxQty,jdbcType=INTEGER},
+      </if>
       <if test="erc721TxQty != null">
         erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
       </if>
@@ -657,6 +672,7 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
+      erc1155_tx_qty = #{erc1155TxQty,jdbcType=INTEGER},
       erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
       year_num = #{yearNum,jdbcType=INTEGER},
@@ -690,6 +706,7 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
+      erc1155_tx_qty = #{erc1155TxQty,jdbcType=INTEGER},
       erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
       year_num = #{yearNum,jdbcType=INTEGER}
@@ -706,7 +723,7 @@
       turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
       proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, 
       add_issue_begin, add_issue_end, next_settle, node_opt_seq, create_time, update_time, 
-      avg_pack_time, erc721_tx_qty, erc20_tx_qty, year_num, issue_rates)
+      avg_pack_time, erc1155_tx_qty, erc721_tx_qty, erc20_tx_qty, year_num, issue_rates)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
@@ -718,8 +735,8 @@
         #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL}, 
         #{item.settleStakingReward,jdbcType=DECIMAL}, #{item.addIssueBegin,jdbcType=BIGINT}, 
         #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.avgPackTime,jdbcType=BIGINT}, 
-        #{item.erc721TxQty,jdbcType=INTEGER}, #{item.erc20TxQty,jdbcType=INTEGER}, #{item.yearNum,jdbcType=INTEGER}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.avgPackTime,jdbcType=BIGINT},
+        #{item.erc1155TxQty,jdbcType=INTEGER}, #{item.erc721TxQty,jdbcType=INTEGER}, #{item.erc20TxQty,jdbcType=INTEGER}, #{item.yearNum,jdbcType=INTEGER},
         #{item.issueRates,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
@@ -815,6 +832,9 @@
         </if>
         <if test="'avg_pack_time'.toString() == column.value">
           #{item.avgPackTime,jdbcType=BIGINT}
+        </if>
+        <if test="'erc1155_tx_qty'.toString() == column.value">
+          #{item.erc1155TxQty,jdbcType=INTEGER}
         </if>
         <if test="'erc721_tx_qty'.toString() == column.value">
           #{item.erc721TxQty,jdbcType=INTEGER}

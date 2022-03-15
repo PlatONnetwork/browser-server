@@ -74,6 +74,9 @@ public class StompPushTask {
     @Resource
     private TokenService tokenService;
 
+    @Resource
+    private Token1155Service token1155Service;
+
     private boolean checkData() {
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
         if (networkStatRedis == null || networkStatRedis.getId() == null) {

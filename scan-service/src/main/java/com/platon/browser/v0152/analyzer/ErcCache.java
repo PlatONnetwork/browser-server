@@ -23,6 +23,8 @@ public class ErcCache {
 
     Set<String> erc721AddressCache = new ConcurrentHashSet<>();
 
+    Set<String> erc1155AddressCache = new ConcurrentHashSet<>();
+
     @Resource
     private TokenMapper tokenMapper;
 
@@ -49,6 +51,9 @@ public class ErcCache {
                 case ERC721:
                     erc721AddressCache.add(token.getAddress());
                     break;
+                case ERC1155:
+                    erc1155AddressCache.add(token.getAddress());
+                    break;
             }
         });
     }
@@ -63,6 +68,10 @@ public class ErcCache {
 
     public Collection<String> getErc721AddressCache() {
         return Collections.unmodifiableCollection(erc721AddressCache);
+    }
+
+    public Collection<String> getErc1155AddressCache() {
+        return Collections.unmodifiableCollection(erc1155AddressCache);
     }
 
 }

@@ -5,6 +5,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
+import com.platon.browser.v0152.contract.Erc1155Contract;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
@@ -236,6 +237,51 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
+    /**
+     * 是否支持Erc1155合约
+     *
+     * @param contractAddress:
+     * @return: boolean
+     * @date: 2022/2/5
+     */
+    private boolean isSupportErc1155(String contractAddress) throws PlatonCallTimeoutException {
+        // 支持erc1155，则必定要支持erc165
+        if (!isSupportErc165(contractAddress)) {
+            log.info("该合约[{}]不支持erc165", contractAddress);
+            return false;
+        }
+        String result = detectInputData(contractAddress, "0x01ffc9a7d9b67a2600000000000000000000000000000000000000000000000000000000");
+        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
+    }
+
+    /**
+     * 是否支持Erc1155合约
+     *
+     * @param contractAddress:
+     * @param blockNumber:
+     * @return: boolean
+     * @date: 2022/2/5
+     */
+    public Boolean isSupportErc1155Metadata(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
+        // 支持erc1155，则必定要支持erc165
+        if (!isSupportErc165(contractAddress, blockNumber)) {
+            log.info("该合约[{}]不支持erc165", contractAddress);
+            return false;
+        }
+        String result = detectInputData(contractAddress, "0x01ffc9a70e89341c00000000000000000000000000000000000000000000000000000000", blockNumber);
+        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
+    }
+
+    private boolean isSupportErc1155(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
+        // 支持erc1155，则必定要支持erc165
+        if (!isSupportErc165(contractAddress, blockNumber)) {
+            log.info("该合约[{}]不支持erc165", contractAddress);
+            return false;
+        }
+        String result = detectInputData(contractAddress, "0x01ffc9a7d9b67a2600000000000000000000000000000000000000000000000000000000", blockNumber);
+        return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
+    }
+
     private ErcContractId getErc20ContractId(String contractAddress) throws PlatonCallTimeoutException {
         ErcContract ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER);
         ErcContractId contractId = resolveContractId(ercContract);
@@ -261,6 +307,20 @@ public class ErcDetectService {
         ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
         ErcContractId contractId = resolveContractId(ercContract);
         contractId.setTypeEnum(ErcTypeEnum.ERC721);
+        return contractId;
+    }
+
+    private ErcContractId getErc1155ContractId(String contractAddress) throws PlatonCallTimeoutException {
+        ErcContract ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER);
+        ErcContractId contractId = resolveContractId(ercContract);
+        contractId.setTypeEnum(ErcTypeEnum.ERC1155);
+        return contractId;
+    }
+
+    private ErcContractId getErc1155ContractId(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
+        ErcContract ercContract = Erc1155Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+        ErcContractId contractId = resolveContractId(ercContract);
+        contractId.setTypeEnum(ErcTypeEnum.ERC1155);
         return contractId;
     }
 
@@ -346,16 +406,25 @@ public class ErcDetectService {
             if (isErc721) {
                 // 取ERC721合约信息
                 log.info("该合约[{}]是721合约", contractAddress);
-                contractId = getErc721ContractId(contractAddress, blockNumber);
-            } else {
-                // 不是ERC721，则检测是否是ERC20
-                log.info("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
-                contractId = getErc20ContractId(contractAddress, blockNumber);
-                if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
-                    // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
-                    contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
-                }
+                return getErc721ContractId(contractAddress);
             }
+
+
+            boolean isErc1155 = isSupportErc1155(contractAddress);
+            if (isErc1155) {
+                // 取ERC721合约信息
+                log.info("该合约[{}]是1155合约", contractAddress);
+                return getErc1155ContractId(contractAddress);
+            }
+
+            // 不是ERC721，则检测是否是ERC20
+            log.info("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
+            contractId = getErc20ContractId(contractAddress, blockNumber);
+            if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
+                // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
+                contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+            }
+
         } catch (PlatonCallTimeoutException e) {
             log.error("获取合约[{}]id超时异常", contractAddress);
             throw e;
@@ -377,4 +446,8 @@ public class ErcDetectService {
         return ercContract.getTxEvents(receipt);
     }
 
+    public List<ErcContract.ErcTxEvent> getErc1155TxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
+        ErcContract ercContract = Erc1155Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+        return ercContract.getTxEvents(receipt);
+    }
 }

@@ -103,6 +103,9 @@ public class InitializationService {
     private EsErc721TxRepository esErc721TxRepository;
 
     @Resource
+    private EsErc1155TxRepository esErc1155TxRepository;
+
+    @Resource
     private EsTransferTxRepository esTransferTxRepository;
 
     @Resource
@@ -140,6 +143,7 @@ public class InitializationService {
             networkStat.setIssueRates(chainConfig.getAddIssueRate().toPlainString());
             networkStat.setErc20TxQty(0);
             networkStat.setErc721TxQty(0);
+            networkStat.setErc1155TxQty(0);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(-1L);
             // 删除节点表和质押表、地址表数据
@@ -328,6 +332,7 @@ public class InitializationService {
             esTransferTxRepository.initIndex();
             esErc20TxRepository.initIndex();
             esErc721TxRepository.initIndex();
+            esErc1155TxRepository.initIndex();
         } catch (Exception e) {
             log.error("初始化ES异常", e);
         }

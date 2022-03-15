@@ -91,6 +91,8 @@ public class TransactionDetailsResp {
 
     private List<Arc721Param> erc721Params;
 
+    private List<Arc1155Param> erc1155Params;
+
     public String getTxHash() {
         return this.txHash;
     }
@@ -580,6 +582,14 @@ public class TransactionDetailsResp {
 
     public void setContractName(String contractName) {
         this.contractName = contractName;
+    }
+
+    public List<Arc1155Param> getErc1155Params() {
+        return erc1155Params;
+    }
+
+    public void setErc1155Params(List<Arc1155Param> erc1155Params) {
+        this.erc1155Params = erc1155Params;
     }
 
     public List<Arc721Param> getErc721Params() {

@@ -285,6 +285,10 @@ public class AddressUpdateTask {
                 break;
             case ERC721_CONTRACT_EXEC:
                 break;
+            case ERC1155_CONTRACT_CREATE:
+                break;
+            case ERC1155_CONTRACT_EXEC:
+                break;
             case CONTRACT_EXEC_DESTROY:
                 break;
             case STAKE_CREATE:

@@ -9,7 +9,8 @@ package com.platon.browser.enums;
 public enum TokenTypeEnum {
 
     ERC20("erc20", "erc20合约"),
-    ERC721("erc721", "erc721合约");
+    ERC721("erc721", "erc721合约"),
+    ERC1155("erc1155", "erc1155合约");
 
     private String type;
 

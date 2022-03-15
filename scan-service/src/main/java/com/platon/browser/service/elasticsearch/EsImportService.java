@@ -45,7 +45,10 @@ public class EsImportService {
     @Resource
     private EsErc721TxService esErc721TxService;
 
-    private static final int SERVICE_COUNT = 5;
+    @Resource
+    private EsErc1155TxService esErc1155TxService;
+
+    private static final int SERVICE_COUNT = 6;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
@@ -80,14 +83,16 @@ public class EsImportService {
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<DelegationReward> delegationRewards) throws Exception {
         Set<ErcTx> erc20TxList = getErc20TxList(transactions);
         Set<ErcTx> erc721TxList = getErc721TxList(transactions);
+        Set<ErcTx> erc1155TxList = getErc1155TxList(transactions);
         if (log.isDebugEnabled()) {
-            log.debug("ES batch import: {}(blocks({}), transactions({}), delegationRewards({}), erc20TxList({}), erc721TxList({}))",
+            log.debug("ES batch import: {}(blocks({}), transactions({}), delegationRewards({}), erc20TxList({}), erc721TxList({}), erc1155TxList({}))",
                       Thread.currentThread().getStackTrace()[1].getMethodName(),
                       blocks.size(),
                       transactions.size(),
                       delegationRewards.size(),
                       erc20TxList.size(),
-                      erc721TxList.size());
+                      erc721TxList.size(),
+                      erc1155TxList.size());
         }
         try {
             long startTime = System.currentTimeMillis();
@@ -97,6 +102,7 @@ public class EsImportService {
             submit(esDelegateRewardService, delegationRewards, latch, ESKeyEnum.DelegateReward, CommonUtil.getTraceId());
             submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx, CommonUtil.getTraceId());
             submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx, CommonUtil.getTraceId());
+            submit(esErc1155TxService, erc1155TxList, latch, ESKeyEnum.Erc1155Tx, CommonUtil.getTraceId());
             latch.await();
             if (isRetry.get()) {
                 LongSummaryStatistics blockSum = blocks.stream().collect(Collectors.summarizingLong(Block::getNum));
@@ -112,15 +118,16 @@ public class EsImportService {
     }
 
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
-    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<ErcTx> erc20TxList, Set<ErcTx> erc721TxList, Set<DelegationReward> delegationRewards) throws Exception {
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<ErcTx> erc20TxList, Set<ErcTx> erc721TxList, Set<ErcTx> erc1155TxList, Set<DelegationReward> delegationRewards) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("ES batch import: {}(blocks({}), transactions({}), delegationRewards({}), erc20TxList({}), erc721TxList({}))",
+            log.debug("ES batch import: {}(blocks({}), transactions({}), delegationRewards({}), erc20TxList({}), erc721TxList({}), erc1155TxList({}))",
                       Thread.currentThread().getStackTrace()[1].getMethodName(),
                       blocks.size(),
                       transactions.size(),
                       delegationRewards.size(),
                       erc20TxList.size(),
-                      erc721TxList.size());
+                      erc721TxList.size(),
+                      erc1155TxList.size());
         }
         try {
             long startTime = System.currentTimeMillis();
@@ -130,6 +137,7 @@ public class EsImportService {
             submit(esDelegateRewardService, delegationRewards, latch, ESKeyEnum.DelegateReward, CommonUtil.getTraceId());
             submit(esErc20TxService, erc20TxList, latch, ESKeyEnum.Erc20Tx, CommonUtil.getTraceId());
             submit(esErc721TxService, erc721TxList, latch, ESKeyEnum.Erc721Tx, CommonUtil.getTraceId());
+            submit(esErc1155TxService, erc1155TxList, latch, ESKeyEnum.Erc1155Tx, CommonUtil.getTraceId());
             latch.await();
             if (isRetry.get()) {
                 LongSummaryStatistics blockSum = blocks.stream().collect(Collectors.summarizingLong(Block::getNum));
@@ -171,7 +179,19 @@ public class EsImportService {
         }
         return result;
     }
-
+    /**
+     * 取erc1155交易列表
+     */
+    public Set<ErcTx> getErc1155TxList(Set<Transaction> transactions) {
+        Set<ErcTx> result = new HashSet<>();
+        if (transactions != null && !transactions.isEmpty()) {
+            for (Transaction tx : transactions) {
+                if (tx.getErc1155TxList().isEmpty()) continue;
+                result.addAll(tx.getErc1155TxList());
+            }
+        }
+        return result;
+    }
     /**
      * 打印统计信息
      *
@@ -195,6 +215,8 @@ public class EsImportService {
                 log.info("ES批量入库成功统计:erc20交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc721Tx) == 0) {
                 log.info("ES批量入库成功统计:erc721交易数[{}]", data.size());
+            } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc1155Tx) == 0) {
+                log.info("ES批量入库成功统计:erc1155交易数[{}]", data.size());
             }
         } catch (Exception e) {
             log.error("ES批量入库成功统计打印异常", e);

@@ -69,7 +69,17 @@ public class StatisticCacheService extends CacheBase {
 	}
 
 	public TokenTransferRecordCacheDto getTokenTransferCache(Integer pageNum, Integer pageSize, ErcTypeEnum typeEnum) {
-		String key = typeEnum==ErcTypeEnum.ERC20?redisKeyConfig.getErc20Tx():redisKeyConfig.getErc721Tx();
+//		String key = typeEnum==ErcTypeEnum.ERC20?redisKeyConfig.getErc20Tx():redisKeyConfig.getErc721Tx();
+
+		String key = "";
+		if (typeEnum == ErcTypeEnum.ERC20) {
+			key = redisKeyConfig.getErc20Tx();
+		} else if (typeEnum == ErcTypeEnum.ERC721) {
+			key = redisKeyConfig.getErc721Tx();
+		} else if (typeEnum == ErcTypeEnum.ERC1155) {
+			key = redisKeyConfig.getErc1155Tx();
+		}
+
 		/* 分页根据key来获取交易数据  */
 		CachePageInfo<Class<ErcTx>> cpi = this.getCachePageInfo(key, pageNum, pageSize);
 		List<ErcTx> oldErcTxList = new LinkedList<>();

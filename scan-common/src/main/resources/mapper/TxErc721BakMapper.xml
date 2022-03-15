@@ -13,6 +13,7 @@
     <result column="from_type" jdbcType="INTEGER" property="fromType" />
     <result column="to" jdbcType="VARCHAR" property="to" />
     <result column="to_type" jdbcType="INTEGER" property="toType" />
+    <result column="token_id" jdbcType="VARCHAR" property="tokenId"/>
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="bn" jdbcType="BIGINT" property="bn" />
     <result column="b_time" jdbcType="TIMESTAMP" property="bTime" />
@@ -81,7 +82,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, seq, `name`, symbol, `decimal`, contract, hash, `from`, from_type, `to`, to_type, 
-    `value`, bn, b_time, tx_fee
+    `token_id`, `value`, bn, b_time, tx_fee
   </sql>
   <sql id="Blob_Column_List">
     remark
@@ -138,13 +139,13 @@
     insert into tx_erc_721_bak (id, seq, `name`, 
       symbol, `decimal`, contract, 
       hash, `from`, from_type, 
-      `to`, to_type, `value`, 
+      `to`, to_type, `token_id`, `value`,
       bn, b_time, tx_fee, 
       remark)
     values (#{id,jdbcType=BIGINT}, #{seq,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, 
       #{symbol,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, #{contract,jdbcType=VARCHAR}, 
       #{hash,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, #{fromType,jdbcType=INTEGER}, 
-      #{to,jdbcType=VARCHAR}, #{toType,jdbcType=INTEGER}, #{value,jdbcType=VARCHAR}, 
+      #{to,jdbcType=VARCHAR}, #{toType,jdbcType=INTEGER}, #{tokenId,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR},
       #{bn,jdbcType=BIGINT}, #{bTime,jdbcType=TIMESTAMP}, #{txFee,jdbcType=VARCHAR}, 
       #{remark,jdbcType=LONGVARCHAR})
   </insert>
@@ -183,6 +184,9 @@
       </if>
       <if test="toType != null">
         to_type,
+      </if>
+      <if test="tokenId != null">
+        `token_id`,
       </if>
       <if test="value != null">
         `value`,
@@ -233,6 +237,9 @@
       </if>
       <if test="toType != null">
         #{toType,jdbcType=INTEGER},
+      </if>
+      <if test="tokenId != null">
+        #{tokenId,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
         #{value,jdbcType=VARCHAR},
@@ -293,6 +300,9 @@
       <if test="record.toType != null">
         to_type = #{record.toType,jdbcType=INTEGER},
       </if>
+      <if test="record.tokenId != null">
+        `value` = #{record.tokenId,jdbcType=VARCHAR},
+      </if>
       <if test="record.value != null">
         `value` = #{record.value,jdbcType=VARCHAR},
       </if>
@@ -326,6 +336,7 @@
       from_type = #{record.fromType,jdbcType=INTEGER},
       `to` = #{record.to,jdbcType=VARCHAR},
       to_type = #{record.toType,jdbcType=INTEGER},
+     `token_id` = #{record.tokenId,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
       bn = #{record.bn,jdbcType=BIGINT},
       b_time = #{record.bTime,jdbcType=TIMESTAMP},
@@ -348,6 +359,7 @@
       from_type = #{record.fromType,jdbcType=INTEGER},
       `to` = #{record.to,jdbcType=VARCHAR},
       to_type = #{record.toType,jdbcType=INTEGER},
+     `token_id` = #{record.tokenId,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
       bn = #{record.bn,jdbcType=BIGINT},
       b_time = #{record.bTime,jdbcType=TIMESTAMP},
@@ -389,6 +401,9 @@
       <if test="toType != null">
         to_type = #{toType,jdbcType=INTEGER},
       </if>
+      <if test="tokenId != null">
+        `token_id` = #{tokenId,jdbcType=VARCHAR},
+      </if>
       <if test="value != null">
         `value` = #{value,jdbcType=VARCHAR},
       </if>
@@ -419,6 +434,7 @@
       from_type = #{fromType,jdbcType=INTEGER},
       `to` = #{to,jdbcType=VARCHAR},
       to_type = #{toType,jdbcType=INTEGER},
+      `token_id` = #{tokenId,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
       bn = #{bn,jdbcType=BIGINT},
       b_time = #{bTime,jdbcType=TIMESTAMP},
@@ -438,6 +454,7 @@
       from_type = #{fromType,jdbcType=INTEGER},
       `to` = #{to,jdbcType=VARCHAR},
       to_type = #{toType,jdbcType=INTEGER},
+     `token_id` = #{tokenId,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
       bn = #{bn,jdbcType=BIGINT},
       b_time = #{bTime,jdbcType=TIMESTAMP},
@@ -451,14 +468,14 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into tx_erc_721_bak
-    (id, seq, `name`, symbol, `decimal`, contract, hash, `from`, from_type, `to`, to_type, 
-      `value`, bn, b_time, tx_fee, remark)
+    (id, seq, `name`, symbol, `decimal`, contract, hash, `from`, from_type, `to`, to_type,
+    `token_id`,`value`, bn, b_time, tx_fee, remark)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.seq,jdbcType=BIGINT}, #{item.name,jdbcType=VARCHAR}, 
         #{item.symbol,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, #{item.contract,jdbcType=VARCHAR}, 
         #{item.hash,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR}, #{item.fromType,jdbcType=INTEGER}, 
-        #{item.to,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.value,jdbcType=VARCHAR}, 
+        #{item.to,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.tokenId,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR},
         #{item.bn,jdbcType=BIGINT}, #{item.bTime,jdbcType=TIMESTAMP}, #{item.txFee,jdbcType=VARCHAR}, 
         #{item.remark,jdbcType=LONGVARCHAR})
     </foreach>
@@ -510,6 +527,9 @@
         </if>
         <if test="'to_type'.toString() == column.value">
           #{item.toType,jdbcType=INTEGER}
+        </if>
+        <if test="'token_id'.toString() == column.value">
+          #{item.tokenId,jdbcType=VARCHAR}
         </if>
         <if test="'value'.toString() == column.value">
           #{item.value,jdbcType=VARCHAR}

@@ -9,6 +9,7 @@ import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.PointLogMapper;
+import com.platon.browser.dao.mapper.TxErc1155BakMapper;
 import com.platon.browser.dao.mapper.TxErc20BakMapper;
 import com.platon.browser.dao.mapper.TxErc721BakMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -45,6 +46,8 @@ public class UpdateTokenQtyTask {
     @Resource
     private TxErc721BakMapper txErc721BakMapper;
 
+    @Resource
+    private TxErc1155BakMapper txErc1155BakMapper;
     /**
      * 更新erc交易数
      * 每5分钟执行一次
@@ -140,9 +143,53 @@ public class UpdateTokenQtyTask {
             } else {
                 TaskUtil.console("当前erc721断点[{}]未找到erc721交易", oldErc721Position);
             }
+
+            // 1155
+            PointLog erc1155PointLog = pointLogMapper.selectByPrimaryKey(9);
+            long oldErc1155Position = Convert.toLong(erc1155PointLog.getPosition());
+            TaskUtil.console("当前页码为[{}]，erc1155断点为[{}]", pageSize, oldErc1155Position);
+            TxErc1155BakExample txErc1155BakExample = new TxErc1155BakExample();
+            txErc1155BakExample.setOrderByClause("id");
+            txErc1155BakExample.createCriteria().andIdGreaterThan(oldErc1155Position).andIdLessThanOrEqualTo(oldErc1155Position + pageSize);
+            List<TxErc1155Bak> erc1155List = txErc1155BakMapper.selectByExample(txErc1155BakExample);
+            if (CollUtil.isNotEmpty(erc1155List)) {
+                TaskUtil.console("找到1155交易[{}]条", erc1155List.size());
+                Map<String, List<ErcTx>> erc1155Map = erc1155List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
+                //累计token的erc1155交易数
+                for (Map.Entry<String, List<ErcTx>> entry : erc1155Map.entrySet()) {
+                    TokenQty tokenQty = getTokenQty(tokenMap, entry.getKey());
+                    tokenQty.setErc1155TxQty(entry.getValue().size());
+                }
+                //累计地址的erc1155交易数
+                for (ErcTx ercTx : erc1155List) {
+                    AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
+                    AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
+                    if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo()) && !AddressUtil.isAddrZero(ercTx.getFrom())) {
+                        fromAddressErcQty.setErc1155TxQty(fromAddressErcQty.getErc1155TxQty() + 1);
+                        TaskUtil.console("该erc1155交易[{}]的from[{}]和to[{}]地址一致，erc交易数只算一次", ercTx.getHash(), ercTx.getFrom(), ercTx.getTo());
+                    } else {
+                        if (!AddressUtil.isAddrZero(fromAddressErcQty.getAddress())) {
+                            fromAddressErcQty.setErc1155TxQty(fromAddressErcQty.getErc1155TxQty() + 1);
+                        } else {
+                            TaskUtil.console("该erc1155交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), fromAddressErcQty.getAddress());
+                        }
+                        if (!AddressUtil.isAddrZero(toAddressErcQty.getAddress())) {
+                            toAddressErcQty.setErc1155TxQty(toAddressErcQty.getErc1155TxQty() + 1);
+                        } else {
+                            TaskUtil.console("该erc1155交易[{}]下，零地址[{}]不统计交易数", ercTx.getHash(), toAddressErcQty.getAddress());
+                        }
+                    }
+                }
+                //记录最大的seq
+                erc1155PointLog.setPosition(CollUtil.getLast(erc1155List).getId().toString());
+            } else {
+                TaskUtil.console("当前erc1155断点[{}]未找到erc1155交易", oldErc1155Position);
+            }
+
+
             if (CollUtil.isNotEmpty(tokenMap.values())) {
                 for (Map.Entry<String, TokenQty> entry : tokenMap.entrySet()) {
-                    entry.getValue().setTokenTxQty(entry.getValue().getErc20TxQty() + entry.getValue().getErc721TxQty());
+                    entry.getValue().setTokenTxQty(entry.getValue().getErc20TxQty() + entry.getValue().getErc721TxQty() + entry.getValue().getErc1155TxQty());
                 }
                 List<TokenQty> list = CollUtil.newArrayList(tokenMap.values());
                 customTokenMapper.batchUpdateTokenQty(list);
@@ -160,6 +207,10 @@ public class UpdateTokenQtyTask {
             if (CollUtil.isNotEmpty(erc721List)) {
                 pointLogMapper.updateByPrimaryKeySelective(erc721PointLog);
                 TaskUtil.console("更新erc交易数，erc721断点为[{}]->[{}]", oldErc721Position, erc721PointLog.getPosition());
+            }
+            if (CollUtil.isNotEmpty(erc1155List)) {
+                pointLogMapper.updateByPrimaryKeySelective(erc1155PointLog);
+                TaskUtil.console("更新erc交易数，erc1155断点为[{}]->[{}]", oldErc1155Position, erc1155PointLog.getPosition());
             }
             XxlJobHelper.handleSuccess("更新erc交易数成功");
         } catch (Exception e) {

@@ -21,4 +21,5 @@ public class EsIndexConfig {
     private String transferTxIndexName; // 主交易内部转账交易索引名称
     private String erc20TxIndexName; // 主交易内部erc20交易索引名称(new)
     private String erc721TxIndexName; // 主交易内部erc721交易索引名称
+    private String erc1155TxIndexName; // 主交易内部erc1155交易索引名称
 }
