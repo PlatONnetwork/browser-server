@@ -9,7 +9,6 @@
             `staking_hes` = #{staking.stakingHes},
             `staking_reduction` = #{staking.stakingReduction},
             `status` = #{staking.status},
-            `stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue},
             `is_settle` = #{staking.isSettle},
             `pre_dele_annualized_rate` = #{staking.preDeleAnnualizedRate},
             `dele_annualized_rate` = #{staking.deleAnnualizedRate},
@@ -25,7 +24,6 @@
             `staking_hes` = #{staking.stakingHes},
             `staking_reduction` = #{staking.stakingReduction},
             `status` = #{staking.status},
-            `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue},
             `is_settle` = #{staking.isSettle},
             `annualized_rate` = #{staking.annualizedRate},
             `pre_dele_annualized_rate` = #{staking.preDeleAnnualizedRate},
@@ -59,6 +57,20 @@
         /*当修改委托奖励比例所在结算周期小于当前结算周期时，统一把reward_per替换为next_reward_per的值*/
         update node set reward_per=next_reward_per where next_reward_per_mod_epoch <![CDATA[ < ]]> #{settingEpoch};
         update staking set reward_per=next_reward_per where next_reward_per_mod_epoch <![CDATA[ < ]]> #{settingEpoch};
+    </update>
+
+    <update id="settleForStakingValue" parameterType="com.platon.browser.dao.param.epoch.Settle">
+        <foreach collection="list" item="staking">
+            /*2、更新节点*/
+            update `node` set
+            `stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue}
+            where `node_id` =  #{staking.nodeId};
+            /*1、更新质押*/
+            update `staking` set
+            `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue}
+            where `node_id` = #{staking.nodeId}
+            and staking_block_num = #{staking.stakingBlockNum};
+        </foreach>
     </update>
 
     <update id="updateGasEstimate">

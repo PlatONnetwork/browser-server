@@ -50,7 +50,6 @@ public class VersionDeclareAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 .replace("VERSION",String.valueOf(txParam.getVersion()));
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(nodeId);
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.VERSION.getCode()));
         nodeOpt.setDesc(desc);

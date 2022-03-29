@@ -6,32 +6,123 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Slash {
-    private String hash;
 
+    /**
+     * 主键
+     */
+    private Long id;
+
+    /**
+     * 节点Id
+     */
     private String nodeId;
 
-    private String slashRate;
+    /**
+     * 交易hash
+     */
+    private String txHash;
 
-    private BigDecimal slashValue;
+    /**
+     * 时间
+     */
+    private Date time;
 
-    private BigDecimal reward;
+    /**
+     * 通过（block_number/每个结算周期出块数）向上取整
+     */
+    private Integer settingEpoch;
 
-    private String benefitAddr;
+    /**
+     * 质押交易所在块高
+     */
+    private Long stakingBlockNum;
 
+    /**
+     * 双签惩罚比例
+     */
+    private BigDecimal slashRate;
+
+    /**
+     * 惩罚金分配给举报人比例
+     */
+    private BigDecimal slashReportRate;
+
+    /**
+     * 交易发送者
+     */
+    private String benefitAddress;
+
+    /**
+     * 双签惩罚后剩下的质押金额，因为双签处罚后节点就被置为退出中，所有金额都会移动到待赎回字段中
+     */
+    private BigDecimal codeRemainRedeemAmount;
+
+    /**
+     * 奖励的金额
+     */
+    private BigDecimal codeRewardValue;
+
+    /**
+     * 节点状态:1候选中,2退出中,3已退出,4已锁定
+     */
+    private Integer codeStatus;
+
+    /**
+     * 当前退出中
+     */
+    private Integer codeStakingReductionEpoch;
+
+    /**
+     * 惩罚的金额
+     */
+    private BigDecimal codeSlashValue;
+
+    /**
+     * 解质押需要经过的结算周期数
+     */
+    private Integer unStakeFreezeDuration;
+
+    /**
+     * 解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者
+     */
+    private Long unStakeEndBlock;
+
+    /**
+     * 双签的区块
+     */
+    private Long blockNum;
+
+    /**
+     * 是否退出:1是,2否
+     */
     private Integer isQuit;
 
+    /**
+     * 是否已处理，1-是，0-否
+     */
+    private Boolean isHandle;
+
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
+    /**
+     * 更新时间
+     */
     private Date updateTime;
 
-    private String data;
+    /**
+     * 举报证据
+     */
+    private String slashData;
 
-    public String getHash() {
-        return hash;
+    public Long getId() {
+        return id;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash == null ? null : hash.trim();
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNodeId() {
@@ -42,36 +133,124 @@ public class Slash {
         this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
-    public String getSlashRate() {
+    public String getTxHash() {
+        return txHash;
+    }
+
+    public void setTxHash(String txHash) {
+        this.txHash = txHash == null ? null : txHash.trim();
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public Integer getSettingEpoch() {
+        return settingEpoch;
+    }
+
+    public void setSettingEpoch(Integer settingEpoch) {
+        this.settingEpoch = settingEpoch;
+    }
+
+    public Long getStakingBlockNum() {
+        return stakingBlockNum;
+    }
+
+    public void setStakingBlockNum(Long stakingBlockNum) {
+        this.stakingBlockNum = stakingBlockNum;
+    }
+
+    public BigDecimal getSlashRate() {
         return slashRate;
     }
 
-    public void setSlashRate(String slashRate) {
-        this.slashRate = slashRate == null ? null : slashRate.trim();
+    public void setSlashRate(BigDecimal slashRate) {
+        this.slashRate = slashRate;
     }
 
-    public BigDecimal getSlashValue() {
-        return slashValue;
+    public BigDecimal getSlashReportRate() {
+        return slashReportRate;
     }
 
-    public void setSlashValue(BigDecimal slashValue) {
-        this.slashValue = slashValue;
+    public void setSlashReportRate(BigDecimal slashReportRate) {
+        this.slashReportRate = slashReportRate;
     }
 
-    public BigDecimal getReward() {
-        return reward;
+    public String getBenefitAddress() {
+        return benefitAddress;
     }
 
-    public void setReward(BigDecimal reward) {
-        this.reward = reward;
+    public void setBenefitAddress(String benefitAddress) {
+        this.benefitAddress = benefitAddress == null ? null : benefitAddress.trim();
     }
 
-    public String getBenefitAddr() {
-        return benefitAddr;
+    public BigDecimal getCodeRemainRedeemAmount() {
+        return codeRemainRedeemAmount;
     }
 
-    public void setBenefitAddr(String benefitAddr) {
-        this.benefitAddr = benefitAddr == null ? null : benefitAddr.trim();
+    public void setCodeRemainRedeemAmount(BigDecimal codeRemainRedeemAmount) {
+        this.codeRemainRedeemAmount = codeRemainRedeemAmount;
+    }
+
+    public BigDecimal getCodeRewardValue() {
+        return codeRewardValue;
+    }
+
+    public void setCodeRewardValue(BigDecimal codeRewardValue) {
+        this.codeRewardValue = codeRewardValue;
+    }
+
+    public Integer getCodeStatus() {
+        return codeStatus;
+    }
+
+    public void setCodeStatus(Integer codeStatus) {
+        this.codeStatus = codeStatus;
+    }
+
+    public Integer getCodeStakingReductionEpoch() {
+        return codeStakingReductionEpoch;
+    }
+
+    public void setCodeStakingReductionEpoch(Integer codeStakingReductionEpoch) {
+        this.codeStakingReductionEpoch = codeStakingReductionEpoch;
+    }
+
+    public BigDecimal getCodeSlashValue() {
+        return codeSlashValue;
+    }
+
+    public void setCodeSlashValue(BigDecimal codeSlashValue) {
+        this.codeSlashValue = codeSlashValue;
+    }
+
+    public Integer getUnStakeFreezeDuration() {
+        return unStakeFreezeDuration;
+    }
+
+    public void setUnStakeFreezeDuration(Integer unStakeFreezeDuration) {
+        this.unStakeFreezeDuration = unStakeFreezeDuration;
+    }
+
+    public Long getUnStakeEndBlock() {
+        return unStakeEndBlock;
+    }
+
+    public void setUnStakeEndBlock(Long unStakeEndBlock) {
+        this.unStakeEndBlock = unStakeEndBlock;
+    }
+
+    public Long getBlockNum() {
+        return blockNum;
+    }
+
+    public void setBlockNum(Long blockNum) {
+        this.blockNum = blockNum;
     }
 
     public Integer getIsQuit() {
@@ -80,6 +259,14 @@ public class Slash {
 
     public void setIsQuit(Integer isQuit) {
         this.isQuit = isQuit;
+    }
+
+    public Boolean getIsHandle() {
+        return isHandle;
+    }
+
+    public void setIsHandle(Boolean isHandle) {
+        this.isHandle = isHandle;
     }
 
     public Date getCreateTime() {
@@ -98,12 +285,12 @@ public class Slash {
         this.updateTime = updateTime;
     }
 
-    public String getData() {
-        return data;
+    public String getSlashData() {
+        return slashData;
     }
 
-    public void setData(String data) {
-        this.data = data == null ? null : data.trim();
+    public void setSlashData(String slashData) {
+        this.slashData = slashData == null ? null : slashData.trim();
     }
 
     /**
@@ -114,16 +301,28 @@ public class Slash {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        hash("hash", "hash", "VARCHAR", false),
+        id("id", "id", "BIGINT", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
-        slashRate("slash_rate", "slashRate", "VARCHAR", false),
-        slashValue("slash_value", "slashValue", "DECIMAL", false),
-        reward("reward", "reward", "DECIMAL", false),
-        benefitAddr("benefit_addr", "benefitAddr", "VARCHAR", false),
+        txHash("tx_hash", "txHash", "VARCHAR", false),
+        time("time", "time", "TIMESTAMP", true),
+        settingEpoch("setting_epoch", "settingEpoch", "INTEGER", false),
+        stakingBlockNum("staking_block_num", "stakingBlockNum", "BIGINT", false),
+        slashRate("slash_rate", "slashRate", "DECIMAL", false),
+        slashReportRate("slash_report_rate", "slashReportRate", "DECIMAL", false),
+        benefitAddress("benefit_address", "benefitAddress", "VARCHAR", false),
+        codeRemainRedeemAmount("code_remain_redeem_amount", "codeRemainRedeemAmount", "DECIMAL", false),
+        codeRewardValue("code_reward_value", "codeRewardValue", "DECIMAL", false),
+        codeStatus("code_status", "codeStatus", "INTEGER", false),
+        codeStakingReductionEpoch("code_staking_reduction_epoch", "codeStakingReductionEpoch", "INTEGER", false),
+        codeSlashValue("code_slash_value", "codeSlashValue", "DECIMAL", false),
+        unStakeFreezeDuration("un_stake_freeze_duration", "unStakeFreezeDuration", "INTEGER", false),
+        unStakeEndBlock("un_stake_end_block", "unStakeEndBlock", "BIGINT", false),
+        blockNum("block_num", "blockNum", "BIGINT", false),
         isQuit("is_quit", "isQuit", "INTEGER", false),
+        isHandle("is_handle", "isHandle", "BIT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        data("data", "data", "LONGVARCHAR", true);
+        slashData("slash_data", "slashData", "LONGVARCHAR", false);
 
         /**
          * This field was generated by MyBatis Generator.
@@ -266,7 +465,7 @@ public class Slash {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column ... excludes) {
+        public static Column[] excludes(Column... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -289,4 +488,5 @@ public class Slash {
             }
         }
     }
+
 }

@@ -18,18 +18,25 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class EsImportServiceTest extends AgentTestBase {
+
     @Mock
     private EsBlockService blockService;
+
     @Mock
     private EsTransactionService transactionService;
+
     @Mock
     private EsNodeOptService nodeOptService;
+
     @Mock
     private EsDelegateRewardService delegateRewardService;
+
     @Mock
     private EsErc20TxRepository esErc20TxRepository;
+
     @Mock
     private EsErc721TxRepository esErc721TxRepository;
+
     @InjectMocks
     @Spy
     private EsImportService target;
@@ -43,9 +50,9 @@ public class EsImportServiceTest extends AgentTestBase {
      * 根据区块号获取激励池余额
      */
     @Test
-    public void batchImport() throws InterruptedException {
-        this.target.batchImport(Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
-        verify(this.target, times(1)).batchImport(anySet(), anySet(), anySet(), anySet());
+    public void batchImport() throws Exception {
+        this.target.batchImport(Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
+        verify(this.target, times(1)).batchImport(anySet(), anySet(), anySet());
     }
 
     @Test
@@ -63,4 +70,5 @@ public class EsImportServiceTest extends AgentTestBase {
         target.getErc721TxList(transactions);
         Assert.assertTrue(true);
     }
+
 }

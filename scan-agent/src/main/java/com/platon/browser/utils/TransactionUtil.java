@@ -268,7 +268,6 @@ public class TransactionUtil {
      * @param log
      * @param contractTypeEnum
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/20
      */
     public static void resolveGeneralContractCreateTxComplementInfo(CollectionTransaction result, String contractAddress,

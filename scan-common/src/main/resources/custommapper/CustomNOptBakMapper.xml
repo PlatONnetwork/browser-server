@@ -1,45 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomNOptBakMapper">
-  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+  <insert id="batchInsertOrUpdateSelective" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     replace into n_opt_bak (
-    <foreach collection="selective" item="column" separator=",">
-      ${column.escapedColumnName}
-    </foreach>
+        `node_id`,`type`,`tx_hash`,`b_num`,`time`,`desc`
     )
     values
     <foreach collection="list" item="item" separator=",">
       (
-      <foreach collection="selective" item="column" separator=",">
-        <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=BIGINT}
-        </if>
-        <if test="'node_id'.toString() == column.value">
-          #{item.nodeId,jdbcType=VARCHAR}
-        </if>
-        <if test="'type'.toString() == column.value">
-          #{item.type,jdbcType=INTEGER}
-        </if>
-        <if test="'tx_hash'.toString() == column.value">
-          #{item.txHash,jdbcType=VARCHAR}
-        </if>
-        <if test="'b_num'.toString() == column.value">
-          #{item.bNum,jdbcType=BIGINT}
-        </if>
-        <if test="'time'.toString() == column.value">
-          #{item.time,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'desc'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR},
+          #{item.type,jdbcType=INTEGER},
+          #{item.txHash,jdbcType=VARCHAR},
+          #{item.bNum,jdbcType=BIGINT},
+          #{item.time,jdbcType=TIMESTAMP},
           #{item.desc,jdbcType=VARCHAR}
-        </if>
-        <if test="'cre_time'.toString() == column.value">
-          #{item.creTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'upd_time'.toString() == column.value">
-          #{item.updTime,jdbcType=TIMESTAMP}
-        </if>
-      </foreach>
       )
     </foreach>
   </insert>
+
+  <select id="getLastNodeOptSeq" resultType="long">
+    select IFNULL(MAX(id),0) as id from n_opt_bak order by id limit 1;
+  </select>
 </mapper>

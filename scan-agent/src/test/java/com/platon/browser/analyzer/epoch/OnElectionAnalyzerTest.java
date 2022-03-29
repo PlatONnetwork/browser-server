@@ -88,7 +88,6 @@ public class OnElectionAnalyzerTest extends AgentTestBase {
         list1.add(historyLowRateSlash);
         when(this.specialApi.getHistoryLowRateSlashList(any(), any())).thenReturn(list1);
         when(this.stakingMapper.selectByExample(any())).thenReturn(list);
-        when(this.networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);
         when(this.chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(this.chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.TEN);
         when(this.chainConfig.getSlashBlockRewardCount()).thenReturn(BigDecimal.TEN);

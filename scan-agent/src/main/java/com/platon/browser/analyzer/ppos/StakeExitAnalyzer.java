@@ -128,7 +128,6 @@ public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.QUIT.getCode()));
         nodeOpt.setTxHash(tx.getHash());

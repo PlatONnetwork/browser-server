@@ -78,7 +78,6 @@ public class ProposalCancelAnalyzer extends PPOSAnalyzer<NodeOpt> {
         proposalBusinessMapper.cancel(businessParam);
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getVerifier());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
         nodeOpt.setDesc(desc);

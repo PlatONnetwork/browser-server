@@ -12,7 +12,8 @@
         t.total_supply as totalSupply,
         th.balance,
         t.decimal,
-        th.token_tx_qty as txCount
+        th.token_tx_qty as txCount,
+        t.create_time as createTime
         from token_holder th left join token t on th.token_address = t.address
         where th.balance != 0
         <if test="tokenAddress != null">
@@ -108,7 +109,7 @@
 
     <update id="batchUpdate">
         <foreach collection="list" item="item" separator=";">
-        update token_holder set balance=#{item.balance},update_time=#{item.updateTime} where token_address=#{item.tokenAddress} and address=#{item.address}
+        update token_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and address=#{item.address}
         </foreach>
     </update>
 
@@ -128,7 +129,8 @@
             th.balance,
             t.DECIMAL,
             ti.token_owner_tx_qty AS txCount,
-            ti.token_id as tokenId
+            ti.token_id as tokenId,
+            t.create_time as createTime
         FROM
             token_holder th
                 LEFT JOIN token t ON th.token_address = t.address

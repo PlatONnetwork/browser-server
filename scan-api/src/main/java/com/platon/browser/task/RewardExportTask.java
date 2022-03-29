@@ -2,8 +2,8 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.custommapper.CustomBlockNodeMapper;
+import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import com.platon.browser.service.elasticsearch.bean.ESResult;
@@ -78,7 +78,6 @@ public class RewardExportTask {
             if (v == null || !v) {
                 return;
             }
-//            String consensus = jedisClient.get(ROUND_KEY);
             String consensus = redisTemplate.opsForValue().get(ROUND_KEY);
             int conL = 0;
             if (StringUtils.isNotBlank(consensus)) {
@@ -134,15 +133,13 @@ public class RewardExportTask {
 
     private void buildFile(String fileName, List<Object[]> rows, String[] headers) {
         File file = new File(this.fileUrl);
-        if (!file.exists())
-            file.mkdir();
+        if (!file.exists()) file.mkdir();
         try (FileOutputStream fis = new FileOutputStream(this.fileUrl + fileName)) {
             /* 设置返回的头，防止csv乱码 */
             fis.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
             try (OutputStreamWriter outputWriter = new OutputStreamWriter(fis, StandardCharsets.UTF_8)) {
                 CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-                if (headers != null)
-                    writer.writeHeaders(headers);
+                if (headers != null) writer.writeHeaders(headers);
                 writer.writeRowsAndClose(rows);
                 log.info("导出报表成功，路径：{}", this.fileUrl + fileName);
             } catch (IOException e) {

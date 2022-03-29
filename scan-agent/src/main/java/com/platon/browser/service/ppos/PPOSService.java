@@ -101,8 +101,7 @@ public class PPOSService {
     public TxAnalyseResult analyze(CollectionEvent event) {
         long startTime = System.currentTimeMillis();
 
-        TxAnalyseResult tar =
-                TxAnalyseResult.builder().nodeOptList(new ArrayList<>()).delegationRewardList(new ArrayList<>()).build();
+        TxAnalyseResult tar = TxAnalyseResult.builder().nodeOptList(new ArrayList<>()).delegationRewardList(new ArrayList<>()).build();
 
         List<Transaction> transactions = event.getTransactions();
 
@@ -153,12 +152,9 @@ public class PPOSService {
         if (block.getNum() == this.preBlockNumber) {
             return tar;
         }
-        this.networkStatCache.updateByBlock(event.getBlock(), tar.getProposalQty());
-
+        this.networkStatCache.updateByBlock(event.getBlock());
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
-
         this.preBlockNumber = block.getNum();
-
         return tar;
     }
 
@@ -177,7 +173,6 @@ public class PPOSService {
             // 调用交易分析引擎分析交易，以补充相关数据
             NodeOpt nodeOpt = null;
             DelegationReward delegationReward = null;
-
             switch (tx.getTypeEnum()) {
                 case STAKE_CREATE:
                     nodeOpt = this.stakeCreateAnalyzer.analyze(event, tx);

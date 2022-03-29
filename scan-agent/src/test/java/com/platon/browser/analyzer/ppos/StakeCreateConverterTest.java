@@ -54,7 +54,6 @@ public class StakeCreateConverterTest extends AgentTestBase {
                 .nodeName("zrj-node1")
                 .stakingBlockNum(new BigInteger("20483"))
                 .build();
-        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
         when(nodeCache.getNode(any())).thenReturn(nodeItem);
         when(parameterService.getValueInBlockChainConfig(any())).thenReturn("5");
         when(stakeEpochService.getUnStakeFreeDuration()).thenReturn(BigInteger.TEN);

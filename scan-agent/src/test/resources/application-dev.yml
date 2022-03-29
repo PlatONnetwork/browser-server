@@ -1,27 +1,36 @@
-#######################
-#      Alaya配置       #
-#######################
-# 当前激活的配置名称(请不要修改)
-profile: dev
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-#Spring框架内部配置
+#1.1.4配置已经迁移到apollo，以下为完整的配置模板，不想使用apollo，可使用以下配置即可
 spring:
+  application.name: scan-agent
   #数据源配置
   datasource:
-    url: jdbc:mysql://192.168.9.191:3306/alaya_browser_${profile}?useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: platon
-    password: platon
-  #Redis配置
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+    password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
+  #Redis键配置
   redis:
+    password: platscan
+    database: 0
     cluster:
       max-redirects: 3
       nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-    password: platscan
-    ssl: false
-  #ES配置
+    key:
+      #最多存储多少条数据
+      max-item: 500000
+      #区块列表
+      blocks: ${platon.redis-namespace}:blocks
+      #交易列表
+      transactions: ${platon.redis-namespace}:transactions
+      #统计信息
+      networkStat: ${platon.redis-namespace}:networkStat
+      #内部转账交易
+      transferTx: ${platon.redis-namespace}:transferTx
+      #erc20交易
+      erc20Tx: ${platon.redis-namespace}:erc20Tx
+      #erc721交易
+      erc721Tx: ${platon.redis-namespace}:erc721Tx
+  #ES索引配置
   elasticsearch:
     high-level-client:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
@@ -29,6 +38,25 @@ spring:
       schema: http
       username: elastic
       password: changeme
+    index:
+      blockIndexName: ${platon.es-namespace}_block
+      transactionIndexName: ${platon.es-namespace}_transaction
+      delegationIndexName: ${platon.es-namespace}_delegation
+      nodeOptIndexName: ${platon.es-namespace}_nodeopt
+      delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
+      transferTxIndexName: ${platon.es-namespace}_transfer_tx
+      erc20TxIndexName: ${platon.es-namespace}_erc20_tx
+      erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+# MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
+  # 实体类别名配置（注意：对应实体类的路径）
+  type-aliases-package: com.platon.browser.dao.entity
+profile: platon
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -74,58 +102,58 @@ logging:
       # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
       file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
       # 日志文件保存的天数
-      max-history: 7
+      max-history: 90
       # 是否在应用启动时进行归档管理
       clean-history-on-start: true
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
-  addressPrefix: atp
+  addressPrefix: lat
   # 金额显示单位
-  valueUnit: ATP
+  valueUnit: LAT
   # 交易输入参数并行解码线程数
   txLogDecodeThreadNum: 200
   # Web3j访问地址
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.112.141:7789,192.168.112.141:7790
+    addresses: 192.168.120.151:7789,192.168.120.151:7790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
-  initIssueAmount: 100000000
+  initIssueAmount: 10000000000
   #每年固定增发比例
-  addIssueRate: 0.05
+  addIssueRate: 0.025
   #每年增发分配给激励池的比例
-  incentiveRateFromIssue: 0.4
+  incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
   foundationSubsidies: {
-    '1':0,
-    '2':0,
-    '3':0,
-    '4':0,
-    '5':0,
-    '6':0,
-    '7':0,
-    '8':0,
-    '9':0
+    '1':62215742.00000000,
+    '2':55965742.00000000,
+    '3':49559492.00000000,
+    '4':42993086.00000000,
+    '5':36262520.00000000,
+    '6':29363689.00000000,
+    '7':22292388.00000000,
+    '8':15044304.00000000,
+    '9':7615018.00000000
   }
   # 初始内置节点默认质押金额(ATP)
-  defaultStakingLockedAmount: 10500
+  defaultStakingLockedAmount: 150000
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/AlayaNetwork/AIPs/tree/master/Alaya/AIP-%s.md
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/blob/master/PIPs/PIP-%s.md
   #提案pip_num参数模板
-  proposalPipNumTemplate: AIP-%s
+  proposalPipNumTemplate: PIP-%s
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 201018
+  chainId: 100
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
@@ -157,3 +185,19 @@ task:
   esRedisNotCatchupBatchSize: 10
   #已追上链,批量入ES和Redis的缓存大小
   esRedisCatchupBatchSize: 1
+xxl:
+  job:
+    admin:
+      #调度中心部署跟地址
+      addresses: http://192.168.120.150:8080/xxl-job-admin
+    #调度中心通讯TOKEN
+    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    executor:
+      #执行器AppName
+      appname: scan-agent
+      #执行器端口号
+      port: 9999
+      #执行器运行日志文件存储磁盘路径
+      logpath: ./logs/jobhandler
+      #执行器日志文件保存天数
+      logretentiondays: 90

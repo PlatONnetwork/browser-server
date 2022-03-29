@@ -77,7 +77,6 @@ public class ProposalTextAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 .replace("VERSION", "");
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getVerifier());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
         nodeOpt.setDesc(desc);

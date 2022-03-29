@@ -1,13 +1,8 @@
 package com.platon.browser.cache;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.ComplementInfo;
-import com.platon.browser.dao.param.ppos.DelegateExit;
-import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.param.claim.Reward;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,10 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -44,18 +36,6 @@ public class AddressCacheTest extends AgentTestBase {
         this.addressCache.getEvmContractAddressCache();
         //this.addressCache.getTypeData("");
         this.addressCache.getTypeData(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
-
-        ComplementInfo ci = new ComplementInfo();
-        ci.setContractType(ContractTypeEnum.EVM.getCode());
-        this.addressCache.updateFirst("123", ci);
-        this.addressCache.getTypeData("123");
-        ci.setContractType(ContractTypeEnum.WASM.getCode());
-        this.addressCache.updateFirst("456", ci);
-        this.addressCache.getTypeData("456");
-        ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
-        this.addressCache.updateFirst("789", ci);
-        //this.addressCache.getTypeData("789");
-
 
         Transaction tx = this.transactionList.get(0);
         tx.setType(Transaction.TypeEnum.TRANSFER.getCode());
@@ -84,18 +64,6 @@ public class AddressCacheTest extends AgentTestBase {
 
         tx.setType(Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
         this.addressCache.update(tx);
-
-        List<Reward> claims = new ArrayList<>();
-        Reward reward = Reward.builder().reward(BigDecimal.TEN).build();
-        claims.add(reward);
-        DelegateRewardClaim drc = DelegateRewardClaim.builder().address("").rewardList(claims).build();
-        this.addressCache.update(drc);
-
-        DelegateExit delegateExit = DelegateExit.builder().txFrom("789").delegateReward(BigDecimal.TEN).build();
-        this.addressCache.update(delegateExit);
-
-        delegateExit = DelegateExit.builder().txFrom("74829301").delegateReward(BigDecimal.TEN).build();
-        this.addressCache.update(delegateExit);
 
         assertTrue(true);
     }

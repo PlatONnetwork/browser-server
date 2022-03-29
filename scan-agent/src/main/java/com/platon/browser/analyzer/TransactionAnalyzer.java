@@ -1,16 +1,23 @@
 package com.platon.browser.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.bean.CollectionTransaction;
 import com.platon.browser.bean.ComplementInfo;
+import com.platon.browser.bean.ErcToken;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.Token;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.decoder.TxInputDecodeResult;
 import com.platon.browser.decoder.TxInputDecodeUtil;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
+import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
@@ -21,12 +28,11 @@ import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.TransactionUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
-import com.platon.browser.v0152.bean.ErcToken;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
 import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -54,6 +60,12 @@ public class TransactionAnalyzer {
 
     @Resource
     private ErcTokenAnalyzer ercTokenAnalyzer;
+
+    @Resource
+    private AddressMapper addressMapper;
+
+    @Resource
+    private TokenMapper tokenMapper;
 
     // 交易解析阶段，维护自身的普通合约地址列表，其初始化数据来自地址缓存和erc緩存
     // <普通合约地址,合约类型枚举>
@@ -92,6 +104,7 @@ public class TransactionAnalyzer {
      * @return com.platon.browser.bean.CollectionTransaction
      * @date 2021/4/20
      */
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         CollectionTransaction result = CollectionTransaction.newInstance().updateWithBlock(collectionBlock).updateWithRawTransaction(rawTransaction);
         log.info("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());
@@ -278,7 +291,51 @@ public class TransactionAnalyzer {
         collectionBlock.setTxFee(txFee);
         // 累加当前交易的能量限制到当前区块的txGasLimit
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(result.decimalGasLimit()).toString());
+        proxyContract(result.getHash());
         return result;
+    }
+
+    /**
+     * 针对特殊合约修改，仅对主网生效
+     *
+     * @param :
+     * @return: void
+     * @date: 2022/2/9
+     */
+    private void proxyContract(String txHash) {
+        // 创建合约后的第一条交易，会设置合约的721属性
+        if ("0x908a9f487a1c9d39a17afe1a868705eec9b0ec899998eb7036412634388755ad".equalsIgnoreCase(txHash)) {
+            Address address = addressMapper.selectByPrimaryKey("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
+            if (ObjectUtil.isNotNull(address)) {
+                Address newAddress = new Address();
+                newAddress.setAddress(address.getAddress());
+                newAddress.setType(6);
+                addressMapper.updateByPrimaryKeySelective(newAddress);
+                Token token = new Token();
+                token.setAddress("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
+                token.setType("erc721");
+                token.setName("QPassport");
+                token.setSymbol("QPT");
+                token.setTotalSupply("0");
+                token.setDecimal(0);
+                token.setIsSupportErc165(true);
+                token.setIsSupportErc20(false);
+                token.setIsSupportErc721(true);
+                token.setIsSupportErc721Enumeration(true);
+                token.setIsSupportErc721Metadata(true);
+                token.setTokenTxQty(0);
+                token.setHolder(0);
+                token.setContractDestroyBlock(0L);
+                token.setContractDestroyUpdate(false);
+                tokenMapper.insertSelective(token);
+                // 重置缓存
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.clear();
+                ercCache.init();
+                addressCache.getEvmContractAddressCache().remove("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
+            } else {
+                log.error("找不到该代理合约地址{}", "lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
+            }
+        }
     }
 
 }

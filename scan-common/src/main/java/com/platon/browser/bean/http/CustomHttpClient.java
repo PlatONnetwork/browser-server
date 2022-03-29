@@ -15,14 +15,16 @@ import java.util.concurrent.TimeUnit;
 
 public class CustomHttpClient {
 
-    public final static OkHttpClient client = new OkHttpClient.Builder()
-            .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .hostnameVerifier(new TrustAnyHostnameVerifier())
-            .sslSocketFactory(createSSLSocketFactory())
-            .build();
+    public static OkHttpClient getOkHttpClient() {
+        OkHttpClient client = new OkHttpClient.Builder().connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
+                                                        .connectTimeout(10, TimeUnit.SECONDS)
+                                                        .readTimeout(10, TimeUnit.SECONDS)
+                                                        .writeTimeout(10, TimeUnit.SECONDS)
+                                                        .hostnameVerifier(new TrustAnyHostnameVerifier())
+                                                        .sslSocketFactory(createSSLSocketFactory())
+                                                        .build();
+        return client;
+    }
 
     /**
      * 默认信任所有的证书
@@ -35,8 +37,7 @@ public class CustomHttpClient {
         SSLSocketFactory sSLSocketFactory = null;
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new TrustAllManager()},
-                    new SecureRandom());
+            sc.init(null, new TrustManager[]{new TrustAllManager()}, new SecureRandom());
             sSLSocketFactory = sc.getSocketFactory();
         } catch (Exception e) {
         }
@@ -47,8 +48,7 @@ public class CustomHttpClient {
     private static class TrustAllManager implements X509TrustManager {
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         }
 
         @Override

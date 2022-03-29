@@ -1,53 +1,17 @@
-# ***************************通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录**************************** #
-# 应用版本
-version: 1.1.3
-#服务器配置
-server:
-  servlet:
-    context-path: /browser-server
-#Spring应用配置
-spring:
-  profiles.active: test
-  application.name: scan-api
-  session.timeout: 1800  #以秒为单位
-  #国际化配置
-  messages.basename: messages
-  #数据源配置
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  #Redis键配置
-  redis:
-    key:
-      #最多存储多少条数据
-      max-item: 500000
-      #区块列表
-      blocks: ${platon.redis-namespace}:blocks
-      #交易列表
-      transactions: ${platon.redis-namespace}:transactions
-      #统计信息
-      networkStat: ${platon.redis-namespace}:networkStat
-      #内部转账交易
-      transferTx: ${platon.redis-namespace}:transferTx
-      #erc20交易
-      erc20Tx: ${platon.redis-namespace}:erc20Tx
-      #erc721交易
-      erc721Tx: ${platon.redis-namespace}:erc721Tx
-  #ES索引配置
-  elasticsearch:
-    index:
-      blockIndexName: ${platon.es-namespace}_block
-      transactionIndexName: ${platon.es-namespace}_transaction
-      delegationIndexName: ${platon.es-namespace}_delegation
-      nodeOptIndexName: ${platon.es-namespace}_nodeopt
-      delegationRewardIndexName: ${platon.es-namespace}_delegation_reward
-      transferTxIndexName: ${platon.es-namespace}_transfer_tx
-      erc20TxIndexName: ${platon.es-namespace}_erc20_tx
-      erc721TxIndexName: ${platon.es-namespace}_erc721_tx
-
-# MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
-mybatis:
-  mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
-  # 实体类别名配置（注意：对应实体类的路径）
-  type-aliases-package: com.platon.browser.dao.entity
-
+#日志配置
+logging:
+  file:
+    name: ./logs/${app.id}.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+  logback:
+    rollingpolicy:
+      # 日志文件大小上限，达到该上限后，会自动压缩
+      max-file-size: 200MB
+      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
+      file-name-pattern: ./logs/${app.id}-%d{yyyy-MM-dd}-%i.log.gz
+      # 日志文件保存的天数
+      max-history: 7
+      # 是否在应用启动时进行归档管理
+      clean-history-on-start: true

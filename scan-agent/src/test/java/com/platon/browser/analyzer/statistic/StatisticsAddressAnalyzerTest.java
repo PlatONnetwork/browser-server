@@ -5,6 +5,7 @@ import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.cache.AddressCache;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -39,11 +40,13 @@ public class StatisticsAddressAnalyzerTest extends AgentTestBase {
     @InjectMocks
     @Spy
     private StatisticsAddressAnalyzer target;
-
+    @Mock
+    private CustomAddressMapper customAddressMapper;
     @Before
     public void setup() throws Exception {
         when(this.addressCache.getAll()).thenReturn(new ArrayList<>(this.addressList));
         when(this.addressMapper.selectByExampleWithBLOBs(any())).thenReturn(new ArrayList<>(this.addressList));
+        when(customAddressMapper.batchUpdateAddressInfo(any())).thenReturn(1);
     }
 
     @Test

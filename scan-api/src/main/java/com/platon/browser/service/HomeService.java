@@ -47,9 +47,6 @@ import java.util.List;
 public class HomeService {
 
     @Resource
-    private BlockChainConfig chainConfig;
-
-    @Resource
     private EsBlockRepository ESBlockRepository;
 
     @Resource

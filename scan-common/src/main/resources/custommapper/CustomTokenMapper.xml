@@ -128,4 +128,21 @@
         </if>
     </select>
 
+    <update id="batchUpdateTokenQty" parameterType="list">
+        <foreach collection="list" item="item" separator=";">
+            update token set token_tx_qty = token_tx_qty + #{item.tokenTxQty} where address = #{item.contract}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateTokenTotalSupply" parameterType="list">
+        <foreach collection="list" item="item" separator=";">
+            update token set total_supply = #{item.totalSupply} where address = #{item.address}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateTokenHolder" parameterType="list">
+        <foreach collection="list" item="item" separator=";">
+            update token set holder = #{item.holder} where address = #{item.address}
+        </foreach>
+    </update>
 </mapper>

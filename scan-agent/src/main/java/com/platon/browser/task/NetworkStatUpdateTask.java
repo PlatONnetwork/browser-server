@@ -1,19 +1,26 @@
 package com.platon.browser.task;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
+import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
 import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.service.account.AccountService;
+import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
+import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
+import com.platon.browser.service.elasticsearch.EsTransactionRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
 import com.platon.browser.task.bean.NetworkStatistics;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.CalculateUtils;
+import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -50,10 +57,97 @@ public class NetworkStatUpdateTask {
     @Resource
     private CustomInternalAddressMapper customInternalAddressMapper;
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Resource
+    private EsTransactionRepository esTransactionRepository;
+
+    @Resource
+    private EsErc20TxRepository esErc20TxRepository;
+
+    @Resource
+    private EsErc721TxRepository esErc721TxRepository;
+
+    @Resource
+    private CustomNOptBakMapper customNOptBakMapper;
+
+    /**
+     * 网络统计相关信息更新任务
+     * 每5秒执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/15
+     */
+    @XxlJob("networkStatUpdateJobHandler")
     public void networkStatUpdate() {
         // 只有程序正常运行才执行任务
         if (AppStatusUtil.isRunning()) start();
+    }
+
+    /**
+     * 更新交易统计数
+     * 更新缓存，再由缓存更新到MySQL和Redis
+     * 每1分钟执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/1
+     */
+    @XxlJob("updateNetworkQtyJobHandler")
+    public void updateNetworkQty() {
+        try {
+            ESQueryBuilderConstructor count = new ESQueryBuilderConstructor();
+            //获取es交易数
+            Long totalCount = 0L;
+            try {
+                ESResult<?> totalCountRes = esTransactionRepository.Count(count);
+                totalCount = totalCountRes.getTotal();
+            } catch (Exception e) {
+                log.error("获取es交易数异常", e);
+            }
+            //获取erc20交易数
+            Long erc20Count = 0L;
+            try {
+                ESResult<?> erc20Res = esErc20TxRepository.Count(count);
+                erc20Count = erc20Res.getTotal();
+            } catch (Exception e) {
+                log.error("获取erc20交易数异常", e);
+            }
+            //获取erc721交易数
+            Long erc721Count = 0L;
+            try {
+                ESResult<?> erc721Res = esErc721TxRepository.Count(count);
+                erc721Count = erc721Res.getTotal();
+            } catch (Exception e) {
+                log.error("获取erc721交易数异常", e);
+            }
+            //获得地址数统计
+            int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
+            //获得进行中的提案
+            int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
+            //获取提案总数
+            int proposalQty = statisticBusinessMapper.getProposalQty();
+            //获取节点操作数
+            long nodeOptSeq = customNOptBakMapper.getLastNodeOptSeq();
+            NetworkStat networkStat = networkStatCache.getNetworkStat();
+            networkStat.setTxQty(totalCount.intValue());
+            networkStat.setErc20TxQty(erc20Count.intValue());
+            networkStat.setErc721TxQty(erc721Count.intValue());
+            networkStat.setAddressQty(addressQty);
+            networkStat.setDoingProposalQty(doingProposalQty);
+            networkStat.setProposalQty(proposalQty);
+            networkStat.setNodeOptSeq(nodeOptSeq);
+            XxlJobHelper.handleSuccess(StrUtil.format("更新交易统计数成功，交易总数为[{}],erc20交易数为[{}],erc721交易数为[{}],地址数为[{}],进行中提案总数为[{}],提案总数为[{}],节点操作数为[{}]",
+                                                      totalCount.intValue(),
+                                                      erc20Count.intValue(),
+                                                      erc721Count.intValue(),
+                                                      addressQty,
+                                                      doingProposalQty,
+                                                      proposalQty,
+                                                      nodeOptSeq));
+        } catch (Exception e) {
+            log.error("更新交易统计数异常", e);
+            throw e;
+        }
     }
 
     protected void start() {
@@ -65,18 +159,24 @@ public class NetworkStatUpdateTask {
             //计算流通量
             BigDecimal turnValue = getCirculationValue(networkStat);
             //计算可使用质押量
-            BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat.getIssueRates(), chainConfig, inciteBalance);
+            BigDecimal availableStaking = CalculateUtils.calculationAvailableValue(networkStat, inciteBalance);
             //获得节点相关的网络统计
             NetworkStatistics networkStatistics = statisticBusinessMapper.getNetworkStatisticsFromNode();
+            //实时质押委托总数
             BigDecimal totalValue = networkStatistics.getTotalValue() == null ? BigDecimal.ZERO : networkStatistics.getTotalValue();
+            //实时质押总数
             BigDecimal stakingValue = networkStatistics.getStakingValue() == null ? BigDecimal.ZERO : networkStatistics.getStakingValue();
-            //获得地址数统计
-            int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
-            //获得进行中的提案
-            int doingProposalQty = statisticBusinessMapper.getNetworkStatisticsFromProposal();
-            networkStatCache.updateByTask(turnValue, availableStaking, totalValue, stakingValue, addressQty, doingProposalQty);
+            networkStatCache.updateByTask(turnValue, availableStaking, totalValue, stakingValue);
+            String msg = StrUtil.format("网络统计任务成功，流通量[{}]，可使用质押量[{}]，实时质押委托总数[{}],实时质押总数[{}]",
+                                        turnValue.toPlainString(),
+                                        availableStaking.toPlainString(),
+                                        totalValue.toPlainString(),
+                                        stakingValue.toPlainString());
+            XxlJobHelper.log(msg);
+            XxlJobHelper.handleSuccess(msg);
         } catch (Exception e) {
             log.error("网络统计任务出错:", e);
+            throw e;
         }
     }
 

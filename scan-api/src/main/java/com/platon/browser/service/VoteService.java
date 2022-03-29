@@ -2,6 +2,7 @@ package com.platon.browser.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.bean.CustomVoteProposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.entity.VoteExample;
 import com.platon.browser.dao.mapper.VoteMapper;
@@ -27,6 +28,7 @@ import java.util.List;
  */
 @Service
 public class VoteService {
+
     @Resource
     private VoteMapper voteMapper;
 
@@ -40,7 +42,16 @@ public class VoteService {
         VoteExample.Criteria criteria = voteExample.createCriteria();
         criteria.andProposalHashEqualTo(voteListRequest.getProposalHash());
         if (StringUtils.isNotBlank(voteListRequest.getOption())) {
-            criteria.andOptionEqualTo(Integer.parseInt(voteListRequest.getOption()));
+            if (CustomVoteProposal.OptionEnum.SUPPORT.getCode().equalsIgnoreCase(voteListRequest.getOption()) || CustomVoteProposal.OptionEnum.OPPOSITION.getCode()
+                                                                                                                                                         .equalsIgnoreCase(voteListRequest.getOption())) {
+                int option = Integer.parseInt(voteListRequest.getOption());
+                criteria.andOptionEqualTo(option);
+            } else {
+                List<Integer> optionList = new ArrayList<>();
+                optionList.add(Integer.valueOf(CustomVoteProposal.OptionEnum.SUPPORT.getCode()));
+                optionList.add(Integer.valueOf(CustomVoteProposal.OptionEnum.OPPOSITION.getCode()));
+                criteria.andOptionNotIn(optionList);
+            }
         }
         /** 分页根据提案hash查询投票列表 */
         List<Vote> votes = voteMapper.selectByExample(voteExample);
@@ -48,9 +59,9 @@ public class VoteService {
         if (!CollectionUtils.isEmpty(votes)) {
             List<VoteListResp> voteListResps = new ArrayList<>(votes.size());
             votes.forEach(vote -> {
-            	/**
-            	 * 循环匹配数据
-            	 */
+                /**
+                 * 循环匹配数据
+                 */
                 VoteListResp resp = new VoteListResp();
                 BeanUtils.copyProperties(vote, resp);
                 resp.setVoter(vote.getNodeId());
@@ -64,4 +75,5 @@ public class VoteService {
         }
         return respPage;
     }
+
 }

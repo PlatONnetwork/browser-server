@@ -60,7 +60,7 @@ public class ConsistencyServiceTest extends AgentTestBase {
     }
 
     @Test
-    public void post() throws IOException {
+    public void post() throws Exception {
 
         TokenTxSummary summary = new TokenTxSummary();
         //when(oldEsErc20TxRepository.groupContractTxCount()).thenReturn(summary);

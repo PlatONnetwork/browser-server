@@ -1,5 +1,6 @@
 package com.platon.browser;
 
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bootstrap.bean.InitializationResult;
@@ -29,6 +30,7 @@ import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
+@EnableApolloConfig
 @EnableRetry
 @Configuration
 @EnableScheduling
@@ -80,7 +82,6 @@ public class AgentApplication implements ApplicationRunner {
         retryableClient.zeroBlockNumberWait();
         InitializationResult initialResult = initializationService.init(traceId);
         consistencyService.post(traceId);
-        consistencyService.loadDestroyContract();
         // 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
         // 已采最高块号

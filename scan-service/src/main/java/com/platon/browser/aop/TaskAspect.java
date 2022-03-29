@@ -16,7 +16,6 @@ import java.util.Set;
 /**
  * 定时任务切面---添加链路id
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/27
  */
 @Slf4j
@@ -28,10 +27,15 @@ public class TaskAspect {
      * 需要打印信息的task类---有些定时任务执行太快，不适合输出日志，有需要的自行添加即可
      */
     private static final Set<String> taskLog = new HashSet<String>() {{
+        add("com.platon.browser.task.NetworkStatUpdateTask");
+        add("com.platon.browser.task.AddressUpdateTask");
         add("com.platon.browser.task.ErcTokenUpdateTask");
+        add("com.platon.browser.task.NodeOptTask");
+        add("com.platon.browser.task.NodeUpdateTask");
+        add("com.platon.browser.task.UpdateTokenQtyTask");
     }};
 
-    @Pointcut(value = "@annotation(org.springframework.scheduling.annotation.Scheduled)")
+    @Pointcut(value = "@annotation(com.xxl.job.core.handler.annotation.XxlJob)")
     public void access() {
 
     }

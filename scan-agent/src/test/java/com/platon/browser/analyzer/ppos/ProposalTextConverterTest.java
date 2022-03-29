@@ -52,7 +52,6 @@ public class ProposalTextConverterTest extends AgentTestBase {
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
         when(chainConfig.getProposalUrlTemplate()).thenReturn(blockChainConfig.getProposalUrlTemplate());
         when(chainConfig.getProposalPipNumTemplate()).thenReturn(blockChainConfig.getProposalPipNumTemplate());
-        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1L);
     }
 
     @Test

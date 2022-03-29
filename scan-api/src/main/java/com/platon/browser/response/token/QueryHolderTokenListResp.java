@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Erc20 持有人对应token列表信息
@@ -41,5 +42,7 @@ public class QueryHolderTokenListResp {
      * token所属合约是否已销毁：0-否，1-是
      */
     private int isContractDestroy;
+
+    private Date createTime;
 
 }

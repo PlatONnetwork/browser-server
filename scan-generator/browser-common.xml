@@ -42,7 +42,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="network_stat" domainObjectName="NetworkStat">
+        <table tableName="token_inventory" domainObjectName="TokenInventory">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>
