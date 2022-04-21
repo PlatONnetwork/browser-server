@@ -10,6 +10,8 @@ import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.service.ErcDetectService;
+import com.platon.tx.exceptions.PlatonCallException;
+import com.platon.tx.exceptions.PlatonCallTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -156,6 +158,10 @@ public class ErcServiceImpl {
             if (ObjectUtil.isNotNull(ercContract)) {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }
+        } catch (PlatonCallException e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{},msg:{}", contractAddress, tokenId, e.getMsg()), e);
+        } catch (PlatonCallTimeoutException e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{},msg:{}", contractAddress, tokenId, e.getMsg()), e);
         } catch (Exception e) {
             log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
         }
@@ -178,6 +184,10 @@ public class ErcServiceImpl {
             if (ObjectUtil.isNotNull(ercContract)) {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }
+        } catch (PlatonCallException e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{},msg:{}", contractAddress, tokenId, e.getMsg()), e);
+        } catch (PlatonCallTimeoutException e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{},msg:{}", contractAddress, tokenId, e.getMsg()), e);
         } catch (Exception e) {
             log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
         }
