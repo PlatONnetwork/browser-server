@@ -15,3 +15,6 @@ logging:
       max-history: 7
       # 是否在应用启动时进行归档管理
       clean-history-on-start: true
+spring:
+  profiles:
+    active: platon

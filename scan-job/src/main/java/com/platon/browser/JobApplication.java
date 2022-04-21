@@ -1,7 +1,6 @@
 package com.platon.browser;
 
 
-import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.utils.AppStatusUtil;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@EnableApolloConfig
 @Slf4j
 @EnableRetry
 @Configuration
