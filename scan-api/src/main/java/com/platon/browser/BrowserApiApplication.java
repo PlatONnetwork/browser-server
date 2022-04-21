@@ -1,7 +1,6 @@
 package com.platon.browser;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.enums.AppStatus;
 import com.platon.browser.utils.AppStatusUtil;
@@ -20,7 +19,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-@EnableApolloConfig
 @EnableCaching
 @Slf4j
 @EnableScheduling
