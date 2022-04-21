@@ -1,9 +1,0 @@
-{
-"addr": "lax17fmjxr6npsgsqhqwkz6t5jtjmclw258sy6n80h",
-"creTime": 1597650053471,
-"extra": "[{\"nodeId\":\"0xd016ee2d7d10d57c27435c617c39ca170a79a9c414e8640e0f6fbedcb0cdb866fb8c03abbedd585897a63e5f6d4b074cbae163462ecba844829061fbdbfa76c5\",\"nodeName\":\"nodeName\",\"reward\":\"5489083621343197792718\"}]",
-"extraClean": "[{\"nodeId\":\"0xd016ee2d7d10d57c27435c617c39ca170a79a9c414e8640e0f6fbedcb0cdb866fb8c03abbedd585897a63e5f6d4b074cbae163462ecba844829061fbdbfa76c5\",\"nodeName\":\"nodeName\",\"reward\":\"5489083621343197792718\"}]",
-"hash": "0xf4b089cf59cf06afdfce4191c0e13e9d257ead00f3ae2bc60e75ae6b72427aa5",
-"time": 1597458877779,
-"updTime": 1597650053471
-}

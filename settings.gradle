@@ -9,7 +9,6 @@ include 'scan-api'
 include 'scan-common'
 include 'scan-generator'
 include 'scan-service'
-include 'scan-press'
 include 'scan-test'
 include 'scan-job'
 
