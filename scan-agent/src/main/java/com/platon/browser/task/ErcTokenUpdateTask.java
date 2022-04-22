@@ -366,8 +366,10 @@ public class ErcTokenUpdateTask {
         } catch (Exception e) {
             log.error(StrUtil.format("增量更新token库存信息异常,当前标识为:{}", pageNum), e);
         } finally {
-            if (batchNum == INVENTORY_BATCH_SIZE) {
+            if (errorNum.get() == INVENTORY_BATCH_SIZE) {
                 tokenInventoryPage.incrementAndGet();
+            } else {
+                tokenInventoryPage.set(0L);
             }
         }
     }
