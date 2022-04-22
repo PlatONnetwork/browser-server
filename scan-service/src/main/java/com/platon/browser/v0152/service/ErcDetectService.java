@@ -2,6 +2,7 @@ package com.platon.browser.v0152.service;
 
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
@@ -10,6 +11,7 @@ import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.crypto.Credentials;
 import com.platon.crypto.Keys;
+import com.platon.parameters.NetworkParameters;
 import com.platon.protocol.core.DefaultBlockParameter;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.core.Response;
@@ -25,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -40,7 +43,10 @@ import java.util.List;
 @Service
 public class ErcDetectService {
 
-    public static final Credentials CREDENTIALS = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
+    @Resource
+    private BlockChainConfig chainConfig;
+
+    public static Credentials CREDENTIALS;
 
     private static final BigInteger GAS_LIMIT = BigInteger.valueOf(2104836);
 
@@ -50,6 +56,12 @@ public class ErcDetectService {
 
     @Resource
     private PlatOnClient platOnClient;
+
+    @PostConstruct
+    public void init() {
+        NetworkParameters.init(chainConfig.getChainId(), chainConfig.getAddressPrefix());
+        CREDENTIALS = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
+    }
 
     /**
      * 检测输入数据--不带重试机制
