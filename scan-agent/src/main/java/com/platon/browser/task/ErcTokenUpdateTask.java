@@ -174,7 +174,7 @@ public class ErcTokenUpdateTask {
                 List<String> list = new ArrayList<>();
                 list.add("lat12v6d2mguvnh4wm2d65k9sf5t2t8z9urer55u08");
                 condition.createCriteria().andTokenAddressNotIn(list).andImageIsNull();
-                condition.setOrderByClause(" id asc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+                condition.setOrderByClause(" id desc limit " + page * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
                 List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
                 // 过滤销毁的合约
                 res = batch;
@@ -294,7 +294,7 @@ public class ErcTokenUpdateTask {
             List<String> list = new ArrayList<>();
             list.add("lat12v6d2mguvnh4wm2d65k9sf5t2t8z9urer55u08");
             condition.createCriteria().andTokenAddressNotIn(list).andImageIsNull();
-            condition.setOrderByClause(" id asc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
+            condition.setOrderByClause(" id desc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
             // 分页更新token库存相关信息
             List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
             List<TokenInventory> res = batch;
