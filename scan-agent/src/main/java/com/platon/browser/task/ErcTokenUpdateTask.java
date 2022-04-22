@@ -293,11 +293,10 @@ public class ErcTokenUpdateTask {
             TokenInventoryExample condition = new TokenInventoryExample();
             List<String> list = new ArrayList<>();
             list.add("lat12v6d2mguvnh4wm2d65k9sf5t2t8z9urer55u08");
-            condition.createCriteria().andTokenAddressNotIn(list).andImageIsNull();
+            condition.createCriteria().andTokenAddressNotIn(list).andImageIsNull().andNameIsNull().andDescriptionIsNull();
             condition.setOrderByClause(" id desc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
             // 分页更新token库存相关信息
-            List<TokenInventory> batch = tokenInventoryMapper.selectByExample(condition);
-            List<TokenInventory> res = batch;
+            List<TokenInventory> res = tokenInventoryMapper.selectByExample(condition);
             batchNum = CommonUtil.ofNullable(() -> res.size()).orElse(0);
             List<TokenInventory> updateParams = new ArrayList<>();
             if (CollUtil.isNotEmpty(res)) {
