@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: platon
+profile: platonhyp
 # 密码加密配置
 jasypt:
   encryptor:
@@ -87,7 +87,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.120.151:7789,192.168.120.151:7790
+    addresses: 192.168.9.139:7789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
