@@ -14,6 +14,8 @@ public class TokenInventory extends TokenInventoryKey {
 
     private String image;
 
+    private String imageUrl;
+
     private Date createTime;
 
     private Date updateTime;
@@ -83,6 +85,14 @@ public class TokenInventory extends TokenInventoryKey {
 
     public void setImage(String image) {
         this.image = image == null ? null : image.trim();
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl == null ? null : imageUrl.trim();
     }
 
     public Date getCreateTime() {

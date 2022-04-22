@@ -197,15 +197,32 @@ public class ErcTokenUpdateTask {
                                     newTi.setTokenAddress(inventory.getTokenAddress());
                                     boolean changed = false;
                                     // 只要有一个属性变动就添加到更新列表中
-                                    if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
+                                    if (ObjectUtil.isNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImageUrl())) {
+                                        inventory.setImage(newTi.getImageUrl());
+                                        changed = true;
+                                    } else if (ObjectUtil.isNotNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImageUrl()) && !newTi.getImageUrl().equals(inventory.getImage())) {
+                                        inventory.setImage(newTi.getImageUrl());
+                                        changed = true;
+                                    }
+                                    if (ObjectUtil.isNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImage())) {
+                                        inventory.setImage(newTi.getImage());
+                                        changed = true;
+                                    } else if (ObjectUtil.isNotNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImage()) && !newTi.getImage().equals(inventory.getImage())) {
                                         inventory.setImage(newTi.getImage());
                                         changed = true;
                                     }
-                                    if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
+                                    if (ObjectUtil.isNull(inventory.getDescription()) && ObjectUtil.isNotNull(newTi.getDescription())) {
+                                        inventory.setDescription(newTi.getDescription());
+                                        changed = true;
+                                    } else if (ObjectUtil.isNotNull(inventory.getDescription()) && ObjectUtil.isNotNull(newTi.getDescription()) && !newTi.getDescription()
+                                                                                                                                                         .equals(inventory.getDescription())) {
                                         inventory.setDescription(newTi.getDescription());
                                         changed = true;
                                     }
-                                    if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
+                                    if (ObjectUtil.isNull(inventory.getName()) && ObjectUtil.isNotNull(newTi.getName())) {
+                                        inventory.setName(newTi.getName());
+                                        changed = true;
+                                    } else if (ObjectUtil.isNotNull(inventory.getName()) && ObjectUtil.isNotNull(newTi.getName()) && !newTi.getName().equals(inventory.getName())) {
                                         inventory.setName(newTi.getName());
                                         changed = true;
                                     }
@@ -293,7 +310,7 @@ public class ErcTokenUpdateTask {
             TokenInventoryExample condition = new TokenInventoryExample();
             List<String> list = new ArrayList<>();
             list.add("lat12v6d2mguvnh4wm2d65k9sf5t2t8z9urer55u08");
-            condition.createCriteria().andTokenAddressNotIn(list).andImageIsNull().andNameIsNull().andDescriptionIsNull();
+            condition.createCriteria().andTokenAddressNotIn(list).andImageIsNull();
             condition.setOrderByClause(" id desc limit " + pageNum * INVENTORY_BATCH_SIZE + "," + INVENTORY_BATCH_SIZE);
             // 分页更新token库存相关信息
             List<TokenInventory> res = tokenInventoryMapper.selectByExample(condition);
@@ -315,15 +332,32 @@ public class ErcTokenUpdateTask {
                                 newTi.setTokenAddress(inventory.getTokenAddress());
                                 boolean changed = false;
                                 // 只要有一个属性变动就添加到更新列表中
-                                if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
+                                if (ObjectUtil.isNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImageUrl())) {
+                                    inventory.setImage(newTi.getImageUrl());
+                                    changed = true;
+                                } else if (ObjectUtil.isNotNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImageUrl()) && !newTi.getImageUrl().equals(inventory.getImage())) {
+                                    inventory.setImage(newTi.getImageUrl());
+                                    changed = true;
+                                }
+                                if (ObjectUtil.isNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImage())) {
+                                    inventory.setImage(newTi.getImage());
+                                    changed = true;
+                                } else if (ObjectUtil.isNotNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImage()) && !newTi.getImage().equals(inventory.getImage())) {
                                     inventory.setImage(newTi.getImage());
                                     changed = true;
                                 }
-                                if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
+                                if (ObjectUtil.isNull(inventory.getDescription()) && ObjectUtil.isNotNull(newTi.getDescription())) {
+                                    inventory.setDescription(newTi.getDescription());
+                                    changed = true;
+                                } else if (ObjectUtil.isNotNull(inventory.getDescription()) && ObjectUtil.isNotNull(newTi.getDescription()) && !newTi.getDescription()
+                                                                                                                                                     .equals(inventory.getDescription())) {
                                     inventory.setDescription(newTi.getDescription());
                                     changed = true;
                                 }
-                                if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
+                                if (ObjectUtil.isNull(inventory.getName()) && ObjectUtil.isNotNull(newTi.getName())) {
+                                    inventory.setName(newTi.getName());
+                                    changed = true;
+                                } else if (ObjectUtil.isNotNull(inventory.getName()) && ObjectUtil.isNotNull(newTi.getName()) && !newTi.getName().equals(inventory.getName())) {
                                     inventory.setName(newTi.getName());
                                     changed = true;
                                 }
