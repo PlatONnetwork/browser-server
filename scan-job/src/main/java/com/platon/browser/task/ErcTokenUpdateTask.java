@@ -20,10 +20,6 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ErcTypeEnum;
-import com.platon.browser.service.elasticsearch.AbstractEsRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
@@ -33,7 +29,6 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -361,33 +356,6 @@ public class ErcTokenUpdateTask {
     }
 
     /**
-     * 获取erc交易
-     *
-     * @param abstractEsRepository:
-     * @param txSeq:
-     * @param pageSize:
-     * @return: java.util.List<com.platon.browser.elasticsearch.dto.ErcTx>
-     * @date: 2021/12/7
-     */
-    private List<ErcTx> getErcList(AbstractEsRepository abstractEsRepository, Long txSeq, int pageSize) throws Exception {
-        try {
-            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-            ESResult<ErcTx> queryResultFromES = new ESResult<>();
-            constructor.setAsc("seq");
-            constructor.setResult(new String[]{"seq", "from", "contract", "to"});
-            ESQueryBuilders esQueryBuilders = new ESQueryBuilders();
-            esQueryBuilders.listBuilders().add(QueryBuilders.rangeQuery("seq").gt(txSeq));
-            constructor.must(esQueryBuilders);
-            constructor.setUnmappedType("long");
-            queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, pageSize);
-            return queryResultFromES.getRsData();
-        } catch (Exception e) {
-            log.error("获取erc交易异常", e);
-            throw e;
-        }
-    }
-
-    /**
      * 更新erc20的token holder的余额
      *
      * @param :
@@ -495,8 +463,8 @@ public class ErcTokenUpdateTask {
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(6);
             long oldPosition = Convert.toLong(pointLog.getPosition());
             TxErc721BakExample example = new TxErc721BakExample();
-            example.setOrderByClause("id");
-            example.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(oldPosition + pageSize);
+            example.setOrderByClause("id asc limit " + pageSize);
+            example.createCriteria().andIdGreaterThan(oldPosition);
             List<TxErc721Bak> list = txErc721BakMapper.selectByExample(example);
             List<TokenHolder> updateParams = new ArrayList<>();
             TaskUtil.console("[erc721]当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
@@ -713,9 +681,8 @@ public class ErcTokenUpdateTask {
         XxlJobHelper.log("当前页数为[{}]，断点为[{}]", batchSize, oldPosition);
         try {
             TokenInventoryExample condition = new TokenInventoryExample();
-            condition.setOrderByClause("id");
-            condition.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(oldPosition + batchSize).andRetryNumLessThan(tokenRetryNum);
-            // 分页更新token库存相关信息
+            condition.setOrderByClause(" id asc limit " + batchSize);
+            condition.createCriteria().andIdGreaterThan(oldPosition).andRetryNumLessThan(tokenRetryNum);
             List<TokenInventoryWithBLOBs> batch = tokenInventoryMapper.selectByExampleWithBLOBs(condition);
             if (CollUtil.isNotEmpty(batch)) {
                 List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
