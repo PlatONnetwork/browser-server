@@ -384,8 +384,8 @@ public class AddressUpdateTask {
     private List<TxBak> getTransactionList(long maxId, int pageSize) throws Exception {
         try {
             TxBakExample example = new TxBakExample();
-            example.createCriteria().andIdGreaterThan(maxId).andIdLessThanOrEqualTo(maxId + pageSize);
-            example.setOrderByClause("id");
+            example.createCriteria().andIdGreaterThan(maxId);
+            example.setOrderByClause("id asc limit " + pageSize);
             List<TxBak> list = txBakMapper.selectByExample(example);
             return list;
         } catch (Exception e) {

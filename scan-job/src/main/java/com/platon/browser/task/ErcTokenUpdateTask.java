@@ -372,8 +372,8 @@ public class ErcTokenUpdateTask {
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(5);
             long oldPosition = Convert.toLong(pointLog.getPosition());
             TxErc20BakExample example = new TxErc20BakExample();
-            example.setOrderByClause("id");
-            example.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(oldPosition + pageSize);
+            example.setOrderByClause("id asc limit " + pageSize);
+            example.createCriteria().andIdGreaterThan(oldPosition);
             List<TxErc20Bak> list = txErc20BakMapper.selectByExample(example);
             List<TokenHolder> updateParams = new ArrayList<>();
             TaskUtil.console("[erc20]当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
@@ -554,8 +554,6 @@ public class ErcTokenUpdateTask {
         // 分页更新token库存相关信息
         List<TokenInventoryWithBLOBs> batch = null;
         do {
-            // 当前查询到的条数
-            int batchNum = 0;
             // 当前失败的条数
             AtomicInteger errorNum = new AtomicInteger(0);
             // 当次更新的条数
@@ -568,7 +566,6 @@ public class ErcTokenUpdateTask {
                 batch = tokenInventoryMapper.selectByExampleWithBLOBs(condition);
                 List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
                 if (CollUtil.isNotEmpty(batch)) {
-                    batchNum = batch.size();
                     int finalPage = page;
                     batch.forEach(inventory -> {
                         TokenInventoryWithBLOBs updateTokenInventory = new TokenInventoryWithBLOBs();
@@ -647,7 +644,7 @@ public class ErcTokenUpdateTask {
                     customTokenInventoryMapper.batchUpdateTokenInfo(updateParams);
                     XxlJobHelper.log("全量更新token库存信息{}", JSONUtil.toJsonStr(updateParams));
                 }
-                String msg = StrUtil.format("全量更新token库存信息:当前标识为:{},查询到的条数为{},过滤后的条数:{},已更新的条数为:{},失败的条数为:{}", page, batch.size(), batchNum, updateNum.get(), errorNum.get());
+                String msg = StrUtil.format("全量更新token库存信息:当前标识为:{},查询到的条数为{},已更新的条数为:{},失败的条数为:{}", page, batch.size(), updateNum.get(), errorNum.get());
                 XxlJobHelper.log(msg);
                 log.info(msg);
             } catch (Exception e) {
@@ -669,8 +666,6 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
-        // 当前查询到的条数
-        int batchNum = 0;
         // 当前失败的条数
         AtomicInteger errorNum = new AtomicInteger(0);
         // 当次更新的条数
@@ -686,7 +681,6 @@ public class ErcTokenUpdateTask {
             List<TokenInventoryWithBLOBs> batch = tokenInventoryMapper.selectByExampleWithBLOBs(condition);
             if (CollUtil.isNotEmpty(batch)) {
                 List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
-                batchNum = batch.size();
                 batch.forEach(inventory -> {
                     TokenInventoryWithBLOBs updateTokenInventory = new TokenInventoryWithBLOBs();
                     updateTokenInventory.setTokenId(inventory.getTokenId());
@@ -770,7 +764,7 @@ public class ErcTokenUpdateTask {
                 String newPosition = Convert.toStr(lastTokenInventory.getId());
                 pointLog.setPosition(newPosition);
                 pointLogMapper.updateByPrimaryKeySelective(pointLog);
-                String msg = StrUtil.format("增量更新token库存信息:断点为[{}]->[{}],查询到的条数为:{},过滤后的条数:{},已更新的条数为:{},失败的条数为:{}", oldPosition, newPosition, batch.size(), batchNum, updateNum.get(), errorNum.get());
+                String msg = StrUtil.format("增量更新token库存信息:断点为[{}]->[{}],查询到的条数为:{},已更新的条数为:{},失败的条数为:{}", oldPosition, newPosition, batch.size(), updateNum.get(), errorNum.get());
                 XxlJobHelper.log(msg);
                 log.info(msg);
                 XxlJobHelper.handleSuccess(msg);

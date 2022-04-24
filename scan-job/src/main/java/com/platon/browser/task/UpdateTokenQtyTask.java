@@ -68,7 +68,7 @@ public class UpdateTokenQtyTask {
             txErc20BakExample.createCriteria().andIdGreaterThan(oldErc20Position);
             List<TxErc20Bak> erc20List = txErc20BakMapper.selectByExample(txErc20BakExample);
             if (CollUtil.isNotEmpty(erc20List)) {
-                TaskUtil.console("找到20交易[{}]条", erc20List.size());
+                TaskUtil.console("找到erc20交易[{}]条", erc20List.size());
                 Map<String, List<ErcTx>> erc20Map = erc20List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
                 //累计token的erc20交易数
                 for (Map.Entry<String, List<ErcTx>> entry : erc20Map.entrySet()) {
@@ -108,7 +108,7 @@ public class UpdateTokenQtyTask {
             txErc721BakExample.createCriteria().andIdGreaterThan(oldErc721Position);
             List<TxErc721Bak> erc721List = txErc721BakMapper.selectByExample(txErc721BakExample);
             if (CollUtil.isNotEmpty(erc721List)) {
-                TaskUtil.console("找到721交易[{}]条", erc721List.size());
+                TaskUtil.console("找到erc721交易[{}]条", erc721List.size());
                 Map<String, List<ErcTx>> erc721Map = erc721List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
                 //累计token的erc721交易数
                 for (Map.Entry<String, List<ErcTx>> entry : erc721Map.entrySet()) {
