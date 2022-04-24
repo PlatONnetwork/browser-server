@@ -64,11 +64,11 @@ public class UpdateTokenQtyTask {
             long oldErc20Position = Convert.toLong(erc20PointLog.getPosition());
             TaskUtil.console("当前页数为[{}]，erc20断点为[{}]", pageSize, oldErc20Position);
             TxErc20BakExample txErc20BakExample = new TxErc20BakExample();
-            txErc20BakExample.setOrderByClause("id");
-            txErc20BakExample.createCriteria().andIdGreaterThan(oldErc20Position).andIdLessThanOrEqualTo(oldErc20Position + pageSize);
+            txErc20BakExample.setOrderByClause("id asc limit " + pageSize);
+            txErc20BakExample.createCriteria().andIdGreaterThan(oldErc20Position);
             List<TxErc20Bak> erc20List = txErc20BakMapper.selectByExample(txErc20BakExample);
             if (CollUtil.isNotEmpty(erc20List)) {
-                TaskUtil.console("找到20交易[{}]条", erc20List.size());
+                TaskUtil.console("找到erc20交易[{}]条", erc20List.size());
                 Map<String, List<ErcTx>> erc20Map = erc20List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
                 //累计token的erc20交易数
                 for (Map.Entry<String, List<ErcTx>> entry : erc20Map.entrySet()) {
@@ -104,11 +104,11 @@ public class UpdateTokenQtyTask {
             long oldErc721Position = Convert.toLong(erc721PointLog.getPosition());
             TaskUtil.console("当前页码为[{}]，erc721断点为[{}]", pageSize, oldErc721Position);
             TxErc721BakExample txErc721BakExample = new TxErc721BakExample();
-            txErc721BakExample.setOrderByClause("id");
-            txErc721BakExample.createCriteria().andIdGreaterThan(oldErc721Position).andIdLessThanOrEqualTo(oldErc721Position + pageSize);
+            txErc721BakExample.setOrderByClause("id asc limit " + pageSize);
+            txErc721BakExample.createCriteria().andIdGreaterThan(oldErc721Position);
             List<TxErc721Bak> erc721List = txErc721BakMapper.selectByExample(txErc721BakExample);
             if (CollUtil.isNotEmpty(erc721List)) {
-                TaskUtil.console("找到721交易[{}]条", erc721List.size());
+                TaskUtil.console("找到erc721交易[{}]条", erc721List.size());
                 Map<String, List<ErcTx>> erc721Map = erc721List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
                 //累计token的erc721交易数
                 for (Map.Entry<String, List<ErcTx>> entry : erc721Map.entrySet()) {

@@ -600,4 +600,3 @@ INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`,
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (5, 1, 'tx_20_bak', '从erc20交易备份表统计TokenHolder余额的断点记录', '0', '2021-12-06 10:23:58', '2021-12-06 10:25:49');
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (6, 1, 'tx_721_bak', '从erc721交易备份表统计TokenHolder持有者数的断点记录', '0', '2021-12-06 10:25:34', '2021-12-06 10:25:39');
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (7, 1, 'token_inventory', '增量更新token库存信息断点记录', '0', '2021-12-10 02:44:32', '2021-12-10 02:44:32');
-INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`) VALUES (8, 1, 'token_inventory', '增量更新销毁token库存信息断点记录', '0', '2021-12-10 02:44:32', '2021-12-10 02:44:32');
