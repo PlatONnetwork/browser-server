@@ -49,9 +49,8 @@ public class NodeOptTask {
             long oldPosition = Convert.toLong(pointLog.getPosition());
             XxlJobHelper.log("当前页数为[{}]，断点为[{}]", batchSize, oldPosition);
             NOptBakExample nOptBakExample = new NOptBakExample();
-            nOptBakExample.setOrderByClause("id");
-            long maxPosition = Convert.toInt(pointLog.getPosition()) + batchSize;
-            nOptBakExample.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(maxPosition);
+            nOptBakExample.setOrderByClause("id asc limit " + batchSize);
+            nOptBakExample.createCriteria().andIdGreaterThan(oldPosition);
             List<NOptBak> nOptBakList = nOptBakMapper.selectByExample(nOptBakExample);
             if (CollUtil.isNotEmpty(nOptBakList)) {
                 Set<NOptBak> nodeOpts = new HashSet<>(nOptBakList);
