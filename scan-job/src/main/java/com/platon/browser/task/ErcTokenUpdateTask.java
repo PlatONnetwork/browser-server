@@ -562,7 +562,7 @@ public class ErcTokenUpdateTask {
                 int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
                 TokenInventoryExample condition = new TokenInventoryExample();
                 condition.setOrderByClause(" id desc limit " + page * batchSize + "," + batchSize);
-                condition.createCriteria().andRetryNumLessThan(tokenRetryNum);
+                condition.createCriteria().andRetryNumLessThan(tokenRetryNum).andImageIsNull();
                 batch = tokenInventoryMapper.selectByExampleWithBLOBs(condition);
                 List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
                 if (CollUtil.isNotEmpty(batch)) {
@@ -677,7 +677,7 @@ public class ErcTokenUpdateTask {
         try {
             TokenInventoryExample condition = new TokenInventoryExample();
             condition.setOrderByClause(" id asc limit " + batchSize);
-            condition.createCriteria().andIdGreaterThan(oldPosition).andRetryNumLessThan(tokenRetryNum);
+            condition.createCriteria().andIdGreaterThan(oldPosition).andRetryNumLessThan(tokenRetryNum).andImageIsNull();
             List<TokenInventoryWithBLOBs> batch = tokenInventoryMapper.selectByExampleWithBLOBs(condition);
             if (CollUtil.isNotEmpty(batch)) {
                 List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
