@@ -193,9 +193,11 @@ xxl:
       addresses: http://10.0.0.34:8060/xxl-job-admin
     #调度中心通讯TOKEN
     accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    #调度中心日志文件保存天数
+    logretentiondays: 90
     executor:
       #执行器AppName
-      appname: scan-agent
+      appname: platon-scan-agent
       #执行器端口号
       port: 9999
       #执行器运行日志文件存储磁盘路径
