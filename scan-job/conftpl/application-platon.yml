@@ -130,7 +130,7 @@ xxl:
     logretentiondays: 90
     executor:
       #执行器AppName
-      appname: scan-job
+      appname: platon-scan-job
       #执行器端口号
       port: 9997
       #执行器运行日志文件存储磁盘路径
