@@ -126,6 +126,8 @@ xxl:
       addresses: http://192.168.120.144:18080/xxl-job-admin
     #调度中心通讯TOKEN
     accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    #调度中心日志文件保存天数
+    logretentiondays: 90
     executor:
       #执行器AppName
       appname: scan-job
