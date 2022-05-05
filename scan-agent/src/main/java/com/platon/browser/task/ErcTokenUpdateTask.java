@@ -112,6 +112,7 @@ public class ErcTokenUpdateTask {
                     int finalPage = page;
                     res.forEach(inventory -> {
                         TokenInventory updateTokenInventory = new TokenInventory();
+                        updateTokenInventory.setId(inventory.getId());
                         updateTokenInventory.setTokenId(inventory.getTokenId());
                         updateTokenInventory.setTokenAddress(inventory.getTokenAddress());
                         String tokenURI = "";
@@ -254,6 +255,7 @@ public class ErcTokenUpdateTask {
             if (CollUtil.isNotEmpty(res)) {
                 res.forEach(inventory -> {
                     TokenInventory updateTokenInventory = new TokenInventory();
+                    updateTokenInventory.setId(inventory.getId());
                     updateTokenInventory.setTokenId(inventory.getTokenId());
                     updateTokenInventory.setTokenAddress(inventory.getTokenAddress());
                     String tokenURI = "";
