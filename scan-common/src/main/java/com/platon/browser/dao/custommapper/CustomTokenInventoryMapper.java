@@ -18,4 +18,6 @@ public interface CustomTokenInventoryMapper {
 
     List<Erc721ContractDestroyBalanceVO> findErc721ContractDestroyBalance(@Param("tokenAddress") String tokenAddress);
 
+    void batchUpdateTokenInfo(@Param("list") List<TokenInventory> list);
+
 }
