@@ -19,20 +19,26 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class EsDelegateRewardService implements EsService<DelegationReward>{
+public class EsDelegateRewardService implements EsService<DelegationReward> {
+
     @Resource
     private EsDelegationRewardRepository ESDelegationRewardRepository;
+
+    @Override
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<DelegationReward> data) throws IOException {
-        if(data.isEmpty()) return;
+        if (data.isEmpty()) {
+            return;
+        }
         try {
-            Map<String,DelegationReward> map = new HashMap<>();
+            Map<String, DelegationReward> map = new HashMap<>();
             // 使用(<hash>)作ES的docId
-            data.forEach(e->map.put(e.getHash(),e));
+            data.forEach(e -> map.put(e.getHash(), e));
             ESDelegationRewardRepository.bulkAddOrUpdate(map);
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
     }
+
 }

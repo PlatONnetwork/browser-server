@@ -24,22 +24,25 @@ public class EsErc721TxService implements EsService<ErcTx> {
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
 
+    @Override
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<ErcTx> recordSet) {
         try {
-            if (recordSet.isEmpty()) return;
+            if (recordSet.isEmpty()) {
+                return;
+            }
             // key: _doc id
             Map<String, ErcTx> txMap = new HashMap<>();
-            recordSet.forEach(t-> txMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTo(), t.getSeq()), t));
+            recordSet.forEach(t -> txMap.put(generateUniqueDocId(t.getHash(), t.getFrom(), t.getTo(), t.getSeq()), t));
             esErc721TxRepository.bulkAddOrUpdate(txMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Batch save data of ESTokenTransferRecord exception", e);
             throw new BusinessException(e.getMessage());
         }
     }
 
     public String generateUniqueDocId(String txHash, String from, String to, long seq) {
-        return seq + "_" + txHash.substring(0, txHash.length() / 2) + from.substring(0, from.length() / 2)
-                + from.substring(0, to.length() / 2);
+        return seq + "_" + txHash.substring(0, txHash.length() / 2) + from.substring(0, from.length() / 2) + from.substring(0, to.length() / 2);
     }
+
 }

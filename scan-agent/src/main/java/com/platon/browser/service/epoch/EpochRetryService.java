@@ -1,5 +1,6 @@
 package com.platon.browser.service.epoch;
 
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.ConfigChange;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.cache.NetworkStatCache;
@@ -17,6 +18,7 @@ import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.protocol.Web3j;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -97,9 +99,21 @@ public class EpochRetryService {
      *
      * @param currentBlockNumber 增发周期内的任意块
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public void issueChange(BigInteger currentBlockNumber) {
         log.debug("增发周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        log.error("重试完成还是业务失败，请联系管理员处理");
     }
 
     /**
@@ -110,7 +124,7 @@ public class EpochRetryService {
      *
      * @param currentBlockNumber 共识周期内的任意块
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public void consensusChange(BigInteger currentBlockNumber) {
         log.debug("共识周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
         try {
@@ -163,7 +177,7 @@ public class EpochRetryService {
      *
      * @param currentBlockNumber 结算周期内的任意块
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public void settlementChange(BigInteger currentBlockNumber) {
         log.debug("结算周期变更:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), currentBlockNumber);
         try {
@@ -240,12 +254,7 @@ public class EpochRetryService {
     private BigDecimal handleStakeReward(BigInteger preSettleEpochLastBlockNumber, BigInteger preEpoch, BigDecimal preStakingReward) throws Exception {
         List<Node> lastNodes = specialApi.getHistoryVerifierList(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
         BigDecimal stakeReward = preStakingReward.divide(BigDecimal.valueOf(lastNodes.size()), 0, BigDecimal.ROUND_DOWN);
-        log.info("块高[{}]第[{}]个结算周期，质押奖励[{}]=总质押奖励[{}]/验证人数量[{}]",
-                preSettleEpochLastBlockNumber,
-                preEpoch,
-                stakeReward.toPlainString(),
-                preStakingReward.toPlainString(),
-                lastNodes.size());
+        log.info("块高[{}]第[{}]个结算周期，质押奖励[{}]=总质押奖励[{}]/验证人数量[{}]", preSettleEpochLastBlockNumber, preEpoch, stakeReward.toPlainString(), preStakingReward.toPlainString(), lastNodes.size());
         return stakeReward;
     }
 
@@ -255,14 +264,18 @@ public class EpochRetryService {
      * @return
      * @throws Exception
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public List<Node> getCandidates() throws CandidateException {
         log.debug("获取实时候选人列表:{}()", Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
             CallResponse<List<Node>> br = platOnClient.getNodeContract().getCandidateList().send();
-            if (!br.isStatusOk()) throw new CandidateException(br.getErrMsg());
+            if (!br.isStatusOk()) {
+                throw new CandidateException(br.getErrMsg());
+            }
             List<Node> candidates = br.getData();
-            if (candidates == null) throw new CandidateException("实时候选节点列表为空!");
+            if (candidates == null) {
+                throw new CandidateException("实时候选节点列表为空!");
+            }
             candidates.forEach(v -> v.setNodeId(HexUtil.prefix(v.getNodeId())));
             return candidates;
         } catch (Exception e) {
@@ -270,6 +283,20 @@ public class EpochRetryService {
             log.error("", e);
             throw new CandidateException(e.getMessage());
         }
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public List<Node> recoverCandidates(Exception e) {
+        log.error("重试完成还是业务失败，请联系管理员处理");
+        List<Node> candidates = new ArrayList<>();
+        return candidates;
     }
 
     /**
@@ -313,11 +340,18 @@ public class EpochRetryService {
                 chainConfig.setSettlePeriodCountPerIssue(chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount()));
             }
 
-            if (configChange.getSettleStakeReward() != null)
+            if (configChange.getSettleStakeReward() != null) {
                 summary.setSettleStakeReward(configChange.getSettleStakeReward());
-            if (configChange.getBlockReward() != null) summary.setBlockReward(configChange.getBlockReward());
-            if (configChange.getStakeReward() != null) summary.setStakeReward(configChange.getStakeReward());
-            if (configChange.getAvgPackTime() != null) summary.setAvgPackTime(configChange.getAvgPackTime());
+            }
+            if (configChange.getBlockReward() != null) {
+                summary.setBlockReward(configChange.getBlockReward());
+            }
+            if (configChange.getStakeReward() != null) {
+                summary.setStakeReward(configChange.getStakeReward());
+            }
+            if (configChange.getAvgPackTime() != null) {
+                summary.setAvgPackTime(configChange.getAvgPackTime());
+            }
         }
         networkStatCache.updateByEpochChange(summary);
     }

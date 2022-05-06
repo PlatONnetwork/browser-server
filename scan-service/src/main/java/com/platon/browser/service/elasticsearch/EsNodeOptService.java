@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.dao.entity.NOptBak;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
@@ -25,9 +24,12 @@ public class EsNodeOptService implements EsService<NOptBak> {
     @Resource
     private EsNodeOptRepository ESNodeOptRepository;
 
+    @Override
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<NOptBak> nodeOpts) throws IOException {
-        if (nodeOpts.isEmpty()) return;
+        if (nodeOpts.isEmpty()) {
+            return;
+        }
         try {
             Map<String, NOptBak> nodeOptMap = new HashMap<>();
             // 使用(<id>)作ES的docId

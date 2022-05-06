@@ -18,6 +18,7 @@ import com.platon.browser.service.ppos.PPOSService;
 import com.platon.browser.service.statistic.StatisticService;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,9 +84,22 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Override
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        retryCount.set(0);
+        log.error("重试完成还是业务失败，请联系管理员处理");
     }
 
     private void surroundExec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
@@ -143,6 +157,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             }
             // 统计业务参数，以MySQL数据库块高为准，所以必须保证块高是最后入库
             statisticService.analyze(copyEvent);
+            // TODO 此分割线以上代码异常重试属于正常逻辑，如果是以下代码发生异常，可能区块相关交易已经发送到ComplementEventHandler进行处理，则该区块会被重复处理多次
             complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, delegationRewardList, event.getTraceId());
             // 释放对象引用
             event.releaseRef();

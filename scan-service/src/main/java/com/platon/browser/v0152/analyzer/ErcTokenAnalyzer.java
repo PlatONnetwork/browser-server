@@ -252,7 +252,7 @@ public class ErcTokenAnalyzer {
                     String contractAddress = token.getAddress();
                     ErcTypeEnum typeEnum = ErcTypeEnum.valueOf(token.getType().toUpperCase());
                     TransactionReceipt transactionReceipt = new TransactionReceipt();
-                    transactionReceipt.setLogs(receipt.getLogs());
+                    transactionReceipt.setLogs(receipt.getLogs().stream().filter(v -> v.getAddress().equalsIgnoreCase(contractAddress)).collect(Collectors.toList()));
                     transactionReceipt.setContractAddress(contractAddress);
                     List<ErcContract.ErcTxEvent> eventList;
                     switch (typeEnum) {

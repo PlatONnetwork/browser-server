@@ -3,6 +3,7 @@ package com.platon.browser.bootstrap;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.CollectionBlock;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.entity.TxBakExample;
@@ -15,6 +16,7 @@ import com.platon.browser.utils.CommonUtil;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -45,9 +47,21 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private Set<Transaction> transactions = new HashSet<>();
 
     @Override
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "BootstrapEventHandler")
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum, label = "BootstrapEventHandler")
     public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        log.error("重试完成还是业务失败，请联系管理员处理");
     }
 
     private void surroundExec(BootstrapEvent event, long sequence, boolean endOfBatch) throws Exception {

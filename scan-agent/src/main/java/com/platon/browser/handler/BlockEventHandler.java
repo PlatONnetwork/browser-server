@@ -1,10 +1,10 @@
 package com.platon.browser.handler;
 
-import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.BlockEvent;
 import com.platon.browser.bean.CollectionBlock;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
@@ -13,6 +13,7 @@ import com.platon.browser.publisher.CollectionEventPublisher;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +41,22 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
     private AtomicLong retryCount = new AtomicLong(0);
 
     @Override
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "BlockEventHandler")
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum, label = "BlockEventHandler")
     public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
         surroundExec(event, sequence, endOfBatch);
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        retryCount.set(0);
+        log.error("重试完成还是业务失败，请联系管理员处理");
     }
 
     private void surroundExec(BlockEvent event, long sequence, boolean endOfBatch) throws InterruptedException, ExecutionException, ContractInvokeException, BeanCreateOrUpdateException, BlankResponseException {
@@ -57,13 +71,14 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             if (retryCount.incrementAndGet() > 1) {
-                log.error("重试次数[{}],该区块[{}]重复处理，可能会引起数据重复统计，event对象数据为[{}]", retryCount.get(), rawBlock.getNumber(), JSONUtil.toJsonStr(event));
+                log.error("重试次数[{}],该区块[{}]重复处理，可能会引起数据重复统计", retryCount.get(), rawBlock.getNumber());
             }
             ReceiptResult receiptResult = event.getReceiptCF().get();
             log.info("当前区块[{}]有[{}]笔交易", rawBlock.getNumber(), CommonUtil.ofNullable(() -> rawBlock.getTransactions().size()).orElse(0));
             // 分析区块
             CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
+            // TODO 此分割线以上代码异常重试属于正常逻辑，如果是以下代码发生异常，可能区块已经发送到CollectionEventHandler进行处理，则该区块会被重复处理多次
             collectionEventPublisher.publish(block, block.getTransactions(), event.getEpochMessage(), event.getTraceId());
             // 释放对象引用
             event.releaseRef();

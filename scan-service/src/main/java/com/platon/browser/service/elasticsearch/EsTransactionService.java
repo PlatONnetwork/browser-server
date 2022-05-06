@@ -19,20 +19,26 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class EsTransactionService implements EsService<Transaction>{
+public class EsTransactionService implements EsService<Transaction> {
+
     @Resource
     private EsTransactionRepository ESTransactionRepository;
+
+    @Override
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<Transaction> transactions) throws IOException {
-        if(transactions.isEmpty()) return;
+        if (transactions.isEmpty()) {
+            return;
+        }
         try {
-            Map<String,Transaction> transactionMap = new HashMap<>();
+            Map<String, Transaction> transactionMap = new HashMap<>();
             // 使用交易Hash作ES的docId
-            transactions.forEach(t->transactionMap.put(t.getHash(),t));
+            transactions.forEach(t -> transactionMap.put(t.getHash(), t));
             ESTransactionRepository.bulkAddOrUpdate(transactionMap);
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
     }
+
 }
