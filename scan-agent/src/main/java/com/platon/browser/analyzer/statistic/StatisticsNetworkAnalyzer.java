@@ -17,14 +17,12 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.utils.CalculateUtils;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -58,11 +56,6 @@ public class StatisticsNetworkAnalyzer {
      */
     private volatile BigDecimal totalIssueValue = BigDecimal.ZERO;
 
-    /**
-     * 重试次数
-     */
-    private AtomicLong retryCount = new AtomicLong(0);
-
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -79,7 +72,6 @@ public class StatisticsNetworkAnalyzer {
         networkStat.setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()));
         setTotalIssueValue(block.getNum(), event.getEpochMessage().getSettleEpochRound(), networkStat);
         statisticBusinessMapper.networkChange(networkStat);
-
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
 
@@ -92,12 +84,8 @@ public class StatisticsNetworkAnalyzer {
      * @return: void
      * @date: 2021/11/9
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     private void setTotalIssueValue(Long curBlockNum, BigInteger settleEpochRound, NetworkStat networkStat) throws Exception {
         try {
-            if (retryCount.incrementAndGet() > 1) {
-                log.warn("获取总发行量-重试次数[{}]", retryCount.get());
-            }
             // 结算周期的区块获取总发行量
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
                 log.info("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
@@ -117,7 +105,6 @@ public class StatisticsNetworkAnalyzer {
                 networkStat.setIssueValue(totalIssueValue);
                 log.info("当前块高[{}]在第[{}]结算周期获取本地内存的年份[{}]和总发行量[{}]成功", curBlockNum, settleEpochRound, yearNum, totalIssueValue.toPlainString());
             }
-            retryCount.set(0);
         } catch (Exception e) {
             log.error(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常，即将重试", curBlockNum, settleEpochRound), e);
             // 如果当前区块获取总发行量异常，则重置本地内存的值

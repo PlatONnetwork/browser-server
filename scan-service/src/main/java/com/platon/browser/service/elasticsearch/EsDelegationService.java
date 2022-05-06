@@ -20,19 +20,25 @@ import java.util.Set;
 @Slf4j
 @Service
 public class EsDelegationService implements EsService<Delegation> {
+
     @Resource
     private EsDelegationRepository ESDelegationRepository;
+
+    @Override
     @Retryable(value = BusinessException.class, maxAttempts = Integer.MAX_VALUE)
     public void save(Set<Delegation> delegations) throws IOException {
-        if(delegations.isEmpty()) return;
+        if (delegations.isEmpty()) {
+            return;
+        }
         try {
-            Map<String,Delegation> delegationMap = new HashMap<>();
+            Map<String, Delegation> delegationMap = new HashMap<>();
             // 使用(<节点ID>-<质押区块号>-<委托人地址>)作ES的docId
-            delegations.forEach(d->delegationMap.put(d.getNodeId()+"-"+d.getStakingBlockNum()+"-"+d.getDelegateAddr(),d));
+            delegations.forEach(d -> delegationMap.put(d.getNodeId() + "-" + d.getStakingBlockNum() + "-" + d.getDelegateAddr(), d));
             ESDelegationRepository.bulkAddOrUpdate(delegationMap);
-        }catch (Exception e){
-            log.error("",e);
+        } catch (Exception e) {
+            log.error("", e);
             throw new BusinessException(e.getMessage());
         }
     }
+
 }

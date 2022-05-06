@@ -1,6 +1,7 @@
 package com.platon.browser.v0152.service;
 
 import cn.hutool.core.util.StrUtil;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.ErcTypeEnum;
@@ -24,6 +25,7 @@ import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +73,7 @@ public class ErcDetectService {
      * @return java.lang.String
      * @date 2021/4/30
      */
-    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = CommonConstant.reTryNum)
     private String detectInputData(String contractAddress, String inputData) throws PlatonCallTimeoutException {
         Transaction transaction = null;
         PlatonCall platonCall = null;
@@ -109,7 +111,7 @@ public class ErcDetectService {
      * @return java.lang.String
      * @date 2021/4/30
      */
-    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = CommonConstant.reTryNum)
     private String detectInputData(String contractAddress, String inputData, BigInteger blockNumber) throws PlatonCallTimeoutException {
         Transaction transaction = null;
         PlatonCall platonCall = null;
@@ -139,6 +141,18 @@ public class ErcDetectService {
         return platonCall.getResult();
     }
 
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public String recoverDetectInputData(Exception e) {
+        log.error("重试完成还是业务失败，请联系管理员处理");
+        return null;
+    }
 
     /**
      * 是否支持Erc165标准
@@ -320,7 +334,7 @@ public class ErcDetectService {
         return contractId;
     }
 
-    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = CommonConstant.reTryNum)
     public ErcContractId getContractId(String contractAddress) throws PlatonCallTimeoutException {
         ErcContractId contractId = null;
         try {
@@ -349,7 +363,7 @@ public class ErcDetectService {
         return contractId;
     }
 
-    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = CommonConstant.reTryNum)
     public ErcContractId getContractId(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         ErcContractId contractId = null;
         try {
@@ -378,6 +392,18 @@ public class ErcDetectService {
         return contractId;
     }
 
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public ErcContractId recover(Exception e) {
+        log.error("重试完成还是业务失败，请联系管理员处理");
+        return null;
+    }
 
     public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
         ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);

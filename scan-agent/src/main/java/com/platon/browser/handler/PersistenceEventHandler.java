@@ -3,6 +3,7 @@ package com.platon.browser.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.PersistenceEvent;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.DisruptorConfig;
@@ -15,6 +16,7 @@ import com.platon.browser.service.redis.RedisImportService;
 import com.platon.browser.utils.CommonUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +63,19 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "PersistenceEventHandler")
     public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        retryCount.set(0);
+        log.error("重试完成还是业务失败，请联系管理员处理");
     }
 
     private void surroundExec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
