@@ -305,7 +305,6 @@ public class ErcTokenAnalyzer {
 
         } catch (Exception e) {
             log.error(StrUtil.format("当前交易[{}]解析ERC交易异常", tx.getHash()), e);
-            throw e;
         }
     }
 
