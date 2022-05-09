@@ -109,6 +109,7 @@ public class AddressUpdateTask {
         List<Address> addressList = addressMapper.selectByExample(addressExample);
         if (CollUtil.isEmpty(addressList)) {
             addressStart.set(0L);
+            return;
         } else {
             addressStart.set(addressStart.get() + addressList.size());
         }
