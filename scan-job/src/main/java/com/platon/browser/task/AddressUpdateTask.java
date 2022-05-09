@@ -88,7 +88,7 @@ public class AddressUpdateTask {
         try {
             int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 1000);
             batchUpdate(addressStart.intValue(), batchSize);
-            XxlJobHelper.handleSuccess("地址表信息补充成功");
+            XxlJobHelper.handleSuccess(StrUtil.format("地址表信息补充成功,当前标识为[{}]", addressStart.get()));
         } catch (Exception e) {
             log.error("地址表信息补充异常", e);
             throw e;
