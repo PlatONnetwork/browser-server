@@ -84,7 +84,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Override
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
     }

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 
@@ -65,6 +66,11 @@ public class AddressUpdateTask {
     private TxBakMapper txBakMapper;
 
     /**
+     * 用于地址表更新
+     */
+    private AtomicLong addressStart = new AtomicLong(0L);
+
+    /**
      * 地址表信息补充
      * 每5秒执行一次
      *
@@ -76,14 +82,13 @@ public class AddressUpdateTask {
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void addressUpdate() {
         // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) return;
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
         try {
-            int start = 0;
             int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 1000);
-            while (!batchUpdate(start, batchSize)) {
-                start += batchSize;
-            }
-            XxlJobHelper.handleSuccess("地址表信息补充成功");
+            batchUpdate(addressStart.intValue(), batchSize);
+            XxlJobHelper.handleSuccess(StrUtil.format("地址表信息补充成功,当前标识为[{}]", addressStart.get()));
         } catch (Exception e) {
             log.error("地址表信息补充异常", e);
             throw e;
@@ -97,31 +102,22 @@ public class AddressUpdateTask {
      * @param size  执行的批次
      * @return
      */
-    protected boolean batchUpdate(int start, int size) {
-        boolean stop = false;
-
+    protected void batchUpdate(int start, int size) {
         //查询待补充的地址
         AddressExample addressExample = new AddressExample();
         addressExample.setOrderByClause("create_time limit " + start + "," + size);
         List<Address> addressList = addressMapper.selectByExample(addressExample);
-
-        if (addressList.isEmpty()) {
-            stop = true;
-            return stop;
+        if (CollUtil.isEmpty(addressList)) {
+            addressStart.set(0L);
+            return;
+        } else {
+            addressStart.set(addressStart.get() + addressList.size());
         }
-
-        if (addressList.size() < size) {
-            stop = true;
-        }
-
         List<String> addressStringList = addressList.stream().map(Address::getAddress).collect(Collectors.toList());
-
         //查询该地址发起的质押（有效的质押和赎回的质押）
         List<AddressStatistics> stakingList = statisticBusinessMapper.getAddressStatisticsFromStaking(addressStringList);
-
         //查询该地址发起的委托
         List<AddressStatistics> delegationList = statisticBusinessMapper.getAddressStatisticsFromDelegation(addressStringList);
-
         //汇总结果
         Map<String, AddressStatistics> stakingMap = stakingList.stream().collect(Collectors.toMap(AddressStatistics::getStakingAddr, v -> v, (v1, v2) -> {
             v1.setStakingHes(v1.getStakingHes().add(v2.getStakingHes()));
@@ -134,17 +130,13 @@ public class AddressUpdateTask {
             v1.setDelegateLocked(v1.getDelegateLocked().add(v2.getDelegateLocked()));
             v1.setDelegateReleased(v1.getDelegateReleased().add(v2.getDelegateReleased()));
             v1.getNodeIdSet().add(v2.getNodeId());
-
             return v1;
         }));
-
         List<Address> updateAddressList = new ArrayList<>();
-
         addressList.forEach(item -> {
             AddressStatistics staking = stakingMap.get(item.getAddress());
             AddressStatistics delegation = delegationMap.get(item.getAddress());
             boolean hasChange = false;
-
             BigDecimal stakingValue = staking == null ? BigDecimal.ZERO : staking.getStakingHes().add(staking.getStakingLocked());
             if (stakingValue.compareTo(item.getStakingValue()) != 0) {
                 item.setStakingValue(stakingValue);
@@ -198,7 +190,6 @@ public class AddressUpdateTask {
         if (!updateAddressList.isEmpty()) {
             statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
         }
-        return stop;
     }
 
     /**
