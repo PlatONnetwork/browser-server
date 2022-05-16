@@ -65,3 +65,13 @@ scan-agent,scan-api,scan-job
 2-no apollo:application-platon.yml
 Choose one of the above two configuration methods
 ```
+
+## scan community team process
+```bash
+1.  The repository administrator creates a feature branch feature-xxx based on the develop branch for the community development team.
+2.  The community development team fork feature-xxx branches to the local warehouse, and the development and self-testing are completed.
+3.  The community development team submits pull requests to the official feature-xxx (note: the merge official develop branch needs to be modified before submission).
+4.  Repository administrators merge feature-xxx into a test version branch (eg: feature-platon-1.1.5).
+5.  The test verifies the function of the test branch feature-platon-1.1.5, if there is a problem, raise an issue.
+6.  Merge into the develop branch when the tests are done.
+```
