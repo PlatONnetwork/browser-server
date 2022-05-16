@@ -66,3 +66,13 @@ scan-agent,scan-api,scan-job
 2-非apollo方式:application-platon.yml
 以上两种配置方式选择一个即可
 ```
+
+## scan社区团队流程
+```bash
+1.  仓库管理员为社区开发团队创建一个基于 develop 分支的功能分支 feature-xxx .
+2.  社区开发团队fork feature-xxx 分支到本地仓库,开发并自测完成后.
+3.  社区开发团队提交pull requests 到官方的 feature-xxx(注意:提交前需要merge官方develop分支的修改).
+4.  仓库管理员将 feature-xxx 合并到某个提测版本分支(如:feature-platon-1.1.5).
+5.  测试对提测分支 feature-platon-1.1.5 功能验证,如存在问题提issue.
+6.  测试完成后合并到 develop 分支.
+```
