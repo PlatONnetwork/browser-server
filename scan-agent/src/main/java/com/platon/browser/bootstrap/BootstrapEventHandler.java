@@ -3,34 +3,25 @@ package com.platon.browser.bootstrap;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.ReceiptResult;
-import com.platon.browser.dao.entity.NOptBak;
-import com.platon.browser.dao.entity.NOptBakExample;
 import com.platon.browser.dao.entity.TxBak;
 import com.platon.browser.dao.entity.TxBakExample;
-import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
-import com.platon.browser.utils.BakDataDeleteUtil;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 /**
  * 自检事件处理器
@@ -49,9 +40,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private TxBakMapper txBakMapper;
 
     @Resource
-    private NOptBakMapper nOptBakMapper;
-
-    @Resource
     private BlockAnalyzer blockAnalyzer;
 
     private Set<Block> blocks = new HashSet<>();
@@ -59,15 +47,24 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private Set<Transaction> transactions = new HashSet<>();
 
     @Override
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "BootstrapEventHandler")
-    public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch)
-            throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException,
-            ContractInvokeException, BlankResponseException {
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum, label = "BootstrapEventHandler")
+    public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
     }
 
-    private void surroundExec(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException,
-            ContractInvokeException, BlankResponseException {
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        log.error("重试完成还是业务失败，请联系管理员处理");
+    }
+
+    private void surroundExec(BootstrapEvent event, long sequence, boolean endOfBatch) throws Exception {
         CommonUtil.putTraceId(event.getTraceId());
         long startTime = System.currentTimeMillis();
         exec(event, sequence, endOfBatch);
@@ -75,8 +72,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         CommonUtil.removeTraceId();
     }
 
-    private void exec(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException, IOException,
-            ContractInvokeException, BlankResponseException {
+    private void exec(BootstrapEvent event, long sequence, boolean endOfBatch) throws Exception {
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();
@@ -97,8 +93,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
                 List<TxBak> txBaks = this.txBakMapper.selectByExample(txBakExample);
                 Map<String, TxBak> txBakMap = new HashMap<>();
                 for (TxBak bak : txBaks) {
-                    if (bak.getId() > txMaxId)
-                        txMaxId = bak.getId();
+                    if (bak.getId() > txMaxId) txMaxId = bak.getId();
                     txBakMap.put(bak.getHash(), bak);
                 }
                 // 更新交易入库到ES和Redis的交易信息
@@ -112,24 +107,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
                 });
             }
 
-            // 从数据库查询备份日志信息,补充到到ES/Redis
-            Long nOptMaxId = 0L;
-            Set<NodeOpt> nodeOpts = new HashSet<>();
-            NOptBakExample nOptBakExample = new NOptBakExample();
-            List<NOptBak> nOptBaks = this.nOptBakMapper.selectByExample(nOptBakExample);
-            for (NOptBak bak : nOptBaks) {
-                if (bak.getId() > nOptMaxId)
-                    nOptMaxId = bak.getId();
-                NodeOpt no = ComplementNodeOpt.newInstance();
-                BeanUtils.copyProperties(bak, no);
-                nodeOpts.add(no);
-            }
-
-            this.esImportService.batchImport(this.blocks, this.transactions, nodeOpts, Collections.emptySet());
+            this.esImportService.batchImport(this.blocks, this.transactions, Collections.emptySet());
             this.redisImportService.batchImport(this.blocks, this.transactions, Collections.emptySet());
-            // 更新已处理的最大ID, 方便删除任务删除已用完的数据
-            BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
-            BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             this.clear();
             event.getCallback().call(block.getNum());

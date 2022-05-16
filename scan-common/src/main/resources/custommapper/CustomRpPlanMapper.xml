@@ -59,4 +59,26 @@
     select sum(amount) from rp_plan
     where address = #{address} and `number` > #{blockNumber}
   </select>
+
+  <select id="getRPNotExpiredValue" resultType="java.math.BigDecimal">
+    select
+        SUM(cast(t2.amount as DECIMAL(64, 18))) as rpNotExpiredValue
+    from
+    (
+        select
+            t1.id ,
+            t1.address ,
+            case
+                when (t1.`number` mod #{settlePeriodBlockCount}) = 0 then cast(( t1.epoch * #{settlePeriodBlockCount} + t1.`number`) as DECIMAL(64, 18))
+                else cast(( t1.epoch * #{settlePeriodBlockCount} + t1.`number` - (t1.`number` mod #{settlePeriodBlockCount})) as DECIMAL(64, 18))
+            end as endBlockNum ,
+            t1.amount ,
+            t1.`number`
+        from
+            rp_plan t1
+    ) t2
+    where
+    t2.endBlockNum <![CDATA[ >= ]]> #{curBlockNumber}
+  </select>
+
 </mapper>

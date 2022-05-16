@@ -18,15 +18,10 @@ public interface SyncTokenInfoMapper {
     /**
      * 同步Token交易数量
      */
-    @Transactional
-    void syncTokenTxCount(
-            @Param("addressParams") List<AddressTokenQtyUpdateParam> addressParams,
-            @Param("tokenParams") List<Erc20TokenTxCountUpdateParam> tokenParams,
-            @Param("tokenAddressParams") List<Erc20TokenAddressRelTxCountUpdateParam> tokenAddressParams,
-            @Param("networkParam") NetworkStatTokenQtyUpdateParam networkParam
-    );
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    void syncTokenTxCount(@Param("addressParams") List<AddressTokenQtyUpdateParam> addressParams, @Param("tokenParams") List<Erc20TokenTxCountUpdateParam> tokenParams, @Param("tokenAddressParams") List<Erc20TokenAddressRelTxCountUpdateParam> tokenAddressParams, @Param("networkParam") NetworkStatTokenQtyUpdateParam networkParam);
 
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateTotalSupply(@Param("totalSupplyParams") List<TotalSupplyUpdateParam> totalSupplyParams);
 
     /**
@@ -34,10 +29,9 @@ public interface SyncTokenInfoMapper {
      *
      * @param totalSupplyParams 需要批量更新的list
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateTokenTotalSupply(@Param("totalSupplyParams") List<TotalSupplyUpdateParam> totalSupplyParams);
 
     /**
@@ -45,10 +39,9 @@ public interface SyncTokenInfoMapper {
      *
      * @param list 需要批量更新的list
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateAddressBalance(@Param("list") List<TokenHolder> list);
 
     /**
@@ -56,17 +49,15 @@ public interface SyncTokenInfoMapper {
      *
      * @param list 需要批量更新的list
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/18
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateTokenInventory(@Param("list") List<TokenInventory> list);
 
     /**
      * 查询合约地址的用户统计数
      *
      * @return java.util.List<com.platon.browser.task.bean.TokenHolderNum>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/19
      */
     List<TokenHolderNum> findTokenHolder();
@@ -76,20 +67,18 @@ public interface SyncTokenInfoMapper {
      *
      * @param list 需要批量更新的list
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/19
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void updateTokenHolder(@Param("list") List<TokenHolderNum> list);
 
     /**
      * 查询token_holder并返回合约类型
      *
      * @return java.util.List<com.platon.browser.task.bean.TokenHolderType>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/20
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     List<TokenHolderType> findTokenHolderType();
 
 }

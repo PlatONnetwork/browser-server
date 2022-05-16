@@ -59,7 +59,6 @@ public class StakeModifyConverterTest extends AgentTestBase {
                 .build();
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
         //when(nodeItem.getStakingBlockNum()).thenReturn(nodeItem.getStakingBlockNum());
-        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(1l);
         Staking staking = new Staking();
         staking.setRewardPer(333);
         when(stakingMapper.selectByPrimaryKey(any())).thenReturn(staking);

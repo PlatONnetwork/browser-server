@@ -4,14 +4,67 @@ import com.platon.utils.Numeric;
 
 import java.math.BigDecimal;
 
+/**
+ * 结算周期信息
+ *
+ * @date: 2021/12/22
+ */
 public class EpochInfo {
-    private BigDecimal packageReward; // 出块奖励
-    private BigDecimal stakingReward; // 结算周期质押奖励
-    private BigDecimal yearNum; // 当前增发周期
-    private BigDecimal yearStartNum; // 当前增发周期开始区块号
-    private BigDecimal yearEndNum; // 当前增发周期结束区块号
-    private BigDecimal remainEpoch; // 当前增发周期剩下的结算周期数
-    private BigDecimal avgPackTime; // 平均出块时间
+
+    /**
+     * 出块奖励--废弃
+     */
+    private BigDecimal packageReward;
+
+    /**
+     * 结算周期质押奖励--废弃
+     */
+    private BigDecimal stakingReward;
+
+    /**
+     * 当前增发周期
+     */
+    private BigDecimal yearNum;
+
+    /**
+     * 当前增发周期开始区块号
+     */
+    private BigDecimal yearStartNum;
+
+    /**
+     * 当前增发周期结束区块号
+     */
+    private BigDecimal yearEndNum;
+
+    /**
+     * 当前增发周期剩下的结算周期数
+     */
+    private BigDecimal remainEpoch;
+
+    /**
+     * 平均出块时间
+     */
+    private BigDecimal avgPackTime;
+
+    /**
+     * 当前结算周期的出块奖励
+     */
+    private BigDecimal curPackageReward;
+
+    /**
+     * 当前结算周期的质押奖励
+     */
+    private BigDecimal curStakingReward;
+
+    /**
+     * 下一个结算周期的出块奖励
+     */
+    private BigDecimal nextPackageReward;
+
+    /**
+     * 下一个结算周期的质押奖励
+     */
+    private BigDecimal nextStakingReward;
 
     public BigDecimal getPackageReward() {
         return packageReward;
@@ -68,4 +121,37 @@ public class EpochInfo {
     public void setAvgPackTime(BigDecimal avgPackTime) {
         this.avgPackTime = avgPackTime;
     }
+
+    public BigDecimal getCurPackageReward() {
+        return curPackageReward;
+    }
+
+    public void setCurPackageReward(String curPackageReward) {
+        this.curPackageReward = new BigDecimal(Numeric.decodeQuantity(curPackageReward));
+    }
+
+    public BigDecimal getCurStakingReward() {
+        return curStakingReward;
+    }
+
+    public void setCurStakingReward(String curStakingReward) {
+        this.curStakingReward = new BigDecimal(Numeric.decodeQuantity(curStakingReward));
+    }
+
+    public BigDecimal getNextPackageReward() {
+        return nextPackageReward;
+    }
+
+    public void setNextPackageReward(String nextPackageReward) {
+        this.nextPackageReward = new BigDecimal(Numeric.decodeQuantity(nextPackageReward));
+    }
+
+    public BigDecimal getNextStakingReward() {
+        return nextStakingReward;
+    }
+
+    public void setNextStakingReward(String nextStakingReward) {
+        this.nextStakingReward = new BigDecimal(Numeric.decodeQuantity(nextStakingReward));
+    }
+
 }

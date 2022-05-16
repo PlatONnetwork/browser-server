@@ -100,7 +100,6 @@ public class ProposalParameterAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 .replace("VALUE", businessParam.getNewValue());
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
-        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getVerifier());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PARAMETER.getCode()));
         nodeOpt.setDesc(desc);

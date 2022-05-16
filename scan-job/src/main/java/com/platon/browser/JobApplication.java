@@ -29,11 +29,7 @@ import java.util.Properties;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@MapperScan(basePackages = {
-        "com.platon.browser",
-        "com.platon.browser.dao.mapper",
-        "com.platon.browser.dao.custommapper"
-})
+@MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper"})
 public class JobApplication implements ApplicationRunner {
 
     static {
@@ -42,8 +38,7 @@ public class JobApplication implements ApplicationRunner {
         try (InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
             String salt = properties.getProperty("jasypt.encryptor.password");
-            if (StringUtils.isBlank(salt))
-                throw new ConfigLoadingException("加密盐不能为空!");
+            if (StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
             salt = salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
             log.info("salt:{}", salt);

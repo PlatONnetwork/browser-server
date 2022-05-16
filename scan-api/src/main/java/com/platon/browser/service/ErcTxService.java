@@ -11,14 +11,12 @@ import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.entity.TokenInventory;
-import com.platon.browser.dao.entity.TokenInventoryExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
+import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.TokenTypeEnum;
 import com.platon.browser.request.token.QueryHolderTokenListReq;
@@ -39,7 +37,6 @@ import com.platon.browser.utils.ConvertUtil;
 import com.platon.browser.utils.DateUtil;
 import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.I18nUtil;
-import com.platon.browser.v0152.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -87,10 +84,10 @@ public class ErcTxService {
     private AddressMapper addressMapper;
 
     @Resource
-    private NetworkStatMapper networkStatMapper;
+    private TokenInventoryMapper tokenInventoryMapper;
 
     @Resource
-    private TokenInventoryMapper tokenInventoryMapper;
+    private TokenMapper tokenMapper;
 
     /**
      * 默认精度
@@ -312,6 +309,7 @@ public class ErcTxService {
                 resp.setBalance(balance);
                 //erc20
                 if (ErcTypeEnum.ERC20.getDesc().equalsIgnoreCase(tokenHolder.getType())) {
+
                     //计算总供应量
                     String originTotalSupply = tokenHolder.getTotalSupply();
                     if (StrUtil.isBlank(originTotalSupply) || Convert.toLong(originTotalSupply, 0L).compareTo(0L) <= 0) {
@@ -343,6 +341,14 @@ public class ErcTxService {
             }
             respList.add(resp);
         });
+        Token token = tokenMapper.selectByPrimaryKey(req.getContract());
+        if (ErcTypeEnum.ERC721.getDesc().equalsIgnoreCase(token.getType())) {
+            respList.sort((v1, v2) -> {
+                BigDecimal value1 = new BigDecimal(StrUtil.removeAll(v1.getPercent(), '%'));
+                BigDecimal value2 = new BigDecimal(StrUtil.removeAll(v2.getPercent(), '%'));
+                return value2.subtract(value1).compareTo(BigDecimal.ZERO);
+            });
+        }
         result.init(ids, respList);
         return result;
     }
@@ -400,12 +406,10 @@ public class ErcTxService {
                 }
             });
         }
-        listResps.sort(new Comparator<QueryHolderTokenListResp>() {
-            @Override
-            public int compare(QueryHolderTokenListResp o1, QueryHolderTokenListResp o2) {
-                return o1.getIsContractDestroy() - o2.getIsContractDestroy();
-            }
-        });
+        listResps.sort(Comparator.comparing(QueryHolderTokenListResp::getIsContractDestroy)
+                                 .thenComparing(QueryHolderTokenListResp::getName)
+                                 .thenComparing(QueryHolderTokenListResp::getTxCount)
+                                 .thenComparing((o1, o2) -> cn.hutool.core.date.DateUtil.compare(o2.getCreateTime(), o1.getCreateTime())));
         result.init(ids, listResps);
         return result;
     }

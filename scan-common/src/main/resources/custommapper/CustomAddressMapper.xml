@@ -92,4 +92,51 @@
         </if>
     </select>
 
+    <update id="updateAddressHaveReward">
+        update address set `have_reward` = `have_reward` + #{amount} where `address` = #{address}
+    </update>
+
+    <update id="batchUpdateAddressErcQty">
+        <foreach collection="list" item="item" separator=";">
+            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty} where address = #{item.address}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateAddressQty">
+        <foreach collection="list" item="item" separator=";">
+            update address set
+            tx_qty = #{item.txQty} ,
+            transfer_qty = #{item.transferQty} ,
+            delegate_qty = #{item.delegateQty} ,
+            staking_qty = #{item.stakingQty} ,
+            proposal_qty = #{item.proposalQty}
+            where address = #{item.address}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateAddressInfo">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE address t
+            SET
+            <if test="item.contractName!=null and item.contractName!=''">
+                t.`contract_name` = #{item.contractName} ,
+            </if>
+            <if test="item.contractCreate!=null and item.contractCreate!=''">
+                t.`contract_create` = #{item.contractCreate} ,
+            </if>
+            <if test="item.contractCreatehash!=null and item.contractCreatehash!=''">
+                t.`contract_createHash` = #{item.contractCreatehash} ,
+            </if>
+            <if test="item.contractDestroyHash!=null and item.contractDestroyHash!=''">
+                t.`contract_destroy_hash` = #{item.contractDestroyHash} ,
+            </if>
+            <if test="item.contractBin!=null and item.contractBin!=''">
+                t.`contract_bin` = #{item.contractBin} ,
+            </if>
+            t.`update_time` = #{item.updateTime}
+            WHERE
+            t.`address` = #{item.address}
+        </foreach>
+    </update>
+
 </mapper>

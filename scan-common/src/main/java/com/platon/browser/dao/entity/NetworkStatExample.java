@@ -1815,6 +1815,66 @@ public class NetworkStatExample {
             addCriterion("erc20_tx_qty not between", value1, value2, "erc20TxQty");
             return (Criteria) this;
         }
+
+        public Criteria andYearNumIsNull() {
+            addCriterion("year_num is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumIsNotNull() {
+            addCriterion("year_num is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumEqualTo(Integer value) {
+            addCriterion("year_num =", value, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumNotEqualTo(Integer value) {
+            addCriterion("year_num <>", value, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumGreaterThan(Integer value) {
+            addCriterion("year_num >", value, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumGreaterThanOrEqualTo(Integer value) {
+            addCriterion("year_num >=", value, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumLessThan(Integer value) {
+            addCriterion("year_num <", value, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumLessThanOrEqualTo(Integer value) {
+            addCriterion("year_num <=", value, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumIn(List<Integer> values) {
+            addCriterion("year_num in", values, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumNotIn(List<Integer> values) {
+            addCriterion("year_num not in", values, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumBetween(Integer value1, Integer value2) {
+            addCriterion("year_num between", value1, value2, "yearNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andYearNumNotBetween(Integer value1, Integer value2) {
+            addCriterion("year_num not between", value1, value2, "yearNum");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

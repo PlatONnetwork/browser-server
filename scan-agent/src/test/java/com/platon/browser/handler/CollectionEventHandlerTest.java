@@ -73,8 +73,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
 
     @Before
     public void setup() throws Exception {
-        ReflectionTestUtils.setField(target, "txDeleteBatchCount", 100);
-        ReflectionTestUtils.setField(target, "optDeleteBatchCount", 100);
+
         NetworkStat networkStat = mock(NetworkStat.class);
         when(networkStatCache.getNetworkStat()).thenReturn(networkStat);
         when(networkStat.getTxQty()).thenReturn(1000);
@@ -94,7 +93,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
         event.setTransactions(new ArrayList<>(transactionList));
-        when(customTxBakMapper.batchInsertOrUpdateSelective(any(), any())).thenReturn(100);
+//        when(customTxBakMapper.batchInsertOrUpdateSelective(any(), any())).thenReturn(100);
         target.onEvent(event, 33, false);
         verify(target, times(1)).onEvent(any(), anyLong(), anyBoolean());
 

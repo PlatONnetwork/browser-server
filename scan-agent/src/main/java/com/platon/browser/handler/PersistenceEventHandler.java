@@ -3,25 +3,24 @@ package com.platon.browser.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.PersistenceEvent;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
-import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
-import com.platon.browser.utils.BakDataDeleteUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -53,8 +52,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     private Set<Transaction> transactionStage = new HashSet<>();
 
-    private Set<NodeOpt> nodeOptStage = new HashSet<>();
-
     private Set<DelegationReward> delegationRewardStage = new HashSet<>();
 
     /**
@@ -64,11 +61,24 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, label = "PersistenceEventHandler")
-    public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         surroundExec(event, sequence, endOfBatch);
     }
 
-    private void surroundExec(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        retryCount.set(0);
+        log.error("重试完成还是业务失败，请联系管理员处理");
+    }
+
+    private void surroundExec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         CommonUtil.putTraceId(event.getTraceId());
         long startTime = System.currentTimeMillis();
         exec(event, sequence, endOfBatch);
@@ -76,7 +86,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
         CommonUtil.removeTraceId();
     }
 
-    private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+    private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         try {
             log.info("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
                      event.getBlock().getNum(),
@@ -85,7 +95,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                      CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
-            nodeOptStage.addAll(event.getNodeOpts());
             delegationRewardStage.addAll(event.getDelegationRewards());
 
             List<Long> blockNums = CollUtil.newArrayList();
@@ -94,7 +103,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                     blockNums = blockStage.stream().map(Block::getNum).sorted().collect(Collectors.toList());
                 }
                 // ES的id是用hash做key，重复入库会覆盖
-                // redis是上游做了去重，如果入库时重试，是没有实现去重机制的
                 log.error("相关区块[{}]的数据重复入库，可能引起数据重复入库，重试次数[{}]", JSONUtil.toJsonStr(blockNums), retryCount.get());
             }
 
@@ -114,7 +122,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             statisticsLog();
 
             // 入库ES 入库节点操作记录到ES
-            esImportService.batchImport(blockStage, transactionStage, nodeOptStage, delegationRewardStage);
+            esImportService.batchImport(blockStage, transactionStage, delegationRewardStage);
 
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
@@ -122,39 +130,16 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             redisImportService.batchImport(blockStage, transactionStage, statistics);
             blockStage.clear();
             transactionStage.clear();
-            nodeOptStage.clear();
             delegationRewardStage.clear();
-
-            // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
-            Long txMaxId = 0L;
-            List<Transaction> transactions = event.getTransactions();
-            if (!transactions.isEmpty()) {
-                for (Transaction tx : transactions) {
-                    if (tx.getId() > txMaxId) txMaxId = tx.getId();
-                }
-            }
-            BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
-
-            // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
-            List<NodeOpt> nOptBaks = event.getNodeOpts();
-            Long nOptMaxId = 0L;
-            if (!nOptBaks.isEmpty()) {
-                for (NodeOpt no : nOptBaks) {
-                    if (no.getId() > nOptMaxId) nOptMaxId = no.getId();
-                }
-                nOptMaxId = nOptBaks.get(0).getId();
-            }
-            BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             maxBlockNumber = event.getBlock().getNum();
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);
         } catch (Exception e) {
-            log.error("", e);
+            log.error("数据入库异常", e);
             throw e;
         }
-
     }
 
     /**

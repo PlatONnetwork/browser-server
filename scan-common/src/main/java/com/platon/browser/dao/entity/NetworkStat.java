@@ -17,26 +17,47 @@ public class NetworkStat {
 
     private String nodeName;
 
+    /**
+     * 交易总数
+     */
     private Integer txQty;
 
     private Integer curTps;
 
     private Integer maxTps;
 
+    /**
+     * 发行量
+     */
     private BigDecimal issueValue;
 
+    /**
+     * 流通量
+     */
     private BigDecimal turnValue;
 
     private BigDecimal availableStaking;
 
+    /**
+     * 实时质押委托总数
+     */
     private BigDecimal stakingDelegationValue;
 
+    /**
+     * 实时质押总数
+     */
     private BigDecimal stakingValue;
 
     private Integer doingProposalQty;
 
+    /**
+     * 提案总数
+     */
     private Integer proposalQty;
 
+    /**
+     * 地址数
+     */
     private Integer addressQty;
 
     private BigDecimal blockReward;
@@ -69,6 +90,14 @@ public class NetworkStat {
      */
     private Integer erc20TxQty;
 
+    /**
+     * 年份
+     */
+    private Integer yearNum;
+
+    /**
+     * 增发比例
+     */
     private String issueRates;
 
     public Integer getId() {
@@ -295,6 +324,14 @@ public class NetworkStat {
         this.erc20TxQty = erc20TxQty;
     }
 
+    public Integer getYearNum() {
+        return yearNum;
+    }
+
+    public void setYearNum(Integer yearNum) {
+        this.yearNum = yearNum;
+    }
+
     public String getIssueRates() {
         return issueRates;
     }
@@ -339,6 +376,7 @@ public class NetworkStat {
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),
         erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
         erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
+        yearNum("year_num", "yearNum", "INTEGER", false),
         issueRates("issue_rates", "issueRates", "LONGVARCHAR", false);
 
         /**

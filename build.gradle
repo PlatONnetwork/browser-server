@@ -15,12 +15,14 @@ plugins {
     id "github.com.sakamotodesu.jcifs" version "0.2.2"
 }
 
+
 import github.com.sakamotodesu.JcifsCopy
-import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonBuilder
-import static java.nio.file.Files.*
-import static java.nio.file.Paths.*
-import static java.nio.file.StandardCopyOption.*
+import org.yaml.snakeyaml.Yaml
+
+import static java.nio.file.Files.copy
+import static java.nio.file.Paths.get
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 group = 'com.platon.browser'
 version = "${projectVersion}"
@@ -42,7 +44,6 @@ def recursiveCopy(startDir, replaceDir) {
             recursiveCopy(conf.path, replaceDir)
         } else {
             def classPathFile = file(conf.path.replace(replaceDir, 'scan-api/build/resources/main/public'))
-            def gg = replaceDir
             def ss = conf.path.replace(replaceDir, 'scan-api/build/package/public')
             def packagePathFile = file(ss)
             def outPathFile = file(conf.path.replace(replaceDir, 'scan-api/build/distributions/public'))
@@ -110,8 +111,8 @@ subprojects {
         // 复制配置文件
         task copyConf(type: Copy) {
             from('src/main/resources/application-platon.yml')
-            from('src/main/resources/application-alaya.yml')
-            from('jasypt.properties')
+            from('src/main/resources/application-apollo.yml')
+            from('../jasypt.properties')
             from('status.hook')
             from("build/libs/${packageName}.jar")
             into('build/package')
@@ -165,7 +166,7 @@ subprojects {
                     desFile.write(tpl.text
                             .replace('_PROJECT_NAME_', "scan-api")
                             .replace('_VERSION_', "$projectVersion")
-                            .replace('_PROFILE_', "dev")
+                            .replace('_PROFILE_', "platon")
                             .replace('_DB_HOST_', "$dbHost")
                             .replace('_DB_USER_', "$dbUser")
                             .replace('_DB_PASS_', "$dbPass")
@@ -177,7 +178,7 @@ subprojects {
                     desFile.write(tpl.text
                             .replace('_PROJECT_NAME_', "scan-agent")
                             .replace('_VERSION_', "$projectVersion")
-                            .replace('_PROFILE_', "dev")
+                            .replace('_PROFILE_', "platon")
                             .replace('_DB_HOST_', "$dbHost")
                             .replace('_DB_USER_', "$dbUser")
                             .replace('_DB_PASS_', "$dbPass")
@@ -329,6 +330,7 @@ subprojects {
 
         implementation 'javax.mail:mail:1.4.7'
         implementation group: 'p6spy', name: 'p6spy', version: '3.9.0'
+        implementation group: 'com.xuxueli', name: 'xxl-job-core', version: '2.3.0'
 
     }
 }

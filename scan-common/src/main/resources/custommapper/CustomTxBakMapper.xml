@@ -1,30 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomTxBakMapper">
-  <insert id="batchInsertOrUpdateSelective" parameterType="map">
-    replace into tx_bak (
-    <foreach collection="selective" item="column" separator=",">
-      ${column.escapedColumnName}
-    </foreach>
+  <insert id="batchInsertOrUpdateSelective" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+    insert into tx_bak (
+        `hash`,`b_hash`,`num`,`index`,`time`,`nonce`,`status`,`gas_price`,`gas_used`,`gas_limit`,`from`,`to`,
+        `value`,`type`,`cost`,`to_type`,`seq`,`input`,`info`,`erc721_tx_info`,`erc20_tx_info`,`transfer_tx_info`,
+        `ppos_tx_info`,`fail_reason`,`contract_type`,`method`,`bin`,`contract_address`
     )
     values
     <foreach collection="list" item="item" separator=",">
       (
-      <foreach collection="selective" item="column" separator=",">
-        <if test="'hash'.toString() == column.value">
-          #{item.hash,jdbcType=VARCHAR}
-        </if>
-        <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=BIGINT}
-        </if>
-        <if test="'num'.toString() == column.value">
-          #{item.num,jdbcType=BIGINT}
-        </if>
-        <if test="'info'.toString() == column.value">
-          #{item.info,jdbcType=LONGVARCHAR}
-        </if>
-      </foreach>
+      #{item.hash,jdbcType=VARCHAR},
+      #{item.bHash,jdbcType=VARCHAR},
+      #{item.num,jdbcType=BIGINT},
+      #{item.index,jdbcType=INTEGER},
+      #{item.time,jdbcType=TIMESTAMP},
+      #{item.nonce,jdbcType=VARCHAR},
+      #{item.status,jdbcType=INTEGER},
+      #{item.gasPrice,jdbcType=VARCHAR},
+      #{item.gasUsed,jdbcType=VARCHAR},
+      #{item.gasLimit,jdbcType=VARCHAR},
+      #{item.from,jdbcType=VARCHAR},
+      #{item.to,jdbcType=VARCHAR},
+      #{item.value,jdbcType=VARCHAR},
+      #{item.type,jdbcType=INTEGER},
+      #{item.cost,jdbcType=VARCHAR},
+      #{item.toType,jdbcType=INTEGER},
+      #{item.seq,jdbcType=BIGINT},
+      #{item.input,jdbcType=LONGVARCHAR},
+      #{item.info,jdbcType=LONGVARCHAR},
+      #{item.erc721TxInfo,jdbcType=LONGVARCHAR},
+      #{item.erc20TxInfo,jdbcType=LONGVARCHAR},
+      #{item.transferTxInfo,jdbcType=LONGVARCHAR},
+      #{item.pposTxInfo,jdbcType=LONGVARCHAR},
+      #{item.failReason,jdbcType=LONGVARCHAR},
+      #{item.contractType,jdbcType=INTEGER},
+      #{item.method,jdbcType=LONGVARCHAR},
+      #{item.bin,jdbcType=LONGVARCHAR},
+      #{item.contractAddress,jdbcType=VARCHAR}
       )
     </foreach>
   </insert>
+
+  <select id="findMaxId" resultType="long">
+    SELECT
+      IFNULL( max( id ), 0 )
+    FROM
+      tx_bak;
+  </select>
+
 </mapper>

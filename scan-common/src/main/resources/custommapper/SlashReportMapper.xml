@@ -19,7 +19,7 @@
 		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
 		and `exception_status` = 3;
 	</select>
-	<update id="slashNode" parameterType="com.platon.browser.dao.param.ppos.Report">
+	<update id="slashNode" parameterType="com.platon.browser.dao.entity.Slash">
 	/*1、更新委托*/
 	update `delegation` set
 		`delegate_released` = `delegate_released` + `delegate_hes` + `delegate_locked`,
@@ -63,26 +63,12 @@
 	where `node_id` = #{nodeId}
 	and `staking_block_num` = #{stakingBlockNum};
 	/*4、添加处罚记录*/
-	insert into `slash` (
-		`hash`,
-		`node_id`,
-		`slash_rate`,
-		`slash_value`,
-		`reward`,
-		`benefit_addr`,
-		`data`,
-		`is_quit`
-	) values (
-		#{txHash},
-		#{nodeId},
-		#{slashRate},
-		#{codeSlashValue},
-		#{codeRewardValue},
-		#{benefitAddr},
-		#{slashData},
-		1
-	);
-
+	update `slash` set
+		`code_slash_value` = #{codeSlashValue},
+		`code_reward_value` = #{codeRewardValue},
+		`is_quit` = 1,
+		`is_handle` = 1
+	where id = #{id};
 </update>
 
 	<update id="updateUnStakeFreezeDuration" parameterType="com.platon.browser.dao.param.ppos.Report">

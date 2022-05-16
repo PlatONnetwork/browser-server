@@ -36,7 +36,7 @@ public class EpochMessage {
     private BigInteger settleEpochRound = BigInteger.ZERO;
 
     /**
-     * 当前所处结算周期轮数
+     * 当前所处增发周期轮数
      */
     private BigInteger issueEpochRound = BigInteger.ZERO;
 

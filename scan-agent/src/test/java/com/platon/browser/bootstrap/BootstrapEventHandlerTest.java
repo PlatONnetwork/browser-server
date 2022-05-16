@@ -72,7 +72,7 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
     }
 
     @Test
-    public void test() throws InterruptedException, ExecutionException, BeanCreateOrUpdateException, IOException, ContractInvokeException, BlankResponseException {
+    public void test() throws Exception {
         CompletableFuture<PlatonBlock> blockCF = getBlockAsync(7000L);
         CompletableFuture<ReceiptResult> receiptCF = getReceiptAsync(7000L);
         BootstrapEvent bootstrapEvent = new BootstrapEvent();
@@ -87,7 +87,6 @@ public class BootstrapEventHandlerTest extends AgentTestBase {
         bak.setHash(receiptCF.get().getResult().get(0).getTransactionHash());
         bak.setNum(receiptCF.get().getResult().get(0).getBlockNumber());
         bak.setId(100L);
-        bak.setInfo("so so");
         txBaks.add(bak);
         when(txBakMapper.selectByExample(any())).thenReturn(txBaks);
         target.onEvent(bootstrapEvent, 1, false);

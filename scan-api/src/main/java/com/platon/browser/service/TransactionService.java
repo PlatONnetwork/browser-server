@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -778,11 +779,11 @@ public class TransactionService {
                                                                  .innerValue(afterConverValue.toString())
                                                                  .build();
                             //查询对应的图片进行回填
-                            TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
-                            tokenInventoryKey.setTokenAddress(erc721.getContract());
-                            tokenInventoryKey.setTokenId(erc721.getValue());
-                            TokenInventory tokenInventory = tokenInventoryMapper.selectByPrimaryKey(tokenInventoryKey);
-                            if (tokenInventory != null) {
+                            TokenInventoryExample example = new TokenInventoryExample();
+                            example.createCriteria().andTokenAddressEqualTo(erc721.getContract()).andTokenIdEqualTo(erc721.getValue());
+                            List<TokenInventoryWithBLOBs> tokenInventoryWithBLOBs = tokenInventoryMapper.selectByExampleWithBLOBs(example);
+                            if (CollUtil.isNotEmpty(tokenInventoryWithBLOBs)) {
+                                TokenInventoryWithBLOBs tokenInventory = tokenInventoryWithBLOBs.get(0);
                                 // 默认取中等缩略图
                                 String image = "";
                                 if (StrUtil.isNotEmpty(tokenInventory.getMediumImage())) {

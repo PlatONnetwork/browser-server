@@ -2,12 +2,14 @@ package com.platon.browser.handler;
 
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.GasEstimateEvent;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -36,9 +38,22 @@ public class GasEstimateEventHandler implements EventHandler<GasEstimateEvent> {
     private AtomicLong retryCount = new AtomicLong(0);
 
     @Override
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public void onEvent(GasEstimateEvent event, long sequence, boolean endOfBatch) {
         surroundExec(event, sequence, endOfBatch);
+    }
+
+    /**
+     * 重试完成还是不成功，会回调该方法
+     *
+     * @param e:
+     * @return: void
+     * @date: 2022/5/6
+     */
+    @Recover
+    public void recover(Exception e) {
+        retryCount.set(0);
+        log.error("重试完成还是业务失败，请联系管理员处理");
     }
 
     private void surroundExec(GasEstimateEvent event, long sequence, boolean endOfBatch) {

@@ -2,12 +2,39 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.TxBakMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TxBak">
-    <id column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="id" jdbcType="BIGINT" property="id" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="hash" jdbcType="VARCHAR" property="hash" />
+    <result column="b_hash" jdbcType="VARCHAR" property="bHash" />
     <result column="num" jdbcType="BIGINT" property="num" />
+    <result column="index" jdbcType="INTEGER" property="index" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="nonce" jdbcType="VARCHAR" property="nonce" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="gas_price" jdbcType="VARCHAR" property="gasPrice" />
+    <result column="gas_used" jdbcType="VARCHAR" property="gasUsed" />
+    <result column="gas_limit" jdbcType="VARCHAR" property="gasLimit" />
+    <result column="from" jdbcType="VARCHAR" property="from" />
+    <result column="to" jdbcType="VARCHAR" property="to" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="cost" jdbcType="VARCHAR" property="cost" />
+    <result column="to_type" jdbcType="INTEGER" property="toType" />
+    <result column="seq" jdbcType="BIGINT" property="seq" />
+    <result column="cre_time" jdbcType="TIMESTAMP" property="creTime" />
+    <result column="upd_time" jdbcType="TIMESTAMP" property="updTime" />
+    <result column="contract_type" jdbcType="INTEGER" property="contractType" />
+    <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
   </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxBak">
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxBakWithBLOBs">
+    <result column="input" jdbcType="LONGVARCHAR" property="input" />
     <result column="info" jdbcType="LONGVARCHAR" property="info" />
+    <result column="erc721_tx_info" jdbcType="LONGVARCHAR" property="erc721TxInfo" />
+    <result column="erc20_tx_info" jdbcType="LONGVARCHAR" property="erc20TxInfo" />
+    <result column="transfer_tx_info" jdbcType="LONGVARCHAR" property="transferTxInfo" />
+    <result column="ppos_tx_info" jdbcType="LONGVARCHAR" property="pposTxInfo" />
+    <result column="fail_reason" jdbcType="LONGVARCHAR" property="failReason" />
+    <result column="method" jdbcType="LONGVARCHAR" property="method" />
+    <result column="bin" jdbcType="LONGVARCHAR" property="bin" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -68,10 +95,13 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, id, num
+    id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
+    `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type, 
+    contract_address
   </sql>
   <sql id="Blob_Column_List">
-    info
+    `input`, info, erc721_tx_info, erc20_tx_info, transfer_tx_info, ppos_tx_info, fail_reason, 
+    `method`, bin
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TxBakExample" resultMap="ResultMapWithBLOBs">
     select
@@ -103,17 +133,17 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from tx_bak
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from tx_bak
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TxBakExample">
     delete from tx_bak
@@ -121,40 +151,220 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.platon.browser.dao.entity.TxBak">
-    insert into tx_bak (hash, id, num, 
-      info)
-    values (#{hash,jdbcType=VARCHAR}, #{id,jdbcType=BIGINT}, #{num,jdbcType=BIGINT}, 
-      #{info,jdbcType=LONGVARCHAR})
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.TxBakWithBLOBs">
+    insert into tx_bak (id, hash, b_hash, 
+      num, `index`, `time`, 
+      nonce, `status`, gas_price, 
+      gas_used, gas_limit, `from`, 
+      `to`, `value`, `type`, cost, 
+      to_type, seq, cre_time, 
+      upd_time, contract_type, contract_address, 
+      `input`, info, erc721_tx_info, 
+      erc20_tx_info, transfer_tx_info, ppos_tx_info, 
+      fail_reason, `method`, bin
+      )
+    values (#{id,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{bHash,jdbcType=VARCHAR}, 
+      #{num,jdbcType=BIGINT}, #{index,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, 
+      #{nonce,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{gasPrice,jdbcType=VARCHAR}, 
+      #{gasUsed,jdbcType=VARCHAR}, #{gasLimit,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, 
+      #{to,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{cost,jdbcType=VARCHAR}, 
+      #{toType,jdbcType=INTEGER}, #{seq,jdbcType=BIGINT}, #{creTime,jdbcType=TIMESTAMP}, 
+      #{updTime,jdbcType=TIMESTAMP}, #{contractType,jdbcType=INTEGER}, #{contractAddress,jdbcType=VARCHAR}, 
+      #{input,jdbcType=LONGVARCHAR}, #{info,jdbcType=LONGVARCHAR}, #{erc721TxInfo,jdbcType=LONGVARCHAR}, 
+      #{erc20TxInfo,jdbcType=LONGVARCHAR}, #{transferTxInfo,jdbcType=LONGVARCHAR}, #{pposTxInfo,jdbcType=LONGVARCHAR}, 
+      #{failReason,jdbcType=LONGVARCHAR}, #{method,jdbcType=LONGVARCHAR}, #{bin,jdbcType=LONGVARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TxBak">
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TxBakWithBLOBs">
     insert into tx_bak
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
       <if test="hash != null">
         hash,
       </if>
-      <if test="id != null">
-        id,
+      <if test="bHash != null">
+        b_hash,
       </if>
       <if test="num != null">
         num,
       </if>
+      <if test="index != null">
+        `index`,
+      </if>
+      <if test="time != null">
+        `time`,
+      </if>
+      <if test="nonce != null">
+        nonce,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="gasPrice != null">
+        gas_price,
+      </if>
+      <if test="gasUsed != null">
+        gas_used,
+      </if>
+      <if test="gasLimit != null">
+        gas_limit,
+      </if>
+      <if test="from != null">
+        `from`,
+      </if>
+      <if test="to != null">
+        `to`,
+      </if>
+      <if test="value != null">
+        `value`,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="cost != null">
+        cost,
+      </if>
+      <if test="toType != null">
+        to_type,
+      </if>
+      <if test="seq != null">
+        seq,
+      </if>
+      <if test="creTime != null">
+        cre_time,
+      </if>
+      <if test="updTime != null">
+        upd_time,
+      </if>
+      <if test="contractType != null">
+        contract_type,
+      </if>
+      <if test="contractAddress != null">
+        contract_address,
+      </if>
+      <if test="input != null">
+        `input`,
+      </if>
       <if test="info != null">
         info,
       </if>
+      <if test="erc721TxInfo != null">
+        erc721_tx_info,
+      </if>
+      <if test="erc20TxInfo != null">
+        erc20_tx_info,
+      </if>
+      <if test="transferTxInfo != null">
+        transfer_tx_info,
+      </if>
+      <if test="pposTxInfo != null">
+        ppos_tx_info,
+      </if>
+      <if test="failReason != null">
+        fail_reason,
+      </if>
+      <if test="method != null">
+        `method`,
+      </if>
+      <if test="bin != null">
+        bin,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
-      <if test="id != null">
-        #{id,jdbcType=BIGINT},
+      <if test="bHash != null">
+        #{bHash,jdbcType=VARCHAR},
       </if>
       <if test="num != null">
         #{num,jdbcType=BIGINT},
       </if>
+      <if test="index != null">
+        #{index,jdbcType=INTEGER},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="nonce != null">
+        #{nonce,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="gasPrice != null">
+        #{gasPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="gasUsed != null">
+        #{gasUsed,jdbcType=VARCHAR},
+      </if>
+      <if test="gasLimit != null">
+        #{gasLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="from != null">
+        #{from,jdbcType=VARCHAR},
+      </if>
+      <if test="to != null">
+        #{to,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="cost != null">
+        #{cost,jdbcType=VARCHAR},
+      </if>
+      <if test="toType != null">
+        #{toType,jdbcType=INTEGER},
+      </if>
+      <if test="seq != null">
+        #{seq,jdbcType=BIGINT},
+      </if>
+      <if test="creTime != null">
+        #{creTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updTime != null">
+        #{updTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="contractType != null">
+        #{contractType,jdbcType=INTEGER},
+      </if>
+      <if test="contractAddress != null">
+        #{contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="input != null">
+        #{input,jdbcType=LONGVARCHAR},
+      </if>
       <if test="info != null">
         #{info,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="erc721TxInfo != null">
+        #{erc721TxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="erc20TxInfo != null">
+        #{erc20TxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="transferTxInfo != null">
+        #{transferTxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="pposTxInfo != null">
+        #{pposTxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="failReason != null">
+        #{failReason,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="method != null">
+        #{method,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="bin != null">
+        #{bin,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -167,17 +377,98 @@
   <update id="updateByExampleSelective" parameterType="map">
     update tx_bak
     <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
       <if test="record.hash != null">
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=BIGINT},
+      <if test="record.bHash != null">
+        b_hash = #{record.bHash,jdbcType=VARCHAR},
       </if>
       <if test="record.num != null">
         num = #{record.num,jdbcType=BIGINT},
       </if>
+      <if test="record.index != null">
+        `index` = #{record.index,jdbcType=INTEGER},
+      </if>
+      <if test="record.time != null">
+        `time` = #{record.time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.nonce != null">
+        nonce = #{record.nonce,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        `status` = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.gasPrice != null">
+        gas_price = #{record.gasPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gasUsed != null">
+        gas_used = #{record.gasUsed,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gasLimit != null">
+        gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.from != null">
+        `from` = #{record.from,jdbcType=VARCHAR},
+      </if>
+      <if test="record.to != null">
+        `to` = #{record.to,jdbcType=VARCHAR},
+      </if>
+      <if test="record.value != null">
+        `value` = #{record.value,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.cost != null">
+        cost = #{record.cost,jdbcType=VARCHAR},
+      </if>
+      <if test="record.toType != null">
+        to_type = #{record.toType,jdbcType=INTEGER},
+      </if>
+      <if test="record.seq != null">
+        seq = #{record.seq,jdbcType=BIGINT},
+      </if>
+      <if test="record.creTime != null">
+        cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updTime != null">
+        upd_time = #{record.updTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.contractType != null">
+        contract_type = #{record.contractType,jdbcType=INTEGER},
+      </if>
+      <if test="record.contractAddress != null">
+        contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.input != null">
+        `input` = #{record.input,jdbcType=LONGVARCHAR},
+      </if>
       <if test="record.info != null">
         info = #{record.info,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.erc721TxInfo != null">
+        erc721_tx_info = #{record.erc721TxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.erc20TxInfo != null">
+        erc20_tx_info = #{record.erc20TxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.transferTxInfo != null">
+        transfer_tx_info = #{record.transferTxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.pposTxInfo != null">
+        ppos_tx_info = #{record.pposTxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.failReason != null">
+        fail_reason = #{record.failReason,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.method != null">
+        `method` = #{record.method,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.bin != null">
+        bin = #{record.bin,jdbcType=LONGVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -186,50 +477,223 @@
   </update>
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update tx_bak
-    set hash = #{record.hash,jdbcType=VARCHAR},
-      id = #{record.id,jdbcType=BIGINT},
+    set id = #{record.id,jdbcType=BIGINT},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      b_hash = #{record.bHash,jdbcType=VARCHAR},
       num = #{record.num,jdbcType=BIGINT},
-      info = #{record.info,jdbcType=LONGVARCHAR}
+      `index` = #{record.index,jdbcType=INTEGER},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
+      nonce = #{record.nonce,jdbcType=VARCHAR},
+      `status` = #{record.status,jdbcType=INTEGER},
+      gas_price = #{record.gasPrice,jdbcType=VARCHAR},
+      gas_used = #{record.gasUsed,jdbcType=VARCHAR},
+      gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
+      `from` = #{record.from,jdbcType=VARCHAR},
+      `to` = #{record.to,jdbcType=VARCHAR},
+      `value` = #{record.value,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=INTEGER},
+      cost = #{record.cost,jdbcType=VARCHAR},
+      to_type = #{record.toType,jdbcType=INTEGER},
+      seq = #{record.seq,jdbcType=BIGINT},
+      cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      upd_time = #{record.updTime,jdbcType=TIMESTAMP},
+      contract_type = #{record.contractType,jdbcType=INTEGER},
+      contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+      `input` = #{record.input,jdbcType=LONGVARCHAR},
+      info = #{record.info,jdbcType=LONGVARCHAR},
+      erc721_tx_info = #{record.erc721TxInfo,jdbcType=LONGVARCHAR},
+      erc20_tx_info = #{record.erc20TxInfo,jdbcType=LONGVARCHAR},
+      transfer_tx_info = #{record.transferTxInfo,jdbcType=LONGVARCHAR},
+      ppos_tx_info = #{record.pposTxInfo,jdbcType=LONGVARCHAR},
+      fail_reason = #{record.failReason,jdbcType=LONGVARCHAR},
+      `method` = #{record.method,jdbcType=LONGVARCHAR},
+      bin = #{record.bin,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update tx_bak
-    set hash = #{record.hash,jdbcType=VARCHAR},
-      id = #{record.id,jdbcType=BIGINT},
-      num = #{record.num,jdbcType=BIGINT}
+    set id = #{record.id,jdbcType=BIGINT},
+      hash = #{record.hash,jdbcType=VARCHAR},
+      b_hash = #{record.bHash,jdbcType=VARCHAR},
+      num = #{record.num,jdbcType=BIGINT},
+      `index` = #{record.index,jdbcType=INTEGER},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
+      nonce = #{record.nonce,jdbcType=VARCHAR},
+      `status` = #{record.status,jdbcType=INTEGER},
+      gas_price = #{record.gasPrice,jdbcType=VARCHAR},
+      gas_used = #{record.gasUsed,jdbcType=VARCHAR},
+      gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
+      `from` = #{record.from,jdbcType=VARCHAR},
+      `to` = #{record.to,jdbcType=VARCHAR},
+      `value` = #{record.value,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=INTEGER},
+      cost = #{record.cost,jdbcType=VARCHAR},
+      to_type = #{record.toType,jdbcType=INTEGER},
+      seq = #{record.seq,jdbcType=BIGINT},
+      cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      upd_time = #{record.updTime,jdbcType=TIMESTAMP},
+      contract_type = #{record.contractType,jdbcType=INTEGER},
+      contract_address = #{record.contractAddress,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TxBak">
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TxBakWithBLOBs">
     update tx_bak
     <set>
-      <if test="id != null">
-        id = #{id,jdbcType=BIGINT},
+      <if test="hash != null">
+        hash = #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="bHash != null">
+        b_hash = #{bHash,jdbcType=VARCHAR},
       </if>
       <if test="num != null">
         num = #{num,jdbcType=BIGINT},
       </if>
+      <if test="index != null">
+        `index` = #{index,jdbcType=INTEGER},
+      </if>
+      <if test="time != null">
+        `time` = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="nonce != null">
+        nonce = #{nonce,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="gasPrice != null">
+        gas_price = #{gasPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="gasUsed != null">
+        gas_used = #{gasUsed,jdbcType=VARCHAR},
+      </if>
+      <if test="gasLimit != null">
+        gas_limit = #{gasLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="from != null">
+        `from` = #{from,jdbcType=VARCHAR},
+      </if>
+      <if test="to != null">
+        `to` = #{to,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        `value` = #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="cost != null">
+        cost = #{cost,jdbcType=VARCHAR},
+      </if>
+      <if test="toType != null">
+        to_type = #{toType,jdbcType=INTEGER},
+      </if>
+      <if test="seq != null">
+        seq = #{seq,jdbcType=BIGINT},
+      </if>
+      <if test="creTime != null">
+        cre_time = #{creTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updTime != null">
+        upd_time = #{updTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="contractType != null">
+        contract_type = #{contractType,jdbcType=INTEGER},
+      </if>
+      <if test="contractAddress != null">
+        contract_address = #{contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="input != null">
+        `input` = #{input,jdbcType=LONGVARCHAR},
+      </if>
       <if test="info != null">
         info = #{info,jdbcType=LONGVARCHAR},
       </if>
+      <if test="erc721TxInfo != null">
+        erc721_tx_info = #{erc721TxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="erc20TxInfo != null">
+        erc20_tx_info = #{erc20TxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="transferTxInfo != null">
+        transfer_tx_info = #{transferTxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="pposTxInfo != null">
+        ppos_tx_info = #{pposTxInfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="failReason != null">
+        fail_reason = #{failReason,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="method != null">
+        `method` = #{method,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="bin != null">
+        bin = #{bin,jdbcType=LONGVARCHAR},
+      </if>
     </set>
-    where hash = #{hash,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TxBak">
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TxBakWithBLOBs">
     update tx_bak
-    set id = #{id,jdbcType=BIGINT},
+    set hash = #{hash,jdbcType=VARCHAR},
+      b_hash = #{bHash,jdbcType=VARCHAR},
       num = #{num,jdbcType=BIGINT},
-      info = #{info,jdbcType=LONGVARCHAR}
-    where hash = #{hash,jdbcType=VARCHAR}
+      `index` = #{index,jdbcType=INTEGER},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      nonce = #{nonce,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=INTEGER},
+      gas_price = #{gasPrice,jdbcType=VARCHAR},
+      gas_used = #{gasUsed,jdbcType=VARCHAR},
+      gas_limit = #{gasLimit,jdbcType=VARCHAR},
+      `from` = #{from,jdbcType=VARCHAR},
+      `to` = #{to,jdbcType=VARCHAR},
+      `value` = #{value,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=INTEGER},
+      cost = #{cost,jdbcType=VARCHAR},
+      to_type = #{toType,jdbcType=INTEGER},
+      seq = #{seq,jdbcType=BIGINT},
+      cre_time = #{creTime,jdbcType=TIMESTAMP},
+      upd_time = #{updTime,jdbcType=TIMESTAMP},
+      contract_type = #{contractType,jdbcType=INTEGER},
+      contract_address = #{contractAddress,jdbcType=VARCHAR},
+      `input` = #{input,jdbcType=LONGVARCHAR},
+      info = #{info,jdbcType=LONGVARCHAR},
+      erc721_tx_info = #{erc721TxInfo,jdbcType=LONGVARCHAR},
+      erc20_tx_info = #{erc20TxInfo,jdbcType=LONGVARCHAR},
+      transfer_tx_info = #{transferTxInfo,jdbcType=LONGVARCHAR},
+      ppos_tx_info = #{pposTxInfo,jdbcType=LONGVARCHAR},
+      fail_reason = #{failReason,jdbcType=LONGVARCHAR},
+      `method` = #{method,jdbcType=LONGVARCHAR},
+      bin = #{bin,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.TxBak">
     update tx_bak
-    set id = #{id,jdbcType=BIGINT},
-      num = #{num,jdbcType=BIGINT}
-    where hash = #{hash,jdbcType=VARCHAR}
+    set hash = #{hash,jdbcType=VARCHAR},
+      b_hash = #{bHash,jdbcType=VARCHAR},
+      num = #{num,jdbcType=BIGINT},
+      `index` = #{index,jdbcType=INTEGER},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      nonce = #{nonce,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=INTEGER},
+      gas_price = #{gasPrice,jdbcType=VARCHAR},
+      gas_used = #{gasUsed,jdbcType=VARCHAR},
+      gas_limit = #{gasLimit,jdbcType=VARCHAR},
+      `from` = #{from,jdbcType=VARCHAR},
+      `to` = #{to,jdbcType=VARCHAR},
+      `value` = #{value,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=INTEGER},
+      cost = #{cost,jdbcType=VARCHAR},
+      to_type = #{toType,jdbcType=INTEGER},
+      seq = #{seq,jdbcType=BIGINT},
+      cre_time = #{creTime,jdbcType=TIMESTAMP},
+      upd_time = #{updTime,jdbcType=TIMESTAMP},
+      contract_type = #{contractType,jdbcType=INTEGER},
+      contract_address = #{contractAddress,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -238,11 +702,24 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into tx_bak
-    (hash, id, num, info)
+    (id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
+      `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type, 
+      contract_address, `input`, info, erc721_tx_info, erc20_tx_info, transfer_tx_info, 
+      ppos_tx_info, fail_reason, `method`, bin)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.id,jdbcType=BIGINT}, #{item.num,jdbcType=BIGINT}, 
-        #{item.info,jdbcType=LONGVARCHAR})
+      (#{item.id,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.bHash,jdbcType=VARCHAR}, 
+        #{item.num,jdbcType=BIGINT}, #{item.index,jdbcType=INTEGER}, #{item.time,jdbcType=TIMESTAMP}, 
+        #{item.nonce,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER}, #{item.gasPrice,jdbcType=VARCHAR}, 
+        #{item.gasUsed,jdbcType=VARCHAR}, #{item.gasLimit,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR}, 
+        #{item.to,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, 
+        #{item.cost,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.seq,jdbcType=BIGINT}, 
+        #{item.creTime,jdbcType=TIMESTAMP}, #{item.updTime,jdbcType=TIMESTAMP}, #{item.contractType,jdbcType=INTEGER}, 
+        #{item.contractAddress,jdbcType=VARCHAR}, #{item.input,jdbcType=LONGVARCHAR}, #{item.info,jdbcType=LONGVARCHAR}, 
+        #{item.erc721TxInfo,jdbcType=LONGVARCHAR}, #{item.erc20TxInfo,jdbcType=LONGVARCHAR}, 
+        #{item.transferTxInfo,jdbcType=LONGVARCHAR}, #{item.pposTxInfo,jdbcType=LONGVARCHAR}, 
+        #{item.failReason,jdbcType=LONGVARCHAR}, #{item.method,jdbcType=LONGVARCHAR}, #{item.bin,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -260,20 +737,102 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
+        <if test="'id'.toString() == column.value">
+          #{item.id,jdbcType=BIGINT}
+        </if>
         <if test="'hash'.toString() == column.value">
           #{item.hash,jdbcType=VARCHAR}
         </if>
-        <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=BIGINT}
+        <if test="'b_hash'.toString() == column.value">
+          #{item.bHash,jdbcType=VARCHAR}
         </if>
         <if test="'num'.toString() == column.value">
           #{item.num,jdbcType=BIGINT}
         </if>
+        <if test="'index'.toString() == column.value">
+          #{item.index,jdbcType=INTEGER}
+        </if>
+        <if test="'time'.toString() == column.value">
+          #{item.time,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'nonce'.toString() == column.value">
+          #{item.nonce,jdbcType=VARCHAR}
+        </if>
+        <if test="'status'.toString() == column.value">
+          #{item.status,jdbcType=INTEGER}
+        </if>
+        <if test="'gas_price'.toString() == column.value">
+          #{item.gasPrice,jdbcType=VARCHAR}
+        </if>
+        <if test="'gas_used'.toString() == column.value">
+          #{item.gasUsed,jdbcType=VARCHAR}
+        </if>
+        <if test="'gas_limit'.toString() == column.value">
+          #{item.gasLimit,jdbcType=VARCHAR}
+        </if>
+        <if test="'from'.toString() == column.value">
+          #{item.from,jdbcType=VARCHAR}
+        </if>
+        <if test="'to'.toString() == column.value">
+          #{item.to,jdbcType=VARCHAR}
+        </if>
+        <if test="'value'.toString() == column.value">
+          #{item.value,jdbcType=VARCHAR}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=INTEGER}
+        </if>
+        <if test="'cost'.toString() == column.value">
+          #{item.cost,jdbcType=VARCHAR}
+        </if>
+        <if test="'to_type'.toString() == column.value">
+          #{item.toType,jdbcType=INTEGER}
+        </if>
+        <if test="'seq'.toString() == column.value">
+          #{item.seq,jdbcType=BIGINT}
+        </if>
+        <if test="'cre_time'.toString() == column.value">
+          #{item.creTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'upd_time'.toString() == column.value">
+          #{item.updTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'contract_type'.toString() == column.value">
+          #{item.contractType,jdbcType=INTEGER}
+        </if>
+        <if test="'contract_address'.toString() == column.value">
+          #{item.contractAddress,jdbcType=VARCHAR}
+        </if>
+        <if test="'input'.toString() == column.value">
+          #{item.input,jdbcType=LONGVARCHAR}
+        </if>
         <if test="'info'.toString() == column.value">
           #{item.info,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'erc721_tx_info'.toString() == column.value">
+          #{item.erc721TxInfo,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'erc20_tx_info'.toString() == column.value">
+          #{item.erc20TxInfo,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'transfer_tx_info'.toString() == column.value">
+          #{item.transferTxInfo,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'ppos_tx_info'.toString() == column.value">
+          #{item.pposTxInfo,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'fail_reason'.toString() == column.value">
+          #{item.failReason,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'method'.toString() == column.value">
+          #{item.method,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'bin'.toString() == column.value">
+          #{item.bin,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

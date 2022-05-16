@@ -6,6 +6,7 @@ import com.platon.browser.ApiTestMockBase;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
+import com.platon.browser.bean.StakingBO;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
@@ -127,6 +128,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setJoinTime(new Date());
         staking.setDeleAnnualizedRate(120.00);
         staking.setBigVersion(1792);
+        staking.setProgramVersion(65535);
         when(nodeMapper.selectByPrimaryKey(any())).thenReturn(staking);
         Address address = new Address();
         address.setType(1);
@@ -178,6 +180,10 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
 
     @Test
     public void testStakingStatisticNew() {
+        StakingBO bo =new StakingBO();
+        bo.setStakingDenominator(BigDecimal.ONE);
+        bo.setTotalStakingValue(BigDecimal.ONE);
+        when(commonService.getTotalStakingValueAndStakingDenominator(any())).thenReturn(bo);
         when(this.customStakingMapper.selectCountByActive()).thenReturn(10);
         StakingStatisticNewResp resp = this.target.stakingStatisticNew();
         assertNotNull(resp);

@@ -8,13 +8,14 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.TaskConfig;
 import com.platon.browser.dao.entity.InternalAddress;
 import com.platon.browser.dao.entity.InternalAddressExample;
-import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.mapper.InternalAddressMapper;
 import com.platon.browser.enums.InternalAddressType;
 import com.platon.protocol.Web3j;
+import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -30,9 +31,6 @@ public class BalanceUpdateTask {
     private InternalAddressMapper internalAddressMapper;
 
     @Resource
-    private CustomInternalAddressMapper customInternalAddressMapper;
-
-    @Resource
     private SpecialApi specialApi;
 
     @Resource(name = "jobPlatOnClient")
@@ -43,22 +41,34 @@ public class BalanceUpdateTask {
 
     /**
      * 更新基金会账户余额
+     * 每6分钟执行一次
      */
-    @Scheduled(cron = "${task.fundAddressCron}")
+    @XxlJob("balanceUpdateJobHandler")
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateFundAccount() {
-        log.info("更新基金会地址余额 START...");
-        updateBalance(InternalAddressType.FUND_ACCOUNT);
-        log.info("更新基金会地址余额 END。");
+        try {
+            updateBalance(InternalAddressType.FUND_ACCOUNT);
+            XxlJobHelper.handleSuccess("更新基金会账户余额完成");
+        } catch (Exception e) {
+            log.error("更新基金会账户余额异常", e);
+            throw e;
+        }
     }
 
     /**
      * 更新内置合约账户余额
+     * 每10秒执行一次
      */
-    @Scheduled(cron = "${task.innerContractCron}")
+    @XxlJob("updateContractAccountJobHandler")
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateContractAccount() {
-        log.info("更新内置合约地址余额 START...");
-        updateBalance(InternalAddressType.OTHER);
-        log.info("更新内置合约地址余额 END。");
+        try {
+            updateBalance(InternalAddressType.OTHER);
+            XxlJobHelper.handleSuccess("更新内置合约账户余额完成");
+        } catch (Exception e) {
+            log.error("更新内置合约账户余额异常", e);
+            throw e;
+        }
     }
 
     private void updateBalance(InternalAddressType type) {

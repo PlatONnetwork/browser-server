@@ -6,10 +6,12 @@ import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.utils.AppStatusUtil;
+import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashSet;
@@ -31,11 +33,19 @@ public class StakingMigrateTask {
     @Resource
     private CustomStakingHistoryMapper customStakingHistoryMapper;
 
-    @Scheduled(cron = "0/30  * * * * ?")
+    /**
+     * 质押表中的历史数据迁移至数据库任务
+     * 每30秒执行一次
+     *
+     * @param :
+     * @return: void
+     * @date: 2021/12/15
+     */
+    @XxlJob("stakingMigrateJobHandler")
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     void stakingMigrate() {
         // 只有程序正常运行才执行任务
-        if (AppStatusUtil.isRunning())
-            start();
+        if (AppStatusUtil.isRunning()) start();
     }
 
     protected void start() {
@@ -52,9 +62,10 @@ public class StakingMigrateTask {
                 });
                 customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
-            log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
+            XxlJobHelper.handleSuccess("质押表中的历史数据迁移至数据库任务成功");
         } catch (Exception e) {
-            log.error("", e);
+            log.error("质押表中的历史数据迁移至数据库任务异常", e);
+            throw e;
         }
     }
 

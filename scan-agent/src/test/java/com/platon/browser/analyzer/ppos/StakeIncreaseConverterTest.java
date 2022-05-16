@@ -49,7 +49,6 @@ public class StakeIncreaseConverterTest extends AgentTestBase {
                 .stakingBlockNum(new BigInteger("20483"))
                 .build();
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
-        when(networkStatCache.getAndIncrementNodeOptSeq()).thenReturn(3l);
     }
 
     @Test

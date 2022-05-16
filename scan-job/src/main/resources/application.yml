@@ -1,17 +1,20 @@
-# ***************************通用配置: 请不要修改此文件，此文件由模板自动生成，若要修改，请移步至conftpl目录**************************** #
-# 应用版本
-version: 1.1.1.0
+#日志配置
+logging:
+  file:
+    name: ./logs/${spring.application.name}.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
+  logback:
+    rollingpolicy:
+      # 日志文件大小上限，达到该上限后，会自动压缩
+      max-file-size: 200MB
+      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
+      file-name-pattern: ./logs/${spring.application.name}-%d{yyyy-MM-dd}-%i.log.gz
+      # 日志文件保存的天数
+      max-history: 90
+      # 是否在应用启动时进行归档管理
+      clean-history-on-start: true
 spring:
-  application.name: scan-job
-  #数据源配置
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-# MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
-mybatis:
-  mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
-  # 实体类别名配置（注意：对应实体类的路径）
-  type-aliases-package: com.platon.browser.dao.entity
-#PlatOn相关配置
-platon:
-  addressPrefix: lat
+  profiles:
+    active: platon

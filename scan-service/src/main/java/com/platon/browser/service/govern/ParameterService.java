@@ -26,7 +26,7 @@ import java.util.List;
  **/
 @Slf4j
 @Service
-@Transactional
+@Transactional(rollbackFor = {Exception.class, Error.class})
 public class ParameterService {
 
     @Resource
@@ -133,7 +133,7 @@ public class ParameterService {
      *
      * @param activeConfigList 被激活的配置信息列表
      */
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void rotateConfig(List<Config> activeConfigList) {
         // 更新配置表
         customConfigMapper.rotateConfig(activeConfigList);

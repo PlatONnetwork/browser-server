@@ -10,7 +10,7 @@ public interface SlashMapper {
 
     int deleteByExample(SlashExample example);
 
-    int deleteByPrimaryKey(String hash);
+    int deleteByPrimaryKey(Long id);
 
     int insert(Slash record);
 
@@ -20,7 +20,7 @@ public interface SlashMapper {
 
     List<Slash> selectByExample(SlashExample example);
 
-    Slash selectByPrimaryKey(String hash);
+    Slash selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") Slash record, @Param("example") SlashExample example);
 

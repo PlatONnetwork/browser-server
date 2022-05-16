@@ -38,15 +38,17 @@
   </insert>
 
   <select id="countBalance" resultType="com.platon.browser.bean.CountBalance">
-    SELECT
+    select
       `type`,
-      SUM( `balance` ) AS free,
-      SUM( `restricting_balance` ) AS locked
-    FROM
+      SUM(`balance`) as free,
+      SUM(`restricting_balance`) as locked
+    from
       `internal_address`
     where
-      is_calculate = 1
-    GROUP BY
+      (`type` = 0
+        and is_calculate = 1)
+       or `type` != 0
+    group by
       `type`
   </select>
 

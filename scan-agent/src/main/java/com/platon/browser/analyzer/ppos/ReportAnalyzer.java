@@ -1,13 +1,14 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.ReportMultiSignParamCache;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.custommapper.SlashBusinessMapper;
-import com.platon.browser.dao.param.ppos.Report;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.SlashBusinessMapper;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Slash;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.SlashMapper;
+import com.platon.browser.dao.param.ppos.Report;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ReportParam;
@@ -40,10 +41,10 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
     private NodeMapper nodeMapper;
 
     @Resource
-    private ReportMultiSignParamCache reportMultiSignParamCache;
+    private StakeEpochService stakeEpochService;
 
     @Resource
-    private StakeEpochService stakeEpochService;
+    private SlashMapper slashMapper;
 
     /**
      * 举报多签(举报验证人)
@@ -57,8 +58,7 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
-        if (null == txParam)
-            return null;
+        if (null == txParam) return null;
         Node staking = nodeMapper.selectByPrimaryKey(txParam.getVerify());
         if (staking != null) {
             // 回填设置参数中的惩罚奖励信息
@@ -68,15 +68,13 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 stakingAmount = staking.getStakingReduction();
             }
             //奖励的金额
-            BigDecimal codeRewardValue = stakingAmount.multiply(chainConfig.getDuplicateSignSlashRate())
-                    .multiply(chainConfig.getDuplicateSignRewardRate());
+            BigDecimal codeRewardValue = stakingAmount.multiply(chainConfig.getDuplicateSignSlashRate()).multiply(chainConfig.getDuplicateSignRewardRate());
             txParam.setReward(codeRewardValue);
         }
 
         updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
-            return null;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -92,19 +90,19 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         // 理论上的退出区块号, 实际的退出块号还要跟状态为进行中的提案的投票截至区块进行对比，取最大者
         BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getVerify(), event.getEpochMessage().getSettleEpochRound(), true);
         Report businessParam = Report.builder()
-                .slashData(txParam.getData())
-                .nodeId(txParam.getVerify())
-                .txHash(tx.getHash())
-                .time(tx.getTime())
-                .stakingBlockNum(txParam.getStakingBlockNum())
-                .slashRate(chainConfig.getDuplicateSignSlashRate())
-                .benefitAddr(tx.getFrom())
-                .slash2ReportRate(chainConfig.getDuplicateSignRewardRate())
-                .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
-                .unStakeEndBlock(unStakeEndBlock)
-                .blockNum(blockNum)
-                .build();
+                                     .slashData(txParam.getData())
+                                     .nodeId(txParam.getVerify())
+                                     .txHash(tx.getHash())
+                                     .time(tx.getTime())
+                                     .stakingBlockNum(txParam.getStakingBlockNum())
+                                     .slashRate(chainConfig.getDuplicateSignSlashRate())
+                                     .benefitAddr(tx.getFrom())
+                                     .slash2ReportRate(chainConfig.getDuplicateSignRewardRate())
+                                     .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                                     .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
+                                     .unStakeEndBlock(unStakeEndBlock)
+                                     .blockNum(blockNum)
+                                     .build();
 
         /**
          * 只有第一次候选中惩罚的时候才需要更新质押锁定周期数
@@ -115,8 +113,21 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         }
 
         // 把举报参数暂时缓存，待共识周期切换时处理
-        reportMultiSignParamCache.addReport(businessParam);
-
+        Slash slash = new Slash();
+        slash.setNodeId(businessParam.getNodeId());
+        slash.setTxHash(businessParam.getTxHash());
+        slash.setTime(businessParam.getTime());
+        slash.setSettingEpoch(businessParam.getSettingEpoch());
+        slash.setStakingBlockNum(businessParam.getStakingBlockNum().longValue());
+        slash.setSlashRate(businessParam.getSlashRate());
+        slash.setSlashReportRate(businessParam.getSlash2ReportRate());
+        slash.setBenefitAddress(businessParam.getBenefitAddr());
+        slash.setUnStakeFreezeDuration(businessParam.getUnStakeFreezeDuration());
+        slash.setUnStakeEndBlock(businessParam.getUnStakeEndBlock().longValue());
+        slash.setBlockNum(businessParam.getBlockNum());
+        slash.setIsHandle(false);
+        slash.setSlashData(businessParam.getSlashData());
+        slashMapper.insert(slash);
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return null;

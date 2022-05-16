@@ -2,6 +2,10 @@ package com.platon.browser.service;
 
 
 import com.platon.browser.ApiTestMockBase;
+import com.platon.browser.bean.CountBalance;
+import com.platon.browser.bean.StakingBO;
+import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.request.home.QueryNavigationRequest;
 import com.platon.browser.response.home.BlockStatisticNewResp;
 import com.platon.browser.response.home.ChainStatisticNewResp;
@@ -11,12 +15,16 @@ import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -28,8 +36,11 @@ public class HomeServiceTest extends ApiTestMockBase {
     @Spy
     private HomeService target;
 
-    @Spy
+    @Mock
     private CommonService service;
+
+    @Mock
+    private CustomInternalAddressMapper customInternalAddressMapper;
 
     @Before
     public void setup() {
@@ -42,6 +53,38 @@ public class HomeServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target, "commonService", commonService);
         ReflectionTestUtils.setField(target, "customNodeMapper", customNodeMapper);
         ReflectionTestUtils.setField(target, "networkParams", networkParams);
+        ReflectionTestUtils.setField(target, "commonService", service);
+        NetworkStat networkStatRedis = new NetworkStat();
+        networkStatRedis.setCurNumber(1000L);
+        networkStatRedis.setCurTps(10);
+        networkStatRedis.setIssueValue(BigDecimal.ONE);
+        when(statisticCacheService.getNetworkStatCache()).thenReturn(networkStatRedis);
+        List<CountBalance> list = new ArrayList<>();
+        CountBalance countBalance1 = new CountBalance();
+        countBalance1.setType(0);
+        countBalance1.setLocked(BigDecimal.TEN);
+        countBalance1.setFree(BigDecimal.TEN);
+        CountBalance countBalance2 = new CountBalance();
+        countBalance2.setType(3);
+        countBalance2.setLocked(BigDecimal.TEN);
+        countBalance2.setFree(BigDecimal.TEN);
+        CountBalance countBalance3 = new CountBalance();
+        countBalance3.setType(6);
+        countBalance3.setLocked(BigDecimal.TEN);
+        countBalance3.setFree(BigDecimal.TEN);
+        CountBalance countBalance4 = new CountBalance();
+        countBalance4.setType(2);
+        countBalance4.setLocked(BigDecimal.TEN);
+        countBalance4.setFree(BigDecimal.TEN);
+        list.add(countBalance1);
+        list.add(countBalance2);
+        list.add(countBalance3);
+        list.add(countBalance4);
+        when(customInternalAddressMapper.countBalance()).thenReturn(list);
+        StakingBO bo =new StakingBO();
+        bo.setTotalStakingValue(BigDecimal.ONE);
+        bo.setStakingDenominator(BigDecimal.ONE);
+        when(service.getTotalStakingValueAndStakingDenominator(any())).thenReturn(bo);
     }
 
     @Test

@@ -1,25 +1,22 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.bean.*;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
-import com.platon.browser.bean.DelegationAddress;
-import com.platon.browser.bean.DelegationStaking;
-import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.custommapper.CustomDelegationMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.custommapper.CustomStakingMapper;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.custommapper.CustomVoteMapper;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.I18nEnum;
@@ -44,7 +41,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -67,7 +63,7 @@ public class StakingService {
     private StatisticCacheService statisticCacheService;
 
     @Resource
-    private CustomStakingMapper customStakingMapper;
+    private CustomVoteMapper customVoteMapper;
 
     @Resource
     private CustomDelegationMapper customDelegationMapper;
@@ -95,6 +91,8 @@ public class StakingService {
 
     @Resource
     private AddressMapper addressMapper;
+    @Resource
+    private ProposalMapper proposalMapper;
 
     public StakingStatisticNewResp stakingStatisticNew() {
         /** 获取统计信息 */
@@ -106,22 +104,12 @@ public class StakingService {
             stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSettle());
             // 接受委托 = 实时质押委托总数 - 实时质押总数
             stakingStatisticNewResp.setDelegationValue(networkStatRedis.getStakingDelegationValue().subtract(networkStatRedis.getStakingValue()));
-            //实时除以现有的结算周期人数
-            Integer count = customStakingMapper.selectCountByActive();
-            // 质押奖励 = 当前结算周期总质押奖励转成LAT单位
-            stakingStatisticNewResp.setStakingReward(networkStatRedis.getSettleStakingReward().divide(new BigDecimal(count), 18, RoundingMode.FLOOR));
+            stakingStatisticNewResp.setStakingReward(networkStatRedis.getStakingReward());
+            stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
+            StakingBO bo = commonService.getTotalStakingValueAndStakingDenominator(networkStatRedis);
+            stakingStatisticNewResp.setStakingDenominator(bo.getStakingDenominator());
+            stakingStatisticNewResp.setStakingDelegationValue(bo.getTotalStakingValue());
         }
-        BigDecimal issueValue = commonService.getIssueValue();
-        logger.info("获取总发行量[{}]", issueValue.toPlainString());
-
-        CommonService.check(issueValue);
-        issueValue = CommonService.ISSUE_VALUE;
-
-        stakingStatisticNewResp.setIssueValue(issueValue);
-        BigDecimal stakingDenominator = commonService.getStakingDenominator();
-        stakingStatisticNewResp.setStakingDenominator(stakingDenominator);
-        BigDecimal totalStakingValue = commonService.getTotalStakingValue();
-        stakingStatisticNewResp.setStakingDelegationValue(totalStakingValue);
         return stakingStatisticNewResp;
     }
 
@@ -335,10 +323,10 @@ public class StakingService {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
-                            resp.getRewardValue(),
-                            stakingNode.getStatFeeRewardValue(),
-                            stakingNode.getStatBlockRewardValue(),
-                            stakingNode.getStatStakingRewardValue());
+                        resp.getRewardValue(),
+                        stakingNode.getStatFeeRewardValue(),
+                        stakingNode.getStatBlockRewardValue(),
+                        stakingNode.getStatStakingRewardValue());
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]", resp.getRewardValue(), stakingNode.getStatFeeRewardValue());
@@ -438,6 +426,13 @@ public class StakingService {
                         break;
                     /** 提案类型 */
                     case PROPOSALS:
+                        Proposal proposal = proposalMapper.selectByPrimaryKey(nodeOpt.getTxHash());
+                        if (ObjectUtil.isNotNull(proposal) && StrUtil.isNotBlank(proposal.getTopic())) {
+                            String desc = StrUtil.replace(stakingOptRecordListResp.getDesc(), Browser.INQUIRY, proposal.getTopic());
+                            nodeOpt.setDesc(desc);
+                            stakingOptRecordListResp.setDesc(desc);
+                            desces = nodeOpt.getDesc().split(Browser.OPT_SPILT);
+                        }
                         stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
                         stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1]) ? "" : desces[1]);
                         stakingOptRecordListResp.setProposalType(desces[2]);
@@ -447,8 +442,16 @@ public class StakingService {
                         break;
                     /** 投票类型 */
                     case VOTE:
-                        stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
+                        // 描述是由定时任务更新的，所以每次查询都要重新查询取最新的值
+                        CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(nodeOpt.getTxHash());
+                        if (ObjectUtil.isNotNull(customVoteProposal) && StrUtil.isNotBlank(customVoteProposal.getTopic())) {
+                            String desc = StrUtil.replace(stakingOptRecordListResp.getDesc(), Browser.INQUIRY, customVoteProposal.getTopic());
+                            nodeOpt.setDesc(desc);
+                            stakingOptRecordListResp.setDesc(desc);
+                            desces = nodeOpt.getDesc().split(Browser.OPT_SPILT);
+                        }
                         stakingOptRecordListResp.setTitle(Browser.INQUIRY.equals(desces[1]) ? "" : desces[1]);
+                        stakingOptRecordListResp.setId(Browser.PIP_NAME + desces[0]);
                         stakingOptRecordListResp.setOption(desces[2]);
                         stakingOptRecordListResp.setProposalType(desces[3]);
                         if (desces.length > 4) {

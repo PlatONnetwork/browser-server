@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.CustomTxDelegationRewardBakMapper">
+  <insert id="batchInsert" parameterType="collection" useGeneratedKeys="true" keyProperty="id">
+    insert into tx_delegation_reward_bak
+    ( `hash`, `bn`, `addr`, `time`, `extra`,`extra_clean`)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.hash},
+      #{item.bn},
+      #{item.addr},
+      #{item.time},
+      #{item.extra},
+      #{item.extraClean}
+      )
+    </foreach>
+  </insert>
+
+  <select id="findMaxId" resultType="long">
+    SELECT
+      IFNULL( max( id ), 0 )
+    FROM
+      tx_delegation_reward_bak;
+  </select>
+
+</mapper>

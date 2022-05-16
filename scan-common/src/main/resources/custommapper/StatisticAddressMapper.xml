@@ -1,45 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.StatisticBusinessMapper">
-<update id="addressChange" parameterType="com.platon.browser.dao.param.statistic.AddressStatChange">
+
+<update id="addressChange" parameterType="list">
     /*更新地址统计表: 以下相关字段的累加操作在Java代码中*/
     replace into `address` (
         `address`,
-        `type`,
-        `tx_qty`,
-        `transfer_qty`,
-        `delegate_qty`,
-        `staking_qty`,
-        `proposal_qty`,
+		`type`,
         `contract_name`,
         `contract_create`,
         `contract_createHash`,
-        `have_reward`,
         `contract_destroy_hash`,
-        `contract_bin`,
-        `erc20_tx_qty`,
-        `erc721_tx_qty`
+        `contract_bin`
     ) values
-    <foreach collection="addressStatItemList" item="item" separator=",">
+    <foreach collection="list" item="item" separator=",">
     (
         #{item.address},
-        #{item.type},
-        #{item.txQty},
-        #{item.transferQty},
-        #{item.delegateQty},
-        #{item.stakingQty},
-        #{item.proposalQty},
+		#{item.type},
         #{item.contractName},
         #{item.contractCreate},
         #{item.contractCreatehash},
-        #{item.haveReward},
         #{item.contractDestroyHash},
-        #{item.contractBin},
-        #{item.erc20TxQty},
-        #{item.erc721TxQty}
+        #{item.contractBin}
     )
     </foreach>
 </update>
+	<insert id="batchInsert" parameterType="list">
+		insert into `address` (
+		`address`,
+		`type`,
+		`contract_name`,
+		`contract_create`,
+		`contract_createHash`,
+		`contract_destroy_hash`,
+		`contract_bin`
+		) values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.address},
+			#{item.type},
+			#{item.contractName},
+			#{item.contractCreate},
+			#{item.contractCreatehash},
+			#{item.contractDestroyHash},
+			#{item.contractBin}
+			)
+		</foreach>
+	</insert>
 
 <select id="getAddressStatisticsFromStaking"  resultType="com.platon.browser.task.bean.AddressStatistics">
 	select

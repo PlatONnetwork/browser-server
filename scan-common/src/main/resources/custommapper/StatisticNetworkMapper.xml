@@ -17,6 +17,10 @@
 	select count(1) from proposal where status = 1
 </select>
 
+    <select id="getProposalQty"  resultType="java.lang.Integer">
+        select count(1) from proposal
+    </select>
+
 <update id="networkChange" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into `network_stat`
     (
@@ -45,7 +49,8 @@
         `avg_pack_time`,
         `issue_rates`,
         `erc20_tx_qty`,
-        `erc721_tx_qty`
+        `erc721_tx_qty`,
+        `year_num`
     )
     values
     (
@@ -74,7 +79,8 @@
         #{avgPackTime},
         #{issueRates},
         #{erc20TxQty},
-        #{erc721TxQty}
+        #{erc721TxQty},
+        #{yearNum}
     )
     on duplicate
     key update
@@ -102,7 +108,8 @@
         `avg_pack_time` = #{avgPackTime},
         `issue_rates` = #{issueRates},
         `erc20_tx_qty` = #{erc20TxQty},
-        `erc721_tx_qty` = #{erc721TxQty}
+        `erc721_tx_qty` = #{erc721TxQty},
+        `year_num` = #{yearNum}
         ;
 </update>
 </mapper>

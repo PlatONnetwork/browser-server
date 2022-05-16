@@ -36,7 +36,7 @@ public class RedisImportServiceTest extends AgentTestBase {
      * 根据区块号获取激励池余额
      */
     @Test
-    public void batchImport() throws InterruptedException, ContractInvokeException, BlankResponseException {
+    public void batchImport() throws Exception {
         target.batchImport(Collections.emptySet(),Collections.emptySet(),Collections.emptySet());
         verify(target, times(1)).batchImport(anySet(),anySet(),anySet());
     }

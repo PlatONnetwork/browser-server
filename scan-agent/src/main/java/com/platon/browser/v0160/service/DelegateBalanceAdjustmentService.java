@@ -106,9 +106,7 @@ public class DelegateBalanceAdjustmentService {
             newNode.setHaveDeleReward(newHaveDeleReward);
             int res = nodeMapper.updateByPrimaryKeySelective(newNode);
             if (res > 0) {
-                log.error("issue1583调账：更新node表成功,nodeId:[{}]：所有质押已领取委托奖励新值[{}]=所有质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];",
-                        nodeInfo.getNodeId(),
-                        newHaveDeleReward, oldHaveDeleReward, totalDeleReward);
+                log.error("issue1583调账：更新node表成功,nodeId:[{}]：所有质押已领取委托奖励新值[{}]=所有质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];", nodeInfo.getNodeId(), newHaveDeleReward, oldHaveDeleReward, totalDeleReward);
             } else {
                 log.error("issue1583调账：更新node表失败,nodeId:[{}]", nodeInfo.getNodeId());
             }
@@ -138,8 +136,10 @@ public class DelegateBalanceAdjustmentService {
             int res = stakingMapper.updateByPrimaryKeySelective(newStaking);
             if (res > 0) {
                 log.error("issue1583调账：更新staking表成功,stakingKey:[{}]：节点当前质押已领取委托奖励新值[{}]=节点当前质押已领取委托奖励旧值[{}]+总共被领取的委托奖励[{}];",
-                        JSONUtil.toJsonStr(stakingKey),
-                        newHaveDeleReward, oldHaveDeleReward, totalDeleReward);
+                          JSONUtil.toJsonStr(stakingKey),
+                          newHaveDeleReward,
+                          oldHaveDeleReward,
+                          totalDeleReward);
             } else {
                 log.error("issue1583调账：更新staking表失败,,stakingKey:[{}]", JSONUtil.toJsonStr(stakingKey));
             }
@@ -176,22 +176,17 @@ public class DelegateBalanceAdjustmentService {
     private List<RecoveredDelegationAmount> updateAddressCache(List<RecoveredDelegationAmount> list) {
         List<RecoveredDelegationAmount> updateDBlist = CollUtil.newArrayList();
         for (RecoveredDelegationAmount recoveredDelegationAmount : list) {
-            Address addrCache = addressCache.getAddress(recoveredDelegationAmount.getDelegateAddr());
-            if (ObjectUtil.isNull(addrCache)) {
-                // 缓存不存在，则去查找db
-                Address addressInfo = addressMapper.selectByPrimaryKey(recoveredDelegationAmount.getDelegateAddr());
-                if (ObjectUtil.isNull(addressInfo)) {
-                    // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
-                    addressCache.update(recoveredDelegationAmount.getDelegateAddr(), recoveredDelegationAmount.getRecoveredDelegationAmount());
-                } else {
-                    // db存在，则存放到updateDBlist，走db的更新方式
-                    updateDBlist.add(recoveredDelegationAmount);
-                    BigDecimal newHaveReward = addressInfo.getHaveReward().add(recoveredDelegationAmount.getRecoveredDelegationAmount());
-                    log.error("更新地址表成功：地址已领取的委托奖励字段新值[{}]=已领取的委托奖励字段旧值[{}]+已领取委托奖励[{}]", newHaveReward, addressInfo.getHaveReward(), recoveredDelegationAmount.getRecoveredDelegationAmount());
-                }
+            Address addressInfo = addressMapper.selectByPrimaryKey(recoveredDelegationAmount.getDelegateAddr());
+            if (ObjectUtil.isNull(addressInfo)) {
+                // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
+                Address address = addressCache.createDefaultAddress(recoveredDelegationAmount.getDelegateAddr());
+                address.setHaveReward(recoveredDelegationAmount.getRecoveredDelegationAmount());
+                addressMapper.insertSelective(address);
             } else {
-                // 缓存存在则直接更新已领取委托奖励
-                addressCache.update(recoveredDelegationAmount.getDelegateAddr(), recoveredDelegationAmount.getRecoveredDelegationAmount());
+                // db存在，则存放到updateDBlist，走db的更新方式
+                updateDBlist.add(recoveredDelegationAmount);
+                BigDecimal newHaveReward = addressInfo.getHaveReward().add(recoveredDelegationAmount.getRecoveredDelegationAmount());
+                log.info("调账---更新地址表成功：地址已领取的委托奖励字段新值[{}]=已领取的委托奖励字段旧值[{}]+已领取委托奖励[{}]", newHaveReward, addressInfo.getHaveReward(), recoveredDelegationAmount.getRecoveredDelegationAmount());
             }
         }
         return updateDBlist;
