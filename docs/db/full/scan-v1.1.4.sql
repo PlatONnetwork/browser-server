@@ -585,6 +585,26 @@ CREATE TABLE `point_log` (
                              PRIMARY KEY (`id`)
 ) COMMENT='断点统计表';
 
+DROP TABLE IF EXISTS `token_expand`;
+CREATE TABLE `token_expand` (
+                                `address` varchar(64)  NOT NULL COMMENT '合约地址',
+                                `icon` text  COMMENT '合约图标',
+                                `web_site` varchar(256)  DEFAULT NULL COMMENT '合约地址',
+                                `details` varchar(256)  DEFAULT NULL COMMENT '合约官网',
+                                `is_show_in_aton` tinyint(1) DEFAULT '0' COMMENT 'aton中是否显示，0-隐藏 1-展示',
+                                `is_show_in_scan` tinyint(1) DEFAULT '0' COMMENT 'scan中是否显示，0-隐藏 1-展示',
+                                `is_can_transfer` tinyint(1) DEFAULT '0' COMMENT '是否可转账 0-不可转账 1-可转账',
+                                `create_id` bigint(20) NOT NULL COMMENT '创建者',
+                                `create_name` varchar(50)  NOT NULL COMMENT '创建者名称',
+                                `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                `update_id` bigint(20) NOT NULL COMMENT '更新者',
+                                `update_name` varchar(50)  NOT NULL COMMENT '更新者名称',
+                                `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                `is_show_in_aton_admin` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否显示在aton管理台，1为显示，0不显示，默认是0',
+                                `is_show_in_scan_admin` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否显示在scan管理台，1为显示，0不显示，默认是0',
+                                PRIMARY KEY (`address`)
+);
+
 -- 初始化数据
 -- 还有部分基金会地址由运维手工导入
 INSERT INTO `internal_address` (`address`,`type`)
