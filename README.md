@@ -68,10 +68,10 @@ Choose one of the above two configuration methods
 
 ## scan community team process
 ```bash
-1.  The repository administrator creates a feature branch feature-xxx based on the develop branch for the community development team.
-2.  The community development team fork feature-xxx branches to the local warehouse, and the development and self-testing are completed.
-3.  The community development team submits pull requests to the official feature-xxx (note: the merge official develop branch needs to be modified before submission).
-4.  Repository administrators merge feature-xxx into a test version branch (eg: feature-platon-1.1.5).
-5.  The test verifies the function of the test branch feature-platon-1.1.5, if there is a problem, raise an issue.
-6.  Merge into the develop branch when the tests are done.
+1. The repository administrator creates a feature branch (accessed based on the develop branch), feature-xxx, for the community development team.
+2. The community development team forks (feature-xxx) to its own repository after the self-test on development is completed.
+3. The community development team submits pr to the official feature-xxx (merge the modification of the official develop branch before submission)
+4. Repository administrator merges feature-xxx into one of the proposed branch, e.g. feature-platon-1.1.5
+5. Testers verify the functions of the proposed branch feature-platon-1.1.5. Issue the problem if any 
+6. After the test is completed, merge it into the develop branch
 ```
