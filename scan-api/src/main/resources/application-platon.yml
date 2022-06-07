@@ -103,11 +103,6 @@ logging:
     com.platon.browser.task: info
     com.platon.browser.client: info
     com.platon.browser.dao: info
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -120,7 +115,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.120.151:7789,192.168.120.151:7790
+    addresses: 192.168.9.139:7789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -168,3 +163,7 @@ limit:
 output:
   file:
     url: /var/tmp
+apollo:
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: false
