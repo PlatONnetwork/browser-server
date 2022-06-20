@@ -8,17 +8,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/*
- * @Auther: dongqile
- * @Date:  2019/11/5
- * @Description:
- */
 public interface EpochBusinessMapper {
+
     /**
      * 新结算周期
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
     void settle(BusinessParam param);
+
+    /**
+     * 查找需要更新质押奖励的节点
+     *
+     * @param preVerifierSet:
+     * @return: java.util.List<com.platon.browser.dao.entity.Staking>
+     * @date: 2022/6/16
+     */
+    List<Staking> findStaking(@Param("list") List<String> preVerifierSet);
 
     /**
      * 新结算周期--更新质押奖励
@@ -65,4 +70,5 @@ public interface EpochBusinessMapper {
      * @return
      */
     List<Staking> getException(@Param("list") List<String> nodeIdList);
+
 }
