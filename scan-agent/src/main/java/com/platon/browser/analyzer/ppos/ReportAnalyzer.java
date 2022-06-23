@@ -127,7 +127,7 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         slash.setBlockNum(businessParam.getBlockNum());
         slash.setIsHandle(false);
         slash.setSlashData(businessParam.getSlashData());
-        slashMapper.insert(slash);
+        slashMapper.insertSelective(slash);
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return null;
