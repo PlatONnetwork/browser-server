@@ -81,6 +81,11 @@ public class NetworkStat {
     private Long avgPackTime;
 
     /**
+     * 整个链的erc1155交易数
+     */
+    private Integer erc1155TxQty;
+
+    /**
      * 整个链的erc721交易数
      */
     private Integer erc721TxQty;
@@ -308,6 +313,14 @@ public class NetworkStat {
         this.avgPackTime = avgPackTime;
     }
 
+    public Integer getErc1155TxQty() {
+        return erc1155TxQty;
+    }
+
+    public void setErc1155TxQty(Integer erc1155TxQty) {
+        this.erc1155TxQty = erc1155TxQty;
+    }
+
     public Integer getErc721TxQty() {
         return erc721TxQty;
     }
@@ -374,6 +387,7 @@ public class NetworkStat {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         avgPackTime("avg_pack_time", "avgPackTime", "BIGINT", false),
+        erc1155TxQty("erc1155_tx_qty", "erc1155TxQty", "INTEGER", false),
         erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
         erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
         yearNum("year_num", "yearNum", "INTEGER", false),

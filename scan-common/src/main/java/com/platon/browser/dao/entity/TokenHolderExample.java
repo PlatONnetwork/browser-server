@@ -176,6 +176,21 @@ public class TokenHolderExample {
             return (Criteria) this;
         }
 
+        public Criteria andTokenIdIn(List<String> values) {
+            addCriterion("token_id in", values, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotIn(List<String> values) {
+            addCriterion("token_id not in", values, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdEqualTo(String value) {
+            addCriterion("token_id =", value, "tokenId");
+            return (Criteria) this;
+        }
+
         public Criteria andAddressIsNull() {
             addCriterion("address is null");
             return (Criteria) this;

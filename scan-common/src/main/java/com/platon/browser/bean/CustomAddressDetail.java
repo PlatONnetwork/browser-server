@@ -12,7 +12,7 @@ import lombok.Data;
 public class CustomAddressDetail extends Address {
 
     /**
-     * 合约类型：erc20 | erc721
+     * 合约类型：erc20 | erc721 | erc1155
      */
     private String tokenType;
 

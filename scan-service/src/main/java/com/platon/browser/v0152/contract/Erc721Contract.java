@@ -225,9 +225,13 @@ public class Erc721Contract extends Contract implements ErcContract {
         for (EventValuesWithLog eventValues : valueList) {
             ErcTxEvent response = new ErcTxEvent();
             response.setLog(eventValues.getLog());
+            response.setOperator("");
             response.setFrom((String) eventValues.getIndexedValues().get(0).getValue());
             response.setTo((String) eventValues.getIndexedValues().get(1).getValue());
-            response.setValue((BigInteger) eventValues.getIndexedValues().get(2).getValue());
+            // 721 修改到token中
+            response.setTokenId((BigInteger) eventValues.getIndexedValues().get(2).getValue());
+            //数量默认为1
+            response.setValue(BigInteger.ONE);
             responses.add(response);
         }
         return responses;
@@ -269,7 +273,7 @@ public class Erc721Contract extends Contract implements ErcContract {
     }
 
     @Override
-    public RemoteCall<BigInteger> balanceOf(String _owner) {
+    public RemoteCall<BigInteger> balanceOf(String _owner, BigInteger _id) {
         final Function function = new Function(FUNC_BALANCEOF, Collections.singletonList(new Address(_owner)), Collections.singletonList(new TypeReference<Uint256>() {
         }));
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);

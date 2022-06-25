@@ -52,6 +52,8 @@ public class Address {
 
     private BigDecimal haveReward;
 
+    private Integer erc1155TxQty;
+
     private Integer erc721TxQty;
 
     private Integer erc20TxQty;
@@ -242,6 +244,14 @@ public class Address {
         this.haveReward = haveReward;
     }
 
+    public Integer getErc1155TxQty() {
+        return erc1155TxQty;
+    }
+
+    public void setErc1155TxQty(Integer erc1155TxQty) {
+        this.erc1155TxQty = erc1155TxQty;
+    }
+
     public Integer getErc721TxQty() {
         return erc721TxQty;
     }
@@ -297,6 +307,7 @@ public class Address {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         haveReward("have_reward", "haveReward", "DECIMAL", false),
+        erc1155TxQty("erc1155_tx_qty", "erc1155TxQty", "INTEGER", false),
         erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
         erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
         contractBin("contract_bin", "contractBin", "LONGVARCHAR", false);

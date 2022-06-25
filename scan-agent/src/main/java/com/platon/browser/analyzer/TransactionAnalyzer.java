@@ -92,6 +92,7 @@ public class TransactionAnalyzer {
             addressCache.getWasmContractAddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.WASM));
             ercCache.getErc20AddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM));
             ercCache.getErc721AddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC721_EVM));
+            ercCache.getErc1155AddressCache().forEach(address -> GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC1155_EVM));
         }
     }
 
@@ -127,6 +128,8 @@ public class TransactionAnalyzer {
                     contractTypeEnum = ContractTypeEnum.ERC20_EVM;
                 } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC721 && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
                     contractTypeEnum = ContractTypeEnum.ERC721_EVM;
+                } else if (ercToken.getTypeEnum() == ErcTypeEnum.ERC1155 && txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE) {
+                    contractTypeEnum = ContractTypeEnum.ERC1155_EVM;
                 } else if (txInputDecodeResult.getTypeEnum() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE) {
                     contractTypeEnum = ContractTypeEnum.WASM;
                 } else {

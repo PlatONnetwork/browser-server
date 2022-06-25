@@ -51,6 +51,10 @@ public class AddressCache {
         return ercCache.getErc721AddressCache().contains(address);
     }
 
+    public boolean isErc1155ContractAddress(String address) {
+        return ercCache.getErc1155AddressCache().contains(address);
+    }
+
     // 全量WASM合约地址缓存
     private Set<String> wasmContractAddressCache = new HashSet<>();
 
@@ -68,6 +72,7 @@ public class AddressCache {
         if (this.isWasmContractAddress(address)) return Transaction.ToTypeEnum.WASM_CONTRACT.getCode();
         if (isErc20ContractAddress(address)) return Transaction.ToTypeEnum.ERC20_CONTRACT.getCode();
         if (isErc721ContractAddress(address)) return Transaction.ToTypeEnum.ERC721_CONTRACT.getCode();
+        if (isErc1155ContractAddress(address)) return Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode();
         return Transaction.ToTypeEnum.ACCOUNT.getCode();
     }
 
@@ -83,6 +88,7 @@ public class AddressCache {
             case WASM_CONTRACT_CREATE:
             case ERC20_CONTRACT_CREATE:
             case ERC721_CONTRACT_CREATE:
+            case ERC1155_CONTRACT_CREATE:
                 this.updateContractFromAddress(from);
                 this.updateAddress(tx, contractAddress);
                 break;
@@ -112,6 +118,9 @@ public class AddressCache {
                     break;
                 case ERC721_EVM:
                     address.setType(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
+                    break;
+                case ERC1155_EVM:
+                    address.setType(AddressTypeEnum.ERC1155_EVM_CONTRACT.getCode());
                     break;
                 default:
                     break;
@@ -189,6 +198,14 @@ public class AddressCache {
                 address.setType(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
                 address.setContractBin(tx.getBin());
                 break;
+            case ERC1155_CONTRACT_CREATE:
+                // 如果地址是EVM合约创建的回执里返回的合约地址
+                address.setContractCreatehash(tx.getHash());
+                address.setContractCreate(tx.getFrom());
+                // 覆盖createDefaultAddress()中设置的值
+                address.setType(AddressTypeEnum.ERC1155_EVM_CONTRACT.getCode());
+                address.setContractBin(tx.getBin());
+                break;
             default:
         }
     }
@@ -235,6 +252,7 @@ public class AddressCache {
         address.setTxQty(0);
         address.setErc20TxQty(0);
         address.setErc721TxQty(0);
+        address.setErc1155TxQty(0);
         address.setTransferQty(0);
         address.setStakingQty(0);
         address.setDelegateQty(0);
