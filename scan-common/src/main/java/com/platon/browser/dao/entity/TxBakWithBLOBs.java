@@ -8,6 +8,8 @@ public class TxBakWithBLOBs extends TxBak {
 
     private String info;
 
+    private String erc1155TxInfo;
+
     private String erc721TxInfo;
 
     private String erc20TxInfo;
@@ -36,6 +38,14 @@ public class TxBakWithBLOBs extends TxBak {
 
     public void setInfo(String info) {
         this.info = info == null ? null : info.trim();
+    }
+
+    public String getErc1155TxInfo() {
+        return erc1155TxInfo;
+    }
+
+    public void setErc1155TxInfo(String erc1155TxInfo) {
+        this.erc1155TxInfo = erc1155TxInfo;
     }
 
     public String getErc721TxInfo() {
@@ -126,6 +136,7 @@ public class TxBakWithBLOBs extends TxBak {
         contractAddress("contract_address", "contractAddress", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true),
         info("info", "info", "LONGVARCHAR", false),
+        erc1155TxInfo("erc1155_tx_info", "erc1155TxInfo", "LONGVARCHAR", false),
         erc721TxInfo("erc721_tx_info", "erc721TxInfo", "LONGVARCHAR", false),
         erc20TxInfo("erc20_tx_info", "erc20TxInfo", "LONGVARCHAR", false),
         transferTxInfo("transfer_tx_info", "transferTxInfo", "LONGVARCHAR", false),

@@ -1,0 +1,45 @@
+index_patterns:
+  - "*_erc1155_tx"
+settings:
+  index:
+    max_result_window: '2000000000'
+    number_of_shards: '5'
+    number_of_replicas: '1'
+mappings:
+  properties:
+    seq:
+      type: long
+    name:
+      type: text
+    symbol:
+      type: keyword
+    decimal:
+      type: integer
+    contract:
+      type: keyword
+    hash:
+      type: keyword
+    from:
+      type: keyword
+    to:
+      type: keyword
+    tokenId:
+      type: keyword
+    value:
+      type: text
+    bn:
+      type: long
+    bTime:
+      format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
+      type: date
+    toType:
+      type: integer
+    fromType:
+      type: integer
+    remark:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    txFee:
+      type: keyword

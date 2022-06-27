@@ -72,7 +72,7 @@ public class StompPushTask {
     private StatisticCacheService statisticCacheService;
 
     @Resource
-    private TokenService tokenService;
+    private TokenService token721Service;
 
     private boolean checkData() {
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
@@ -204,7 +204,7 @@ public class StompPushTask {
              */
             QueryTokenDetailReq queryTokenDetailReq = new QueryTokenDetailReq();
             queryTokenDetailReq.setAddress("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
-            this.tokenService.queryTokenDetail(queryTokenDetailReq);
+            this.token721Service.queryTokenDetail(queryTokenDetailReq);
         }
     }
 

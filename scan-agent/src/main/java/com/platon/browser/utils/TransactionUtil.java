@@ -281,6 +281,9 @@ public class TransactionUtil {
         } else if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
+        } else if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC1155_CONTRACT_CREATE.getCode());
+            ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
         } else if (contractTypeEnum == ContractTypeEnum.WASM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
@@ -329,6 +332,10 @@ public class TransactionUtil {
             ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             ci.setType(Transaction.TypeEnum.ERC721_CONTRACT_EXEC.getCode());
         }
+        if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            ci.setToType(Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.ERC1155_CONTRACT_EXEC.getCode());
+        }
 
         if("0x".equals(binCode)){
             // 如果交易的binCode属性为0x,则表明掉用了合约自毁方法, 交易类型设置为 合约销毁
@@ -374,6 +381,11 @@ public class TransactionUtil {
         if (addressCache.isErc721ContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
+            return;
+        }
+        if (addressCache.isErc1155ContractAddress(toAddress)) {
+            ci.setToType(Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
+            ci.setContractType(ContractTypeEnum.ERC1155_EVM.getCode());
             return;
         }
         ci.setToType(Transaction.ToTypeEnum.ACCOUNT.getCode());

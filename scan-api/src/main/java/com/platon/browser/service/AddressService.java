@@ -102,8 +102,10 @@ public class AddressService {
         if (item != null) {
             if (TokenTypeEnum.ERC20.getType().equalsIgnoreCase(item.getTokenType())) {
                 resp.setHasErc20(true);
-            } else {
+            } else if (TokenTypeEnum.ERC721.getType().equalsIgnoreCase(item.getTokenType())) {
                 resp.setHasErc721(true);
+            } else if (TokenTypeEnum.ERC1155.getType().equalsIgnoreCase(item.getTokenType())) {
+                resp.setHasErc1155(true);
             }
             BeanUtils.copyProperties(item, resp);
             resp.setDelegateUnlock(item.getDelegateHes());

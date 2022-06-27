@@ -52,7 +52,8 @@ public class CustomAddress extends Address {
         EVM(3, "3EVM合约"),
         WASM(4, "WASM合约"),
         ERC20_EVM(5, "ERC20合约"),
-        ERC721_EVM(6, "ERC721合约");
+        ERC721_EVM(6, "ERC721合约"),
+        ERC1155_EVM(7, "ERC1155合约");
 
         private int code;
         private String desc;

@@ -22,6 +22,9 @@ public class Block {
     @JSONField(serialize = false)
     private Integer erc721TxQty = 0;
 
+    @JSONField(serialize = false)
+    private Integer erc1155TxQty = 0;
+
     private Long num;
 
     private String hash;

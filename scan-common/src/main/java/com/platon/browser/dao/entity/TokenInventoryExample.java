@@ -250,6 +250,11 @@ public class TokenInventoryExample {
             return (Criteria) this;
         }
 
+        public Criteria andOwnerIdEqualTo(String value) {
+            addCriterion("owner =", value, "owner");
+            return (Criteria) this;
+        }
+
         public Criteria andTokenIdNotEqualTo(String value) {
             addCriterion("token_id <>", value, "tokenId");
             return (Criteria) this;

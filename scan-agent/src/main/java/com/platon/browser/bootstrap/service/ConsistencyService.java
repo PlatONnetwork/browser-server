@@ -6,10 +6,7 @@ import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.bootstrap.bean.SyncData;
-import com.platon.browser.dao.custommapper.CustomTx20BakMapper;
-import com.platon.browser.dao.custommapper.CustomTx721BakMapper;
-import com.platon.browser.dao.custommapper.CustomTxBakMapper;
-import com.platon.browser.dao.custommapper.CustomTxDelegationRewardBakMapper;
+import com.platon.browser.dao.custommapper.*;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -67,7 +64,13 @@ public class ConsistencyService {
     private TxErc721BakMapper txErc721BakMapper;
 
     @Resource
+    private TxErc1155BakMapper txErc1155BakMapper;
+
+    @Resource
     private CustomTx721BakMapper customTx721BakMapper;
+
+    @Resource
+    private CustomTx1155BakMapper customTx1155BakMapper;
 
     @Resource
     private EsImportService esImportService;
@@ -99,6 +102,8 @@ public class ConsistencyService {
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
 
+    @Resource
+    private EsErc1155TxRepository esErc1155TxRepository;
     /**
      * 开机自检,一致性开机自检子流程,检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
      *
@@ -118,6 +123,7 @@ public class ConsistencyService {
         syncDelegationRewardTx(esDelegationRewardRepository, syncData);
         syncErc20Tx(esErc20TxRepository, syncData);
         syncErc721Tx(esErc721TxRepository, syncData);
+        syncErc1155Tx(esErc1155TxRepository, syncData);
         syncDataToESAndRedis(syncData);
         log.info("MYSQL/ES/REDIS中的数据同步完成!");
     }
@@ -305,6 +311,53 @@ public class ConsistencyService {
     }
 
     /**
+     * 同步mysql的erc1155交易信息到es和Redis
+     *
+     * @param abstractEsRepository:
+     * @param syncData:
+     * @return: void
+     * @date: 2022/2/14
+     */
+    private void syncErc1155Tx(AbstractEsRepository abstractEsRepository, SyncData syncData) throws Exception {
+        try {
+            long mysqlTxId = customTx1155BakMapper.findMaxId();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setDesc("id");
+            constructor.setResult(new String[]{"id", "seq", "hash", "bn"});
+            constructor.setUnmappedType("long");
+            ESResult<ErcTx> queryResultFromES = abstractEsRepository.search(constructor, ErcTx.class, 1, 1);
+            List<ErcTx> list = queryResultFromES.getRsData();
+            long esTxId = getEsTxId(list);
+            if (mysqlTxId > esTxId) {
+                TxErc1155BakExample example = new TxErc1155BakExample();
+                example.createCriteria().andIdGreaterThan(esTxId).andIdLessThanOrEqualTo(mysqlTxId);
+                List<TxErc1155Bak> txErc1155BakList = txErc1155BakMapper.selectByExample(example);
+                for (TxErc1155Bak txErc1155Bak : txErc1155BakList) {
+                    ErcTx ercTx = new ErcTx();
+                    BeanUtil.copyProperties(txErc1155Bak, ercTx);
+                    syncData.getErc1155BakSet().add(ercTx);
+                }
+                log.info("MYSQL/ES/REDIS erc1155交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+            } else {
+                log.info("MySQL没有erc1155交易数据需要同步");
+            }
+        } catch (Exception e) {
+            log.error("MySQL同步erc1155交易数据异常", e);
+            throw new Exception("MySQL同步erc1155交易数据异常");
+        }
+    }
+
+    private long getEsTxId(List<ErcTx> list ) {
+        long esTxId = 0;
+        if ( CollUtil.isNotEmpty(list)) {
+            ErcTx ercTx = CollUtil.getFirst(list);
+            if (ercTx.getId() != null) {
+                esTxId = ercTx.getId();
+            }
+        }
+        return esTxId;
+    }
+    /**
      * 同步交易数据到es和Redis
      *
      * @param syncData:
@@ -312,8 +365,8 @@ public class ConsistencyService {
      * @date: 2022/1/20
      */
     private void syncDataToESAndRedis(SyncData syncData) throws Exception {
-        esImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getDelegationRewardBakSet());
-        redisImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet());
+        esImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getErc1155BakSet(), syncData.getDelegationRewardBakSet());
+        redisImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getErc1155BakSet());
     }
 
 }

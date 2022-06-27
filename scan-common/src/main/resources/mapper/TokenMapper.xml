@@ -13,6 +13,8 @@
     <result column="is_support_erc721" jdbcType="BIT" property="isSupportErc721" />
     <result column="is_support_erc721_enumeration" jdbcType="BIT" property="isSupportErc721Enumeration" />
     <result column="is_support_erc721_metadata" jdbcType="BIT" property="isSupportErc721Metadata" />
+    <result column="is_support_erc1155" jdbcType="BIT" property="isSupportErc1155"/>
+    <result column="is_support_erc1155_metadata" jdbcType="BIT" property="isSupportErc1155Metadata"/>
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
@@ -80,7 +82,7 @@
   </sql>
   <sql id="Base_Column_List">
     address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
-    is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, create_time, 
+    is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, is_support_erc1155,is_support_erc1155_metadata, create_time,
     update_time, token_tx_qty, holder, contract_destroy_block, contract_destroy_update
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenExample" resultMap="BaseResultMap">
@@ -117,14 +119,16 @@
     insert into token (address, `type`, `name`, 
       symbol, total_supply, `decimal`, 
       is_support_erc165, is_support_erc20, is_support_erc721, 
-      is_support_erc721_enumeration, is_support_erc721_metadata, 
+      is_support_erc721_enumeration, is_support_erc721_metadata,
+      is_support_erc1155, is_support_erc1155_metadata,
       create_time, update_time, token_tx_qty, 
       holder, contract_destroy_block, contract_destroy_update
       )
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{symbol,jdbcType=VARCHAR}, #{totalSupply,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, 
       #{isSupportErc165,jdbcType=BIT}, #{isSupportErc20,jdbcType=BIT}, #{isSupportErc721,jdbcType=BIT}, 
-      #{isSupportErc721Enumeration,jdbcType=BIT}, #{isSupportErc721Metadata,jdbcType=BIT}, 
+      #{isSupportErc721Enumeration,jdbcType=BIT}, #{isSupportErc721Metadata,jdbcType=BIT},
+      #{isSupportErc1155,jdbcType=BIT}, #{isSupportErc1155Metadata,jdbcType=BIT},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
       #{holder,jdbcType=INTEGER}, #{contractDestroyBlock,jdbcType=BIGINT}, #{contractDestroyUpdate,jdbcType=BIT}
       )
@@ -164,6 +168,12 @@
       </if>
       <if test="isSupportErc721Metadata != null">
         is_support_erc721_metadata,
+      </if>
+      <if test="isSupportErc1155 != null">
+        is_support_erc1155,
+      </if>
+      <if test="isSupportErc1155Metadata != null">
+        is_support_erc1155_metadata,
       </if>
       <if test="createTime != null">
         create_time,
@@ -217,6 +227,12 @@
       </if>
       <if test="isSupportErc721Metadata != null">
         #{isSupportErc721Metadata,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc1155 != null">
+        #{isSupportErc1155,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc1155Metadata != null">
+        #{isSupportErc1155Metadata,jdbcType=BIT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -280,6 +296,12 @@
       <if test="record.isSupportErc721Metadata != null">
         is_support_erc721_metadata = #{record.isSupportErc721Metadata,jdbcType=BIT},
       </if>
+      <if test="record.isSupportErc1155 != null">
+        is_support_erc1155 = #{record.isSupportErc1155,jdbcType=BIT},
+      </if>
+      <if test="record.isSupportErc1155Metadata != null">
+        is_support_erc1155_metadata = #{record.isSupportErc1155Metadata,jdbcType=BIT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -316,6 +338,8 @@
       is_support_erc721 = #{record.isSupportErc721,jdbcType=BIT},
       is_support_erc721_enumeration = #{record.isSupportErc721Enumeration,jdbcType=BIT},
       is_support_erc721_metadata = #{record.isSupportErc721Metadata,jdbcType=BIT},
+      is_support_erc1155 = #{record.isSupportErc1155,jdbcType=BIT},
+      is_support_erc1155_metadata = #{record.isSupportErc1155Metadata,jdbcType=BIT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
@@ -359,6 +383,12 @@
       <if test="isSupportErc721Metadata != null">
         is_support_erc721_metadata = #{isSupportErc721Metadata,jdbcType=BIT},
       </if>
+      <if test="isSupportErc1155 != null">
+        is_support_erc1155 = #{isSupportErc1155,jdbcType=BIT},
+      </if>
+      <if test="isSupportErc1155Metadata != null">
+        is_support_erc1155_metadata = #{isSupportErc1155Metadata,jdbcType=BIT},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -392,6 +422,8 @@
       is_support_erc721 = #{isSupportErc721,jdbcType=BIT},
       is_support_erc721_enumeration = #{isSupportErc721Enumeration,jdbcType=BIT},
       is_support_erc721_metadata = #{isSupportErc721Metadata,jdbcType=BIT},
+      is_support_erc1155            = #{isSupportErc1155,jdbcType=BIT},
+      is_support_erc1155_metadata   = #{isSupportErc1155Metadata,jdbcType=BIT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
@@ -408,7 +440,8 @@
     -->
     insert into token
     (address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
-      is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, create_time, 
+      is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata,
+      is_support_erc1155,is_support_erc1155_metadata, create_time,
       update_time, token_tx_qty, holder, contract_destroy_block, contract_destroy_update
       )
     values
@@ -416,7 +449,8 @@
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
         #{item.symbol,jdbcType=VARCHAR}, #{item.totalSupply,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, 
         #{item.isSupportErc165,jdbcType=BIT}, #{item.isSupportErc20,jdbcType=BIT}, #{item.isSupportErc721,jdbcType=BIT}, 
-        #{item.isSupportErc721Enumeration,jdbcType=BIT}, #{item.isSupportErc721Metadata,jdbcType=BIT}, 
+        #{item.isSupportErc721Enumeration,jdbcType=BIT}, #{item.isSupportErc721Metadata,jdbcType=BIT},
+        #{item.isSupportErc1155,jdbcType=BIT}, #{item.isSupportErc1155Metadata,jdbcType=BIT},
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
         #{item.holder,jdbcType=INTEGER}, #{item.contractDestroyBlock,jdbcType=BIGINT}, 
         #{item.contractDestroyUpdate,jdbcType=BIT})
@@ -469,6 +503,12 @@
         </if>
         <if test="'is_support_erc721_metadata'.toString() == column.value">
           #{item.isSupportErc721Metadata,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc1155'.toString() == column.value">
+          #{item.isSupportErc1155,jdbcType=BIT}
+        </if>
+        <if test="'is_support_erc1155_metadata'.toString() == column.value">
+          #{item.isSupportErc1155Metadata,jdbcType=BIT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}

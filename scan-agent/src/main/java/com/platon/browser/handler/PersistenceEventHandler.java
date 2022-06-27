@@ -156,14 +156,16 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 map.forEach((blockNum, transactions) -> {
                     IntSummaryStatistics erc20Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc20TxList().size()));
                     IntSummaryStatistics erc721Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc721TxList().size()));
+                    IntSummaryStatistics erc1155Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc1155TxList().size()));
                     IntSummaryStatistics transferTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getTransferTxList().size()));
                     IntSummaryStatistics pposTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getPposTxList().size()));
                     IntSummaryStatistics virtualTransactionSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getVirtualTransactions().size()));
-                    log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
+                    log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],erc1155交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
                              blockNum,
                              CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
                              erc20Size.getSum(),
                              erc721Size.getSum(),
+                             erc1155Size.getSum(),
                              transferTxSize.getSum(),
                              pposTxSize.getSum(),
                              virtualTransactionSize.getSum());
