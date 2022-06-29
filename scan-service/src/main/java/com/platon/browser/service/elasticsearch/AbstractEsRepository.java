@@ -208,7 +208,7 @@ public abstract class AbstractEsRepository {
         if (this.existsIndex()) {
             this.deleteIndex();
         }
-        Map<String, Object> setting = new HashMap(3);
+        Map<String, Object> setting = new HashMap();
         // 查询的返回数量，默认是10000
         setting.put("max_result_window", 2000000000);
         // 主碎片的数量
@@ -313,8 +313,7 @@ public abstract class AbstractEsRepository {
      *
      * @throws IOException
      */
-    public <T> ESResult<T> search(Map<String, Object> filter, Class<T> clazz, List<ESSortDto> esSortDtos, int pageNo,
-                                  int pageSize) throws IOException {
+    public <T> ESResult<T> search(Map<String, Object> filter, Class<T> clazz, List<ESSortDto> esSortDtos, int pageNo, int pageSize) throws IOException {
         long startTime = System.currentTimeMillis();
 
         if (pageNo <= 0) {
@@ -349,8 +348,7 @@ public abstract class AbstractEsRepository {
      *
      * @throws IOException
      */
-    public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz, int pageNo,
-                                  int pageSize) throws IOException {
+    public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz, int pageNo, int pageSize) throws IOException {
         long startTime = System.currentTimeMillis();
 
         if (pageNo <= 0) {

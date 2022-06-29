@@ -8,6 +8,12 @@ alter table token add column   `is_support_erc1155_metadata`   tinyint(1)  NOT N
 
 alter table tx_bak add column `erc1155_tx_info`  longtext COMMENT 'erc1155交易列表信息' after  `info` ;
 
+alter table token_holder add column `token_id`  varchar(128) NOT NULL COMMENT 'ERC721, ERC1155的tokenId';
+
+alter table tx_erc_20_bak add column `token_id`  varchar(255) NOT NULL COMMENT 'tokenId';
+
+alter table tx_erc_721_bak add column `token_id`  varchar(255) NOT NULL COMMENT 'tokenId';
+
 DROP TABLE IF EXISTS `token_1155_inventory`;
 CREATE TABLE `token_1155_inventory`
 (
