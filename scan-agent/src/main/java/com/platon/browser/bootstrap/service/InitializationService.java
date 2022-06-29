@@ -319,7 +319,6 @@ public class InitializationService {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     private void initEs() {

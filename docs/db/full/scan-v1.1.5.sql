@@ -542,6 +542,7 @@ CREATE TABLE `tx_erc_20_bak`
     `from_type` int(1)       NOT NULL COMMENT '发送方类型',
     `to`        varchar(42)  NOT NULL COMMENT 'to地址',
     `to_type`   int(1)       NOT NULL COMMENT '接收方类型',
+    `token_id`  varchar(255) NOT NULL COMMENT 'tokenId',
     `value`     varchar(255) NOT NULL COMMENT '交易value',
     `bn`        bigint(20)   DEFAULT NULL COMMENT '区块高度',
     `b_time`    datetime     DEFAULT NULL COMMENT '区块时间',

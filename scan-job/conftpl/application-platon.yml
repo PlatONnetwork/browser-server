@@ -26,6 +26,7 @@ spring:
       transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+      erc1155TxIndexName: ${platon.es-namespace}_erc1155_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
@@ -104,26 +105,11 @@ logging:
   level:
     org.springframework: error
     com.platon.browser.task: debug
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-  logback:
-    rollingpolicy:
-      # 日志文件大小上限，达到该上限后，会自动压缩
-      max-file-size: 200MB
-      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
-      file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
-      # 日志文件保存的天数
-      max-history: 90
-      # 是否在应用启动时进行归档管理
-      clean-history-on-start: true
 xxl:
   job:
     admin:
       #调度中心部署跟地址
-      addresses: http://192.168.120.144:18080/xxl-job-admin
+      addresses: http://10.0.0.34:8060/xxl-job-admin
     #调度中心通讯TOKEN
     accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
     #调度中心日志文件保存天数
@@ -131,9 +117,14 @@ xxl:
     executor:
       #执行器AppName
       appname: platon-scan-job
+      ip: 192.168.21.114
       #执行器端口号
       port: 9997
       #执行器运行日志文件存储磁盘路径
       logpath: ./logs/jobhandler
       #执行器日志文件保存天数
       logretentiondays: 90
+apollo:
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: false

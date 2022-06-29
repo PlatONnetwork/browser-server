@@ -31,6 +31,8 @@ spring:
       erc20Tx: ${platon.redis-namespace}:erc20Tx
       #erc721交易
       erc721Tx: ${platon.redis-namespace}:erc721Tx
+      #erc1155交易
+      erc1155Tx: ${platon.redis-namespace}:erc1155Tx
   #ES索引配置
   elasticsearch:
     high-level-client:
@@ -48,12 +50,13 @@ spring:
       transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+      erc1155TxIndexName: ${platon.es-namespace}_erc1155_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
-profile: platon
+profile: platonhyp
 # 密码加密配置
 jasypt:
   encryptor:
@@ -91,21 +94,6 @@ logging:
     com.platon.browser.persistence.handler: info
     com.platon.browser.persistence.queue.handler: info
     com.platon.browser.task: info
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-  logback:
-    rollingpolicy:
-      # 日志文件大小上限，达到该上限后，会自动压缩
-      max-file-size: 200MB
-      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
-      file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
-      # 日志文件保存的天数
-      max-history: 90
-      # 是否在应用启动时进行归档管理
-      clean-history-on-start: true
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -118,7 +106,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.120.151:7789,192.168.120.151:7790
+    addresses: 192.168.9.139:7789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -197,10 +185,15 @@ xxl:
     logretentiondays: 90
     executor:
       #执行器AppName
-      appname: platon-scan-agent
+      appname: platonhyp-scan-agent
+      ip: 192.168.21.140
       #执行器端口号
       port: 9999
       #执行器运行日志文件存储磁盘路径
       logpath: ./logs/jobhandler
       #执行器日志文件保存天数
       logretentiondays: 90
+apollo:
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: false

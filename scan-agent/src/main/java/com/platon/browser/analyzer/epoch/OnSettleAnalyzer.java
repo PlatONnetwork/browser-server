@@ -72,12 +72,12 @@ public class OnSettleAnalyzer {
         }
 
         Settle settle = Settle.builder()
-                .preVerifierSet(preVerifierMap.keySet())
-                .curVerifierSet(curVerifierMap.keySet())
-                .stakingReward(event.getEpochMessage().getStakeReward())
-                .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
-                .build();
+                              .preVerifierSet(preVerifierMap.keySet())
+                              .curVerifierSet(curVerifierMap.keySet())
+                              .stakingReward(event.getEpochMessage().getStakeReward())
+                              .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                              .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
+                              .build();
 
         List<Integer> statusList = new ArrayList<>();
         statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
@@ -208,9 +208,7 @@ public class OnSettleAnalyzer {
      */
     private void updateStakingRewardValue(long blockNum, BigInteger epoch, Set<String> preVerifierSet, BigDecimal stakingRewardValue) {
         if (CollUtil.isNotEmpty(preVerifierSet)) {
-            StakingExample example = new StakingExample();
-            example.createCriteria().andNodeIdIn(new ArrayList<>(preVerifierSet));
-            List<Staking> stakings = stakingMapper.selectByExampleWithBLOBs(example);
+            List<Staking> stakings = epochBusinessMapper.findStaking(new ArrayList<>(preVerifierSet));
             List<Staking> updateStakingList = new ArrayList<>();
             for (Staking staking : stakings) {
                 Staking updateStaking = new Staking();
@@ -220,12 +218,12 @@ public class OnSettleAnalyzer {
                 updateStakingList.add(updateStaking);
                 // MySQL数据库会四舍五入取整
                 log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
-                        blockNum,
-                        epoch,
-                        staking.getNodeId(),
-                        staking.getStakingRewardValue().add(updateStaking.getStakingRewardValue()).setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(),
-                        staking.getStakingRewardValue().toPlainString(),
-                        updateStaking.getStakingRewardValue().toPlainString());
+                         blockNum,
+                         epoch,
+                         staking.getNodeId(),
+                         staking.getStakingRewardValue().add(updateStaking.getStakingRewardValue()).setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(),
+                         staking.getStakingRewardValue().toPlainString(),
+                         updateStaking.getStakingRewardValue().toPlainString());
             }
             epochBusinessMapper.settleForStakingValue(updateStakingList);
         }
@@ -260,7 +258,7 @@ public class OnSettleAnalyzer {
         // 如果当前节点在下一轮结算周期还是验证人,则记录下一轮结算周期的质押成本
         // 计算当前质押成本 成本暂时不需要委托
         curSettleCost = staking.getStakingLocked() // 锁定的质押金
-                .add(staking.getStakingHes()); // 犹豫期的质押金
+                               .add(staking.getStakingHes()); // 犹豫期的质押金
 //                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
 //                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
 
@@ -282,9 +280,9 @@ public class OnSettleAnalyzer {
         if (settle.getPreVerifierSet().contains(staking.getNodeId())) {
             // 如果当前节点在前一轮结算周期，则计算真实收益
             curSettleStakeProfit = staking.getStakingRewardValue() // 质押奖励
-                    .add(staking.getBlockRewardValue()) // + 出块奖励
-                    .add(staking.getFeeRewardValue()) // + 手续费奖励
-                    .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
+                                          .add(staking.getBlockRewardValue()) // + 出块奖励
+                                          .add(staking.getFeeRewardValue()) // + 手续费奖励
+                                          .subtract(staking.getTotalDeleReward()); // - 当前结算周期的委托奖励总和
         }
         // 轮换质押收益信息，把当前节点在上一周期的收益放入轮换信息里
         CalculateUtils.rotateProfit(ari.getStakeProfit(), curSettleStakeProfit, BigInteger.valueOf(settle.getSettingEpoch() - 1L), chainConfig);
@@ -377,9 +375,9 @@ public class OnSettleAnalyzer {
      */
     private void recoverLog(Staking staking, int settingEpoch, Block block, List<NodeOpt> nodeOpts) {
         String desc = NodeOpt.TypeEnum.UNLOCKED.getTpl()
-                .replace("LOCKED_EPOCH", staking.getZeroProduceFreezeEpoch().toString())
-                .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
-                .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
+                                               .replace("LOCKED_EPOCH", staking.getZeroProduceFreezeEpoch().toString())
+                                               .replace("UNLOCKED_EPOCH", String.valueOf(settingEpoch))
+                                               .replace("FREEZE_DURATION", staking.getZeroProduceFreezeDuration().toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(staking.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.UNLOCKED.getCode()));
