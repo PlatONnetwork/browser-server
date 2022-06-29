@@ -1,4 +1,8 @@
-alter table address add column `erc1155_tx_qty`        int(11)        NOT NULL DEFAULT '0' COMMENT 'erc1155 token对应的交易数' after `proposal_qty`;
+
+
+alter table tx_erc_721_bak add column  `token_id`  varchar(255) NOT NULL COMMENT 'tokenId' after `to_type`;
+
+alter table address add column `erc1155_tx_qty`  int(11)   NOT NULL DEFAULT '0' COMMENT 'erc1155 token对应的交易数' after `proposal_qty`;
 
 alter table network_stat add column  `erc1155_tx_qty`           int(11)          NOT NULL DEFAULT '0' COMMENT 'erc1155 token对应的交易数' after  `avg_pack_time`;
 
