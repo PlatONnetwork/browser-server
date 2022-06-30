@@ -27,6 +27,10 @@ public class Token {
 
     private Boolean isSupportErc721Metadata;
 
+    private Boolean isSupportErc1155;
+
+    private Boolean isSupportErc1155Metadata;
+
     private Date createTime;
 
     private Date updateTime;
@@ -127,6 +131,22 @@ public class Token {
         this.isSupportErc721Metadata = isSupportErc721Metadata;
     }
 
+    public Boolean getIsSupportErc1155() {
+        return isSupportErc1155;
+    }
+
+    public void setIsSupportErc1155(Boolean isSupportErc1155) {
+        this.isSupportErc1155 = isSupportErc1155;
+    }
+
+    public Boolean getIsSupportErc1155Metadata() {
+        return isSupportErc1155Metadata;
+    }
+
+    public void setIsSupportErc1155Metadata(Boolean isSupportErc1155Metadata) {
+        this.isSupportErc1155Metadata = isSupportErc1155Metadata;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -194,6 +214,8 @@ public class Token {
         isSupportErc721("is_support_erc721", "isSupportErc721", "BIT", false),
         isSupportErc721Enumeration("is_support_erc721_enumeration", "isSupportErc721Enumeration", "BIT", false),
         isSupportErc721Metadata("is_support_erc721_metadata", "isSupportErc721Metadata", "BIT", false),
+        isSupportErc1155("is_support_erc1155", "isSupportErc1155", "BIT", false),
+        isSupportErc1155Metadata("is_support_erc1155_metadata", "isSupportErc1155Metadata", "BIT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         tokenTxQty("token_tx_qty", "tokenTxQty", "INTEGER", false),

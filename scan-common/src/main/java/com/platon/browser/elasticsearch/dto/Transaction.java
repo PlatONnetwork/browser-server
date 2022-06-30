@@ -58,6 +58,8 @@ public class Transaction {
 
     private String info;
 
+    private String erc1155TxInfo; // 存储基本信息的json数组串，来自erc1155TxList
+
     private String erc721TxInfo; // 存储基本信息的json数组串，来自erc721TxList
 
     private String erc20TxInfo; // 存储基本信息的json数组串，来自erc20TxList
@@ -75,6 +77,10 @@ public class Transaction {
     private String bin;
 
     private String contractAddress;
+
+    // erc1155交易列表
+    @JSONField(serialize = false)
+    private List<ErcTx> erc1155TxList = new ArrayList<>();
 
     // erc721交易列表
     @JSONField(serialize = false)
@@ -162,6 +168,14 @@ public class Transaction {
          * 9-ERC721合约调用(合约执行)
          */
         ERC721_CONTRACT_EXEC(9, "ERC721合约调用(合约执行)"),
+        /**
+         * 10-ERC1155合约发布(合约创建)
+         */
+        ERC1155_CONTRACT_CREATE(10, "ERC1155合约发布(合约创建)"),
+        /**
+         * 11-ERC1155合约调用(合约执行)
+         */
+        ERC1155_CONTRACT_EXEC(11, "ERC1155合约调用(合约执行)"),
         /**
          * 1000-发起质押(创建验证人)
          */
@@ -303,7 +317,8 @@ public class Transaction {
         EVM_CONTRACT(3, "EVM合约"),
         WASM_CONTRACT(4, "WASM合约"),
         ERC20_CONTRACT(5, "ERC20-EVM合约"),
-        ERC721_CONTRACT(6, "ERC721-EVM合约");
+        ERC721_CONTRACT(6, "ERC721-EVM合约"),
+        ERC1155_CONTRACT(7, "ERC1155-EVM合约");
 
         private int code;
 

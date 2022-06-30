@@ -43,6 +43,13 @@ public class QueryDetailResp {
 
     private Integer erc721TxQty; // token erc 721交易总数
 
+    /**
+     * 是否是erc1155
+     */
+    private boolean hasErc1155 = false;
+
+    private Integer erc1155TxQty; // token erc 1155交易总数
+
     private Integer transferQty;         //转账交易总数
 
     private Integer delegateQty;         //委托交易总数
@@ -330,6 +337,22 @@ public class QueryDetailResp {
 
     public void setHasErc721(boolean hasErc721) {
         this.hasErc721 = hasErc721;
+    }
+
+    public boolean isHasErc1155() {
+        return hasErc1155;
+    }
+
+    public void setHasErc1155(boolean hasErc1155) {
+        this.hasErc1155 = hasErc1155;
+    }
+
+    public Integer getErc1155TxQty() {
+        return erc1155TxQty;
+    }
+
+    public void setErc1155TxQty(Integer erc1155TxQty) {
+        this.erc1155TxQty = erc1155TxQty;
     }
 
     public String getTokenSymbol() {

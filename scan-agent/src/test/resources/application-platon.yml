@@ -31,6 +31,8 @@ spring:
       erc20Tx: ${platon.redis-namespace}:erc20Tx
       #erc721交易
       erc721Tx: ${platon.redis-namespace}:erc721Tx
+      #erc1155交易
+      erc1155Tx: ${platon.redis-namespace}:erc1155Tx
   #ES索引配置
   elasticsearch:
     high-level-client:
@@ -48,6 +50,7 @@ spring:
       transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+      erc1155TxIndexName: ${platon.es-namespace}_erc1155_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml

@@ -12,7 +12,8 @@ public enum ESKeyEnum {
     NodeOpt("NodeOpt"),
     DelegateReward("DelegateReward"),
     Erc20Tx("Erc20Tx"),
-    Erc721Tx("Erc721Tx");
+    Erc721Tx("Erc721Tx"),
+    Erc1155Tx("Erc1155Tx");
 
     private String key;
 

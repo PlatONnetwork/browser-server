@@ -66,6 +66,11 @@ mappings:
       index: false
       type: text
       doc_values: false
+    erc1155TxInfo:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
     erc721TxInfo:
       norms: false
       index: false
