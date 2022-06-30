@@ -56,7 +56,7 @@ mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
-profile: platonhyp
+profile: platon
 # 密码加密配置
 jasypt:
   encryptor:
@@ -185,8 +185,8 @@ xxl:
     logretentiondays: 90
     executor:
       #执行器AppName
-      appname: platonhyp-scan-agent
-      ip: 192.168.21.140
+      appname: platon-scan-agent
+      ip: 192.168.21.114
       #执行器端口号
       port: 9999
       #执行器运行日志文件存储磁盘路径

@@ -118,8 +118,8 @@ xxl:
     logretentiondays: 90
     executor:
       #执行器AppName
-      appname: platonhyp-scan-job
-      ip: 192.168.21.140
+      appname: platon-scan-job
+      ip: 192.168.21.114
       #执行器端口号
       port: 9997
       #执行器运行日志文件存储磁盘路径

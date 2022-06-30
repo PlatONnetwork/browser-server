@@ -23,10 +23,10 @@ mappings:
       type: keyword
     to:
       type: keyword
+    value:
+      type: keyword
     tokenId:
       type: keyword
-    value:
-      type: text
     bn:
       type: long
     bTime:

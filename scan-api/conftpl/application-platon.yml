@@ -81,7 +81,7 @@ mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
-profile: platonhyp
+profile: platon
 # 密码加密配置
 jasypt:
   encryptor:
@@ -106,11 +106,6 @@ logging:
     com.platon.browser.task: info
     com.platon.browser.client: info
     com.platon.browser.dao: info
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -171,3 +166,7 @@ limit:
 output:
   file:
     url: /var/tmp
+apollo:
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: false

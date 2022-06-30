@@ -23,8 +23,6 @@ mappings:
       type: keyword
     to:
       type: keyword
-    tokenId:
-      type: keyword
     value:
       type: keyword
     bn:

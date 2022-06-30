@@ -25,6 +25,8 @@ mappings:
       type: keyword
     value:
       type: keyword
+    tokenId:
+      type: keyword
     bn:
       type: long
     bTime:
