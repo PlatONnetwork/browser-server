@@ -17,4 +17,8 @@ logging:
       clean-history-on-start: true
 spring:
   profiles:
-    active: platon
+    active: apollo
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}

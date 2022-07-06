@@ -11,7 +11,7 @@ spring:
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #Redis键配置
   redis:
-    password: platscan
+    password: ENC(D4K/Kxv2c2MT7FaaT+ZHQswHs8KvRm6N)
     database: 0
     cluster:
       max-redirects: 3
@@ -39,8 +39,8 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      username: elastic
-      password: changeme
+      username: ENC(VME69JEYLfmUXi3KuDQTWA==)
+      password: ENC(A6E/VrNrulxXUK7GSjlmiN7NqxZV5P6o)
     index:
       blockIndexName: ${platon.es-namespace}_block
       transactionIndexName: ${platon.es-namespace}_transaction
@@ -57,10 +57,6 @@ mybatis:
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
 profile: platon
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
@@ -109,7 +105,7 @@ platon:
     addresses: 192.168.9.139:7789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
-  #PlatON初始总发行量(ATP)
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
@@ -129,7 +125,7 @@ platon:
     '8':15044304.00000000,
     '9':7615018.00000000
   }
-  # 初始内置节点默认质押金额(ATP)
+  # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 150000
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
@@ -180,7 +176,7 @@ xxl:
       #调度中心部署跟地址
       addresses: http://10.0.0.34:8060/xxl-job-admin
     #调度中心通讯TOKEN
-    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    accessToken: ENC(IZf5O7X2oiVstkwHNZUxEhPzDKInPh0TexHqj7b4YY39c10DzZaDqqQYWoSw8l2q)
     #调度中心日志文件保存天数
     logretentiondays: 90
     executor:

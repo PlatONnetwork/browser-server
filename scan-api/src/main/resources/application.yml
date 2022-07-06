@@ -18,3 +18,7 @@ logging:
 spring:
   profiles:
     active: platon
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}

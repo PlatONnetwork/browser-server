@@ -37,7 +37,7 @@ spring:
     maxPoolPreparedStatementPerConnectionSize: 100
   #Redis键配置
   redis:
-    password: platscan
+    password: ENC(D4K/Kxv2c2MT7FaaT+ZHQswHs8KvRm6N)
     cluster:
       max-redirects: 3
       nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
@@ -64,8 +64,8 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      username: elastic
-      password: changeme
+      username: ENC(VME69JEYLfmUXi3KuDQTWA==)
+      password: ENC(A6E/VrNrulxXUK7GSjlmiN7NqxZV5P6o)
     index:
       blockIndexName: ${platon.es-namespace}_block
       transactionIndexName: ${platon.es-namespace}_transaction
@@ -82,10 +82,6 @@ mybatis:
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
 profile: platon
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #性能配置
 server:
   port: 40010

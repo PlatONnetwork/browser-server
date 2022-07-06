@@ -70,12 +70,12 @@ public abstract class AbstractEsRepository {
 
     private String getTplJson() {
         String tplName = getTemplateFileName() + TPL_FILE_SUFFIX;
-        log.info("template file:{}", tplName);
+        log.debug("template file:{}", tplName);
         try {
             Yaml yaml = new Yaml();
             Object result = yaml.load(AbstractEsRepository.class.getResourceAsStream(CLASSPATH_ES_TPL_DIR + tplName));
             String json = JSON.toJSONString(result, true);
-            log.info("template json:{}", json);
+            log.debug("template json:{}", json);
             return json;
         } catch (Exception e) {
             log.warn("解析文件{}出错：{}", tplName, e.getMessage());
@@ -206,7 +206,8 @@ public abstract class AbstractEsRepository {
      */
     public boolean initIndex() throws IOException {
         if (this.existsIndex()) {
-            this.deleteIndex();
+            log.info("索引[{}]已存在", getIndexName());
+            return true;
         }
         Map<String, Object> setting = new HashMap();
         // 查询的返回数量，默认是10000
@@ -216,6 +217,7 @@ public abstract class AbstractEsRepository {
         // 副本每个主碎片的数量
         setting.put("number_of_replicas", 1);
         this.createIndex(setting, null);
+        log.info("索引[{}]创建完成", getIndexName());
         return true;
     }
 

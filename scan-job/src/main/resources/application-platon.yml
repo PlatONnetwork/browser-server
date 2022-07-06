@@ -6,7 +6,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #ES索引配置
@@ -15,8 +15,8 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      username: elastic
-      password: changeme
+      username: ENC(VME69JEYLfmUXi3KuDQTWA==)
+      password: ENC(A6E/VrNrulxXUK7GSjlmiN7NqxZV5P6o)
     index:
       blockIndexName: ${platon.es-namespace}_block
       transactionIndexName: ${platon.es-namespace}_transaction
@@ -33,11 +33,7 @@ mybatis:
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
 # 当前激活的配置名称(请不要修改)
-profile: platonhyp
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+profile: platon
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -50,7 +46,7 @@ platon:
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.9.139:7789
+    addresses: 192.168.120.151:7789,192.168.120.151:7790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(ATP)
@@ -94,8 +90,6 @@ platon:
       pageCount: 250
   #Es索引命名空间
   es-namespace: browser_${profile}
-  #token_inventory表重试次数
-  token-retry-num: 3
 task:
   #允许更新的最大地址数量
   maxAddressCount: 5004
@@ -113,7 +107,7 @@ xxl:
       #调度中心部署跟地址
       addresses: http://10.0.0.34:8060/xxl-job-admin
     #调度中心通讯TOKEN
-    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    accessToken: ENC(IZf5O7X2oiVstkwHNZUxEhPzDKInPh0TexHqj7b4YY39c10DzZaDqqQYWoSw8l2q)
     #调度中心日志文件保存天数
     logretentiondays: 90
     executor:
