@@ -113,7 +113,7 @@ platon:
   incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
     '1':62215742.00000000,
     '2':55965742.00000000,

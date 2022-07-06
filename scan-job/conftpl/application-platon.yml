@@ -82,7 +82,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 100
+  chainId: 210425
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
