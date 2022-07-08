@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.ES721Bean;
 import com.platon.browser.bean.ESBean;
 import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
 import com.platon.browser.service.elasticsearch.EsTransactionRepository;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
@@ -20,11 +21,15 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @EnableRetry
@@ -41,16 +46,23 @@ public class AgentApplication implements ApplicationRunner {
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
 
+    @Resource
+    protected RedisTemplate<String, String> redisTemplate;
+
     public static void main(String[] args) {
         SpringApplication.run(AgentApplication.class, args);
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        updateTransaction();
+//        updateTransaction();
         log.info("================修改es索引browser_platon_transaction完成=====================");
-        update721Transaction();
+//        update721Transaction();
         log.info("================修改es索引browser_platon_erc721_tx完成=====================");
+//        updateRedisTransaction();
+        log.info("================修改redis索引browser:platon:transactions完成=====================");
+        updateRedis721Transaction();
+        log.info("================修改redis索引browser:platon:erc721Tx完成=====================");
     }
 
 
@@ -97,10 +109,59 @@ public class AgentApplication implements ApplicationRunner {
             esBean.get_source().setSymbol("HKDID");
             esErc721TxRepository.update(esBean.get_id(), esBean.get_source());
             updateCount++;
-            Thread.sleep(200);
             log.info("[{}]该id[{}]修改成功", updateCount, esBean.get_id());
+            Thread.sleep(200);
         }
     }
 
+    public void updateRedisTransaction() {
+        try {
+            Set<ZSetOperations.TypedTuple<String>> resSet = redisTemplate.opsForZSet()
+                                                                         .reverseRangeByScoreWithScores("browser:platon:transactions", new Double("3529602100000"), new Double("3547265200000"));
+            assert resSet != null;
+            int updateCount = 0;
+            for (ZSetOperations.TypedTuple<String> item : resSet) {
+                Transaction transaction = JSONUtil.toBean(item.getValue(), Transaction.class);
+                if ("lat10lwnl9ktmeghx757yj6xrelf9gzhcwaly3q36j".equalsIgnoreCase(transaction.getTo())) {
+                    List<ErcTx> ercTxList = JSONUtil.toList(transaction.getErc721TxInfo(), ErcTx.class);
+                    for (ErcTx ercTx : ercTxList) {
+                        ercTx.setName("HashKey DID");
+                        ercTx.setSymbol("HKDID");
+                    }
+                    transaction.setErc721TxInfo(JSON.toJSONString(ercTxList));
+                    redisTemplate.opsForZSet().remove("browser:platon:transactions", item.getValue());
+                    redisTemplate.opsForZSet().add("browser:platon:transactions", JSON.toJSONString(transaction), item.getScore());
+                    updateCount++;
+                    log.info("[{}]该分数[{}]更新成功", updateCount, new BigDecimal(item.getScore()).toPlainString());
+                    Thread.sleep(200);
+                }
+            }
+        } catch (Exception e) {
+            log.error("更新redistransaction异常", e);
+        }
+    }
+
+    public void updateRedis721Transaction() {
+        try {
+            Set<ZSetOperations.TypedTuple<String>> resSet = redisTemplate.opsForZSet()
+                                                                         .reverseRangeByScoreWithScores("browser:platon:erc721Tx", new Double("3529602100000"), new Double("3547265200000"));
+            assert resSet != null;
+            int updateCount = 0;
+            for (ZSetOperations.TypedTuple<String> item : resSet) {
+                ErcTx ercTx = JSONUtil.toBean(item.getValue(), ErcTx.class);
+                if ("lat10lwnl9ktmeghx757yj6xrelf9gzhcwaly3q36j".equalsIgnoreCase(ercTx.getContract())) {
+                    ercTx.setName("HashKey DID");
+                    ercTx.setSymbol("HKDID");
+                    redisTemplate.opsForZSet().remove("browser:platon:erc721Tx", item.getValue());
+                    redisTemplate.opsForZSet().add("browser:platon:erc721Tx", JSON.toJSONString(ercTx), item.getScore());
+                    updateCount++;
+                    log.info("erc721Tx[{}]该分数[{}]更新成功", updateCount, new BigDecimal(item.getScore()).toPlainString());
+                    Thread.sleep(200);
+                }
+            }
+        } catch (Exception e) {
+            log.error("更新rediserc721Tx异常", e);
+        }
+    }
 
 }

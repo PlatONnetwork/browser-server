@@ -14,11 +14,11 @@ spring:
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #Redis配置
   redis:
-    password: platscan
+    password: 1ElkXN7ZmZWVVC
     database: 0
     cluster:
-      max-redirects: 3
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+      max-redirects: 1
+      nodes: huangyongpeng.redis.singapore.rds.aliyuncs.com:6379
   #ES配置
   elasticsearch:
     high-level-client:
