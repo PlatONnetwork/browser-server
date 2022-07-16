@@ -384,13 +384,27 @@ public class Erc1155Contract extends Contract implements ErcContract {
         List<EventValuesWithLog> valueList = extractEventParametersWithLog(TRANSFERSINGLE_EVENT, transactionReceipt);
         ArrayList<ErcTxEvent> responses = new ArrayList<>(valueList.size());
         for (EventValuesWithLog eventValues : valueList) {
+            // 不是ERC1155 标准事件
+            if (eventValues.getIndexedValues().size() != 3) {
+                continue;
+            }
+            // 不是ERC1155 标准事件
+            if (eventValues.getNonIndexedValues().size() != 2) {
+                continue;
+            }
+            // tokenId 不存在事件，说明事件不是标准的事件
+            BigInteger tokenId = (BigInteger) eventValues.getNonIndexedValues().get(0).getValue();
+            if (tokenId == null) {
+                continue;
+            }
+
             ErcTxEvent response = new ErcTxEvent();
             response.setLog(eventValues.getLog());
             response.setOperator((String) eventValues.getIndexedValues().get(0).getValue());
             response.setFrom((String) eventValues.getIndexedValues().get(1).getValue());
             response.setTo((String) eventValues.getIndexedValues().get(2).getValue());
 
-            response.setTokenId((BigInteger) eventValues.getNonIndexedValues().get(0).getValue());
+            response.setTokenId(tokenId);
             response.setValue((BigInteger) eventValues.getNonIndexedValues().get(1).getValue());
             responses.add(response);
         }
@@ -401,6 +415,16 @@ public class Erc1155Contract extends Contract implements ErcContract {
         List<EventValuesWithLog> batchValueList = extractEventParametersWithLog(TRANSFERBATCH_EVENT, transactionReceipt);
         for (EventValuesWithLog eventValues : batchValueList) {
             Log log = eventValues.getLog();
+
+            // 不是ERC1155 标准事件
+            if (eventValues.getIndexedValues().size() != 3) {
+                continue;
+            }
+            // 不是ERC1155 标准事件
+            if (eventValues.getNonIndexedValues().size() != 2) {
+                continue;
+            }
+
             String operator = (String) eventValues.getIndexedValues().get(0).getValue();
             String from = (String) eventValues.getIndexedValues().get(1).getValue();
             String to = (String) eventValues.getIndexedValues().get(2).getValue();
