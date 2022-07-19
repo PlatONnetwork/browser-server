@@ -324,6 +324,9 @@
       <if test="haveReward != null">
         #{haveReward,jdbcType=DECIMAL},
       </if>
+      <if test="erc1155TxQty != null">
+        #{erc1155TxQty,jdbcType=INTEGER},
+      </if>
       <if test="erc721TxQty != null">
         #{erc721TxQty,jdbcType=INTEGER},
       </if>
