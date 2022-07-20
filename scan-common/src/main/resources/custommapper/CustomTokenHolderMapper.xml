@@ -147,7 +147,7 @@
                     #{item.address,jdbcType=VARCHAR}
                 </if>
                 <if test="'token_id'.toString() == column.value">
-                    #{item.tokenId,jdbcType=DECIMAL}
+                    #{item.tokenId,jdbcType=VARCHAR}
                 </if>
                 <if test="'balance'.toString() == column.value">
                     #{item.balance,jdbcType=DECIMAL}
