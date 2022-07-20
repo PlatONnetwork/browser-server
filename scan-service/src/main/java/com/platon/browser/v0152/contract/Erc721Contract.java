@@ -229,7 +229,13 @@ public class Erc721Contract extends Contract implements ErcContract {
             response.setFrom((String) eventValues.getIndexedValues().get(0).getValue());
             response.setTo((String) eventValues.getIndexedValues().get(1).getValue());
             // 721 修改到token中
-            response.setTokenId((BigInteger) eventValues.getIndexedValues().get(2).getValue());
+
+            BigInteger tokenId = (BigInteger) eventValues.getIndexedValues().get(2).getValue();
+            if (tokenId == null) {
+                continue;
+            }
+
+            response.setTokenId(tokenId);
             //数量默认为1
             response.setValue(BigInteger.ONE);
             responses.add(response);
