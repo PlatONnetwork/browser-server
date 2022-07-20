@@ -183,11 +183,16 @@ public class ErcTokenUpdateTask {
                 if (CollUtil.isNotEmpty(res)) {
                     CountDownLatch latch = new CountDownLatch(res.size());
                     res.forEach(holder -> {
+                        // 如果 tokenId 为null，这个 token 还是旧的数据，说明没有转账的操作，忽略更新
+                        if (holder.getTokenId() == null) {
+                            return;
+                        }
                         HOLDER_UPDATE_POOL.submit(() -> {
                             try {
                                 // 查询余额并回填
                                 ErcToken token = CollUtil.findOne(ercTokens, ercToken -> ercToken.getAddress().equalsIgnoreCase(holder.getTokenAddress()));
                                 if (token != null) {
+                                    //
                                     BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress(), new BigInteger(holder.getTokenId()));
                                     if (ObjectUtil.isNull(holder.getBalance()) || new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
                                         log.info("token[{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]", holder.getTokenAddress(), holder.getAddress(), holder.getBalance(), balance.toString());
