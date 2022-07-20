@@ -610,7 +610,7 @@ public class ErcTxService {
                 .name(record.getName())
                 .decimal(record.getDecimal())
                 .symbol(record.getSymbol())
-                .tokenId(record.getValue())
+                .tokenId(record.getTokenId())
 //                .result(record.getResult())
                 .value(new BigDecimal(record.getValue()))
                 .blockTimestamp(record.getBTime())

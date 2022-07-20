@@ -49,7 +49,7 @@ public class ErcTokenInventoryAnalyzer {
         if (CollUtil.isNotEmpty(txList)) {
             txList.forEach(tx -> {
                 String tokenAddress = tx.getContract();
-                String tokenId = tx.getValue();
+                String tokenId = tx.getTokenId();
                 // 校验tokenid长度是否符合入库标准
                 if (CommonUtil.ofNullable(() -> tokenId.length()).orElse(0) > 128) {
                     // 仅打印日志而不能抛出异常来阻塞流程
@@ -90,7 +90,7 @@ public class ErcTokenInventoryAnalyzer {
                     // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
                     if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {
                         TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
-                        tokenInventoryKey.setTokenId(tx.getValue());
+                        tokenInventoryKey.setTokenId(tx.getTokenId());
                         tokenInventoryKey.setTokenAddress(tx.getContract());
                         delTokenInventory.add(tokenInventoryKey);
                     }
