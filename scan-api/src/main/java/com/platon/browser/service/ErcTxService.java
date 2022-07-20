@@ -401,11 +401,7 @@ public class ErcTxService {
                 } else if (ErcTypeEnum.ERC721.getDesc().equalsIgnoreCase(tokenHolder.getType())) {
                     //erc721
                     // 增加是否为 null 的判断
-                    Long holderValue =  map.get(tokenHolder.getAddress());
-                    int holderNum = 0;
-                    if (holderValue != null) {
-                        holderNum = holderValue.intValue();
-                    }
+                    int holderNum = map.get(tokenHolder.getAddress()).intValue();
                     long total = totalTokenInventory.size();
                     String percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP)
                             .multiply(BigDecimal.valueOf(100))
