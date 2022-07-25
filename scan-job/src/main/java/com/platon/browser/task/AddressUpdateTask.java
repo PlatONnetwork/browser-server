@@ -315,6 +315,7 @@ public class AddressUpdateTask {
                 addressQty.setProposalQty(addressQty.getProposalQty() + 1);
                 break;
             case REPORT:
+                addressQty.setStakingQty(addressQty.getStakingQty() + 1);
                 break;
             case RESTRICTING_CREATE:
                 break;
