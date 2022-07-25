@@ -15,8 +15,8 @@ spring:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      username: elastic
-      password: changeme
+      username: ENC(VME69JEYLfmUXi3KuDQTWA==)
+      password: ENC(A6E/VrNrulxXUK7GSjlmiN7NqxZV5P6o)
     index:
       blockIndexName: ${platon.es-namespace}_block
       transactionIndexName: ${platon.es-namespace}_transaction
@@ -33,10 +33,6 @@ mybatis:
   type-aliases-package: com.platon.browser.dao.entity
 # 当前激活的配置名称(请不要修改)
 profile: platon
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -52,7 +48,7 @@ platon:
     addresses: 192.168.120.151:7789,192.168.120.151:7790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
-  #PlatON初始总发行量(ATP)
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
@@ -60,7 +56,7 @@ platon:
   incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
     '1':62215742.00000000,
     '2':55965742.00000000,
@@ -72,7 +68,7 @@ platon:
     '8':15044304.00000000,
     '9':7615018.00000000
   }
-  # 初始内置节点默认质押金额(ATP)
+  # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 150000
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
@@ -85,7 +81,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 100
+  chainId: 210425
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
@@ -104,36 +100,26 @@ logging:
   level:
     org.springframework: error
     com.platon.browser.task: debug
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-  logback:
-    rollingpolicy:
-      # 日志文件大小上限，达到该上限后，会自动压缩
-      max-file-size: 200MB
-      # 日志归档的文件名，日志文件达到一定大小之后，自动进行压缩归档
-      file-name-pattern: ./logs/${spring.application.name}-${profile}-%d{yyyy-MM-dd}-%i.log.gz
-      # 日志文件保存的天数
-      max-history: 90
-      # 是否在应用启动时进行归档管理
-      clean-history-on-start: true
 xxl:
   job:
     admin:
       #调度中心部署跟地址
-      addresses: http://192.168.120.144:18080/xxl-job-admin
+      addresses: http://10.0.0.34:8060/xxl-job-admin
     #调度中心通讯TOKEN
-    accessToken: GOJ4hui834hGIhHIh33984dG3DER4Gh784u9dh
+    accessToken: ENC(IZf5O7X2oiVstkwHNZUxEhPzDKInPh0TexHqj7b4YY39c10DzZaDqqQYWoSw8l2q)
     #调度中心日志文件保存天数
     logretentiondays: 90
     executor:
       #执行器AppName
       appname: platon-scan-job
+      ip: 192.168.21.114
       #执行器端口号
       port: 9997
       #执行器运行日志文件存储磁盘路径
       logpath: ./logs/jobhandler
       #执行器日志文件保存天数
       logretentiondays: 90
+apollo:
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: false
