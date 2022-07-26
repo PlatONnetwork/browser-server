@@ -331,6 +331,7 @@ subprojects {
         implementation 'javax.mail:mail:1.4.7'
         implementation group: 'p6spy', name: 'p6spy', version: '3.9.0'
         implementation group: 'com.xuxueli', name: 'xxl-job-core', version: '2.3.0'
+        implementation group: 'com.ctrip.framework.apollo', name: 'apollo-client', version: '1.9.1'
 
     }
 }
