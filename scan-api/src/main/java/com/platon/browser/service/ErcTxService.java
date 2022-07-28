@@ -183,7 +183,7 @@ public class ErcTxService {
         }
 
         List<QueryTokenTransferRecordListResp> recordListResp = records.parallelStream()
-                .filter(p -> p != null && p.getDecimal() != null)
+                .filter(p -> p != null)
                 .map(p -> this.toQueryTokenTransferRecordListResp(req.getAddress(), p))
                 .collect(Collectors.toList());
         result.init(recordListResp, totalCount, displayTotalCount, totalCount / req.getPageSize() + 1);
@@ -605,7 +605,7 @@ public class ErcTxService {
                 .name(record.getName())
                 .decimal(record.getDecimal())
                 .symbol(record.getSymbol())
-                .tokenId(record.getValue())
+                .tokenId(record.getTokenId())
 //                .result(record.getResult())
                 .value(new BigDecimal(record.getValue()))
                 .blockTimestamp(record.getBTime())
@@ -617,8 +617,9 @@ public class ErcTxService {
         // Processing accuracy calculation.
         if (null != record.getValue()) {
             BigDecimal transferValue = new BigDecimal(record.getValue());
-            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
-            resp.setTransferValue(actualTransferValue);
+            //TODO 暂时1155取不到精度，后续修改
+//            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            resp.setTransferValue(transferValue);
         } else {
             resp.setTransferValue(BigDecimal.ZERO);
         }

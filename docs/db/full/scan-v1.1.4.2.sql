@@ -579,7 +579,7 @@ CREATE TABLE `tx_erc_1155_bak`
 (
     `id`        bigint(20)   NOT NULL AUTO_INCREMENT COMMENT '主键',
     `seq`       bigint(20)   NOT NULL COMMENT '序号ID',
-    `name`      varchar(64)  NOT NULL COMMENT '合约名称',
+    `name`      varchar(64)  DEFAULT NULL COMMENT '合约名称',
     `symbol`    varchar(64)  DEFAULT NULL COMMENT '单位',
     `decimal`   int(20)      DEFAULT NULL COMMENT '精度',
     `contract`  varchar(42)  NOT NULL COMMENT '合约地址',
