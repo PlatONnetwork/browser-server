@@ -8,6 +8,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
+    <result column="token_id" jdbcType="VARCHAR" property="tokenId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -68,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    token_address, address, balance, create_time, update_time, token_tx_qty
+    token_address, address, balance, create_time, update_time, token_tx_qty, token_id
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TokenHolderExample" resultMap="BaseResultMap">
     select
