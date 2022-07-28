@@ -1,6 +1,5 @@
 package com.platon.browser.analyzer.ppos;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
@@ -10,7 +9,6 @@ import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.param.ppos.ProposalVote;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.ProposalVoteParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,12 +54,12 @@ public class ProposalVoteAnalyzer extends PPOSAnalyzer<NodeOpt> {
             txParam.setPIDID(proposal.getPipId());
             txParam.setProposalType(String.valueOf(proposal.getType()));
         } catch (Exception e) {
-            log.error(StrUtil.format("查询提案[{}]异常", proposalId), e);
-            throw e;
-        }
-
-        if (ObjectUtil.isNull(proposal)) {
-            throw new BusinessException("找不到投票提案[proposalId=" + txParam.getProposalId() + "], 无法相关信息!");
+            if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) {
+                log.warn(StrUtil.format("交易[{}]失败，查询提案[{}]异常", tx.getHash(), proposalId), e);
+            } else {
+                log.error(StrUtil.format("交易[{}]成功，查询提案[{}]异常", tx.getHash(), proposalId), e);
+                throw e;
+            }
         }
 
         // 补充节点名称
