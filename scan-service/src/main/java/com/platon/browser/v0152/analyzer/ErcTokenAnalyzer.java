@@ -62,6 +62,9 @@ public class ErcTokenAnalyzer {
     private ErcTokenHolderAnalyzer ercTokenHolderAnalyzer;
 
     @Resource
+    private ErcToken1155HolderAnalyzer ercToken1155HolderAnalyzer;
+
+    @Resource
     private CustomTokenMapper customTokenMapper;
 
     @Resource
@@ -184,7 +187,7 @@ public class ErcTokenAnalyzer {
                                .txFee(tx.getCost())
                                .fromType(addressCache.getTypeData(event.getFrom()))
                                .toType(addressCache.getTypeData(event.getTo()))
-                                .operator(event.getOperator())
+                               .operator(event.getOperator())
                                .from(event.getFrom())
                                .to(event.getTo())
                                .tokenId(event.getTokenId().toString())
@@ -285,6 +288,7 @@ public class ErcTokenAnalyzer {
                             }
                             txList = resolveErcTxFromEvent(token, tx, erc20TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc20TxList().addAll(txList);
+                            ercTokenHolderAnalyzer.analyze(txList);
                             break;
                         case ERC721:
                             eventList = ercDetectService.getErc721TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
@@ -296,6 +300,7 @@ public class ErcTokenAnalyzer {
                             txList = resolveErcTxFromEvent(token, tx, erc721TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc721TxList().addAll(txList);
                             ercTokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
+                            ercTokenHolderAnalyzer.analyze(txList);
                             break;
                         case ERC1155:
                             eventList = ercDetectService.getErc1155TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
@@ -307,17 +312,20 @@ public class ErcTokenAnalyzer {
                             txList = resolveErcTxFromEvent(token, tx, erc1155TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc1155TxList().addAll(txList);
                             erc1155TokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
+                            ercToken1155HolderAnalyzer.analyze(txList);
+                            break;
+                        default:
                             break;
                     }
                     token.setUpdateTime(new Date());
                     token.setDirty(true);
-                    ercTokenHolderAnalyzer.analyze(txList);
                 } else {
                     log.error("当前交易[{}]缓存中未找到合约地址[{}]对应的Erc Token", tx.getHash(), tokenLog.getAddress());
                 }
             });
             tx.setErc20TxInfo(getErcTxInfo(tx.getErc20TxList()));
             tx.setErc721TxInfo(getErcTxInfo(tx.getErc721TxList()));
+            tx.setErc1155TxInfo(getErcTxInfo(tx.getErc1155TxList()));
             log.info("当前交易[{}]有[{}]笔log,其中token交易有[{}]笔，其中erc20有[{}]笔,其中erc721有[{}]笔,其中erc1155有[{}]笔",
                      tx.getHash(),
                      CommonUtil.ofNullable(() -> receipt.getLogs().size()).orElse(0),

@@ -17,6 +17,9 @@
                 <if test="'token_id'.toString() == column.value">
                     #{item.tokenId,jdbcType=VARCHAR}
                 </if>
+                <if test="'owner'.toString() == column.value">
+                    #{item.owner,jdbcType=VARCHAR}
+                </if>
                 <if test="'name'.toString() == column.value">
                     #{item.name,jdbcType=VARCHAR}
                 </if>
@@ -26,6 +29,9 @@
                 <if test="'image'.toString() == column.value">
                     #{item.image,jdbcType=VARCHAR}
                 </if>
+                <if test="'decimal'.toString() == column.value">
+                    #{item.decimal,jdbcType=INTEGER}
+                </if>
                 <if test="'create_time'.toString() == column.value">
                     #{item.createTime,jdbcType=TIMESTAMP}
                 </if>
@@ -34,6 +40,9 @@
                 </if>
                 <if test="'token_tx_qty'.toString() == column.value">
                     #{item.tokenTxQty,jdbcType=INTEGER}
+                </if>
+                <if test="'token_owner_tx_qty'.toString() == column.value">
+                    #{item.tokenOwnerTxQty,jdbcType=INTEGER}
                 </if>
                 <if test="'small_image'.toString() == column.value">
                     #{item.smallImage}

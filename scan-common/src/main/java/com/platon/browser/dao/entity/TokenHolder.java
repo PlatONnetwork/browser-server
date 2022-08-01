@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class TokenHolder extends TokenHolderKey {
+    private String tokenId;
 
     private String balance;
 
@@ -14,12 +15,20 @@ public class TokenHolder extends TokenHolderKey {
 
     private Integer tokenTxQty;
 
+    public String getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(String tokenId) {
+        this.tokenId = tokenId == null ? null : tokenId.trim();
+    }
+
     public String getBalance() {
         return balance;
     }
 
     public void setBalance(String balance) {
-        this.balance = balance;
+        this.balance = balance == null ? null : balance.trim();
     }
 
     public Date getCreateTime() {
@@ -203,7 +212,7 @@ public class TokenHolder extends TokenHolderKey {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column... excludes) {
+        public static Column[] excludes(Column ... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -226,5 +235,4 @@ public class TokenHolder extends TokenHolderKey {
             }
         }
     }
-
 }

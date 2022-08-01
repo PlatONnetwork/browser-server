@@ -45,7 +45,6 @@ public class ErcTokenInventoryAnalyzer {
     public void analyze(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
         List<TokenInventoryWithBLOBs> insertOrUpdate = new ArrayList<>();
         List<TokenInventoryKey> delTokenInventory = new ArrayList<>();
-        Date date = new Date();
         if (CollUtil.isNotEmpty(txList)) {
             txList.forEach(tx -> {
                 String tokenAddress = tx.getContract();
@@ -68,7 +67,6 @@ public class ErcTokenInventoryAnalyzer {
                         tokenInventory = new TokenInventoryWithBLOBs();
                         tokenInventory.setTokenAddress(tokenAddress);
                         tokenInventory.setTokenId(tokenId);
-                        tokenInventory.setCreateTime(date);
                         tokenInventory.setTokenTxQty(1);
                         tokenInventory.setRetryNum(0);
                         String tokenURI = ercServiceImpl.getTokenURI(tokenAddress, new BigInteger(tokenId), blockNumber);
@@ -85,12 +83,11 @@ public class ErcTokenInventoryAnalyzer {
                         tokenInventory.setTokenOwnerTxQty(1);
                     }
                     tokenInventory.setOwner(tx.getTo());
-                    tokenInventory.setUpdateTime(date);
                     insertOrUpdate.add(tokenInventory);
                     // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
                     if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {
                         TokenInventoryKey tokenInventoryKey = new TokenInventoryKey();
-                        tokenInventoryKey.setTokenId(tx.getValue());
+                        tokenInventoryKey.setTokenId(tx.getTokenId());
                         tokenInventoryKey.setTokenAddress(tx.getContract());
                         delTokenInventory.add(tokenInventoryKey);
                     }

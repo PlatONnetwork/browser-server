@@ -5,10 +5,12 @@ import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper;
 import com.platon.browser.dao.entity.Token1155Inventory;
 import com.platon.browser.dao.entity.Token1155InventoryExample;
+import com.platon.browser.dao.entity.Token1155InventoryKey;
 import com.platon.browser.dao.entity.Token1155InventoryWithBLOBs;
 import com.platon.browser.dao.mapper.Token1155InventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.service.erc.ErcServiceImpl;
+import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class Erc1155TokenInventoryAnalyzer {
      */
     public void analyze(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
         List<Token1155InventoryWithBLOBs> insertOrUpdate = new ArrayList<>();
-        Date date = new Date();
+        List<Token1155InventoryKey> delToken1155InventoryKey = new ArrayList<>();
         if (CollUtil.isNotEmpty(txList)) {
             txList.forEach(tx -> {
                 String tokenAddress = tx.getContract();
@@ -63,13 +64,12 @@ public class Erc1155TokenInventoryAnalyzer {
                     Token1155InventoryWithBLOBs toTokenInventory = null;
                     // 不为空,交易次数+1
                     if (CollUtil.isNotEmpty(toTokenInventoryWithBLOBs) && toTokenInventoryWithBLOBs.size() == 1) {
-                        toTokenInventory =  CollUtil.getFirst(toTokenInventoryWithBLOBs);
-                    }
-                    if (toTokenInventory == null) {
+                        toTokenInventory = CollUtil.getFirst(toTokenInventoryWithBLOBs);
+                        toTokenInventory.setTokenTxQty(toTokenInventory.getTokenTxQty() + 1);
+                    } else {
                         toTokenInventory = new Token1155InventoryWithBLOBs();
                         toTokenInventory.setTokenAddress(tokenAddress);
                         toTokenInventory.setTokenId(tokenId);
-                        toTokenInventory.setCreateTime(date);
                         toTokenInventory.setTokenTxQty(1);
                         toTokenInventory.setRetryNum(0);
                         String tokenURI = ercServiceImpl.getToken1155URI(tokenAddress, new BigInteger(tokenId), blockNumber);
@@ -78,17 +78,15 @@ public class Erc1155TokenInventoryAnalyzer {
                         } else {
                             log.warn("当前块高[{}]获取合约[{}]tokenId[{}]的tokenUrl为空，请联系管理员处理", blockNumber, tokenAddress, tokenId);
                         }
-                    } else {
-                        toTokenInventory.setTokenTxQty(toTokenInventory.getTokenTxQty() + 1);
                     }
-                    if (tx.getTo().equalsIgnoreCase(toTokenInventory.getOwner())) {
-                        int tokenOwnerTxQty = toTokenInventory.getTokenOwnerTxQty() == null ? 0 : toTokenInventory.getTokenOwnerTxQty();
-                        toTokenInventory.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
-                    } else {
-                        toTokenInventory.setTokenOwnerTxQty(1);
-                    }
-                    toTokenInventory.setUpdateTime(date);
                     insertOrUpdate.add(toTokenInventory);
+                    // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
+                    if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {
+                        Token1155InventoryKey token1155InventoryKey = new Token1155InventoryKey();
+                        token1155InventoryKey.setTokenId(tx.getTokenId());
+                        token1155InventoryKey.setTokenAddress(tx.getContract());
+                        delToken1155InventoryKey.add(token1155InventoryKey);
+                    }
                 }
             });
 
@@ -96,7 +94,10 @@ public class Erc1155TokenInventoryAnalyzer {
                 customToken1155InventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate, Token1155Inventory.Column.values());
                 log.info("当前交易[{}]添加erc1155库存[{}]笔成功", txHash, insertOrUpdate.size());
             }
-
+            if (CollUtil.isNotEmpty(delToken1155InventoryKey)) {
+                customToken1155InventoryMapper.burnAndDelTokenInventory(delToken1155InventoryKey);
+                log.info("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delToken1155InventoryKey.size());
+            }
         }
     }
 

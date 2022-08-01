@@ -3,6 +3,7 @@ package com.platon.browser.dao.custommapper;
 import com.github.pagehelper.Page;
 import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.bean.TokenHolderCount;
+import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.TokenHolder;
 import org.apache.ibatis.annotations.Param;
 
@@ -41,6 +42,8 @@ public interface CustomTokenHolderMapper {
     Page<CustomTokenHolder> findErc1155TokenHolder(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
 
     int batchInsertOrUpdateSelective(@Param("list") List<TokenHolder> list, @Param("selective") TokenHolder.Column... selective);
+
+    int batchInsertOrUpdateSelective1155(@Param("list") List<Token1155Holder> list, @Param("selective") Token1155Holder.Column... selective);
 
     /**
      * 批量更新token持有者余额

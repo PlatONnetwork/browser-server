@@ -1,6 +1,5 @@
 package com.platon.browser.dao.entity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -176,21 +175,6 @@ public class TokenHolderExample {
             return (Criteria) this;
         }
 
-        public Criteria andTokenIdIn(List<String> values) {
-            addCriterion("token_id in", values, "tokenId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenIdNotIn(List<String> values) {
-            addCriterion("token_id not in", values, "tokenId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenIdEqualTo(String value) {
-            addCriterion("token_id =", value, "tokenId");
-            return (Criteria) this;
-        }
-
         public Criteria andAddressIsNull() {
             addCriterion("address is null");
             return (Criteria) this;
@@ -261,6 +245,76 @@ public class TokenHolderExample {
             return (Criteria) this;
         }
 
+        public Criteria andTokenIdIsNull() {
+            addCriterion("token_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdIsNotNull() {
+            addCriterion("token_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdEqualTo(String value) {
+            addCriterion("token_id =", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotEqualTo(String value) {
+            addCriterion("token_id <>", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdGreaterThan(String value) {
+            addCriterion("token_id >", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdGreaterThanOrEqualTo(String value) {
+            addCriterion("token_id >=", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdLessThan(String value) {
+            addCriterion("token_id <", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdLessThanOrEqualTo(String value) {
+            addCriterion("token_id <=", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdLike(String value) {
+            addCriterion("token_id like", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotLike(String value) {
+            addCriterion("token_id not like", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdIn(List<String> values) {
+            addCriterion("token_id in", values, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotIn(List<String> values) {
+            addCriterion("token_id not in", values, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdBetween(String value1, String value2) {
+            addCriterion("token_id between", value1, value2, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotBetween(String value1, String value2) {
+            addCriterion("token_id not between", value1, value2, "tokenId");
+            return (Criteria) this;
+        }
+
         public Criteria andBalanceIsNull() {
             addCriterion("balance is null");
             return (Criteria) this;
@@ -271,52 +325,62 @@ public class TokenHolderExample {
             return (Criteria) this;
         }
 
-        public Criteria andBalanceEqualTo(BigDecimal value) {
+        public Criteria andBalanceEqualTo(String value) {
             addCriterion("balance =", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceNotEqualTo(BigDecimal value) {
+        public Criteria andBalanceNotEqualTo(String value) {
             addCriterion("balance <>", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceGreaterThan(BigDecimal value) {
+        public Criteria andBalanceGreaterThan(String value) {
             addCriterion("balance >", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceGreaterThanOrEqualTo(BigDecimal value) {
+        public Criteria andBalanceGreaterThanOrEqualTo(String value) {
             addCriterion("balance >=", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceLessThan(BigDecimal value) {
+        public Criteria andBalanceLessThan(String value) {
             addCriterion("balance <", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceLessThanOrEqualTo(BigDecimal value) {
+        public Criteria andBalanceLessThanOrEqualTo(String value) {
             addCriterion("balance <=", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceIn(List<BigDecimal> values) {
+        public Criteria andBalanceLike(String value) {
+            addCriterion("balance like", value, "balance");
+            return (Criteria) this;
+        }
+
+        public Criteria andBalanceNotLike(String value) {
+            addCriterion("balance not like", value, "balance");
+            return (Criteria) this;
+        }
+
+        public Criteria andBalanceIn(List<String> values) {
             addCriterion("balance in", values, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceNotIn(List<BigDecimal> values) {
+        public Criteria andBalanceNotIn(List<String> values) {
             addCriterion("balance not in", values, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andBalanceBetween(String value1, String value2) {
             addCriterion("balance between", value1, value2, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceNotBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andBalanceNotBetween(String value1, String value2) {
             addCriterion("balance not between", value1, value2, "balance");
             return (Criteria) this;
         }
