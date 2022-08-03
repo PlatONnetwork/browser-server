@@ -2,7 +2,6 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.Token1155HolderExample;
-import com.platon.browser.dao.entity.Token1155HolderKey;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,7 +10,7 @@ public interface Token1155HolderMapper {
 
     int deleteByExample(Token1155HolderExample example);
 
-    int deleteByPrimaryKey(Token1155HolderKey key);
+    int deleteByPrimaryKey(Long id);
 
     int insert(Token1155Holder record);
 
@@ -19,7 +18,7 @@ public interface Token1155HolderMapper {
 
     List<Token1155Holder> selectByExample(Token1155HolderExample example);
 
-    Token1155Holder selectByPrimaryKey(Token1155HolderKey key);
+    Token1155Holder selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") Token1155Holder record, @Param("example") Token1155HolderExample example);
 

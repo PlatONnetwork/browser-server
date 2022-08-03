@@ -105,6 +105,66 @@ public class Token1155HolderExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andIdIsNull() {
+            addCriterion("id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdIsNotNull() {
+            addCriterion("id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdEqualTo(Long value) {
+            addCriterion("id =", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotEqualTo(Long value) {
+            addCriterion("id <>", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdGreaterThan(Long value) {
+            addCriterion("id >", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("id >=", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdLessThan(Long value) {
+            addCriterion("id <", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdLessThanOrEqualTo(Long value) {
+            addCriterion("id <=", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdIn(List<Long> values) {
+            addCriterion("id in", values, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotIn(List<Long> values) {
+            addCriterion("id not in", values, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdBetween(Long value1, Long value2) {
+            addCriterion("id between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotBetween(Long value1, Long value2) {
+            addCriterion("id not between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
         public Criteria andTokenAddressIsNull() {
             addCriterion("token_address is null");
             return (Criteria) this;
@@ -385,6 +445,66 @@ public class Token1155HolderExample {
             return (Criteria) this;
         }
 
+        public Criteria andTokenOwnerTxQtyIsNull() {
+            addCriterion("token_owner_tx_qty is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyIsNotNull() {
+            addCriterion("token_owner_tx_qty is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyEqualTo(Integer value) {
+            addCriterion("token_owner_tx_qty =", value, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyNotEqualTo(Integer value) {
+            addCriterion("token_owner_tx_qty <>", value, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyGreaterThan(Integer value) {
+            addCriterion("token_owner_tx_qty >", value, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("token_owner_tx_qty >=", value, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyLessThan(Integer value) {
+            addCriterion("token_owner_tx_qty <", value, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyLessThanOrEqualTo(Integer value) {
+            addCriterion("token_owner_tx_qty <=", value, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyIn(List<Integer> values) {
+            addCriterion("token_owner_tx_qty in", values, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyNotIn(List<Integer> values) {
+            addCriterion("token_owner_tx_qty not in", values, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyBetween(Integer value1, Integer value2) {
+            addCriterion("token_owner_tx_qty between", value1, value2, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenOwnerTxQtyNotBetween(Integer value1, Integer value2) {
+            addCriterion("token_owner_tx_qty not between", value1, value2, "tokenOwnerTxQty");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
@@ -502,66 +622,6 @@ public class Token1155HolderExample {
 
         public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
             addCriterion("update_time not between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyIsNull() {
-            addCriterion("token_owner_tx_qty is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyIsNotNull() {
-            addCriterion("token_owner_tx_qty is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyEqualTo(Integer value) {
-            addCriterion("token_owner_tx_qty =", value, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyNotEqualTo(Integer value) {
-            addCriterion("token_owner_tx_qty <>", value, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyGreaterThan(Integer value) {
-            addCriterion("token_owner_tx_qty >", value, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("token_owner_tx_qty >=", value, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyLessThan(Integer value) {
-            addCriterion("token_owner_tx_qty <", value, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyLessThanOrEqualTo(Integer value) {
-            addCriterion("token_owner_tx_qty <=", value, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyIn(List<Integer> values) {
-            addCriterion("token_owner_tx_qty in", values, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyNotIn(List<Integer> values) {
-            addCriterion("token_owner_tx_qty not in", values, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyBetween(Integer value1, Integer value2) {
-            addCriterion("token_owner_tx_qty between", value1, value2, "tokenOwnerTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenOwnerTxQtyNotBetween(Integer value1, Integer value2) {
-            addCriterion("token_owner_tx_qty not between", value1, value2, "tokenOwnerTxQty");
             return (Criteria) this;
         }
     }

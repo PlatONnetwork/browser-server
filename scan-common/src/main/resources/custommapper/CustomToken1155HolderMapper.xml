@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.CustomToken1155HolderMapper">
+    <select id="selectByUK" resultType="com.platon.browser.dao.entity.Token1155Holder">
+        select id,
+               token_address      as tokenAddress,
+               token_id           as tokenId,
+               address,
+               balance,
+               create_time        as createTime,
+               update_time        as updateTime,
+               token_owner_tx_qty as tokenOwnerTxQty
+        from token_1155_holder
+        where token_address = #{token1155HolderKey.tokenAddress,jdbcType=VARCHAR}
+          and token_id = #{token1155HolderKey.tokenId,jdbcType=VARCHAR}
+          and address = #{token1155HolderKey.address,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="batchInsertOrUpdateSelective1155" parameterType="map">
+        replace into token_1155_holder (
+        <foreach collection="selective" item="column" separator=",">
+            ${column.escapedColumnName}
+        </foreach>
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            <foreach collection="selective" item="column" separator=",">
+                <if test="'token_address'.toString() == column.value">
+                    #{item.tokenAddress,jdbcType=VARCHAR}
+                </if>
+                <if test="'address'.toString() == column.value">
+                    #{item.address,jdbcType=VARCHAR}
+                </if>
+                <if test="'token_id'.toString() == column.value">
+                    #{item.tokenId,jdbcType=VARCHAR}
+                </if>
+                <if test="'balance'.toString() == column.value">
+                    #{item.balance,jdbcType=DECIMAL}
+                </if>
+                <if test="'create_time'.toString() == column.value">
+                    #{item.createTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'update_time'.toString() == column.value">
+                    #{item.updateTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'token_tx_qty'.toString() == column.value">
+                    #{item.tokenTxQty,jdbcType=INTEGER}
+                </if>
+                <if test="'token_owner_tx_qty'.toString() == column.value">
+                    #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+                </if>
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate">
+        <foreach collection="list" item="item" separator=";">
+            update token_1155_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and token_id=#{item.tokenId} and address=#{item.address}
+        </foreach>
+    </update>
+
+    <select id="findDestroyContract" parameterType="integer" resultType="com.platon.browser.bean.Erc1155ContractDestroyBean">
+        select
+        t1.address as tokenAddress ,
+        t1.contract_destroy_block as contractDestroyBlock ,
+        t2.address,
+        t2.token_id AS tokenId
+        from
+        token t1
+        left join token_1155_holder t2 on
+        t1.address = t2.token_address
+        where
+        t1.contract_destroy_block is not null
+        and t1.contract_destroy_block > 0
+        and t1.contract_destroy_update = 0
+        <if test="type != null">
+            and t1.type = #{type}
+        </if>
+    </select>
+
+</mapper>

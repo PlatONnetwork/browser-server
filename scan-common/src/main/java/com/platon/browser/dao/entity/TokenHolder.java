@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class TokenHolder extends TokenHolderKey {
-    private String tokenId;
-
     private String balance;
 
     private Date createTime;
@@ -14,14 +12,6 @@ public class TokenHolder extends TokenHolderKey {
     private Date updateTime;
 
     private Integer tokenTxQty;
-
-    public String getTokenId() {
-        return tokenId;
-    }
-
-    public void setTokenId(String tokenId) {
-        this.tokenId = tokenId == null ? null : tokenId.trim();
-    }
 
     public String getBalance() {
         return balance;
@@ -65,7 +55,6 @@ public class TokenHolder extends TokenHolderKey {
     public enum Column {
         tokenAddress("token_address", "tokenAddress", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
-        tokenId("token_id", "tokenId", "VARCHAR", false),
         balance("balance", "balance", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),

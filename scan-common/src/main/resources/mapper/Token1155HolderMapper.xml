@@ -2,13 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.Token1155HolderMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Token1155Holder">
-    <id column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
-    <id column="token_id" jdbcType="VARCHAR" property="tokenId" />
-    <id column="address" jdbcType="VARCHAR" property="address" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="token_address" jdbcType="VARCHAR" property="tokenAddress" />
+    <result column="token_id" jdbcType="VARCHAR" property="tokenId" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
     <result column="balance" jdbcType="VARCHAR" property="balance" />
+    <result column="token_owner_tx_qty" jdbcType="INTEGER" property="tokenOwnerTxQty" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="token_owner_tx_qty" jdbcType="INTEGER" property="tokenOwnerTxQty" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    token_address, token_id, address, balance, create_time, update_time, token_owner_tx_qty
+    id, token_address, token_id, address, balance, token_owner_tx_qty, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.Token1155HolderExample" resultMap="BaseResultMap">
     select
@@ -85,19 +86,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.Token1155HolderKey" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from token_1155_holder
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
-      and address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.Token1155HolderKey">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from token_1155_holder
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
-      and address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.Token1155HolderExample">
     delete from token_1155_holder
@@ -106,16 +103,19 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Token1155Holder">
-    insert into token_1155_holder (token_address, token_id, address, 
-      balance, create_time, update_time, 
-      token_owner_tx_qty)
-    values (#{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
-      #{balance,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{tokenOwnerTxQty,jdbcType=INTEGER})
+    insert into token_1155_holder (id, token_address, token_id, 
+      address, balance, token_owner_tx_qty, 
+      create_time, update_time)
+    values (#{id,jdbcType=BIGINT}, #{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{balance,jdbcType=VARCHAR}, #{tokenOwnerTxQty,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Token1155Holder">
     insert into token_1155_holder
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
       <if test="tokenAddress != null">
         token_address,
       </if>
@@ -128,17 +128,20 @@
       <if test="balance != null">
         balance,
       </if>
+      <if test="tokenOwnerTxQty != null">
+        token_owner_tx_qty,
+      </if>
       <if test="createTime != null">
         create_time,
       </if>
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="tokenOwnerTxQty != null">
-        token_owner_tx_qty,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
       <if test="tokenAddress != null">
         #{tokenAddress,jdbcType=VARCHAR},
       </if>
@@ -151,14 +154,14 @@
       <if test="balance != null">
         #{balance,jdbcType=VARCHAR},
       </if>
+      <if test="tokenOwnerTxQty != null">
+        #{tokenOwnerTxQty,jdbcType=INTEGER},
+      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="tokenOwnerTxQty != null">
-        #{tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -171,6 +174,9 @@
   <update id="updateByExampleSelective" parameterType="map">
     update token_1155_holder
     <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
       <if test="record.tokenAddress != null">
         token_address = #{record.tokenAddress,jdbcType=VARCHAR},
       </if>
@@ -183,14 +189,14 @@
       <if test="record.balance != null">
         balance = #{record.balance,jdbcType=VARCHAR},
       </if>
+      <if test="record.tokenOwnerTxQty != null">
+        token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.tokenOwnerTxQty != null">
-        token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
     </set>
     <if test="_parameter != null">
@@ -199,13 +205,14 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update token_1155_holder
-    set token_address = #{record.tokenAddress,jdbcType=VARCHAR},
+    set id = #{record.id,jdbcType=BIGINT},
+      token_address = #{record.tokenAddress,jdbcType=VARCHAR},
       token_id = #{record.tokenId,jdbcType=VARCHAR},
       address = #{record.address,jdbcType=VARCHAR},
       balance = #{record.balance,jdbcType=VARCHAR},
+      token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -213,8 +220,20 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Token1155Holder">
     update token_1155_holder
     <set>
+      <if test="tokenAddress != null">
+        token_address = #{tokenAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenId != null">
+        token_id = #{tokenId,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
       <if test="balance != null">
         balance = #{balance,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenOwnerTxQty != null">
+        token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -222,23 +241,19 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="tokenOwnerTxQty != null">
-        token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
-      </if>
     </set>
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
-      and address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Token1155Holder">
     update token_1155_holder
-    set balance = #{balance,jdbcType=VARCHAR},
+    set token_address = #{tokenAddress,jdbcType=VARCHAR},
+      token_id = #{tokenId,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      balance = #{balance,jdbcType=VARCHAR},
+      token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER}
-    where token_address = #{tokenAddress,jdbcType=VARCHAR}
-      and token_id = #{tokenId,jdbcType=VARCHAR}
-      and address = #{address,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -247,13 +262,13 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into token_1155_holder
-    (token_address, token_id, address, balance, create_time, update_time, token_owner_tx_qty
-      )
+    (id, token_address, token_id, address, balance, token_owner_tx_qty, create_time, 
+      update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, 
-        #{item.balance,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.tokenOwnerTxQty,jdbcType=INTEGER})
+      (#{item.id,jdbcType=BIGINT}, #{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, 
+        #{item.address,jdbcType=VARCHAR}, #{item.balance,jdbcType=VARCHAR}, #{item.tokenOwnerTxQty,jdbcType=INTEGER}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -271,6 +286,9 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
+        <if test="'id'.toString() == column.value">
+          #{item.id,jdbcType=BIGINT}
+        </if>
         <if test="'token_address'.toString() == column.value">
           #{item.tokenAddress,jdbcType=VARCHAR}
         </if>
@@ -283,14 +301,14 @@
         <if test="'balance'.toString() == column.value">
           #{item.balance,jdbcType=VARCHAR}
         </if>
+        <if test="'token_owner_tx_qty'.toString() == column.value">
+          #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+        </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'token_owner_tx_qty'.toString() == column.value">
-          #{item.tokenOwnerTxQty,jdbcType=INTEGER}
         </if>
       </foreach>
       )

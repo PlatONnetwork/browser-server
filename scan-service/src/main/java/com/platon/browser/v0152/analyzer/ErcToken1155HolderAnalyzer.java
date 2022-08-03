@@ -1,11 +1,9 @@
 package com.platon.browser.v0152.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
+import com.platon.browser.dao.custommapper.CustomToken1155HolderMapper;
 import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.Token1155HolderKey;
-import com.platon.browser.dao.mapper.Token1155HolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +22,7 @@ import java.util.List;
 public class ErcToken1155HolderAnalyzer {
 
     @Resource
-    private Token1155HolderMapper token1155HolderMapper;
-
-    @Resource
-    private CustomTokenHolderMapper customTokenHolderMapper;
-
-    @Resource
-    private AddressCache addressCache;
+    private CustomToken1155HolderMapper customToken1155HolderMapper;
 
     private Token1155HolderKey getTokenHolderKey(String ownerAddress, ErcTx ercTx) {
         Token1155HolderKey key = new Token1155HolderKey();
@@ -51,7 +43,7 @@ public class ErcToken1155HolderAnalyzer {
             resolveTokenHolder(true, tx.getTo(), tx, insertOrUpdate);
         });
         if (CollUtil.isNotEmpty(insertOrUpdate)) {
-            customTokenHolderMapper.batchInsertOrUpdateSelective1155(insertOrUpdate, Token1155Holder.Column.values());
+            customToken1155HolderMapper.batchInsertOrUpdateSelective1155(insertOrUpdate, Token1155Holder.Column.values());
         }
     }
 
@@ -72,7 +64,7 @@ public class ErcToken1155HolderAnalyzer {
             return;
         }
         Token1155HolderKey key = getTokenHolderKey(ownerAddress, ercTx);
-        Token1155Holder tokenHolder = token1155HolderMapper.selectByPrimaryKey(key);
+        Token1155Holder tokenHolder = customToken1155HolderMapper.selectByUK(key);
         if (tokenHolder == null) {
             tokenHolder = new Token1155Holder();
             tokenHolder.setTokenAddress(key.getTokenAddress());
@@ -87,7 +79,6 @@ public class ErcToken1155HolderAnalyzer {
         } else {
             tokenHolder.setTokenOwnerTxQty(1);
         }
-        //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721, erc1155所有tokenId的交易总数
         log.info("该1155合约地址[{}][{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getTokenId(), tokenHolder.getAddress(), tokenHolder.getTokenOwnerTxQty());
         insertOrUpdate.add(tokenHolder);
     }

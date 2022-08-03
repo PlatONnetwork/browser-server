@@ -166,46 +166,6 @@
         </foreach>
     </insert>
 
-
-    <insert id="batchInsertOrUpdateSelective1155" parameterType="map">
-        replace into token_1155_holder (
-        <foreach collection="selective" item="column" separator=",">
-            ${column.escapedColumnName}
-        </foreach>
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-            (
-            <foreach collection="selective" item="column" separator=",">
-                <if test="'token_address'.toString() == column.value">
-                    #{item.tokenAddress,jdbcType=VARCHAR}
-                </if>
-                <if test="'address'.toString() == column.value">
-                    #{item.address,jdbcType=VARCHAR}
-                </if>
-                <if test="'token_id'.toString() == column.value">
-                    #{item.tokenId,jdbcType=VARCHAR}
-                </if>
-                <if test="'balance'.toString() == column.value">
-                    #{item.balance,jdbcType=DECIMAL}
-                </if>
-                <if test="'create_time'.toString() == column.value">
-                    #{item.createTime,jdbcType=TIMESTAMP}
-                </if>
-                <if test="'update_time'.toString() == column.value">
-                    #{item.updateTime,jdbcType=TIMESTAMP}
-                </if>
-                <if test="'token_tx_qty'.toString() == column.value">
-                    #{item.tokenTxQty,jdbcType=INTEGER}
-                </if>
-                <if test="'token_owner_tx_qty'.toString() == column.value">
-                    #{item.tokenOwnerTxQty,jdbcType=INTEGER}
-                </if>
-            </foreach>
-            )
-        </foreach>
-    </insert>
-
     <update id="batchUpdate">
         <foreach collection="list" item="item" separator=";">
         update token_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and address=#{item.address}

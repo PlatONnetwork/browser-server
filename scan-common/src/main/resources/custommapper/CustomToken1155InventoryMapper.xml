@@ -92,27 +92,6 @@
           and ti.token_id = #{tokenId,jdbcType=VARCHAR}
     </select>
 
-<!--    <select id="findErc1155ContractDestroyBalance" parameterType="string" resultType="com.platon.browser.bean.Erc1155ContractDestroyBalanceVO">-->
-<!--        select-->
-<!--            t2.token_address as tokenAddress ,-->
-<!--            t2.owner ,-->
-<!--            count(1) as num-->
-<!--        from-->
-<!--            (-->
-<!--                select-->
-<!--                    t1.token_address ,-->
-<!--                    t1.token_id ,-->
-<!--                    t1.owner-->
-<!--                from-->
-<!--                    token_1155_inventory t1-->
-<!--                where-->
-<!--                    t1.token_address = #{tokenAddress}-->
-<!--            ) t2-->
-<!--        group by-->
-<!--            t2.owner-->
-<!--    </select>-->
-
-
     <select id="findErc1155ContractDestroyBalance" parameterType="string" resultType="com.platon.browser.bean.Erc1155ContractDestroyBalanceVO">
         select
             t2.token_address as tokenAddress ,

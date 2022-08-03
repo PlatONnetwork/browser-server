@@ -94,7 +94,7 @@ public class ErcServiceImpl {
             ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
             ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
-        }  else if (ErcTypeEnum.ERC1155.equals(ercTypeEnum)) {
+        } else if (ErcTypeEnum.ERC1155.equals(ercTypeEnum)) {
             ercContract = Erc1155Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
         }
         return ercContract;
@@ -139,6 +139,35 @@ public class ErcServiceImpl {
             }
         } catch (Exception e) {
             log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException interruptedException) {
+                log.warn("InterruptedException异常", interruptedException);
+            }
+            throw new BusinessException("查询Token余额失败！");
+        }
+        return balance;
+    }
+
+    /**
+     * 获取历史块高的erc1155的合约余额
+     *
+     * @param tokenAddress:
+     * @param tokenId:
+     * @param account:
+     * @param blockNumber:
+     * @return: java.math.BigInteger
+     * @date: 2022/8/3
+     */
+    public BigInteger getErc1155HistoryBalance(String tokenAddress, BigInteger tokenId, String account, BigInteger blockNumber) {
+        BigInteger balance = BigInteger.ZERO;
+        try {
+            ErcContract ercContract = getErcContract(tokenAddress, ErcTypeEnum.ERC1155, blockNumber);
+            if (ObjectUtil.isNotNull(ercContract)) {
+                balance = ercContract.balanceOf(account, tokenId).send();
+            }
+        } catch (Exception e) {
+            log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},tokenId:{},account:{}", tokenAddress, tokenId, account), e);
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException interruptedException) {
@@ -225,4 +254,5 @@ public class ErcServiceImpl {
         }
         return tokenURI;
     }
+
 }
