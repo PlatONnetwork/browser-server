@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -204,6 +205,44 @@ public class ErcTokenAnalyzer {
     }
 
     /**
+     * 从交易回执的事件中解析出交易
+     *
+     * @param token:
+     * @param tx:
+     * @param eventList:
+     * @param seq:
+     * @return: java.util.List<com.platon.browser.elasticsearch.dto.ErcTx>
+     * @date: 2022/8/3
+     */
+    private List<ErcTx> resolveErc1155TxFromEvent(Token token, CollectionTransaction tx, List<ErcContract.ErcTxEvent> eventList, AtomicLong seq) {
+        List<ErcTx> txList = new ArrayList<>();
+        eventList.forEach(event -> {
+            // 转换参数进行设置内部交易
+            ErcTx ercTx = ErcTx.builder()
+                               .seq(seq.incrementAndGet())
+                               .bn(tx.getNum())
+                               .hash(tx.getHash())
+                               .bTime(tx.getTime())
+                               .txFee(tx.getCost())
+                               .fromType(addressCache.getTypeData(event.getFrom()))
+                               .toType(addressCache.getTypeData(event.getTo()))
+                               .operator(event.getOperator())
+                               .from(event.getFrom())
+                               .to(event.getTo())
+                               .tokenId(event.getTokenId().toString())
+                               .value(event.getValue().toString())
+                               .name(token.getName())
+                               .symbol(token.getSymbol())
+                               .decimal(token.getDecimal())
+                               .contract(token.getAddress())
+                               .build();
+            txList.add(ercTx);
+            addAddressCache(event.getFrom(), event.getTo());
+        });
+        return txList;
+    }
+
+    /**
      * 真实交易的from和to地址添加到地址缓存，然后入库
      *
      * @param from:
@@ -305,11 +344,7 @@ public class ErcTokenAnalyzer {
                         case ERC1155:
                             eventList = ercDetectService.getErc1155TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
                             List<ErcContract.ErcTxEvent> erc1155TxEventList = eventList.stream().filter(v -> v.getLog().equals(tokenLog)).collect(Collectors.toList());
-                            if (erc1155TxEventList.size() > 1) {
-                                log.error("当前交易[{}]erc1155交易回执日志解析异常{}", tx.getHash(), tokenLog);
-                                break;
-                            }
-                            txList = resolveErcTxFromEvent(token, tx, erc1155TxEventList, collectionBlock.getSeq().incrementAndGet());
+                            txList = resolveErc1155TxFromEvent(token, tx, erc1155TxEventList, collectionBlock.getSeq());
                             tx.getErc1155TxList().addAll(txList);
                             erc1155TokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
                             ercToken1155HolderAnalyzer.analyze(txList);

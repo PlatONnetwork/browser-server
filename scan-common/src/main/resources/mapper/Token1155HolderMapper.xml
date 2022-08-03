@@ -8,7 +8,6 @@
     <result column="balance" jdbcType="VARCHAR" property="balance" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="token_tx_qty" jdbcType="INTEGER" property="tokenTxQty" />
     <result column="token_owner_tx_qty" jdbcType="INTEGER" property="tokenOwnerTxQty" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -70,8 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    token_address, token_id, address, balance, create_time, update_time, token_tx_qty, 
-    token_owner_tx_qty
+    token_address, token_id, address, balance, create_time, update_time, token_owner_tx_qty
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.Token1155HolderExample" resultMap="BaseResultMap">
     select
@@ -110,10 +108,10 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Token1155Holder">
     insert into token_1155_holder (token_address, token_id, address, 
       balance, create_time, update_time, 
-      token_tx_qty, token_owner_tx_qty)
+      token_owner_tx_qty)
     values (#{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
       #{balance,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{tokenTxQty,jdbcType=INTEGER}, #{tokenOwnerTxQty,jdbcType=INTEGER})
+      #{tokenOwnerTxQty,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Token1155Holder">
     insert into token_1155_holder
@@ -135,9 +133,6 @@
       </if>
       <if test="updateTime != null">
         update_time,
-      </if>
-      <if test="tokenTxQty != null">
-        token_tx_qty,
       </if>
       <if test="tokenOwnerTxQty != null">
         token_owner_tx_qty,
@@ -161,9 +156,6 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="tokenTxQty != null">
-        #{tokenTxQty,jdbcType=INTEGER},
       </if>
       <if test="tokenOwnerTxQty != null">
         #{tokenOwnerTxQty,jdbcType=INTEGER},
@@ -197,9 +189,6 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.tokenTxQty != null">
-        token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
-      </if>
       <if test="record.tokenOwnerTxQty != null">
         token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
@@ -216,7 +205,6 @@
       balance = #{record.balance,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      token_tx_qty = #{record.tokenTxQty,jdbcType=INTEGER},
       token_owner_tx_qty = #{record.tokenOwnerTxQty,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -234,9 +222,6 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="tokenTxQty != null">
-        token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
-      </if>
       <if test="tokenOwnerTxQty != null">
         token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER},
       </if>
@@ -250,7 +235,6 @@
     set balance = #{balance,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      token_tx_qty = #{tokenTxQty,jdbcType=INTEGER},
       token_owner_tx_qty = #{tokenOwnerTxQty,jdbcType=INTEGER}
     where token_address = #{tokenAddress,jdbcType=VARCHAR}
       and token_id = #{tokenId,jdbcType=VARCHAR}
@@ -263,13 +247,13 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into token_1155_holder
-    (token_address, token_id, address, balance, create_time, update_time, token_tx_qty, 
-      token_owner_tx_qty)
+    (token_address, token_id, address, balance, create_time, update_time, token_owner_tx_qty
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, 
         #{item.balance,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.tokenTxQty,jdbcType=INTEGER}, #{item.tokenOwnerTxQty,jdbcType=INTEGER})
+        #{item.tokenOwnerTxQty,jdbcType=INTEGER})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -305,9 +289,6 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'token_tx_qty'.toString() == column.value">
-          #{item.tokenTxQty,jdbcType=INTEGER}
-        </if>
         <if test="'token_owner_tx_qty'.toString() == column.value">
           #{item.tokenOwnerTxQty,jdbcType=INTEGER}
         </if>
@@ -315,4 +296,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

@@ -48,7 +48,6 @@ public class Token1155HolderKey {
         balance("balance", "balance", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        tokenTxQty("token_tx_qty", "tokenTxQty", "INTEGER", false),
         tokenOwnerTxQty("token_owner_tx_qty", "tokenOwnerTxQty", "INTEGER", false);
 
         /**

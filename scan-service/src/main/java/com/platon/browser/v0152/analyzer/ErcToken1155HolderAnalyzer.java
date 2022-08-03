@@ -77,11 +77,8 @@ public class ErcToken1155HolderAnalyzer {
             tokenHolder = new Token1155Holder();
             tokenHolder.setTokenAddress(key.getTokenAddress());
             tokenHolder.setAddress(key.getAddress());
-            tokenHolder.setTokenTxQty(1);
             tokenHolder.setBalance("0");
             tokenHolder.setTokenId(ercTx.getTokenId());
-        } else {
-            tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }
         // to地址对合约交易次数加1
         if (to && ercTx.getTo().equalsIgnoreCase(ownerAddress)) {
@@ -91,7 +88,7 @@ public class ErcToken1155HolderAnalyzer {
             tokenHolder.setTokenOwnerTxQty(1);
         }
         //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721, erc1155所有tokenId的交易总数
-        log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
+        log.info("该1155合约地址[{}][{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getTokenId(), tokenHolder.getAddress(), tokenHolder.getTokenOwnerTxQty());
         insertOrUpdate.add(tokenHolder);
     }
 

@@ -11,8 +11,6 @@ public class Token1155Holder extends Token1155HolderKey {
 
     private Date updateTime;
 
-    private Integer tokenTxQty;
-
     private Integer tokenOwnerTxQty;
 
     public String getBalance() {
@@ -39,14 +37,6 @@ public class Token1155Holder extends Token1155HolderKey {
         this.updateTime = updateTime;
     }
 
-    public Integer getTokenTxQty() {
-        return tokenTxQty;
-    }
-
-    public void setTokenTxQty(Integer tokenTxQty) {
-        this.tokenTxQty = tokenTxQty;
-    }
-
     public Integer getTokenOwnerTxQty() {
         return tokenOwnerTxQty;
     }
@@ -69,7 +59,6 @@ public class Token1155Holder extends Token1155HolderKey {
         balance("balance", "balance", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        tokenTxQty("token_tx_qty", "tokenTxQty", "INTEGER", false),
         tokenOwnerTxQty("token_owner_tx_qty", "tokenOwnerTxQty", "INTEGER", false);
 
         /**

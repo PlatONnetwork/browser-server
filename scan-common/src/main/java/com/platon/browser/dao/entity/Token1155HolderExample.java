@@ -505,66 +505,6 @@ public class Token1155HolderExample {
             return (Criteria) this;
         }
 
-        public Criteria andTokenTxQtyIsNull() {
-            addCriterion("token_tx_qty is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyIsNotNull() {
-            addCriterion("token_tx_qty is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyEqualTo(Integer value) {
-            addCriterion("token_tx_qty =", value, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyNotEqualTo(Integer value) {
-            addCriterion("token_tx_qty <>", value, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyGreaterThan(Integer value) {
-            addCriterion("token_tx_qty >", value, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("token_tx_qty >=", value, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyLessThan(Integer value) {
-            addCriterion("token_tx_qty <", value, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyLessThanOrEqualTo(Integer value) {
-            addCriterion("token_tx_qty <=", value, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyIn(List<Integer> values) {
-            addCriterion("token_tx_qty in", values, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyNotIn(List<Integer> values) {
-            addCriterion("token_tx_qty not in", values, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyBetween(Integer value1, Integer value2) {
-            addCriterion("token_tx_qty between", value1, value2, "tokenTxQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andTokenTxQtyNotBetween(Integer value1, Integer value2) {
-            addCriterion("token_tx_qty not between", value1, value2, "tokenTxQty");
-            return (Criteria) this;
-        }
-
         public Criteria andTokenOwnerTxQtyIsNull() {
             addCriterion("token_owner_tx_qty is null");
             return (Criteria) this;
