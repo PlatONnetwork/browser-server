@@ -95,7 +95,7 @@ public class ErcTxService {
     private TokenMapper tokenMapper;
 
     @Resource
-    TokenHolderMapper tokenHolderMapper;
+    Token1155HolderMapper token1155HolderMapper;
 
     /**
      * 默认精度
@@ -317,7 +317,7 @@ public class ErcTxService {
             return balanceMap;
         }
 
-        TokenHolderExample tokenHolderExample = new TokenHolderExample();
+        Token1155HolderExample tokenHolderExample = new Token1155HolderExample();
 
         List<String> tokenIdList = new ArrayList<>(token1155Inventories.size());
 
@@ -329,7 +329,7 @@ public class ErcTxService {
 
         tokenHolderExample.createCriteria().andTokenAddressEqualTo(tokenAddress).andTokenIdIn(tokenIdList);
 
-        List<TokenHolder> tokenHolderList = tokenHolderMapper.selectByExample(tokenHolderExample);
+        List<Token1155Holder> tokenHolderList = token1155HolderMapper.selectByExample(tokenHolderExample);
 
         tokenHolderList.forEach(ele -> {
 
@@ -368,7 +368,6 @@ public class ErcTxService {
         Page<TokenInventory> totalTokenInventory = token721InventoryMapper.selectByExample(token721Example);
         Map<String, Long> map = totalTokenInventory.getResult().stream().collect(Collectors.groupingBy(TokenInventory::getOwner, Collectors.counting()));
 
-        //
         Token1155InventoryExample token1155Example = new Token1155InventoryExample();
         token1155Example.createCriteria().andTokenAddressEqualTo(req.getContract());
         Page<Token1155Inventory> totalToken1155Inventory = token1155InventoryMapper.selectByExample(token1155Example);

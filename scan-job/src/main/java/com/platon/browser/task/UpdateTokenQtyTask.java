@@ -145,7 +145,7 @@ public class UpdateTokenQtyTask {
                 TaskUtil.console("当前erc721断点[{}]未找到erc721交易", oldErc721Position);
             }
             // 1155
-            PointLog erc1155PointLog = pointLogMapper.selectByPrimaryKey(9);
+            PointLog erc1155PointLog = pointLogMapper.selectByPrimaryKey(10);
             long oldErc1155Position = Convert.toLong(erc1155PointLog.getPosition());
             TaskUtil.console("当前页码为[{}]，erc1155断点为[{}]", pageSize, oldErc1155Position);
             TxErc1155BakExample txErc1155BakExample = new TxErc1155BakExample();

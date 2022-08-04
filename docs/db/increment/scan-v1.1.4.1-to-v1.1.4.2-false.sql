@@ -76,6 +76,8 @@ CREATE TABLE `tx_erc_1155_bak`
 
 
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`)
-VALUES (8, 1, 'tx_1155_bak', '从erc1155交易备份表统计地址表和token表交易数的断点记录', '0', '2021-12-06 02:47:41', '2021-12-06 02:47:41');
+VALUES (8, 1, 'token_1155_holder', '统计TokenHolder持有者数的断点记录', '0', '2021-12-06 02:47:41', '2021-12-06 02:47:41');
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`)
 VALUES (9, 1, 'token_1155_inventory', '增量更新token1155库存信息断点记录', '0', '2021-12-10 02:44:32', '2021-12-10 02:44:32');
+INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`)
+VALUES (10, 1, 'tx_1155_bak', '从erc1155交易备份表统计地址表和token表交易数的断点记录', '0', '2021-12-10 02:44:32', '2021-12-10 02:44:32');

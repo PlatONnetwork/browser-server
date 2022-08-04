@@ -1,7 +1,6 @@
 package com.platon.browser.v0152.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
-import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
@@ -28,9 +27,6 @@ public class ErcTokenHolderAnalyzer {
 
     @Resource
     private CustomTokenHolderMapper customTokenHolderMapper;
-
-    @Resource
-    private AddressCache addressCache;
 
     private TokenHolderKey getTokenHolderKey(String ownerAddress, ErcTx ercTx) {
         TokenHolderKey key = new TokenHolderKey();
@@ -68,20 +64,7 @@ public class ErcTokenHolderAnalyzer {
             tokenHolder.setAddress(key.getAddress());
             tokenHolder.setTokenTxQty(1);
             tokenHolder.setBalance("0");
-            tokenHolder.setTokenId(ercTx.getTokenId());
         } else {
-            // 旧数据表没有 tokenId 字段，所以获取到的 tokenId 为 null
-            // 现在为了兼容旧数据，要判断合约是 ERC721 还是 ERC20
-            // 如果是 ERC20 tokenId 则设置为 0
-            // 旧数据表的 RC721 的 tokenId 字段放在 balance 字段， 因此 ERC721 要把 balance 字段的值设置到 tokenId 中，同时 balance 设置为 0
-            if (tokenHolder.getTokenId() == null) {
-                if (addressCache.isErc20ContractAddress(tokenHolder.getTokenAddress())) {
-                    tokenHolder.setTokenId("0");
-                } else if (addressCache.isErc721ContractAddress(tokenHolder.getTokenAddress())) {
-                    tokenHolder.setTokenId(tokenHolder.getBalance());
-                    tokenHolder.setBalance("0");
-                }
-            }
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }
         //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721, erc1155所有tokenId的交易总数
