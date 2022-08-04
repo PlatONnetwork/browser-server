@@ -6,12 +6,10 @@ import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.bean.HistoryLowRateSlash;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
-import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -45,12 +43,6 @@ public class OnElectionAnalyzer {
 
     @Resource
     private EpochBusinessMapper epochBusinessMapper;
-
-    @Resource
-    private StakeBusinessMapper stakeBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     @Resource
     private BlockChainConfig chainConfig;
