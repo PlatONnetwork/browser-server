@@ -26,6 +26,9 @@
         <foreach collection="list" item="item" separator=",">
             (
             <foreach collection="selective" item="column" separator=",">
+                <if test="'id'.toString() == column.value">
+                    #{item.id}
+                </if>
                 <if test="'token_address'.toString() == column.value">
                     #{item.tokenAddress,jdbcType=VARCHAR}
                 </if>
@@ -43,9 +46,6 @@
                 </if>
                 <if test="'update_time'.toString() == column.value">
                     #{item.updateTime,jdbcType=TIMESTAMP}
-                </if>
-                <if test="'token_tx_qty'.toString() == column.value">
-                    #{item.tokenTxQty,jdbcType=INTEGER}
                 </if>
                 <if test="'token_owner_tx_qty'.toString() == column.value">
                     #{item.tokenOwnerTxQty,jdbcType=INTEGER}

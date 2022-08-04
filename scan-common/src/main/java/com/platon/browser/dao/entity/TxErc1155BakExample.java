@@ -225,206 +225,6 @@ public class TxErc1155BakExample {
             return (Criteria) this;
         }
 
-        public Criteria andNameIsNull() {
-            addCriterion("`name` is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameIsNotNull() {
-            addCriterion("`name` is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameEqualTo(String value) {
-            addCriterion("`name` =", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameNotEqualTo(String value) {
-            addCriterion("`name` <>", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameGreaterThan(String value) {
-            addCriterion("`name` >", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameGreaterThanOrEqualTo(String value) {
-            addCriterion("`name` >=", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameLessThan(String value) {
-            addCriterion("`name` <", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameLessThanOrEqualTo(String value) {
-            addCriterion("`name` <=", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameLike(String value) {
-            addCriterion("`name` like", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameNotLike(String value) {
-            addCriterion("`name` not like", value, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameIn(List<String> values) {
-            addCriterion("`name` in", values, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameNotIn(List<String> values) {
-            addCriterion("`name` not in", values, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameBetween(String value1, String value2) {
-            addCriterion("`name` between", value1, value2, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andNameNotBetween(String value1, String value2) {
-            addCriterion("`name` not between", value1, value2, "name");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolIsNull() {
-            addCriterion("symbol is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolIsNotNull() {
-            addCriterion("symbol is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolEqualTo(String value) {
-            addCriterion("symbol =", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolNotEqualTo(String value) {
-            addCriterion("symbol <>", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolGreaterThan(String value) {
-            addCriterion("symbol >", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolGreaterThanOrEqualTo(String value) {
-            addCriterion("symbol >=", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolLessThan(String value) {
-            addCriterion("symbol <", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolLessThanOrEqualTo(String value) {
-            addCriterion("symbol <=", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolLike(String value) {
-            addCriterion("symbol like", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolNotLike(String value) {
-            addCriterion("symbol not like", value, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolIn(List<String> values) {
-            addCriterion("symbol in", values, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolNotIn(List<String> values) {
-            addCriterion("symbol not in", values, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolBetween(String value1, String value2) {
-            addCriterion("symbol between", value1, value2, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andSymbolNotBetween(String value1, String value2) {
-            addCriterion("symbol not between", value1, value2, "symbol");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalIsNull() {
-            addCriterion("`decimal` is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalIsNotNull() {
-            addCriterion("`decimal` is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalEqualTo(Integer value) {
-            addCriterion("`decimal` =", value, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalNotEqualTo(Integer value) {
-            addCriterion("`decimal` <>", value, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalGreaterThan(Integer value) {
-            addCriterion("`decimal` >", value, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalGreaterThanOrEqualTo(Integer value) {
-            addCriterion("`decimal` >=", value, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalLessThan(Integer value) {
-            addCriterion("`decimal` <", value, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalLessThanOrEqualTo(Integer value) {
-            addCriterion("`decimal` <=", value, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalIn(List<Integer> values) {
-            addCriterion("`decimal` in", values, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalNotIn(List<Integer> values) {
-            addCriterion("`decimal` not in", values, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalBetween(Integer value1, Integer value2) {
-            addCriterion("`decimal` between", value1, value2, "decimal");
-            return (Criteria) this;
-        }
-
-        public Criteria andDecimalNotBetween(Integer value1, Integer value2) {
-            addCriterion("`decimal` not between", value1, value2, "decimal");
-            return (Criteria) this;
-        }
-
         public Criteria andContractIsNull() {
             addCriterion("contract is null");
             return (Criteria) this;
@@ -492,6 +292,76 @@ public class TxErc1155BakExample {
 
         public Criteria andContractNotBetween(String value1, String value2) {
             addCriterion("contract not between", value1, value2, "contract");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdIsNull() {
+            addCriterion("token_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdIsNotNull() {
+            addCriterion("token_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdEqualTo(String value) {
+            addCriterion("token_id =", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotEqualTo(String value) {
+            addCriterion("token_id <>", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdGreaterThan(String value) {
+            addCriterion("token_id >", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdGreaterThanOrEqualTo(String value) {
+            addCriterion("token_id >=", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdLessThan(String value) {
+            addCriterion("token_id <", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdLessThanOrEqualTo(String value) {
+            addCriterion("token_id <=", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdLike(String value) {
+            addCriterion("token_id like", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotLike(String value) {
+            addCriterion("token_id not like", value, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdIn(List<String> values) {
+            addCriterion("token_id in", values, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotIn(List<String> values) {
+            addCriterion("token_id not in", values, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdBetween(String value1, String value2) {
+            addCriterion("token_id between", value1, value2, "tokenId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTokenIdNotBetween(String value1, String value2) {
+            addCriterion("token_id not between", value1, value2, "tokenId");
             return (Criteria) this;
         }
 

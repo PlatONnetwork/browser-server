@@ -2,9 +2,8 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.TxErc1155Bak;
 import com.platon.browser.dao.entity.TxErc1155BakExample;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface TxErc1155BakMapper {
     long countByExample(TxErc1155BakExample example);
@@ -17,15 +16,21 @@ public interface TxErc1155BakMapper {
 
     int insertSelective(TxErc1155Bak record);
 
+    List<TxErc1155Bak> selectByExampleWithBLOBs(TxErc1155BakExample example);
+
     List<TxErc1155Bak> selectByExample(TxErc1155BakExample example);
 
     TxErc1155Bak selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") TxErc1155Bak record, @Param("example") TxErc1155BakExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") TxErc1155Bak record, @Param("example") TxErc1155BakExample example);
+
     int updateByExample(@Param("record") TxErc1155Bak record, @Param("example") TxErc1155BakExample example);
 
     int updateByPrimaryKeySelective(TxErc1155Bak record);
+
+    int updateByPrimaryKeyWithBLOBs(TxErc1155Bak record);
 
     int updateByPrimaryKey(TxErc1155Bak record);
 
