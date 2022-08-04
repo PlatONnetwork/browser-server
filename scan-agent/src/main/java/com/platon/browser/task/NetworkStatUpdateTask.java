@@ -10,6 +10,7 @@ import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.service.account.AccountService;
+import com.platon.browser.service.elasticsearch.EsErc1155TxRepository;
 import com.platon.browser.service.elasticsearch.EsErc20TxRepository;
 import com.platon.browser.service.elasticsearch.EsErc721TxRepository;
 import com.platon.browser.service.elasticsearch.EsTransactionRepository;
@@ -67,6 +68,9 @@ public class NetworkStatUpdateTask {
     private EsErc721TxRepository esErc721TxRepository;
 
     @Resource
+    private EsErc1155TxRepository esErc1155TxRepository;
+
+    @Resource
     private CustomNOptBakMapper customNOptBakMapper;
 
     /**
@@ -80,7 +84,9 @@ public class NetworkStatUpdateTask {
     @XxlJob("networkStatUpdateJobHandler")
     public void networkStatUpdate() {
         // 只有程序正常运行才执行任务
-        if (AppStatusUtil.isRunning()) start();
+        if (AppStatusUtil.isRunning()) {
+            start();
+        }
     }
 
     /**
@@ -120,6 +126,14 @@ public class NetworkStatUpdateTask {
             } catch (Exception e) {
                 log.error("获取erc721交易数异常", e);
             }
+            //获取erc1155交易数
+            Long erc1155Count = 0L;
+            try {
+                ESResult<?> erc1155Res = esErc1155TxRepository.Count(count);
+                erc1155Count = erc1155Res.getTotal();
+            } catch (Exception e) {
+                log.error("获取erc1155交易数异常", e);
+            }
             //获得地址数统计
             int addressQty = statisticBusinessMapper.getNetworkStatisticsFromAddress();
             //获得进行中的提案
@@ -132,14 +146,16 @@ public class NetworkStatUpdateTask {
             networkStat.setTxQty(totalCount.intValue());
             networkStat.setErc20TxQty(erc20Count.intValue());
             networkStat.setErc721TxQty(erc721Count.intValue());
+            networkStat.setErc1155TxQty(erc1155Count.intValue());
             networkStat.setAddressQty(addressQty);
             networkStat.setDoingProposalQty(doingProposalQty);
             networkStat.setProposalQty(proposalQty);
             networkStat.setNodeOptSeq(nodeOptSeq);
-            XxlJobHelper.handleSuccess(StrUtil.format("更新交易统计数成功，交易总数为[{}],erc20交易数为[{}],erc721交易数为[{}],地址数为[{}],进行中提案总数为[{}],提案总数为[{}],节点操作数为[{}]",
+            XxlJobHelper.handleSuccess(StrUtil.format("更新交易统计数成功，交易总数为[{}],erc20交易数为[{}],erc721交易数为[{}],erc1155交易数为[{}],地址数为[{}],进行中提案总数为[{}],提案总数为[{}],节点操作数为[{}]",
                                                       totalCount.intValue(),
                                                       erc20Count.intValue(),
                                                       erc721Count.intValue(),
+                                                      erc1155Count.intValue(),
                                                       addressQty,
                                                       doingProposalQty,
                                                       proposalQty,
