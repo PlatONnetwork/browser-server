@@ -6,7 +6,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #ES索引配置
@@ -82,7 +82,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 210425
+  chainId: 2022041901
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
@@ -112,8 +112,8 @@ xxl:
     logretentiondays: 90
     executor:
       #执行器AppName
-      appname: platon-scan-job
-      ip: 192.168.21.114
+      appname: dev-platon-job
+      ip: 192.168.21.194
       #执行器端口号
       port: 9997
       #执行器运行日志文件存储磁盘路径

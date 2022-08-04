@@ -270,7 +270,6 @@ public class ErcTokenUpdateTask {
                 Token1155HolderExample condition = new Token1155HolderExample();
                 condition.setOrderByClause(" id asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
                 batch = token1155HolderMapper.selectByExample(condition);
-                List<ErcToken> ercTokens = getErcTokens();
                 // 过滤销毁的合约
                 List<Token1155Holder> res = subtractErc1155ToLis(batch, getDestroyContracts());
                 List<Token1155Holder> updateParams = new ArrayList<>();
@@ -280,7 +279,7 @@ public class ErcTokenUpdateTask {
                         HOLDER_UPDATE_POOL.submit(() -> {
                             try {
                                 BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), ErcTypeEnum.ERC1155, holder.getAddress(), new BigInteger(holder.getTokenId()));
-                                if (ObjectUtil.isNull(holder.getBalance()) || new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
+                                if (!balance.toString().equalsIgnoreCase(holder.getBalance())) {
                                     log.info("1155token[{}][{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]",
                                              holder.getTokenAddress(),
                                              holder.getTokenId(),
@@ -302,7 +301,7 @@ public class ErcTokenUpdateTask {
                     try {
                         latch.await();
                     } catch (InterruptedException e) {
-                        log.error("", e);
+                        log.error("异常", e);
                     }
                 }
                 if (CollUtil.isNotEmpty(updateParams)) {
@@ -658,6 +657,10 @@ public class ErcTokenUpdateTask {
             example.setOrderByClause("id");
             example.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(oldPosition + pageSize);
             List<Token1155Holder> list = token1155HolderMapper.selectByExample(example);
+            if (CollUtil.isEmpty(list)) {
+                TaskUtil.console("[erc1155]该断点[{}]未找到交易", oldPosition);
+                return;
+            }
             // 过滤销毁的合约
             List<Token1155Holder> res = subtractErc1155ToLis(list, getDestroyContracts());
             List<Token1155Holder> updateParams = new ArrayList<>();
