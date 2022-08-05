@@ -9,7 +9,7 @@ import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.custommapper.CustomToken1155HolderMapper;
 import com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.Token1155InventoryMapper;
+import com.platon.browser.dao.mapper.Token1155HolderMapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.request.token.QueryTokenIdDetailReq;
 import com.platon.browser.request.token.QueryTokenIdListReq;
@@ -41,6 +41,9 @@ public class Token1155Service {
     private CustomToken1155HolderMapper customToken1155HolderMapper;
 
     @Resource
+    private Token1155HolderMapper token1155HolderMapper;
+
+    @Resource
     private CustomToken1155InventoryMapper customToken1155InventoryMapper;
 
     @Resource
@@ -48,10 +51,6 @@ public class Token1155Service {
 
     @Resource
     private DownFileCommon downFileCommon;
-
-    @Resource
-    private Token1155InventoryMapper token1155InventoryMapper;
-
 
     /**
      * ARC1155 库存列表
@@ -112,29 +111,27 @@ public class Token1155Service {
 
     public AccountDownload exportTokenId(String address, String contract, String tokenId, String local, String timeZone) {
         PageHelper.startPage(1, 3000);
-        Token1155InventoryExample example = new Token1155InventoryExample();
-        Token1155InventoryExample.Criteria criteria = example.createCriteria();
-//        //根据地址、合约地址、tokenid去查询列表
-//        if (StringUtils.isNotBlank(address)) {
-//            criteria.andOwnerEqualTo(address);
-//        }
+        Token1155HolderExample example = new Token1155HolderExample();
+        Token1155HolderExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(address)) {
+            criteria.andAddressEqualTo(address);
+        }
         if (StringUtils.isNotBlank(contract)) {
             criteria.andTokenAddressEqualTo(contract);
         }
         if (StringUtils.isNotBlank(tokenId)) {
             criteria.andTokenIdEqualTo(tokenId);
         }
-        Page<Token1155Inventory> tokenInventorys = token1155InventoryMapper.selectByExample(example);
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS,
-                                                                                                                                                     local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
-                                                                                                                                                                         local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
-                                                                                                                                                                                             local)};
+        Page<Token1155Holder> token1155HolderList = token1155HolderMapper.selectByExample(example);
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
+                                                                                                                                                        local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
+                                                                                                                                                                            local)};
         List<Object[]> rows = new ArrayList<>();
-        tokenInventorys.forEach(tokenInventory -> {
-            Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()};
+        token1155HolderList.forEach(tokenInventory -> {
+            Object[] row = {tokenInventory.getTokenAddress(), tokenInventory.getAddress(), tokenInventory.getTokenId(), tokenInventory.getTokenOwnerTxQty()};
             rows.add(row);
         });
-        return this.downFileCommon.writeDate("Token-Id-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
+        return this.downFileCommon.writeDate("Token-Id-" + address + "-" + System.currentTimeMillis() + ".CSV", rows, headers);
 
     }
 

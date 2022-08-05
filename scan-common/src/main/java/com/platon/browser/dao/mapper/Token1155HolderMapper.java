@@ -1,11 +1,14 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.Token1155HolderExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface Token1155HolderMapper {
+
     long countByExample(Token1155HolderExample example);
 
     int deleteByExample(Token1155HolderExample example);
@@ -16,7 +19,7 @@ public interface Token1155HolderMapper {
 
     int insertSelective(Token1155Holder record);
 
-    List<Token1155Holder> selectByExample(Token1155HolderExample example);
+    Page<Token1155Holder> selectByExample(Token1155HolderExample example);
 
     Token1155Holder selectByPrimaryKey(Long id);
 
@@ -44,5 +47,6 @@ public interface Token1155HolderMapper {
      * @mbg.generated
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
-    int batchInsertSelective(@Param("list") List<Token1155Holder> list, @Param("selective") Token1155Holder.Column ... selective);
+    int batchInsertSelective(@Param("list") List<Token1155Holder> list, @Param("selective") Token1155Holder.Column... selective);
+
 }
