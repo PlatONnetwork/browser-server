@@ -72,20 +72,23 @@
     </delete>
 
     <select id="selectTokenInventory" resultType="com.platon.browser.bean.CustomToken1155Inventory">
-        SELECT ti.token_address AS tokenAddress,
-               ti.token_id      AS tokenId,
-               # ti.OWNER AS OWNER, # ti.balance AS balance, ti.NAME AS NAME,
-               ti.description,
-               ti.image,
-               ti.create_time   AS createTime,
-               ti.update_time   AS updateTime,
-               ti.token_tx_qty  AS tokenTxQty,
-               t.NAME           AS tokenName,
-               t.symbol         AS symbol
-        FROM token_1155_inventory ti
-                 LEFT JOIN token t ON ti.token_address = t.address
-        where ti.token_address = #{tokenAddress,jdbcType=VARCHAR}
-          and ti.token_id = #{tokenId,jdbcType=VARCHAR}
+        SELECT
+            t1.token_address AS tokenAddress,
+            t1.token_id AS tokenId,
+            t1.address,
+            t1.balance,
+            t2.image,
+            t2.`name`,
+            t2.token_tx_qty AS txCount,
+            '' AS tokenName,
+            '' AS symbol
+        FROM
+            token_1155_holder t1
+                LEFT JOIN token_1155_inventory t2 ON t1.token_address = t2.token_address
+                AND t1.token_id = t2.token_id
+        WHERE
+            t1.token_address = #{tokenAddress}
+          AND t1.token_id = #{tokenId}
     </select>
 
     <select id="findErc1155ContractDestroyBalance" parameterType="string" resultType="com.platon.browser.bean.Erc1155ContractDestroyBalanceVO">
@@ -126,19 +129,19 @@
 
     <select id="findOneByUK" resultType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
         select id,
-               token_address,
-               token_id,
+               token_address as tokenAddress,
+               token_id as tokenId,
                `name`,
                image,
                `decimal`,
-               create_time,
-               update_time,
-               token_tx_qty,
-               small_image,
-               medium_image,
-               retry_num,
+               create_time as createTime,
+               update_time as updateTime,
+               token_tx_qty as tokenTxQty,
+               small_image as smallImage,
+               medium_image as mediumImage,
+               retry_num as retryNum,
                description,
-               token_url
+               token_url as tokenUrl
         from token_1155_inventory
         where token_address = #{key.tokenAddress}
           and token_id = #{key.tokenId}

@@ -103,4 +103,29 @@
             ) t1
                 LEFT JOIN ( SELECT token_address, count( 1 ) AS allCount, sum( token_tx_qty ) AS token_tx_qty FROM token_1155_inventory WHERE token_address = #{contract} ) t2 ON t1.token_address = t2.token_address
     </select>
+
+    <select id="findTokenIdList" resultType="com.platon.browser.bean.TokenIdListBean">
+        SELECT
+            t1.token_address AS contract,
+            t1.token_id AS tokenId,
+            t1.address,
+            t1.balance,
+            t2.image,
+            t2.token_tx_qty AS txCount
+        FROM
+            token_1155_holder t1
+                LEFT JOIN token_1155_inventory t2 ON t1.token_address = t2.token_address
+                AND t1.token_id = t2.token_id
+        WHERE
+            1 = 1
+        <if test="key.tokenAddress != null">
+            AND t1.token_address = #{key.tokenAddress}
+        </if>
+        <if test="key.address != null">
+            AND t1.address = #{key.address}
+        </if>
+        <if test="key.tokenId != null">
+            AND t1.token_id = #{key.tokenId}
+        </if>
+    </select>
 </mapper>

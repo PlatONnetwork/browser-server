@@ -1,9 +1,9 @@
 package com.platon.browser.dao.custommapper;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.bean.Erc1155ContractDestroyBean;
 import com.platon.browser.bean.Token1155HolderListBean;
+import com.platon.browser.bean.TokenIdListBean;
 import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.Token1155HolderKey;
 import org.apache.ibatis.annotations.Param;
@@ -57,5 +57,14 @@ public interface CustomToken1155HolderMapper {
      * @date: 2022/8/5
      */
     Page<Token1155HolderListBean> findToken1155HolderList(@Param("contract") String contract);
+
+    /**
+     * 库存列表
+     *
+     * @param key:
+     * @return: com.github.pagehelper.Page<com.platon.browser.bean.TokenIdListBean>
+     * @date: 2022/8/5
+     */
+    Page<TokenIdListBean> findTokenIdList(@Param("key") Token1155HolderKey key);
 
 }

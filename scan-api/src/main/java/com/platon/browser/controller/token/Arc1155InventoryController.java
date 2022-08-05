@@ -1,4 +1,4 @@
-package com.platon.browser.controller.token;//package com.platon.browser.controller;
+package com.platon.browser.controller.token;
 
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
@@ -53,7 +53,7 @@ public class Arc1155InventoryController {
     }
 
     /**
-     * ARC721库存详情
+     * ARC1155库存详情
      *
      * @param req
      * @return reactor.core.publisher.Mono<com.platon.browser.response.BaseResp < com.platon.browser.response.token.QueryTokenIdDetailResp>>
@@ -68,7 +68,7 @@ public class Arc1155InventoryController {
     }
 
     /**
-     * ARC721库存列表导出
+     * ARC1155库存列表导出
      *
      * @param address
      * @param contract
