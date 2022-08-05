@@ -28,7 +28,6 @@ public class TokenInventoryUpdate {
      * @param page 页码
      * @param size 条数
      * @return boolean
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/22
      */
     public boolean getPageUpdate(Integer page, Integer size) {

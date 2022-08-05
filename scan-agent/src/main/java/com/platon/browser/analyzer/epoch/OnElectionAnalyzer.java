@@ -34,7 +34,6 @@ import java.util.List;
 /**
  * 选举
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/2/3
  */
 @Slf4j

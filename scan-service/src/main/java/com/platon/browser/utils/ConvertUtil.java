@@ -41,12 +41,10 @@ public class ConvertUtil {
      * @param value  原值
      * @param factor 精度（多少个0）
      * @return java.math.BigDecimal
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/30
      */
     public static BigDecimal convertByFactor(BigDecimal value, int factor) {
-        return new BigDecimal(EnergonUtil.format(value.divide(BigDecimal.TEN.pow(factor))
-                .setScale(12, BigDecimal.ROUND_DOWN), 12));
+        return new BigDecimal(EnergonUtil.format(value.divide(BigDecimal.TEN.pow(factor)).setScale(12, BigDecimal.ROUND_DOWN), 12));
     }
 
 }

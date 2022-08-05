@@ -23,11 +23,10 @@ public interface CustomTokenHolderMapper {
      * @param address
      * @param type
      * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/3
      */
     Page<CustomTokenHolder> findErc721TokenHolder(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
-    
+
     int batchInsertOrUpdateSelective(@Param("list") List<TokenHolder> list, @Param("selective") TokenHolder.Column... selective);
 
     /**
@@ -35,7 +34,6 @@ public interface CustomTokenHolderMapper {
      *
      * @param list
      * @return int
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/18
      */
     int batchUpdate(@Param("list") List<TokenHolder> list);
@@ -45,7 +43,6 @@ public interface CustomTokenHolderMapper {
      *
      * @param
      * @return java.util.List<com.platon.browser.bean.TokenHolderCount>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/17
      */
     List<TokenHolderCount> findTokenHolderCount();
@@ -56,7 +53,6 @@ public interface CustomTokenHolderMapper {
      * @param tokenAddress
      * @param address
      * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/19
      */
     Page<CustomTokenHolder> selectListByERC721(@Param("tokenAddress") String tokenAddress, @Param("address") String address);

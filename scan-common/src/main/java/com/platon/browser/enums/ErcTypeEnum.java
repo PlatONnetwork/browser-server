@@ -26,7 +26,6 @@ public enum ErcTypeEnum {
      *
      * @param name
      * @return com.platon.browser.v0151.enums.ErcTypeEnum
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/19
      */
     public static ErcTypeEnum getErcTypeEnum(String name) {

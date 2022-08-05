@@ -3,7 +3,6 @@ package com.platon.browser.enums;
 /**
  * token类型枚举
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/1/29
  */
 public enum TokenTypeEnum {

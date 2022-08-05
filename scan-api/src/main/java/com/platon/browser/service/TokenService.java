@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,7 +94,6 @@ public class TokenService {
      *
      * @param req
      * @return com.platon.browser.response.RespPage<com.platon.browser.response.token.QueryTokenIdListResp>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/28
      */
     public RespPage<QueryTokenIdListResp> queryTokenIdList(QueryTokenIdListReq req) {
@@ -155,7 +153,7 @@ public class TokenService {
             Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getOwner(), tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()};
             rows.add(row);
         });
-        return this.downFileCommon.writeDate("Token-Id-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
+        return this.downFileCommon.writeDate("Token-Id-" + address + "-" + System.currentTimeMillis() + ".CSV", rows, headers);
 
     }
 

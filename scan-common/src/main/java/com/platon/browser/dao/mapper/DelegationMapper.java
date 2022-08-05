@@ -3,10 +3,9 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.entity.DelegationKey;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
 
 public interface DelegationMapper {
 
@@ -55,7 +54,6 @@ public interface DelegationMapper {
      *
      * @param list
      * @return int
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/18
      */
     int batchDeleteIsHistory(@Param("list") List<Delegation> list);

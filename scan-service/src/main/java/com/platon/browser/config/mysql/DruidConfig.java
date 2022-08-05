@@ -17,7 +17,6 @@ import java.util.Map;
 /**
  * Druid 配置
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/1
  */
 @Configuration
@@ -35,7 +34,6 @@ public class DruidConfig {
      *
      * @param
      * @return org.springframework.boot.web.servlet.ServletRegistrationBean
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/1
      */
     @Bean
@@ -45,7 +43,8 @@ public class DruidConfig {
         Map<String, String> initParams = new HashMap<>();
         initParams.put("loginUsername", "admin");
         initParams.put("loginPassword", "123456");
-        initParams.put("allow", ""); //默认就是允许所有访问
+        //默认就是允许所有访问
+        initParams.put("allow", "");
         // deny：Druid 后台拒绝谁访问，表示禁止此ip访问
         // initParams.put("deny","192.168.10.132");
         bean.setInitParameters(initParams);
@@ -57,7 +56,6 @@ public class DruidConfig {
      *
      * @param
      * @return org.springframework.boot.web.servlet.FilterRegistrationBean
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/1
      */
     @Bean

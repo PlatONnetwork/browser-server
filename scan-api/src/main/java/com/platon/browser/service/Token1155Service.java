@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,7 +56,6 @@ public class Token1155Service {
      *
      * @param req
      * @return com.platon.browser.response.RespPage<com.platon.browser.response.token.QueryTokenIdListResp>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/28
      */
     public RespPage<QueryTokenIdListResp> queryTokenIdList(QueryTokenIdListReq req) {

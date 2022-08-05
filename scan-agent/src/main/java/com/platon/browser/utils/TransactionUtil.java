@@ -306,7 +306,6 @@ public class TransactionUtil {
      * @param contractTypeEnum
      * @param logger
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/20
      */
     public static void resolveGeneralContractInvokeTxComplementInfo(CollectionTransaction tx, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum, Logger logger) throws BeanCreateOrUpdateException {
