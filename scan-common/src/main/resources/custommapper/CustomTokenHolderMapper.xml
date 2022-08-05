@@ -214,16 +214,16 @@
         th.token_address AS tokenAddress,
         th.address,
         t.type,
-        t.symbol,
-        t.NAME,
+        ti.NAME,
+        ti.DECIMAL,
+        '' AS symbol,
         t.total_supply AS totalSupply,
         th.balance,
-        t.DECIMAL,
-        ti.token_owner_tx_qty AS txCount,
+        th.token_owner_tx_qty AS txCount,
         ti.token_id as tokenId,
         t.create_time as createTime
         FROM
-        token_holder th
+        token_1155_holder th
         LEFT JOIN token t ON th.token_address = t.address
         LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address
         WHERE

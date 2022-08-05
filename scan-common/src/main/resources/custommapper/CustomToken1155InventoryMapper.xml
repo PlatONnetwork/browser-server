@@ -72,73 +72,76 @@
     </delete>
 
     <select id="selectTokenInventory" resultType="com.platon.browser.bean.CustomToken1155Inventory">
-        SELECT
-            ti.token_address AS tokenAddress,
-            ti.token_id AS tokenId,
-#             ti.OWNER AS OWNER,
-#             ti.balance AS balance,
-            ti.NAME AS NAME,
-            ti.description,
-            ti.image,
-            ti.create_time AS createTime,
-            ti.update_time AS updateTime,
-            ti.token_tx_qty AS tokenTxQty,
-            t.NAME AS tokenName,
-            t.symbol AS symbol
-        FROM
-            token_1155_inventory ti
-                LEFT JOIN token t ON ti.token_address = t.address
+        SELECT ti.token_address AS tokenAddress,
+               ti.token_id      AS tokenId,
+               # ti.OWNER AS OWNER, # ti.balance AS balance, ti.NAME AS NAME,
+               ti.description,
+               ti.image,
+               ti.create_time   AS createTime,
+               ti.update_time   AS updateTime,
+               ti.token_tx_qty  AS tokenTxQty,
+               t.NAME           AS tokenName,
+               t.symbol         AS symbol
+        FROM token_1155_inventory ti
+                 LEFT JOIN token t ON ti.token_address = t.address
         where ti.token_address = #{tokenAddress,jdbcType=VARCHAR}
           and ti.token_id = #{tokenId,jdbcType=VARCHAR}
     </select>
 
     <select id="findErc1155ContractDestroyBalance" parameterType="string" resultType="com.platon.browser.bean.Erc1155ContractDestroyBalanceVO">
-        select
-            t2.token_address as tokenAddress ,
-            count(1) as num
-        from
-            (
-                select
-                    t1.token_address ,
-                    t1.token_id
-                from
-                    token_1155_inventory t1
-                where
-                    t1.token_address = #{tokenAddress}
-            ) t2
-        group by
-            t2.token_address
+        select t2.token_address as tokenAddress,
+               count(1)         as num
+        from (
+                 select t1.token_address,
+                        t1.token_id
+                 from token_1155_inventory t1
+                 where t1.token_address = #{tokenAddress}
+             ) t2
+        group by t2.token_address
     </select>
 
     <select id="findDestroyContracts" resultType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
-        SELECT
-            t1.id as id,
-            t1.token_address as tokenAddress,
-            t1.token_id as tokenId,
-#             t1.`owner` as owner,
-            t1.`name` as name,
-            t1.image as image,
-            t1.create_time as createTime,
-            t1.update_time as updateTime,
-            t1.token_tx_qty as tokenTxQty,
-#             t1.token_owner_tx_qty as tokenOwnerTxQty,
-            t1.small_image as smallImage,
-            t1.medium_image as mediumImage,
-            t1.retry_num as retryNum,
-            t1.description as description,
-            t1.token_url as tokenUrl
-        FROM
-            token_inventory t1
-                LEFT JOIN address t2 ON t1.token_address = t2.address
-        WHERE
-            t2.contract_destroy_hash IS NOT NULL
-          AND LENGTH( trim( t2.contract_destroy_hash ) ) > 0
+        SELECT t1.id            as id,
+               t1.token_address as tokenAddress,
+               t1.token_id      as tokenId,
+               # t1.`owner` as owner, t1.`name` as name,
+               t1.image         as image,
+               t1.create_time   as createTime,
+               t1.update_time   as updateTime,
+               t1.token_tx_qty  as tokenTxQty,
+               # t1.token_owner_tx_qty as tokenOwnerTxQty, t1.small_image as smallImage,
+               t1.medium_image  as mediumImage,
+               t1.retry_num     as retryNum,
+               t1.description   as description,
+               t1.token_url     as tokenUrl
+        FROM token_inventory t1
+                 LEFT JOIN address t2 ON t1.token_address = t2.address
+        WHERE t2.contract_destroy_hash IS NOT NULL
+          AND LENGTH(trim(t2.contract_destroy_hash)) > 0
           AND t1.id > #{minId}
         <![CDATA[ AND t1.id <= #{maxId} ]]>
         <![CDATA[ AND t1.retry_num < #{retryNum} ]]>
-        ORDER BY
-            t1.id
+        ORDER BY t1.id
     </select>
 
+    <select id="findOneByUK" resultType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
+        select id,
+               token_address,
+               token_id,
+               `name`,
+               image,
+               `decimal`,
+               create_time,
+               update_time,
+               token_tx_qty,
+               small_image,
+               medium_image,
+               retry_num,
+               description,
+               token_url
+        from token_1155_inventory
+        where token_address = #{key.tokenAddress}
+          and token_id = #{key.tokenId}
+    </select>
 
 </mapper>

@@ -1,13 +1,13 @@
 package com.platon.browser.v0152.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper;
 import com.platon.browser.dao.entity.Token1155Inventory;
 import com.platon.browser.dao.entity.Token1155InventoryExample;
 import com.platon.browser.dao.entity.Token1155InventoryKey;
 import com.platon.browser.dao.entity.Token1155InventoryWithBLOBs;
-import com.platon.browser.dao.mapper.Token1155InventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
@@ -26,9 +26,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class Erc1155TokenInventoryAnalyzer {
-
-    @Resource
-    private Token1155InventoryMapper token1155InventoryMapper;
 
     @Resource
     private CustomToken1155InventoryMapper customToken1155InventoryMapper;
@@ -58,13 +55,12 @@ public class Erc1155TokenInventoryAnalyzer {
                     // 1, 判断接收地址是否存在, 如果存在则对balance做增加动作
                     Token1155InventoryExample toExample = new Token1155InventoryExample();
                     toExample.createCriteria().andTokenAddressEqualTo(tokenAddress).andTokenIdEqualTo(tokenId);
-                    //
-                    List<Token1155InventoryWithBLOBs> toTokenInventoryWithBLOBs = token1155InventoryMapper.selectByExampleWithBLOBs(toExample);
-                    //
-                    Token1155InventoryWithBLOBs toTokenInventory = null;
+                    Token1155InventoryKey key = new Token1155InventoryKey();
+                    key.setTokenAddress(tokenAddress);
+                    key.setTokenId(tokenId);
+                    Token1155InventoryWithBLOBs toTokenInventory = customToken1155InventoryMapper.findOneByUK(key);
                     // 不为空,交易次数+1
-                    if (CollUtil.isNotEmpty(toTokenInventoryWithBLOBs) && toTokenInventoryWithBLOBs.size() == 1) {
-                        toTokenInventory = CollUtil.getFirst(toTokenInventoryWithBLOBs);
+                    if (ObjectUtil.isNotNull(toTokenInventory)) {
                         toTokenInventory.setTokenTxQty(toTokenInventory.getTokenTxQty() + 1);
                     } else {
                         toTokenInventory = new Token1155InventoryWithBLOBs();
@@ -79,6 +75,7 @@ public class Erc1155TokenInventoryAnalyzer {
                             log.warn("当前块高[{}]获取合约[{}]tokenId[{}]的tokenUrl为空，请联系管理员处理", blockNumber, tokenAddress, tokenId);
                         }
                     }
+
                     insertOrUpdate.add(toTokenInventory);
                     // 如果合约交易当中，to地址是0地址的话，需要清除TokenInventory记录
                     if (StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())) {

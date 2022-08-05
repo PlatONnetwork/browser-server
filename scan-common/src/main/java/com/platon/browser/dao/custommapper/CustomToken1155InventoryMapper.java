@@ -30,4 +30,7 @@ public interface CustomToken1155InventoryMapper {
      * @date: 2022/2/10
      */
     List<Token1155InventoryWithBLOBs> findDestroyContracts(@Param("minId") Long minId, @Param("maxId") Long maxId, @Param("retryNum") Integer retryNum);
+
+    Token1155InventoryWithBLOBs findOneByUK(@Param("key") Token1155InventoryKey key);
+
 }

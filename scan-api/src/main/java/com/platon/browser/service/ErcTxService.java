@@ -8,8 +8,10 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomTokenHolder;
+import com.platon.browser.bean.Token1155HolderListBean;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
+import com.platon.browser.dao.custommapper.CustomToken1155HolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
@@ -78,6 +80,9 @@ public class ErcTxService {
 
     @Resource
     private CustomTokenHolderMapper customTokenHolderMapper;
+
+    @Resource
+    private CustomToken1155HolderMapper customToken1155HolderMapper;
 
     @Resource
     private DownFileCommon downFileCommon;
@@ -246,8 +251,8 @@ public class ErcTxService {
                                                                                            "0",
                                                                                            timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(
-                        valueOut), esTokenTransferRecord.getDecimal()).toString()), esTokenTransferRecord.getSymbol()};
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), 0).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), 0)
+                                                                                                                                      .toString()), esTokenTransferRecord.getSymbol()};
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
                 String symbol = "";
@@ -353,6 +358,14 @@ public class ErcTxService {
     }
 
     public RespPage<QueryTokenHolderListResp> tokenHolderList(QueryTokenHolderListReq req) {
+        if ("erc1155".equalsIgnoreCase(req.getErcType())) {
+            return token1155HolderList(req);
+        } else {
+            return token20And721HolderList(req);
+        }
+    }
+
+    public RespPage<QueryTokenHolderListResp> token20And721HolderList(QueryTokenHolderListReq req) {
         if (log.isDebugEnabled()) {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
@@ -367,12 +380,6 @@ public class ErcTxService {
         token721Example.createCriteria().andTokenAddressEqualTo(req.getContract());
         Page<TokenInventory> totalTokenInventory = token721InventoryMapper.selectByExample(token721Example);
         Map<String, Long> map = totalTokenInventory.getResult().stream().collect(Collectors.groupingBy(TokenInventory::getOwner, Collectors.counting()));
-
-        Token1155InventoryExample token1155Example = new Token1155InventoryExample();
-        token1155Example.createCriteria().andTokenAddressEqualTo(req.getContract());
-        Page<Token1155Inventory> totalToken1155Inventory = token1155InventoryMapper.selectByExample(token1155Example);
-        Map<String, BigDecimal> erc1155Map = token1155InventoryToBalanceMap(totalToken1155Inventory.getResult());
-
         ids.getResult().forEach(tokenHolder -> {
             QueryTokenHolderListResp resp = new QueryTokenHolderListResp();
             resp.setAddress(tokenHolder.getAddress());
@@ -409,10 +416,6 @@ public class ErcTxService {
                                                               .stripTrailingZeros()
                                                               .toPlainString() + "%";
                     resp.setPercent(percent);
-                } else if (ErcTypeEnum.ERC1155.getDesc().equalsIgnoreCase(tokenHolder.getType())) {
-                    // erc1155
-                    String percent = getErc1155Percent(erc1155Map, tokenHolder);
-                    resp.setPercent(percent);
                 }
             } else {
                 resp.setBalance(originBalance);
@@ -421,7 +424,7 @@ public class ErcTxService {
             respList.add(resp);
         });
         Token token = tokenMapper.selectByPrimaryKey(req.getContract());
-        if (ErcTypeEnum.ERC721.getDesc().equalsIgnoreCase(token.getType()) || ErcTypeEnum.ERC1155.getDesc().equalsIgnoreCase(token.getType())) {
+        if (ErcTypeEnum.ERC721.getDesc().equalsIgnoreCase(token.getType())) {
             respList.sort((v1, v2) -> {
                 BigDecimal value1 = new BigDecimal(StrUtil.removeAll(v1.getPercent(), '%'));
                 BigDecimal value2 = new BigDecimal(StrUtil.removeAll(v2.getPercent(), '%'));
@@ -429,6 +432,33 @@ public class ErcTxService {
             });
         }
         result.init(ids, respList);
+        return result;
+    }
+
+    public RespPage<QueryTokenHolderListResp> token1155HolderList(QueryTokenHolderListReq req) {
+        RespPage<QueryTokenHolderListResp> result = new RespPage<>();
+        PageHelper.startPage(req.getPageNo(), req.getPageSize());
+        Page<Token1155HolderListBean> token1155HolderList = customToken1155HolderMapper.findToken1155HolderList(req.getContract());
+        List<QueryTokenHolderListResp> list = new ArrayList<>();
+        if (CollUtil.isNotEmpty(token1155HolderList)) {
+            for (Token1155HolderListBean token1155HolderListBean : token1155HolderList) {
+                QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
+                queryTokenHolderListResp.setAddress(token1155HolderListBean.getAddress());
+                queryTokenHolderListResp.setPercent(token1155HolderListBean.getPercent()
+                                                                           .multiply(BigDecimal.valueOf(100))
+                                                                           .setScale(decimal, RoundingMode.HALF_UP)
+                                                                           .stripTrailingZeros()
+                                                                           .toPlainString() + "%");
+                queryTokenHolderListResp.setBalance(new BigDecimal(token1155HolderListBean.getBalance()));
+                list.add(queryTokenHolderListResp);
+            }
+            list.sort((v1, v2) -> {
+                BigDecimal value1 = new BigDecimal(StrUtil.removeAll(v1.getPercent(), '%'));
+                BigDecimal value2 = new BigDecimal(StrUtil.removeAll(v2.getPercent(), '%'));
+                return value2.subtract(value1).compareTo(BigDecimal.ZERO);
+            });
+            result.init(token1155HolderList, list);
+        }
         return result;
     }
 
