@@ -81,43 +81,40 @@
     </select>
 
     <select id="findToken1155HolderList" resultType="com.platon.browser.bean.Token1155HolderListBean">
-        SELECT
-            t1.token_address AS contract,
-            t1.address,
-            t1.count AS balance,
-            CONVERT ( t1.count / t2.allCount, DECIMAL ( 65, 6 ) ) AS percent
-        FROM
-            (
-                SELECT
-                    token_address,
-                    address,
-                    count( 1 ) AS count
-                FROM
-                    token_1155_holder
-                WHERE
-                    balance != 0
-                  AND token_address = #{contract}
-                GROUP BY
-                    token_address,
-                    address
-            ) t1
-                LEFT JOIN ( SELECT token_address, count( 1 ) AS allCount, sum( token_tx_qty ) AS token_tx_qty FROM token_1155_inventory WHERE token_address = #{contract} ) t2 ON t1.token_address = t2.token_address
+        SELECT t1.token_address                                 AS contract,
+               t1.address,
+               t1.count                                         AS balance,
+               CONVERT(t1.count / t2.allCount, DECIMAL (65, 6)) AS percent
+        FROM (
+                 SELECT token_address,
+                        address,
+                        count(1) AS count
+                 FROM
+                     token_1155_holder
+                 WHERE
+                     balance != 0
+                   AND token_address = #{contract}
+                 GROUP BY
+                     token_address,
+                     address
+             ) t1
+                 LEFT JOIN (SELECT token_address, count(1) AS allCount, sum(token_tx_qty) AS token_tx_qty FROM token_1155_inventory WHERE token_address = #{contract}) t2 ON t1.token_address = t2.token_address
     </select>
 
     <select id="findTokenIdList" resultType="com.platon.browser.bean.TokenIdListBean">
         SELECT
-            t1.token_address AS contract,
-            t1.token_id AS tokenId,
-            t1.address,
-            t1.balance,
-            t2.image,
-            t2.token_tx_qty AS txCount
+        t1.token_address AS contract,
+        t1.token_id AS tokenId,
+        t1.address,
+        t1.balance,
+        t2.image,
+        t2.token_tx_qty AS txCount
         FROM
-            token_1155_holder t1
-                LEFT JOIN token_1155_inventory t2 ON t1.token_address = t2.token_address
-                AND t1.token_id = t2.token_id
+        token_1155_holder t1
+        LEFT JOIN token_1155_inventory t2 ON t1.token_address = t2.token_address
+        AND t1.token_id = t2.token_id
         WHERE
-            1 = 1
+        1 = 1
         <if test="key.tokenAddress != null">
             AND t1.token_address = #{key.tokenAddress}
         </if>
@@ -128,4 +125,61 @@
             AND t1.token_id = #{key.tokenId}
         </if>
     </select>
+
+    <select id="selectListByERC1155" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        SELECT
+        th.token_address AS tokenAddress,
+        th.address,
+        t.type,
+        ti.NAME,
+        ti.DECIMAL,
+        '' AS symbol,
+        t.total_supply AS totalSupply,
+        th.balance,
+        th.token_owner_tx_qty AS txCount,
+        ti.token_id as tokenId,
+        t.create_time as createTime
+        FROM
+        token_1155_holder th
+        LEFT JOIN token t ON th.token_address = t.address
+        LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address AND th.token_id = ti.token_id
+        WHERE
+        th.balance != 0
+        <if test="tokenAddress != null">
+            and th.token_address = #{tokenAddress}
+        </if>
+        <if test="address != null">
+            and th.address = #{address}
+        </if>
+        AND t.type = "erc1155"
+        ORDER BY
+        balance DESC
+    </select>
+
+    <select id="findErc1155TokenHolder" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        SELECT
+        th.token_address AS tokenAddress,
+        th.address,
+        ti.token_id AS tokenId,
+        'erc1155' AS type,
+        '' AS symbol,
+        ti.NAME,
+        0 AS totalSupply,
+        th.token_owner_tx_qty AS txCount,
+        th.balance
+        FROM
+        token_1155_holder th
+        LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address
+        AND th.token_id = ti.token_id
+        WHERE
+        th.balance != 0
+        <if test="address != null">
+            AND th.address = #{address}
+        </if>
+        ORDER BY
+        th.balance + 0
+    </select>
+
 </mapper>

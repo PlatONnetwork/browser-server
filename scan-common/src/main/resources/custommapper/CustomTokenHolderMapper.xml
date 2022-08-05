@@ -99,37 +99,6 @@
             balance DESC
     </select>
 
-    <select id="findErc1155TokenHolder" parameterType="java.lang.String"
-            resultType="com.platon.browser.bean.CustomTokenHolder">
-        SELECT
-        th.token_address AS tokenAddress,
-        th.address,
-        ti.token_id AS tokenId,
-        t.type,
-        t.symbol,
-        t.NAME,
-        t.total_supply AS totalSupply,
-        ti.token_owner_tx_qty AS txCount
-        FROM
-        token_1155_inventory ti
-        LEFT JOIN token_holder th ON th.token_address = ti.token_address
-        LEFT JOIN token t ON th.token_address = t.address
-        WHERE
-        th.balance != 0
-        <if test="tokenAddress != null">
-            and th.token_address = #{tokenAddress}
-        </if>
-        <if test="address != null">
-            AND th.address = #{address}
-            AND ti.`owner` = #{address}
-        </if>
-        <if test="type != null">
-            AND t.type = #{type}
-        </if>
-        ORDER BY
-        balance DESC
-    </select>
-
     <insert id="batchInsertOrUpdateSelective" parameterType="map">
         replace into token_holder (
         <foreach collection="selective" item="column" separator=",">
@@ -206,37 +175,6 @@
         AND t.type = "erc721"
         ORDER BY
             balance DESC
-    </select>
-
-    <select id="selectListByERC1155" parameterType="java.lang.String"
-            resultType="com.platon.browser.bean.CustomTokenHolder">
-        SELECT
-        th.token_address AS tokenAddress,
-        th.address,
-        t.type,
-        ti.NAME,
-        ti.DECIMAL,
-        '' AS symbol,
-        t.total_supply AS totalSupply,
-        th.balance,
-        th.token_owner_tx_qty AS txCount,
-        ti.token_id as tokenId,
-        t.create_time as createTime
-        FROM
-        token_1155_holder th
-        LEFT JOIN token t ON th.token_address = t.address
-        LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address AND th.token_id = ti.token_id
-        WHERE
-        th.balance != 0
-        <if test="tokenAddress != null">
-            and th.token_address = #{tokenAddress}
-        </if>
-        <if test="address != null">
-            and th.address = #{address}
-        </if>
-        AND t.type = "erc1155"
-        ORDER BY
-        balance DESC
     </select>
 
     <select id="getZeroBalanceTokenHolderList" resultType="com.platon.browser.dao.entity.TokenHolder">

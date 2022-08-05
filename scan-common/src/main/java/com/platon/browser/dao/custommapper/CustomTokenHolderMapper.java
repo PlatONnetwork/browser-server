@@ -27,19 +27,7 @@ public interface CustomTokenHolderMapper {
      * @date 2021/4/3
      */
     Page<CustomTokenHolder> findErc721TokenHolder(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
-
-    /**
-     * 查询erc1155令牌数量
-     *
-     * @param tokenAddress
-     * @param address
-     * @param type
-     * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
-     * @author huangyongpeng@matrixelements.com
-     * @date 2022/2/12
-     */
-    Page<CustomTokenHolder> findErc1155TokenHolder(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
-
+    
     int batchInsertOrUpdateSelective(@Param("list") List<TokenHolder> list, @Param("selective") TokenHolder.Column... selective);
 
     /**
@@ -72,17 +60,6 @@ public interface CustomTokenHolderMapper {
      * @date 2021/3/19
      */
     Page<CustomTokenHolder> selectListByERC721(@Param("tokenAddress") String tokenAddress, @Param("address") String address);
-
-    /**
-     * 查询erc1155的TokenHolderList
-     *
-     * @param tokenAddress
-     * @param address
-     * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
-     * @author dexin.y@digquant.com
-     * @date 2022/2/12
-     */
-    Page<CustomTokenHolder> selectListByERC1155(@Param("tokenAddress") String tokenAddress, @Param("address") String address);
 
     /**
      * 取余额为0的token holder

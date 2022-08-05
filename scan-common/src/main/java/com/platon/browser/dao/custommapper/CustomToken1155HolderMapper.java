@@ -1,6 +1,7 @@
 package com.platon.browser.dao.custommapper;
 
 import com.github.pagehelper.Page;
+import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.bean.Erc1155ContractDestroyBean;
 import com.platon.browser.bean.Token1155HolderListBean;
 import com.platon.browser.bean.TokenIdListBean;
@@ -66,5 +67,18 @@ public interface CustomToken1155HolderMapper {
      * @date: 2022/8/5
      */
     Page<TokenIdListBean> findTokenIdList(@Param("key") Token1155HolderKey key);
+
+    /**
+     * 查询erc1155的TokenHolderList
+     *
+     * @param tokenAddress
+     * @param address
+     * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
+     * @author dexin.y@digquant.com
+     * @date 2022/2/12
+     */
+    Page<CustomTokenHolder> selectListByERC1155(@Param("tokenAddress") String tokenAddress, @Param("address") String address);
+
+    Page<CustomTokenHolder> findErc1155TokenHolder(@Param("address") String address);
 
 }
