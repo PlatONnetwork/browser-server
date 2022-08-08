@@ -23,15 +23,7 @@ public class ErcToken1155HolderAnalyzer {
 
     @Resource
     private CustomToken1155HolderMapper customToken1155HolderMapper;
-
-    private Token1155HolderKey getTokenHolderKey(String ownerAddress, ErcTx ercTx) {
-        Token1155HolderKey key = new Token1155HolderKey();
-        key.setTokenAddress(ercTx.getContract());
-        key.setAddress(ownerAddress);
-        key.setTokenId(ercTx.getTokenId());
-        return key;
-    }
-
+    
     /**
      * 解析Token Holder
      */
@@ -39,8 +31,8 @@ public class ErcToken1155HolderAnalyzer {
     public void analyze(List<ErcTx> txList) {
         List<Token1155Holder> insertOrUpdate = new ArrayList<>();
         txList.forEach(tx -> {
-            resolveTokenHolder(false, tx.getFrom(), tx, insertOrUpdate);
-            resolveTokenHolder(true, tx.getTo(), tx, insertOrUpdate);
+            resolveTokenHolder(tx.getFrom(), tx, insertOrUpdate);
+            resolveTokenHolder(tx.getTo(), tx, insertOrUpdate);
         });
         if (CollUtil.isNotEmpty(insertOrUpdate)) {
             customToken1155HolderMapper.batchInsertOrUpdateSelective1155(insertOrUpdate, Token1155Holder.Column.values());
@@ -50,20 +42,22 @@ public class ErcToken1155HolderAnalyzer {
     /**
      * 解析
      *
-     * @param to:             是否为to地址
      * @param ownerAddress:   地址
      * @param ercTx:          erc交易
      * @param insertOrUpdate: 更新列表
      * @return: void
      * @date: 2022/8/1
      */
-    private void resolveTokenHolder(boolean to, String ownerAddress, ErcTx ercTx, List<Token1155Holder> insertOrUpdate) {
+    private void resolveTokenHolder(String ownerAddress, ErcTx ercTx, List<Token1155Holder> insertOrUpdate) {
         // 零地址不需要創建holder
         if (AddressUtil.isAddrZero(ownerAddress)) {
             log.warn("该地址[{}]为0地址，不创建token holder", ownerAddress);
             return;
         }
-        Token1155HolderKey key = getTokenHolderKey(ownerAddress, ercTx);
+        Token1155HolderKey key = new Token1155HolderKey();
+        key.setTokenAddress(ercTx.getContract());
+        key.setAddress(ownerAddress);
+        key.setTokenId(ercTx.getTokenId());
         Token1155Holder tokenHolder = customToken1155HolderMapper.selectByUK(key);
         if (tokenHolder == null) {
             tokenHolder = new Token1155Holder();
