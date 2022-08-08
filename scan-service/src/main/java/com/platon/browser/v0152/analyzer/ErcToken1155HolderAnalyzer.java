@@ -69,15 +69,13 @@ public class ErcToken1155HolderAnalyzer {
             tokenHolder = new Token1155Holder();
             tokenHolder.setTokenAddress(key.getTokenAddress());
             tokenHolder.setAddress(key.getAddress());
+            // 余额由定时任务更新，设置成默认值
             tokenHolder.setBalance("0");
             tokenHolder.setTokenId(ercTx.getTokenId());
-        }
-        // to地址对合约交易次数加1
-        if (to && ercTx.getTo().equalsIgnoreCase(ownerAddress)) {
+            tokenHolder.setTokenOwnerTxQty(1);
+        } else {
             int tokenOwnerTxQty = tokenHolder.getTokenOwnerTxQty() == null ? 0 : tokenHolder.getTokenOwnerTxQty();
             tokenHolder.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
-        } else {
-            tokenHolder.setTokenOwnerTxQty(1);
         }
         log.info("该1155合约地址[{}][{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getTokenId(), tokenHolder.getAddress(), tokenHolder.getTokenOwnerTxQty());
         insertOrUpdate.add(tokenHolder);
