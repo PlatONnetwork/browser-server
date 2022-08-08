@@ -221,7 +221,7 @@ public class ErcTxService {
             constructor.must(new ESQueryBuilders().term("contract", contract));
         }
         if (StrUtil.isNotBlank(tokenId)) {
-            constructor.must(new ESQueryBuilders().term("value", tokenId));
+            constructor.must(new ESQueryBuilders().term("tokenId", tokenId));
         }
         if (StringUtils.isNotBlank(address)) {
             constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", address)).should(QueryBuilders.termQuery("to", address)));
