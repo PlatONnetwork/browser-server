@@ -3,6 +3,7 @@ package com.platon.browser.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
@@ -499,15 +500,11 @@ public class ErcTxService {
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
             if (null != balance) {
-                //TODO 1155暂时无法获取精度
                 BigDecimal actualTransferValue;
-                if ("erc1155".equalsIgnoreCase(req.getType())) {
-                    actualTransferValue = balance;
-                    //TODO 1155暂时获取不了name和symbol
-                    queryHolderTokenListResp.setName("");
-                    queryHolderTokenListResp.setSymbol("");
-                } else {
+                if (ObjectUtil.isNotNull(tokenHolder.getDecimal())) {
                     actualTransferValue = ConvertUtil.convertByFactor(balance, tokenHolder.getDecimal());
+                } else {
+                    actualTransferValue = balance;
                 }
                 queryHolderTokenListResp.setBalance(actualTransferValue);
             } else {
