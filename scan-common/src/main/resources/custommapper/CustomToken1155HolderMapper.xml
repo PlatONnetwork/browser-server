@@ -124,6 +124,7 @@
         <if test="key.tokenId != null">
             AND t1.token_id = #{key.tokenId}
         </if>
+        AND t1.balance != 0
     </select>
 
     <select id="selectListByERC1155" parameterType="java.lang.String"
