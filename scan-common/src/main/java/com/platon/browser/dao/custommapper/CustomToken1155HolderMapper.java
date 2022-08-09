@@ -1,10 +1,7 @@
 package com.platon.browser.dao.custommapper;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.bean.CustomTokenHolder;
-import com.platon.browser.bean.Erc1155ContractDestroyBean;
-import com.platon.browser.bean.Token1155HolderListBean;
-import com.platon.browser.bean.TokenIdListBean;
+import com.platon.browser.bean.*;
 import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.Token1155HolderKey;
 import org.apache.ibatis.annotations.Param;
@@ -80,5 +77,7 @@ public interface CustomToken1155HolderMapper {
     Page<CustomTokenHolder> selectListByERC1155(@Param("tokenAddress") String tokenAddress, @Param("address") String address);
 
     Page<CustomTokenHolder> findErc1155TokenHolder(@Param("address") String address);
+
+    Page<TokenHolderCount> findToken1155Holder();
 
 }

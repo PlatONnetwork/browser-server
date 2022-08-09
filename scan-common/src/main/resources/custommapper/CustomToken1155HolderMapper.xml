@@ -182,4 +182,15 @@
         th.balance + 0
     </select>
 
+    <select id="findToken1155Holder" resultType="com.platon.browser.bean.TokenHolderCount">
+        SELECT
+            token_address AS tokenAddress,
+            count( 1 ) AS tokenHolderCount
+        FROM
+            token_1155_holder
+        WHERE
+            balance != 0
+        GROUP BY
+            token_address
+    </select>
 </mapper>

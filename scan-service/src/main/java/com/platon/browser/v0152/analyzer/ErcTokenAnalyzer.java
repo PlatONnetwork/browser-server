@@ -310,7 +310,7 @@ public class ErcTokenAnalyzer {
             tokenLogs.forEach(tokenLog -> {
                 ErcToken token = ercCache.tokenCache.get(tokenLog.getAddress());
                 if (ObjectUtil.isNotNull(token)) {
-                    List<ErcTx> txList = Collections.emptyList();
+                    List<ErcTx> txList;
                     String contractAddress = token.getAddress();
                     ErcTypeEnum typeEnum = ErcTypeEnum.valueOf(token.getType().toUpperCase());
                     TransactionReceipt transactionReceipt = new TransactionReceipt();

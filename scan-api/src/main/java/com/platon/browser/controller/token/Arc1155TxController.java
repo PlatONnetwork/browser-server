@@ -1,4 +1,4 @@
-package com.platon.browser.controller.token;//package com.platon.browser.controller;
+package com.platon.browser.controller.token;
 
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
@@ -62,22 +62,14 @@ public class Arc1155TxController {
      * @date 2022/2/12
      */
     @GetMapping("export")
-    public void export(@RequestParam(value = "address", required = false) String address,
-                       @RequestParam(value = "contract", required = false) String contract,
-                       @RequestParam(value = "date", required = true) Long date,
-                       @RequestParam(value = "local", required = true) String local,
-                       @RequestParam(value = "timeZone", required = true) String timeZone,
-                       @RequestParam(value = "token", required = false) String token,
-                       @RequestParam(value = "tokenId", required = false) String tokenId,
-                       HttpServletResponse response) {
+    public void export(@RequestParam(value = "address", required = false) String address, @RequestParam(value = "contract", required = false) String contract, @RequestParam(value = "date", required = true) Long date, @RequestParam(value = "local", required = true) String local, @RequestParam(value = "timeZone", required = true) String timeZone, @RequestParam(value = "token", required = false) String token, @RequestParam(value = "tokenId", required = false) String tokenId, HttpServletResponse response) {
         try {
             /**
              * 鉴权
              */
             commonMethod.recaptchaAuth(token);
             AccountDownload accountDownload = ercTxService.exportToken1155TransferList(address, contract, date, local, timeZone, tokenId);
-            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
-                    accountDownload.getData());
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(), accountDownload.getData());
         } catch (Exception e) {
             log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));

@@ -14,7 +14,9 @@ import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.custommapper.CustomToken1155HolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.TokenInventoryMapper;
+import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.enums.I18nEnum;
@@ -94,13 +96,7 @@ public class ErcTxService {
     private TokenInventoryMapper token721InventoryMapper;
 
     @Resource
-    private Token1155InventoryMapper token1155InventoryMapper;
-
-    @Resource
     private TokenMapper tokenMapper;
-
-    @Resource
-    Token1155HolderMapper token1155HolderMapper;
 
     /**
      * 默认精度
@@ -666,7 +662,7 @@ public class ErcTxService {
                                                                                                                                                                     local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT,
                                                                                                                                                                                         local)};
         }
-        return this.downFileCommon.writeDate("HolderToken-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
+        return this.downFileCommon.writeDate("HolderToken-" + address + "-" + System.currentTimeMillis() + ".CSV", rows, headers);
     }
 
     public QueryTokenTransferRecordListResp toQueryTokenTransferRecordListResp(String address, ErcTx record) {
@@ -684,7 +680,7 @@ public class ErcTxService {
 //                .result(record.getResult())
                                                                                 .value(new BigDecimal(record.getValue()))
                                                                                 .blockTimestamp(record.getBTime())
-                                                                                .systemTimestamp(new Date().getTime())
+                                                                                .systemTimestamp(System.currentTimeMillis())
                                                                                 .value(null == record.getValue() ? BigDecimal.ZERO : new BigDecimal(record.getValue()))
                                                                                 .fromType(record.getFromType())
                                                                                 .toType(record.getToType())
@@ -713,7 +709,6 @@ public class ErcTxService {
     private BigDecimal getAddressBalance(CustomTokenHolder tokenHolder) {
         //暂时由后台统计余额
         return new BigDecimal(tokenHolder.getBalance());
-//        return this.ercService.getBalance(erc20TokenAddressRel.getContract(), erc20TokenAddressRel.getAddress());
     }
 
 }

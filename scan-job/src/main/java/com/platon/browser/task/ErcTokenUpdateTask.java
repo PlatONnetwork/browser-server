@@ -1429,6 +1429,18 @@ public class ErcTokenUpdateTask {
                 });
             });
         }
+        List<TokenHolderCount> token1155List = customToken1155HolderMapper.findToken1155Holder();
+        if (CollUtil.isNotEmpty(token1155List) && CollUtil.isNotEmpty(tokenList)) {
+            token1155List.forEach(tokenHolderCount -> {
+                tokenList.forEach(token -> {
+                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
+                        token.setHolder(tokenHolderCount.getTokenHolderCount());
+                        updateTokenList.add(token);
+                        TaskUtil.console("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
+                    }
+                });
+            });
+        }
         if (CollUtil.isNotEmpty(updateTokenList)) {
             customTokenMapper.batchUpdateTokenHolder(updateTokenList);
         }

@@ -1,4 +1,4 @@
-package com.platon.browser.controller.token;//package com.platon.browser.controller;
+package com.platon.browser.controller.token;
 
 import com.platon.browser.config.CommonMethod;
 import com.platon.browser.config.DownFileCommon;
