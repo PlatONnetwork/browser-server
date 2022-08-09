@@ -99,7 +99,9 @@ public class TransactionUtil {
      * 获得真实交易解除委托时所提取的委托收益
      */
     public static BigInteger getDelegateReward(List<Log> logs) {
-        if (logs == null || logs.isEmpty()) return BigInteger.ZERO;
+        if (logs == null || logs.isEmpty()) {
+            return BigInteger.ZERO;
+        }
         return getDelegateReward(logs.get(0));
     }
 
@@ -110,16 +112,22 @@ public class TransactionUtil {
      * @return
      */
     private static BigInteger getDelegateReward(Log log) {
-        if (log == null) return BigInteger.ZERO;
+        if (log == null) {
+            return BigInteger.ZERO;
+        }
         String logData = log.getData();
-        if (null == logData || "".equals(logData)) return BigInteger.ZERO;
+        if (null == logData || "".equals(logData)) {
+            return BigInteger.ZERO;
+        }
 
         RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
         List<RlpType> rlpList = ((RlpList) (rlp.getValues().get(0))).getValues();
         String decodedStatus = new String(((RlpString) rlpList.get(0)).getBytes());
         int statusCode = Integer.parseInt(decodedStatus);
 
-        if (statusCode != ErrorCode.SUCCESS) return BigInteger.ZERO;
+        if (statusCode != ErrorCode.SUCCESS) {
+            return BigInteger.ZERO;
+        }
 
         return ((RlpString) (RlpDecoder.decode(((RlpString) rlpList.get(1)).getBytes())).getValues().get(0)).asPositiveBigInteger();
     }
@@ -156,7 +164,9 @@ public class TransactionUtil {
                 }
             }
             inputs.removeAll(ppremoveList);
-            if (inputs.size() > 0) PPosInvokeContractInputCache.update(block.getNum(), inputs);
+            if (inputs.size() > 0) {
+                PPosInvokeContractInputCache.update(block.getNum(), inputs);
+            }
         }
 
         // 取出当前普通合约调用交易内部调用PPOS操作的输入参数
@@ -167,7 +177,9 @@ public class TransactionUtil {
             for (int i = 0; i < virtualTxList.size(); i++) {
                 Transaction vt = virtualTxList.get(i);
                 // 交易失败，跳过
-                if (vt.getStatus() != Transaction.StatusEnum.SUCCESS.getCode()) continue;
+                if (vt.getStatus() != Transaction.StatusEnum.SUCCESS.getCode()) {
+                    continue;
+                }
                 /**
                  * 合约代理PPOS时，回执中的logs的内部结构： List- - 虚拟交易1的log - ... - 虚拟交易n的log - 合约调用的log
                  */
