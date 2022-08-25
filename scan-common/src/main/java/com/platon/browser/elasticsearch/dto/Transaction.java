@@ -201,6 +201,10 @@ public class Transaction {
          */
         DELEGATE_EXIT(1005, "减持/撤销委托(赎回委托)"),
         /**
+         * 1005-减持/撤销委托(赎回委托)
+         */
+        REDEEM_DELEGATION(1006, "领取解锁的委托"),
+        /**
          * 2000-提交文本提案(创建提案)
          */
         PROPOSAL_TEXT(2000, "提交文本提案(创建提案)"),
