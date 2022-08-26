@@ -4,8 +4,8 @@
   <insert id="batchInsertOrUpdateSelective" parameterType="map" useGeneratedKeys="true" keyProperty="id">
     insert into tx_bak (
         `hash`,`b_hash`,`num`,`index`,`time`,`nonce`,`status`,`gas_price`,`gas_used`,`gas_limit`,`from`,`to`,
-        `value`,`type`,`cost`,`to_type`,`seq`,`input`,`info`,`erc1155_tx_info`,`erc721_tx_info`,`erc20_tx_info`,`transfer_tx_info`,
-        `ppos_tx_info`,`fail_reason`,`contract_type`,`method`,`bin`,`contract_address`
+        `value`,`type`,`cost`,`to_type`,`seq`,`info`,`erc1155_tx_info`,`erc721_tx_info`,`erc20_tx_info`,`transfer_tx_info`,
+        `ppos_tx_info`,`fail_reason`,`contract_type`,`method`,`contract_address`
     )
     values
     <foreach collection="list" item="item" separator=",">
@@ -27,7 +27,6 @@
       #{item.cost,jdbcType=VARCHAR},
       #{item.toType,jdbcType=INTEGER},
       #{item.seq,jdbcType=BIGINT},
-      #{item.input,jdbcType=LONGVARCHAR},
       #{item.info,jdbcType=LONGVARCHAR},
       #{item.erc1155TxInfo,jdbcType=LONGVARCHAR},
       #{item.erc721TxInfo,jdbcType=LONGVARCHAR},
@@ -37,7 +36,6 @@
       #{item.failReason,jdbcType=LONGVARCHAR},
       #{item.contractType,jdbcType=INTEGER},
       #{item.method,jdbcType=LONGVARCHAR},
-      #{item.bin,jdbcType=LONGVARCHAR},
       #{item.contractAddress,jdbcType=VARCHAR}
       )
     </foreach>
