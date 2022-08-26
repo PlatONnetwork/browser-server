@@ -18,7 +18,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-
+/**
+ * api文档：http://localhost:40010/browser-server/#/home
+ *
+ * @date: 2022/8/25
+ */
 @EnableCaching
 @Slf4j
 @EnableScheduling
