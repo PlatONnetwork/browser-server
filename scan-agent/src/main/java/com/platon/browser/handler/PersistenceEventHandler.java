@@ -3,7 +3,6 @@ package com.platon.browser.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.PersistenceEvent;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.DisruptorConfig;
@@ -89,16 +88,15 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         try {
             log.info("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
-                     event.getBlock().getNum(),
-                     CommonUtil.ofNullable(() -> event.getTransactions().size()).orElse(0),
-                     CommonUtil.ofNullable(() -> event.getNodeOpts().size()).orElse(0),
-                     CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
+                    event.getBlock().getNum(),
+                    CommonUtil.ofNullable(() -> event.getTransactions().size()).orElse(0),
+                    CommonUtil.ofNullable(() -> event.getNodeOpts().size()).orElse(0),
+                    CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
             // 去除Transaction中冗余的字段
             if (CollUtil.isNotEmpty(transactionStage)) {
                 for (Transaction transaction : transactionStage) {
-                    transaction.setInput("");
                     transaction.setBin("");
                 }
             }
@@ -165,13 +163,13 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                     IntSummaryStatistics pposTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getPposTxList().size()));
                     IntSummaryStatistics virtualTransactionSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getVirtualTransactions().size()));
                     log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
-                             blockNum,
-                             CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
-                             erc20Size.getSum(),
-                             erc721Size.getSum(),
-                             transferTxSize.getSum(),
-                             pposTxSize.getSum(),
-                             virtualTransactionSize.getSum());
+                            blockNum,
+                            CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
+                            erc20Size.getSum(),
+                            erc721Size.getSum(),
+                            transferTxSize.getSum(),
+                            pposTxSize.getSum(),
+                            virtualTransactionSize.getSum());
                 });
             }
         } catch (Exception e) {
