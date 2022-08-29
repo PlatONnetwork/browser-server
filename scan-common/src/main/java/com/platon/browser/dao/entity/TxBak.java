@@ -257,6 +257,7 @@ public class TxBak {
         contractAddress("contract_address", "contractAddress", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true),
         info("info", "info", "LONGVARCHAR", false),
+        erc1155TxInfo("erc1155_tx_info", "erc1155TxInfo", "LONGVARCHAR", false),
         erc721TxInfo("erc721_tx_info", "erc721TxInfo", "LONGVARCHAR", false),
         erc20TxInfo("erc20_tx_info", "erc20TxInfo", "LONGVARCHAR", false),
         transferTxInfo("transfer_tx_info", "transferTxInfo", "LONGVARCHAR", false),

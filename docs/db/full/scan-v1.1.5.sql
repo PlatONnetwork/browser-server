@@ -453,6 +453,7 @@ CREATE TABLE `tx_bak` (
                           `seq` bigint(20) DEFAULT NULL COMMENT 'seq',
                           `cre_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                           `upd_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                          `input` longtext ,
                           `info` longtext ,
                           `erc1155_tx_info` longtext COLLATE utf8mb4_unicode_ci COMMENT 'erc1155交易列表信息',
                           `erc721_tx_info` longtext COMMENT 'erc721交易列表信息',
