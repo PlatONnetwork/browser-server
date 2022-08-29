@@ -76,23 +76,33 @@ public class Transaction {
 
     private String contractAddress;
 
-    // erc721交易列表
+    /**
+     * erc721交易列表
+     */
     @JSONField(serialize = false)
     private List<ErcTx> erc721TxList = new ArrayList<>();
 
-    // erc20 交易列表
+    /**
+     * erc20 交易列表
+     */
     @JSONField(serialize = false)
     private List<ErcTx> erc20TxList = new ArrayList<>();
 
-    // 内部转账交易
+    /**
+     * 内部转账交易
+     */
     @JSONField(serialize = false)
     private List<Transaction> transferTxList = new ArrayList<>();
 
-    // PPOS调用交易
+    /**
+     * PPOS调用交易
+     */
     @JSONField(serialize = false)
     private List<Transaction> pposTxList = new ArrayList<>();
 
-    // 虚拟交易，
+    /**
+     * 虚拟交易
+     */
     @JSONField(serialize = false)
     private List<Transaction> virtualTransactions = new ArrayList<>();
 

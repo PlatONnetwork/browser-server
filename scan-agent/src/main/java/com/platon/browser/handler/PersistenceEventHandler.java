@@ -95,8 +95,14 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                      CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
+            // 去除Transaction中冗余的字段
+            if (CollUtil.isNotEmpty(transactionStage)) {
+                for (Transaction transaction : transactionStage) {
+                    transaction.setInput("");
+                    transaction.setBin("");
+                }
+            }
             delegationRewardStage.addAll(event.getDelegationRewards());
-
             List<Long> blockNums = CollUtil.newArrayList();
             if (retryCount.incrementAndGet() > 1) {
                 if (CollUtil.isNotEmpty(blockStage)) {
@@ -123,7 +129,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(blockStage, transactionStage, delegationRewardStage);
-
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             statistics.add(networkStatCache.getNetworkStat());
