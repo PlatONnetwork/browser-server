@@ -98,7 +98,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             // 去除Transaction中冗余的字段
             if (CollUtil.isNotEmpty(transactionStage)) {
                 for (Transaction transaction : transactionStage) {
-                    transaction.setInput("");
                     transaction.setBin("");
                 }
             }

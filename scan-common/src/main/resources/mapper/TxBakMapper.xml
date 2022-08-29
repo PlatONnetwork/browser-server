@@ -26,6 +26,7 @@
     <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxBakWithBLOBs">
+    <result column="input" jdbcType="LONGVARCHAR" property="input" />
     <result column="info" jdbcType="LONGVARCHAR" property="info" />
     <result column="erc721_tx_info" jdbcType="LONGVARCHAR" property="erc721TxInfo" />
     <result column="erc20_tx_info" jdbcType="LONGVARCHAR" property="erc20TxInfo" />
@@ -98,8 +99,8 @@
     contract_address
   </sql>
   <sql id="Blob_Column_List">
-    info, erc721_tx_info, erc20_tx_info, transfer_tx_info, ppos_tx_info, fail_reason, 
-    `method`
+    info, erc1155_tx_info, erc721_tx_info, erc20_tx_info, transfer_tx_info, ppos_tx_info, 
+    fail_reason, `method`
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TxBakExample" resultMap="ResultMapWithBLOBs">
     select
@@ -157,9 +158,9 @@
       `to`, `value`, `type`, cost, 
       to_type, seq, cre_time, 
       upd_time, contract_type, contract_address, 
-      info, erc721_tx_info, erc20_tx_info, 
-      transfer_tx_info, ppos_tx_info, fail_reason, 
-      `method`)
+      info, erc1155_tx_info, erc721_tx_info, 
+      erc20_tx_info, transfer_tx_info, ppos_tx_info, 
+      fail_reason, `method`)
     values (#{id,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{bHash,jdbcType=VARCHAR}, 
       #{num,jdbcType=BIGINT}, #{index,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, 
       #{nonce,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{gasPrice,jdbcType=VARCHAR}, 
@@ -167,9 +168,9 @@
       #{to,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{cost,jdbcType=VARCHAR}, 
       #{toType,jdbcType=INTEGER}, #{seq,jdbcType=BIGINT}, #{creTime,jdbcType=TIMESTAMP}, 
       #{updTime,jdbcType=TIMESTAMP}, #{contractType,jdbcType=INTEGER}, #{contractAddress,jdbcType=VARCHAR}, 
-      #{info,jdbcType=LONGVARCHAR}, #{erc721TxInfo,jdbcType=LONGVARCHAR}, #{erc20TxInfo,jdbcType=LONGVARCHAR}, 
-      #{transferTxInfo,jdbcType=LONGVARCHAR}, #{pposTxInfo,jdbcType=LONGVARCHAR}, #{failReason,jdbcType=LONGVARCHAR}, 
-      #{method,jdbcType=LONGVARCHAR})
+      #{info,jdbcType=LONGVARCHAR}, #{erc1155TxInfo,jdbcType=LONGVARCHAR}, #{erc721TxInfo,jdbcType=LONGVARCHAR}, 
+      #{erc20TxInfo,jdbcType=LONGVARCHAR}, #{transferTxInfo,jdbcType=LONGVARCHAR}, #{pposTxInfo,jdbcType=LONGVARCHAR}, 
+      #{failReason,jdbcType=LONGVARCHAR}, #{method,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TxBakWithBLOBs">
     insert into tx_bak
@@ -242,6 +243,9 @@
       </if>
       <if test="info != null">
         info,
+      </if>
+      <if test="erc1155TxInfo != null">
+        erc1155_tx_info,
       </if>
       <if test="erc721TxInfo != null">
         erc721_tx_info,
@@ -331,6 +335,9 @@
       </if>
       <if test="info != null">
         #{info,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="erc1155TxInfo != null">
+        #{erc1155TxInfo,jdbcType=LONGVARCHAR},
       </if>
       <if test="erc721TxInfo != null">
         #{erc721TxInfo,jdbcType=LONGVARCHAR},
@@ -430,6 +437,9 @@
       <if test="record.info != null">
         info = #{record.info,jdbcType=LONGVARCHAR},
       </if>
+      <if test="record.erc1155TxInfo != null">
+        erc1155_tx_info = #{record.erc1155TxInfo,jdbcType=LONGVARCHAR},
+      </if>
       <if test="record.erc721TxInfo != null">
         erc721_tx_info = #{record.erc721TxInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -478,6 +488,7 @@
       contract_type = #{record.contractType,jdbcType=INTEGER},
       contract_address = #{record.contractAddress,jdbcType=VARCHAR},
       info = #{record.info,jdbcType=LONGVARCHAR},
+      erc1155_tx_info = #{record.erc1155TxInfo,jdbcType=LONGVARCHAR},
       erc721_tx_info = #{record.erc721TxInfo,jdbcType=LONGVARCHAR},
       erc20_tx_info = #{record.erc20TxInfo,jdbcType=LONGVARCHAR},
       transfer_tx_info = #{record.transferTxInfo,jdbcType=LONGVARCHAR},
@@ -585,6 +596,9 @@
       <if test="info != null">
         info = #{info,jdbcType=LONGVARCHAR},
       </if>
+      <if test="erc1155TxInfo != null">
+        erc1155_tx_info = #{erc1155TxInfo,jdbcType=LONGVARCHAR},
+      </if>
       <if test="erc721TxInfo != null">
         erc721_tx_info = #{erc721TxInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -630,6 +644,7 @@
       contract_type = #{contractType,jdbcType=INTEGER},
       contract_address = #{contractAddress,jdbcType=VARCHAR},
       info = #{info,jdbcType=LONGVARCHAR},
+      erc1155_tx_info = #{erc1155TxInfo,jdbcType=LONGVARCHAR},
       erc721_tx_info = #{erc721TxInfo,jdbcType=LONGVARCHAR},
       erc20_tx_info = #{erc20TxInfo,jdbcType=LONGVARCHAR},
       transfer_tx_info = #{transferTxInfo,jdbcType=LONGVARCHAR},
@@ -672,8 +687,8 @@
     insert into tx_bak
     (id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
       `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type, 
-      contract_address, info, erc721_tx_info, erc20_tx_info, transfer_tx_info, ppos_tx_info, 
-      fail_reason, `method`)
+      contract_address, info, erc1155_tx_info, erc721_tx_info, erc20_tx_info, transfer_tx_info, 
+      ppos_tx_info, fail_reason, `method`)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.bHash,jdbcType=VARCHAR}, 
@@ -683,10 +698,10 @@
         #{item.to,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, 
         #{item.cost,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.seq,jdbcType=BIGINT}, 
         #{item.creTime,jdbcType=TIMESTAMP}, #{item.updTime,jdbcType=TIMESTAMP}, #{item.contractType,jdbcType=INTEGER}, 
-        #{item.contractAddress,jdbcType=VARCHAR}, #{item.info,jdbcType=LONGVARCHAR}, #{item.erc721TxInfo,jdbcType=LONGVARCHAR}, 
-        #{item.erc20TxInfo,jdbcType=LONGVARCHAR}, #{item.transferTxInfo,jdbcType=LONGVARCHAR}, 
-        #{item.pposTxInfo,jdbcType=LONGVARCHAR}, #{item.failReason,jdbcType=LONGVARCHAR}, 
-        #{item.method,jdbcType=LONGVARCHAR})
+        #{item.contractAddress,jdbcType=VARCHAR}, #{item.info,jdbcType=LONGVARCHAR}, #{item.erc1155TxInfo,jdbcType=LONGVARCHAR}, 
+        #{item.erc721TxInfo,jdbcType=LONGVARCHAR}, #{item.erc20TxInfo,jdbcType=LONGVARCHAR}, 
+        #{item.transferTxInfo,jdbcType=LONGVARCHAR}, #{item.pposTxInfo,jdbcType=LONGVARCHAR}, 
+        #{item.failReason,jdbcType=LONGVARCHAR}, #{item.method,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -772,6 +787,9 @@
         </if>
         <if test="'info'.toString() == column.value">
           #{item.info,jdbcType=LONGVARCHAR}
+        </if>
+        <if test="'erc1155_tx_info'.toString() == column.value">
+          #{item.erc1155TxInfo,jdbcType=LONGVARCHAR}
         </if>
         <if test="'erc721_tx_info'.toString() == column.value">
           #{item.erc721TxInfo,jdbcType=LONGVARCHAR}
