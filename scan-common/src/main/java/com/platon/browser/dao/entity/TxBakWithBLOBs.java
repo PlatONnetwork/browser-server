@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TxBakWithBLOBs extends TxBak {
-    private String info;
+    private String input;
 
-    private String erc1155TxInfo;
+    private String info;
 
     private String erc721TxInfo;
 
@@ -20,20 +20,20 @@ public class TxBakWithBLOBs extends TxBak {
 
     private String method;
 
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input == null ? null : input.trim();
+    }
+
     public String getInfo() {
         return info;
     }
 
     public void setInfo(String info) {
         this.info = info == null ? null : info.trim();
-    }
-
-    public String getErc1155TxInfo() {
-        return erc1155TxInfo;
-    }
-
-    public void setErc1155TxInfo(String erc1155TxInfo) {
-        this.erc1155TxInfo = erc1155TxInfo == null ? null : erc1155TxInfo.trim();
     }
 
     public String getErc721TxInfo() {
@@ -114,8 +114,8 @@ public class TxBakWithBLOBs extends TxBak {
         updTime("upd_time", "updTime", "TIMESTAMP", false),
         contractType("contract_type", "contractType", "INTEGER", false),
         contractAddress("contract_address", "contractAddress", "VARCHAR", false),
+        input("input", "input", "LONGVARCHAR", true),
         info("info", "info", "LONGVARCHAR", false),
-        erc1155TxInfo("erc1155_tx_info", "erc1155TxInfo", "LONGVARCHAR", false),
         erc721TxInfo("erc721_tx_info", "erc721TxInfo", "LONGVARCHAR", false),
         erc20TxInfo("erc20_tx_info", "erc20TxInfo", "LONGVARCHAR", false),
         transferTxInfo("transfer_tx_info", "transferTxInfo", "LONGVARCHAR", false),
