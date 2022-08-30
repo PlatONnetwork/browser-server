@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 @Component
 public class PlatOnClient {
+
     // 交易输入参数并行解码线程池
     @Getter
     @Setter
@@ -40,44 +41,67 @@ public class PlatOnClient {
     // 交易输入参数并行解码线程数
     @Value("${platon.txLogDecodeThreadNum}")
     private int logDecodeThreadNum;
+
     @Resource
     private RetryableClient retryableClient;
+
     @Resource
     private SpecialApi specialApi;
-    public DelegateContract getDelegateContract(){return retryableClient.getDelegateContract();}
-    public NodeContract getNodeContract(){return retryableClient.getNodeContract();}
-    public ProposalContract getProposalContract(){return retryableClient.getProposalContract();}
-    public RestrictingPlanContract getRestrictingPlanContract(){return retryableClient.getRestrictingPlanContract();}
-    public SlashContract getSlashContract(){return retryableClient.getSlashContract();}
-    public StakingContract getStakingContract(){return retryableClient.getStakingContract();}
-    public RewardContract getRewardContract(){return retryableClient.getRewardContract();}
+
+    public DelegateContract getDelegateContract() {
+        return retryableClient.getDelegateContract();
+    }
+
+    public NodeContract getNodeContract() {
+        return retryableClient.getNodeContract();
+    }
+
+    public ProposalContract getProposalContract() {
+        return retryableClient.getProposalContract();
+    }
+
+    public RestrictingPlanContract getRestrictingPlanContract() {
+        return retryableClient.getRestrictingPlanContract();
+    }
+
+    public SlashContract getSlashContract() {
+        return retryableClient.getSlashContract();
+    }
+
+    public StakingContract getStakingContract() {
+        return retryableClient.getStakingContract();
+    }
+
+    public RewardContract getRewardContract() {
+        return retryableClient.getRewardContract();
+    }
 
     @PostConstruct
     private void init() throws ConfigLoadingException {
-        logDecodeExecutor=Executors.newFixedThreadPool(logDecodeThreadNum);
+        logDecodeExecutor = Executors.newFixedThreadPool(logDecodeThreadNum);
         retryableClient.init();
     }
 
-    public void updateCurrentWeb3jWrapper(){
+    public void updateCurrentWeb3jWrapper() {
         retryableClient.updateCurrentWeb3jWrapper();
     }
 
-    public Web3jWrapper getWeb3jWrapper(){
+    public Web3jWrapper getWeb3jWrapper() {
         return retryableClient.getWeb3jWrapper();
     }
 
     public ReceiptResult getReceiptResult(Long blockNumber) throws IOException, InterruptedException {
-        ReceiptResult receiptResult = specialApi.getReceiptResult(retryableClient.getWeb3jWrapper(),BigInteger.valueOf(blockNumber));
-        receiptResult.resolve(blockNumber,logDecodeExecutor);
+        ReceiptResult receiptResult = specialApi.getReceiptResult(retryableClient.getWeb3jWrapper(), BigInteger.valueOf(blockNumber));
+        receiptResult.resolve(blockNumber, logDecodeExecutor);
         return receiptResult;
     }
 
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,backoff=@Backoff(value=3000L))
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(value = 3000L))
     public EconomicConfig getEconomicConfig() throws ConfigLoadingException {
         try {
             EconomicConfig ec = retryableClient.getWeb3jWrapper().getWeb3j().getEconomicConfig().send().getEconomicConfig();
-            String msg = JSON.toJSONString(ec,true);
-            log.info("链上配置:{}",msg);
+            String msg = JSON.toJSONString(ec);
+            log.info("链上配置:{}", msg);
             return ec;
         } catch (Exception e) {
             retryableClient.updateCurrentWeb3jWrapper();
@@ -86,7 +110,7 @@ public class PlatOnClient {
         }
     }
 
-    public void updateContract(){
+    public void updateContract() {
         retryableClient.updateContract();
     }
 
@@ -98,7 +122,7 @@ public class PlatOnClient {
         try {
             return getNodeContract().getValidatorList().send().getData();
         } catch (Exception e) {
-           throw new BusinessException(e.getMessage());
+            throw new BusinessException(e.getMessage());
         }
     }
 
@@ -109,12 +133,13 @@ public class PlatOnClient {
             throw new BusinessException(e.getMessage());
         }
     }
-    
+
     public List<GovernParam> getGovernParamValue(String module) {
-    	try {
+        try {
             return getProposalContract().getParamList(module).send().getData();
         } catch (Exception e) {
             throw new BusinessException(e.getMessage());
         }
     }
+
 }

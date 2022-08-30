@@ -164,6 +164,9 @@ public class ParameterService {
             case UN_STAKE_FREEZE_DURATION:
                 staleValue = chainConfig.getUnStakeRefundSettlePeriodCount().toString();
                 break;
+            case UN_DELEGATE_FREEZE_DURATION:
+                staleValue = chainConfig.getUnDelegateFreezeDurationCount().toString();
+                break;
             // 惩罚相关
             case SLASH_FRACTION_DUPLICATE_SIGN:
                 staleValue = chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).setScale(0).toString();
