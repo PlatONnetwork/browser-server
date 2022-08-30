@@ -100,6 +100,7 @@ public class ParameterService {
         chainConfig.setDelegateThreshold(modifiableParam.getStaking().getOperatingThreshold());
         //节点质押退回锁定周期
         chainConfig.setUnStakeRefundSettlePeriodCount(modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger());
+        chainConfig.setUnDelegateFreezeDurationCount(modifiableParam.getStaking().getUnDelegateFreezeDuration().toBigInteger());
         //备选结算周期验证节点数量(U)
         chainConfig.setSettlementValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
         //举报最高处罚n3‱

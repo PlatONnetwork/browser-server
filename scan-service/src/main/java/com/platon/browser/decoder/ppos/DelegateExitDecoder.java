@@ -50,7 +50,8 @@ public class DelegateExitDecoder extends AbstractPPOSDecoder {
             BigInteger restrictingPlan = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(3)).getBytes())).getValues().get(0)).asPositiveBigInteger();
             BigInteger lockReleased = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(4)).getBytes())).getValues().get(0)).asPositiveBigInteger();
             BigInteger lockRestrictingPlan = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(5)).getBytes())).getValues().get(0)).asPositiveBigInteger();
-            delegateExitParam.setDelegateIncome(new BigDecimal(delegateIncome))
+            delegateExitParam.setDecodedStatus(decodedStatus)
+                             .setDelegateIncome(new BigDecimal(delegateIncome))
                              .setReleased(new BigDecimal(released))
                              .setRestrictingPlan(new BigDecimal(restrictingPlan))
                              .setLockReleased(new BigDecimal(lockReleased))

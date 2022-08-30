@@ -53,6 +53,11 @@ public class DelegateExitParam extends TxParam {
     private String nodeName;
 
     /**
+     * 状态码
+     */
+    String decodedStatus;
+
+    /**
      * 委托的收益(委托锁定新增字段)
      */
     private BigDecimal delegateIncome;
