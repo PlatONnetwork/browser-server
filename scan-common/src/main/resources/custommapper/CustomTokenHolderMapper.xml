@@ -12,7 +12,6 @@
         t.total_supply as totalSupply,
         th.balance,
         t.decimal,
-        th.token_id as tokenId,
         th.token_tx_qty as txCount,
         t.create_time as createTime
         from token_holder th left join token t on th.token_address = t.address

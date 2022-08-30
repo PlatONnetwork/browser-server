@@ -56,9 +56,7 @@ public class BlockChainConfig {
         try (InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
             String salt = properties.getProperty("jasypt.encryptor.password");
-            if (StringUtils.isBlank(salt)) {
-                throw new ConfigLoadingException("加密盐不能为空!");
-            }
+            if (StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
             salt = salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
             log.info("salt:{}", salt);
@@ -164,11 +162,6 @@ public class BlockChainConfig {
      * 【质押】节点质押退回锁定的结算周期数
      */
     private BigInteger unStakeRefundSettlePeriodCount;
-
-    /**
-     * 【质押】解委托锁定周期数
-     */
-    private BigInteger unDelegateFreezeDurationCount;
 
     /**
      * 【惩罚】双签奖励百分比
@@ -416,7 +409,6 @@ public class BlockChainConfig {
         setDelegateThreshold(new BigDecimal(dec.getStaking().getOperatingThreshold()));
         //【质押】节点质押退回锁定的结算周期数
         setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
-        setUnDelegateFreezeDurationCount(dec.getStaking().getUnDelegateFreezeDuration());
         //【惩罚】双签奖励百分比
         setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //【惩罚】双签处罚万分比

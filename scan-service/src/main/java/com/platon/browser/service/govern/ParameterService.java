@@ -1,11 +1,11 @@
 package com.platon.browser.service.govern;
 
+import com.platon.browser.bean.govern.ModifiableParam;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.bean.govern.ModifiableParam;
+import com.platon.browser.dao.custommapper.CustomConfigMapper;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
-import com.platon.browser.dao.custommapper.CustomConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import lombok.extern.slf4j.Slf4j;
@@ -164,9 +164,6 @@ public class ParameterService {
                 break;
             case UN_STAKE_FREEZE_DURATION:
                 staleValue = chainConfig.getUnStakeRefundSettlePeriodCount().toString();
-                break;
-            case UN_DELEGATE_FREEZE_DURATION:
-                staleValue = chainConfig.getUnDelegateFreezeDurationCount().toString();
                 break;
             // 惩罚相关
             case SLASH_FRACTION_DUPLICATE_SIGN:
