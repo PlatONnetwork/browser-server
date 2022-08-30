@@ -74,7 +74,7 @@ public abstract class AbstractEsRepository {
         try {
             Yaml yaml = new Yaml();
             Object result = yaml.load(AbstractEsRepository.class.getResourceAsStream(CLASSPATH_ES_TPL_DIR + tplName));
-            String json = JSON.toJSONString(result, true);
+            String json = JSON.toJSONString(result);
             log.debug("template json:{}", json);
             return json;
         } catch (Exception e) {
@@ -114,7 +114,7 @@ public abstract class AbstractEsRepository {
         AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
         if (log.isDebugEnabled()) {
             log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-            log.debug("createIndexWithMapping:{}", JSON.toJSONString(response, true));
+            log.debug("createIndexWithMapping:{}", JSON.toJSONString(response));
         }
     }
 
@@ -142,7 +142,7 @@ public abstract class AbstractEsRepository {
         }
         CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-        log.debug("createIndex:{}", JSON.toJSONString(response, true));
+        log.debug("createIndex:{}", JSON.toJSONString(response));
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class AbstractEsRepository {
         }
         CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-        log.debug("createIndex:{}", JSON.toJSONString(response, true));
+        log.debug("createIndex:{}", JSON.toJSONString(response));
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class AbstractEsRepository {
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-        log.debug("deleteIndex:{}", JSON.toJSONString(response, true));
+        log.debug("deleteIndex:{}", JSON.toJSONString(response));
     }
 
     /**
@@ -235,7 +235,7 @@ public abstract class AbstractEsRepository {
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-        log.debug("add:{}", JSON.toJSONString(response, true));
+        log.debug("add:{}", JSON.toJSONString(response));
     }
 
     /**
@@ -253,7 +253,7 @@ public abstract class AbstractEsRepository {
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-        log.debug("add:{}", JSON.toJSONString(response, true));
+        log.debug("add:{}", JSON.toJSONString(response));
         return response;
     }
 
@@ -268,7 +268,7 @@ public abstract class AbstractEsRepository {
 
         GetRequest request = new GetRequest(getIndexName(), id);
         GetResponse response = client.get(request, RequestOptions.DEFAULT);
-        log.debug("get:{}", JSON.toJSONString(response, true));
+        log.debug("get:{}", JSON.toJSONString(response));
         String res = response.getSourceAsString();
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
@@ -290,7 +290,7 @@ public abstract class AbstractEsRepository {
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-        log.debug("update:{}", JSON.toJSONString(response, true));
+        log.debug("update:{}", JSON.toJSONString(response));
     }
 
     /**
@@ -307,7 +307,7 @@ public abstract class AbstractEsRepository {
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-        log.debug("delete:{}", JSON.toJSONString(response, true));
+        log.debug("delete:{}", JSON.toJSONString(response));
     }
 
     /**
@@ -439,14 +439,14 @@ public abstract class AbstractEsRepository {
         try {
             BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
             log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-            log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+            log.debug("bulkAdd:{}", JSON.toJSONString(response));
         } catch (Exception e) {
             log.error("ES批量增加或更新异常", e);
             if (e instanceof RuntimeException && e.getMessage().contains("Request cannot be executed; I/O reactor status: STOPPED")) {
                 client = (RestHighLevelClient) springUtils.resetSpring("restHighLevelClient");
                 BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
                 log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-                log.debug("bulkAdd:{}", JSON.toJSONString(response, true));
+                log.debug("bulkAdd:{}", JSON.toJSONString(response));
             }
             throw e;
         }
@@ -470,7 +470,7 @@ public abstract class AbstractEsRepository {
 
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
-        log.debug("bulkDelete:{}", JSON.toJSONString(response, true));
+        log.debug("bulkDelete:{}", JSON.toJSONString(response));
     }
 
 }
