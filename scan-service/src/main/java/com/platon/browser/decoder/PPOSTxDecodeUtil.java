@@ -71,7 +71,7 @@ public class PPOSTxDecodeUtil {
                     case DELEGATE_EXIT: // 1005 减持/撤销委托
                         return result.setParam(DelegateExitDecoder.decode(rootList, logs));
                     case REDEEM_DELEGATION: // 1006 领取解锁的委托
-                        return result.setParam(DelegateExitDecoder.decode(rootList, logs));
+                        return result.setParam(RedeemDelegationDecoder.decode(rootList, logs));
                     case PROPOSAL_TEXT: // 2000 提交文本提案
                         return result.setParam(ProposalTextDecoder.decode(rootList));
                     case PROPOSAL_UPGRADE: // 2001 提交升级提案
