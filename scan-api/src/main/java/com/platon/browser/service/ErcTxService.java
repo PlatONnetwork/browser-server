@@ -685,8 +685,9 @@ public class ErcTxService {
         // Processing accuracy calculation.
         if (null != record.getValue()) {
             BigDecimal transferValue = new BigDecimal(record.getValue());
-            //TODO 暂时1155取不到精度，后续修改
-//            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            if (record.getDecimal() != null && record.getDecimal() > 0) {
+                transferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            }
             resp.setTransferValue(transferValue);
         } else {
             resp.setTransferValue(BigDecimal.ZERO);
