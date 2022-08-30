@@ -495,8 +495,8 @@ public class ErcTxService {
             String contractAddress = tokenHolder.getTokenAddress();
             QueryHolderTokenListResp queryHolderTokenListResp = new QueryHolderTokenListResp();
             BeanUtils.copyProperties(tokenHolder, queryHolderTokenListResp);
+            queryHolderTokenListResp.setName(StrUtil.emptyIfNull(tokenHolder.getName()));
             queryHolderTokenListResp.setContract(contractAddress);
-
             BigDecimal balance = this.getAddressBalance(tokenHolder);
             //金额转换成对应的值
             if (null != balance) {
