@@ -56,8 +56,9 @@ public class BlockChainConfig {
         try (InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
             String salt = properties.getProperty("jasypt.encryptor.password");
-            if (StringUtils.isBlank(salt))
+            if (StringUtils.isBlank(salt)) {
                 throw new ConfigLoadingException("加密盐不能为空!");
+            }
             salt = salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
             log.info("salt:{}", salt);
@@ -163,6 +164,11 @@ public class BlockChainConfig {
      * 【质押】节点质押退回锁定的结算周期数
      */
     private BigInteger unStakeRefundSettlePeriodCount;
+
+    /**
+     * 【质押】解委托锁定周期数
+     */
+    private BigInteger unDelegateFreezeDurationCount;
 
     /**
      * 【惩罚】双签奖励百分比
@@ -394,10 +400,7 @@ public class BlockChainConfig {
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
         setConsensusPeriodBlockCount(expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals()));
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        setSettlePeriodBlockCount(settlementCycleMinutes
-                .multiply(BigInteger.valueOf(60))
-                .divide(blockInterval.multiply(consensusPeriodBlockCount))
-                .multiply(consensusPeriodBlockCount));
+        setSettlePeriodBlockCount(settlementCycleMinutes.multiply(BigInteger.valueOf(60)).divide(blockInterval.multiply(consensusPeriodBlockCount)).multiply(consensusPeriodBlockCount));
         //【通用】PlatOn基金会账户地址
         setPlatOnFundAccount(dec.getInnerAcc().getPlatonFundAccount());
         //【通用】PlatOn基金会账户初始余额
@@ -413,6 +416,7 @@ public class BlockChainConfig {
         setDelegateThreshold(new BigDecimal(dec.getStaking().getOperatingThreshold()));
         //【质押】节点质押退回锁定的结算周期数
         setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
+        setUnDelegateFreezeDurationCount(dec.getStaking().getUnDelegateFreezeDuration());
         //【惩罚】双签奖励百分比
         setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //【惩罚】双签处罚万分比
@@ -434,13 +438,10 @@ public class BlockChainConfig {
         setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】文本提案投票周期
         setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
-                .divide(
-                        new BigDecimal(
-                                BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-                                        .multiply(dec.getCommon().getPerRoundBlocks())
-                                        .multiply(consensusValidatorCount)) //每个共识轮验证节点数量
-                        , 0, RoundingMode.FLOOR
-                ));
+                                                                                                         .divide(new BigDecimal(BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
+                                                                                                                                               .multiply(dec.getCommon().getPerRoundBlocks())
+                                                                                                                                               .multiply(consensusValidatorCount)) //每个共识轮验证节点数量
+                                                                                                                 , 0, RoundingMode.FLOOR));
 
         //【治理】参数提案的投票持续最长的时间（单位：s）
         setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
