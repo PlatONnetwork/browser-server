@@ -46,32 +46,32 @@ public class SpecialApi {
     /**
      * 查询结算周期历史验证人队列
      */
-    public static final int GET_HISTORY_VERIFIER_LIST_FUNC_TYPE = 1300;
+    public static final int GET_HISTORY_VERIFIER_LIST_FUNC_TYPE = 1106;
 
     /**
      * 查询历史共识周期的验证人列
      */
-    public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1301;
+    public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1107;
 
     /**
      * 历史低出块处罚信息
      */
-    public static final int GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE = 1304;
+    public static final int GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE = 1110;
 
     /**
      * 查询版本列表
      */
-    public static final int GET_NODE_VERSION = 1302;
+    public static final int GET_NODE_VERSION = 1108;
 
     /**
      * 查询版本列表
      */
-    public static final int GET_HISTORY_REWARD = 1303;
+    public static final int GET_HISTORY_REWARD = 1109;
 
     /**
      * 获取可用和锁仓余额
      */
-    public static final int GET_RESTRICTING_BALANCE_FUNC_TYPE = 4200;
+    public static final int GET_RESTRICTING_BALANCE_FUNC_TYPE = 4101;
 
     /**
      * 获取提案结果
@@ -81,7 +81,7 @@ public class SpecialApi {
     /**
      * 查询合约调用PPOS信息
      */
-    public static final int GET_PPOS_INFO_FUNC_TYPE = 1305;
+    public static final int GET_PPOS_INFO_FUNC_TYPE = 1111;
 
     /**
      * 查询质押委托调账信息
