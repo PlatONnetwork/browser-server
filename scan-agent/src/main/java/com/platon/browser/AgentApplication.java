@@ -37,27 +37,39 @@ import java.util.concurrent.CompletableFuture;
 @MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper", "com.platon.browser.v0150.dao", "com.platon.browser.v0151.dao"})
 public class AgentApplication implements ApplicationRunner {
 
-    // 区块服务
+    /**
+     * 区块服务
+     */
     @Resource
     private BlockService blockService;
 
-    // 交易服务
+    /**
+     * 交易服务
+     */
     @Resource
     private ReceiptService receiptService;
 
-    // 区块事件发布服务
+    /**
+     * 区块事件发布服务
+     */
     @Resource
     private BlockEventPublisher blockEventPublisher;
 
-    // 周期服务
+    /**
+     * 周期服务
+     */
     @Resource
     private EpochService epochService;
 
-    // 启动一致性检查服务
+    /**
+     * 启动一致性检查服务
+     */
     @Resource
     private ConsistencyService consistencyService;
 
-    // 启动初始化服务
+    /**
+     * 启动初始化服务
+     */
     @Resource
     private InitializationService initializationService;
 
