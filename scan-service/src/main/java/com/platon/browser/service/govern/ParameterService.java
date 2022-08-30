@@ -63,7 +63,6 @@ public class ParameterService {
             configList.add(config);
             config.setCreateTime(date);
             config.setUpdateTime(date);
-
             // Alaya版本特殊处理【锁仓最小释放金额属性】，因为：
             // 在Alaya版本中，debug_economic接口不会返回minimumRelease参数，因此需要在提案合约中查询出来并设置到BlockChainConfig实例中
             // 防止后面代码 getValueInBlockChainConfig("minimumRelease") 时取不到参数值报错
@@ -74,7 +73,6 @@ public class ParameterService {
                 chainConfig.setRestrictingMinimumRelease(new BigDecimal(minimumRelease));
                 // 接下来的代码就可以从blockChainConfig实例中获取此值了
             }
-
             // 浏览器刚启动时在BlockChainConfig中调用debugEconomicConfig接口取得链刚启动时的参数
             // 所以从零开始同步时，需要从BlockChainConfig取得初始参数值
             String initValue = getValueInBlockChainConfig(config.getName());
@@ -100,7 +98,6 @@ public class ParameterService {
         chainConfig.setDelegateThreshold(modifiableParam.getStaking().getOperatingThreshold());
         //节点质押退回锁定周期
         chainConfig.setUnStakeRefundSettlePeriodCount(modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger());
-        chainConfig.setUnDelegateFreezeDurationCount(modifiableParam.getStaking().getUnDelegateFreezeDuration().toBigInteger());
         //备选结算周期验证节点数量(U)
         chainConfig.setSettlementValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
         //举报最高处罚n3‱
@@ -164,6 +161,9 @@ public class ParameterService {
                 break;
             case UN_STAKE_FREEZE_DURATION:
                 staleValue = chainConfig.getUnStakeRefundSettlePeriodCount().toString();
+                break;
+            case UN_DELEGATE_FREEZE_DURATION:
+                staleValue = chainConfig.getUnDelegateFreezeDurationCount().toString();
                 break;
             // 惩罚相关
             case SLASH_FRACTION_DUPLICATE_SIGN:

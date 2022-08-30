@@ -43,35 +43,36 @@ import java.util.List;
 @Component
 public class SpecialApi {
 
+
     /**
      * 查询结算周期历史验证人队列
      */
-    public static final int GET_HISTORY_VERIFIER_LIST_FUNC_TYPE = 1106;
+    public static final int GET_HISTORY_VERIFIER_LIST_FUNC_TYPE = 1300;
 
     /**
      * 查询历史共识周期的验证人列
      */
-    public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1107;
+    public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1301;
 
     /**
      * 历史低出块处罚信息
      */
-    public static final int GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE = 1110;
+    public static final int GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE = 1304;
 
     /**
      * 查询版本列表
      */
-    public static final int GET_NODE_VERSION = 1108;
+    public static final int GET_NODE_VERSION = 1302;
 
     /**
      * 查询版本列表
      */
-    public static final int GET_HISTORY_REWARD = 1109;
+    public static final int GET_HISTORY_REWARD = 1303;
 
     /**
      * 获取可用和锁仓余额
      */
-    public static final int GET_RESTRICTING_BALANCE_FUNC_TYPE = 4101;
+    public static final int GET_RESTRICTING_BALANCE_FUNC_TYPE = 4200;
 
     /**
      * 获取提案结果
@@ -81,7 +82,7 @@ public class SpecialApi {
     /**
      * 查询合约调用PPOS信息
      */
-    public static final int GET_PPOS_INFO_FUNC_TYPE = 1111;
+    public static final int GET_PPOS_INFO_FUNC_TYPE = 1305;
 
     /**
      * 查询质押委托调账信息
