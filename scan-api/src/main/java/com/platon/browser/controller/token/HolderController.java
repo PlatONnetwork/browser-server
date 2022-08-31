@@ -51,13 +51,14 @@ public class HolderController {
     /**
      * Token令牌持有人列表导出
      *
-     * @param contract
-     * @param local
-     * @param timeZone
-     * @param token
-     * @param response
-     * @return void
-     * @date 2021/5/25
+     * @param contract:
+     * @param local:
+     * @param timeZone:
+     * @param token:
+     * @param ercType:
+     * @param response:
+     * @return: void
+     * @date: 2022/8/31
      */
     @GetMapping("export")
     public void export(@RequestParam(value = "contract", required = true) String contract, @RequestParam(value = "local", required = true) String local, @RequestParam(value = "timeZone", required = true) String timeZone, @RequestParam(value = "token", required = false) String token, @RequestParam(value = "ercType", required = true) String ercType, HttpServletResponse response) {
