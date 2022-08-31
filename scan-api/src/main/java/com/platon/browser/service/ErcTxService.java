@@ -300,8 +300,8 @@ public class ErcTxService {
                                                                                            "0",
                                                                                            timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), 0).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), 0)
-                                                                                                                                      .toString()), esTokenTransferRecord.getSymbol()};
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(
+                        valueOut), esTokenTransferRecord.getDecimal()).toString()), esTokenTransferRecord.getSymbol()};
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
                 String symbol = "";
