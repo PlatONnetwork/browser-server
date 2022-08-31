@@ -193,6 +193,9 @@ public enum I18nEnum {
     CODE301203,
     CODE301204,
     CODE301205,
+    code301206,
+    code301207,
+    code301208,
     CODE302001,
     CODE302002,
     CODE302003,
@@ -252,7 +255,8 @@ public enum I18nEnum {
     CODE304011,
     CODE304012,
     CODE304013,
-
+    code304014,
+    code304015,
     CODE305001,
     DELETEGATE_CODE304013;
 
