@@ -283,7 +283,7 @@ public class ErcTxService {
         // Set sort field
         constructor.setDesc("seq");
         // response filed to show.
-        constructor.setResult(new String[]{"seq", "hash", "bn", "from", "contract", "to", "value", "decimal", "name", "symbol", "result", "bTime"});
+        constructor.setResult(new String[]{"seq", "hash", "bn", "from", "contract", "tokenId", "to", "value", "decimal", "name", "symbol", "result", "bTime"});
         try {
             queryResultFromES = repository.search(constructor, ErcTx.class, 1, 30000);
         } catch (Exception e) {
@@ -296,26 +296,38 @@ public class ErcTxService {
                 boolean toIsAddress = address.equals(esTokenTransferRecord.getTo());
                 String valueIn = toIsAddress ? esTokenTransferRecord.getValue() : "0";
                 String valueOut = !toIsAddress ? esTokenTransferRecord.getValue() : "0";
+                if (tokenTypeEnum.equals(TokenTypeEnum.ERC20)) {
+                    valueIn = ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString();
+                    valueOut = ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal()).toString();
+                } else if (tokenTypeEnum.equals(TokenTypeEnum.ERC721) || tokenTypeEnum.equals(TokenTypeEnum.ERC1155)) {
+                    if (address.equalsIgnoreCase(esTokenTransferRecord.getFrom())) {
+                        valueOut = esTokenTransferRecord.getTokenId();
+                    } else if (address.equalsIgnoreCase(esTokenTransferRecord.getTo())) {
+                        valueIn = esTokenTransferRecord.getTokenId();
+                    }
+                }
                 Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(),
                                                                                            "0",
                                                                                            timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(
-                        valueOut), esTokenTransferRecord.getDecimal()).toString()), esTokenTransferRecord.getSymbol()};
+                        HexUtil.append(valueIn), HexUtil.append(valueOut), esTokenTransferRecord.getSymbol()};
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
                 String symbol = "";
+                String value = "0";
                 if (tokenTypeEnum.equals(TokenTypeEnum.ERC20)) {
                     symbol = esTokenTransferRecord.getSymbol();
+                    value = ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getValue()), esTokenTransferRecord.getDecimal()).toString();
                 }
                 if (tokenTypeEnum.equals(TokenTypeEnum.ERC721) || tokenTypeEnum.equals(TokenTypeEnum.ERC1155)) {
                     symbol = StrUtil.format("{}({})", esTokenTransferRecord.getName(), esTokenTransferRecord.getSymbol());
+                    value = esTokenTransferRecord.getTokenId();
                 }
                 Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(),
                                                                                            "0",
                                                                                            timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(esTokenTransferRecord.getValue()), esTokenTransferRecord.getDecimal()).toString()), symbol};
+                        HexUtil.append(value), symbol};
                 rows.add(row);
             }
         });
