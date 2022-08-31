@@ -48,7 +48,7 @@ public class ErcTokenInventoryAnalyzer {
         if (CollUtil.isNotEmpty(txList)) {
             txList.forEach(tx -> {
                 String tokenAddress = tx.getContract();
-                String tokenId = tx.getValue();
+                String tokenId = tx.getTokenId();
                 // 校验tokenid长度是否符合入库标准
                 if (CommonUtil.ofNullable(() -> tokenId.length()).orElse(0) > 128) {
                     // 仅打印日志而不能抛出异常来阻塞流程

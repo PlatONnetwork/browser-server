@@ -300,8 +300,8 @@ public class ErcTxService {
                                                                                            "0",
                                                                                            timeZone), esTokenTransferRecord.getFrom(), esTokenTransferRecord.getTo(),
                         /** 数值von转换成lat，并保留十八位精确度 */
-                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), 0).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueOut), 0)
-                                                                                                                                      .toString()), esTokenTransferRecord.getSymbol()};
+                        HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(valueIn), esTokenTransferRecord.getDecimal()).toString()), HexUtil.append(ConvertUtil.convertByFactor(new BigDecimal(
+                        valueOut), esTokenTransferRecord.getDecimal()).toString()), esTokenTransferRecord.getSymbol()};
                 rows.add(row);
             } else if (StringUtils.isNotBlank(contract)) {
                 String symbol = "";
@@ -685,8 +685,9 @@ public class ErcTxService {
         // Processing accuracy calculation.
         if (null != record.getValue()) {
             BigDecimal transferValue = new BigDecimal(record.getValue());
-            //TODO 暂时1155取不到精度，后续修改
-//            BigDecimal actualTransferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            if (record.getDecimal() != null && record.getDecimal() > 0) {
+                transferValue = ConvertUtil.convertByFactor(transferValue, record.getDecimal());
+            }
             resp.setTransferValue(transferValue);
         } else {
             resp.setTransferValue(BigDecimal.ZERO);

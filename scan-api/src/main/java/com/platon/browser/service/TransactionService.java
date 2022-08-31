@@ -768,9 +768,6 @@ public class TransactionService {
                     if (erc721List != null) {
                         List<Arc721Param> arc721Params = new ArrayList<>();
                         erc721List.forEach(erc721 -> {
-                            // 精度转换
-                            int decimal = Integer.parseInt(String.valueOf(erc721.getDecimal()));
-                            BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc721.getValue()), decimal);
                             Arc721Param arc721Param = Arc721Param.builder()
                                                                  .innerContractAddr(erc721.getContract())
                                                                  .innerContractName(erc721.getName())
@@ -780,7 +777,7 @@ public class TransactionService {
                                                                  .innerSymbol(erc721.getSymbol())
                                                                  .innerTo(erc721.getTo())
                                                                  .toType(erc721.getToType())
-                                                                 .innerValue(afterConverValue.toString())
+                                                                 .innerValue(erc721.getTokenId())
                                                                  .build();
                             //查询对应的图片进行回填
                             TokenInventoryExample example = new TokenInventoryExample();
