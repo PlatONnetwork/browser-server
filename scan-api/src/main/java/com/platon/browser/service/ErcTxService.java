@@ -141,13 +141,13 @@ public class ErcTxService {
             // construct of params
             ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
             ESResult<ErcTx> queryResultFromES = new ESResult<>();
-
             // condition: txHash/contract/txFrom/transferTo
             if (StringUtils.isNotEmpty(req.getContract())) {
                 constructor.must(new ESQueryBuilders().terms("contract", Collections.singletonList(req.getContract())));
             }
             if (StrUtil.isNotBlank(req.getTokenId())) {
-                constructor.must(new ESQueryBuilders().term("tokenId", req.getTokenId()));
+                // 兼容旧数据
+                constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("tokenId", req.getTokenId())).should(QueryBuilders.termQuery("value", req.getTokenId())));
             }
             if (StringUtils.isNotEmpty(req.getAddress())) {
                 constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress())).should(QueryBuilders.termQuery("to", req.getAddress())));
