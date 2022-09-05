@@ -301,9 +301,17 @@ public class ErcTxService {
                     valueOut = ConvertUtil.convertByFactor(new BigDecimal(valueOut), esTokenTransferRecord.getDecimal()).toString();
                 } else if (tokenTypeEnum.equals(TokenTypeEnum.ERC721) || tokenTypeEnum.equals(TokenTypeEnum.ERC1155)) {
                     if (address.equalsIgnoreCase(esTokenTransferRecord.getFrom())) {
-                        valueOut = esTokenTransferRecord.getTokenId();
+                        if (ObjectUtil.isNull(esTokenTransferRecord.getTokenId())) {
+                            valueOut = esTokenTransferRecord.getValue();
+                        } else {
+                            valueOut = esTokenTransferRecord.getTokenId();
+                        }
                     } else if (address.equalsIgnoreCase(esTokenTransferRecord.getTo())) {
-                        valueIn = esTokenTransferRecord.getTokenId();
+                        if (ObjectUtil.isNull(esTokenTransferRecord.getTokenId())) {
+                            valueIn = esTokenTransferRecord.getValue();
+                        } else {
+                            valueIn = esTokenTransferRecord.getTokenId();
+                        }
                     }
                 }
                 Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(),
