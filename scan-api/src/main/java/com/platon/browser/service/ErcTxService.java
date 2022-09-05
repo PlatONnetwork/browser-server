@@ -321,7 +321,11 @@ public class ErcTxService {
                 }
                 if (tokenTypeEnum.equals(TokenTypeEnum.ERC721) || tokenTypeEnum.equals(TokenTypeEnum.ERC1155)) {
                     symbol = StrUtil.format("{}({})", esTokenTransferRecord.getName(), esTokenTransferRecord.getSymbol());
-                    value = esTokenTransferRecord.getTokenId();
+                    if (ObjectUtil.isNull(esTokenTransferRecord.getTokenId())) {
+                        value = esTokenTransferRecord.getValue();
+                    } else {
+                        value = esTokenTransferRecord.getTokenId();
+                    }
                 }
                 Object[] row = {esTokenTransferRecord.getHash(), DateUtil.timeZoneTransfer(esTokenTransferRecord.getBTime(),
                                                                                            "0",
