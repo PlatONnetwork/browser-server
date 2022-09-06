@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +28,13 @@ public class ErcTokenHolderAnalyzer {
     @Resource
     private CustomTokenHolderMapper customTokenHolderMapper;
 
+    private TokenHolderKey getTokenHolderKey(String ownerAddress, ErcTx ercTx) {
+        TokenHolderKey key = new TokenHolderKey();
+        key.setTokenAddress(ercTx.getContract());
+        key.setAddress(ownerAddress);
+        return key;
+    }
+
     /**
      * 解析Token Holder
      */
@@ -36,38 +42,33 @@ public class ErcTokenHolderAnalyzer {
     public void analyze(List<ErcTx> txList) {
         List<TokenHolder> insertOrUpdate = new ArrayList<>();
         txList.forEach(tx -> {
-            resolveTokenHolder(tx.getContract(), tx.getFrom(), insertOrUpdate);
-            resolveTokenHolder(tx.getContract(), tx.getTo(), insertOrUpdate);
+            resolveTokenHolder(tx.getFrom(), tx, insertOrUpdate);
+            resolveTokenHolder(tx.getTo(), tx, insertOrUpdate);
         });
         if (CollUtil.isNotEmpty(insertOrUpdate)) {
             customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
         }
     }
 
-    private void resolveTokenHolder(String tokenAddress, String userAddress, List<TokenHolder> insertOrUpdate) {
+    private void resolveTokenHolder(String ownerAddress, ErcTx ercTx, List<TokenHolder> insertOrUpdate) {
         // 零地址不需要創建holder
-        if (AddressUtil.isAddrZero(userAddress)) {
-            log.warn("该地址[{}]为0地址，不创建token holder", userAddress);
+        if (AddressUtil.isAddrZero(ownerAddress)) {
+            log.warn("该地址[{}]为0地址，不创建token holder", ownerAddress);
             return;
         }
-        Date date = new Date();
-        TokenHolderKey key = new TokenHolderKey();
-        key.setTokenAddress(tokenAddress);
-        key.setAddress(userAddress);
+        TokenHolderKey key = getTokenHolderKey(ownerAddress, ercTx);
         TokenHolder tokenHolder = tokenHolderMapper.selectByPrimaryKey(key);
         if (tokenHolder == null) {
             tokenHolder = new TokenHolder();
             tokenHolder.setTokenAddress(key.getTokenAddress());
             tokenHolder.setAddress(key.getAddress());
-            tokenHolder.setCreateTime(date);
             tokenHolder.setTokenTxQty(1);
             tokenHolder.setBalance("0");
         } else {
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }
-        //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721所有tokenId的交易总数
+        //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721, erc1155所有tokenId的交易总数
         log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
-        tokenHolder.setUpdateTime(date);
         insertOrUpdate.add(tokenHolder);
     }
 

@@ -1,7 +1,8 @@
 package com.platon.browser.request.token;
 
-import com.platon.browser.request.PageReq;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * 查询toknid列表请求参数
@@ -12,7 +13,10 @@ import lombok.Data;
 @Data
 public class QueryTokenIdDetailReq {
 
-    private String contract;//
+    @NotBlank(message = "合约不能为空")
+    private String contract;
 
-    private String tokenId;//
+    @NotBlank(message = "tokenID不能为空")
+    private String tokenId;
+
 }

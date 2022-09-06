@@ -58,25 +58,17 @@ public class Arc20TxController {
      * @param token    令牌
      * @param response
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/17
      */
     @GetMapping("export")
-    public void export(@RequestParam(value = "address", required = false) String address,
-                       @RequestParam(value = "contract", required = false) String contract,
-                       @RequestParam(value = "date", required = true) Long date,
-                       @RequestParam(value = "local", required = true) String local,
-                       @RequestParam(value = "timeZone", required = true) String timeZone,
-                       @RequestParam(value = "token", required = false) String token,
-                       HttpServletResponse response) {
+    public void export(@RequestParam(value = "address", required = false) String address, @RequestParam(value = "contract", required = false) String contract, @RequestParam(value = "date", required = true) Long date, @RequestParam(value = "local", required = true) String local, @RequestParam(value = "timeZone", required = true) String timeZone, @RequestParam(value = "token", required = false) String token, HttpServletResponse response) {
         try {
             /**
              * 鉴权
              */
             commonMethod.recaptchaAuth(token);
             AccountDownload accountDownload = ercTxService.exportToken20TransferList(address, contract, date, local, timeZone);
-            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
-                    accountDownload.getData());
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(), accountDownload.getData());
         } catch (Exception e) {
             log.error("download error", e);
             throw new BusinessException(this.i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));

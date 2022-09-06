@@ -27,4 +27,8 @@ public class TokenQty {
      */
     private long erc721TxQty;
 
+    /**
+     * token erc1155交易数
+     */
+    private long erc1155TxQty;
 }

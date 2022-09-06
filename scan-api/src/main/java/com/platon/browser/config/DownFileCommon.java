@@ -52,7 +52,7 @@ public class DownFileCommon {
             /** 设置导出的csv头，防止乱码 */
             byteArrayOutputStream.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
         } catch (Exception e) {
-            this.log.error("输出数据错误:", e);
+            log.error("输出数据错误:", e);
             return accountDownload;
         }
         Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);

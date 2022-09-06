@@ -51,28 +51,24 @@ public class HolderController {
     /**
      * Token令牌持有人列表导出
      *
-     * @param contract
-     * @param local
-     * @param timeZone
-     * @param token
-     * @param response
-     * @return void
-     * @date 2021/5/25
+     * @param contract:
+     * @param local:
+     * @param timeZone:
+     * @param token:
+     * @param ercType:
+     * @param response:
+     * @return: void
+     * @date: 2022/8/31
      */
     @GetMapping("export")
-    public void export(@RequestParam(value = "contract", required = true) String contract,
-                       @RequestParam(value = "local", required = true) String local,
-                       @RequestParam(value = "timeZone", required = true) String timeZone,
-                       @RequestParam(value = "token", required = false) String token,
-                       HttpServletResponse response) {
+    public void export(@RequestParam(value = "contract", required = true) String contract, @RequestParam(value = "local", required = true) String local, @RequestParam(value = "timeZone", required = true) String timeZone, @RequestParam(value = "token", required = false) String token, @RequestParam(value = "ercType", required = true) String ercType, HttpServletResponse response) {
         try {
             /**
              * 鉴权
              */
             commonMethod.recaptchaAuth(token);
-            AccountDownload accountDownload = ercTxService.exportTokenHolderList(contract, local, timeZone);
-            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(),
-                    accountDownload.getData());
+            AccountDownload accountDownload = ercTxService.exportTokenHolderList(contract, local, timeZone, ercType);
+            downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(), accountDownload.getData());
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new BusinessException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));

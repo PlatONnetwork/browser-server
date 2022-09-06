@@ -70,6 +70,9 @@ public class StatisticsAddressAnalyzer {
                         case ERC721_EVM:
                             address.setType(CustomAddress.TypeEnum.ERC721_EVM.getCode());
                             break;
+                        case ERC1155_EVM:
+                            address.setType(CustomAddress.TypeEnum.ERC1155_EVM.getCode());
+                            break;
                     }
                 }
             });
@@ -160,6 +163,9 @@ public class StatisticsAddressAnalyzer {
                             break;
                         case ERC721_EVM:
                             address.setType(CustomAddress.TypeEnum.ERC721_EVM.getCode());
+                            break;
+                        case ERC1155_EVM:
+                            address.setType(CustomAddress.TypeEnum.ERC1155_EVM.getCode());
                             break;
                     }
                 }

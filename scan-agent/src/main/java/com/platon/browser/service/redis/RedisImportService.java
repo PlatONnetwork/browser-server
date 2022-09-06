@@ -48,7 +48,10 @@ public class RedisImportService {
     @Resource
     private RedisErc721TxService redisErc721TxService;
 
-    private static final int SERVICE_COUNT = 5;
+    @Resource
+    private RedisErc1155TxService redisErc1155TxService;
+
+    private static final int SERVICE_COUNT = 6;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(SERVICE_COUNT);
 
@@ -86,12 +89,14 @@ public class RedisImportService {
         try {
             Set<ErcTx> erc20TxList = getErc20TxList(transactions);
             Set<ErcTx> erc721TxList = getErc721TxList(transactions);
+            Set<ErcTx> erc1155TxList = getErc1155TxList(transactions);
             CountDownLatch latch = new CountDownLatch(SERVICE_COUNT);
             submit(redisBlockService, blocks, false, latch, RedisKeyEnum.Block, CommonUtil.getTraceId());
             submit(redisTransactionService, transactions, false, latch, RedisKeyEnum.Transaction, CommonUtil.getTraceId());
             submit(redisStatisticService, statistics, true, latch, RedisKeyEnum.Statistic, CommonUtil.getTraceId());
             submit(redisErc20TxService, erc20TxList, false, latch, RedisKeyEnum.Erc20Tx, CommonUtil.getTraceId());
             submit(redisErc721TxService, erc721TxList, false, latch, RedisKeyEnum.Erc721Tx, CommonUtil.getTraceId());
+            submit(redisErc1155TxService, erc1155TxList, false, latch, RedisKeyEnum.Erc1155Tx, CommonUtil.getTraceId());
             latch.await();
             if (isRetry.get()) {
                 LongSummaryStatistics blockSum = blocks.stream().collect(Collectors.summarizingLong(Block::getNum));
@@ -107,15 +112,16 @@ public class RedisImportService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<ErcTx> erc20TxList, Set<ErcTx> erc721TxList) throws Exception {
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<ErcTx> erc20TxList, Set<ErcTx> erc721TxList, Set<ErcTx> erc1155TxList) throws Exception {
         log.debug("Redis批量导入:{}(blocks({}),transactions({})", Thread.currentThread().getStackTrace()[1].getMethodName(), blocks.size(), transactions.size());
         long startTime = System.currentTimeMillis();
         try {
-            CountDownLatch latch = new CountDownLatch(4);
+            CountDownLatch latch = new CountDownLatch(5);
             submit(redisBlockService, blocks, false, latch, RedisKeyEnum.Block, CommonUtil.getTraceId());
             submit(redisTransactionService, transactions, false, latch, RedisKeyEnum.Transaction, CommonUtil.getTraceId());
             submit(redisErc20TxService, erc20TxList, false, latch, RedisKeyEnum.Erc20Tx, CommonUtil.getTraceId());
             submit(redisErc721TxService, erc721TxList, false, latch, RedisKeyEnum.Erc721Tx, CommonUtil.getTraceId());
+            submit(redisErc1155TxService, erc1155TxList, false, latch, RedisKeyEnum.Erc1155Tx, CommonUtil.getTraceId());
             latch.await();
             if (isRetry.get()) {
                 LongSummaryStatistics blockSum = blocks.stream().collect(Collectors.summarizingLong(Block::getNum));
@@ -159,6 +165,20 @@ public class RedisImportService {
     }
 
     /**
+     * 取erc1155交易列表
+     */
+    public Set<ErcTx> getErc1155TxList(Set<Transaction> transactions) {
+        Set<ErcTx> result = new HashSet<>();
+        if (transactions != null && !transactions.isEmpty()) {
+            for (Transaction tx : transactions) {
+                if (tx.getErc1155TxList().isEmpty()) continue;
+                result.addAll(tx.getErc1155TxList());
+            }
+        }
+        return result;
+    }
+
+    /**
      * 打印统计信息
      *
      * @param data
@@ -181,6 +201,8 @@ public class RedisImportService {
                 log.info("redis批量入库成功统计:erc20交易数[{}]", data.size());
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Erc721Tx) == 0) {
                 log.info("redis批量入库成功统计:erc721交易数[{}]", data.size());
+            } else if (redisKeyEnum.compareTo(RedisKeyEnum.Erc1155Tx) == 0) {
+                log.info("redis批量入库成功统计:erc1155交易数[{}]", data.size());
             }
         } catch (Exception e) {
             log.error("redis批量入库统计异常", e);

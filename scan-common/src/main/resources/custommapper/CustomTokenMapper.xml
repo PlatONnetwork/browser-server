@@ -87,6 +87,12 @@
                 <if test="'is_support_erc721_metadata'.toString() == column.value">
                     #{item.isSupportErc721Metadata,jdbcType=BIT}
                 </if>
+                <if test="'is_support_erc1155'.toString() == column.value">
+                    #{item.isSupportErc1155,jdbcType=BIT}
+                </if>
+                <if test="'is_support_erc1155_metadata'.toString() == column.value">
+                    #{item.isSupportErc1155Metadata,jdbcType=BIT}
+                </if>
                 <if test="'create_time'.toString() == column.value">
                     #{item.createTime,jdbcType=TIMESTAMP}
                 </if>

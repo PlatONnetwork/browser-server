@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * mybatis配置
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/25
  */
 @Configuration
@@ -28,7 +27,6 @@ public class MyBatisConfig {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/25
      */
     @PostConstruct

@@ -65,7 +65,6 @@ public class BrowserApiApplication implements ApplicationRunner {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/7
      */
     private void zeroBlockNumberWait() {
@@ -89,7 +88,6 @@ public class BrowserApiApplication implements ApplicationRunner {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/2
      */
     private void dataSourceLog() {

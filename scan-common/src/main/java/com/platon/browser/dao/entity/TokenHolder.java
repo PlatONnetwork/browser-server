@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class TokenHolder extends TokenHolderKey {
-
     private String balance;
 
     private Date createTime;
@@ -19,7 +18,7 @@ public class TokenHolder extends TokenHolderKey {
     }
 
     public void setBalance(String balance) {
-        this.balance = balance;
+        this.balance = balance == null ? null : balance.trim();
     }
 
     public Date getCreateTime() {
@@ -202,7 +201,7 @@ public class TokenHolder extends TokenHolderKey {
          * @mbg.generated
          * @project https://github.com/itfsw/mybatis-generator-plugin
          */
-        public static Column[] excludes(Column... excludes) {
+        public static Column[] excludes(Column ... excludes) {
             ArrayList<Column> columns = new ArrayList<>(Arrays.asList(Column.values()));
             if (excludes != null && excludes.length > 0) {
                 columns.removeAll(new ArrayList<>(Arrays.asList(excludes)));
@@ -225,5 +224,4 @@ public class TokenHolder extends TokenHolderKey {
             }
         }
     }
-
 }

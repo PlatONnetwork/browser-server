@@ -11,6 +11,7 @@ import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
@@ -93,6 +94,9 @@ public class TransactionService {
 
     @Resource
     private TokenInventoryMapper tokenInventoryMapper;
+
+    @Resource
+    private CustomToken1155InventoryMapper customToken1155InventoryMapper;
 
     @Resource
     private StatisticCacheService statisticCacheService;
@@ -764,9 +768,6 @@ public class TransactionService {
                     if (erc721List != null) {
                         List<Arc721Param> arc721Params = new ArrayList<>();
                         erc721List.forEach(erc721 -> {
-                            // 精度转换
-                            int decimal = Integer.parseInt(String.valueOf(erc721.getDecimal()));
-                            BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc721.getValue()), decimal);
                             Arc721Param arc721Param = Arc721Param.builder()
                                                                  .innerContractAddr(erc721.getContract())
                                                                  .innerContractName(erc721.getName())
@@ -776,7 +777,7 @@ public class TransactionService {
                                                                  .innerSymbol(erc721.getSymbol())
                                                                  .innerTo(erc721.getTo())
                                                                  .toType(erc721.getToType())
-                                                                 .innerValue(afterConverValue.toString())
+                                                                 .innerValue(erc721.getTokenId())
                                                                  .build();
                             //查询对应的图片进行回填
                             TokenInventoryExample example = new TokenInventoryExample();
@@ -798,6 +799,33 @@ public class TransactionService {
                         resp.setErc721Params(arc721Params);
                     }
                     resp.setTxInfo(transaction.getInput());
+                    break;
+                case ERC1155_CONTRACT_EXEC:
+                    List<ErcTx> erc1155List = JSONObject.parseArray(transaction.getErc1155TxInfo(), ErcTx.class);
+                    List<Arc1155Param> list = new ArrayList<>();
+                    if (CollUtil.isNotEmpty(erc1155List)) {
+                        for (ErcTx ercTx : erc1155List) {
+                            Arc1155Param arc1155Param = new Arc1155Param();
+                            Token1155InventoryKey token1155InventoryKey = new Token1155InventoryKey();
+                            token1155InventoryKey.setTokenAddress(ercTx.getContract());
+                            token1155InventoryKey.setTokenId(ercTx.getTokenId());
+                            Token1155InventoryWithBLOBs token1155Inventory = customToken1155InventoryMapper.findOneByUK(token1155InventoryKey);
+                            arc1155Param.setContract(ercTx.getContract())
+                                        .setTokenId(ercTx.getTokenId())
+                                        .setName(token1155Inventory.getName())
+                                        .setDecimal(token1155Inventory.getDecimal())
+                                        .setImage(token1155Inventory.getImage())
+                                        .setFrom(ercTx.getFrom())
+                                        .setFromType(ercTx.getFromType())
+                                        .setTo(ercTx.getTo())
+                                        .setToType(ercTx.getToType())
+                                        .setValue(ercTx.getValue());
+                            list.add(arc1155Param);
+                        }
+                    }
+                    resp.setErc1155Params(list);
+                    break;
+                default:
                     break;
             }
         }
@@ -940,7 +968,7 @@ public class TransactionService {
             queryClaimByAddressResps.add(queryClaimByAddressResp);
         }
 
-        result.init(queryClaimByAddressResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
+        result.init(queryClaimByAddressResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0L);
         return result;
     }
 

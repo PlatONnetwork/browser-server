@@ -30,7 +30,6 @@ import java.util.Optional;
 /**
  * 共识
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/2/3
  */
 @Slf4j

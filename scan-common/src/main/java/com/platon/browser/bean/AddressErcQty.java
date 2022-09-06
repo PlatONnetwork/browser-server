@@ -21,5 +21,8 @@ public class AddressErcQty {
      * token erc721交易数
      */
     private long erc721TxQty;
-
+    /**
+     * token erc1155交易数
+     */
+    private long erc1155TxQty;
 }

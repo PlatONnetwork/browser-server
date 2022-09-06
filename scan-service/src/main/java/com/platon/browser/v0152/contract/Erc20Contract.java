@@ -214,8 +214,10 @@ public class Erc20Contract extends Contract implements ErcContract {
         for (EventValuesWithLog eventValues : valueList) {
             ErcTxEvent resp = new ErcTxEvent();
             resp.setLog(eventValues.getLog());
+            resp.setOperator("");
             resp.setFrom((String) eventValues.getIndexedValues().get(0).getValue());
             resp.setTo((String) eventValues.getIndexedValues().get(1).getValue());
+            resp.setTokenId(BigInteger.ZERO);
             resp.setValue((BigInteger) eventValues.getNonIndexedValues().get(0).getValue());
             responses.add(resp);
         }
@@ -257,7 +259,7 @@ public class Erc20Contract extends Contract implements ErcContract {
     }
 
     @Override
-    public RemoteCall<BigInteger> balanceOf(String _owner) {
+    public RemoteCall<BigInteger> balanceOf(String _owner, BigInteger _id) {
         final Function function = new Function(FUNC_BALANCEOF, Collections.singletonList(new Address(_owner)), Collections.singletonList(new TypeReference<Uint256>() {
         }));
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);

@@ -124,15 +124,10 @@ public class RetryableClient {
                     log.error("Web3j连接协议[{}]不合法!", protocol.getHead());
                     System.exit(1);
                 }
-                Web3jWrapper web3j = Web3jWrapper.builder()
-                        .address(protocol.getHead() + address)
-                        .web3jService(service)
-                        .web3j(Web3j.build(service))
-                        .build();
+                Web3jWrapper web3j = Web3jWrapper.builder().address(protocol.getHead() + address).web3jService(service).web3j(Web3j.build(service)).build();
                 web3jWrappers.add(web3j);
             });
-            if (web3jWrappers.isEmpty())
-                throw new ConfigLoadingException("没有可用Web3j实例!");
+            if (web3jWrappers.isEmpty()) throw new ConfigLoadingException("没有可用Web3j实例!");
             updateCurrentWeb3jWrapper();
         } catch (Exception e) {
             log.error("加载Web3j配置错误,将重试:", e);
@@ -209,7 +204,6 @@ public class RetryableClient {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/27
      */
     public void zeroBlockNumberWait() {

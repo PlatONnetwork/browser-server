@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.CustomToken1155HolderMapper">
+    <select id="selectByUK" resultType="com.platon.browser.dao.entity.Token1155Holder">
+        select id,
+               token_address      as tokenAddress,
+               token_id           as tokenId,
+               address,
+               balance,
+               create_time        as createTime,
+               update_time        as updateTime,
+               token_owner_tx_qty as tokenOwnerTxQty
+        from token_1155_holder
+        where token_address = #{token1155HolderKey.tokenAddress,jdbcType=VARCHAR}
+          and token_id = #{token1155HolderKey.tokenId,jdbcType=VARCHAR}
+          and address = #{token1155HolderKey.address,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="batchInsertOrUpdateSelective1155" parameterType="map">
+        replace into token_1155_holder (
+        <foreach collection="selective" item="column" separator=",">
+            ${column.escapedColumnName}
+        </foreach>
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            <foreach collection="selective" item="column" separator=",">
+                <if test="'id'.toString() == column.value">
+                    #{item.id}
+                </if>
+                <if test="'token_address'.toString() == column.value">
+                    #{item.tokenAddress,jdbcType=VARCHAR}
+                </if>
+                <if test="'address'.toString() == column.value">
+                    #{item.address,jdbcType=VARCHAR}
+                </if>
+                <if test="'token_id'.toString() == column.value">
+                    #{item.tokenId,jdbcType=VARCHAR}
+                </if>
+                <if test="'balance'.toString() == column.value">
+                    #{item.balance,jdbcType=DECIMAL}
+                </if>
+                <if test="'create_time'.toString() == column.value">
+                    #{item.createTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'update_time'.toString() == column.value">
+                    #{item.updateTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'token_owner_tx_qty'.toString() == column.value">
+                    #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+                </if>
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate">
+        <foreach collection="list" item="item" separator=";">
+            update token_1155_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and token_id=#{item.tokenId} and address=#{item.address}
+        </foreach>
+    </update>
+
+    <select id="findDestroyContract" parameterType="integer" resultType="com.platon.browser.bean.Erc1155ContractDestroyBean">
+        select
+        t1.address as tokenAddress ,
+        t1.contract_destroy_block as contractDestroyBlock ,
+        t2.address,
+        t2.token_id AS tokenId
+        from
+        token t1
+        left join token_1155_holder t2 on
+        t1.address = t2.token_address
+        where
+        t1.contract_destroy_block is not null
+        and t1.contract_destroy_block > 0
+        and t1.contract_destroy_update = 0
+        <if test="type != null">
+            and t1.type = #{type}
+        </if>
+    </select>
+
+    <select id="findToken1155HolderList" resultType="com.platon.browser.bean.Token1155HolderListBean">
+        SELECT t1.token_address                                 AS contract,
+               t1.address,
+               t1.count                                         AS balance,
+               CONVERT(t1.count / t2.allCount, DECIMAL (65, 6)) AS percent
+        FROM (
+                 SELECT token_address,
+                        address,
+                        count(1) AS count
+                 FROM
+                     token_1155_holder
+                 WHERE
+                     balance != 0
+                   AND token_address = #{contract}
+                 GROUP BY
+                     token_address,
+                     address
+             ) t1
+                 LEFT JOIN (SELECT token_address, count(1) AS allCount FROM token_1155_holder WHERE balance != 0 AND token_address = #{contract}) t2 ON t1.token_address = t2.token_address
+    </select>
+
+    <select id="findTokenIdList" resultType="com.platon.browser.bean.TokenIdListBean">
+        SELECT
+        t1.token_address AS contract,
+        t1.token_id AS tokenId,
+        t1.address,
+        t1.balance,
+        t2.image,
+        t2.token_tx_qty AS txCount
+        FROM
+        token_1155_holder t1
+        LEFT JOIN token_1155_inventory t2 ON t1.token_address = t2.token_address
+        AND t1.token_id = t2.token_id
+        WHERE
+        1 = 1
+        <if test="key.tokenAddress != null">
+            AND t1.token_address = #{key.tokenAddress}
+        </if>
+        <if test="key.address != null">
+            AND t1.address = #{key.address}
+        </if>
+        <if test="key.tokenId != null">
+            AND t1.token_id = #{key.tokenId}
+        </if>
+        AND t1.balance != 0
+    </select>
+
+    <select id="selectListByERC1155" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        SELECT
+        th.token_address AS tokenAddress,
+        th.address,
+        t.type,
+        ti.NAME,
+        ti.DECIMAL,
+        '' AS symbol,
+        t.total_supply AS totalSupply,
+        th.balance,
+        th.token_owner_tx_qty AS txCount,
+        ti.token_id as tokenId,
+        t.create_time as createTime
+        FROM
+        token_1155_holder th
+        LEFT JOIN token t ON th.token_address = t.address
+        LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address AND th.token_id = ti.token_id
+        WHERE
+        th.balance != 0
+        <if test="tokenAddress != null">
+            and th.token_address = #{tokenAddress}
+        </if>
+        <if test="address != null">
+            and th.address = #{address}
+        </if>
+        AND t.type = "erc1155"
+        ORDER BY
+        balance DESC
+    </select>
+
+    <select id="findErc1155TokenHolder" parameterType="java.lang.String"
+            resultType="com.platon.browser.bean.CustomTokenHolder">
+        SELECT
+        th.token_address AS tokenAddress,
+        th.address,
+        ti.token_id AS tokenId,
+        'erc1155' AS type,
+        '' AS symbol,
+        ti.`name`,
+        ti.`decimal`,
+        0 AS totalSupply,
+        th.token_owner_tx_qty AS txCount,
+        th.balance
+        FROM
+        token_1155_holder th
+        LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address
+        AND th.token_id = ti.token_id
+        WHERE
+        th.balance != 0
+        <if test="address != null">
+            AND th.address = #{address}
+        </if>
+        ORDER BY
+        th.balance + 0
+    </select>
+
+    <select id="findToken1155Holder" resultType="com.platon.browser.bean.TokenHolderCount">
+        SELECT
+            token_address AS tokenAddress,
+            count( 1 ) AS tokenHolderCount
+        FROM
+                ( SELECT DISTINCT token_address, address FROM token_1155_holder WHERE balance != 0 ) t1
+        GROUP BY
+            token_address
+    </select>
+</mapper>

@@ -26,6 +26,7 @@ spring:
       transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+      erc1155TxIndexName: ${platon.es-namespace}_erc1155_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
@@ -81,7 +82,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 210425
+  chainId: 2022041901
   #同步时的索引查询分页参数配置
   paging:
     erc20-transaction:
@@ -111,8 +112,8 @@ xxl:
     logretentiondays: 90
     executor:
       #执行器AppName
-      appname: platon-scan-job
-      ip: 192.168.21.114
+      appname: dev-platon-job
+      ip: 192.168.21.194
       #执行器端口号
       port: 9997
       #执行器运行日志文件存储磁盘路径

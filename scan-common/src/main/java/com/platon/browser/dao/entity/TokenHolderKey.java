@@ -34,7 +34,7 @@ public class TokenHolderKey {
     public enum Column {
         tokenAddress("token_address", "tokenAddress", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
-        balance("balance", "balance", "DECIMAL", false),
+        balance("balance", "balance", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         tokenTxQty("token_tx_qty", "tokenTxQty", "INTEGER", false);

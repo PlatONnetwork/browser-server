@@ -1,6 +1,5 @@
 package com.platon.browser.bootstrap.service;
 
-import com.platon.contracts.ppos.dto.resp.Node;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.bootstrap.bean.InitializationResult;
@@ -21,6 +20,7 @@ import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
+import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -85,22 +85,25 @@ public class InitializationService {
     private StakeEpochService stakeEpochService;
 
     @Resource
-    private EsBlockRepository ESBlockRepository;
+    private EsBlockRepository esBlockRepository;
 
     @Resource
-    private EsTransactionRepository ESTransactionRepository;
+    private EsTransactionRepository esTransactionRepository;
 
     @Resource
-    private EsDelegationRewardRepository ESDelegationRewardRepository;
+    private EsDelegationRewardRepository esDelegationRewardRepository;
 
     @Resource
-    private EsNodeOptRepository ESNodeOptRepository;
+    private EsNodeOptRepository esNodeOptRepository;
 
     @Resource
     private EsErc20TxRepository esErc20TxRepository;
 
     @Resource
     private EsErc721TxRepository esErc721TxRepository;
+
+    @Resource
+    private EsErc1155TxRepository esErc1155TxRepository;
 
     @Resource
     private EsTransferTxRepository esTransferTxRepository;
@@ -120,7 +123,8 @@ public class InitializationService {
         log.info("进入应用初始化子流程");
         proposalCache.init();
         ercCache.init();
-
+        // 初始化ES
+        initEs();
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
         if (networkStat == null) {
@@ -140,6 +144,7 @@ public class InitializationService {
             networkStat.setIssueRates(chainConfig.getAddIssueRate().toPlainString());
             networkStat.setErc20TxQty(0);
             networkStat.setErc721TxQty(0);
+            networkStat.setErc1155TxQty(0);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(-1L);
             // 删除节点表和质押表、地址表数据
@@ -155,8 +160,6 @@ public class InitializationService {
             networkStatCache.init(networkStat);
             // 初始化内置地址
             addressCache.initOnFirstStart();
-            // 初始化ES
-            initEs();
 
             return initialResult;
         }
@@ -237,15 +240,20 @@ public class InitializationService {
             CustomStaking staking = new CustomStaking();
             staking.updateWithVerifier(v);
             staking.setStakingTxIndex(index);
-            staking.setStakingReductionEpoch(BigInteger.ONE.intValue()); // 提前设置验证轮数
+            // 提前设置验证轮数
+            staking.setStakingReductionEpoch(BigInteger.ONE.intValue());
             staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
             staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
             staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-            if (validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+            if (validatorSet.contains(v.getNodeId())) {
+                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+            }
 
-            if (StringUtils.isBlank(staking.getNodeName())) staking.setNodeName("platon.node." + (index + 1));
+            if (StringUtils.isBlank(staking.getNodeName())) {
+                staking.setNodeName("platon.node." + (index + 1));
+            }
 
             // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
             AnnualizedRateInfo ari = new AnnualizedRateInfo();
@@ -295,8 +303,10 @@ public class InitializationService {
             node.setStakingTxIndex(index);
             node.setTotalValue(staking.getStakingLocked());
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
-            node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
-            node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
+            // 提前设置验证轮数
+            node.setStatVerifierTime(BigInteger.ONE.intValue());
+            // 期望出块数=共识周期块数/实际参与共识节点数
+            node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount());
             node.setPreTotalDeleReward(BigDecimal.ZERO);
 
             nodes.add(node);
@@ -305,8 +315,12 @@ public class InitializationService {
 
         // 入库
         List<com.platon.browser.dao.entity.Node> returnData = new ArrayList<>(nodes);
-        if (!nodes.isEmpty()) nodeMapper.batchInsert(returnData);
-        if (!stakingList.isEmpty()) stakingMapper.batchInsert(new ArrayList<>(stakingList));
+        if (!nodes.isEmpty()) {
+            nodeMapper.batchInsert(returnData);
+        }
+        if (!stakingList.isEmpty()) {
+            stakingMapper.batchInsert(new ArrayList<>(stakingList));
+        }
         return returnData;
     }
 
@@ -315,19 +329,19 @@ public class InitializationService {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     private void initEs() {
         log.info("初始化ES");
         try {
-            ESBlockRepository.initIndex();
-            ESTransactionRepository.initIndex();
-            ESDelegationRewardRepository.initIndex();
-            ESNodeOptRepository.initIndex();
+            esBlockRepository.initIndex();
+            esTransactionRepository.initIndex();
+            esDelegationRewardRepository.initIndex();
+            esNodeOptRepository.initIndex();
             esTransferTxRepository.initIndex();
             esErc20TxRepository.initIndex();
             esErc721TxRepository.initIndex();
+            esErc1155TxRepository.initIndex();
         } catch (Exception e) {
             log.error("初始化ES异常", e);
         }
