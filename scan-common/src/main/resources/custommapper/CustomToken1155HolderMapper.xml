@@ -98,7 +98,7 @@
                      token_address,
                      address
              ) t1
-                 LEFT JOIN (SELECT token_address, count(1) AS allCount, sum(token_tx_qty) AS token_tx_qty FROM token_1155_inventory WHERE token_address = #{contract}) t2 ON t1.token_address = t2.token_address
+                 LEFT JOIN (SELECT token_address, count(1) AS allCount FROM token_1155_holder WHERE balance != 0 AND token_address = #{contract}) t2 ON t1.token_address = t2.token_address
     </select>
 
     <select id="findTokenIdList" resultType="com.platon.browser.bean.TokenIdListBean">
