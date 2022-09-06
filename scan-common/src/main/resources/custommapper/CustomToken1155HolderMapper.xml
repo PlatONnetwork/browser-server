@@ -188,9 +188,7 @@
             token_address AS tokenAddress,
             count( 1 ) AS tokenHolderCount
         FROM
-            token_1155_holder
-        WHERE
-            balance != 0
+                ( SELECT DISTINCT token_address, address FROM token_1155_holder WHERE balance != 0 ) t1
         GROUP BY
             token_address
     </select>
