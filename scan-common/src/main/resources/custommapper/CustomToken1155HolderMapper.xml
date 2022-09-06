@@ -166,7 +166,8 @@
         ti.token_id AS tokenId,
         'erc1155' AS type,
         '' AS symbol,
-        ti.NAME,
+        ti.`name`,
+        ti.`decimal`,
         0 AS totalSupply,
         th.token_owner_tx_qty AS txCount,
         th.balance

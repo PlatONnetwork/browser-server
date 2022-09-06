@@ -661,12 +661,15 @@ public class ErcTxService {
         } else if (ErcTypeEnum.ERC1155.getDesc().equalsIgnoreCase(type)) {
             Page<CustomTokenHolder> rs = customToken1155HolderMapper.findErc1155TokenHolder(address);
             rs.forEach(customTokenHolder -> {
-                Object[] row = {customTokenHolder.getTokenAddress(), customTokenHolder.getTokenId(), customTokenHolder.getBalance(), customTokenHolder.getTxCount()};
+                Object[] row = {StrUtil.emptyIfNull(customTokenHolder.getName()), customTokenHolder.getTokenAddress(), customTokenHolder.getTokenId(), customTokenHolder.getBalance(), customTokenHolder.getTxCount(), customTokenHolder.getDecimal()};
                 rows.add(row);
             });
-            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
-                                                                                                            local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
-                                                                                                                                local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT, local)};
+            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_CONTRACT,
+                                                                                                        local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
+                                                                                                                            local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
+                                                                                                                                                local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_TXCOUNT,
+                                                                                                                                                                    local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_DECIMALS,
+                                                                                                                                                                                        local)};
 
         } else {
             Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(null, address, type);
