@@ -33,4 +33,6 @@ public interface CustomToken1155InventoryMapper {
 
     Token1155InventoryWithBLOBs findOneByUK(@Param("key") Token1155InventoryKey key);
 
+    long findMaxId();
+
 }

@@ -6,7 +6,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.9.191:3306/platon_browser_hrplat100v10000?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.9.191:3306/scan_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(bpshgjWOgn2d+oGmSTBPNA==)
     password: ENC(bpshgjWOgn2d+oGmSTBPNA==)
   #ES索引配置
