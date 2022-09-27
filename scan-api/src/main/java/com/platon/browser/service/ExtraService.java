@@ -168,11 +168,7 @@ public class ExtraService {
         for (ConfigDetail stakingConfig : stakingConfigDetails) {
             if ("unStakeFreezeDuration".equalsIgnoreCase(stakingConfig.getName())) {
                 stakingConfig.setStartValue(maxEvidenceAge);
-            }
-            if ("unDelegateFreezeDuration".equalsIgnoreCase(stakingConfig.getName())) {
-                stakingConfig.setStart("(");
-                stakingConfig.setStartValue("0");
-                stakingConfig.setEndValue("unStakeFreezeDuration");
+                break;
             }
         }
         /**
