@@ -112,13 +112,14 @@ public class BlockService {
                 items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
             }
             lists.addAll(this.transferBlockListResp(items));
-        } else {
-            respPage.setCode(ErrorCodeEnum.RECORD_NOT_EXIST.getCode());
-            respPage.setErrMsg(StrUtil.format("查询记录超过最大限制{}", Browser.MAX_NUM));
         }
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-        page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
         long totalCount = networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber();
+        if (totalCount > Browser.MAX_NUM) {
+            page.setTotal(Browser.MAX_NUM);
+        } else {
+            page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
+        }
         long displayTotalCount = totalCount > Browser.MAX_NUM ? Browser.MAX_NUM : totalCount;
         respPage.init(lists, totalCount, displayTotalCount, page.getPages());
         if (System.currentTimeMillis() - startTime > 100) {
@@ -228,9 +229,9 @@ public class BlockService {
         List<Object[]> rows = new ArrayList<>();
         blockList.getRsData().forEach(block -> {
             Object[] row = {block.getNum(), DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone), block.getTxQty(), HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(),
-                                                                                                                                                                           Convert.Unit.KPVON)
-                                                                                                                                                                  .setScale(18,
-                                                                                                                                                                            RoundingMode.DOWN))), HexUtil.append(
+                    Convert.Unit.KPVON)
+                    .setScale(18,
+                            RoundingMode.DOWN))), HexUtil.append(
                     EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN)))};
             rows.add(row);
         });
@@ -247,10 +248,10 @@ public class BlockService {
         /** 初始化writer对象 */
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         writer.writeHeaders(i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT, local),
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD, local) + "(" + valueUnit + ")",
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE, local) + "(" + valueUnit + ")");
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD, local) + "(" + valueUnit + ")",
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE, local) + "(" + valueUnit + ")");
         writer.writeRowsAndClose(rows);
 
         blockDownload.setData(baos.toByteArray());
