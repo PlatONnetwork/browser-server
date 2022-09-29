@@ -89,7 +89,7 @@ public class BlockService {
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
         Long bNumber = networkStatRedis.getCurNumber();
         /** 小于50万条查询redis */
-        if (req.getPageNo() * req.getPageSize() < Browser.MAX_NUM) {
+        if (req.getPageNo() * req.getPageSize() <= Browser.MAX_NUM) {
             /**
              * 当页号等于1，重新获取数据，与首页保持一致
              */
