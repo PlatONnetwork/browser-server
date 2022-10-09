@@ -3,6 +3,7 @@ package com.platon.browser.decoder.ppos;
 import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.TxParam;
+import com.platon.contracts.ppos.dto.common.ErrorCode;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.rlp.solidity.RlpDecoder;
 import com.platon.rlp.solidity.RlpList;
@@ -45,17 +46,22 @@ public class DelegateExitDecoder extends AbstractPPOSDecoder {
             RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
             List<RlpType> rlpList = ((RlpList) (rlp.getValues().get(0))).getValues();
             String decodedStatus = new String(((RlpString) rlpList.get(0)).getBytes());
-            BigInteger delegateIncome = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(1)).getBytes())).getValues().get(0)).asPositiveBigInteger();
-            BigInteger released = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(2)).getBytes())).getValues().get(0)).asPositiveBigInteger();
-            BigInteger restrictingPlan = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(3)).getBytes())).getValues().get(0)).asPositiveBigInteger();
-            BigInteger lockReleased = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(4)).getBytes())).getValues().get(0)).asPositiveBigInteger();
-            BigInteger lockRestrictingPlan = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(5)).getBytes())).getValues().get(0)).asPositiveBigInteger();
-            delegateExitParam.setDecodedStatus(decodedStatus)
-                             .setDelegateIncome(new BigDecimal(delegateIncome))
-                             .setReleased(new BigDecimal(released))
-                             .setRestrictingPlan(new BigDecimal(restrictingPlan))
-                             .setLockReleased(new BigDecimal(lockReleased))
-                             .setLockRestrictingPlan(new BigDecimal(lockRestrictingPlan));
+            int statusCode = Integer.parseInt(decodedStatus);
+            if (statusCode == ErrorCode.SUCCESS) {
+                BigInteger delegateIncome = ((RlpString) RlpDecoder.decode(((RlpString) rlpList.get(1)).getBytes()).getValues().get(0)).asPositiveBigInteger();
+                delegateExitParam.setDelegateIncome(new BigDecimal(delegateIncome));
+                if (rlpList.size() > 2) {
+                    BigInteger released = ((RlpString) RlpDecoder.decode(((RlpString) rlpList.get(2)).getBytes()).getValues().get(0)).asPositiveBigInteger();
+                    BigInteger restrictingPlan = ((RlpString) RlpDecoder.decode(((RlpString) rlpList.get(3)).getBytes()).getValues().get(0)).asPositiveBigInteger();
+                    BigInteger lockReleased = ((RlpString) RlpDecoder.decode(((RlpString) rlpList.get(4)).getBytes()).getValues().get(0)).asPositiveBigInteger();
+                    BigInteger lockRestrictingPlan = ((RlpString) RlpDecoder.decode(((RlpString) rlpList.get(5)).getBytes()).getValues().get(0)).asPositiveBigInteger();
+                    delegateExitParam.setDecodedStatus(decodedStatus)
+                                     .setReleased(new BigDecimal(released))
+                                     .setRestrictingPlan(new BigDecimal(restrictingPlan))
+                                     .setLockReleased(new BigDecimal(lockReleased))
+                                     .setLockRestrictingPlan(new BigDecimal(lockRestrictingPlan));
+                }
+            }
         }
         return delegateExitParam;
     }
