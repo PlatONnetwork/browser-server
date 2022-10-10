@@ -34,6 +34,7 @@ public class RedeemDelegationDecoder extends AbstractPPOSDecoder {
             BigInteger released = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(1)).getBytes())).getValues().get(0)).asPositiveBigInteger();
             BigInteger restrictingPlan = ((RlpString) ((RlpList) RlpDecoder.decode(((RlpString) rlpList.get(2)).getBytes())).getValues().get(0)).asPositiveBigInteger();
             redeemDelegationParm.setStatus(status).setReleased(new BigDecimal(released)).setRestrictingPlan(new BigDecimal(restrictingPlan)).setRestrictingPlan(new BigDecimal(restrictingPlan));
+            redeemDelegationParm.setValue(redeemDelegationParm.getReleased().add(redeemDelegationParm.getRestrictingPlan()));
         }
         return redeemDelegationParm;
     }
