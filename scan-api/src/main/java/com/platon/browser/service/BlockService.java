@@ -2,13 +2,19 @@ package com.platon.browser.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.utils.*;
+import com.platon.utils.Convert;
 import com.github.pagehelper.Page;
 import com.platon.browser.constant.Browser;
-import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
+import com.platon.browser.service.elasticsearch.EsBlockRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.enums.ErrorCodeEnum;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
+import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.request.PageReq;
@@ -19,14 +25,9 @@ import com.platon.browser.request.newblock.BlockListByNodeIdReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
-import com.platon.browser.service.elasticsearch.EsBlockRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilderConstructor;
-import com.platon.browser.service.elasticsearch.query.ESQueryBuilders;
-import com.platon.browser.utils.*;
-import com.platon.utils.Convert;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -42,12 +43,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -78,8 +77,6 @@ public class BlockService {
     @Resource
     private CustomNodeMapper customNodeMapper;
 
-    private Lock lock = new ReentrantLock();
-
     @Value("${platon.valueUnit}")
     private String valueUnit;
 
@@ -93,12 +90,11 @@ public class BlockService {
         NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
         Long bNumber = networkStatRedis.getCurNumber();
         /** 小于50万条查询redis */
-        if (req.getPageNo() * req.getPageSize() < Browser.MAX_NUM) {
+        if (req.getPageNo() * req.getPageSize() <= Browser.MAX_NUM) {
             /**
              * 当页号等于1，重新获取数据，与首页保持一致
              */
             List<Block> items;
-            long aa = System.currentTimeMillis();
             if (req.getPageNo() == 1) {
                 /** 查询缓存最新的八条区块信息 */
                 items = statisticCacheService.getBlockCache(0, 1);
@@ -117,13 +113,14 @@ public class BlockService {
                 items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
             }
             lists.addAll(this.transferBlockListResp(items));
-        } else {
-            respPage.setCode(ErrorCodeEnum.RECORD_NOT_EXIST.getCode());
-            respPage.setErrMsg(StrUtil.format("查询记录超过最大限制{}", Browser.MAX_NUM));
         }
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-        page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
         long totalCount = networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber();
+        if (totalCount > Browser.MAX_NUM) {
+            page.setTotal(Browser.MAX_NUM);
+        } else {
+            page.setTotal(networkStatRedis.getCurNumber() == null ? 0 : networkStatRedis.getCurNumber());
+        }
         long displayTotalCount = totalCount > Browser.MAX_NUM ? Browser.MAX_NUM : totalCount;
         respPage.init(lists, totalCount, displayTotalCount, page.getPages());
         if (System.currentTimeMillis() - startTime > 100) {
@@ -232,11 +229,13 @@ public class BlockService {
         /** 将查询数据转成对应list */
         List<Object[]> rows = new ArrayList<>();
         blockList.getRsData().forEach(block -> {
-            Object[] row = {block.getNum(), DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone), block.getTxQty(), HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(),
-                                                                                                                                                                           Convert.Unit.KPVON)
-                                                                                                                                                                  .setScale(18,
-                                                                                                                                                                            RoundingMode.DOWN))), HexUtil.append(
-                    EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN)))};
+            Object[] row = {
+                    block.getNum(),
+                    DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
+                    block.getTxQty(),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getReward(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN))),
+                    HexUtil.append(EnergonUtil.format(Convert.fromVon(block.getTxFee(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN)))
+            };
             rows.add(row);
         });
 
@@ -251,11 +250,13 @@ public class BlockService {
         Writer outputWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
         /** 初始化writer对象 */
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        writer.writeHeaders(i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT, local),
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD, local) + "(" + valueUnit + ")",
-                            i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE, local) + "(" + valueUnit + ")");
+        writer.writeHeaders(
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD, local) + "(" + valueUnit + ")",
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE, local) + "(" + valueUnit + ")"
+        );
         writer.writeRowsAndClose(rows);
 
         blockDownload.setData(baos.toByteArray());
