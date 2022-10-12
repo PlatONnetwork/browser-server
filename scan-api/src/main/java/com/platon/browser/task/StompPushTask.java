@@ -56,19 +56,10 @@ public class StompPushTask {
     private StakingService stakingService;
 
     @Resource
-    private BlockService blockService;
-
-    @Resource
-    private TransactionService transactionService;
-
-    @Resource
     private ParameterService parameterService;
 
     @Resource
     private StatisticCacheService statisticCacheService;
-
-    @Resource
-    private TokenService token721Service;
 
     private boolean checkData() {
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();

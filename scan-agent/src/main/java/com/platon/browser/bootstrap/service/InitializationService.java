@@ -7,10 +7,12 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.enums.AddressTypeEnum;
+import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
@@ -20,6 +22,7 @@ import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.v0152.analyzer.ErcCache;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -111,6 +114,12 @@ public class InitializationService {
     @Resource
     private ErcCache ercCache;
 
+    @Resource
+    private ConfigMapper configMapper;
+
+    @Resource
+    private PlatOnClient platOnClient;
+
     /**
      * 进入应用初始化子流程
      *
@@ -135,7 +144,6 @@ public class InitializationService {
                 log.error("", e);
                 throw new BusinessException("初始化错误:" + e.getMessage());
             }
-
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
             networkStat.setId(1);
@@ -160,8 +168,30 @@ public class InitializationService {
             networkStatCache.init(networkStat);
             // 初始化内置地址
             addressCache.initOnFirstStart();
-
             return initialResult;
+        } else {
+            try {
+                List<Config> configList = configMapper.selectByExample(null);
+                List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("").send().getData();
+                for (GovernParam gp : governParamList) {
+                    Optional<Config> configOptional = configList.stream().filter(v -> v.getName().equalsIgnoreCase(gp.getParamItem().getName())).findFirst();
+                    if (!configOptional.isPresent()) {
+                        Config config = new Config();
+                        config.setModule(gp.getParamItem().getModule());
+                        config.setName(gp.getParamItem().getName());
+                        config.setRangeDesc(gp.getParamItem().getDesc());
+                        config.setActiveBlock(0L);
+                        String initValue = getValueInBlockChainConfig(config.getName());
+                        config.setInitValue(initValue);
+                        config.setStaleValue(initValue);
+                        config.setValue(initValue);
+                        configMapper.insertSelective(config);
+                        log.info("新增的治理参数[{}]", config.getName());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("校对治理参数异常", e);
+            }
         }
 
         // 确保chainConfig先就绪
@@ -261,16 +291,16 @@ public class InitializationService {
             List<PeriodValueElement> stakeCosts = new ArrayList<>();
             stakeCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
             BigDecimal stakeCostVal = staking.getStakingLocked() // 锁定的质押金
-                                             .add(staking.getStakingHes()) // 犹豫期的质押金
-                                             .add(staking.getStatDelegateHes()) // 犹豫期的委托金
-                                             .add(staking.getStatDelegateLocked()); // 锁定的委托金
+                    .add(staking.getStakingHes()) // 犹豫期的质押金
+                    .add(staking.getStatDelegateHes()) // 犹豫期的委托金
+                    .add(staking.getStatDelegateLocked()); // 锁定的委托金
             stakeCosts.add(new PeriodValueElement().setPeriod(1L).setValue(stakeCostVal));
             ari.setStakeCost(stakeCosts);
             // |- 委托的成本
             List<PeriodValueElement> delegateCosts = new ArrayList<>();
             delegateCosts.add(new PeriodValueElement().setPeriod(0L).setValue(BigDecimal.ZERO));
             BigDecimal delegateCostVal = staking.getStatDelegateLocked() // 锁定的委托金
-                                                .add(staking.getStatDelegateHes()); // 犹豫期的委托金
+                    .add(staking.getStatDelegateHes()); // 犹豫期的委托金
             delegateCosts.add(new PeriodValueElement().setPeriod(1L).setValue(delegateCostVal));
             ari.setDelegateCost(delegateCosts);
 
@@ -346,6 +376,74 @@ public class InitializationService {
             log.error("初始化ES异常", e);
         }
 
+    }
+
+    public String getValueInBlockChainConfig(String name) {
+        ModifiableGovernParamEnum paramEnum = ModifiableGovernParamEnum.getMap().get(name);
+        String staleValue = "";
+        switch (paramEnum) {
+            // 质押相关
+            case STAKE_THRESHOLD:
+                staleValue = chainConfig.getStakeThreshold().toString();
+                break;
+            case OPERATING_THRESHOLD:
+                staleValue = chainConfig.getDelegateThreshold().toString();
+                break;
+            case MAX_VALIDATORS:
+                staleValue = chainConfig.getSettlementValidatorCount().toString();
+                break;
+            case UN_STAKE_FREEZE_DURATION:
+                staleValue = chainConfig.getUnStakeRefundSettlePeriodCount().toString();
+                break;
+            case UN_DELEGATE_FREEZE_DURATION:
+                staleValue = chainConfig.getUnDelegateFreezeDurationCount().toString();
+                break;
+            // 惩罚相关
+            case SLASH_FRACTION_DUPLICATE_SIGN:
+                staleValue = chainConfig.getDuplicateSignSlashRate().multiply(BigDecimal.valueOf(10000)).setScale(0).toString();
+                break;
+            case DUPLICATE_SIGN_REPORT_REWARD:
+                staleValue = chainConfig.getDuplicateSignRewardRate().multiply(BigDecimal.valueOf(100)).setScale(0).toString();
+                break;
+            case MAX_EVIDENCE_AGE:
+                staleValue = chainConfig.getEvidenceValidEpoch().toString();
+                break;
+            case SLASH_BLOCKS_REWARD:
+                staleValue = chainConfig.getSlashBlockRewardCount().toString();
+                break;
+            // 区块相关
+            case MAX_BLOCK_GAS_LIMIT:
+                staleValue = chainConfig.getMaxBlockGasLimit().toString();
+                break;
+            // 零出块次数阈值，在指定时间范围内达到该次数则处罚
+            case ZERO_PRODUCE_NUMBER_THRESHOLD:
+                staleValue = chainConfig.getZeroProduceNumberThreshold().toString();
+                break;
+            // 上一次零出块后，在往后的N个共识周期内如若再出现零出块，则在这N个共识周期完成时记录零出块信息
+            case ZERO_PRODUCE_CUMULATIVE_TIME:
+                staleValue = chainConfig.getZeroProduceCumulativeTime().toString();
+                break;
+            // 节点零出块惩罚被锁定时间
+            case ZERO_PRODUCE_FREEZE_DURATION:
+                staleValue = chainConfig.getZeroProduceFreezeDuration().toString();
+                break;
+            case REWARD_PER_MAX_CHANGE_RANGE:
+                staleValue = chainConfig.getRewardPerMaxChangeRange().toString();
+                break;
+            case REWARD_PER_CHANGE_INTERVAL:
+                staleValue = chainConfig.getRewardPerChangeInterval().toString();
+                break;
+            case INCREASE_ISSUANCE_RATIO:
+                staleValue = chainConfig.getAddIssueRate().multiply(new BigDecimal(10000)).setScale(0).toPlainString();
+                break;
+            case RESTRICTING_MINIMUM_RELEASE:
+                //最小锁仓释放金额(LAT)
+                staleValue = chainConfig.getRestrictingMinimumRelease().toString();
+                break;
+            default:
+                break;
+        }
+        return staleValue;
     }
 
 }
