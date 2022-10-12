@@ -44,6 +44,12 @@ gradlew clean buildTar -x test -b scan-agent/build.gradle
 gradlew clean buildTar -x test -b scan-api/build.gradle
 ```
 
+### scan-job的打包
+
+```bash
+gradlew clean buildTar -x test -b scan-job/build.gradle
+```
+
 ## 组件版本
 
 ```bash

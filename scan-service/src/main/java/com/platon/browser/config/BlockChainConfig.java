@@ -400,7 +400,9 @@ public class BlockChainConfig {
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
         setConsensusPeriodBlockCount(expectBlockCount.multiply(dec.getCommon().getMaxConsensusVals()));
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        setSettlePeriodBlockCount(settlementCycleMinutes.multiply(BigInteger.valueOf(60)).divide(blockInterval.multiply(consensusPeriodBlockCount)).multiply(consensusPeriodBlockCount));
+        setSettlePeriodBlockCount(settlementCycleMinutes.multiply(BigInteger.valueOf(60))
+                                                        .divide(blockInterval.multiply(consensusPeriodBlockCount))
+                                                        .multiply(consensusPeriodBlockCount));
         //【通用】PlatOn基金会账户地址
         setPlatOnFundAccount(dec.getInnerAcc().getPlatonFundAccount());
         //【通用】PlatOn基金会账户初始余额
@@ -418,40 +420,69 @@ public class BlockChainConfig {
         setUnStakeRefundSettlePeriodCount(dec.getStaking().getUnStakeFreezeDuration());
         setUnDelegateFreezeDurationCount(dec.getStaking().getUnDelegateFreezeDuration());
         //【惩罚】双签奖励百分比
-        setDuplicateSignRewardRate(dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
+        setDuplicateSignRewardRate(dec.getSlashing()
+                                      .getDuplicateSignReportReward()
+                                      .divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //【惩罚】双签处罚万分比
-        setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing().getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setDuplicateSignSlashRate(new BigDecimal(dec.getSlashing()
+                                                    .getSlashFractionDuplicateSign()).divide(BigDecimal.valueOf(10000),
+                                                                                             16,
+                                                                                             RoundingMode.FLOOR));
         //【惩罚】举报证据有效周期数
         setEvidenceValidEpoch(new BigDecimal(dec.getSlashing().getMaxEvidenceAge()));
         //【惩罚】扣除区块奖励的个数
         setSlashBlockRewardCount(new BigDecimal(dec.getSlashing().getSlashBlocksReward()));
 
         //【治理】文本提案参与率: >
-        setMinProposalTextParticipationRate(dec.getGov().getTextProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalTextParticipationRate(dec.getGov()
+                                               .getTextProposalVoteRate()
+                                               .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】文本提案支持率：>=
-        setMinProposalTextSupportRate(dec.getGov().getTextProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalTextSupportRate(dec.getGov()
+                                         .getTextProposalSupportRate()
+                                         .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】取消提案参与率: >
-        setMinProposalCancelParticipationRate(dec.getGov().getCancelProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalCancelParticipationRate(dec.getGov()
+                                                 .getCancelProposalVoteRate()
+                                                 .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】取消提案支持率：>=
-        setMinProposalCancelSupportRate(dec.getGov().getCancelProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalCancelSupportRate(dec.getGov()
+                                           .getCancelProposalSupportRate()
+                                           .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】升级提案通过率
-        setMinProposalUpgradePassRate(dec.getGov().getVersionProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setMinProposalUpgradePassRate(dec.getGov()
+                                         .getVersionProposalSupportRate()
+                                         .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】文本提案投票周期
-        setProposalTextConsensusRounds(new BigDecimal(dec.getGov().getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
-                                                                                                         .divide(new BigDecimal(BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-                                                                                                                                               .multiply(dec.getCommon().getPerRoundBlocks())
-                                                                                                                                               .multiply(consensusValidatorCount)) //每个共识轮验证节点数量
-                                                                                                                 , 0, RoundingMode.FLOOR));
+        setProposalTextConsensusRounds(new BigDecimal(dec.getGov()
+                                                         .getTextProposalVoteDurationSeconds()) // 文本提案的投票持续最长的时间（单位：s）
+                                                                                                .divide(new BigDecimal(
+                                                                                                                BigInteger.ONE // 出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
+                                                                                                                               .multiply(
+                                                                                                                                       dec.getCommon()
+                                                                                                                                          .getPerRoundBlocks())
+                                                                                                                               .multiply(
+                                                                                                                                       consensusValidatorCount))
+                                                                                                        //每个共识轮验证节点数量
+                                                                                                        ,
+                                                                                                        0,
+                                                                                                        RoundingMode.FLOOR));
 
         //【治理】参数提案的投票持续最长的时间（单位：s）
         setParamProposalVoteDurationSeconds(dec.getGov().getParamProposalVoteDurationSeconds());
         //【治理】参数提案投票参与率阈值（参数提案投票通过条件之一：大于此值，则参数提案投票通过)
-        setParamProposalVoteRate(dec.getGov().getParamProposalVoteRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setParamProposalVoteRate(dec.getGov()
+                                    .getParamProposalVoteRate()
+                                    .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //【治理】参数提案投票支持率阈值（参数提案投票通过条件之一：大于等于此值，则参数提案投票通过
-        setParamProposalSupportRate(dec.getGov().getParamProposalSupportRate().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        setParamProposalSupportRate(dec.getGov()
+                                       .getParamProposalSupportRate()
+                                       .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
 
         //【奖励】激励池分配给出块激励的比例
-        setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
+        setBlockRewardRate(new BigDecimal(dec.getReward().getNewBlockRate()).divide(BigDecimal.valueOf(100),
+                                                                                    2,
+                                                                                    RoundingMode.FLOOR));
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         setStakeRewardRate(BigDecimal.ONE.subtract(blockRewardRate));
         //【奖励】Platon基金会年限

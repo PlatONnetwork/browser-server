@@ -43,6 +43,13 @@ gradlew clean buildTar -x test -b scan-agent/build.gradle
 ```bash
 gradlew clean buildTar -x test -b scan-api/build.gradle
 ```
+
+### scan-job build
+
+```bash
+gradlew clean buildTar -x test -b scan-job/build.gradle
+```
+
 ## Component Version
 
 ```bash
