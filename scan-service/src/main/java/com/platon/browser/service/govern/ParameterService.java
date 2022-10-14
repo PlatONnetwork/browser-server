@@ -7,6 +7,7 @@ import com.platon.browser.dao.custommapper.CustomConfigMapper;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
+import com.platon.browser.utils.ChainVersionUtil;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @description: 治理参数服务
@@ -98,12 +101,20 @@ public class ParameterService {
         chainConfig.setDelegateThreshold(modifiableParam.getStaking().getOperatingThreshold());
         //节点质押退回锁定周期
         chainConfig.setUnStakeRefundSettlePeriodCount(modifiableParam.getStaking().getUnStakeFreezeDuration().toBigInteger());
+        //解委托锁定周期数
+        if (modifiableParam.getStaking().getUnDelegateFreezeDuration().compareTo(BigDecimal.ZERO) > 0) {
+            chainConfig.setUnDelegateFreezeDurationCount(modifiableParam.getStaking().getUnDelegateFreezeDuration().toBigInteger());
+        }
         //备选结算周期验证节点数量(U)
         chainConfig.setSettlementValidatorCount(modifiableParam.getStaking().getMaxValidators().toBigInteger());
         //举报最高处罚n3‱
-        chainConfig.setDuplicateSignSlashRate(modifiableParam.getSlashing().getSlashFractionDuplicateSign().divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
+        chainConfig.setDuplicateSignSlashRate(modifiableParam.getSlashing()
+                                                             .getSlashFractionDuplicateSign()
+                                                             .divide(BigDecimal.valueOf(10000), 16, RoundingMode.FLOOR));
         //举报奖励n4%
-        chainConfig.setDuplicateSignRewardRate(modifiableParam.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
+        chainConfig.setDuplicateSignRewardRate(modifiableParam.getSlashing()
+                                                              .getDuplicateSignReportReward()
+                                                              .divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR));
         //证据有效期
         chainConfig.setEvidenceValidEpoch(modifiableParam.getSlashing().getMaxEvidenceAge());
         //扣除区块奖励的个数
@@ -211,6 +222,41 @@ public class ParameterService {
                 break;
         }
         return staleValue;
+    }
+
+    /**
+     * 升级1.3.0配置unDelegateFreezeDuration治理参数，方法以后可改造成升级提案就配置所有新增的参数
+     *
+     * @param proposalVersion
+     */
+    public void configUnDelegateFreezeDuration(BigInteger proposalVersion) {
+        BigInteger version = ChainVersionUtil.toBigIntegerVersion("1.3.0");
+        if (proposalVersion.compareTo(version) >= 0) {
+            try {
+                List<Config> configList = configMapper.selectByExample(null);
+                List<GovernParam> governParamList = platOnClient.getProposalContract().getParamList("staking").send().getData();
+                for (GovernParam gp : governParamList) {
+                    Optional<Config> configOptional = configList.stream()
+                                                                .filter(v -> v.getName().equalsIgnoreCase(gp.getParamItem().getName()))
+                                                                .findFirst();
+                    if (!configOptional.isPresent() && gp.getParamItem().getName().equalsIgnoreCase("unDelegateFreezeDuration")) {
+                        Config config = new Config();
+                        config.setModule(gp.getParamItem().getModule());
+                        config.setName(gp.getParamItem().getName());
+                        config.setRangeDesc(gp.getParamItem().getDesc());
+                        config.setActiveBlock(0L);
+                        String initValue = getValueInBlockChainConfig(config.getName());
+                        config.setInitValue(initValue);
+                        config.setStaleValue(initValue);
+                        config.setValue(initValue);
+                        configMapper.insertSelective(config);
+                        log.info("新增的治理参数[{}]", config.getName());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("校对治理参数异常", e);
+            }
+        }
     }
 
 }
