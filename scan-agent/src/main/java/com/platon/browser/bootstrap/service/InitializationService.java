@@ -135,7 +135,6 @@ public class InitializationService {
                 log.error("", e);
                 throw new BusinessException("初始化错误:" + e.getMessage());
             }
-
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
             networkStat.setId(1);
@@ -160,7 +159,6 @@ public class InitializationService {
             networkStatCache.init(networkStat);
             // 初始化内置地址
             addressCache.initOnFirstStart();
-
             return initialResult;
         }
 

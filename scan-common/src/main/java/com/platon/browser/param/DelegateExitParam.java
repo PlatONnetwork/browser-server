@@ -1,8 +1,6 @@
 package com.platon.browser.param;
 
 import com.platon.browser.utils.HexUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,10 +14,8 @@ import java.math.BigInteger;
  * txType=1005减持/撤销委托(赎回委托)
  */
 @Data
-@Builder
-@AllArgsConstructor
 @Accessors(chain = true)
-public class DelegateExitParam extends TxParam{
+public class DelegateExitParam extends TxParam {
 
     /**
      * 代表着某个node的某次质押的唯一标示
@@ -30,18 +26,22 @@ public class DelegateExitParam extends TxParam{
      * 被质押的节点Id(也叫候选人的节点Id)
      */
     private String nodeId;
-    public void setNodeId(String nodeId){
-        this.nodeId= HexUtil.prefix(nodeId);
+
+    public DelegateExitParam setNodeId(String nodeId) {
+        this.nodeId = HexUtil.prefix(nodeId);
+        return this;
     }
 
     /**
      * 减持委托的金额(按照最小单位算，1LAT = 10**18 von)
      */
     private BigDecimal amount;
+
     /**
      * 真正减持的委托金额(按照最小单位算，1LAT = 10**18 von)
      */
     private BigDecimal realAmount;
+
     /**
      * 委托金额对应的奖励数(按照最小单位算，1LAT = 10**18 von)
      */
@@ -51,4 +51,35 @@ public class DelegateExitParam extends TxParam{
      * 被质押节点的名称(有长度限制，表示该节点的名称)
      */
     private String nodeName;
+
+    /**
+     * 状态码
+     */
+    String decodedStatus;
+
+    /**
+     * 委托的收益(委托锁定新增字段)
+     */
+    private BigDecimal delegateIncome;
+
+    /**
+     * 撤销的委托金退回用户余额(委托锁定新增字段)
+     */
+    private BigDecimal released;
+
+    /**
+     * 撤销的委托金退回用户锁仓账户(委托锁定新增字段)
+     */
+    private BigDecimal restrictingPlan;
+
+    /**
+     * 撤销的委托金转到锁定期,来自余额(委托锁定新增字段)
+     */
+    private BigDecimal lockReleased;
+
+    /**
+     * 撤销的委托金转到锁定期,来自锁仓账户(委托锁定新增字段)
+     */
+    private BigDecimal lockRestrictingPlan;
+
 }

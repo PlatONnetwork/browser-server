@@ -146,5 +146,8 @@
         where token_address = #{key.tokenAddress}
           and token_id = #{key.tokenId}
     </select>
-
+    <select id="findMaxId" resultType="long">
+        SELECT MAX(id) AS maxId
+        FROM token_1155_inventory
+    </select>
 </mapper>

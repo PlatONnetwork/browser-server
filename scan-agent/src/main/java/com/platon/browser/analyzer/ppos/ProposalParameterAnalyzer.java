@@ -2,12 +2,11 @@ package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.param.ppos.ProposalParameter;
-import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalParameterParam;
@@ -36,9 +35,6 @@ public class ProposalParameterAnalyzer extends PPOSAnalyzer<NodeOpt> {
     private ProposalBusinessMapper proposalBusinessMapper;
 
     @Resource
-    private NetworkStatCache networkStatCache;
-
-    @Resource
     private ProposalCache proposalCache;
 
     @Resource
@@ -58,8 +54,9 @@ public class ProposalParameterAnalyzer extends PPOSAnalyzer<NodeOpt> {
         // 补充节点名称
         updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus())
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) {
             return null;
+        }
 
         long startTime = System.currentTimeMillis();
 
@@ -67,23 +64,23 @@ public class ProposalParameterAnalyzer extends PPOSAnalyzer<NodeOpt> {
         BigDecimal activeBlockNum = voteEndBlockNum.add(BigDecimal.ONE);
         String staleValue = parameterService.getValueInBlockChainConfig(txParam.getName());
         ProposalParameter businessParam = ProposalParameter.builder()
-                .nodeId(txParam.getVerifier())
-                .pIDID(txParam.getPIDID())
-                .url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
-                .pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
-                .endVotingBlock(voteEndBlockNum.toBigInteger())
-                .activeBlock(activeBlockNum.toBigInteger())
-                .topic(CustomProposal.QUERY_FLAG)
-                .description(CustomProposal.QUERY_FLAG)
-                .txHash(tx.getHash())
-                .blockNumber(BigInteger.valueOf(tx.getNum()))
-                .timestamp(tx.getTime())
-                .stakingName(txParam.getNodeName())
-                .module(txParam.getModule())
-                .name(txParam.getName())
-                .staleValue(staleValue)
-                .newValue(txParam.getNewValue())
-                .build();
+                                                           .nodeId(txParam.getVerifier())
+                                                           .pIDID(txParam.getPIDID())
+                                                           .url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
+                                                           .pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
+                                                           .endVotingBlock(voteEndBlockNum.toBigInteger())
+                                                           .activeBlock(activeBlockNum.toBigInteger())
+                                                           .topic(CustomProposal.QUERY_FLAG)
+                                                           .description(CustomProposal.QUERY_FLAG)
+                                                           .txHash(tx.getHash())
+                                                           .blockNumber(BigInteger.valueOf(tx.getNum()))
+                                                           .timestamp(tx.getTime())
+                                                           .stakingName(txParam.getNodeName())
+                                                           .module(txParam.getModule())
+                                                           .name(txParam.getName())
+                                                           .staleValue(staleValue)
+                                                           .newValue(txParam.getNewValue())
+                                                           .build();
 
         // 业务数据入库
         proposalBusinessMapper.parameter(businessParam);
@@ -92,12 +89,12 @@ public class ProposalParameterAnalyzer extends PPOSAnalyzer<NodeOpt> {
         proposalCache.add(activeBlockNum.longValue(), tx.getHash());
 
         String desc = NodeOpt.TypeEnum.PARAMETER.getTpl()
-                .replace("ID", txParam.getPIDID())
-                .replace("TITLE", businessParam.getTopic())
-                .replace("TYPE", String.valueOf(CustomProposal.TypeEnum.PARAMETER.getCode()))
-                .replace("MODULE", businessParam.getModule())
-                .replace("NAME", businessParam.getName())
-                .replace("VALUE", businessParam.getNewValue());
+                                                .replace("ID", txParam.getPIDID())
+                                                .replace("TITLE", businessParam.getTopic())
+                                                .replace("TYPE", String.valueOf(CustomProposal.TypeEnum.PARAMETER.getCode()))
+                                                .replace("MODULE", businessParam.getModule())
+                                                .replace("NAME", businessParam.getName())
+                                                .replace("VALUE", businessParam.getNewValue());
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(txParam.getVerifier());

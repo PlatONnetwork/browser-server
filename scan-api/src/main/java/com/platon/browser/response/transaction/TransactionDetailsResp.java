@@ -3,8 +3,6 @@ package com.platon.browser.response.transaction;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.json.CustomLatSerializer;
 import com.platon.browser.config.json.CustomVersionSerializer;
-import com.platon.browser.dao.entity.TxErc1155Bak;
-import com.platon.browser.elasticsearch.dto.ErcTx;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -145,6 +143,11 @@ public class TransactionDetailsResp {
     private List<Arc721Param> erc721Params;
 
     private List<Arc1155Param> erc1155Params;
+
+    /**
+     * 总领取解锁的委托
+     */
+    private BigDecimal redeemDelegationValue;
 
     public String getTxHash() {
         return this.txHash;
@@ -661,4 +664,11 @@ public class TransactionDetailsResp {
         this.erc1155Params = erc1155Params;
     }
 
+    public BigDecimal getRedeemDelegationValue() {
+        return redeemDelegationValue;
+    }
+
+    public void setRedeemDelegationValue(BigDecimal redeemDelegationValue) {
+        this.redeemDelegationValue = redeemDelegationValue;
+    }
 }

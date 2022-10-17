@@ -1,8 +1,10 @@
 package com.platon.browser.response.address;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.bean.LockDelegate;
 import com.platon.browser.config.json.CustomLatSerializer;
 
 /**
@@ -15,76 +17,160 @@ import com.platon.browser.config.json.CustomLatSerializer;
  */
 public class QueryDetailResp {
 
-    private Integer type;                //地址详情  1：账号   2：内置合约   3：EVM合约 4:WASM
+    /**
+     * 地址详情  1：账号   2：内置合约   3：EVM合约 4:WASM
+     */
+    private Integer type;
 
-    private BigDecimal balance;             //余额(单位:ATP)
+    /**
+     * 余额(单位:lat)
+     */
+    private BigDecimal balance;
 
-    private BigDecimal restrictingBalance;  //锁仓余额(单位:ATP)
+    /**
+     * 锁仓余额(单位:lat)
+     */
+    private BigDecimal restrictingBalance;
 
-    private BigDecimal stakingValue;        //质押的金额
+    /**
+     * 质押的金额
+     */
+    private BigDecimal stakingValue;
 
-    private BigDecimal delegateValue;       //委托的金额
+    /**
+     * 委托的金额
+     */
+    private BigDecimal delegateValue;
 
-    private BigDecimal redeemedValue;       //赎回中的金额
+    /**
+     * 赎回中的金额
+     */
+    private BigDecimal redeemedValue;
 
-    private Integer txQty;             //交易总数
+    /**
+     * 交易总数
+     */
+    private Integer txQty;
 
     /**
      * 是否是erc20
      */
     private boolean hasErc20 = false;
 
-    private Integer erc20TxQty; // token erc20交易总数
+    /**
+     * token erc20交易总数
+     */
+    private Integer erc20TxQty;
 
     /**
      * 是否是erc721
      */
     private boolean hasErc721 = false;
 
-    private Integer erc721TxQty; // token erc 721交易总数
+    /**
+     * token erc 721交易总数
+     */
+    private Integer erc721TxQty;
 
     /**
      * 是否是erc1155
      */
     private boolean hasErc1155 = false;
 
-    private Integer erc1155TxQty; // token erc 1155交易总数
+    /**
+     * token erc 1155交易总数
+     */
+    private Integer erc1155TxQty;
 
-    private Integer transferQty;         //转账交易总数
+    /**
+     * 转账交易总数
+     */
+    private Integer transferQty;
 
-    private Integer delegateQty;         //委托交易总数
+    /**
+     * 委托交易总数
+     */
+    private Integer delegateQty;
 
-    private Integer stakingQty;          //验证人交易总数
+    /**
+     * 验证人交易总数
+     */
+    private Integer stakingQty;
 
-    private Integer proposalQty;         //治理交易总数
+    /**
+     * 治理交易总数
+     */
+    private Integer proposalQty;
 
-    private Integer candidateCount;      //已委托验证人
+    /**
+     * 已委托验证人
+     */
+    private Integer candidateCount;
 
-    private BigDecimal delegateHes;         //未锁定委托（ATP）
+    /**
+     * 未锁定委托（lat）
+     */
+    private BigDecimal delegateHes;
 
-    private BigDecimal delegateLocked;      //已锁定委托（ATP）
+    /**
+     * 已锁定委托（lat）
+     */
+    private BigDecimal delegateLocked;
 
-    private BigDecimal delegateUnlock;      //已解除委托（ATP）
+    /**
+     * 已解除委托（lat）
+     */
+    private BigDecimal delegateUnlock;
 
-    private BigDecimal delegateReleased;    //待赎回委托（ATP）
+    /**
+     * 待赎回委托（lat）
+     */
+    private BigDecimal delegateReleased;
 
-    private BigDecimal delegateClaim;    //待提取委托（ATP）
+    /**
+     * 待提取委托（lat）
+     */
+    private BigDecimal delegateClaim;
 
-    private BigDecimal haveReward;    //已提取委托（ATP）
+    /**
+     * 已提取委托（lat）
+     */
+    private BigDecimal haveReward;
 
-    private String contractName;        //合约名称
+    /**
+     * 合约名称
+     */
+    private String contractName;
 
-    private String contractCreate;      //合约创建者地址
+    /**
+     * 合约创建者地址
+     */
+    private String contractCreate;
 
-    private String contractCreateHash; //合约创建哈希
+    /**
+     * 合约创建哈希
+     */
+    private String contractCreateHash;
 
-    private String contractBin; //合约bin
+    /**
+     * 合约bin
+     */
+    private String contractBin;
 
-    private Integer isRestricting; //是否锁仓
+    /**
+     * 是否锁仓
+     */
+    private Integer isRestricting;
 
-    private Integer isDestroy; //是否销毁
+    /**
+     * 是否销毁
+     */
+    private Integer isDestroy;
 
-    private String destroyHash; //合约销毁哈希
+    /**
+     * 合约销毁哈希
+     */
+    private String destroyHash;
 
     /**
      * 合约符号
@@ -95,6 +181,21 @@ public class QueryDetailResp {
      * 合约名称
      */
     private String tokenName;
+
+    /**
+     * 委托冻结计划
+     */
+    private List<LockDelegate> lockDelegateList;
+
+    /**
+     * 已解冻的委托金额/待提取委托(lat)
+     */
+    private String unLockBalance;
+
+    /**
+     * 未解冻的委托金额/待赎回委托(lat)
+     */
+    private String lockBalance;
 
     public Integer getType() {
         return this.type;
@@ -369,6 +470,30 @@ public class QueryDetailResp {
 
     public void setTokenName(String tokenName) {
         this.tokenName = tokenName;
+    }
+
+    public List<LockDelegate> getLockDelegateList() {
+        return lockDelegateList;
+    }
+
+    public void setLockDelegateList(List<LockDelegate> lockDelegateList) {
+        this.lockDelegateList = lockDelegateList;
+    }
+
+    public String getUnLockBalance() {
+        return unLockBalance;
+    }
+
+    public void setUnLockBalance(String unLockBalance) {
+        this.unLockBalance = unLockBalance;
+    }
+
+    public String getLockBalance() {
+        return lockBalance;
+    }
+
+    public void setLockBalance(String lockBalance) {
+        this.lockBalance = lockBalance;
     }
 
 }

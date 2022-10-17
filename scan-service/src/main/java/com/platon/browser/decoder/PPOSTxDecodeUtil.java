@@ -25,17 +25,20 @@ import java.util.List;
  */
 @Slf4j
 public class PPOSTxDecodeUtil {
-    private PPOSTxDecodeUtil(){}
+
+    private PPOSTxDecodeUtil() {
+    }
+
     public static PPOSTxDecodeResult decode(String txInput, List<Log> logs) {
         PPOSTxDecodeResult result = new PPOSTxDecodeResult();
         try {
             if (StringUtils.isNotEmpty(txInput) && !txInput.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
-                List <RlpType> rlpTypes = rlpList.getValues();
+                List<RlpType> rlpTypes = rlpList.getValues();
 
-                if(rlpTypes.size() == 1 && rlpTypes.get(0).getClass().equals(RlpString.class)) {
-                    OthersTxParam txParam=new OthersTxParam();
-                    txParam.setData(((RlpString)rlpTypes.get(0)).asString());
+                if (rlpTypes.size() == 1 && rlpTypes.get(0).getClass().equals(RlpString.class)) {
+                    OthersTxParam txParam = new OthersTxParam();
+                    txParam.setData(((RlpString) rlpTypes.get(0)).asString());
                     result.setParam(txParam);
                     return result;
                 }
@@ -48,10 +51,10 @@ public class PPOSTxDecodeUtil {
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
 
                 Transaction.TypeEnum typeEnum = Transaction.TypeEnum.getEnum(txCode.intValue());
-                if(typeEnum == null) {
-                	OthersTxParam txParam=new OthersTxParam();
-                	result.setParam(txParam);
-                	return result;
+                if (typeEnum == null) {
+                    OthersTxParam txParam = new OthersTxParam();
+                    result.setParam(txParam);
+                    return result;
                 }
                 result.setTypeEnum(typeEnum);
                 switch (typeEnum) {
@@ -66,7 +69,9 @@ public class PPOSTxDecodeUtil {
                     case DELEGATE_CREATE: // 1004 发起委托
                         return result.setParam(DelegateCreateDecoder.decode(rootList));
                     case DELEGATE_EXIT: // 1005 减持/撤销委托
-                        return result.setParam(DelegateExitDecoder.decode(rootList));
+                        return result.setParam(DelegateExitDecoder.decode(rootList, logs));
+                    case REDEEM_DELEGATION: // 1006 领取解锁的委托
+                        return result.setParam(RedeemDelegationDecoder.decode(rootList, logs));
                     case PROPOSAL_TEXT: // 2000 提交文本提案
                         return result.setParam(ProposalTextDecoder.decode(rootList));
                     case PROPOSAL_UPGRADE: // 2001 提交升级提案
@@ -85,15 +90,18 @@ public class PPOSTxDecodeUtil {
                         return result.setParam(RestrictingCreateDecoder.decode(rootList));
                     case CLAIM_REWARDS: // 5000 领取委托奖励
                         // 如果日志为空则不解析
-                        if(logs.isEmpty()) return result;
-                        return result.setParam(DelegateRewardClaimDecoder.decode(rootList,logs));
-				default:
-					break;
+                        if (logs.isEmpty()) {
+                            return result;
+                        }
+                        return result.setParam(DelegateRewardClaimDecoder.decode(rootList, logs));
+                    default:
+                        break;
                 }
             }
         } catch (Exception e) {
-            log.error("解析内置合约交易输入出错:",e);
+            log.error("解析内置合约交易输入出错:", e);
         }
         return result;
     }
+
 }

@@ -69,43 +69,35 @@
     </delete>
 
     <select id="selectTokenInventory" resultType="com.platon.browser.bean.CustomTokenInventory">
-        SELECT
-            ti.token_address AS tokenAddress,
-            ti.token_id AS tokenId,
-            ti.OWNER AS OWNER,
-            ti.NAME AS NAME,
-            ti.description,
-            ti.image,
-            ti.create_time AS createTime,
-            ti.update_time AS updateTime,
-            ti.token_tx_qty AS tokenTxQty,
-            t.NAME AS tokenName,
-            t.symbol AS symbol
-        FROM
-            token_inventory ti
-                LEFT JOIN token t ON ti.token_address = t.address
+        SELECT ti.token_address AS tokenAddress,
+               ti.token_id      AS tokenId,
+               ti.OWNER         AS OWNER,
+               ti.NAME          AS NAME,
+               ti.description,
+               ti.image,
+               ti.create_time   AS createTime,
+               ti.update_time   AS updateTime,
+               ti.token_tx_qty  AS tokenTxQty,
+               t.NAME           AS tokenName,
+               t.symbol         AS symbol
+        FROM token_inventory ti
+                 LEFT JOIN token t ON ti.token_address = t.address
         where ti.token_address = #{tokenAddress,jdbcType=VARCHAR}
           and ti.token_id = #{tokenId,jdbcType=VARCHAR}
     </select>
 
     <select id="findErc721ContractDestroyBalance" parameterType="string" resultType="com.platon.browser.bean.Erc721ContractDestroyBalanceVO">
-        select
-            t2.token_address as tokenAddress ,
-            t2.owner ,
-            count(1) as num
-        from
-            (
-                select
-                    t1.token_address ,
-                    t1.token_id ,
-                    t1.owner
-                from
-                    token_inventory t1
-                where
-                    t1.token_address = #{tokenAddress}
-            ) t2
-        group by
-            t2.owner
+        select t2.token_address as tokenAddress,
+               t2.owner,
+               count(1)         as num
+        from (
+                 select t1.token_address,
+                        t1.token_id,
+                        t1.owner
+                 from token_inventory t1
+                 where t1.token_address = #{tokenAddress}
+             ) t2
+        group by t2.owner
     </select>
 
     <update id="batchUpdateTokenInfo">
@@ -129,4 +121,8 @@
         </foreach>
     </update>
 
+    <select id="findMaxId" resultType="long">
+        SELECT MAX(id) AS maxId
+        FROM token_inventory
+    </select>
 </mapper>
