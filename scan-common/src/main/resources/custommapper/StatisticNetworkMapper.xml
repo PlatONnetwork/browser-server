@@ -50,6 +50,7 @@
         `issue_rates`,
         `erc20_tx_qty`,
         `erc721_tx_qty`,
+        `erc1155_tx_qty`,
         `year_num`
     )
     values
@@ -80,6 +81,7 @@
         #{issueRates},
         #{erc20TxQty},
         #{erc721TxQty},
+        #{erc1155TxQty},
         #{yearNum}
     )
     on duplicate
@@ -109,6 +111,7 @@
         `issue_rates` = #{issueRates},
         `erc20_tx_qty` = #{erc20TxQty},
         `erc721_tx_qty` = #{erc721TxQty},
+        `erc1155_tx_qty` = #{erc1155TxQty},
         `year_num` = #{yearNum}
         ;
 </update>

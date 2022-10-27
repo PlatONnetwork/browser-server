@@ -54,11 +54,22 @@ public class ErcTx {
     private String hash;
 
     /**
+     * erc1155的操作者
+     */
+    private String operator;
+
+    /**
      * 交易发起者（也是代币扣除方）
      */
     private String from;
 
     private String to;
+
+
+    /**
+     * erc721, erc1155的标识符
+     */
+    private String tokenId;
 
     /**
      * 交易value
@@ -107,10 +118,12 @@ public class ErcTx {
         decimal("decimal", "decimal", "INTEGER", true),
         contract("contract", "contract", "VARCHAR", false),
         hash("hash", "hash", "VARCHAR", false),
+        operator("operator", "operator", "VARCHAR", true),
         from("from", "from", "VARCHAR", true),
         fromType("from_type", "fromType", "INTEGER", false),
         to("to", "to", "VARCHAR", true),
         toType("to_type", "toType", "INTEGER", false),
+        tokenId("token_id", "tokenId", "VARCHAR", true),
         value("value", "value", "VARCHAR", true),
         bn("bn", "bn", "BIGINT", false),
         bTime("b_time", "bTime", "TIMESTAMP", false),

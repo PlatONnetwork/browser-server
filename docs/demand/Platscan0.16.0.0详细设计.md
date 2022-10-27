@@ -25,7 +25,6 @@ C -->|新版本| E[新业务逻辑]
      * @param event Collection事件
      * @param tx    交易
      * @return com.platon.browser.bean.DelegateExitResult
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/2/3
      */
     @Override

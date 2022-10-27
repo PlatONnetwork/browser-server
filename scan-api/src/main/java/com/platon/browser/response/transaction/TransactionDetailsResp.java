@@ -1,83 +1,134 @@
 package com.platon.browser.response.transaction;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.json.CustomLatSerializer;
 import com.platon.browser.config.json.CustomVersionSerializer;
-import com.platon.browser.param.Erc20Param;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 交易详情返回对象
- * 
+ *
+ * @author zhangrj
  * @file TransactionDetailsResp.java
  * @description
- * @author zhangrj
  * @data 2019年8月31日
  */
 public class TransactionDetailsResp {
+
     private String txHash; // 交易hash
+
     private String from; // 发送方地址
+
     private String to; // 接收方地址（操作地址）
+
     private Long timestamp; // 交易时间
+
     private Long serverTime; // 服务器时间
+
     private String confirmNum; // 区块确认数
+
     private Long blockNumber; // 交易所在区块高度
+
     private String gasLimit; // 能量限制
+
     private String gasUsed; // 能量消耗
+
     private BigDecimal gasPrice; // 能量价格
+
     private BigDecimal value; // 金额(单位:von)
+
     private BigDecimal actualTxCost; // 交易费用(单位:von)
+
     private String txType; // 交易类型
+
     private String input; // 附加输入数据
+
     private String txInfo; // 附加输入数据解析后的结构
+
     private String failReason; // 失败原因
+
     private Boolean first; // 是否第一条记录
+
     private Boolean last; // 是否最后一条记录
+
     private String receiveType; // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
+
     private Integer contractType; // 合约类型 1-evm合约 2-wasm合约
+
     private String method; // 合约调用函数
+
     private String contractName; // 合约名称
+
     private String rPAccount; // 锁仓计划的地址
+
     private BigDecimal rPNum;
+
     private List<TransactionDetailsRPPlanResp> rPPlan;
+
     private List<TransactionDetailsEvidencesResp> evidences;
+
     private String nodeId; // 节点id
+
     private String nodeName; // 节点名称
+
     private String benefitAddr; // 用于接受出块奖励和质押奖励的收益账户
+
     private String externalId; // 外部Id(有长度限制，给第三方拉取节点描述的Id)
+
     private String externalUrl; // 外部url
+
     private String website; // 节点的第三方主页(有长度限制，表示该节点的主页)
+
     private String details; // 节点的描述(有长度限制，表示该节点的描述)
+
     private String programVersion; // 程序的真实版本，治理rpc获取
+
     private BigDecimal applyAmount; // 申请赎回的金额
+
     private BigDecimal redeemLocked; // 赎回中被锁定的金额
+
     private Integer redeemStatus; // 赎回状态， 1： 退回中 2：退回成功
+
     private String redeemUnLockedBlock; // 预计赎回到账的区块
+
     private String proposalUrl; // 提案的github地址 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md eip-100为提案id
+
     private String proposalHash; // 提案id
+
     private String proposalOption; // 投票 1：文本提案 2：升级提案 3：参数提案
+
     private String proposalNewVersion; // 升级提案的版本
+
     private String declareVersion; // 声明的版本
+
     private Integer txReceiptStatus; // 交易状态
+
     private String voteStatus; // 投票选项 1:支持 2:反对 3:弃权
 
     private String evidence;// 证据
+
     private Integer reportType;// 举报类型:1：区块双签
+
     private BigDecimal reportRewards;// 举报奖励
+
     private Integer reportStatus;// 举报状态 \r\n1：失败\r\n2：成功
 
     private String pipNum;// 提案pip编号
+
     private Integer proposalStatus;// 提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
+
     private String proposalTitle;// 提案标题
 
     private String preHash;// 上一条记录
+
     private String nextHash;// 下一条记录
 
     private BigDecimal txAmount; // 交易费用
 
     private String delegationRatio; // 委托比例
+
     private List<TransactionDetailsRewardsResp> rewards;
 
     // private String innerFrom; // 内部交易from
@@ -90,6 +141,13 @@ public class TransactionDetailsResp {
     private List<Arc20Param> erc20Params;
 
     private List<Arc721Param> erc721Params;
+
+    private List<Arc1155Param> erc1155Params;
+
+    /**
+     * 总领取解锁的委托
+     */
+    private BigDecimal redeemDelegationValue;
 
     public String getTxHash() {
         return this.txHash;
@@ -596,5 +654,21 @@ public class TransactionDetailsResp {
 
     public void setErc20Params(List<Arc20Param> erc20Params) {
         this.erc20Params = erc20Params;
+    }
+
+    public List<Arc1155Param> getErc1155Params() {
+        return erc1155Params;
+    }
+
+    public void setErc1155Params(List<Arc1155Param> erc1155Params) {
+        this.erc1155Params = erc1155Params;
+    }
+
+    public BigDecimal getRedeemDelegationValue() {
+        return redeemDelegationValue;
+    }
+
+    public void setRedeemDelegationValue(BigDecimal redeemDelegationValue) {
+        this.redeemDelegationValue = redeemDelegationValue;
     }
 }

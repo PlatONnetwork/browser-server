@@ -84,7 +84,9 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
         // 补充节点名称
         updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) return der;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) {
+            return der;
+        }
 
         long startTime = System.currentTimeMillis();
 
@@ -95,13 +97,17 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
         delegationKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
         Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
 
-        if (delegation == null) return der;
+        if (delegation == null) {
+            return der;
+        }
         // 查询出对应的节点信息
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria().andNodeIdEqualTo(delegation.getNodeId()).andStakingBlockNumEqualTo(delegation.getStakingBlockNum());
         List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 
-        if (stakings.isEmpty()) throw new BusinessException("委托者:" + tx.getFrom() + "的质押节点:" + txParam.getNodeId() + "不存在");
+        if (stakings.isEmpty()) {
+            throw new BusinessException("委托者:" + tx.getFrom() + "的质押节点:" + txParam.getNodeId() + "不存在");
+        }
 
         Staking staking = stakings.get(0);
 
@@ -167,7 +173,9 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
                 BigDecimal remainDelegateLocked = delegation.getDelegateLocked() // +锁定委托金额
                                                             .add(delegation.getDelegateHes()) // +犹豫期委托金额
                                                             .subtract(realRefundAmount); // -真实扣除金额
-                if (remainDelegateLocked.compareTo(BigDecimal.ZERO) < 0) remainDelegateLocked = BigDecimal.ZERO;
+                if (remainDelegateLocked.compareTo(BigDecimal.ZERO) < 0) {
+                    remainDelegateLocked = BigDecimal.ZERO;
+                }
                 // 委托记录本身的金额变动
                 businessParam.getBalance().setDelegateHes(BigDecimal.ZERO) // 犹豫期金额置0
                              .setDelegateLocked(remainDelegateLocked) // 锁定金额+犹豫金额-真实扣除金额
@@ -182,7 +190,9 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
             // 对委托表&节点表记录，从待领取字段扣除真实赎回金额 stat_delegate_released
             // 对质押表，从待领取字段扣除 stat_delegate_released
             BigDecimal delegateReleasedBalance = delegation.getDelegateReleased().subtract(realRefundAmount);
-            if (delegateReleasedBalance.compareTo(BigDecimal.ZERO) < 0) delegateReleasedBalance = BigDecimal.ZERO;
+            if (delegateReleasedBalance.compareTo(BigDecimal.ZERO) < 0) {
+                delegateReleasedBalance = BigDecimal.ZERO;
+            }
             businessParam.getBalance().setDelegateReleased(delegateReleasedBalance);
             businessParam.getBalance().setDelegateHes(BigDecimal.ZERO);
             businessParam.getBalance().setDelegateLocked(BigDecimal.ZERO);

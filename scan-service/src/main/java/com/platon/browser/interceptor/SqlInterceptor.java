@@ -21,7 +21,6 @@ import java.util.regex.Matcher;
 /**
  * mybatis拦截打印异常的SQL--针对update类型的SQL(delete、insert、update)
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/24
  */
 @Slf4j
@@ -58,7 +57,6 @@ public class SqlInterceptor implements Interceptor {
      *
      * @param target 目标对象
      * @return java.lang.Object 对象
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/25
      */
     @Override
@@ -74,7 +72,6 @@ public class SqlInterceptor implements Interceptor {
      *
      * @param properties mybatis配置的属性
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/25
      */
     @Override
@@ -88,7 +85,6 @@ public class SqlInterceptor implements Interceptor {
      * @param configuration
      * @param boundSql
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/24
      */
     public String showSql(Configuration configuration, BoundSql boundSql) {
@@ -137,7 +133,6 @@ public class SqlInterceptor implements Interceptor {
      *
      * @param obj
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/24
      */
     private String getParameterValue(Object obj) {

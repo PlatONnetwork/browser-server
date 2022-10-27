@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 /**
  * 区块工具类
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/3/10
  */
 public class BlockUtil {
@@ -24,7 +23,6 @@ public class BlockUtil {
      *
      * @param extraData
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/10
      */
     public static String getPostscriptFromExtraData(String extraData) {
@@ -46,7 +44,6 @@ public class BlockUtil {
      *
      * @param hexString
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/3/10
      */
     public static String delHEXPre(String hexString) {
@@ -55,15 +52,6 @@ public class BlockUtil {
         } else {
             return hexString;
         }
-    }
-
-    public static void main(String[] args) {
-        String desc1 = "τῆς ἄνω ὁδοῦ ἀεὶ ἑξόμεθα καὶ δικαιοσύνην μετὰ φρονήσεως παντὶ τρόπῳ ἐπιτηδεύσομεν.";
-        String desc2 = "We shall always keep to the upper road and practice justice with prudence in every way.";
-        String desc3 = "让我们永远坚持走向上的路，全力以审慎践行正义。";
-        desc1 = "0x" + Hex.toHexString(desc1.getBytes());
-        System.out.println("打印结果为：" + desc1);
-        System.out.println("打印结果为：" + BlockUtil.getPostscriptFromExtraData("0x"));
     }
 
 }

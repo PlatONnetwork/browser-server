@@ -25,4 +25,7 @@ public class QueryTokenHolderListReq extends PageReq {
     @Size(min = 42, max = 42)
     private String contract;
 
+    @NotBlank(message = "{erc20/erc721/erc1155}")
+    private String ercType;
+
 }

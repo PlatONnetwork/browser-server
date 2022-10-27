@@ -21,10 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueryTokenTransferRecordListReq extends PageReq {
 
-    //@Size(min = 42, max = 42)
     private String contract;
 
-    //@Size(min = 42, max = 42)
     private String address;
 
     private String txHash;

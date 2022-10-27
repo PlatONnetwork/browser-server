@@ -95,8 +95,13 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                      CommonUtil.ofNullable(() -> event.getDelegationRewards().size()).orElse(0));
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
+            // 去除Transaction中冗余的字段
+            if (CollUtil.isNotEmpty(transactionStage)) {
+                for (Transaction transaction : transactionStage) {
+                    transaction.setBin("");
+                }
+            }
             delegationRewardStage.addAll(event.getDelegationRewards());
-
             List<Long> blockNums = CollUtil.newArrayList();
             if (retryCount.incrementAndGet() > 1) {
                 if (CollUtil.isNotEmpty(blockStage)) {
@@ -123,7 +128,6 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
             // 入库ES 入库节点操作记录到ES
             esImportService.batchImport(blockStage, transactionStage, delegationRewardStage);
-
             // 入库Redis 更新Redis中的统计记录
             Set<NetworkStat> statistics = new HashSet<>();
             statistics.add(networkStatCache.getNetworkStat());
@@ -156,14 +160,16 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 map.forEach((blockNum, transactions) -> {
                     IntSummaryStatistics erc20Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc20TxList().size()));
                     IntSummaryStatistics erc721Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc721TxList().size()));
+                    IntSummaryStatistics erc1155Size = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getErc1155TxList().size()));
                     IntSummaryStatistics transferTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getTransferTxList().size()));
                     IntSummaryStatistics pposTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getPposTxList().size()));
                     IntSummaryStatistics virtualTransactionSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getVirtualTransactions().size()));
-                    log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
+                    log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],erc1155交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
                              blockNum,
                              CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
                              erc20Size.getSum(),
                              erc721Size.getSum(),
+                             erc1155Size.getSum(),
                              transferTxSize.getSum(),
                              pposTxSize.getSum(),
                              virtualTransactionSize.getSum());

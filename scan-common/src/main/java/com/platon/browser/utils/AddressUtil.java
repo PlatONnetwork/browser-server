@@ -5,7 +5,6 @@ import com.platon.bech32.Bech32;
 /**
  * 地址工具类
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/2/9
  */
 public class AddressUtil {
@@ -20,7 +19,6 @@ public class AddressUtil {
      *
      * @param addr
      * @return boolean
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/2/9
      */
     public static boolean isAddrZero(String addr) {
@@ -40,7 +38,6 @@ public class AddressUtil {
      * @param from
      * @param to
      * @return boolean
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/2/9
      */
     public static boolean isAddrZero(String from, String to) {

@@ -16,6 +16,7 @@ import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryKey;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.TokenTypeEnum;
 import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.request.token.QueryTokenIdDetailReq;
 import com.platon.browser.request.token.QueryTokenIdListReq;
@@ -34,7 +35,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,14 +75,16 @@ public class TokenService {
 
     public QueryTokenDetailResp queryTokenDetail(QueryTokenDetailReq req) {
         CustomTokenDetail customTokenDetail = customTokenMapper.selectDetailByAddress(req.getAddress());
-        // 总供应量为0，则取值总库存量
-        int total = 0;
-        if (ObjectUtil.isNotNull(customTokenDetail) && CommonUtil.ofNullable(() -> customTokenDetail.getTotalSupply()).orElse("0").equalsIgnoreCase("0")) {
-            TokenInventoryExample example = new TokenInventoryExample();
-            example.createCriteria().andTokenAddressEqualTo(req.getAddress());
-            Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
-            total = totalTokenInventory.size();
-            customTokenDetail.setTotalSupply(Convert.toStr(total));
+        if (!customTokenDetail.getType().equalsIgnoreCase(TokenTypeEnum.ERC1155.getType())) {
+            // 总供应量为0，则取值总库存量
+            int total = 0;
+            if (ObjectUtil.isNotNull(customTokenDetail) && CommonUtil.ofNullable(() -> customTokenDetail.getTotalSupply()).orElse("0").equalsIgnoreCase("0")) {
+                TokenInventoryExample example = new TokenInventoryExample();
+                example.createCriteria().andTokenAddressEqualTo(req.getAddress());
+                Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
+                total = totalTokenInventory.size();
+                customTokenDetail.setTotalSupply(Convert.toStr(total));
+            }
         }
         return QueryTokenDetailResp.fromTokenDetail(customTokenDetail);
     }
@@ -92,7 +94,6 @@ public class TokenService {
      *
      * @param req
      * @return com.platon.browser.response.RespPage<com.platon.browser.response.token.QueryTokenIdListResp>
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/28
      */
     public RespPage<QueryTokenIdListResp> queryTokenIdList(QueryTokenIdListReq req) {
@@ -143,15 +144,16 @@ public class TokenService {
             criteria.andTokenIdEqualTo(tokenId);
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
-                                                                                                                                                                                                              local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
-                                                                                                                                                                                                                                  local)};
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS,
+                                                                                                                                                     local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
+                                                                                                                                                                         local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
+                                                                                                                                                                                             local)};
         List<Object[]> rows = new ArrayList<>();
         tokenInventorys.forEach(tokenInventory -> {
             Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getOwner(), tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()};
             rows.add(row);
         });
-        return this.downFileCommon.writeDate("Token-Id-" + address + "-" + new Date().getTime() + ".CSV", rows, headers);
+        return this.downFileCommon.writeDate("Token-Id-" + address + "-" + System.currentTimeMillis() + ".CSV", rows, headers);
 
     }
 

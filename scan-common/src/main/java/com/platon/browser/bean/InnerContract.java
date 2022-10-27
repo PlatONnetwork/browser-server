@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 /**
  * 内置合约
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/7
  */
 @Data

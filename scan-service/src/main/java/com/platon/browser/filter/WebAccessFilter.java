@@ -18,7 +18,6 @@ import java.io.IOException;
 /**
  * 接口访问过滤器
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/4
  */
 @Slf4j
@@ -53,7 +52,6 @@ public class WebAccessFilter implements Filter {
      *
      * @param requestWrapper
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/23
      */
     private String getReqTraceId(RequestWrapper requestWrapper) {
@@ -90,7 +88,6 @@ public class WebAccessFilter implements Filter {
      *
      * @param requestWrapper
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/23
      */
     private void requestParamLog(RequestWrapper requestWrapper) {
@@ -102,7 +99,10 @@ public class WebAccessFilter implements Filter {
                      StrUtil.blankToDefault(requestWrapper.getContentType(), "无"),
                      StrUtil.blankToDefault(requestWrapper.getParamBody(), "无"));
         } else {
-            log.info("[请求接口开始] 路径URL:{}, 请求方式:{}, Content-Type:{}, 请求参数:文件上传", requestWrapper.getRequestURL(), requestWrapper.getMethod(), StrUtil.blankToDefault(requestWrapper.getContentType(), "无"));
+            log.info("[请求接口开始] 路径URL:{}, 请求方式:{}, Content-Type:{}, 请求参数:文件上传",
+                     requestWrapper.getRequestURL(),
+                     requestWrapper.getMethod(),
+                     StrUtil.blankToDefault(requestWrapper.getContentType(), "无"));
         }
     }
 

@@ -11,6 +11,7 @@ import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.constant.Browser;
+import com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
@@ -93,6 +94,9 @@ public class TransactionService {
 
     @Resource
     private TokenInventoryMapper tokenInventoryMapper;
+
+    @Resource
+    private CustomToken1155InventoryMapper customToken1155InventoryMapper;
 
     @Resource
     private StatisticCacheService statisticCacheService;
@@ -256,21 +260,21 @@ public class TransactionService {
                     this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local), transaction.getFrom(), transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
                     HexUtil.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)), HexUtil.append(EnergonUtil.format(Convert.fromVon(valueOut,
-                                                                                                                                                                                            Convert.Unit.KPVON)
-                                                                                                                                                                                   .setScale(18,
-                                                                                                                                                                                             RoundingMode.DOWN),
-                                                                                                                                                                            18)), HexUtil.append(
+                                    Convert.Unit.KPVON)
+                            .setScale(18,
+                                    RoundingMode.DOWN),
+                    18)), HexUtil.append(
                     EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18))};
             rows.add(row);
         });
         String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP,
-                                                                                                                                                        local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE,
-                                                                                                                                                                            local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
-                                                                                                                                                                                                local), this.i18n.i(
+                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE,
+                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
+                local), this.i18n.i(
                 I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
                 local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT,
-                                                                                                                        local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE,
-                                                                                                                                                                    local) + "(" + valueUnit + ")"};
+                local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE,
+                local) + "(" + valueUnit + ")"};
         return this.downFileCommon.writeDate("Transaction-" + address + "-" + date + ".CSV", rows, headers);
     }
 
@@ -504,6 +508,15 @@ public class TransactionService {
                             logger.error("委托赎回交易信息解析异常", e);
                         }
                         break;
+
+                    case REDEEM_DELEGATION:
+                        try {
+                            RedeemDelegationParm redeemDelegationParm = JSON.parseObject(txInfo, RedeemDelegationParm.class);
+                            resp.setRedeemDelegationValue(ConvertUtil.convertByFactor(redeemDelegationParm.getValue(), 18));
+                        } catch (Exception e) {
+                            logger.error("领取解锁的委托异常", e);
+                        }
+                        break;
                     /**
                      * 文本提案
                      */
@@ -667,9 +680,9 @@ public class TransactionService {
                                     number = this.blockChainConfig.getSettlePeriodBlockCount().multiply(p.getEpoch()).add(BigInteger.valueOf(transaction.getNum()));
                                 } else {
                                     number = this.blockChainConfig.getSettlePeriodBlockCount()
-                                                                  .multiply(p.getEpoch().subtract(BigInteger.ONE))
-                                                                  .add(BigInteger.valueOf(transaction.getNum()))
-                                                                  .add(this.blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
+                                            .multiply(p.getEpoch().subtract(BigInteger.ONE))
+                                            .add(BigInteger.valueOf(transaction.getNum()))
+                                            .add(this.blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
                                 }
                                 transactionDetailsRPPlanResp.setBlockNumber(String.valueOf(number));
                                 rpPlanResps.add(transactionDetailsRPPlanResp);
@@ -745,16 +758,16 @@ public class TransactionService {
                             int decimal = Integer.parseInt(String.valueOf(erc20.getDecimal()));
                             BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc20.getValue()), decimal);
                             Arc20Param arc20Param = Arc20Param.builder()
-                                                              .innerContractAddr(erc20.getContract())
-                                                              .innerContractName(erc20.getName())
-                                                              .innerDecimal(String.valueOf(erc20.getDecimal()))
-                                                              .innerFrom(erc20.getFrom())
-                                                              .fromType(erc20.getFromType())
-                                                              .innerSymbol(erc20.getSymbol())
-                                                              .innerTo(erc20.getTo())
-                                                              .toType(erc20.getToType())
-                                                              .innerValue(afterConverValue.toString())
-                                                              .build();
+                                    .innerContractAddr(erc20.getContract())
+                                    .innerContractName(erc20.getName())
+                                    .innerDecimal(String.valueOf(erc20.getDecimal()))
+                                    .innerFrom(erc20.getFrom())
+                                    .fromType(erc20.getFromType())
+                                    .innerSymbol(erc20.getSymbol())
+                                    .innerTo(erc20.getTo())
+                                    .toType(erc20.getToType())
+                                    .innerValue(afterConverValue.toString())
+                                    .build();
                             arc20Params.add(arc20Param);
                         });
                         resp.setErc20Params(arc20Params);
@@ -764,20 +777,17 @@ public class TransactionService {
                     if (erc721List != null) {
                         List<Arc721Param> arc721Params = new ArrayList<>();
                         erc721List.forEach(erc721 -> {
-                            // 精度转换
-                            int decimal = Integer.parseInt(String.valueOf(erc721.getDecimal()));
-                            BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc721.getValue()), decimal);
                             Arc721Param arc721Param = Arc721Param.builder()
-                                                                 .innerContractAddr(erc721.getContract())
-                                                                 .innerContractName(erc721.getName())
-                                                                 .innerDecimal(String.valueOf(erc721.getDecimal()))
-                                                                 .innerFrom(erc721.getFrom())
-                                                                 .fromType(erc721.getFromType())
-                                                                 .innerSymbol(erc721.getSymbol())
-                                                                 .innerTo(erc721.getTo())
-                                                                 .toType(erc721.getToType())
-                                                                 .innerValue(afterConverValue.toString())
-                                                                 .build();
+                                    .innerContractAddr(erc721.getContract())
+                                    .innerContractName(erc721.getName())
+                                    .innerDecimal(String.valueOf(erc721.getDecimal()))
+                                    .innerFrom(erc721.getFrom())
+                                    .fromType(erc721.getFromType())
+                                    .innerSymbol(erc721.getSymbol())
+                                    .innerTo(erc721.getTo())
+                                    .toType(erc721.getToType())
+                                    .innerValue(erc721.getTokenId())
+                                    .build();
                             //查询对应的图片进行回填
                             TokenInventoryExample example = new TokenInventoryExample();
                             example.createCriteria().andTokenAddressEqualTo(erc721.getContract()).andTokenIdEqualTo(erc721.getValue());
@@ -798,6 +808,33 @@ public class TransactionService {
                         resp.setErc721Params(arc721Params);
                     }
                     resp.setTxInfo(transaction.getInput());
+                    break;
+                case ERC1155_CONTRACT_EXEC:
+                    List<ErcTx> erc1155List = JSONObject.parseArray(transaction.getErc1155TxInfo(), ErcTx.class);
+                    List<Arc1155Param> list = new ArrayList<>();
+                    if (CollUtil.isNotEmpty(erc1155List)) {
+                        for (ErcTx ercTx : erc1155List) {
+                            Arc1155Param arc1155Param = new Arc1155Param();
+                            Token1155InventoryKey token1155InventoryKey = new Token1155InventoryKey();
+                            token1155InventoryKey.setTokenAddress(ercTx.getContract());
+                            token1155InventoryKey.setTokenId(ercTx.getTokenId());
+                            Token1155InventoryWithBLOBs token1155Inventory = customToken1155InventoryMapper.findOneByUK(token1155InventoryKey);
+                            arc1155Param.setContract(ercTx.getContract())
+                                    .setTokenId(ercTx.getTokenId())
+                                    .setName(token1155Inventory.getName())
+                                    .setDecimal(token1155Inventory.getDecimal())
+                                    .setImage(token1155Inventory.getImage())
+                                    .setFrom(ercTx.getFrom())
+                                    .setFromType(ercTx.getFromType())
+                                    .setTo(ercTx.getTo())
+                                    .setToType(ercTx.getToType())
+                                    .setValue(ercTx.getValue());
+                            list.add(arc1155Param);
+                        }
+                    }
+                    resp.setErc1155Params(list);
+                    break;
+                default:
                     break;
             }
         }
@@ -940,7 +977,7 @@ public class TransactionService {
             queryClaimByAddressResps.add(queryClaimByAddressResp);
         }
 
-        result.init(queryClaimByAddressResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
+        result.init(queryClaimByAddressResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0L);
         return result;
     }
 

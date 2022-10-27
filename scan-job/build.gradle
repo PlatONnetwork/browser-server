@@ -13,7 +13,7 @@ apply plugin: 'distribution' //打包tar包用到的插件
 def packageName = "${project.name}-${version}"
 // 复制配置文件
 task copyConf(type: Copy) {
-    from('src/main/resources/application-platon.yml')
+    from('src/main/resources/application-apollo.yml')
     from('src/main/resources/application-platon.yml')
     from('release/start.sh')
     from('release/stop.sh')
@@ -49,7 +49,7 @@ remotes {
     }
 }
 
-task deployToTestEnv(dependsOn:['build'],group: 'deploy') {
+task deployToTestEnv(dependsOn: ['build'], group: 'deploy') {
     def deployDir = "$deployRootDir"
     def activeProfile = "$deployProfile"
     doLast {

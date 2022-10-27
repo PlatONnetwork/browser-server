@@ -36,14 +36,11 @@ public class ProposalCache {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/19
      */
     public void init() {
         log.info("初始化提案缓存");
         // 初始化提案缓存：把所有状态为投票中的【参数提案】和【升级提案】缓存到内存中
-        // ProposalExample proposalExample = new ProposalExample();
-        // proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.VOTING.getCode());
         List<Proposal> proposalList = proposalMapper.selectByExample(null);
         proposalList.forEach(p -> add(p.getActiveBlock(), p.getHash()));
     }

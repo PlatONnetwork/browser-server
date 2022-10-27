@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +57,13 @@ public class ErcTokenAnalyzer {
     private ErcTokenInventoryAnalyzer ercTokenInventoryAnalyzer;
 
     @Resource
+    private Erc1155TokenInventoryAnalyzer erc1155TokenInventoryAnalyzer;
+
+    @Resource
     private ErcTokenHolderAnalyzer ercTokenHolderAnalyzer;
+
+    @Resource
+    private ErcToken1155HolderAnalyzer ercToken1155HolderAnalyzer;
 
     @Resource
     private CustomTokenMapper customTokenMapper;
@@ -86,6 +93,8 @@ public class ErcTokenAnalyzer {
                     token.setIsSupportErc721(false);
                     token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
                     token.setIsSupportErc721Metadata(token.getIsSupportErc721());
+                    token.setIsSupportErc1155(false);
+                    token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
                     ercCache.erc20AddressCache.add(contractAddress);
                     break;
                 case ERC721:
@@ -94,12 +103,25 @@ public class ErcTokenAnalyzer {
                     token.setIsSupportErc721(true);
                     token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress, blockNumber));
                     token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress, blockNumber));
+                    token.setIsSupportErc1155(false);
+                    token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
                     ercCache.erc721AddressCache.add(contractAddress);
+                    break;
+                case ERC1155:
+                    token.setIsSupportErc20(false);
+                    token.setIsSupportErc165(true);
+                    token.setIsSupportErc721(false);
+                    token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
+                    token.setIsSupportErc721Metadata(token.getIsSupportErc721());
+                    //
+                    token.setIsSupportErc1155(true);
+                    token.setIsSupportErc1155Metadata(ercDetectService.isSupportErc1155Metadata(contractAddress, blockNumber));
+                    ercCache.erc1155AddressCache.add(contractAddress);
                     break;
                 default:
             }
             if (token.getTypeEnum() != ErcTypeEnum.UNKNOWN) {
-                // 入库ERC721或ERC20 Token记录
+                // 入库ERC721、ERC20或ERC1155 Token记录
                 token.setTokenTxQty(0);
                 token.setContractDestroyBlock(0L);
                 token.setContractDestroyUpdate(false);
@@ -166,8 +188,48 @@ public class ErcTokenAnalyzer {
                                .txFee(tx.getCost())
                                .fromType(addressCache.getTypeData(event.getFrom()))
                                .toType(addressCache.getTypeData(event.getTo()))
+                               .operator(event.getOperator())
                                .from(event.getFrom())
                                .to(event.getTo())
+                               .tokenId(event.getTokenId().toString())
+                               .value(event.getValue().toString())
+                               .name(token.getName())
+                               .symbol(token.getSymbol())
+                               .decimal(token.getDecimal())
+                               .contract(token.getAddress())
+                               .build();
+            txList.add(ercTx);
+            addAddressCache(event.getFrom(), event.getTo());
+        });
+        return txList;
+    }
+
+    /**
+     * 从交易回执的事件中解析出交易
+     *
+     * @param token:
+     * @param tx:
+     * @param eventList:
+     * @param seq:
+     * @return: java.util.List<com.platon.browser.elasticsearch.dto.ErcTx>
+     * @date: 2022/8/3
+     */
+    private List<ErcTx> resolveErc1155TxFromEvent(Token token, CollectionTransaction tx, List<ErcContract.ErcTxEvent> eventList, AtomicLong seq) {
+        List<ErcTx> txList = new ArrayList<>();
+        eventList.forEach(event -> {
+            // 转换参数进行设置内部交易
+            ErcTx ercTx = ErcTx.builder()
+                               .seq(seq.incrementAndGet())
+                               .bn(tx.getNum())
+                               .hash(tx.getHash())
+                               .bTime(tx.getTime())
+                               .txFee(tx.getCost())
+                               .fromType(addressCache.getTypeData(event.getFrom()))
+                               .toType(addressCache.getTypeData(event.getTo()))
+                               .operator(event.getOperator())
+                               .from(event.getFrom())
+                               .to(event.getTo())
+                               .tokenId(event.getTokenId().toString())
                                .value(event.getValue().toString())
                                .name(token.getName())
                                .symbol(token.getSymbol())
@@ -248,7 +310,7 @@ public class ErcTokenAnalyzer {
             tokenLogs.forEach(tokenLog -> {
                 ErcToken token = ercCache.tokenCache.get(tokenLog.getAddress());
                 if (ObjectUtil.isNotNull(token)) {
-                    List<ErcTx> txList = Collections.emptyList();
+                    List<ErcTx> txList;
                     String contractAddress = token.getAddress();
                     ErcTypeEnum typeEnum = ErcTypeEnum.valueOf(token.getType().toUpperCase());
                     TransactionReceipt transactionReceipt = new TransactionReceipt();
@@ -265,6 +327,7 @@ public class ErcTokenAnalyzer {
                             }
                             txList = resolveErcTxFromEvent(token, tx, erc20TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc20TxList().addAll(txList);
+                            ercTokenHolderAnalyzer.analyze(txList);
                             break;
                         case ERC721:
                             eventList = ercDetectService.getErc721TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
@@ -276,23 +339,35 @@ public class ErcTokenAnalyzer {
                             txList = resolveErcTxFromEvent(token, tx, erc721TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc721TxList().addAll(txList);
                             ercTokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
+                            ercTokenHolderAnalyzer.analyze(txList);
+                            break;
+                        case ERC1155:
+                            eventList = ercDetectService.getErc1155TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
+                            List<ErcContract.ErcTxEvent> erc1155TxEventList = eventList.stream().filter(v -> v.getLog().equals(tokenLog)).collect(Collectors.toList());
+                            txList = resolveErc1155TxFromEvent(token, tx, erc1155TxEventList, collectionBlock.getSeq());
+                            tx.getErc1155TxList().addAll(txList);
+                            erc1155TokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
+                            ercToken1155HolderAnalyzer.analyze(txList);
+                            break;
+                        default:
                             break;
                     }
                     token.setUpdateTime(new Date());
                     token.setDirty(true);
-                    ercTokenHolderAnalyzer.analyze(txList);
                 } else {
                     log.error("当前交易[{}]缓存中未找到合约地址[{}]对应的Erc Token", tx.getHash(), tokenLog.getAddress());
                 }
             });
             tx.setErc20TxInfo(getErcTxInfo(tx.getErc20TxList()));
             tx.setErc721TxInfo(getErcTxInfo(tx.getErc721TxList()));
-            log.info("当前交易[{}]有[{}]笔log,其中token交易有[{}]笔，其中erc20有[{}]笔,其中erc721有[{}]笔",
+            tx.setErc1155TxInfo(getErcTxInfo(tx.getErc1155TxList()));
+            log.info("当前交易[{}]有[{}]笔log,其中token交易有[{}]笔，其中erc20有[{}]笔,其中erc721有[{}]笔,其中erc1155有[{}]笔",
                      tx.getHash(),
                      CommonUtil.ofNullable(() -> receipt.getLogs().size()).orElse(0),
                      CommonUtil.ofNullable(() -> tokenLogs.size()).orElse(0),
                      CommonUtil.ofNullable(() -> tx.getErc20TxList().size()).orElse(0),
-                     CommonUtil.ofNullable(() -> tx.getErc721TxList().size()).orElse(0));
+                     CommonUtil.ofNullable(() -> tx.getErc721TxList().size()).orElse(0),
+                     CommonUtil.ofNullable(() -> tx.getErc1155TxList().size()).orElse(0));
 
             // 针对销毁的合约处理
             if (tx.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {

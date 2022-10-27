@@ -8,7 +8,8 @@ package com.platon.browser.enums;
 public enum ErcTypeEnum {
     UNKNOWN("unknown"),
     ERC20("erc20"),
-    ERC721("erc721");
+    ERC721("erc721"),
+    ERC1155("erc1155");
 
     private String desc;
 
@@ -25,7 +26,6 @@ public enum ErcTypeEnum {
      *
      * @param name
      * @return com.platon.browser.v0151.enums.ErcTypeEnum
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/1/19
      */
     public static ErcTypeEnum getErcTypeEnum(String name) {

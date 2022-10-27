@@ -19,7 +19,6 @@ import java.util.Map;
 /**
  * 获取request的body，防止body丢失
  *
- * @author huangyongpeng@matrixelements.com
  * @date 2021/4/28
  */
 @Slf4j
@@ -82,7 +81,6 @@ public class RequestWrapper extends HttpServletRequestWrapper {
      *
      * @param
      * @return java.lang.String
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/23
      */
     public String getParamBody() {

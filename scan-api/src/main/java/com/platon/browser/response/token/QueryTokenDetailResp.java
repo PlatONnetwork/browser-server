@@ -70,18 +70,21 @@ public class QueryTokenDetailResp {
             totalSupply = ConvertUtil.convertByFactor(new BigDecimal(token.getTotalSupply()), token.getDecimal());
         }
         return QueryTokenDetailResp.builder()
-                .address(token.getAddress()).name(token.getName())
-                .symbol(token.getSymbol()).decimal(token.getDecimal())
-                .totalSupply(totalSupply.toString())
-                .creator(token.getCreator()).txHash(token.getTxHash())
-                .txCount(token.getTxCount())
-                .createTime(token.getCreateTime())
-                .holder(token.getHolder())
-                .binCode(token.getBinCode())
-                .webSite(token.getWebSite())
-                .type(token.getType())
-                .isContractDestroy(token.getIsContractDestroy())
-                .build();
+                                   .address(token.getAddress())
+                                   .name(token.getName())
+                                   .symbol(token.getSymbol())
+                                   .decimal(token.getDecimal())
+                                   .totalSupply(totalSupply.toString())
+                                   .creator(token.getCreator())
+                                   .txHash(token.getTxHash())
+                                   .txCount(token.getTxCount())
+                                   .createTime(token.getCreateTime())
+                                   .holder(token.getHolder())
+                                   .binCode(token.getBinCode())
+                                   .webSite(token.getWebSite())
+                                   .type(token.getType())
+                                   .isContractDestroy(token.getIsContractDestroy())
+                                   .build();
     }
 
 }

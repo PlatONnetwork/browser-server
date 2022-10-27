@@ -1,9 +1,12 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomAddressDetail;
+import com.platon.browser.bean.DlLock;
+import com.platon.browser.bean.LockDelegate;
 import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
@@ -102,8 +105,10 @@ public class AddressService {
         if (item != null) {
             if (TokenTypeEnum.ERC20.getType().equalsIgnoreCase(item.getTokenType())) {
                 resp.setHasErc20(true);
-            } else {
+            } else if (TokenTypeEnum.ERC721.getType().equalsIgnoreCase(item.getTokenType())) {
                 resp.setHasErc721(true);
+            } else if (TokenTypeEnum.ERC1155.getType().equalsIgnoreCase(item.getTokenType())) {
+                resp.setHasErc1155(true);
             }
             BeanUtils.copyProperties(item, resp);
             resp.setDelegateUnlock(item.getDelegateHes());
@@ -135,6 +140,50 @@ public class AddressService {
         if (rpPlans != null && !rpPlans.isEmpty()) {
             resp.setIsRestricting(1);
         }
+        List<LockDelegate> lockDelegateList = new ArrayList<>();
+        try {
+            List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
+            // 已解冻的委托金额/待提取委托
+            BigDecimal unLockBalance = BigDecimal.ZERO;
+            // 未解冻的委托金额/待赎回委托
+            BigDecimal lockBalance = BigDecimal.ZERO;
+            if (CollUtil.isNotEmpty(restrictingBalances)) {
+                unLockBalance = new BigDecimal(restrictingBalances.get(0).getDlFreeBalance().add(restrictingBalances.get(0).getDlRestrictingBalance()));
+                unLockBalance = ConvertUtil.convertByFactor(unLockBalance, 18);
+                if (CollUtil.isNotEmpty(restrictingBalances.get(0).getDlLocks())) {
+                    NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+                    Block block = null;
+                    try {
+                        block = esBlockRepository.get(String.valueOf(networkStat.getCurNumber()), Block.class);
+                    } catch (Exception e) {
+                        logger.error("获取区块错误。", e);
+                    }
+                    for (DlLock dlLock : restrictingBalances.get(0).getDlLocks()) {
+                        BigDecimal accLockBalance = new BigDecimal(dlLock.getFreeBalance().add(dlLock.getLockBalance()));
+                        accLockBalance = ConvertUtil.convertByFactor(accLockBalance, 18);
+                        lockBalance = lockBalance.add(accLockBalance);
+                        LockDelegate lockDelegate = new LockDelegate();
+                        lockDelegate.setBlockNum(dlLock.getEpoch().multiply(blockChainConfig.getSettlePeriodBlockCount()));
+                        // 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间
+                        BigDecimal diff = new BigDecimal(lockDelegate.getBlockNum().subtract(BigInteger.valueOf(networkStat.getCurNumber())));
+                        if (block != null) {
+                            if (diff.compareTo(BigDecimal.ZERO) > 0) {
+                                lockDelegate.setDate(new BigDecimal(networkStat.getAvgPackTime()).multiply(diff).add(BigDecimal.valueOf(block.getTime().getTime())).longValue());
+                            } else {
+                                lockDelegate.setDate(block.getTime().getTime());
+                            }
+                        }
+                        lockDelegate.setLock(accLockBalance.toPlainString());
+                        lockDelegateList.add(lockDelegate);
+                    }
+                }
+                resp.setLockBalance(lockBalance.toPlainString());
+                resp.setUnLockBalance(unLockBalance.toPlainString());
+            }
+        } catch (Exception e) {
+            logger.error("获取冻结委托异常", e);
+        }
+        resp.setLockDelegateList(lockDelegateList);
         return resp;
     }
 
@@ -184,13 +233,13 @@ public class AddressService {
              */
             BigInteger number;
             long remainder = rPlan.getNumber() % blockChainConfig.getSettlePeriodBlockCount().longValue();
-            if (remainder == 0l) {
-                number = blockChainConfig.getSettlePeriodBlockCount()
-                        .multiply(rPlan.getEpoch()).add(BigInteger.valueOf(rPlan.getNumber()));
+            if (remainder == 0L) {
+                number = blockChainConfig.getSettlePeriodBlockCount().multiply(rPlan.getEpoch()).add(BigInteger.valueOf(rPlan.getNumber()));
             } else {
                 number = blockChainConfig.getSettlePeriodBlockCount()
-                        .multiply(rPlan.getEpoch().subtract(BigInteger.ONE)).add(BigInteger.valueOf(rPlan.getNumber()))
-                        .add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
+                                         .multiply(rPlan.getEpoch().subtract(BigInteger.ONE))
+                                         .add(BigInteger.valueOf(rPlan.getNumber()))
+                                         .add(blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
             }
 
             detailsRPPlanResp.setBlockNumber(number.toString());
@@ -205,8 +254,7 @@ public class AddressService {
             if (block != null) {
                 if (diff.compareTo(BigDecimal.ZERO) > 0) {
                     NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-                    detailsRPPlanResp.setEstimateTime(new BigDecimal(networkStat.getAvgPackTime()).multiply(diff)
-                            .add(BigDecimal.valueOf(block.getTime().getTime())).longValue());
+                    detailsRPPlanResp.setEstimateTime(new BigDecimal(networkStat.getAvgPackTime()).multiply(diff).add(BigDecimal.valueOf(block.getTime().getTime())).longValue());
                 } else {
                     detailsRPPlanResp.setEstimateTime(block.getTime().getTime());
                 }
@@ -243,7 +291,7 @@ public class AddressService {
             resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
         }
         /** 特殊账户余额直接查询链  */
-        if (resp.getBalance().compareTo(BigDecimal.valueOf(10000000000l)) > 0) {
+        if (resp.getBalance().compareTo(BigDecimal.valueOf(10000000000L)) > 0) {
             BigInteger balance = platonClient.getWeb3jWrapper().getWeb3j().platonGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance();
             resp.setBalance(new BigDecimal(balance));
         }

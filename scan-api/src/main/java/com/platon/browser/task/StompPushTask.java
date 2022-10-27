@@ -7,11 +7,7 @@ import com.platon.browser.config.MessageDto;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
-import com.platon.browser.request.newblock.BlockDetailsReq;
-import com.platon.browser.request.newtransaction.TransactionDetailsReq;
-import com.platon.browser.request.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.request.staking.AliveStakingListReq;
-import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.home.BlockStatisticNewResp;
@@ -60,19 +56,10 @@ public class StompPushTask {
     private StakingService stakingService;
 
     @Resource
-    private BlockService blockService;
-
-    @Resource
-    private TransactionService transactionService;
-
-    @Resource
     private ParameterService parameterService;
 
     @Resource
     private StatisticCacheService statisticCacheService;
-
-    @Resource
-    private TokenService tokenService;
 
     private boolean checkData() {
         NetworkStat networkStatRedis = this.statisticCacheService.getNetworkStatCache();
@@ -93,8 +80,7 @@ public class StompPushTask {
         }
         if (this.checkData()) {
             ChainStatisticNewResp chainStatisticNewResp = this.homeService.chainStatisticNew();
-            BaseResp<ChainStatisticNewResp> resp =
-                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), chainStatisticNewResp);
+            BaseResp<ChainStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), chainStatisticNewResp);
             this.messagingTemplate.convertAndSend("/topic/chain/statistic/new", resp);
         }
     }
@@ -106,8 +92,7 @@ public class StompPushTask {
     public void pushBlockStatisticNew() {
         if (this.checkData()) {
             BlockStatisticNewResp blockStatisticNewResp = this.homeService.blockStatisticNew();
-            BaseResp<BlockStatisticNewResp> resp =
-                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), blockStatisticNewResp);
+            BaseResp<BlockStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), blockStatisticNewResp);
             this.messagingTemplate.convertAndSend("/topic/block/statistic/new", resp);
         }
     }
@@ -119,8 +104,7 @@ public class StompPushTask {
     public void pushStakingListNew() {
         if (this.checkData()) {
             StakingListNewResp stakingListNewResp = this.homeService.stakingListNew();
-            BaseResp<StakingListNewResp> resp =
-                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingListNewResp);
+            BaseResp<StakingListNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingListNewResp);
             this.messagingTemplate.convertAndSend("/topic/staking/list/new", resp);
         }
     }
@@ -132,8 +116,7 @@ public class StompPushTask {
     public void pushStakingStatisticNew() {
         if (this.checkData()) {
             StakingStatisticNewResp stakingStatisticNewResp = this.stakingService.stakingStatisticNew();
-            BaseResp<StakingStatisticNewResp> resp =
-                    BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingStatisticNewResp);
+            BaseResp<StakingStatisticNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(), this.i18n.i(I18nEnum.SUCCESS), stakingStatisticNewResp);
             this.messagingTemplate.convertAndSend("/topic/staking/statistic/new", resp);
         }
     }
@@ -170,41 +153,6 @@ public class StompPushTask {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * es定时查询，warm
-     */
-    @Scheduled(cron = "0/20 * * * * ?")
-    public void eswarm() {
-        if (this.checkData()) {
-            /**
-             * 区块index做warm
-             */
-            BlockDetailsReq blockDetailsReq = new BlockDetailsReq();
-            blockDetailsReq.setNumber(1);
-            this.blockService.blockDetails(blockDetailsReq);
-            TransactionListByBlockRequest transactionListByBlockRequest = new TransactionListByBlockRequest();
-            /**
-             * 交易index做warm
-             */
-            transactionListByBlockRequest.setBlockNumber(1);
-            transactionListByBlockRequest.setPageNo(1);
-            transactionListByBlockRequest.setPageSize(10);
-            this.transactionService.getTransactionListByBlock(transactionListByBlockRequest);
-            /**
-             * 交易index做warm
-             */
-            TransactionDetailsReq transactionDetailsReq = new TransactionDetailsReq();
-            transactionDetailsReq.setTxHash("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
-            this.transactionService.transactionDetails(transactionDetailsReq);
-            /**
-             * token交易index做warm
-             */
-            QueryTokenDetailReq queryTokenDetailReq = new QueryTokenDetailReq();
-            queryTokenDetailReq.setAddress("0xb5346e3ffe9e381ebc47ae750eafc1e7926b50c10a2e15e00245a8205df62e7b");
-            this.tokenService.queryTokenDetail(queryTokenDetailReq);
         }
     }
 

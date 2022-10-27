@@ -18,7 +18,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-
+/**
+ * api文档：http://localhost:40010/browser-server/#/home
+ *
+ * @date: 2022/8/25
+ */
 @EnableCaching
 @Slf4j
 @EnableScheduling
@@ -65,7 +69,6 @@ public class BrowserApiApplication implements ApplicationRunner {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/7
      */
     private void zeroBlockNumberWait() {
@@ -89,7 +92,6 @@ public class BrowserApiApplication implements ApplicationRunner {
      *
      * @param
      * @return void
-     * @author huangyongpeng@matrixelements.com
      * @date 2021/4/2
      */
     private void dataSourceLog() {

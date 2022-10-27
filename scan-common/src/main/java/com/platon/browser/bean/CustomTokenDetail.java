@@ -3,7 +3,8 @@ package com.platon.browser.bean;
 import lombok.Data;
 
 @Data
-public class CustomTokenDetail extends CustomToken{
+public class CustomTokenDetail extends CustomToken {
+
     private String creator;
 
     private String txHash;

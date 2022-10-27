@@ -6,6 +6,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
+import com.platon.browser.v0152.contract.Erc1155Contract;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
@@ -35,15 +36,16 @@ public class ErcServiceImpl {
      * @param tokenAddress 合约地址
      * @param type         合约类型
      * @param account      用户地址
+     * @param id           tokenId
      * @return java.math.BigInteger
      * @date 2021/1/20
      */
-    public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account) {
+    public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account, BigInteger id) {
         BigInteger balance = BigInteger.ZERO;
         try {
             ErcContract ercContract = getErcContract(tokenAddress, type);
             if (ObjectUtil.isNotNull(ercContract)) {
-                balance = ercContract.balanceOf(account).send();
+                balance = ercContract.balanceOf(account, id).send();
             }
         } catch (Exception e) {
             log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
@@ -92,6 +94,8 @@ public class ErcServiceImpl {
             ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
             ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
+        } else if (ErcTypeEnum.ERC1155.equals(ercTypeEnum)) {
+            ercContract = Erc1155Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER);
         }
         return ercContract;
     }
@@ -111,6 +115,8 @@ public class ErcServiceImpl {
             ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
         } else if (ErcTypeEnum.ERC721.equals(ercTypeEnum)) {
             ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
+        } else if (ErcTypeEnum.ERC1155.equals(ercTypeEnum)) {
+            ercContract = Erc1155Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
         }
         return ercContract;
     }
@@ -129,10 +135,39 @@ public class ErcServiceImpl {
         try {
             ErcContract ercContract = getErcContract(tokenAddress, ErcTypeEnum.ERC20, blockNumber);
             if (ObjectUtil.isNotNull(ercContract)) {
-                balance = ercContract.balanceOf(account).send();
+                balance = ercContract.balanceOf(account, BigInteger.ZERO).send();
             }
         } catch (Exception e) {
             log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException interruptedException) {
+                log.warn("InterruptedException异常", interruptedException);
+            }
+            throw new BusinessException("查询Token余额失败！");
+        }
+        return balance;
+    }
+
+    /**
+     * 获取历史块高的erc1155的合约余额
+     *
+     * @param tokenAddress:
+     * @param tokenId:
+     * @param account:
+     * @param blockNumber:
+     * @return: java.math.BigInteger
+     * @date: 2022/8/3
+     */
+    public BigInteger getErc1155HistoryBalance(String tokenAddress, BigInteger tokenId, String account, BigInteger blockNumber) {
+        BigInteger balance = BigInteger.ZERO;
+        try {
+            ErcContract ercContract = getErcContract(tokenAddress, ErcTypeEnum.ERC1155, blockNumber);
+            if (ObjectUtil.isNotNull(ercContract)) {
+                balance = ercContract.balanceOf(account, tokenId).send();
+            }
+        } catch (Exception e) {
+            log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},tokenId:{},account:{}", tokenAddress, tokenId, account), e);
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException interruptedException) {
@@ -181,6 +216,32 @@ public class ErcServiceImpl {
         String tokenURI = "";
         try {
             ErcContract ercContract = getErcContract(contractAddress, ErcTypeEnum.ERC721, blockNumber);
+            if (ObjectUtil.isNotNull(ercContract)) {
+                tokenURI = ercContract.getTokenURI(tokenId).send();
+            }
+        } catch (PlatonCallException e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{},msg:{}", contractAddress, tokenId, e.getMsg()), e);
+        } catch (PlatonCallTimeoutException e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{},msg:{}", contractAddress, tokenId, e.getMsg()), e);
+        } catch (Exception e) {
+            log.warn(StrFormatter.format("getTokenURI异常，token_address：{},token_id:{}", contractAddress, tokenId), e);
+        }
+        return tokenURI;
+    }
+
+    /**
+     * 获取TokenURI
+     *
+     * @param contractAddress 合约地址
+     * @param tokenId         token id
+     * @param blockNumber:    块高
+     * @return: java.lang.String
+     * @date: 2022/2/10
+     */
+    public String getToken1155URI(String contractAddress, BigInteger tokenId, BigInteger blockNumber) {
+        String tokenURI = "";
+        try {
+            ErcContract ercContract = getErcContract(contractAddress, ErcTypeEnum.ERC1155, blockNumber);
             if (ObjectUtil.isNotNull(ercContract)) {
                 tokenURI = ercContract.getTokenURI(tokenId).send();
             }

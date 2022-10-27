@@ -37,7 +37,7 @@ spring:
     maxPoolPreparedStatementPerConnectionSize: 100
   #Redis键配置
   redis:
-    password: platscan
+    password: ENC(D4K/Kxv2c2MT7FaaT+ZHQswHs8KvRm6N)
     cluster:
       max-redirects: 3
       nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
@@ -56,14 +56,16 @@ spring:
       erc20Tx: ${platon.redis-namespace}:erc20Tx
       #erc721交易
       erc721Tx: ${platon.redis-namespace}:erc721Tx
+      #erc1155交易
+      erc1155Tx: ${platon.redis-namespace}:erc1155Tx
   #ES索引配置
   elasticsearch:
     high-level-client:
       hosts: 192.168.120.103,192.168.120.104,192.168.120.105
       port: 9200
       schema: http
-      username: elastic
-      password: changeme
+      username: ENC(VME69JEYLfmUXi3KuDQTWA==)
+      password: ENC(A6E/VrNrulxXUK7GSjlmiN7NqxZV5P6o)
     index:
       blockIndexName: ${platon.es-namespace}_block
       transactionIndexName: ${platon.es-namespace}_transaction
@@ -73,16 +75,13 @@ spring:
       transferTxIndexName: ${platon.es-namespace}_transfer_tx
       erc20TxIndexName: ${platon.es-namespace}_erc20_tx
       erc721TxIndexName: ${platon.es-namespace}_erc721_tx
+      erc1155TxIndexName: ${platon.es-namespace}_erc1155_tx
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:custommapper/*.xml
   # 实体类别名配置（注意：对应实体类的路径）
   type-aliases-package: com.platon.browser.dao.entity
 profile: platon
-# 密码加密配置
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #性能配置
 server:
   port: 40010
@@ -103,11 +102,6 @@ logging:
     com.platon.browser.task: info
     com.platon.browser.client: info
     com.platon.browser.dao: info
-  file:
-    name: ./logs/${spring.application.name}-${profile}.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
 #PlatOn相关配置
 platon:
   # 地址HRP前缀
@@ -120,10 +114,10 @@ platon:
   web3j:
     #HTTP或WS
     protocol: WS
-    addresses: 192.168.120.151:7789,192.168.120.151:7790
+    addresses: 192.168.9.139:7789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
-  #PlatON初始总发行量(ATP)
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
@@ -131,7 +125,7 @@ platon:
   incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(ATP)>
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
     '1':62215742.00000000,
     '2':55965742.00000000,
@@ -143,7 +137,7 @@ platon:
     '8':15044304.00000000,
     '9':7615018.00000000
   }
-  # 初始内置节点默认质押金额(ATP)
+  # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 150000
   #区块最大Gas限制
   maxBlockGasLimit: 201600000
@@ -154,7 +148,7 @@ platon:
   #keyBase api
   keyBaseApi: _/api/1.0/user/lookup.json?key_suffix=
   #链id
-  chainId: 100
+  chainId: 210425
   #Redis命名空间
   redis-namespace: browser:${profile}
   #Es索引命名空间
@@ -168,3 +162,7 @@ limit:
 output:
   file:
     url: /var/tmp
+apollo:
+  bootstrap:
+    # 是否开启 Apollo
+    enabled: false

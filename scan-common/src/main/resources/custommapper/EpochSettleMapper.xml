@@ -59,6 +59,21 @@
         update staking set reward_per=next_reward_per where next_reward_per_mod_epoch <![CDATA[ < ]]> #{settingEpoch};
     </update>
 
+    <select id="findStaking" parameterType="list" resultType="com.platon.browser.dao.entity.Staking">
+        SELECT
+            t1.node_id AS nodeId,
+            t1.staking_block_num AS stakingBlockNum,
+            t1.staking_reward_value AS stakingRewardValue
+        FROM
+            staking t1
+                INNER JOIN ( SELECT node_id, max( staking_block_num ) AS staking_block_num FROM staking WHERE node_id IN
+                <foreach collection="list" item="nodeId" open="(" close=")" separator=",">
+                    #{nodeId}
+                </foreach>
+                GROUP BY node_id ) t2 ON t1.node_id = t2.node_id
+                AND t1.staking_block_num = t2.staking_block_num
+    </select>
+
     <update id="settleForStakingValue" parameterType="com.platon.browser.dao.param.epoch.Settle">
         <foreach collection="list" item="staking">
             /*2、更新节点*/

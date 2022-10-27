@@ -21,12 +21,8 @@
 - scan-agent：Block synchronization service, which synchronizes the data of special nodes to the database of the blockchain browser.
 - scan-api：Browser api service provides api interface for web pages.
 - scan-common：General module.
-- scan-export：Command line client for report export.
 - scan-generator：mybatis skeleton generation.
-- scan-press：Used to generate pressure test data.
 - scan-service：General Service Module
-- scan-sync：A tool to synchronize block transactions to redis.
-- scan-test：Test class, used to create contract.
 - docs：Interface documentation
 - estpl：Elastic Search Template definition
 - scripts：Script file
@@ -47,6 +43,13 @@ gradlew clean buildTar -x test -b scan-agent/build.gradle
 ```bash
 gradlew clean buildTar -x test -b scan-api/build.gradle
 ```
+
+### scan-job build
+
+```bash
+gradlew clean buildTar -x test -b scan-job/build.gradle
+```
+
 ## Component Version
 
 ```bash

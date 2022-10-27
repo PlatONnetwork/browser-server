@@ -58,6 +58,8 @@ public class Transaction {
 
     private String info;
 
+    private String erc1155TxInfo; // 存储基本信息的json数组串，来自erc1155TxList
+
     private String erc721TxInfo; // 存储基本信息的json数组串，来自erc721TxList
 
     private String erc20TxInfo; // 存储基本信息的json数组串，来自erc20TxList
@@ -76,23 +78,39 @@ public class Transaction {
 
     private String contractAddress;
 
-    // erc721交易列表
+    /**
+     * erc1155交易列表
+     */
+    @JSONField(serialize = false)
+    private List<ErcTx> erc1155TxList = new ArrayList<>();
+
+    /**
+     * erc721交易列表
+     */
     @JSONField(serialize = false)
     private List<ErcTx> erc721TxList = new ArrayList<>();
 
-    // erc20 交易列表
+    /**
+     * erc20 交易列表
+     */
     @JSONField(serialize = false)
     private List<ErcTx> erc20TxList = new ArrayList<>();
 
-    // 内部转账交易
+    /**
+     * 内部转账交易
+     */
     @JSONField(serialize = false)
     private List<Transaction> transferTxList = new ArrayList<>();
 
-    // PPOS调用交易
+    /**
+     * PPOS调用交易
+     */
     @JSONField(serialize = false)
     private List<Transaction> pposTxList = new ArrayList<>();
 
-    // 虚拟交易，
+    /**
+     * 虚拟交易
+     */
     @JSONField(serialize = false)
     private List<Transaction> virtualTransactions = new ArrayList<>();
 
@@ -163,6 +181,14 @@ public class Transaction {
          */
         ERC721_CONTRACT_EXEC(9, "ERC721合约调用(合约执行)"),
         /**
+         * 10-ERC1155合约发布(合约创建)
+         */
+        ERC1155_CONTRACT_CREATE(10, "ERC1155合约发布(合约创建)"),
+        /**
+         * 11-ERC1155合约调用(合约执行)
+         */
+        ERC1155_CONTRACT_EXEC(11, "ERC1155合约调用(合约执行)"),
+        /**
          * 1000-发起质押(创建验证人)
          */
         STAKE_CREATE(1000, "发起质押(创建验证人)"),
@@ -186,6 +212,10 @@ public class Transaction {
          * 1005-减持/撤销委托(赎回委托)
          */
         DELEGATE_EXIT(1005, "减持/撤销委托(赎回委托)"),
+        /**
+         * 1005-减持/撤销委托(赎回委托)
+         */
+        REDEEM_DELEGATION(1006, "领取解锁的委托"),
         /**
          * 2000-提交文本提案(创建提案)
          */
@@ -303,7 +333,8 @@ public class Transaction {
         EVM_CONTRACT(3, "EVM合约"),
         WASM_CONTRACT(4, "WASM合约"),
         ERC20_CONTRACT(5, "ERC20-EVM合约"),
-        ERC721_CONTRACT(6, "ERC721-EVM合约");
+        ERC721_CONTRACT(6, "ERC721-EVM合约"),
+        ERC1155_CONTRACT(7, "ERC1155-EVM合约");
 
         private int code;
 

@@ -97,7 +97,11 @@ public class OnNewBlockAnalyzer {
                                     .build();
 
         newBlockMapper.newBlock(newBlock);
-        log.info("块高[{}]节点[{}]的手续费为[{}]出块奖励为[{}]", event.getBlock().getNum(), newBlock.getNodeId(), newBlock.getFeeRewardValue(), newBlock.getBlockRewardValue());
+        log.info("块高[{}]节点[{}]的手续费为[{}]出块奖励为[{}]",
+                 event.getBlock().getNum(),
+                 newBlock.getNodeId(),
+                 newBlock.getFeeRewardValue(),
+                 newBlock.getBlockRewardValue());
 
         // 检查当前区块是否有参数提案生效
         Set<String> proposalTxHashSet = proposalCache.get(block.getNum());
@@ -140,14 +144,15 @@ public class OnNewBlockAnalyzer {
                                 config.setValue(gp.getParamValue().getValue());
                                 configList.add(config);
                             });
-
                             BigInteger proposalVersion = new BigInteger(proposal.getNewVersion());
                             String proposalPipid = proposal.getPipId();
                             BigInteger configVersion = v0150Config.getAdjustmentActiveVersion();
                             String configPipid = v0150Config.getAdjustmentPipId();
                             if (proposalVersion.compareTo(configVersion) >= 0 && proposalPipid.equals(configPipid)) {
                                 // 升级提案版本号及提案ID与配置文件中指定的一样，则执行调账逻辑
-                                List<AdjustParam> adjustParams = specialApi.getStakingDelegateAdjustDataList(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
+                                List<AdjustParam> adjustParams = specialApi.getStakingDelegateAdjustDataList(platOnClient.getWeb3jWrapper()
+                                                                                                                         .getWeb3j(),
+                                                                                                             BigInteger.valueOf(block.getNum()));
                                 adjustParams.forEach(param -> {
                                     param.setBlockTime(block.getTime());
                                     param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount());
@@ -159,6 +164,8 @@ public class OnNewBlockAnalyzer {
                             if (proposalVersion.compareTo(v0160Version) == 0 && CommonConstant.ALAYA_CHAIN_ID == chainConfig.getChainId()) {
                                 delegateBalanceAdjustmentService.adjust();
                             }
+                            // 升级提案1.3.0+会配置unDelegateFreezeDuration治理参数
+                            parameterService.configUnDelegateFreezeDuration(proposalVersion);
                         }
                     }
                 } catch (Exception e) {

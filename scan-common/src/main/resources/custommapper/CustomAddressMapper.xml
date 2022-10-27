@@ -25,6 +25,7 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="have_reward" jdbcType="DECIMAL" property="haveReward"/>
+        <result column="erc1155_tx_qty" jdbcType="INTEGER" property="erc1155TxQty"/>
         <result column="erc721_tx_qty" jdbcType="INTEGER" property="erc721TxQty"/>
         <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty"/>
         <result column="contract_bin" jdbcType="LONGVARCHAR" property="contractBin"/>
@@ -58,6 +59,7 @@
                a.create_time,
                a.update_time,
                a.have_reward,
+               a.erc1155_tx_qty,
                a.erc721_tx_qty,
                a.erc20_tx_qty,
                a.contract_bin,
@@ -98,7 +100,7 @@
 
     <update id="batchUpdateAddressErcQty">
         <foreach collection="list" item="item" separator=";">
-            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty} where address = #{item.address}
+            update address set erc20_tx_qty = erc20_tx_qty + #{item.erc20TxQty} , erc721_tx_qty = erc721_tx_qty + #{item.erc721TxQty}, erc1155_tx_qty = erc1155_tx_qty + #{item.erc1155TxQty} where address = #{item.address}
         </foreach>
     </update>
 

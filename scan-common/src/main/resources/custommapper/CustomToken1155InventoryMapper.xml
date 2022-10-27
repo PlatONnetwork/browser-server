@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper">
+    <insert id="batchInsertOrUpdateSelective" parameterType="map">
+        replace into token_1155_inventory (
+        <foreach collection="selective" item="column" separator=",">
+            ${column.escapedColumnName}
+        </foreach>
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            <foreach collection="selective" item="column" separator=",">
+                <if test="'token_address'.toString() == column.value">
+                    #{item.tokenAddress,jdbcType=VARCHAR}
+                </if>
+                <if test="'token_id'.toString() == column.value">
+                    #{item.tokenId,jdbcType=VARCHAR}
+                </if>
+                <if test="'owner'.toString() == column.value">
+                    #{item.owner,jdbcType=VARCHAR}
+                </if>
+                <if test="'name'.toString() == column.value">
+                    #{item.name,jdbcType=VARCHAR}
+                </if>
+                <if test="'description'.toString() == column.value">
+                    #{item.description,jdbcType=VARCHAR}
+                </if>
+                <if test="'image'.toString() == column.value">
+                    #{item.image,jdbcType=VARCHAR}
+                </if>
+                <if test="'decimal'.toString() == column.value">
+                    #{item.decimal,jdbcType=INTEGER}
+                </if>
+                <if test="'create_time'.toString() == column.value">
+                    #{item.createTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'update_time'.toString() == column.value">
+                    #{item.updateTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="'token_tx_qty'.toString() == column.value">
+                    #{item.tokenTxQty,jdbcType=INTEGER}
+                </if>
+                <if test="'token_owner_tx_qty'.toString() == column.value">
+                    #{item.tokenOwnerTxQty,jdbcType=INTEGER}
+                </if>
+                <if test="'small_image'.toString() == column.value">
+                    #{item.smallImage}
+                </if>
+                <if test="'medium_image'.toString() == column.value">
+                    #{item.mediumImage}
+                </if>
+                <if test="'id'.toString() == column.value">
+                    #{item.id}
+                </if>
+                <if test="'token_url'.toString() == column.value">
+                    #{item.tokenUrl}
+                </if>
+                <if test="'retry_num'.toString() == column.value">
+                    #{item.retryNum}
+                </if>
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <delete id="burnAndDelTokenInventory">
+        <foreach collection="list" item="item" separator=";">
+            delete from token_1155_inventory
+            where token_address = #{item.tokenAddress} and token_id = #{item.tokenId}
+        </foreach>
+    </delete>
+
+    <select id="selectTokenInventory" resultType="com.platon.browser.bean.CustomToken1155Inventory">
+        SELECT
+            t1.token_address AS tokenAddress,
+            t1.token_id AS tokenId,
+            t1.address,
+            t1.balance,
+            t2.image,
+            t2.`name`,
+            t2.token_tx_qty AS txCount,
+            '' AS tokenName,
+            '' AS symbol
+        FROM
+            token_1155_holder t1
+                LEFT JOIN token_1155_inventory t2 ON t1.token_address = t2.token_address
+                AND t1.token_id = t2.token_id
+        WHERE
+            t1.token_address = #{tokenAddress}
+          AND t1.token_id = #{tokenId}
+    </select>
+
+    <select id="findErc1155ContractDestroyBalance" parameterType="string" resultType="com.platon.browser.bean.Erc1155ContractDestroyBalanceVO">
+        select t2.token_address as tokenAddress,
+               count(1)         as num
+        from (
+                 select t1.token_address,
+                        t1.token_id
+                 from token_1155_inventory t1
+                 where t1.token_address = #{tokenAddress}
+             ) t2
+        group by t2.token_address
+    </select>
+
+    <select id="findDestroyContracts" resultType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
+        SELECT t1.id            as id,
+               t1.token_address as tokenAddress,
+               t1.token_id      as tokenId,
+               # t1.`owner` as owner, t1.`name` as name,
+               t1.image         as image,
+               t1.create_time   as createTime,
+               t1.update_time   as updateTime,
+               t1.token_tx_qty  as tokenTxQty,
+               # t1.token_owner_tx_qty as tokenOwnerTxQty, t1.small_image as smallImage,
+               t1.medium_image  as mediumImage,
+               t1.retry_num     as retryNum,
+               t1.description   as description,
+               t1.token_url     as tokenUrl
+        FROM token_inventory t1
+                 LEFT JOIN address t2 ON t1.token_address = t2.address
+        WHERE t2.contract_destroy_hash IS NOT NULL
+          AND LENGTH(trim(t2.contract_destroy_hash)) > 0
+          AND t1.id > #{minId}
+        <![CDATA[ AND t1.id <= #{maxId} ]]>
+        <![CDATA[ AND t1.retry_num < #{retryNum} ]]>
+        ORDER BY t1.id
+    </select>
+
+    <select id="findOneByUK" resultType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
+        select id,
+               token_address as tokenAddress,
+               token_id as tokenId,
+               `name`,
+               image,
+               `decimal`,
+               create_time as createTime,
+               update_time as updateTime,
+               token_tx_qty as tokenTxQty,
+               small_image as smallImage,
+               medium_image as mediumImage,
+               retry_num as retryNum,
+               description,
+               token_url as tokenUrl
+        from token_1155_inventory
+        where token_address = #{key.tokenAddress}
+          and token_id = #{key.tokenId}
+    </select>
+    <select id="findMaxId" resultType="long">
+        SELECT MAX(id) AS maxId
+        FROM token_1155_inventory
+    </select>
+</mapper>

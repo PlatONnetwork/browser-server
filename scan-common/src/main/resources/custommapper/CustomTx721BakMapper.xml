@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.dao.custommapper.CustomTx721BakMapper">
     <insert id="batchInsert" parameterType="map" useGeneratedKeys="true" keyProperty="id">
         insert into tx_erc_721_bak
-        ( `seq`, `name`, `symbol`, `decimal`,`contract`, `hash`,`from`,`from_type`,`to`,`to_type`,`value`,`bn`,`b_time`,`tx_fee`)
+        ( `seq`, `name`, `symbol`, `decimal`,`contract`, `hash`,`from`,`from_type`,`to`,`to_type`,`token_id`,`value`,`bn`,`b_time`,`tx_fee`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.seq},
@@ -16,6 +16,7 @@
             #{item.fromType},
             #{item.to},
             #{item.toType},
+            #{item.tokenId},
             #{item.value},
             #{item.bn},
             #{item.bTime},

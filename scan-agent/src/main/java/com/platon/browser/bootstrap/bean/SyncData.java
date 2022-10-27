@@ -20,6 +20,8 @@ public class SyncData {
 
     private Set<ErcTx> erc721BakSet = new HashSet<>();
 
+    private Set<ErcTx> erc1155BakSet = new HashSet<>();
+
     private Set<DelegationReward> delegationRewardBakSet = new HashSet<>();
 
 }

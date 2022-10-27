@@ -106,7 +106,7 @@
     insert into token_holder (token_address, address, balance, 
       create_time, update_time, token_tx_qty
       )
-    values (#{tokenAddress,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{balance,jdbcType=VARCHAR},
+    values (#{tokenAddress,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{balance,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}
       )
   </insert>
@@ -235,7 +235,7 @@
     (token_address, address, balance, create_time, update_time, token_tx_qty)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.balance,jdbcType=VARCHAR},
+      (#{item.tokenAddress,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.balance,jdbcType=VARCHAR}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}
         )
     </foreach>
@@ -277,4 +277,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>
