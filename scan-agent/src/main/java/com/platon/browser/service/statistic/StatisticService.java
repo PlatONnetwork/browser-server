@@ -108,11 +108,15 @@ public class StatisticService {
                     } else {
                         nodeSettleStatis = NodeSettleStatis.jsonToBean(info);
                         if (event.getEpochMessage().getCurrentBlockNumber().compareTo(BigInteger.valueOf(nodeSettleStatis.getBlockNum())) > 0) {
-                            addNodeSettleStatisElected(event.getEpochMessage().getPreValidatorList(), node.getNodeId(), event.getEpochMessage().getSettleEpochRound(), nodeSettleStatis);
+                            addNodeSettleStatisElected(event.getEpochMessage().getPreValidatorList(),
+                                                       node.getNodeId(),
+                                                       event.getEpochMessage().getSettleEpochRound(),
+                                                       nodeSettleStatis);
                         }
                     }
                     Node updateNode = new Node();
                     updateNode.setNodeId(node.getNodeId());
+                    updateNode.setStakingBlockNum(node.getStakingBlockNum());
                     updateNode.setNodeSettleStatisInfo(JSONUtil.toJsonStr(nodeSettleStatis));
                     updateNodeList.add(updateNode);
                     updateNodeCacheSettleStatis(node.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));
@@ -133,7 +137,9 @@ public class StatisticService {
                 }
             }
         } catch (Exception e) {
-            log.error(StrUtil.format("节点在共识轮数[{}]块高[{}]当选出块节点更新异常", event.getEpochMessage().getConsensusEpochRound(), event.getEpochMessage().getCurrentBlockNumber()), e);
+            log.error(StrUtil.format("节点在共识轮数[{}]块高[{}]当选出块节点更新异常",
+                                     event.getEpochMessage().getConsensusEpochRound(),
+                                     event.getEpochMessage().getCurrentBlockNumber()), e);
         }
     }
 
@@ -164,7 +170,10 @@ public class StatisticService {
      * @return void
      * @date 2021/6/1
      */
-    private void addNodeSettleStatisElected(List<com.platon.contracts.ppos.dto.resp.Node> curValidatorList, String nodeId, BigInteger curIssueEpochRound, NodeSettleStatis nodeSettleStatis) {
+    private void addNodeSettleStatisElected(List<com.platon.contracts.ppos.dto.resp.Node> curValidatorList,
+                                            String nodeId,
+                                            BigInteger curIssueEpochRound,
+                                            NodeSettleStatis nodeSettleStatis) {
         if (nodeSettleStatis.getNodeSettleStatisQueue().size() > 0) {
             List<NodeSettleStatisBase> list = nodeSettleStatis.getNodeSettleStatisQueue().toList();
             // 已记录的最高结算周期轮数，队列已排序
@@ -298,7 +307,9 @@ public class StatisticService {
      */
     private boolean inCurValidator(List<com.platon.contracts.ppos.dto.resp.Node> curValidatorList, String nodeId) {
         if (CollUtil.isNotEmpty(curValidatorList)) {
-            List<com.platon.contracts.ppos.dto.resp.Node> curValidator = curValidatorList.stream().filter(v -> v.getNodeId().equalsIgnoreCase(nodeId)).collect(Collectors.toList());
+            List<com.platon.contracts.ppos.dto.resp.Node> curValidator = curValidatorList.stream()
+                                                                                         .filter(v -> v.getNodeId().equalsIgnoreCase(nodeId))
+                                                                                         .collect(Collectors.toList());
             if (curValidator.size() > 0) {
                 return true;
             } else {

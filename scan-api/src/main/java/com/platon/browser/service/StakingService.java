@@ -91,6 +91,7 @@ public class StakingService {
 
     @Resource
     private AddressMapper addressMapper;
+
     @Resource
     private ProposalMapper proposalMapper;
 
@@ -197,7 +198,9 @@ public class StakingService {
             if (staking.getNodeId().equals(networkStatRedis.getNodeId())) {
                 aliveStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
             } else {
-                aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(staking.getStatus(), staking.getIsConsensus(), staking.getIsSettle()));
+                aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(staking.getStatus(),
+                                                                                 staking.getIsConsensus(),
+                                                                                 staking.getIsSettle()));
             }
             /** 质押总数=有效的质押+委托 */
             aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
@@ -205,7 +208,8 @@ public class StakingService {
             try {
                 String nodeSettleStatisInfo = staking.getNodeSettleStatisInfo();
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
-                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()),
+                                                                 blockChainConfig.getSettlePeriodBlockCount());
                 aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
@@ -216,6 +220,7 @@ public class StakingService {
             } else {
                 aliveStakingListResp.setVersion(ChainVersionUtil.toStringVersion(BigInteger.valueOf(staking.getBigVersion())));
             }
+            aliveStakingListResp.setPreDeleAnnualizedRate(NodeApr.getPreDeleAnnualizedRate(staking.getNodeApr()));
             lists.add(aliveStakingListResp);
             i++;
         }
@@ -262,7 +267,9 @@ public class StakingService {
              * 带提取的委托等于hes+lock
              */
             historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateValue().add(stakingNode.getStatDelegateReleased()));
-            historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSettle()));
+            historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(),
+                                                                               stakingNode.getIsConsensus(),
+                                                                               stakingNode.getIsSettle()));
             historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
 
             // 退出中节点预估解锁块高
@@ -308,7 +315,8 @@ public class StakingService {
                 String nodeSettleStatisInfo = stakingNode.getNodeSettleStatisInfo();
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
                 NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()),
+                                                                 blockChainConfig.getSettlePeriodBlockCount());
                 resp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
@@ -317,16 +325,20 @@ public class StakingService {
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
-            resp.setDeleRewardRed(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()).subtract(stakingNode.getHaveDeleReward()));
+            resp.setDeleRewardRed(stakingNode.getTotalDeleReward()
+                                             .add(stakingNode.getPreTotalDeleReward())
+                                             .subtract(stakingNode.getHaveDeleReward()));
             /** 只有不是内置节点才计算年化率  */
             if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
-                resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
+                resp.setRewardValue(stakingNode.getStatFeeRewardValue()
+                                               .add(stakingNode.getStatBlockRewardValue())
+                                               .add(stakingNode.getStatStakingRewardValue()));
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
-                        resp.getRewardValue(),
-                        stakingNode.getStatFeeRewardValue(),
-                        stakingNode.getStatBlockRewardValue(),
-                        stakingNode.getStatStakingRewardValue());
+                            resp.getRewardValue(),
+                            stakingNode.getStatFeeRewardValue(),
+                            stakingNode.getStatBlockRewardValue(),
+                            stakingNode.getStatStakingRewardValue());
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]", resp.getRewardValue(), stakingNode.getStatFeeRewardValue());

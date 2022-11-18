@@ -1,13 +1,12 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.dao.custommapper.StakeBusinessMapper;
-import com.platon.browser.dao.param.ppos.StakeModify;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.param.ppos.StakeModify;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -26,13 +25,11 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
-public class StakeModifyAnalyzer extends PPOSAnalyzer<NodeOpt> {
+public class StakeModifyAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     @Resource
     private StakeBusinessMapper stakeBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     @Resource
     private StakingMapper stakingMapper;
@@ -57,17 +54,17 @@ public class StakeModifyAnalyzer extends PPOSAnalyzer<NodeOpt> {
         long startTime = System.currentTimeMillis();
 
         StakeModify businessParam = StakeModify.builder()
-                .nodeId(txParam.getNodeId())
-                .nodeName(txParam.getNodeName())
-                .externalId(txParam.getExternalId())
-                .benefitAddr(txParam.getBenefitAddress())
-                .webSite(txParam.getWebsite())
-                .details(txParam.getDetails())
-                .isInit(isInit(txParam.getBenefitAddress()))
-                .stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
-                .nextRewardPer(txParam.getDelegateRewardPer())
-                .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                .build();
+                                               .nodeId(txParam.getNodeId())
+                                               .nodeName(txParam.getNodeName())
+                                               .externalId(txParam.getExternalId())
+                                               .benefitAddr(txParam.getBenefitAddress())
+                                               .webSite(txParam.getWebsite())
+                                               .details(txParam.getDetails())
+                                               .isInit(isInit(txParam.getBenefitAddress()))
+                                               .stakingBlockNum(nodeCache.getNode(txParam.getNodeId()).getStakingBlockNum())
+                                               .nextRewardPer(txParam.getDelegateRewardPer())
+                                               .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                                               .build();
 
 
         StakingKey stakingKey = new StakingKey();
@@ -95,8 +92,8 @@ public class StakeModifyAnalyzer extends PPOSAnalyzer<NodeOpt> {
          */
         if (txParam.getDelegateRewardPer() != null && !String.valueOf(businessParam.getNextRewardPer()).equals(preDelegateRewardRate)) {
             desc = NodeOpt.TypeEnum.MODIFY.getTpl()
-                    .replace("BEFORERATE", preDelegateRewardRate)
-                    .replace("AFTERRATE", String.valueOf(businessParam.getNextRewardPer()));
+                                          .replace("BEFORERATE", preDelegateRewardRate)
+                                          .replace("AFTERRATE", String.valueOf(businessParam.getNextRewardPer()));
         }
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();

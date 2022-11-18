@@ -87,6 +87,7 @@ public class NodeCache {
         cache.forEach((k, v) -> {
             Node node = new Node();
             node.setNodeId(k);
+            node.setStakingBlockNum(v.getStakingBlockNum().longValue());
             node.setNodeSettleStatisInfo(v.getNodeSettleStatisInfo());
             list.add(node);
         });

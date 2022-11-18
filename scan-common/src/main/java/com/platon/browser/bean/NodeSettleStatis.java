@@ -36,11 +36,13 @@ public class NodeSettleStatis {
     private Long blockNum = new Long("0");
 
     /**
-     * 创建有界优先队列，存放节点8个结算周期(最近7个结算周期(不一定是连续的)+当前的结算周期)的出块统计信息
+     * 创建有界优先队列，存放节点9个结算周期(最近8个结算周期(不一定是连续的)+当前的结算周期)的出块统计信息
      */
-    BoundedPriorityQueue<NodeSettleStatisBase> nodeSettleStatisQueue = new BoundedPriorityQueue<NodeSettleStatisBase>(CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM + 1, (v1, v2) -> {
-        return v2.getSettleEpochRound().compareTo(v1.getSettleEpochRound());
-    });
+    BoundedPriorityQueue<NodeSettleStatisBase> nodeSettleStatisQueue = new BoundedPriorityQueue<NodeSettleStatisBase>(CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM + 2,
+                                                                                                                      (v1, v2) -> {
+                                                                                                                          return v2.getSettleEpochRound()
+                                                                                                                                   .compareTo(v1.getSettleEpochRound());
+                                                                                                                      });
 
     /**
      * json转bean
@@ -92,8 +94,10 @@ public class NodeSettleStatis {
                     return difference.compareTo(BigInteger.ZERO) > 0 && difference.compareTo(BigInteger.valueOf(CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM)) <= 0;
                 }).collect(Collectors.toList());
                 if (CollUtil.isNotEmpty(last)) {
-                    LongSummaryStatistics blockNumGrandTotal = last.stream().collect(Collectors.summarizingLong(v -> v.getBlockNumGrandTotal().longValue()));
-                    LongSummaryStatistics blockNumElected = last.stream().collect(Collectors.summarizingLong(v -> v.getBlockNumElected().longValue()));
+                    LongSummaryStatistics blockNumGrandTotal = last.stream()
+                                                                   .collect(Collectors.summarizingLong(v -> v.getBlockNumGrandTotal().longValue()));
+                    LongSummaryStatistics blockNumElected = last.stream()
+                                                                .collect(Collectors.summarizingLong(v -> v.getBlockNumElected().longValue()));
                     BigDecimal molecular = BigDecimal.valueOf(blockNumGrandTotal.getSum());
                     BigDecimal denominator = BigDecimal.valueOf(blockNumElected.getSum()).multiply(BigDecimal.TEN);
                     // 分母为0，直接返回
@@ -105,7 +109,14 @@ public class NodeSettleStatis {
                             .multiply(BigDecimal.valueOf(100))
                             .setScale(6, RoundingMode.HALF_UP)
                             .stripTrailingZeros();
-                    log.debug("节点[{}]在第[{}]结算周期计算最近[{}]结算周期({})的出块率为[{}%]=[{}]/([{}]*10)", this.getNodeId(), curSettleEpochRound, CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, last.stream().map(v -> v.getSettleEpochRound()).collect(Collectors.toList()), percent.toPlainString(), molecular, blockNumElected.getSum());
+                    log.debug("节点[{}]在第[{}]结算周期计算最近[{}]结算周期({})的出块率为[{}%]=[{}]/([{}]*10)",
+                              this.getNodeId(),
+                              curSettleEpochRound,
+                              CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM,
+                              last.stream().map(v -> v.getSettleEpochRound()).collect(Collectors.toList()),
+                              percent.toPlainString(),
+                              molecular,
+                              blockNumElected.getSum());
                     return percent.toPlainString() + "%";
                 } else {
                     return "0%";

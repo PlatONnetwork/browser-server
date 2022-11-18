@@ -33,6 +33,11 @@ public class CommonConstant {
     public static final int BLOCK_RATE_SETTLE_EPOCH_NUM = 7;
 
     /**
+     * 统计8个结算周期的apr
+     */
+    public static final int BLOCK_APR_EPOCH_NUM = 8;
+
+    /**
      * 重试次数，宁愿丢失数据也不要阻碍主流程追块
      */
     public static final int reTryNum = 3;

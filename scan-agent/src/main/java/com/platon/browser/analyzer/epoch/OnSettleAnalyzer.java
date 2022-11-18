@@ -1,6 +1,7 @@
 package com.platon.browser.analyzer.epoch;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.config.BlockChainConfig;
@@ -102,7 +103,6 @@ public class OnSettleAnalyzer {
                 staking.setLowRateSlashCount(0);
                 exitedNodeIds.add(staking.getNodeId());
             }
-
             //锁定中记录状态设置（状态为已锁定中且已经经过指定的结算周期数，则把状态置为候选中）
             if (staking.getStatus() == CustomStaking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
                     (staking.getZeroProduceFreezeEpoch() + staking.getZeroProduceFreezeDuration()) < settle.getSettingEpoch()
@@ -114,6 +114,9 @@ public class OnSettleAnalyzer {
                 staking.setExceptionStatus(CustomStaking.ExceptionStatusEnum.NORMAL.getCode());
                 // 从已锁定状态恢复到候选中状态
                 staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+                // 块高恢复
+                log.info("节点[{}]从退出中块高[{}]恢复为候选中", staking.getNodeId(), staking.getLeaveNum());
+                staking.setLeaveNum(0L);
                 recoverLog(staking, settle.getSettingEpoch(), block, nodeOpts);
             }
 
@@ -161,7 +164,10 @@ public class OnSettleAnalyzer {
         epochBusinessMapper.settle(settle);
 
         // 更新节点的质押奖励
-        updateStakingRewardValue(block.getNum() - 1, event.getEpochMessage().getSettleEpochRound().subtract(BigInteger.ONE), settle.getPreVerifierSet(), event.getEpochMessage().getStakeReward());
+        updateStakingRewardValue(block.getNum() - 1,
+                                 event.getEpochMessage().getSettleEpochRound().subtract(BigInteger.ONE),
+                                 settle.getPreVerifierSet(),
+                                 event.getEpochMessage().getStakeReward());
 
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k, v) -> {
@@ -221,7 +227,10 @@ public class OnSettleAnalyzer {
                          blockNum,
                          epoch,
                          staking.getNodeId(),
-                         staking.getStakingRewardValue().add(updateStaking.getStakingRewardValue()).setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(),
+                         staking.getStakingRewardValue()
+                                .add(updateStaking.getStakingRewardValue())
+                                .setScale(0, BigDecimal.ROUND_HALF_UP)
+                                .toPlainString(),
                          staking.getStakingRewardValue().toPlainString(),
                          updateStaking.getStakingRewardValue().toPlainString());
             }
@@ -346,7 +355,8 @@ public class OnSettleAnalyzer {
         // 设置当前质押记录的委托奖励年化率
         staking.setDeleAnnualizedRate(annualizedRate.doubleValue());
         // 计算当前质押的年化率 END ******************************
-
+        NodeApr nodeApr = NodeApr.build(settle.getSettingEpoch(), staking.getNodeId(), annualizedRate, staking.getNodeApr());
+        staking.setNodeApr(JSONUtil.toJsonStr(nodeApr));
         // 更新年化率计算原始信息
         staking.setAnnualizedRateInfo(ari.toJSONString());
     }

@@ -2,14 +2,11 @@ package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.VersionDeclareParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * @description: 委托业务参数转换器
@@ -18,10 +15,8 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
-public class VersionDeclareAnalyzer extends PPOSAnalyzer<NodeOpt> {
-
-    @Resource
-    private NetworkStatCache networkStatCache;
+public class VersionDeclareAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     /**
      * 版本声明分析
@@ -35,9 +30,9 @@ public class VersionDeclareAnalyzer extends PPOSAnalyzer<NodeOpt> {
     public NodeOpt analyze(CollectionEvent event, Transaction tx) {
         VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
         // 补充节点名称
-        updateTxInfo(txParam,tx);
+        updateTxInfo(txParam, tx);
         // 失败的交易不分析业务数据
-        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+        if (Transaction.StatusEnum.FAILURE.getCode() == tx.getStatus()) return null;
 
         long startTime = System.currentTimeMillis();
 
@@ -45,9 +40,9 @@ public class VersionDeclareAnalyzer extends PPOSAnalyzer<NodeOpt> {
         String nodeName = txParam.getNodeName();
 
         String desc = NodeOpt.TypeEnum.VERSION.getTpl()
-                .replace("NODE_NAME",nodeName)
-                .replace("ACTIVE_NODE",nodeId)
-                .replace("VERSION",String.valueOf(txParam.getVersion()));
+                                              .replace("NODE_NAME", nodeName)
+                                              .replace("ACTIVE_NODE", nodeId)
+                                              .replace("VERSION", String.valueOf(txParam.getVersion()));
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(nodeId);
@@ -57,8 +52,9 @@ public class VersionDeclareAnalyzer extends PPOSAnalyzer<NodeOpt> {
         nodeOpt.setBNum(event.getBlock().getNum());
         nodeOpt.setTime(tx.getTime());
 
-        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
         return nodeOpt;
     }
+
 }

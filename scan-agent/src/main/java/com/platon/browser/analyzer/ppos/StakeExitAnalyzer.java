@@ -2,14 +2,13 @@ package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.ppos.StakeExit;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
@@ -31,13 +30,11 @@ import java.math.BigInteger;
  **/
 @Slf4j
 @Service
-public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
+public class StakeExitAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     @Resource
     private StakeBusinessMapper stakeBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     @Resource
     private StakingMapper stakingMapper;
@@ -69,7 +66,7 @@ public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
             curEpoch = EpochUtil.getEpoch(BigInteger.valueOf(tx.getNum()), chainConfig.getSettlePeriodBlockCount());
             // 计算质押金退回的区块号 = 每个结算周期的区块数x(退出质押所在结算周期轮数+需要经过的结算周期轮数)
             BigInteger withdrawBlockNum = chainConfig.getSettlePeriodBlockCount()
-                    .multiply(curEpoch.add(chainConfig.getUnStakeRefundSettlePeriodCount()));
+                                                     .multiply(curEpoch.add(chainConfig.getUnStakeRefundSettlePeriodCount()));
             txParam.setWithdrawBlockNum(withdrawBlockNum);
         } catch (BlockNumberException e) {
             log.error("", e);
@@ -98,14 +95,15 @@ public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
         BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getNodeId(), event.getEpochMessage().getSettleEpochRound(), true);
         // 撤销质押
         StakeExit businessParam = StakeExit.builder()
-                .nodeId(txParam.getNodeId())
-                .stakingBlockNum(txParam.getStakingBlockNum())
-                .time(tx.getTime())
-                .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
-                .unStakeEndBlock(unStakeEndBlock)
-                .status(CustomStaking.StatusEnum.EXITING.getCode())
-                .build();
+                                           .nodeId(txParam.getNodeId())
+                                           .stakingBlockNum(txParam.getStakingBlockNum())
+                                           .time(tx.getTime())
+                                           .leaveNum(tx.getNum())
+                                           .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                                           .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
+                                           .unStakeEndBlock(unStakeEndBlock)
+                                           .status(CustomStaking.StatusEnum.EXITING.getCode())
+                                           .build();
 
         // 判断当前退出质押操作是否与质押创建操作处于同一个结算周期，如果输入同一周期，则节点置为已退出
         BigInteger stakeEpoch = EpochUtil.getEpoch(BigInteger.valueOf(staking.getStakingBlockNum()), chainConfig.getSettlePeriodBlockCount());

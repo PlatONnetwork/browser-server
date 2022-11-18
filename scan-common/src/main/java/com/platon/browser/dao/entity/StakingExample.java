@@ -1416,6 +1416,66 @@ public class StakingExample {
             return (Criteria) this;
         }
 
+        public Criteria andLeaveNumIsNull() {
+            addCriterion("leave_num is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumIsNotNull() {
+            addCriterion("leave_num is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumEqualTo(Long value) {
+            addCriterion("leave_num =", value, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumNotEqualTo(Long value) {
+            addCriterion("leave_num <>", value, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumGreaterThan(Long value) {
+            addCriterion("leave_num >", value, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumGreaterThanOrEqualTo(Long value) {
+            addCriterion("leave_num >=", value, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumLessThan(Long value) {
+            addCriterion("leave_num <", value, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumLessThanOrEqualTo(Long value) {
+            addCriterion("leave_num <=", value, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumIn(List<Long> values) {
+            addCriterion("leave_num in", values, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumNotIn(List<Long> values) {
+            addCriterion("leave_num not in", values, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumBetween(Long value1, Long value2) {
+            addCriterion("leave_num between", value1, value2, "leaveNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andLeaveNumNotBetween(Long value1, Long value2) {
+            addCriterion("leave_num not between", value1, value2, "leaveNum");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIsNull() {
             addCriterion("`status` is null");
             return (Criteria) this;

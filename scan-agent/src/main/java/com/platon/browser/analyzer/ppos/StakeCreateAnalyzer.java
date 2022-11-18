@@ -1,8 +1,7 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.param.ppos.StakeCreate;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -11,10 +10,10 @@ import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.utils.DateUtil;
 import com.platon.browser.service.ppos.StakeEpochService;
-import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.ChainVersionUtil;
+import com.platon.browser.utils.DateUtil;
+import com.platon.browser.utils.HexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,11 @@ import java.util.Date;
  **/
 @Slf4j
 @Service
-public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
+public class StakeCreateAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     @Resource
     private StakeBusinessMapper stakeBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     @Resource
     private ParameterService parameterService;
@@ -75,26 +72,26 @@ public class StakeCreateAnalyzer extends PPOSAnalyzer<NodeOpt> {
         // 理论上的退出区块号
         BigInteger unStakeEndBlock = stakeEpochService.getUnStakeEndBlock(txParam.getNodeId(), event.getEpochMessage().getSettleEpochRound(), false);
         StakeCreate businessParam = StakeCreate.builder()
-                .nodeId(txParam.getNodeId())
-                .stakingHes(txParam.getAmount())
-                .nodeName(txParam.getNodeName())
-                .externalId(txParam.getExternalId())
-                .benefitAddr(txParam.getBenefitAddress())
-                .programVersion(txParam.getProgramVersion().toString())
-                .bigVersion(bigVersion.toString())
-                .webSite(txParam.getWebsite())
-                .details(txParam.getDetails())
-                .isInit(isInit(txParam.getBenefitAddress()))
-                .stakingBlockNum(stakingBlockNum)
-                .stakingTxIndex(tx.getIndex())
-                .stakingAddr(tx.getFrom())
-                .joinTime(txTime)
-                .txHash(tx.getHash())
-                .delegateRewardPer(txParam.getDelegateRewardPer())
-                .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
-                .unStakeEndBlock(unStakeEndBlock)
-                .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                .build();
+                                               .nodeId(txParam.getNodeId())
+                                               .stakingHes(txParam.getAmount())
+                                               .nodeName(txParam.getNodeName())
+                                               .externalId(txParam.getExternalId())
+                                               .benefitAddr(txParam.getBenefitAddress())
+                                               .programVersion(txParam.getProgramVersion().toString())
+                                               .bigVersion(bigVersion.toString())
+                                               .webSite(txParam.getWebsite())
+                                               .details(txParam.getDetails())
+                                               .isInit(isInit(txParam.getBenefitAddress()))
+                                               .stakingBlockNum(stakingBlockNum)
+                                               .stakingTxIndex(tx.getIndex())
+                                               .stakingAddr(tx.getFrom())
+                                               .joinTime(txTime)
+                                               .txHash(tx.getHash())
+                                               .delegateRewardPer(txParam.getDelegateRewardPer())
+                                               .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
+                                               .unStakeEndBlock(unStakeEndBlock)
+                                               .settleEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                                               .build();
 
         stakeBusinessMapper.create(businessParam);
 

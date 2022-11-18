@@ -151,8 +151,7 @@ public class OnNewBlockAnalyzer {
                             if (proposalVersion.compareTo(configVersion) >= 0 && proposalPipid.equals(configPipid)) {
                                 // 升级提案版本号及提案ID与配置文件中指定的一样，则执行调账逻辑
                                 List<AdjustParam> adjustParams = specialApi.getStakingDelegateAdjustDataList(platOnClient.getWeb3jWrapper()
-                                                                                                                         .getWeb3j(),
-                                                                                                             BigInteger.valueOf(block.getNum()));
+                                                                                                                         .getWeb3j(), BigInteger.valueOf(block.getNum()));
                                 adjustParams.forEach(param -> {
                                     param.setBlockTime(block.getTime());
                                     param.setSettleBlockCount(chainConfig.getSettlePeriodBlockCount());

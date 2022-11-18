@@ -1,12 +1,11 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.CustomProposal;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.param.ppos.ProposalText;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalTextParam;
@@ -24,16 +23,14 @@ import java.math.BigInteger;
  **/
 @Slf4j
 @Service
-public class ProposalTextAnalyzer extends PPOSAnalyzer<NodeOpt> {
+public class ProposalTextAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     @Resource
     private BlockChainConfig chainConfig;
 
     @Resource
     private ProposalBusinessMapper proposalBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     /**
      * 提交文本提案(创建提案)
@@ -55,26 +52,28 @@ public class ProposalTextAnalyzer extends PPOSAnalyzer<NodeOpt> {
         long startTime = System.currentTimeMillis();
 
         ProposalText businessParam = ProposalText.builder()
-                .nodeId(txParam.getVerifier())
-                .pIDID(txParam.getPIDID())
-                .url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
-                .pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
-                .endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(), chainConfig.getProposalTextConsensusRounds(), chainConfig).toBigInteger())
-                .topic(CustomProposal.QUERY_FLAG)
-                .description(CustomProposal.QUERY_FLAG)
-                .txHash(tx.getHash())
-                .blockNumber(BigInteger.valueOf(tx.getNum()))
-                .timestamp(tx.getTime())
-                .stakingName(txParam.getNodeName())
-                .build();
+                                                 .nodeId(txParam.getVerifier())
+                                                 .pIDID(txParam.getPIDID())
+                                                 .url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
+                                                 .pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
+                                                 .endVotingBlock(RoundCalculation.endBlockNumCal(tx.getNum().toString(),
+                                                                                                 chainConfig.getProposalTextConsensusRounds(),
+                                                                                                 chainConfig).toBigInteger())
+                                                 .topic(CustomProposal.QUERY_FLAG)
+                                                 .description(CustomProposal.QUERY_FLAG)
+                                                 .txHash(tx.getHash())
+                                                 .blockNumber(BigInteger.valueOf(tx.getNum()))
+                                                 .timestamp(tx.getTime())
+                                                 .stakingName(txParam.getNodeName())
+                                                 .build();
         proposalBusinessMapper.text(businessParam);
 
 
         String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
-                .replace("ID", txParam.getPIDID())
-                .replace("TITLE", businessParam.getTopic())
-                .replace("TYPE", String.valueOf(CustomProposal.TypeEnum.TEXT.getCode()))
-                .replace("VERSION", "");
+                                                .replace("ID", txParam.getPIDID())
+                                                .replace("TITLE", businessParam.getTopic())
+                                                .replace("TYPE", String.valueOf(CustomProposal.TypeEnum.TEXT.getCode()))
+                                                .replace("VERSION", "");
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(txParam.getVerifier());

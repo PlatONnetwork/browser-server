@@ -16,8 +16,9 @@
             `annualized_rate_info` = #{staking.annualizedRateInfo},
             `total_dele_reward` = #{staking.totalDeleReward},
             `exception_status` = #{staking.exceptionStatus},
-            `low_rate_slash_count` = #{staking.lowRateSlashCount}
-            where `node_id` =  #{staking.nodeId};
+            `low_rate_slash_count` = #{staking.lowRateSlashCount},
+            `node_apr`=#{staking.nodeApr}
+            where `node_id` = #{staking.nodeId};
             /*1、更新质押*/
             update `staking` set
             `staking_locked` = #{staking.stakingLocked},
@@ -31,27 +32,28 @@
             `annualized_rate_info` = #{staking.annualizedRateInfo},
             `total_dele_reward` = #{staking.totalDeleReward},
             `exception_status` = #{staking.exceptionStatus},
-            `low_rate_slash_count` = #{staking.lowRateSlashCount}
+            `low_rate_slash_count` = #{staking.lowRateSlashCount},
+            `node_apr`=#{staking.nodeApr}
             where `node_id` = #{staking.nodeId}
             and staking_block_num = #{staking.stakingBlockNum};
         </foreach>
         /*3、更新委托*/
         update `delegation` set
-            `delegate_locked` = `delegate_hes` + `delegate_locked`,
-            `delegate_hes` = 0
+        `delegate_locked` = `delegate_hes` + `delegate_locked`,
+        `delegate_hes` = 0
         where `is_history` = 2
         and `delegate_hes` > 0;
         /*4、更新质押*/
         update `staking` set
-            `stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`,
-            `stat_delegate_hes` = 0
+        `stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`,
+        `stat_delegate_hes` = 0
         where `stat_delegate_hes` > 0;
 
         <foreach collection="exitNodeList" item="nodeId">
             /*5、节点委托奖励累加*/
             update `node` set
             `pre_total_dele_reward` = `pre_total_dele_reward`+`total_dele_reward`
-            where `node_id` =  #{nodeId};
+            where `node_id` = #{nodeId};
         </foreach>
         update `node` set `total_dele_reward`=0 where `status` = 3;
         /*当修改委托奖励比例所在结算周期小于当前结算周期时，统一把reward_per替换为next_reward_per的值*/
@@ -61,17 +63,17 @@
 
     <select id="findStaking" parameterType="list" resultType="com.platon.browser.dao.entity.Staking">
         SELECT
-            t1.node_id AS nodeId,
-            t1.staking_block_num AS stakingBlockNum,
-            t1.staking_reward_value AS stakingRewardValue
+        t1.node_id AS nodeId,
+        t1.staking_block_num AS stakingBlockNum,
+        t1.staking_reward_value AS stakingRewardValue
         FROM
-            staking t1
-                INNER JOIN ( SELECT node_id, max( staking_block_num ) AS staking_block_num FROM staking WHERE node_id IN
-                <foreach collection="list" item="nodeId" open="(" close=")" separator=",">
-                    #{nodeId}
-                </foreach>
-                GROUP BY node_id ) t2 ON t1.node_id = t2.node_id
-                AND t1.staking_block_num = t2.staking_block_num
+        staking t1
+        INNER JOIN ( SELECT node_id, max( staking_block_num ) AS staking_block_num FROM staking WHERE node_id IN
+        <foreach collection="list" item="nodeId" open="(" close=")" separator=",">
+            #{nodeId}
+        </foreach>
+        GROUP BY node_id ) t2 ON t1.node_id = t2.node_id
+        AND t1.staking_block_num = t2.staking_block_num
     </select>
 
     <update id="settleForStakingValue" parameterType="com.platon.browser.dao.param.epoch.Settle">
@@ -79,10 +81,10 @@
             /*2、更新节点*/
             update `node` set
             `stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.stakingRewardValue}
-            where `node_id` =  #{staking.nodeId};
+            where `node_id` = #{staking.nodeId};
             /*1、更新质押*/
             update `staking` set
-            `staking_reward_value` =  `staking_reward_value` + #{staking.stakingRewardValue}
+            `staking_reward_value` = `staking_reward_value` + #{staking.stakingRewardValue}
             where `node_id` = #{staking.nodeId}
             and staking_block_num = #{staking.stakingBlockNum};
         </foreach>

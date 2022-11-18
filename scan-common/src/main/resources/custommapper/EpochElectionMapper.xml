@@ -1,113 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.EpochBusinessMapper">
-	<select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
-		/*查询低出块率质押节点*/
-		select  `node_id` as nodeId,
-			`staking_block_num` as stakingBlockNum
-		from staking
-		where `status` = 1
-		and `node_id` in <foreach open="(" collection="list" item="item"  separator="," close=")"> #{item} </foreach>
-		and `pre_cons_block_qty` = 0;
-	</select>
-	<update id="setException">
-		/*把节点设置为异常*/
-		/*2、更新质押*/
-		update `staking` set `exception_status` = 2
-		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
-		/*3、更新节点*/
-		update `node` set `exception_status` = 2
-		where `node_id` in  <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>;
-	</update>
-	<select id="getException" resultType="com.platon.browser.dao.entity.Staking">
-		/*查询异常节点*/
-		select  `node_id` as nodeId,
-		`staking_block_num` as stakingBlockNum
-		from staking
-		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
-		and `exception_status` = 2
-		and `status` = 1;
-	</select>
-	<update id="slashNode" parameterType="com.platon.browser.dao.param.epoch.Election">
-		/*处理低出块率被锁定的节点*/
-		<foreach collection="lockedNodeList" item="item">
-			/*1、更新质押*/
-			update `staking` set
-			`status` = #{item.status},
-			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_hes` = #{item.stakingHes},
-			`staking_locked` = #{item.stakingLocked},
-			`leave_time` = #{item.leaveTime},
-			`is_consensus` = 2,
-			`is_settle` = 2,
-			`zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
-			`zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
-			`low_rate_slash_count` = `low_rate_slash_count`+1
-			where `staking_block_num` = #{item.stakingBlockNum}
-			and `node_id` =  #{item.nodeId} ;
-			/*2、更新节点*/
-			update `node` set
-			`status` = #{item.status},
-			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_hes` = #{item.stakingHes},
-			`staking_locked` = #{item.stakingLocked},
-			`total_value` = `total_value` - #{item.slashAmount},
-			`leave_time` = #{item.leaveTime},
-			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
-			`is_consensus` = 2,
-			`is_settle` = 2,
-			`zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
-			`zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
-			`low_rate_slash_count` = `low_rate_slash_count`+1
-			where `node_id` = #{item.nodeId} ;
-		</foreach>
-		/*处理低出块率,罚款后质押金低于质押门槛导致退出的节点: 与质押退出逻辑一样*/
-		<foreach collection="exitingNodeList" item="item">
-			/*1、更新委托*/
-			update `delegation` set
-			/*为防止节点主动退出质押，导致delegate_hes和delegate_locked都为0，最终导致delegate_released为0的情况，需要累加delegate_released本身*/
-			`delegate_released` = `delegate_released` + `delegate_hes` + `delegate_locked`,
-			`delegate_hes` = 0,
-			`delegate_locked` = 0
-			where `node_id` = #{item.nodeId}
-			and `staking_block_num` = #{item.stakingBlockNum}
-			and `is_history` = 2;
-			/*2、更新节点*/
-			update `node` set
-			`leave_time` = #{item.leaveTime},
-			`stat_slash_low_qty` = `stat_slash_low_qty` + 1,
-			`status` = 2,/*退出中*/
-			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
-			`total_value` = 0,
-			`staking_locked` = 0,
-			`staking_hes` = 0,
-			`stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,/*待提取委托，要用户主动领取*/
-			`stat_delegate_value` = 0,
-			`stat_valid_addrs` = 0,
-			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{item.nodeId} and is_history = 2),
-		    `is_consensus` = 2,
-			`un_stake_freeze_duration` = #{unStakeFreezeDuration},
-			`un_stake_end_block` = #{unStakeEndBlock},
-			`low_rate_slash_count` = `low_rate_slash_count`+1
-			where `node_id` = #{item.nodeId};
-			/*3、更新质押*/
-			update `staking` set
-			`leave_time` = #{item.leaveTime},
-			`status` = 2,
-			`staking_reduction_epoch` = #{settingEpoch},
-			`staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
-			`staking_locked` = 0,
-			`staking_hes` = 0,
-			`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
-			`stat_delegate_hes` = 0,
-			`stat_delegate_locked` = 0,
-			`is_consensus` = 2,
-			`un_stake_freeze_duration` = #{unStakeFreezeDuration},
-			`un_stake_end_block` = #{unStakeEndBlock},
-			`low_rate_slash_count` = `low_rate_slash_count`+1
-			where `node_id` = #{item.nodeId}
-			and `staking_block_num` = #{item.stakingBlockNum};
-		</foreach>
-	</update>
+    <select id="querySlashNode" resultType="com.platon.browser.dao.entity.Staking">
+        /*查询低出块率质押节点*/
+        select `node_id` as nodeId,
+        `staking_block_num` as stakingBlockNum
+        from staking
+        where `status` = 1
+        and `node_id` in
+        <foreach open="(" collection="list" item="item" separator="," close=")">#{item}</foreach>
+        and `pre_cons_block_qty` = 0;
+    </select>
+    <update id="setException">
+        /*把节点设置为异常*/
+        /*2、更新质押*/
+        update `staking` set `exception_status` = 2
+        where `node_id` in <foreach open="(" collection="list" item="nodeId" separator="," close=")">#{nodeId}</foreach>;
+        /*3、更新节点*/
+        update `node` set `exception_status` = 2
+        where `node_id` in  <foreach open="(" collection="list" item="nodeId" separator="," close=")">#{nodeId}</foreach>;
+    </update>
+    <select id="getException" resultType="com.platon.browser.dao.entity.Staking">
+        /*查询异常节点*/
+        select `node_id` as nodeId,
+        `staking_block_num` as stakingBlockNum
+        from staking
+        where `node_id` in
+        <foreach open="(" collection="list" item="nodeId" separator="," close=")">#{nodeId}</foreach>
+        and `exception_status` = 2
+        and `status` = 1;
+    </select>
+    <update id="slashNode" parameterType="com.platon.browser.dao.param.epoch.Election">
+        /*处理低出块率被锁定的节点*/
+        <foreach collection="lockedNodeList" item="item">
+            /*1、更新质押*/
+            update `staking` set
+            `status` = #{item.status},
+            `staking_reduction_epoch` = #{settingEpoch},
+            `staking_hes` = #{item.stakingHes},
+            `staking_locked` = #{item.stakingLocked},
+            `leave_time` = #{item.leaveTime},
+            <if test="leaveNum != null">
+                `leave_num` = #{leaveNum},
+            </if>
+            `is_consensus` = 2,
+            `is_settle` = 2,
+            `zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
+            `zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
+            `low_rate_slash_count` = `low_rate_slash_count`+1
+            where `staking_block_num` = #{item.stakingBlockNum}
+            and `node_id` = #{item.nodeId} ;
+            /*2、更新节点*/
+            update `node` set
+            `status` = #{item.status},
+            `staking_reduction_epoch` = #{settingEpoch},
+            `staking_hes` = #{item.stakingHes},
+            `staking_locked` = #{item.stakingLocked},
+            `total_value` = `total_value` - #{item.slashAmount},
+            `leave_time` = #{item.leaveTime},
+            <if test="leaveNum != null">
+                `leave_num` = #{leaveNum},
+            </if>
+            `stat_slash_low_qty` = `stat_slash_low_qty` + 1,
+            `is_consensus` = 2,
+            `is_settle` = 2,
+            `zero_produce_freeze_duration` = #{zeroProduceFreezeDuration},
+            `zero_produce_freeze_epoch` = #{zeroProduceFreezeEpoch},
+            `low_rate_slash_count` = `low_rate_slash_count`+1
+            where `node_id` = #{item.nodeId} ;
+        </foreach>
+        /*处理低出块率,罚款后质押金低于质押门槛导致退出的节点: 与质押退出逻辑一样*/
+        <foreach collection="exitingNodeList" item="item">
+            /*1、更新委托*/
+            update `delegation` set
+            /*为防止节点主动退出质押，导致delegate_hes和delegate_locked都为0，最终导致delegate_released为0的情况，需要累加delegate_released本身*/
+            `delegate_released` = `delegate_released` + `delegate_hes` + `delegate_locked`,
+            `delegate_hes` = 0,
+            `delegate_locked` = 0
+            where `node_id` = #{item.nodeId}
+            and `staking_block_num` = #{item.stakingBlockNum}
+            and `is_history` = 2;
+            /*2、更新节点*/
+            update `node` set
+            `leave_time` = #{item.leaveTime},
+            `stat_slash_low_qty` = `stat_slash_low_qty` + 1,
+            `status` = 2,/*退出中*/
+            `staking_reduction_epoch` = #{settingEpoch},
+            `staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
+            `total_value` = 0,
+            `staking_locked` = 0,
+            `staking_hes` = 0,
+            `stat_delegate_released` = `stat_delegate_released` + `stat_delegate_value`,/*待提取委托，要用户主动领取*/
+            `stat_delegate_value` = 0,
+            `stat_valid_addrs` = 0,
+            `stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{item.nodeId} and is_history = 2),
+            `is_consensus` = 2,
+            `un_stake_freeze_duration` = #{unStakeFreezeDuration},
+            `un_stake_end_block` = #{unStakeEndBlock},
+            `low_rate_slash_count` = `low_rate_slash_count`+1
+            where `node_id` = #{item.nodeId};
+            /*3、更新质押*/
+            update `staking` set
+            `leave_time` = #{item.leaveTime},
+            `status` = 2,
+            `staking_reduction_epoch` = #{settingEpoch},
+            `staking_reduction` = IF(`staking_locked`+`staking_hes`-#{item.slashAmount} > 0,`staking_locked`+`staking_hes`-#{item.slashAmount},0),
+            `staking_locked` = 0,
+            `staking_hes` = 0,
+            `stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`,
+            `stat_delegate_hes` = 0,
+            `stat_delegate_locked` = 0,
+            `is_consensus` = 2,
+            `un_stake_freeze_duration` = #{unStakeFreezeDuration},
+            `un_stake_end_block` = #{unStakeEndBlock},
+            `low_rate_slash_count` = `low_rate_slash_count`+1
+            where `node_id` = #{item.nodeId}
+            and `staking_block_num` = #{item.stakingBlockNum};
+        </foreach>
+    </update>
 </mapper>

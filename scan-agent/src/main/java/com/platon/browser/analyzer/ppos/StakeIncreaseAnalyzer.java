@@ -1,8 +1,7 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.param.ppos.StakeIncrease;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -20,13 +19,11 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
-public class StakeIncreaseAnalyzer extends PPOSAnalyzer<NodeOpt> {
+public class StakeIncreaseAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     @Resource
     private StakeBusinessMapper stakeBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     /**
      * 增持质押(增加自有质押)
@@ -50,10 +47,10 @@ public class StakeIncreaseAnalyzer extends PPOSAnalyzer<NodeOpt> {
 
 
         StakeIncrease businessParam = StakeIncrease.builder()
-                .nodeId(txParam.getNodeId())
-                .amount(txParam.getAmount())
-                .stakingBlockNum(txParam.getStakingBlockNum())
-                .build();
+                                                   .nodeId(txParam.getNodeId())
+                                                   .amount(txParam.getAmount())
+                                                   .stakingBlockNum(txParam.getStakingBlockNum())
+                                                   .build();
 
         stakeBusinessMapper.increase(businessParam);
 

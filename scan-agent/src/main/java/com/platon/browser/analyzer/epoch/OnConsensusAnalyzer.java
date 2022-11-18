@@ -1,7 +1,9 @@
 package com.platon.browser.analyzer.epoch;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.CusSlash;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
@@ -67,7 +69,9 @@ public class OnConsensusAnalyzer {
         event.getEpochMessage().getCurValidatorList().forEach(v -> nextConsNodeIdList.add(v.getNodeId()));
         // 每个共识周期的期望出块数
         BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(nextConsNodeIdList.size()));
-        Consensus consensus = Consensus.builder().expectBlockNum(expectBlockNum).validatorList(nextConsNodeIdList) // 在sql中，如果节点在下一共识周期列表中，则共识状态设置为1，否则为2
+        Consensus consensus = Consensus.builder()
+                                       .expectBlockNum(expectBlockNum)
+                                       .validatorList(nextConsNodeIdList) // 在sql中，如果节点在下一共识周期列表中，则共识状态设置为1，否则为2
                                        .build();
         epochBusinessMapper.consensus(consensus);
 
@@ -91,6 +95,7 @@ public class OnConsensusAnalyzer {
                     slashNodeIdExample.createCriteria().andNodeIdEqualTo(slashNode.getNodeId()).andIsHandleEqualTo(false);
                     List<Slash> reportList = slashMapper.selectByExampleWithBLOBs(slashNodeIdExample);
                     reportList.forEach(report -> {
+                        // 惩罚节点
                         NodeOpt nodeOpt = slashNode(report, block);
                         nodeOpts.add(nodeOpt);
                     });
@@ -110,12 +115,14 @@ public class OnConsensusAnalyzer {
     /**
      * 惩罚节点
      *
-     * @param businessParam:
+     * @param copyBusinessParam:
      * @param block:
      * @return: com.platon.browser.elasticsearch.dto.NodeOpt
      * @date: 2021/12/2
      */
-    private NodeOpt slashNode(Slash businessParam, Block block) {
+    private NodeOpt slashNode(Slash copyBusinessParam, Block block) {
+        CusSlash businessParam = new CusSlash();
+        BeanUtil.copyProperties(copyBusinessParam, businessParam);
         /**
          * 处理双签处罚
          * 重要！！！！！！： 一旦节点被双签处罚，节点所有金额都会变成待赎回状态
@@ -152,6 +159,7 @@ public class OnConsensusAnalyzer {
             businessParam.setCodeStatus(2);
             // 设置退出操作所在周期
             businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
+            businessParam.setLeaveNum(block.getNum());
         } else {
             // 节点状态置为已退出
             businessParam.setCodeStatus(3);
@@ -164,7 +172,9 @@ public class OnConsensusAnalyzer {
         businessParam.setCodeSlashValue(codeSlashValue);
         slashBusinessMapper.slashNode(businessParam);
         //操作描述:6【PERCENT|AMOUNT】
-        String desc = NodeOpt.TypeEnum.MULTI_SIGN.getTpl().replace("PERCENT", chainConfig.getDuplicateSignSlashRate().toString()).replace("AMOUNT", codeSlashValue.toString());
+        String desc = NodeOpt.TypeEnum.MULTI_SIGN.getTpl()
+                                                 .replace("PERCENT", chainConfig.getDuplicateSignSlashRate().toString())
+                                                 .replace("AMOUNT", codeSlashValue.toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(businessParam.getNodeId());
         nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MULTI_SIGN.getCode()));

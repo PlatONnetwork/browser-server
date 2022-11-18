@@ -1,13 +1,12 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.cache.ProposalCache;
-import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.CustomProposal;
+import com.platon.browser.cache.ProposalCache;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.param.ppos.ProposalUpgrade;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalUpgradeParam;
@@ -26,16 +25,14 @@ import java.math.BigInteger;
  **/
 @Slf4j
 @Service
-public class ProposalUpgradeAnalyzer extends PPOSAnalyzer<NodeOpt> {
+public class ProposalUpgradeAnalyzer
+        extends PPOSAnalyzer<NodeOpt> {
 
     @Resource
     private BlockChainConfig chainConfig;
 
     @Resource
     private ProposalBusinessMapper proposalBusinessMapper;
-
-    @Resource
-    private NetworkStatCache networkStatCache;
 
     @Resource
     private ProposalCache proposalCache;
@@ -60,20 +57,21 @@ public class ProposalUpgradeAnalyzer extends PPOSAnalyzer<NodeOpt> {
         BigInteger voteNum = RoundCalculation.endBlockNumCal(tx.getNum().toString(), txParam.getEndVotingRound(), chainConfig).toBigInteger();
         long startTime = System.currentTimeMillis();
         ProposalUpgrade businessParam = ProposalUpgrade.builder()
-                .nodeId(txParam.getVerifier())
-                .pIDID(txParam.getPIDID())
-                .url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
-                .pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
-                .endVotingBlock(voteNum)
-                .activeBlock(RoundCalculation.activeBlockNumCal(new BigDecimal(voteNum), chainConfig).toBigInteger())
-                .topic(CustomProposal.QUERY_FLAG)
-                .description(CustomProposal.QUERY_FLAG)
-                .txHash(tx.getHash())
-                .blockNumber(BigInteger.valueOf(tx.getNum()))
-                .timestamp(tx.getTime())
-                .stakingName(txParam.getNodeName())
-                .newVersion(String.valueOf(txParam.getNewVersion()))
-                .build();
+                                                       .nodeId(txParam.getVerifier())
+                                                       .pIDID(txParam.getPIDID())
+                                                       .url(String.format(chainConfig.getProposalUrlTemplate(), txParam.getPIDID()))
+                                                       .pipNum(String.format(chainConfig.getProposalPipNumTemplate(), txParam.getPIDID()))
+                                                       .endVotingBlock(voteNum)
+                                                       .activeBlock(RoundCalculation.activeBlockNumCal(new BigDecimal(voteNum), chainConfig)
+                                                                                    .toBigInteger())
+                                                       .topic(CustomProposal.QUERY_FLAG)
+                                                       .description(CustomProposal.QUERY_FLAG)
+                                                       .txHash(tx.getHash())
+                                                       .blockNumber(BigInteger.valueOf(tx.getNum()))
+                                                       .timestamp(tx.getTime())
+                                                       .stakingName(txParam.getNodeName())
+                                                       .newVersion(String.valueOf(txParam.getNewVersion()))
+                                                       .build();
 
         proposalBusinessMapper.upgrade(businessParam);
 
@@ -82,10 +80,10 @@ public class ProposalUpgradeAnalyzer extends PPOSAnalyzer<NodeOpt> {
         proposalCache.add(activeBlockNum.longValue(), tx.getHash());
 
         String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
-                .replace("ID", txParam.getPIDID())
-                .replace("TITLE", businessParam.getTopic())
-                .replace("TYPE", String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()))
-                .replace("VERSION", businessParam.getNewVersion());
+                                                .replace("ID", txParam.getPIDID())
+                                                .replace("TITLE", businessParam.getTopic())
+                                                .replace("TYPE", String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()))
+                                                .replace("VERSION", businessParam.getNewVersion());
 
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setNodeId(txParam.getVerifier());

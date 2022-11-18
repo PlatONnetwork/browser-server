@@ -13,35 +13,85 @@ import com.platon.browser.config.json.CustomLowLatSerializer;
  */
 public class AliveStakingListResp {
 
-    private Integer ranking;           //排行
+    /**
+     * 排行
+     */
+    private Integer ranking;
 
-    private String nodeId;            //节点id
+    /**
+     * 节点id
+     */
+    private String nodeId;
 
-    private String nodeName;          //验证人名称
+    /**
+     * 验证人名称
+     */
+    private String nodeName;
 
-    private String stakingIcon;       //验证人图标
+    /**
+     * 验证人图标
+     */
+    private String stakingIcon;
 
-    private Integer status;            //状态   1:候选中  2:活跃中  3:出块中
+    /**
+     * 状态   1:候选中  2:活跃中  3:出块中
+     */
+    private Integer status;
 
-    private String totalValue;        //质押总数=有效的质押+委托
+    /**
+     * 质押总数=有效的质押+委托
+     */
+    private String totalValue;
 
-    private String delegateValue;     //委托总数
+    /**
+     * 委托总数
+     */
+    private String delegateValue;
 
-    private Integer delegateQty;       //委托人数
+    /**
+     * 委托人数
+     */
+    private Integer delegateQty;
 
-    private Integer slashLowQty;      //低出块率举报次数
+    /**
+     * 低出块率举报次数
+     */
+    private Integer slashLowQty;
 
-    private Integer slashMultiQty;    //多签举报次数
+    /**
+     * 多签举报次数
+     */
+    private Integer slashMultiQty;
 
-    private Long blockQty;          //产生的区块数
+    /**
+     * 产生的区块数
+     */
+    private Long blockQty;
 
-    private String expectedIncome;    //预计年收化率（从验证人加入时刻开始计算）
+    /**
+     * 预计年收化率（从验证人加入时刻开始计算）
+     */
+    private String expectedIncome;
 
-    private Boolean isRecommend;     //是否官方推荐
+    /**
+     * 是否官方推荐
+     */
+    private Boolean isRecommend;
 
-    private Boolean isInit;          //是否为初始节点
+    /**
+     * 是否为初始节点
+     */
+    private Boolean isInit;
 
-    private String deleAnnualizedRate;  //预计委托年化率（从验证人加入时刻开始计算）
+    /**
+     * 预计委托年化率（从验证人加入时刻开始计算）
+     */
+    private String deleAnnualizedRate;
+
+    /**
+     * 前一天预计委托年化率（从验证人加入时刻开始计算）
+     */
+    private String preDeleAnnualizedRate;
 
     /**
      * 委托奖励比例
@@ -202,6 +252,14 @@ public class AliveStakingListResp {
 
     public void setVersion(String version) {
         Version = version;
+    }
+
+    public String getPreDeleAnnualizedRate() {
+        return preDeleAnnualizedRate;
+    }
+
+    public void setPreDeleAnnualizedRate(String preDeleAnnualizedRate) {
+        this.preDeleAnnualizedRate = preDeleAnnualizedRate;
     }
 
 }
