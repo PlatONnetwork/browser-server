@@ -2,76 +2,78 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomDelegationMapper">
 
-  <resultMap id="BaseResultMap" type="com.platon.browser.bean.CustomDelegation" extends="com.platon.browser.dao.mapper.DelegationMapper.BaseResultMap"/>
+    <resultMap id="BaseResultMap" type="com.platon.browser.bean.CustomDelegation"
+               extends="com.platon.browser.dao.mapper.DelegationMapper.BaseResultMap"/>
 
-  <resultMap id="StakingListResultMap" type="com.platon.browser.bean.DelegationStaking">
-    <id column="delegate_addr" jdbcType="VARCHAR" property="delegateAddr" />
-    <id column="delegate_addr_type" jdbcType="INTEGER" property="delegateAddrType" />
-    <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes" />
-    <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked" />
-    <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased" />
-  </resultMap>
-  
-  <resultMap id="AddressListResultMap" type="com.platon.browser.bean.DelegationAddress">
-    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
-    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
-    <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes" />
-    <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked" />
-    <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased" />
-  </resultMap>
-  
-  <select id="selectByNodeId" resultMap="BaseResultMap">
-    select
-    <include refid="com.platon.browser.dao.mapper.DelegationMapper.Base_Column_List" />
-    from delegation where node_id = #{nodeId}
-  </select>
+    <resultMap id="StakingListResultMap" type="com.platon.browser.bean.DelegationStaking">
+        <id column="delegate_addr" jdbcType="VARCHAR" property="delegateAddr"/>
+        <id column="delegate_addr_type" jdbcType="INTEGER" property="delegateAddrType"/>
+        <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes"/>
+        <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked"/>
+        <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased"/>
+    </resultMap>
 
-  <select id="selectByNodeIdList" resultMap="BaseResultMap">
-    select
-    <include refid="com.platon.browser.dao.mapper.DelegationMapper.Base_Column_List" />
-    from delegation where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
-  </select>
-  
-  <select id="selectStakingByNodeId" resultMap="StakingListResultMap">
-      SELECT
-      a.delegate_addr,
-      IFNULL( b.type, 1 ) AS delegate_addr_type,
-      a.delegate_hes,
-      a.delegate_locked,
-      a.delegate_released
-      FROM
-      (
-      SELECT
-      `delegate_addr`,
-      sum( `delegate_hes` ) AS delegate_hes,
-      sum( `delegate_locked` ) AS delegate_locked,
-      sum( `delegate_released` ) AS delegate_released
-      FROM
-      delegation
-      <where>
-          is_history = 2
-          <if test="nodeId != null">
-              AND node_id=#{nodeId,jdbcType=VARCHAR}
-          </if>
-      </where>
-      GROUP BY
-      `delegate_addr`
-      ORDER BY
-      `cur_delegation_block_num` DESC
-      ) a
-      LEFT JOIN address b ON a.delegate_addr = b.address
-  </select>
-  
-  <select id="selectAddressByAddr" resultMap="AddressListResultMap">
-  	select d.`node_id`,n.`node_name`,sum(d.`delegate_hes`) as delegate_hes,sum(d.`delegate_locked`) as delegate_locked,sum(d.`delegate_released`) as delegate_released
-  	from `delegation` d inner join `node` n on d.`node_id` = n.`node_id`
-	<where>
-		d.`is_history`=2  
-		<if test="delegateAddr != null">
-			AND d.`delegate_addr`=#{delegateAddr,jdbcType=VARCHAR}
-		</if>
-	</where>
-	group by d.`node_id` order by d.`cur_delegation_block_num` desc
-  </select>
+    <resultMap id="AddressListResultMap" type="com.platon.browser.bean.DelegationAddress">
+        <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
+        <result column="node_name" jdbcType="VARCHAR" property="nodeName"/>
+        <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes"/>
+        <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked"/>
+        <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased"/>
+    </resultMap>
+
+    <select id="selectByNodeId" resultMap="BaseResultMap">
+        select
+        <include refid="com.platon.browser.dao.mapper.DelegationMapper.Base_Column_List"/>
+        from delegation where node_id = #{nodeId}
+    </select>
+
+    <select id="selectByNodeIdList" resultMap="BaseResultMap">
+        select
+        <include refid="com.platon.browser.dao.mapper.DelegationMapper.Base_Column_List"/>
+        from delegation where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    </select>
+
+    <select id="selectStakingByNodeId" resultMap="StakingListResultMap">
+        SELECT
+        a.delegate_addr,
+        IFNULL( b.type, 1 ) AS delegate_addr_type,
+        a.delegate_hes,
+        a.delegate_locked,
+        a.delegate_released
+        FROM
+        (
+        SELECT
+        `delegate_addr`,
+        sum( `delegate_hes` ) AS delegate_hes,
+        sum( `delegate_locked` ) AS delegate_locked,
+        sum( `delegate_released` ) AS delegate_released
+        FROM
+        delegation
+        <where>
+            is_history = 2
+            <if test="nodeId != null">
+                AND node_id=#{nodeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+        GROUP BY
+        `delegate_addr`
+        ORDER BY
+        `cur_delegation_block_num` DESC
+        ) a
+        LEFT JOIN address b ON a.delegate_addr = b.address
+    </select>
+
+    <select id="selectAddressByAddr" resultMap="AddressListResultMap">
+        select d.`node_id`,n.`node_name`,sum(d.`delegate_hes`) as delegate_hes,sum(d.`delegate_locked`) as delegate_locked,sum(d.`delegate_released`)
+        as delegate_released
+        from `delegation` d inner join `node` n on d.`node_id` = n.`node_id`
+        <where>
+            d.`is_history`=2
+            <if test="delegateAddr != null">
+                AND d.`delegate_addr`=#{delegateAddr,jdbcType=VARCHAR}
+            </if>
+        </where>
+        group by d.`node_id` order by d.`cur_delegation_block_num` desc
+    </select>
 
 </mapper>

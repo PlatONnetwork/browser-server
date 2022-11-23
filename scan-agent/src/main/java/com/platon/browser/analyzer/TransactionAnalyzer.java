@@ -106,7 +106,10 @@ public class TransactionAnalyzer {
      * @date 2021/4/20
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
+    public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws
+                                                                                                             BeanCreateOrUpdateException,
+                                                                                                             ContractInvokeException,
+                                                                                                             BlankResponseException {
         CollectionTransaction result = CollectionTransaction.newInstance().updateWithBlock(collectionBlock).updateWithRawTransaction(rawTransaction);
         log.info("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());
         // 使用地址缓存初始化普通合约缓存信息
@@ -178,12 +181,13 @@ public class TransactionAnalyzer {
                     result.setStatus(receipt.getStatus());
                     if (result.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                         // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表
-                        List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
-                                                                                                                                             specialApi,
-                                                                                                                                             platOnClient,
-                                                                                                                                             result,
-                                                                                                                                             receipt,
-                                                                                                                                             log);
+                        List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(
+                                collectionBlock,
+                                specialApi,
+                                platOnClient,
+                                result,
+                                receipt,
+                                log);
                         // 把成功的虚拟交易挂到当前普通合约交易上
                         result.setVirtualTransactions(successVirtualTransactions);
                     }
@@ -214,7 +218,8 @@ public class TransactionAnalyzer {
 
         // 默认取状态字段作为交易成功与否的状态
         int status = receipt.getStatus();
-        if (InnerContractAddrEnum.getAddresses().contains(result.getTo()) && ci.getType() != com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.TRANSFER.getCode()) {
+        if (InnerContractAddrEnum.getAddresses()
+                                 .contains(result.getTo()) && ci.getType() != com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.TRANSFER.getCode()) {
             // 如果接收者为内置合约且不为转账, 取日志中的状态作为交易成功与否的状态
             status = receipt.getLogStatus();
         }
@@ -326,6 +331,8 @@ public class TransactionAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(true);
                 token.setIsSupportErc721Metadata(true);
+                token.setIsSupportErc1155(false);
+                token.setIsSupportErc1155Metadata(false);
                 token.setTokenTxQty(0);
                 token.setHolder(0);
                 token.setContractDestroyBlock(0L);

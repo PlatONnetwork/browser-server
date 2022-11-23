@@ -1,11 +1,12 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.bean.CustomDelegation.YesNoEnum;
 import com.platon.browser.bean.*;
+import com.platon.browser.bean.CustomDelegation.YesNoEnum;
 import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
@@ -41,10 +42,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 验证人模块方法
@@ -205,12 +205,14 @@ public class StakingService {
             /** 质押总数=有效的质押+委托 */
             aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
             aliveStakingListResp.setDeleAnnualizedRate(staking.getDeleAnnualizedRate().toString());
+
             try {
                 String nodeSettleStatisInfo = staking.getNodeSettleStatisInfo();
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
                 BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()),
                                                                  blockChainConfig.getSettlePeriodBlockCount());
                 aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+                aliveStakingListResp.setUpTime(computeUpTime(staking, nodeSettleStatis, settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
             }
@@ -228,6 +230,134 @@ public class StakingService {
         page.setTotal(stakingPage.getTotal());
         respPage.init(page, lists);
         return respPage;
+    }
+
+    // 节点最近24小时(8个结算周期)的正常运行时间比例
+    private String computeUpTime(Node node, NodeSettleStatis nodeSettleStatis, BigInteger settleEpochRound) {
+        try {
+            BigInteger settleNum = BigInteger.valueOf(10750L);
+            // 统计周期总区块
+            BigInteger totalBlockNum = settleNum.multiply(BigInteger.valueOf(CommonConstant.BLOCK_APR_EPOCH_NUM));
+            BigInteger max = settleNum.multiply(settleEpochRound.subtract(BigInteger.ONE));
+            // 统计周期最大区块
+            max = max.compareTo(settleNum) < 0 ? settleNum : max;
+            BigInteger min = settleNum.multiply(settleEpochRound.subtract(BigInteger.valueOf(CommonConstant.BLOCK_APR_EPOCH_NUM))
+                                                                .subtract(BigInteger.ONE));
+            // 统计周期最小区块
+            min = min.compareTo(BigInteger.ZERO) <= 0 ? BigInteger.ZERO : min;
+            BigInteger subNum = computeSubNum(nodeSettleStatis, settleEpochRound);
+            BigInteger stakingSubNum = computeStakingSubNum(max, min, BigInteger.valueOf(node.getStakingBlockNum()));
+            BigInteger leaveSubNum = leaveSubNum(node, max, min, settleNum);
+            BigInteger subBlockNUm = totalBlockNum.subtract(subNum).subtract(stakingSubNum).subtract(leaveSubNum);
+            BigDecimal percent = new BigDecimal(subBlockNUm)
+                    .divide(new BigDecimal(totalBlockNum), 6, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(6, RoundingMode.HALF_UP)
+                    .stripTrailingZeros();
+            logger.info("节点[{}]运行时间比例[{}]=(总区块数[{}]-应出未出区块[{}]-质押未出区块[{}]-退出区块[{}])/总区块数[{}]*100%",
+                        node.getNodeId(),
+                        percent.toPlainString() + "%",
+                        totalBlockNum.longValue(),
+                        subNum.longValue(),
+                        stakingSubNum.longValue(),
+                        leaveSubNum.longValue(),
+                        totalBlockNum.longValue());
+            return percent.toPlainString() + "%";
+        } catch (Exception e) {
+            logger.error("计算节点24小时正常运行时间异常", e);
+            return "0%";
+        }
+    }
+
+    /**
+     * 统计节点在8个结算周期时应出而未出的区块数
+     *
+     * @param nodeSettleStatis:
+     * @param settleEpochRound:
+     * @return:
+     * @date: 2022/11/22
+     */
+    private BigInteger computeSubNum(NodeSettleStatis nodeSettleStatis, BigInteger settleEpochRound) {
+        BigInteger subNum = BigInteger.ZERO;
+        if (nodeSettleStatis.getNodeSettleStatisQueue().size() > 0) {
+            // 已按结算周期轮数排序，index[0]是最大的
+            List<NodeSettleStatisBase> list = nodeSettleStatis.getNodeSettleStatisQueue().toList();
+            // 过滤数据，与当前结算周期轮数的差值大于0且小于等于8的，即是最近8个结算周期。不包括当前结算周期
+            List<NodeSettleStatisBase> last = list.stream().filter(v -> {
+                BigInteger difference = settleEpochRound.subtract(v.getSettleEpochRound());
+                return difference.compareTo(BigInteger.ZERO) > 0 && difference.compareTo(BigInteger.valueOf(CommonConstant.BLOCK_APR_EPOCH_NUM)) <= 0;
+            }).collect(Collectors.toList());
+            if (CollUtil.isNotEmpty(last)) {
+                LongSummaryStatistics blockNumGrandTotal = last.stream()
+                                                               .collect(Collectors.summarizingLong(v -> v.getBlockNumGrandTotal().longValue()));
+                LongSummaryStatistics blockNumElected = last.stream()
+                                                            .collect(Collectors.summarizingLong(v -> v.getBlockNumElected().longValue()));
+                // 在当前结算周期少出块
+                if (BigInteger.valueOf(blockNumElected.getSum())
+                              .multiply(BigInteger.TEN)
+                              .compareTo(BigInteger.valueOf(blockNumGrandTotal.getSum())) > 0) {
+                    BigInteger sub = BigInteger.valueOf(blockNumElected.getSum())
+                                               .multiply(BigInteger.TEN)
+                                               .subtract(BigInteger.valueOf(blockNumGrandTotal.getSum()));
+                    subNum = subNum.add(sub);
+                }
+            }
+        }
+        return subNum;
+    }
+
+    /**
+     * 节点质押块高减去开始区块
+     *
+     * @param max:
+     * @param min:
+     * @param stakingBlockNum:
+     * @return:
+     * @date: 2022/11/22
+     */
+    private BigInteger computeStakingSubNum(BigInteger max,
+                                            BigInteger min,
+                                            BigInteger stakingBlockNum) {
+        BigInteger stakingSubNum = BigInteger.ZERO;
+        if (stakingBlockNum.compareTo(min) >= 0 && stakingBlockNum.compareTo(max) <= 0) {
+            stakingSubNum = stakingBlockNum.subtract(min);
+        }
+        return stakingSubNum;
+    }
+
+    private BigInteger leaveSubNum(Node node,
+                                   BigInteger max,
+                                   BigInteger min,
+                                   BigInteger settleNum) {
+        BigInteger leaveSubNum = BigInteger.ZERO;
+        BigInteger startNum = min;
+        BigInteger endNum = max;
+        if (ObjectUtil.isNull(node.getLeaveNum())
+                && node.getZeroProduceFreezeEpoch() <= 0
+                && node.getZeroProduceFreezeDuration() <= 0) {
+            return leaveSubNum;
+        }
+        // 有leaveNum，就以leaveNum为准
+        if (ObjectUtil.isNotNull(node.getLeaveNum())
+                && BigInteger.valueOf(node.getLeaveNum()).compareTo(min) >= 0
+                && BigInteger.valueOf(node.getLeaveNum()).compareTo(max) <= 0) {
+            startNum = BigInteger.valueOf(node.getLeaveNum());
+        } else if (ObjectUtil.isNull(node.getLeaveNum())
+                && node.getZeroProduceFreezeEpoch() > 0
+                && node.getZeroProduceFreezeDuration() > 0) {
+            startNum = BigInteger.valueOf(node.getZeroProduceFreezeEpoch()).multiply(settleNum);
+        }
+        if (startNum.compareTo(min) < 0) {
+            startNum = min;
+        }
+        if (node.getZeroProduceFreezeEpoch() > 0 && node.getZeroProduceFreezeDuration() > 0) {
+            BigInteger zeroProduceFreezeEpoch = BigInteger.valueOf(node.getZeroProduceFreezeEpoch() + node.getZeroProduceFreezeDuration())
+                                                          .multiply(settleNum);
+            endNum = (zeroProduceFreezeEpoch.compareTo(min) >= 0 && zeroProduceFreezeEpoch.compareTo(max) <= 0) ? zeroProduceFreezeEpoch : max;
+        }
+
+        leaveSubNum = endNum.subtract(startNum);
+        return leaveSubNum;
     }
 
     public RespPage<HistoryStakingListResp> historyStakingList(HistoryStakingListReq req) {

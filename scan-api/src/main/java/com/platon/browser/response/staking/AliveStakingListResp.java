@@ -108,6 +108,11 @@ public class AliveStakingListResp {
      */
     private String Version;
 
+    /**
+     * 节点最近24小时(8个结算周期)的正常运行时间比例
+     */
+    private String upTime;
+
     public Integer getRanking() {
         return ranking;
     }
@@ -260,6 +265,14 @@ public class AliveStakingListResp {
 
     public void setPreDeleAnnualizedRate(String preDeleAnnualizedRate) {
         this.preDeleAnnualizedRate = preDeleAnnualizedRate;
+    }
+
+    public String getUpTime() {
+        return upTime;
+    }
+
+    public void setUpTime(String upTime) {
+        this.upTime = upTime;
     }
 
 }
