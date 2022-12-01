@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface CustomTokenHolderMapper {
 
-    Page<CustomTokenHolder> selectListByParams(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
+    Page<CustomTokenHolder> selectListByParams(@Param("tokenAddress") String tokenAddress,
+                                               @Param("address") String address,
+                                               @Param("type") String type);
 
     Page<CustomTokenHolder> selectERC721Holder(@Param("tokenAddress") String tokenAddress);
-
-    Page<CustomTokenHolder> selectERC1155Holder(@Param("tokenAddress") String tokenAddress);
 
     /**
      * 查询erc721令牌数量
@@ -25,7 +25,9 @@ public interface CustomTokenHolderMapper {
      * @return com.github.pagehelper.Page<com.platon.browser.bean.CustomTokenHolder>
      * @date 2021/4/3
      */
-    Page<CustomTokenHolder> findErc721TokenHolder(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
+    Page<CustomTokenHolder> findErc721TokenHolder(@Param("tokenAddress") String tokenAddress,
+                                                  @Param("address") String address,
+                                                  @Param("type") String type);
 
     int batchInsertOrUpdateSelective(@Param("list") List<TokenHolder> list, @Param("selective") TokenHolder.Column... selective);
 
@@ -63,6 +65,9 @@ public interface CustomTokenHolderMapper {
      * @param type
      * @return
      */
-    List<TokenHolder> getZeroBalanceTokenHolderList(@Param("type") String type, @Param("offset") int offset, @Param("limit") int limit, @Param("orderby") String orderby);
+    List<TokenHolder> getZeroBalanceTokenHolderList(@Param("type") String type,
+                                                    @Param("offset") int offset,
+                                                    @Param("limit") int limit,
+                                                    @Param("orderby") String orderby);
 
 }

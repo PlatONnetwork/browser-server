@@ -21,8 +21,4 @@ public interface CustomDelegationMapper {
 
     Page<DelegationAddress> selectAddressByAddr(@Param("delegateAddr") String delegateAddr);
 
-    /**
-     * 批量更新
-     */
-    int batchUpdateByDelegationKey(@Param("list") List<RecoveredDelegationAmount> list);
 }
