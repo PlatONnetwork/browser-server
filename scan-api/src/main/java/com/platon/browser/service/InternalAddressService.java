@@ -72,12 +72,19 @@ public class InternalAddressService {
      */
     public RespPage<String> getInternalAddressList(PageReq req) {
         RespPage<String> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return respPage;
+        }
         InternalAddressExample internalAddressExample = new InternalAddressExample();
         internalAddressExample.createCriteria().andTypeEqualTo(0).andIsShowEqualTo(true);
         internalAddressExample.setOrderByClause(" address asc");
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<InternalAddress> internalAddressList = customInternalAddressMapper.selectListByExample(internalAddressExample);
-        List<String> internalAddrList = internalAddressList.stream().map(internalAddress -> internalAddress.getAddress()).collect(Collectors.toList());
+        List<String> internalAddrList = internalAddressList.stream()
+                                                           .map(internalAddress -> internalAddress.getAddress())
+                                                           .collect(Collectors.toList());
         respPage.init(internalAddressList, internalAddrList);
         return respPage;
     }

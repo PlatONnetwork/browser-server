@@ -91,6 +91,7 @@ public class StakingService {
 
     @Resource
     private AddressMapper addressMapper;
+
     @Resource
     private ProposalMapper proposalMapper;
 
@@ -114,6 +115,12 @@ public class StakingService {
     }
 
     public RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req) {
+        RespPage<AliveStakingListResp> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return respPage;
+        }
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Integer status = null;
         Integer isSettle = null;
@@ -143,7 +150,6 @@ public class StakingService {
             default:
                 break;
         }
-        RespPage<AliveStakingListResp> respPage = new RespPage<>();
         List<AliveStakingListResp> lists = new LinkedList<>();
         /** 根据条件和状态进行查询列表 */
         NodeExample nodeExample = new NodeExample();
@@ -197,7 +203,9 @@ public class StakingService {
             if (staking.getNodeId().equals(networkStatRedis.getNodeId())) {
                 aliveStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
             } else {
-                aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(staking.getStatus(), staking.getIsConsensus(), staking.getIsSettle()));
+                aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(staking.getStatus(),
+                                                                                 staking.getIsConsensus(),
+                                                                                 staking.getIsSettle()));
             }
             /** 质押总数=有效的质押+委托 */
             aliveStakingListResp.setTotalValue(staking.getTotalValue().toString());
@@ -205,7 +213,8 @@ public class StakingService {
             try {
                 String nodeSettleStatisInfo = staking.getNodeSettleStatisInfo();
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
-                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()),
+                                                                 blockChainConfig.getSettlePeriodBlockCount());
                 aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
@@ -226,12 +235,17 @@ public class StakingService {
     }
 
     public RespPage<HistoryStakingListResp> historyStakingList(HistoryStakingListReq req) {
+        RespPage<HistoryStakingListResp> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return respPage;
+        }
         /** 设置只查询退出中和已退出 */
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         List<Integer> status = new ArrayList<>();
         status.add(CustomStaking.StatusEnum.EXITING.getCode());
         status.add(CustomStaking.StatusEnum.EXITED.getCode());
-        RespPage<HistoryStakingListResp> respPage = new RespPage<>();
         List<HistoryStakingListResp> lists = new LinkedList<>();
         /** 根据条件和状态进行查询列表 */
         NodeExample nodeExample = new NodeExample();
@@ -262,7 +276,9 @@ public class StakingService {
              * 带提取的委托等于hes+lock
              */
             historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateValue().add(stakingNode.getStatDelegateReleased()));
-            historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSettle()));
+            historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(),
+                                                                               stakingNode.getIsConsensus(),
+                                                                               stakingNode.getIsSettle()));
             historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
 
             // 退出中节点预估解锁块高
@@ -308,7 +324,8 @@ public class StakingService {
                 String nodeSettleStatisInfo = stakingNode.getNodeSettleStatisInfo();
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
                 NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
+                BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()),
+                                                                 blockChainConfig.getSettlePeriodBlockCount());
                 resp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
@@ -317,16 +334,20 @@ public class StakingService {
             /**
              * 待领取奖励等于 累积委托奖励加上上轮奖励减去已领取委托奖励
              */
-            resp.setDeleRewardRed(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()).subtract(stakingNode.getHaveDeleReward()));
+            resp.setDeleRewardRed(stakingNode.getTotalDeleReward()
+                                             .add(stakingNode.getPreTotalDeleReward())
+                                             .subtract(stakingNode.getHaveDeleReward()));
             /** 只有不是内置节点才计算年化率  */
             if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
-                resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
+                resp.setRewardValue(stakingNode.getStatFeeRewardValue()
+                                               .add(stakingNode.getStatBlockRewardValue())
+                                               .add(stakingNode.getStatStakingRewardValue()));
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
-                        resp.getRewardValue(),
-                        stakingNode.getStatFeeRewardValue(),
-                        stakingNode.getStatBlockRewardValue(),
-                        stakingNode.getStatStakingRewardValue());
+                            resp.getRewardValue(),
+                            stakingNode.getStatFeeRewardValue(),
+                            stakingNode.getStatBlockRewardValue(),
+                            stakingNode.getStatStakingRewardValue());
             } else {
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue());
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]", resp.getRewardValue(), stakingNode.getStatFeeRewardValue());
@@ -393,6 +414,11 @@ public class StakingService {
 
     public RespPage<StakingOptRecordListResp> stakingOptRecordList(StakingOptRecordListReq req) {
         RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 50000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=50000]");
+            return respPage;
+        }
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
         ESResult<NodeOpt> items = new ESResult<>();
@@ -506,6 +532,12 @@ public class StakingService {
     }
 
     public RespPage<DelegationListByStakingResp> delegationListByStaking(DelegationListByStakingReq req) {
+        RespPage<DelegationListByStakingResp> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 50000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=50000]");
+            return respPage;
+        }
         Node node = nodeMapper.selectByPrimaryKey(req.getNodeId());
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         List<DelegationListByStakingResp> lists = new LinkedList<>();
@@ -527,12 +559,17 @@ public class StakingService {
         /** 分页统计总数 */
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         page.setTotal(delegationStakings.getTotal());
-        RespPage<DelegationListByStakingResp> respPage = new RespPage<>();
         respPage.init(page, lists);
         return respPage;
     }
 
     public RespPage<DelegationListByAddressResp> delegationListByAddress(DelegationListByAddressReq req) {
+        RespPage<DelegationListByAddressResp> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 50000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=50000]");
+            return respPage;
+        }
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         List<DelegationListByAddressResp> lists = new LinkedList<>();
         /** 根据地址分页查询委托列表 */
@@ -580,14 +617,18 @@ public class StakingService {
         /** 统计总数 */
         Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
         page.setTotal(delegationAddresses.getTotal());
-        RespPage<DelegationListByAddressResp> respPage = new RespPage<>();
         respPage.init(page, lists);
         return respPage;
     }
 
     public RespPage<LockedStakingListResp> lockedStakingList(LockedStakingListReq req) {
-        PageHelper.startPage(req.getPageNo(), req.getPageSize());
         RespPage<LockedStakingListResp> respPage = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return respPage;
+        }
+        PageHelper.startPage(req.getPageNo(), req.getPageSize());
         List<LockedStakingListResp> lists = new LinkedList<>();
         NodeExample nodeExample = new NodeExample();
         nodeExample.setOrderByClause(" leave_time desc");

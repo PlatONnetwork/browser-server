@@ -64,11 +64,17 @@ public class TokenService {
     private TokenInventoryMapper tokenInventoryMapper;
 
     public RespPage<QueryTokenListResp> queryTokenList(QueryTokenListReq req) {
-        // page params: #{offset}, #{size}
         RespPage<QueryTokenListResp> result = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return result;
+        }
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Page<CustomToken> customTokens = customTokenMapper.selectListByType(req.getType());
-        List<QueryTokenListResp> data = customTokens.stream().map(customToken -> QueryTokenListResp.fromToken(customToken)).collect(Collectors.toList());
+        List<QueryTokenListResp> data = customTokens.stream()
+                                                    .map(customToken -> QueryTokenListResp.fromToken(customToken))
+                                                    .collect(Collectors.toList());
         result.init(customTokens, data);
         return result;
     }
@@ -78,7 +84,9 @@ public class TokenService {
         if (!customTokenDetail.getType().equalsIgnoreCase(TokenTypeEnum.ERC1155.getType())) {
             // 总供应量为0，则取值总库存量
             int total = 0;
-            if (ObjectUtil.isNotNull(customTokenDetail) && CommonUtil.ofNullable(() -> customTokenDetail.getTotalSupply()).orElse("0").equalsIgnoreCase("0")) {
+            if (ObjectUtil.isNotNull(customTokenDetail) && CommonUtil.ofNullable(() -> customTokenDetail.getTotalSupply())
+                                                                     .orElse("0")
+                                                                     .equalsIgnoreCase("0")) {
                 TokenInventoryExample example = new TokenInventoryExample();
                 example.createCriteria().andTokenAddressEqualTo(req.getAddress());
                 Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
@@ -98,6 +106,11 @@ public class TokenService {
      */
     public RespPage<QueryTokenIdListResp> queryTokenIdList(QueryTokenIdListReq req) {
         RespPage<QueryTokenIdListResp> result = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 10000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=10000]");
+            return result;
+        }
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         TokenInventoryExample example = new TokenInventoryExample();
         TokenInventoryExample.Criteria criteria = example.createCriteria();
@@ -144,13 +157,21 @@ public class TokenService {
             criteria.andTokenIdEqualTo(tokenId);
         }
         Page<TokenInventory> tokenInventorys = tokenInventoryMapper.selectByExample(example);
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS,
-                                                                                                                                                     local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
-                                                                                                                                                                         local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
-                                                                                                                                                                                             local)};
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_NAME, local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS,
+                                        local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
+                                        local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
+                                        local)};
         List<Object[]> rows = new ArrayList<>();
         tokenInventorys.forEach(tokenInventory -> {
-            Object[] row = {tokenInventory.getName(), tokenInventory.getTokenAddress(), tokenInventory.getOwner(), tokenInventory.getTokenId(), tokenInventory.getTokenTxQty()};
+            Object[] row = {tokenInventory.getName(),
+                            tokenInventory.getTokenAddress(),
+                            tokenInventory.getOwner(),
+                            tokenInventory.getTokenId(),
+                            tokenInventory.getTokenTxQty()};
             rows.add(row);
         });
         return this.downFileCommon.writeDate("Token-Id-" + address + "-" + System.currentTimeMillis() + ".CSV", rows, headers);

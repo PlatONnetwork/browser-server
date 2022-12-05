@@ -60,6 +60,11 @@ public class Token1155Service {
      */
     public RespPage<QueryTokenIdListResp> queryTokenIdList(QueryTokenIdListReq req) {
         RespPage<QueryTokenIdListResp> result = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 10000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=10000]");
+            return result;
+        }
         Token1155HolderKey key = new Token1155HolderKey();
         if (StrUtil.isNotBlank(req.getContract())) {
             key.setTokenAddress(req.getContract());
@@ -121,12 +126,18 @@ public class Token1155Service {
             criteria.andTokenIdEqualTo(tokenId);
         }
         Page<Token1155Holder> token1155HolderList = token1155HolderMapper.selectByExample(example);
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
-                                                                                                                                                        local), this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
-                                                                                                                                                                            local)};
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN, local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_ADDRESS, local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TOKEN_ID,
+                                        local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_TOKEN_CSV_TX_COUNT,
+                                        local)};
         List<Object[]> rows = new ArrayList<>();
         token1155HolderList.forEach(tokenInventory -> {
-            Object[] row = {tokenInventory.getTokenAddress(), tokenInventory.getAddress(), tokenInventory.getTokenId(), tokenInventory.getTokenOwnerTxQty()};
+            Object[] row = {tokenInventory.getTokenAddress(),
+                            tokenInventory.getAddress(),
+                            tokenInventory.getTokenId(),
+                            tokenInventory.getTokenOwnerTxQty()};
             rows.add(row);
         });
         return this.downFileCommon.writeDate("Token-Id-" + address + "-" + System.currentTimeMillis() + ".CSV", rows, headers);

@@ -131,12 +131,20 @@ public class TransactionService {
          */
         List<TransactionListResp> lists = this.transferList(items);
         NetworkStat networkStat = this.statisticCacheService.getNetworkStatCache();
-        result.init(lists, null == networkStat.getTxQty() ? 0 : networkStat.getTxQty(), transactionCacheDto.getPage().getTotalCount(), transactionCacheDto.getPage().getTotalPages());
+        result.init(lists,
+                    null == networkStat.getTxQty() ? 0 : networkStat.getTxQty(),
+                    transactionCacheDto.getPage().getTotalCount(),
+                    transactionCacheDto.getPage().getTotalPages());
         return result;
     }
 
     public RespPage<TransactionListResp> getTransactionListByBlock(TransactionListByBlockRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return result;
+        }
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().term("num", req.getBlockNumber()));
         ESResult<Transaction> items = new ESResult<>();
@@ -163,14 +171,19 @@ public class TransactionService {
 
     public RespPage<TransactionListResp> getTransactionListByAddress(TransactionListByAddressRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-
+        if (req.getPageNo() * req.getPageSize() > 50000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=50000]");
+            return result;
+        }
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 
         ESResult<Transaction> items = new ESResult<>();
         if (req.getTxType() != null && !req.getTxType().isEmpty()) {
             constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
         }
-        constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress())).should(QueryBuilders.termQuery("to", req.getAddress())));
+        constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress()))
+                                                    .should(QueryBuilders.termQuery("to", req.getAddress())));
         constructor.setDesc("seq");
         constructor.setUnmappedType("long");
         constructor.setResult(new String[]{"hash", "time", "status", "from", "to", "value", "num", "type", "toType", "cost", "failReason"});
@@ -253,28 +266,43 @@ public class TransactionService {
             boolean toIsAddress = address.equals(transaction.getTo());
             String valueIn = toIsAddress ? transaction.getValue() : "0";
             String valueOut = !toIsAddress ? transaction.getValue() : "0";
-            Object[] row = {transaction.getHash(), transaction.getNum(), DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
-                    /**
-                     * 枚举类型名称需要对应
-                    */
-                    this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local), transaction.getFrom(), transaction.getTo(),
-                    /** 数值von转换成lat，并保留十八位精确度 */
-                    HexUtil.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)), HexUtil.append(EnergonUtil.format(Convert.fromVon(valueOut,
-                                    Convert.Unit.KPVON)
-                            .setScale(18,
-                                    RoundingMode.DOWN),
-                    18)), HexUtil.append(
-                    EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18))};
+            Object[] row = {transaction.getHash(),
+                            transaction.getNum(),
+                            DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
+                            /**
+                             * 枚举类型名称需要对应
+                            */
+                            this.i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
+                            transaction.getFrom(),
+                            transaction.getTo(),
+                            /** 数值von转换成lat，并保留十八位精确度 */
+                            HexUtil.append(EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN), 18)),
+                            HexUtil.append(EnergonUtil.format(Convert.fromVon(valueOut,
+                                                                              Convert.Unit.KPVON)
+                                                                     .setScale(18,
+                                                                               RoundingMode.DOWN),
+                                                              18)),
+                            HexUtil.append(
+                                    EnergonUtil.format(Convert.fromVon(transaction.getCost(), Convert.Unit.KPVON).setScale(18, RoundingMode.DOWN),
+                                                       18))};
             rows.add(row);
         });
-        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local), this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP,
-                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE,
-                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
-                local), this.i18n.i(
-                I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
-                local), this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT,
-                local) + "(" + valueUnit + ")", this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE,
-                local) + "(" + valueUnit + ")"};
+        String[] headers = {this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP,
+                                        local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE,
+                                        local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM,
+                                        local),
+                            this.i18n.i(
+                                    I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO,
+                                    local),
+                            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local) + "(" + valueUnit + ")",
+                            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT,
+                                        local) + "(" + valueUnit + ")",
+                            this.i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE,
+                                        local) + "(" + valueUnit + ")"};
         return this.downFileCommon.writeDate("Transaction-" + address + "-" + date + ".CSV", rows, headers);
     }
 
@@ -408,7 +436,8 @@ public class TransactionService {
                             resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
                             resp.setTxAmount(createValidatorParam.getAmount());
                             resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
-                            resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE).toString());
+                            resp.setDelegationRatio(new BigDecimal(createValidatorParam.getDelegateRewardPer()).divide(Browser.PERCENTAGE)
+                                                                                                               .toString());
                         } catch (Exception e) {
                             logger.error("创建验证人交易信息解析异常", e);
                         }
@@ -528,7 +557,8 @@ public class TransactionService {
                             }
                             resp.setNodeId(createProposalTextParam.getVerifier());
                             resp.setProposalHash(req.getTxHash());
-                            resp.setNodeName(this.commonService.getNodeName(createProposalTextParam.getVerifier(), createProposalTextParam.getNodeName()));
+                            resp.setNodeName(this.commonService.getNodeName(createProposalTextParam.getVerifier(),
+                                                                            createProposalTextParam.getNodeName()));
                             /** 如果数据库有值，以数据库为准 */
                             this.transferTransaction(resp, req.getTxHash());
                         } catch (Exception e) {
@@ -547,7 +577,8 @@ public class TransactionService {
                             }
                             resp.setNodeId(createProposalUpgradeParam.getVerifier());
                             resp.setProposalHash(req.getTxHash());
-                            resp.setNodeName(this.commonService.getNodeName(createProposalUpgradeParam.getVerifier(), createProposalUpgradeParam.getNodeName()));
+                            resp.setNodeName(this.commonService.getNodeName(createProposalUpgradeParam.getVerifier(),
+                                                                            createProposalUpgradeParam.getNodeName()));
                             /** 如果数据库有值，以数据库为准 */
                             this.transferTransaction(resp, req.getTxHash());
                         } catch (Exception e) {
@@ -565,7 +596,8 @@ public class TransactionService {
                             }
                             resp.setNodeId(proposalParameterParam.getVerifier());
                             resp.setProposalHash(req.getTxHash());
-                            resp.setNodeName(this.commonService.getNodeName(proposalParameterParam.getVerifier(), proposalParameterParam.getNodeName()));
+                            resp.setNodeName(this.commonService.getNodeName(proposalParameterParam.getVerifier(),
+                                                                            proposalParameterParam.getNodeName()));
                             /** 如果数据库有值，以数据库为准 */
                             this.transferTransaction(resp, req.getTxHash());
                         } catch (Exception e) {
@@ -642,7 +674,8 @@ public class TransactionService {
                             List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
                             TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
                             transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
-                            transactionDetailsEvidencesResp.setNodeName(this.commonService.getNodeName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
+                            transactionDetailsEvidencesResp.setNodeName(this.commonService.getNodeName(reportValidatorParam.getVerify(),
+                                                                                                       reportValidatorParam.getNodeName()));
                             resp.setEvidence(reportValidatorParam.getData());
                             transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
                             /**
@@ -677,12 +710,15 @@ public class TransactionService {
                                 BigInteger number;
                                 long remainder = transaction.getNum() % this.blockChainConfig.getSettlePeriodBlockCount().longValue();
                                 if (remainder == 0l) {
-                                    number = this.blockChainConfig.getSettlePeriodBlockCount().multiply(p.getEpoch()).add(BigInteger.valueOf(transaction.getNum()));
+                                    number = this.blockChainConfig.getSettlePeriodBlockCount()
+                                                                  .multiply(p.getEpoch())
+                                                                  .add(BigInteger.valueOf(transaction.getNum()));
                                 } else {
                                     number = this.blockChainConfig.getSettlePeriodBlockCount()
-                                            .multiply(p.getEpoch().subtract(BigInteger.ONE))
-                                            .add(BigInteger.valueOf(transaction.getNum()))
-                                            .add(this.blockChainConfig.getSettlePeriodBlockCount().subtract(BigInteger.valueOf(remainder)));
+                                                                  .multiply(p.getEpoch().subtract(BigInteger.ONE))
+                                                                  .add(BigInteger.valueOf(transaction.getNum()))
+                                                                  .add(this.blockChainConfig.getSettlePeriodBlockCount()
+                                                                                            .subtract(BigInteger.valueOf(remainder)));
                                 }
                                 transactionDetailsRPPlanResp.setBlockNumber(String.valueOf(number));
                                 rpPlanResps.add(transactionDetailsRPPlanResp);
@@ -758,16 +794,16 @@ public class TransactionService {
                             int decimal = Integer.parseInt(String.valueOf(erc20.getDecimal()));
                             BigDecimal afterConverValue = ConvertUtil.convertByFactor(new BigDecimal(erc20.getValue()), decimal);
                             Arc20Param arc20Param = Arc20Param.builder()
-                                    .innerContractAddr(erc20.getContract())
-                                    .innerContractName(erc20.getName())
-                                    .innerDecimal(String.valueOf(erc20.getDecimal()))
-                                    .innerFrom(erc20.getFrom())
-                                    .fromType(erc20.getFromType())
-                                    .innerSymbol(erc20.getSymbol())
-                                    .innerTo(erc20.getTo())
-                                    .toType(erc20.getToType())
-                                    .innerValue(afterConverValue.toString())
-                                    .build();
+                                                              .innerContractAddr(erc20.getContract())
+                                                              .innerContractName(erc20.getName())
+                                                              .innerDecimal(String.valueOf(erc20.getDecimal()))
+                                                              .innerFrom(erc20.getFrom())
+                                                              .fromType(erc20.getFromType())
+                                                              .innerSymbol(erc20.getSymbol())
+                                                              .innerTo(erc20.getTo())
+                                                              .toType(erc20.getToType())
+                                                              .innerValue(afterConverValue.toString())
+                                                              .build();
                             arc20Params.add(arc20Param);
                         });
                         resp.setErc20Params(arc20Params);
@@ -778,16 +814,16 @@ public class TransactionService {
                         List<Arc721Param> arc721Params = new ArrayList<>();
                         erc721List.forEach(erc721 -> {
                             Arc721Param arc721Param = Arc721Param.builder()
-                                    .innerContractAddr(erc721.getContract())
-                                    .innerContractName(erc721.getName())
-                                    .innerDecimal(String.valueOf(erc721.getDecimal()))
-                                    .innerFrom(erc721.getFrom())
-                                    .fromType(erc721.getFromType())
-                                    .innerSymbol(erc721.getSymbol())
-                                    .innerTo(erc721.getTo())
-                                    .toType(erc721.getToType())
-                                    .innerValue(erc721.getTokenId())
-                                    .build();
+                                                                 .innerContractAddr(erc721.getContract())
+                                                                 .innerContractName(erc721.getName())
+                                                                 .innerDecimal(String.valueOf(erc721.getDecimal()))
+                                                                 .innerFrom(erc721.getFrom())
+                                                                 .fromType(erc721.getFromType())
+                                                                 .innerSymbol(erc721.getSymbol())
+                                                                 .innerTo(erc721.getTo())
+                                                                 .toType(erc721.getToType())
+                                                                 .innerValue(erc721.getTokenId())
+                                                                 .build();
                             //查询对应的图片进行回填
                             TokenInventoryExample example = new TokenInventoryExample();
                             example.createCriteria().andTokenAddressEqualTo(erc721.getContract()).andTokenIdEqualTo(erc721.getValue());
@@ -820,15 +856,15 @@ public class TransactionService {
                             token1155InventoryKey.setTokenId(ercTx.getTokenId());
                             Token1155InventoryWithBLOBs token1155Inventory = customToken1155InventoryMapper.findOneByUK(token1155InventoryKey);
                             arc1155Param.setContract(ercTx.getContract())
-                                    .setTokenId(ercTx.getTokenId())
-                                    .setName(token1155Inventory.getName())
-                                    .setDecimal(token1155Inventory.getDecimal())
-                                    .setImage(token1155Inventory.getImage())
-                                    .setFrom(ercTx.getFrom())
-                                    .setFromType(ercTx.getFromType())
-                                    .setTo(ercTx.getTo())
-                                    .setToType(ercTx.getToType())
-                                    .setValue(ercTx.getValue());
+                                        .setTokenId(ercTx.getTokenId())
+                                        .setName(token1155Inventory.getName())
+                                        .setDecimal(token1155Inventory.getDecimal())
+                                        .setImage(token1155Inventory.getImage())
+                                        .setFrom(ercTx.getFrom())
+                                        .setFromType(ercTx.getFromType())
+                                        .setTo(ercTx.getTo())
+                                        .setToType(ercTx.getToType())
+                                        .setValue(ercTx.getValue());
                             list.add(arc1155Param);
                         }
                     }
@@ -917,6 +953,11 @@ public class TransactionService {
 
     public RespPage<QueryClaimByAddressResp> queryClaimByAddress(TransactionListByAddressRequest req) {
         RespPage<QueryClaimByAddressResp> result = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 5000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return result;
+        }
         /** 根据地址查询具体的领取奖励数据 */
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().term("addr", req.getAddress()));
@@ -982,6 +1023,12 @@ public class TransactionService {
     }
 
     public RespPage<QueryClaimByStakingResp> queryClaimByStaking(QueryClaimByStakingReq req) {
+        RespPage<QueryClaimByStakingResp> result = new RespPage<>();
+        if (req.getPageNo() * req.getPageSize() > 50000) {
+            result.setCode(500);
+            result.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=50000]");
+            return result;
+        }
         /** 根据地址查询具体的领取奖励数据 */
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
         constructor.must(new ESQueryBuilders().fuzzy("extraClean", req.getNodeId()));
@@ -1027,7 +1074,6 @@ public class TransactionService {
             queryClaimByStakingResp.setReward(allRewards);
             queryClaimByStakingResps.add(queryClaimByStakingResp);
         }
-        RespPage<QueryClaimByStakingResp> result = new RespPage<>();
         result.init(queryClaimByStakingResps, delegationRewards.getTotal(), delegationRewards.getTotal(), 0l);
         return result;
     }

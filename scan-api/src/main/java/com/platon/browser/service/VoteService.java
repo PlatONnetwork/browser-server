@@ -33,6 +33,12 @@ public class VoteService {
     private VoteMapper voteMapper;
 
     public RespPage<VoteListResp> queryByProposal(VoteListRequest voteListRequest) {
+        RespPage<VoteListResp> respPage = new RespPage<>();
+        if (voteListRequest.getPageNo() * voteListRequest.getPageSize() > 5000) {
+            respPage.setCode(500);
+            respPage.setErrMsg("请求数据过大，请规范页面请求[PageNo()*PageSize()<=5000]");
+            return respPage;
+        }
         Page<?> page = PageHelper.startPage(voteListRequest.getPageNo(), voteListRequest.getPageSize(), true);
         /**
          * 根据时间戳倒序查询hash值
@@ -42,8 +48,10 @@ public class VoteService {
         VoteExample.Criteria criteria = voteExample.createCriteria();
         criteria.andProposalHashEqualTo(voteListRequest.getProposalHash());
         if (StringUtils.isNotBlank(voteListRequest.getOption())) {
-            if (CustomVoteProposal.OptionEnum.SUPPORT.getCode().equalsIgnoreCase(voteListRequest.getOption()) || CustomVoteProposal.OptionEnum.OPPOSITION.getCode()
-                                                                                                                                                         .equalsIgnoreCase(voteListRequest.getOption())) {
+            if (CustomVoteProposal.OptionEnum.SUPPORT.getCode()
+                                                     .equalsIgnoreCase(voteListRequest.getOption()) || CustomVoteProposal.OptionEnum.OPPOSITION.getCode()
+                                                                                                                                               .equalsIgnoreCase(
+                                                                                                                                                       voteListRequest.getOption())) {
                 int option = Integer.parseInt(voteListRequest.getOption());
                 criteria.andOptionEqualTo(option);
             } else {
@@ -55,7 +63,6 @@ public class VoteService {
         }
         /** 分页根据提案hash查询投票列表 */
         List<Vote> votes = voteMapper.selectByExample(voteExample);
-        RespPage<VoteListResp> respPage = new RespPage<>();
         if (!CollectionUtils.isEmpty(votes)) {
             List<VoteListResp> voteListResps = new ArrayList<>(votes.size());
             votes.forEach(vote -> {
