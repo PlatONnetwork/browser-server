@@ -24,7 +24,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -77,6 +80,12 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     @Resource
     private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
 
+
+    @Resource
+    private CustomTokenHolderMapper customTokenHolderMapper;
+
+    @Resource
+    private CustomToken1155HolderMapper customToken1155HolderMapper;
     /**
      * 重试次数
      */
@@ -117,7 +126,12 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
             List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
             for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
+
+                //
+                // 重要：
+                // 解析区块中的交易，特别是token交易，按token类型分别解析出交易信息，放入各自类型的列表中；并把token的holder，以及holder持有token的余额，交易次数等信息，保存到本地db中
                 CollectionTransaction transaction = transactionAnalyzer.analyze(copyEvent.getBlock(), tr, receiptMap.get(tr.getHash()));
+
                 // 把解析好的交易添加到当前区块的交易列表
                 copyEvent.getBlock().getTransactions().add(transaction);
                 copyEvent.getTransactions().add(transaction);
@@ -139,14 +153,30 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             if (CollUtil.isNotEmpty(txAnalyseResult.getNodeOptList())) {
                 nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
             }
+
+            // 这里把解析出的所有数据详情保存到本地DB。
+            // 这样即使后续ES入库失败，只需要重启agent，有com.platon.browser.bootstrap.service.ConsistencyService来完成ES重新入库，而不需要再从链上同步
             // 交易入库mysql，因为缓存无法实现自增id，不再删除操作日志表
+            List<ErcTx> erc20List = new ArrayList<>();
+            List<ErcTx> erc721List = new ArrayList<>();
+            List<ErcTx> erc1155List = new ArrayList<>();
+            this.getErcTx(transactions, erc20List, erc721List, erc1155List);
+
             if (CollUtil.isNotEmpty(transactions)) {
                 // 依赖于数据库的自增id
                 customTxBakMapper.batchInsertOrUpdateSelective(transactions);
-                addTxErc20Bak(transactions);
-                addTxErc721Bak(transactions);
-                addTxErc1155Bak(transactions);
             }
+
+            if (CollUtil.isNotEmpty(erc20List)) {
+                customTx20BakMapper.batchInsert(erc20List);
+            }
+            if (CollUtil.isNotEmpty(erc721List)) {
+                customTx721BakMapper.batchInsert(erc721List);
+            }
+            if (CollUtil.isNotEmpty(erc1155List)) {
+                customTx1155BakMapper.batchInsert(erc1155List);
+            }
+
             List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
             // 委托奖励交易入库
             if (CollUtil.isNotEmpty(delegationRewardList)) {
@@ -225,7 +255,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      * @return: void
      * @date: 2021/12/16
      */
-    private void addTxErc20Bak(List<Transaction> transactions) {
+    /*private void addTxErc20Bak(List<Transaction> transactions) {
         List<ErcTx> erc20List = new ArrayList<>();
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc20TxList())) {
@@ -235,6 +265,21 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         if (CollUtil.isNotEmpty(erc20List)) {
             customTx20BakMapper.batchInsert(erc20List);
         }
+    }*/
+
+
+    private void getErcTx(List<Transaction> transactions, List<ErcTx> erc20List, List<ErcTx> erc721List, List<ErcTx>erc1155List){
+        transactions.forEach(transaction -> {
+            if (CollUtil.isNotEmpty(transaction.getErc20TxList())) {
+                erc20List.addAll(transaction.getErc20TxList());
+            }
+            if (CollUtil.isNotEmpty(transaction.getErc721TxList())) {
+                erc721List.addAll(transaction.getErc721TxList());
+            }
+            if (CollUtil.isNotEmpty(transaction.getErc1155TxList())) {
+                erc1155List.addAll(transaction.getErc1155TxList());
+            }
+        });
     }
 
     /**
@@ -244,7 +289,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      * @return: void
      * @date: 2021/12/16
      */
-    private void addTxErc721Bak(List<Transaction> transactions) {
+    /*private void addTxErc721Bak(List<Transaction> transactions) {
         List<ErcTx> erc721List = new ArrayList<>();
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc721TxList())) {
@@ -254,7 +299,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         if (CollUtil.isNotEmpty(erc721List)) {
             customTx721BakMapper.batchInsert(erc721List);
         }
-    }
+    }*/
 
     /**
      * erc1155交易入库
@@ -263,8 +308,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      * @return: void
      * @date: 2022/2/5
      */
-    private void addTxErc1155Bak(List<Transaction> transactions) {
-        Set<ErcTx> erc1155Set = new HashSet<>();
+   /* private void addTxErc1155Bak(List<Transaction> transactions) {
+        List<ErcTx> erc1155Set = new ArrayList<>();
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc1155TxList())) {
                 erc1155Set.addAll(transaction.getErc1155TxList());
@@ -273,5 +318,5 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         if (CollUtil.isNotEmpty(erc1155Set)) {
             customTx1155BakMapper.batchInsert(erc1155Set);
         }
-    }
+    }*/
 }

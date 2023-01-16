@@ -1,14 +1,13 @@
 package com.platon.browser.elasticsearch.dto;
 
-import java.math.BigDecimal;
-import java.util.*;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 @Data
 @Accessors(chain = true)
@@ -91,7 +90,7 @@ public class Transaction {
     private List<ErcTx> erc721TxList = new ArrayList<>();
 
     /**
-     * erc20 交易列表
+     * erc20 交易列表@
      */
     @JSONField(serialize = false)
     private List<ErcTx> erc20TxList = new ArrayList<>();

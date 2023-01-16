@@ -122,7 +122,7 @@ public class TransactionAnalyzer {
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             receipt.getContractCreated().forEach(contract -> {
                 // solidity 类型 erc20 或 721 token检测及入口
-                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                ErcToken ercToken = ercTokenAnalyzer.resolveNewToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
                 // solidity or wasm
                 TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
                 // 内存中更新地址类型
@@ -237,6 +237,10 @@ public class TransactionAnalyzer {
               .setContractType(ci.getContractType())
               .setBin(ci.getBinCode())
               .setMethod(ci.getMethod());
+
+        //
+        // 重要：
+        // 解析token交易，得到token的holder，以及holder的持有余额，交易次数等，把这些信息都写入token_holder表
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 累加总交易数

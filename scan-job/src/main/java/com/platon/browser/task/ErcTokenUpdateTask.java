@@ -123,6 +123,10 @@ public class ErcTokenUpdateTask {
      * 全量更新token的总供应量
      * 每5分钟更新
      *
+     * 根据：表token中所有记录，
+     * 通过：rpc查询每个token的totalSupply，
+     * 更新：表token中记录。
+     *
      * @return void
      * @date 2021/1/18
      */
@@ -143,11 +147,19 @@ public class ErcTokenUpdateTask {
      * 增量更新token持有者余额
      * 每1分钟运行一次
      *
+     * 根据：
+     * 表tx_erc_20_bak / tx_erc_721_bak / tx_erc_1155_bak 中的合约交易记录，
+     * 增量统计：（统计过的每类交易记录ID，将被记录到print_log表中）
+     * 每个erc token的涉及的账户地址，然后通过rpc查询每个erc token这些地址的余额
+     * 更新到表token_holder(erc20, erc721) / token_1155_holder
+     *
+     *
      * @param
      * @return void
      * @date 2021/2/1
      */
-    @XxlJob("incrementUpdateTokenHolderBalanceJobHandler")
+    // @XxlJob("incrementUpdateTokenHolderBalanceJobHandler")\
+    //
     public void incrementUpdateTokenHolderBalance() {
         if (tokenHolderLock.tryLock()) {
             try {
@@ -165,8 +177,14 @@ public class ErcTokenUpdateTask {
     /**
      * 全量更新token持有者余额
      * 每天00:00:00执行一次
+     *
+     * 根据：
+     * 表token_holder / token_1155_holder中所有记录，
+     * 通过：
+     * rpc查询每个token上的holder的余额，如果和本地db中的余额不一致，则更新。
+     *
      */
-    @XxlJob("totalUpdateTokenHolderBalanceJobHandler")
+    // @XxlJob("totalUpdateTokenHolderBalanceJobHandler")
     public void totalUpdateTokenHolder() {
         totalUpdateTokenHolderBalance();
         totalUpdateToken1155HolderBalance();
@@ -318,6 +336,10 @@ public class ErcTokenUpdateTask {
      * 全量更新token库存信息
      * 每天凌晨1点执行一次
      *
+     * 参考：增量更新token库存信息
+     * 这个任务是把“增量更新token库存信息”里，不会再刷新的记录过滤出来，
+     * 通过http访问token_url，来更新本地db中NFT的属性值
+     *
      * @param
      * @return void
      * @date 2021/4/17
@@ -339,11 +361,17 @@ public class ErcTokenUpdateTask {
      * 增量更新token库存信息
      * 每1分钟执行一次
      *
+     * 根据：
+     * 表 token_inventory / token_1155_inventory中记录（这些都是NFT），
+     * 从上次统计的id开始（print_log中相应记录），并且重试次数<3次，并且image is null的记录
+     * 通过http协议访问token_url，并获取响应值，从响应值中解析出NFT的有关属性值，和本地db中的值比较，如果有变化则更新到本地db
+     * 一次任务后，将更新print_log，以及重试次数+1，这样，在这次任务周期中，没有刷新的NFT，将不会在下次任务中刷新（因为print_log的存在，将不会搜索出此NFT记录）
+     *
      * @param
      * @return void
      * @date 2021/2/1
      */
-    @XxlJob("incrementUpdateTokenInventoryJobHandler")
+    // @XxlJob("incrementUpdateTokenInventoryJobHandler")
     public void incrementUpdateTokenInventory() {
         if (tokenInventoryLock.tryLock()) {
             try {
@@ -393,8 +421,13 @@ public class ErcTokenUpdateTask {
         List<ErcToken> batch = new ArrayList<>();
         batchList.add(batch);
         List<ErcToken> tokens = getErcTokens();
+        //
+        //
+        // 遍历全网token
+        //
         for (ErcToken token : tokens) {
             if (token.isDirty()) {
+                //todo:这个dirty并没有赋值（db表中没有对应字段），所以，这个if(){...}是无效的
                 updateParams.add(token);
             }
             if (!(token.getTypeEnum() == ErcTypeEnum.ERC20 || token.getIsSupportErc721Enumeration())) {
@@ -715,107 +748,48 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
-        long id = customToken721InventoryMapper.findMaxId() + 1;
+
         // 分页更新token库存相关信息
-        List<TokenInventoryWithBLOBs> batch = null;
         int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        int pageNo = 1;
+
+        List<TokenInventoryWithBLOBs> nftList = null;
         do {
-            // 当前失败的条数
-            AtomicInteger errorNum = new AtomicInteger(0);
-            // 当次更新的条数
-            AtomicInteger updateNum = new AtomicInteger(0);
-            try {
-                TokenInventoryExample condition = new TokenInventoryExample();
-                condition.setOrderByClause(" id desc limit " + batchSize);
-                condition.createCriteria().andRetryNumLessThan(tokenRetryNum).andImageIsNull().andIdLessThan(id);
-                batch = token721InventoryMapper.selectByExampleWithBLOBs(condition);
-                List<TokenInventoryWithBLOBs> updateParams = new ArrayList<>();
-                if (CollUtil.isNotEmpty(batch)) {
-                    batch.forEach(inventory -> {
-                        TokenInventoryWithBLOBs updateTokenInventory = new TokenInventoryWithBLOBs();
-                        updateTokenInventory.setTokenId(inventory.getTokenId());
-                        updateTokenInventory.setTokenAddress(inventory.getTokenAddress());
-                        updateTokenInventory.setTokenUrl(inventory.getTokenUrl());
-                        try {
-                            if (StrUtil.isNotBlank(inventory.getTokenUrl())) {
-                                Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                                Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute();
-                                if (response.code() == 200) {
-                                    String resp = response.body().string();
-                                    UpdateTokenInventory newTi = JSONUtil.toBean(resp, UpdateTokenInventory.class);
-                                    newTi.setTokenId(inventory.getTokenId());
-                                    newTi.setTokenAddress(inventory.getTokenAddress());
-                                    boolean changed = false;
-                                    // 只要有一个属性变动就添加到更新列表中
-                                    if (ObjectUtil.isNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImageUrl())) {
-                                        updateTokenInventory.setImage(newTi.getImageUrl());
-                                        changed = true;
-                                    } else if (ObjectUtil.isNotNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImageUrl()) && !inventory.getImage().equals(newTi.getImageUrl())) {
-                                        updateTokenInventory.setImage(newTi.getImageUrl());
-                                        changed = true;
-                                    }
-                                    if (ObjectUtil.isNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImage())) {
-                                        updateTokenInventory.setImage(newTi.getImage());
-                                        changed = true;
-                                    } else if (ObjectUtil.isNotNull(inventory.getImage()) && ObjectUtil.isNotNull(newTi.getImage()) && !inventory.getImage().equals(newTi.getImage())) {
-                                        updateTokenInventory.setImage(newTi.getImage());
-                                        changed = true;
-                                    }
-                                    if (ObjectUtil.isNull(inventory.getDescription()) && ObjectUtil.isNotNull(newTi.getDescription())) {
-                                        updateTokenInventory.setDescription(newTi.getDescription());
-                                        changed = true;
-                                    } else if (ObjectUtil.isNotNull(inventory.getDescription()) && ObjectUtil.isNotNull(newTi.getDescription()) && !inventory.getDescription()
-                                                                                                                                                             .equals(newTi.getDescription())) {
-                                        updateTokenInventory.setDescription(newTi.getDescription());
-                                        changed = true;
-                                    }
-                                    if (ObjectUtil.isNull(inventory.getName()) && ObjectUtil.isNotNull(newTi.getName())) {
-                                        updateTokenInventory.setName(newTi.getName());
-                                        changed = true;
-                                    } else if (ObjectUtil.isNotNull(inventory.getName()) && ObjectUtil.isNotNull(newTi.getName()) && !inventory.getName().equals(newTi.getName())) {
-                                        updateTokenInventory.setName(newTi.getName());
-                                        changed = true;
-                                    }
-                                    if (changed) {
-                                        updateNum.getAndIncrement();
-                                        updateTokenInventory.setRetryNum(0);
-                                        updateParams.add(updateTokenInventory);
-                                        log.info("库存有属性变动需要更新,token[{}]", JSONUtil.toJsonStr(updateTokenInventory));
-                                    }
-                                } else {
-                                    errorNum.getAndIncrement();
-                                    updateTokenInventory.setRetryNum(inventory.getRetryNum() + 1);
-                                    updateParams.add(updateTokenInventory);
-                                    log.warn("http请求异常：http状态码:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(updateTokenInventory));
-                                }
-                            } else {
-                                errorNum.getAndIncrement();
-                                updateTokenInventory.setRetryNum(inventory.getRetryNum() + 1);
-                                updateParams.add(updateTokenInventory);
-                                String msg = StrUtil.format("请求TokenURI为空,,token:{}", JSONUtil.toJsonStr(updateTokenInventory));
-                                XxlJobHelper.log(msg);
-                                log.warn(msg);
-                            }
-                        } catch (Exception e) {
-                            errorNum.getAndIncrement();
-                            updateTokenInventory.setRetryNum(inventory.getRetryNum() + 1);
-                            updateParams.add(updateTokenInventory);
-                            log.warn(StrUtil.format("全量更新token库存信息异常,token:{}", JSONUtil.toJsonStr(updateTokenInventory)), e);
+            int offset = (pageNo-1) * batchSize;
+            //查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
+            nftList = token721InventoryMapper.listValidTokenInventoryToRefresh(offset, batchSize);
+            pageNo++;
+
+            if (CollUtil.isNotEmpty(nftList)) {
+                nftList.forEach(inventory -> {
+                    // 重试次数+1
+                    inventory.setRetryNum(inventory.getRetryNum() + 1);
+                    if (inventory.getTokenUrl().startsWith("ipfs://")){
+                        String tokenUrl = inventory.getTokenUrl().replace("ipfs://", "https://ipfs.io/ipfs/");
+                        inventory.setTokenUrl(tokenUrl);
+                    }
+                    Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
+                    try (Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute()) {
+                        if (response.code() == 200 && response.body() !=null) {
+                            String resp = response.body().string();
+                            TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);
+                            inventory.setImage(newTi.getImage());
+                            inventory.setDescription(newTi.getDescription());
+                            inventory.setName(newTi.getName());
+
+                            log.info("NFT(ERC_721)有属性更新,token[{}]", JSONUtil.toJsonStr(inventory));
+                        } else {
+                            log.warn("NFT(ERC_721)属性查询http响应状态码异常:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(inventory));
                         }
-                    });
-                    id = batch.get(batch.size() - 1).getId();
-                }
-                if (CollUtil.isNotEmpty(updateParams)) {
-                    customToken721InventoryMapper.batchUpdateTokenInfo(updateParams);
-                    XxlJobHelper.log("全量更新token库存信息{}", JSONUtil.toJsonStr(updateParams));
-                }
-                String msg = StrUtil.format("全量更新token库存信息:查询到的条数为{},已更新的条数为:{},失败的条数为:{}", batch.size(), updateNum.get(), errorNum.get());
-                XxlJobHelper.log(msg);
-                log.info(msg);
-            } catch (Exception e) {
-                log.error(StrUtil.format("全量更新token库存信息异常"), e);
+                    } catch (Exception e) {
+                        log.warn(StrUtil.format("NFT(ERC_721)属性查询异常,token:{}", JSONUtil.toJsonStr(inventory)), e);
+                    }
+                });
+
+                customToken721InventoryMapper.batchUpdateTokenInfo(nftList);
+                XxlJobHelper.log("NFT(ERC_721)属性更新：{}", JSONUtil.toJsonStr(nftList));
             }
-        } while (CollUtil.isNotEmpty(batch));
+        } while (CollUtil.isNotEmpty(nftList) && nftList.size() < batchSize);
     }
 
     /**
@@ -831,110 +805,46 @@ public class ErcTokenUpdateTask {
             return;
         }
         // 分页更新token库存相关信息
-        List<Token1155InventoryWithBLOBs> batch = null;
-        long id = customToken1155InventoryMapper.findMaxId() + 1;
         int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        int pageNo = 1;
+
+        List<Token1155InventoryWithBLOBs> nftList = null;
         do {
-            // 当前查询到的条数
-            int batchNum = 0;
-            // 当前失败的条数
-            AtomicInteger errorNum = new AtomicInteger(0);
-            // 当次更新的条数
-            AtomicInteger updateNum = new AtomicInteger(0);
-            try {
-                Token1155InventoryExample condition = new Token1155InventoryExample();
-                condition.setOrderByClause(" id desc limit " + batchSize);
-                condition.createCriteria().andRetryNumLessThan(tokenRetryNum).andImageIsNull().andIdLessThan(id);
-                batch = token1155InventoryMapper.selectByExampleWithBLOBs(condition);
-                // 过滤销毁的合约
-                List<Token1155InventoryWithBLOBs> res = token1155InventorySubtractToList(batch, getDestroyContracts());
-                List<Token1155InventoryWithBLOBs> updateParams = new ArrayList<>();
-                if (CollUtil.isNotEmpty(res)) {
-                    batchNum = res.size();
-                    res.forEach(inventory -> {
-                        try {
-                            if (StrUtil.isNotBlank(inventory.getTokenUrl())) {
-                                Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                                Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute();
-                                if (response.code() == 200) {
-                                    String resp = response.body().string();
-                                    Token1155InventoryWithBLOBs newTi = JSONUtil.toBean(resp, Token1155InventoryWithBLOBs.class);
-                                    newTi.setTokenId(inventory.getTokenId());
-                                    newTi.setTokenAddress(inventory.getTokenAddress());
-                                    boolean changed = false;
-                                    // 只要有一个属性变动就添加到更新列表中
-                                    if (ObjectUtil.isNull(inventory.getImage()) || !newTi.getImage().equals(inventory.getImage())) {
-                                        inventory.setImage(newTi.getImage());
-                                        changed = true;
-                                    }
-                                    if (ObjectUtil.isNull(inventory.getDescription()) || !newTi.getDescription().equals(inventory.getDescription())) {
-                                        inventory.setDescription(newTi.getDescription());
-                                        changed = true;
-                                    }
-                                    if (ObjectUtil.isNull(inventory.getName()) || !newTi.getName().equals(inventory.getName())) {
-                                        inventory.setName(newTi.getName());
-                                        changed = true;
-                                    }
-                                    if (ObjectUtil.isNull(inventory.getDecimal()) || !newTi.getDecimal().equals(inventory.getDecimal())) {
-                                        inventory.setDecimal(newTi.getDecimal());
-                                        changed = true;
-                                    }
-                                    if (changed) {
-                                        updateNum.getAndIncrement();
-                                        inventory.setRetryNum(0);
-                                        updateParams.add(inventory);
-                                        log.info("1155token[{}]库存有属性变动需要更新,tokenURL[{}],tokenName[{}],tokenDesc[{}],tokenImage[{}],ecimal[{}]",
-                                                 inventory.getTokenAddress(),
-                                                 inventory.getTokenUrl(),
-                                                 inventory.getName(),
-                                                 inventory.getDescription(),
-                                                 inventory.getImage(),
-                                                 inventory.getDecimal());
-                                    }
-                                } else {
-                                    errorNum.getAndIncrement();
-                                    inventory.setRetryNum(inventory.getRetryNum() + 1);
-                                    updateParams.add(inventory);
-                                    log.warn("http请求异常：http状态码:{},http消息:{},1155token_address:{},token_id:{},tokenURI:{},重试次数:{}",
-                                             response.code(),
-                                             response.message(),
-                                             inventory.getTokenAddress(),
-                                             inventory.getTokenId(),
-                                             inventory.getTokenUrl(),
-                                             inventory.getRetryNum());
-                                }
-                            } else {
-                                errorNum.getAndIncrement();
-                                inventory.setRetryNum(inventory.getRetryNum() + 1);
-                                updateParams.add(inventory);
-                                String msg = StrUtil.format("请求TokenURI为空,1155token_address：{},token_id:{},重试次数:{}", inventory.getTokenAddress(), inventory.getTokenId(), inventory.getRetryNum());
-                                XxlJobHelper.log(msg);
-                                log.warn(msg);
-                            }
-                        } catch (Exception e) {
-                            errorNum.getAndIncrement();
-                            inventory.setRetryNum(inventory.getRetryNum() + 1);
-                            updateParams.add(inventory);
-                            log.warn(StrUtil.format("全量更新1155token库存信息异常,token_address：{},token_id:{},tokenURI:{},重试次数:{}",
-                                                    inventory.getTokenAddress(),
-                                                    inventory.getTokenId(),
-                                                    inventory.getTokenUrl(),
-                                                    inventory.getRetryNum()), e);
+            int offset = (pageNo-1) * batchSize;
+            //查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
+            nftList = token1155InventoryMapper.listValidTokenInventoryToRefresh(offset, batchSize);
+            pageNo++;
+            if (CollUtil.isNotEmpty(nftList)) {
+                nftList.forEach(inventory -> {
+                    // 重试次数+1
+                    inventory.setRetryNum(inventory.getRetryNum() + 1);
+                    if (inventory.getTokenUrl().startsWith("ipfs://")){
+                        String tokenUrl = inventory.getTokenUrl().replace("ipfs://", "https://ipfs.io/ipfs/");
+                        inventory.setTokenUrl(tokenUrl);
+                    }
+                    Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
+                    try (Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute()) {
+                        if (response.code() == 200 && response.body() !=null) {
+                            String resp = response.body().string();
+                            Token1155InventoryWithBLOBs newTi = JSONUtil.toBean(resp, Token1155InventoryWithBLOBs.class);
+                            inventory.setImage(newTi.getImage());
+                            inventory.setDescription(newTi.getDescription());
+                            inventory.setName(newTi.getName());
+                            inventory.setDecimal(newTi.getDecimal());
+
+                            log.info("NFT(ERC_1155)有属性更新,token[{}]", JSONUtil.toJsonStr(inventory));
+                        } else {
+                            log.warn("NFT(ERC_1155)属性查询http响应状态码异常:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(inventory));
                         }
-                    });
-                    id = batch.get(batch.size() - 1).getId();
-                }
-                if (CollUtil.isNotEmpty(updateParams)) {
-                    customToken1155InventoryMapper.batchInsertOrUpdateSelective(updateParams, Token1155Inventory.Column.values());
-                    XxlJobHelper.log("全量更新1155token库存信息{}", JSONUtil.toJsonStr(updateParams));
-                }
-                String msg = StrUtil.format("全量更新1155token库存信息:查询到的条数为{},过滤后的条数:{},已更新的条数为:{},失败的条数为:{}", batch.size(), batchNum, updateNum.get(), errorNum.get());
-                XxlJobHelper.log(msg);
-                log.info(msg);
-            } catch (Exception e) {
-                log.error(StrUtil.format("全量更新1155token库存信息异常,当前标识为"), e);
+                    } catch (Exception e) {
+                        log.warn(StrUtil.format("NFT(ERC_1155)属性查询异常,token:{}", JSONUtil.toJsonStr(inventory)), e);
+                    }
+                });
+
+                customToken1155InventoryMapper.batchInsertOrUpdateSelective(nftList);
+                XxlJobHelper.log("NFT(ERC_1155)属性更新：{}", JSONUtil.toJsonStr(nftList));
             }
-        } while (CollUtil.isNotEmpty(batch));
+        } while (CollUtil.isNotEmpty(nftList) && nftList.size() < batchSize);
     }
 
     /**
@@ -1263,16 +1173,26 @@ public class ErcTokenUpdateTask {
             List<String> contractErc721Destroys = customAddressMapper.findContractDestroy(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
             if (CollUtil.isNotEmpty(contractErc721Destroys)) {
                 for (String tokenAddress : contractErc721Destroys) {
+                    //
+                    //
+                    // 从token_inventory表中，按token_Address统计出每个owner拥有的token_id数量（即token_address上的NFT余额）
                     List<Erc721ContractDestroyBalanceVO> list = customToken721InventoryMapper.findErc721ContractDestroyBalance(tokenAddress);
+
+                    // 从token_holder表中，查询出所有token_address的拥有者
                     Page<CustomTokenHolder> ids = customTokenHolderMapper.selectERC721Holder(tokenAddress);
                     List<TokenHolder> updateParams = new ArrayList<>();
                     StringBuilder res = new StringBuilder();
                     for (CustomTokenHolder tokenHolder : ids) {
+                        //查找onwer=token_holder的拥有token_id的数量
                         List<Erc721ContractDestroyBalanceVO> filterList = list.stream().filter(v -> v.getOwner().equalsIgnoreCase(tokenHolder.getAddress())).collect(Collectors.toList());
                         int balance = 0;
                         if (CollUtil.isNotEmpty(filterList)) {
+                            //这里只会找出一个记录
                             balance = filterList.get(0).getNum();
                         }
+                        //
+                        // token_holder表中余额!=token_inventory表中owner拥有的token_id数量，
+                        // 则把token_inventory表中owner拥有的token_id数量，更新到token_holder表中
                         if (!tokenHolder.getBalance().equalsIgnoreCase(cn.hutool.core.convert.Convert.toStr(balance))) {
                             TokenHolder updateTokenHolder = new TokenHolder();
                             updateTokenHolder.setTokenAddress(tokenHolder.getTokenAddress());

@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -14,7 +15,8 @@ public class Token1155Holder {
     private String address;
 
     private String balance;
-
+    //increment，为正数，则余额增加；为负数，则余额减少
+    private BigDecimal increment;
     private Integer tokenOwnerTxQty;
 
     private Date createTime;
@@ -83,6 +85,14 @@ public class Token1155Holder {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public BigDecimal getIncrement() {
+        return increment;
+    }
+
+    public void setIncrement(BigDecimal increment) {
+        this.increment = increment;
     }
 
     /**

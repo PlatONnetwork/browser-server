@@ -1,6 +1,5 @@
 package com.platon.browser.dao.custommapper;
 
-import com.github.pagehelper.Page;
 import com.platon.browser.bean.CustomTokenInventory;
 import com.platon.browser.bean.Erc721ContractDestroyBalanceVO;
 import com.platon.browser.dao.entity.TokenInventory;

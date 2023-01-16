@@ -79,7 +79,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, token_address, token_id, `owner`, `name`, image, create_time, update_time, token_tx_qty, 
+    id, token_address, token_id, `owner`, `name`, image, create_time, update_time, token_tx_qty,
     token_owner_tx_qty, small_image, medium_image, retry_num
   </sql>
   <sql id="Blob_Column_List">
@@ -116,7 +116,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -134,16 +134,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.TokenInventoryWithBLOBs">
-    insert into token_inventory (id, token_address, token_id, 
-      `owner`, `name`, image, 
-      create_time, update_time, token_tx_qty, 
-      token_owner_tx_qty, small_image, medium_image, 
+    insert into token_inventory (id, token_address, token_id,
+      `owner`, `name`, image,
+      create_time, update_time, token_tx_qty,
+      token_owner_tx_qty, small_image, medium_image,
       retry_num, description, token_url
       )
-    values (#{id,jdbcType=BIGINT}, #{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, 
-      #{owner,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
-      #{tokenOwnerTxQty,jdbcType=INTEGER}, #{smallImage,jdbcType=VARCHAR}, #{mediumImage,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=BIGINT}, #{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR},
+      #{owner,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER},
+      #{tokenOwnerTxQty,jdbcType=INTEGER}, #{smallImage,jdbcType=VARCHAR}, #{mediumImage,jdbcType=VARCHAR},
       #{retryNum,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR}, #{tokenUrl,jdbcType=LONGVARCHAR}
       )
   </insert>
@@ -432,16 +432,16 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into token_inventory
-    (id, token_address, token_id, `owner`, `name`, image, create_time, update_time, token_tx_qty, 
+    (id, token_address, token_id, `owner`, `name`, image, create_time, update_time, token_tx_qty,
       token_owner_tx_qty, small_image, medium_image, retry_num, description, token_url
       )
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=BIGINT}, #{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, 
-        #{item.owner,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
-        #{item.tokenOwnerTxQty,jdbcType=INTEGER}, #{item.smallImage,jdbcType=VARCHAR}, 
-        #{item.mediumImage,jdbcType=VARCHAR}, #{item.retryNum,jdbcType=INTEGER}, #{item.description,jdbcType=LONGVARCHAR}, 
+      (#{item.id,jdbcType=BIGINT}, #{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR},
+        #{item.owner,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR},
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER},
+        #{item.tokenOwnerTxQty,jdbcType=INTEGER}, #{item.smallImage,jdbcType=VARCHAR},
+        #{item.mediumImage,jdbcType=VARCHAR}, #{item.retryNum,jdbcType=INTEGER}, #{item.description,jdbcType=LONGVARCHAR},
         #{item.tokenUrl,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
@@ -510,4 +510,12 @@
     </foreach>
   </insert>
 
+  <select id="listValidTokenInventoryToRefresh" resultMap="ResultMapWithBLOBs">
+    SELECT ti.*
+    FROM token_inventory ti
+    WHERE ti.token_url IS NOT NULL AND ti.image IS NULL AND ti.retry_num <![CDATA[ < ]]> 3
+      AND ti.token_address NOT IN (SELECT address FROM address WHERE contract_destroy_hash IS NOT NULL)
+    ORDER BY ti.id
+    LIMIT #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
 </mapper>

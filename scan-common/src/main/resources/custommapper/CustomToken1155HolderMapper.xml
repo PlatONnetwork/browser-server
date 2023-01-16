@@ -61,6 +61,15 @@
         </foreach>
     </update>
 
+    <update id="batchChange">
+        <foreach collection="list" item="item" separator=";">
+            INSERT INTO token_1155_holder (token_address, token_id, address, balance, token_owner_tx_qty )
+            VALUES (#{item.tokenAddress}, #{item.address}, #{item.tokenId}, #{item.increment}, 1)
+            ON DUPLICATE KEY
+            UPDATE balance = cast(balance AS DECIMAL (64,0)) + #{item.increment}, token_owner_tx_qty = token_owner_tx_qty + 1
+        </foreach>
+    </update>
+
     <select id="findDestroyContract" parameterType="integer" resultType="com.platon.browser.bean.Erc1155ContractDestroyBean">
         select
         t1.address as tokenAddress ,

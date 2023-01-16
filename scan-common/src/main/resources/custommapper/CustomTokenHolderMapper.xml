@@ -117,6 +117,17 @@
         </foreach>
     </update>
 
+    <update id="batchChange">
+        <foreach collection="list" item="item" separator=";">
+            INSERT INTO token_holder (token_address, address, balance, token_tx_qty )
+            VALUES (#{item.tokenAddress}, #{item.address}, #{item.increment}, 1)
+            ON DUPLICATE KEY
+            UPDATE balance = cast(balance AS DECIMAL (64,0)) + #{item.increment}, token_tx_qty = token_tx_qty + 1
+        </foreach>
+    </update>
+
+
+
     <select id="findTokenHolderCount" resultType="com.platon.browser.bean.TokenHolderCount">
         select t.token_address as tokenAddress, count(1) as tokenHolderCount
         from token_holder t

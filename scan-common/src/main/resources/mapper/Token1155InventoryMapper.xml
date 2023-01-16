@@ -78,7 +78,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, token_address, token_id, `name`, image, `decimal`, create_time, update_time, 
+    id, token_address, token_id, `name`, image, `decimal`, create_time, update_time,
     token_tx_qty, small_image, medium_image, retry_num
   </sql>
   <sql id="Blob_Column_List">
@@ -115,7 +115,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -133,15 +133,15 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
-    insert into token_1155_inventory (id, token_address, token_id, 
-      `name`, image, `decimal`, 
-      create_time, update_time, token_tx_qty, 
-      small_image, medium_image, retry_num, 
+    insert into token_1155_inventory (id, token_address, token_id,
+      `name`, image, `decimal`,
+      create_time, update_time, token_tx_qty,
+      small_image, medium_image, retry_num,
       description, token_url)
-    values (#{id,jdbcType=BIGINT}, #{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR}, 
-      #{name,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
-      #{smallImage,jdbcType=VARCHAR}, #{mediumImage,jdbcType=VARCHAR}, #{retryNum,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=BIGINT}, #{tokenAddress,jdbcType=VARCHAR}, #{tokenId,jdbcType=VARCHAR},
+      #{name,jdbcType=VARCHAR}, #{image,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER},
+      #{smallImage,jdbcType=VARCHAR}, #{mediumImage,jdbcType=VARCHAR}, #{retryNum,jdbcType=INTEGER},
       #{description,jdbcType=LONGVARCHAR}, #{tokenUrl,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Token1155InventoryWithBLOBs">
@@ -413,14 +413,14 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into token_1155_inventory
-    (id, token_address, token_id, `name`, image, `decimal`, create_time, update_time, 
+    (id, token_address, token_id, `name`, image, `decimal`, create_time, update_time,
       token_tx_qty, small_image, medium_image, retry_num, description, token_url)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=BIGINT}, #{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR}, 
-        #{item.name,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
-        #{item.smallImage,jdbcType=VARCHAR}, #{item.mediumImage,jdbcType=VARCHAR}, #{item.retryNum,jdbcType=INTEGER}, 
+      (#{item.id,jdbcType=BIGINT}, #{item.tokenAddress,jdbcType=VARCHAR}, #{item.tokenId,jdbcType=VARCHAR},
+        #{item.name,jdbcType=VARCHAR}, #{item.image,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER},
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER},
+        #{item.smallImage,jdbcType=VARCHAR}, #{item.mediumImage,jdbcType=VARCHAR}, #{item.retryNum,jdbcType=INTEGER},
         #{item.description,jdbcType=LONGVARCHAR}, #{item.tokenUrl,jdbcType=LONGVARCHAR}
         )
     </foreach>
@@ -487,4 +487,12 @@
     </foreach>
   </insert>
 
+  <select id="listValidTokenInventoryToRefresh" resultMap="ResultMapWithBLOBs">
+    SELECT ti.*
+    FROM token_1155_inventory ti
+    WHERE ti.token_url IS NOT NULL AND ti.image IS NULL AND ti.retry_num <![CDATA[ < ]]> 3
+      AND ti.token_address NOT IN (SELECT address FROM address WHERE contract_destroy_hash IS NOT NULL)
+    ORDER BY ti.id
+    LIMIT #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
 </mapper>

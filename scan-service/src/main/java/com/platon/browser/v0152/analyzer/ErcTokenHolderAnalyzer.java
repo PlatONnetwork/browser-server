@@ -8,10 +8,12 @@ import com.platon.browser.dao.mapper.TokenHolderMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,17 +42,46 @@ public class ErcTokenHolderAnalyzer {
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(List<ErcTx> txList) {
-        List<TokenHolder> insertOrUpdate = new ArrayList<>();
+        List<TokenHolder> changeBalanceList = new ArrayList<>();
         txList.forEach(tx -> {
-            resolveTokenHolder(tx.getFrom(), tx, insertOrUpdate);
-            resolveTokenHolder(tx.getTo(), tx, insertOrUpdate);
+            //resolveTokenHolder(tx.getFrom(), tx, insertOrUpdate);
+            //resolveTokenHolder(tx.getTo(), tx, insertOrUpdate);
+            if (StringUtils.isBlank(tx.getFrom()) || AddressUtil.isAddrZero(tx.getFrom())){ //铸币
+                TokenHolder toHolder = new TokenHolder();
+                toHolder.setTokenAddress(tx.getContract());
+                toHolder.setAddress(tx.getTo());
+                toHolder.setIncrement(new BigDecimal(tx.getValue())); //变动量
+                changeBalanceList.add(toHolder);
+            }if (StringUtils.isBlank(tx.getTo()) || AddressUtil.isAddrZero(tx.getTo())) { //销毁
+                TokenHolder fromHolder = new TokenHolder();
+                fromHolder.setTokenAddress(tx.getContract());
+                fromHolder.setAddress(tx.getFrom());
+                fromHolder.setIncrement(new BigDecimal(tx.getValue()).negate()); //变动量
+                changeBalanceList.add(fromHolder);
+            }else{ //正常token转账
+                //from减少
+                TokenHolder fromHolder = new TokenHolder();
+                fromHolder.setTokenAddress(tx.getContract());
+                fromHolder.setAddress(tx.getFrom());
+                fromHolder.setIncrement(new BigDecimal(tx.getValue()).negate()); //变动量
+                changeBalanceList.add(fromHolder);
+
+                //to增加
+                TokenHolder toHolder = new TokenHolder();
+                toHolder.setTokenAddress(tx.getContract());
+                toHolder.setAddress(tx.getTo());
+                toHolder.setIncrement(new BigDecimal(tx.getValue())); //变动量
+                changeBalanceList.add(toHolder);
+            }
+
         });
-        if (CollUtil.isNotEmpty(insertOrUpdate)) {
-            customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
+        if (CollUtil.isNotEmpty(changeBalanceList)) {
+            //customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
+            customTokenHolderMapper.batchChange(changeBalanceList);
         }
     }
 
-    private void resolveTokenHolder(String ownerAddress, ErcTx ercTx, List<TokenHolder> insertOrUpdate) {
+    /*private void resolveTokenHolder(String ownerAddress, ErcTx ercTx, List<TokenHolder> insertOrUpdate) {
         // 零地址不需要創建holder
         if (AddressUtil.isAddrZero(ownerAddress)) {
             log.warn("该地址[{}]为0地址，不创建token holder", ownerAddress);
@@ -70,6 +101,6 @@ public class ErcTokenHolderAnalyzer {
         //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721, erc1155所有tokenId的交易总数
         log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
         insertOrUpdate.add(tokenHolder);
-    }
+    }*/
 
 }
