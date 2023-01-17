@@ -33,7 +33,8 @@ CREATE TABLE `address`
     `erc721_tx_qty`         int(11)        NOT NULL DEFAULT '0' COMMENT 'erc721 token对应的交易数',
     `erc20_tx_qty`          int(11)        NOT NULL DEFAULT '0' COMMENT 'erc20 token对应的交易数',
     PRIMARY KEY (`address`),
-    INDEX (`contract_destroy_hash`)
+    INDEX (`contract_destroy_hash`(1)),
+    INDEX (`create_time`),
     KEY `type` (`type`) USING BTREE
 );
 
@@ -510,8 +511,8 @@ CREATE TABLE `token_inventory`
     `token_url`          longtext COMMENT 'url',
     `retry_num`          int(10)      NOT NULL DEFAULT '0' COMMENT '重试次数',
     PRIMARY KEY (`id`),
-    INDEX (`token_url` ),
-    INDEX (`image`),
+    INDEX (`token_url`(1)),
+    INDEX (`image`(1)),
     INDEX (`retry_num`),
     UNIQUE KEY `token_address` (`token_address`, `token_id`)
 );
@@ -678,8 +679,8 @@ CREATE TABLE `token_1155_inventory`
     `create_time`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    INDEX (`token_url` ),
-    INDEX (`image`),
+    INDEX (`token_url`(1)),
+    INDEX (`image`(1)),
     INDEX (`retry_num`),
     UNIQUE KEY `uk_tokenAddress_tokenId` (`token_address`, `token_id`)
 );

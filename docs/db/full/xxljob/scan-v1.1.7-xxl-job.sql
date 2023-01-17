@@ -7,6 +7,7 @@ use `xxl_job`;
 
 SET NAMES utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_info`;
 CREATE TABLE `xxl_job_info` (
                                 `id` int(11) NOT NULL AUTO_INCREMENT,
                                 `job_group` int(11) NOT NULL COMMENT '执行器主键ID',
@@ -35,6 +36,7 @@ CREATE TABLE `xxl_job_info` (
                                 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_log`;
 CREATE TABLE `xxl_job_log` (
                                `id` bigint(20) NOT NULL AUTO_INCREMENT,
                                `job_group` int(11) NOT NULL COMMENT '执行器主键ID',
@@ -56,6 +58,7 @@ CREATE TABLE `xxl_job_log` (
                                KEY `I_handle_code` (`handle_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_log_report`;
 CREATE TABLE `xxl_job_log_report` (
                                       `id` int(11) NOT NULL AUTO_INCREMENT,
                                       `trigger_day` datetime DEFAULT NULL COMMENT '调度-时间',
@@ -67,6 +70,7 @@ CREATE TABLE `xxl_job_log_report` (
                                       UNIQUE KEY `i_trigger_day` (`trigger_day`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_logglue`;
 CREATE TABLE `xxl_job_logglue` (
                                    `id` int(11) NOT NULL AUTO_INCREMENT,
                                    `job_id` int(11) NOT NULL COMMENT '任务，主键ID',
@@ -78,6 +82,7 @@ CREATE TABLE `xxl_job_logglue` (
                                    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_registry`;
 CREATE TABLE `xxl_job_registry` (
                                     `id` int(11) NOT NULL AUTO_INCREMENT,
                                     `registry_group` varchar(50) NOT NULL,
@@ -88,6 +93,7 @@ CREATE TABLE `xxl_job_registry` (
                                     KEY `i_g_k_v` (`registry_group`,`registry_key`,`registry_value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_group`;
 CREATE TABLE `xxl_job_group` (
                                  `id` int(11) NOT NULL AUTO_INCREMENT,
                                  `app_name` varchar(64) NOT NULL COMMENT '执行器AppName',
@@ -98,6 +104,7 @@ CREATE TABLE `xxl_job_group` (
                                  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_user`;
 CREATE TABLE `xxl_job_user` (
                                 `id` int(11) NOT NULL AUTO_INCREMENT,
                                 `username` varchar(50) NOT NULL COMMENT '账号',
@@ -108,6 +115,7 @@ CREATE TABLE `xxl_job_user` (
                                 UNIQUE KEY `i_username` (`username`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `xxl_job_lock`;
 CREATE TABLE `xxl_job_lock` (
                                 `lock_name` varchar(50) NOT NULL COMMENT '锁名称',
                                 PRIMARY KEY (`lock_name`)
@@ -132,7 +140,7 @@ INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `
 INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '全量更新token的总供应量', '2021-11-30 10:50:12', '2021-11-30 10:50:12', 'admin', '', 'CRON', '0 */5 * * * ?', 'DO_NOTHING', 'FIRST', 'totalUpdateTokenTotalSupplyJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:50:12', '', 0, 0, 0);
 -- INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '增量更新token持有者余额', '2021-11-30 10:51:09', '2021-12-07 11:14:34', 'admin', '', 'CRON', '0 */1 * * * ?', 'DO_NOTHING', 'FIRST', 'incrementUpdateTokenHolderBalanceJobHandler', '500', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:51:09', '', 0, 0, 0);
 -- INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '全量更新token持有者余额', '2021-11-30 10:51:57', '2021-11-30 10:51:57', 'admin', '', 'CRON', '0 0 0 * * ?', 'DO_NOTHING', 'FIRST', 'totalUpdateTokenHolderBalanceJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:51:57', '', 0, 0, 0);
-INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '全量更新token库存信息', '2021-11-30 10:53:01', '2021-12-01 18:06:37', 'admin', '', 'CRON', '0 0 1 */1 * ?', 'DO_NOTHING', 'FIRST', 'totalUpdateTokenInventoryJobHandler', '100', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:53:01', '', 0, 0, 0);
+INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '持续更新NFT资产信息', '2021-11-30 10:53:01', '2021-12-01 18:06:37', 'admin', '', 'CRON', '0 0 1 */1 * ?', 'DO_NOTHING', 'FIRST', 'totalUpdateTokenInventoryJobHandler', '100', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:53:01', '', 0, 0, 0);
 -- INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '增量更新token库存信息', '2021-11-30 10:53:42', '2021-12-01 18:07:33', 'admin', '', 'CRON', '0 */1 * * * ?', 'DO_NOTHING', 'FIRST', 'incrementUpdateTokenInventoryJobHandler', '10', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:53:42', '', 0, 0, 0);
 INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '销毁的721合约更新余额', '2021-11-30 10:54:19', '2021-11-30 10:54:19', 'admin', '', 'CRON', '0 */10 * * * ?', 'DO_NOTHING', 'FIRST', 'contractDestroyUpdateBalanceJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-30 10:54:19', '', 0, 0, 0);
 INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '节点操作备份表迁移到ES任务', '2021-12-01 16:54:32', '2021-12-01 17:02:57', 'admin', '', 'CRON', '0 */10 * * * ?', 'DO_NOTHING', 'FIRST', 'nodeOptMoveToESJobHandler', '100', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-12-01 16:54:32', '', 0, 0, 0);
