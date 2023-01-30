@@ -40,8 +40,8 @@
             `staking_hes` = #{item.stakingHes},
             `staking_locked` = #{item.stakingLocked},
             `leave_time` = #{item.leaveTime},
-            <if test="leaveNum != null">
-                `leave_num` = #{leaveNum},
+            <if test="item.leaveNum != null">
+                `leave_num` = #{item.leaveNum},
             </if>
             `is_consensus` = 2,
             `is_settle` = 2,
@@ -58,8 +58,8 @@
             `staking_locked` = #{item.stakingLocked},
             `total_value` = `total_value` - #{item.slashAmount},
             `leave_time` = #{item.leaveTime},
-            <if test="leaveNum != null">
-                `leave_num` = #{leaveNum},
+            <if test="item.leaveNum != null">
+                `leave_num` = #{item.leaveNum},
             </if>
             `stat_slash_low_qty` = `stat_slash_low_qty` + 1,
             `is_consensus` = 2,
