@@ -304,6 +304,7 @@ public class ErcTokenAnalyzer {
                                          .collect(Collectors.toList());
 
             if (CollUtil.isEmpty(tokenLogs)) {
+                log.debug("区块{}中交易数量为0", collectionBlock.getNum());
                 return;
             }
 

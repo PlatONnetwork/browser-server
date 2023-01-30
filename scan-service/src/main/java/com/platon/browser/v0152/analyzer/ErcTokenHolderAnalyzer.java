@@ -77,6 +77,7 @@ public class ErcTokenHolderAnalyzer {
         });
         if (CollUtil.isNotEmpty(changeBalanceList)) {
             //customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
+            log.debug("区块中ERC20/ERC721交易数量：{}，需要更新的token持有者记录数量为：{}", txList.size(), changeBalanceList.size());
             customTokenHolderMapper.batchChange(changeBalanceList);
         }
     }
