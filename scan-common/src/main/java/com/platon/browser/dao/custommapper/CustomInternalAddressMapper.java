@@ -31,4 +31,9 @@ public interface CustomInternalAddressMapper {
      */
     Page<InternalAddress> selectListByExample(InternalAddressExample example);
 
+    /**
+     * 返回参与计算的基金会地址
+     * @return
+     */
+    List<String> listCalculableFoundationAddress();
 }

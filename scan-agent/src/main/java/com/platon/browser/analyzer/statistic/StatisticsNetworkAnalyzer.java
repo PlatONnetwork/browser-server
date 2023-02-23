@@ -89,7 +89,10 @@ public class StatisticsNetworkAnalyzer {
             // 结算周期的区块获取总发行量
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
                 log.info("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
+                //  根据块高算出year
                 yearNum = getYearNum(curBlockNum);
+                // todo: lvxiaoyi: 2023/02/14 增加一个接口，根据块高查询总发行量
+                // 算出总发行量
                 totalIssueValue = getTotalIssueValue(yearNum);
                 networkStat.setYearNum(yearNum);
                 networkStat.setIssueValue(totalIssueValue);
@@ -114,6 +117,7 @@ public class StatisticsNetworkAnalyzer {
         }
     }
 
+
     /**
      * 当前块高
      *
@@ -135,7 +139,7 @@ public class StatisticsNetworkAnalyzer {
     }
 
     /**
-     * 获取总发行量
+     * 获取总发行量（单位：LAT）
      *
      * @param yearNum: 第几年
      * @return: java.math.BigDecimal

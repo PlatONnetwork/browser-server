@@ -5,6 +5,7 @@ import com.platon.abi.solidity.datatypes.BytesType;
 import com.platon.abi.solidity.datatypes.Utf8String;
 import com.platon.abi.solidity.datatypes.generated.Uint256;
 import com.platon.browser.bean.*;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -17,6 +18,7 @@ import com.platon.contracts.ppos.dto.common.ErrorCode;
 import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.contracts.ppos.utils.EncoderUtils;
 import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.core.RemoteCall;
 import com.platon.protocol.core.Request;
@@ -28,11 +30,13 @@ import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Auther: Chendongming
@@ -91,6 +95,8 @@ public class SpecialApi {
 
     private static final String BLANK_RES = "结果为空!";
 
+
+
     /**
      * rpc调用接口
      *
@@ -102,10 +108,23 @@ public class SpecialApi {
      * @throws Exception
      */
     private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to) throws ContractInvokeException {
+        return this.rpc(web3j, function, from, to, DefaultBlockParameterName.LATEST);
+    }
+
+    private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to, Long blockNumber) throws ContractInvokeException {
+        DefaultBlockParameter blockParameter = DefaultBlockParameterName.LATEST;
+        if(blockNumber!=null){
+            blockParameter = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
+        }
+        return this.rpc(web3j, function, from, to, blockParameter);
+    }
+
+    private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to, DefaultBlockParameter blockParameter) throws ContractInvokeException {
         CallResponse<String> br;
         try {
+
             br = new RemoteCall<>(() -> {
-                PlatonCall ethCall = web3j.platonCall(Transaction.createEthCallTransaction(from, to, EncoderUtils.functionEncoder(function)), DefaultBlockParameterName.LATEST).send();
+                PlatonCall ethCall = web3j.platonCall(Transaction.createEthCallTransaction(from, to, EncoderUtils.functionEncoder(function)), blockParameter).send();
                 if (ethCall.hasError()) {
                     throw new ContractInvokeException(ethCall.getError().getMessage());
                 }
@@ -139,7 +158,6 @@ public class SpecialApi {
         }
         return br;
     }
-
     /**
      * 根据区块号获取结算周期验证人列表
      *
@@ -246,14 +264,29 @@ public class SpecialApi {
 
     /**
      * 根据账户地址获取锁仓余额
-     *
+     *  此方法是复用的：
+     *  1. 可以查询地址的锁仓未释放金额： RestrictingBalance.lockBalance; //EOA的锁仓未释放余额
+     *  2. 也可以查询地址的余额： RestrictingBalance.freeBalance; //EOA帐号余额
+     *  todo: 增加一个接口，新增参数：blockNumber，实现根据块高查询:
+     *  1.锁仓未释放金额
+     *  2.地址余额
      * @param addresses
      * @return
      * @throws Exception
      */
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
+        return this.getRestrictingBalance(web3j, addresses, DefaultBlockParameterName.LATEST);
+    }
+    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses, Long blockNumber) throws ContractInvokeException, BlankResponseException {
+        DefaultBlockParameter blockParameter = DefaultBlockParameterName.LATEST;
+        if(blockNumber!=null){
+            blockParameter = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
+        }
+        return this.getRestrictingBalance(web3j, addresses, blockParameter);
+    }
+    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses, DefaultBlockParameter blockParameter) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(GET_RESTRICTING_BALANCE_FUNC_TYPE, Collections.singletonList(new Utf8String(addresses)));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
+        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), blockParameter);
         if (br == null || br.getData() == null) {
             throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!", addresses));
         }

@@ -51,6 +51,9 @@
     group by
       `type`
   </select>
+  <select id="listCalculableFoundationAddress" resultType="java.lang.String">
+    select address from internal_address where type = 0 and is_calculate = 1
+  </select>
 
   <sql id="Example_Where_Clause">
     <where>
