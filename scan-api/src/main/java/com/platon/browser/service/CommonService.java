@@ -1,7 +1,6 @@
 package com.platon.browser.service;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.bean.EpochInfo;
@@ -14,8 +13,6 @@ import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.service.account.AccountService;
 import com.platon.browser.utils.CommonUtil;
 import com.platon.browser.utils.EpochUtil;
@@ -23,6 +20,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -144,22 +142,21 @@ public class CommonService {
 
             // 基金会
             List<String> addressList = customInternalAddressMapper.listCalculableFoundationAddress();
-            String addressParamStr = String.join(";", addressList);
-
-            try {
-                List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper().getWeb3j(), addressParamStr, blockNumber);
-                BigInteger value = balanceList.stream().map(RestrictingBalance::getDlFreeBalance).reduce(BigInteger.ZERO, BigInteger::add);
-                foundationValue = new BigDecimal(value);
-            } catch (Exception e) {
-                log.error("获取基金会余额异常", e);
-                return BigDecimal.ZERO;
+            if (!CollectionUtils.isEmpty(addressList)){
+                String addressParamStr = String.join(";", addressList);
+                try {
+                    List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper().getWeb3j(), addressParamStr, blockNumber);
+                    BigInteger value = balanceList.stream().map(RestrictingBalance::getDlFreeBalance).reduce(BigInteger.ZERO, BigInteger::add);
+                    foundationValue = new BigDecimal(value);
+                } catch (Exception e) {
+                    log.error("获取基金会余额异常", e);
+                    return BigDecimal.ZERO;
+                }
             }
-
             BigDecimal circulationValue = issueValue.subtract(restrictingValue).subtract(inciteValue).subtract(foundationValue);
             log.debug("区块：{}上的流通量：{}", blockNumber, circulationValue.toPlainString());
             return circulationValue;
         }
-
     }
     /**
      * 查询统计的余额
