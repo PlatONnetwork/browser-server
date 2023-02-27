@@ -52,7 +52,7 @@ public class ErcTokenHolderAnalyzer {
                 toHolder.setAddress(tx.getTo());
                 toHolder.setIncrement(new BigDecimal(tx.getValue())); //变动量
                 changeBalanceList.add(toHolder);
-            }if (StringUtils.isBlank(tx.getTo()) || AddressUtil.isAddrZero(tx.getTo())) { //销毁
+            }if (StringUtils.isBlank(tx.getTo()) || AddressUtil.isAddrZero(tx.getTo())) { //销毁币（不是销毁合约）
                 TokenHolder fromHolder = new TokenHolder();
                 fromHolder.setTokenAddress(tx.getContract());
                 fromHolder.setAddress(tx.getFrom());
