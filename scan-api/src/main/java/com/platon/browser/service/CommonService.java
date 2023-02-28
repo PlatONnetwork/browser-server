@@ -154,7 +154,7 @@ public class CommonService {
                 }
             }
             BigDecimal circulationValue = issueValue.subtract(restrictingValue).subtract(inciteValue).subtract(foundationValue);
-            log.debug("区块：{}上的流通量：{}", blockNumber, circulationValue.toPlainString());
+            log.debug("区块：{}上的流通量(von)：{}", blockNumber, circulationValue.toPlainString());
             return circulationValue;
         }
     }
@@ -230,7 +230,7 @@ public class CommonService {
 
 
     /**
-     * 返回当前块高的总发行量：整数，单位：wei
+     * 返回当前块高的总发行量：整数（单位：von）
      * @param blockNumber
      * @return
      * @throws Exception
@@ -240,7 +240,7 @@ public class CommonService {
         int yearNum = getYearNum(blockNumber);
            // 算出总发行量
         BigDecimal issueValue = getTotalIssueValue(yearNum);
-        log.info("当前块高：{}的总发行量(wei)：{}", blockNumber, issueValue.toPlainString());
+        log.debug("当前块高：{}的总发行量(von)：{}", blockNumber, issueValue.toPlainString());
 
         return issueValue;
     }
@@ -266,15 +266,15 @@ public class CommonService {
     }
 
     /**
-     * 返回总发行量：整数，单位：wei
+     * 返回总发行量：整数（单位：von）
      * @param yearNum
      * @return
      * @throws Exception
      */
     private BigDecimal getTotalIssueValue(int yearNum) throws Exception {
-        // 获取初始发行金额(wei)
+        // 获取初始发行金额(LAT/ATP)
         BigDecimal initIssueAmount = blockChainConfig.getInitIssueAmount();
-        //initIssueAmount = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON);
+        initIssueAmount = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON);
         // 每年固定增发比例
         BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
         //BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);

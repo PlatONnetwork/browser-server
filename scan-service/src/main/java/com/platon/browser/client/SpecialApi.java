@@ -5,7 +5,6 @@ import com.platon.abi.solidity.datatypes.BytesType;
 import com.platon.abi.solidity.datatypes.Utf8String;
 import com.platon.abi.solidity.datatypes.generated.Uint256;
 import com.platon.browser.bean.*;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
@@ -30,13 +29,11 @@ import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @Auther: Chendongming
@@ -263,11 +260,10 @@ public class SpecialApi {
     }
 
     /**
-     * 根据账户地址获取锁仓余额
+     * 根据账户地址获取锁仓余额（单位：von）
      *  此方法是复用的：
      *  1. 可以查询地址的锁仓未释放金额： RestrictingBalance.lockBalance; //EOA的锁仓未释放余额
      *  2. 也可以查询地址的余额： RestrictingBalance.freeBalance; //EOA帐号余额
-     *  todo: 增加一个接口，新增参数：blockNumber，实现根据块高查询:
      *  1.锁仓未释放金额
      *  2.地址余额
      * @param addresses
