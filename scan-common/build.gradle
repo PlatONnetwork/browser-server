@@ -7,7 +7,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '7.0.0.Final'
-    testCompile "com.alibaba:druid:$druidVersion"
+    compile "com.alibaba:druid-spring-boot-starter:$druidVersion"
     testCompile "mysql:mysql-connector-java:$mysqlConnectorVersion"
     testCompile "org.springframework:spring-test:$springbootVersion"
 	testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"

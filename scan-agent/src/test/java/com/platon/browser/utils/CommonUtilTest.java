@@ -1,10 +1,6 @@
 package com.platon.browser.utils;
 
-import cn.hutool.core.collection.BoundedPriorityQueue;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.bean.NodeSettleStatisBase;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -137,4 +133,10 @@ public class CommonUtilTest {
         log.info("============{}", percent.toPlainString());
     }
 
+    @Test
+    public void testCompress() {
+        String text = "{\"nodeAprQueue\":[{\"epochNum\":647,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":646,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":645,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":644,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":643,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":642,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":641,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":640,\"deleAnnualizedRate\":\"0\"},{\"epochNum\":639,\"deleAnnualizedRate\":\"0\"}],\"nodeId\":\"0x00ec943a40e69df4bb7bf2b516360af9e26e0b4072c4ef08527a4bd9fa9f83fe304ea3751ac81cc88e8a70374d2773fc2fc525c4173a8798cb81c153bc2e7f92\"}";
+        String compressed = GzipUtils.compress(text);
+        log.info("============{}, length:{}", compressed, compressed.length());
+    }
 }

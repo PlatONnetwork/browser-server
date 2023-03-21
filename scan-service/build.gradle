@@ -1,6 +1,6 @@
 dependencies {
     compile project(":scan-common")
-    compile "com.alibaba:druid:$druidVersion"
+    compile "com.alibaba:druid-spring-boot-starter:$druidVersion"
     compile "com.univocity:univocity-parsers:$univocityVersion"
     runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
     compileOnly "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"

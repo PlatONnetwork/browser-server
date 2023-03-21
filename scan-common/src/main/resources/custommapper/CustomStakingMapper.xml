@@ -28,4 +28,10 @@
         WHERE (`status` = 1 and `is_settle` = 1)
            or (`status` = 2 and `is_settle` = 1)
     </select>
+
+    <update id="updateNodeSettleStatis">
+        <foreach collection="list" item="item">
+            update staking set node_settle_statis_info = #{item.nodeSettleStatisInfo} where node_id = #{item.nodeId} and staking_block_num = #{item.stakingBlockNum};
+        </foreach>
+    </update>
 </mapper>

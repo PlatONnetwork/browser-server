@@ -10,6 +10,7 @@ import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
+import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -46,6 +47,9 @@ public class StatisticService {
 
     @Resource
     private CustomNodeMapper customNodeMapper;
+
+    @Resource
+    private CustomStakingMapper customStakingMapper;
 
     @Resource
     protected NodeCache nodeCache;
@@ -122,6 +126,7 @@ public class StatisticService {
                     updateNodeCacheSettleStatis(node.getNodeId(), JSONUtil.toJsonStr(nodeSettleStatis));
                 });
                 if (CollUtil.isNotEmpty(updateNodeList)) {
+                    //2023/03/21, lvxiaoyi, 把两个sql update分开到各自的mapper中，便于druid的统计
                     int res = customNodeMapper.updateNodeSettleStatis(updateNodeList);
                     if (res > 0) {
                         log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功",
@@ -134,6 +139,9 @@ public class StatisticService {
                                   event.getEpochMessage().getConsensusEpochRound(),
                                   event.getEpochMessage().getCurrentBlockNumber());
                     }
+                    //2023/03/21, lvxiaoyi, 把两个sql update分开到各自的mapper中，便于druid的统计
+                    customStakingMapper.updateNodeSettleStatis(updateNodeList);
+
                 }
             }
         } catch (Exception e) {
