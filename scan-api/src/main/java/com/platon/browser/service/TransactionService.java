@@ -790,7 +790,7 @@ public class TransactionService {
                                     .build();
                             //查询对应的图片进行回填
                             TokenInventoryExample example = new TokenInventoryExample();
-                            example.createCriteria().andTokenAddressEqualTo(erc721.getContract()).andTokenIdEqualTo(erc721.getValue());
+                            example.createCriteria().andTokenAddressEqualTo(erc721.getContract()).andTokenIdEqualTo(erc721.getTokenId());
                             List<TokenInventoryWithBLOBs> tokenInventoryWithBLOBs = tokenInventoryMapper.selectByExampleWithBLOBs(example);
                             if (CollUtil.isNotEmpty(tokenInventoryWithBLOBs)) {
                                 TokenInventoryWithBLOBs tokenInventory = tokenInventoryWithBLOBs.get(0);

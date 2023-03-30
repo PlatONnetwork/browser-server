@@ -138,7 +138,7 @@
           #{item.totalDeleReward,jdbcType=DECIMAL}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
-          #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+          #{item.annualizedRateInfo,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

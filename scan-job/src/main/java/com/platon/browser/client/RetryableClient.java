@@ -170,7 +170,7 @@ public class RetryableClient {
                         currentWeb3jWrapper = wrapper;
                     }
                 } catch (Exception e2) {
-                    log.info("候选Web3j实例({})无效！", wrapper.getAddress());
+                    log.warn("候选Web3j实例({})无效！", wrapper.getAddress());
                 }
             }
             if (preWeb3j == null || preWeb3j != currentWeb3jWrapper) {
@@ -178,9 +178,9 @@ public class RetryableClient {
                 updateContract();
             }
             if (maxBlockNumber == -1) {
-                log.info("当前所有候选Web3j实例均无法连通!");
+                log.warn("当前所有候选Web3j实例均无法连通!");
                 if (protocol == Web3jProtocolEnum.WS) {
-                    log.info("重新初始化websocket连接!");
+                    log.debug("重新初始化websocket连接!");
                     try {
                         init();
                     } catch (ConfigLoadingException e) {

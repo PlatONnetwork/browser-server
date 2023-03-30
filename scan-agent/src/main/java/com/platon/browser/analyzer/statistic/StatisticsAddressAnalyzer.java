@@ -1,7 +1,6 @@
 package com.platon.browser.analyzer.statistic;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.analyzer.TransactionAnalyzer;
@@ -18,7 +17,6 @@ import com.platon.browser.enums.ContractTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ public class StatisticsAddressAnalyzer {
     @Resource
     private AddressMapper addressMapper;
 
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) {
         long startTime = System.currentTimeMillis();
         log.debug("block({}),transactions({}),consensus({}),settlement({}),issue({})",
@@ -78,12 +76,14 @@ public class StatisticsAddressAnalyzer {
             });
             List<Address> list = CollUtil.newArrayList(addressCache.getAll());
             statisticBusinessMapper.batchInsert(list);
-            log.info("初始化内置地址入库成功:{}", JSONUtil.toJsonStr(list));
+            log.debug("初始化内置地址入库成功:{}", JSONUtil.toJsonStr(list));
             return;
         } else if (CollUtil.isNotEmpty(itemFromDb)) {
             // 查看交易列表中是否有bin属性为0x的交易,有则对to对应的合约地址进行设置
             event.getTransactions().forEach(tx -> {
                 // 如果tx的bin为0x，表明这笔交易是销毁合约交易或调用已销毁合约交易, to地址必定是合约地址
+                // lvxiaoyi: 2023/03/29 可以直接判断tx.type=Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()
+                // 参考com.platon.browser.utils.TransactionUtil.resolveGeneralContractInvokeTxComplementInfo
                 if ("0x".equals(tx.getBin())) {
                     itemFromDb.forEach(address -> {
                         if (address.getAddress().equalsIgnoreCase(tx.getTo())) {
@@ -140,7 +140,7 @@ public class StatisticsAddressAnalyzer {
                     // 批量更新经常发生异常，采用单个更新，服务器压力偏大，但每次更新的地址数不多，故压力还好
                     addressMapper.updateByPrimaryKeySelective(address);
                 }
-                log.info("批量更新地址信息成功，成功数:{}，数据为：{}", newItemFromDb.size(), JSONUtil.toJsonStr(newItemFromDb));
+                log.debug("批量更新地址信息成功，成功数:{}，数据为：{}", newItemFromDb.size(), JSONUtil.toJsonStr(newItemFromDb));
             }
         }
         // 对比缓存和数据的数据，取出缓存中新增的地址
@@ -176,7 +176,7 @@ public class StatisticsAddressAnalyzer {
         }
         if (CollUtil.isNotEmpty(newAddrList)) {
             statisticBusinessMapper.batchInsert(newAddrList);
-            log.info("新增地址成功{}", JSONUtil.toJsonStr(newAddrList));
+            log.debug("新增地址成功{}", JSONUtil.toJsonStr(newAddrList));
         }
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }

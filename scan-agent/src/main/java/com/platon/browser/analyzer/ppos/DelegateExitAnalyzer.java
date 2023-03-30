@@ -258,11 +258,17 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
             List<GasEstimate> estimates = new ArrayList<>();
             GasEstimate estimate = new GasEstimate();
             estimate.setNodeId(txParam.getNodeId());
+            estimate.setNodeIdHashCode(txParam.getNodeId().hashCode());
             estimate.setSbn(txParam.getStakingBlockNum().longValue());
             estimate.setAddr(tx.getFrom());
+            // lvxiaoyi, 用户在委托后，如果有任何其它操作入追加委托，撤回部分委托等，底层将会把此用户之前的未结算奖励做结算汇总并记录，然后重新开始计算未领取奖励和epoch。
+            // 并且，在计算用户的这些后续操作的手续费时，会把未领取奖励的epoch数量*100作为额外的手续费。这样，就避免了重新计算epoch后，用户领取奖励时手续费少算的问题。
+            // 也就是说，把用户最后领取奖励的部分手续费，提前在中间操作时扣除了。
+            // 如果用户在委托后，用户没有后续操作，底层就不会产生此用户的奖励结算汇总。
+            // 所有，这里要重置为0（这个逻辑也体现在com.platon.browser.dao.custommapper.CustomGasEstimateMapper.batchInsertOrResetEpoch对应的sql语句上）
             estimate.setEpoch(0L);
             estimates.add(estimate);
-            customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
+            customGasEstimateMapper.batchInsertOrResetEpoch(estimates);
         }
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);

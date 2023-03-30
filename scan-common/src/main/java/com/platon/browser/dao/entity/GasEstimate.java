@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GasEstimate extends GasEstimateKey {
+    /**
+     * 委托用户未领取委托奖励持续的epoch数量
+     */
     private Long epoch;
+
+    private int nodeIdHashCode;
 
     public Long getEpoch() {
         return epoch;
@@ -12,6 +17,14 @@ public class GasEstimate extends GasEstimateKey {
 
     public void setEpoch(Long epoch) {
         this.epoch = epoch;
+    }
+
+    public int getNodeIdHashCode() {
+        return nodeIdHashCode;
+    }
+
+    public void setNodeIdHashCode(int nodeIdHashCode) {
+        this.nodeIdHashCode = nodeIdHashCode;
     }
 
     /**
@@ -24,6 +37,7 @@ public class GasEstimate extends GasEstimateKey {
     public enum Column {
         addr("addr", "addr", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
+        nodeIdHashCode("node_id_hash_code", "nodeIdHashCode", "INTEGER", false),
         sbn("sbn", "sbn", "BIGINT", false),
         epoch("epoch", "epoch", "BIGINT", false);
 

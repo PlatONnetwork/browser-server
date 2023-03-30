@@ -295,7 +295,7 @@ public class AddressCache {
      * 初始化内置地址,第一次启动初始化
      */
     public void initOnFirstStart() {
-        log.info("初始化内置地址");
+        log.debug("初始化内置地址");
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
             this.addressMap.put(contractDescEnum.getAddress(), this.createDefaultAddress(contractDescEnum.getAddress()));
         }

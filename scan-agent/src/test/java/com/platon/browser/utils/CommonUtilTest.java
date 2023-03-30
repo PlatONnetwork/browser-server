@@ -1,31 +1,28 @@
 package com.platon.browser.utils;
 
-import cn.hutool.core.collection.BoundedPriorityQueue;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.bean.NodeSettleStatisBase;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RunWith(MockitoJUnitRunner.Silent.class)
 public class CommonUtilTest {
-
     @Test
     public void test() {
         long time = DateUtil.parse("2021-03-27 18:30:00", "yyyy-MM-dd HH:mm:ss").getTime();
@@ -71,7 +68,7 @@ public class CommonUtilTest {
     @Test
     public void Test1() {
         NodeSettleStatis nodeSettleStatis = new NodeSettleStatis();
-        nodeSettleStatis.setNodeId("aaaaaaaa");
+        //nodeSettleStatis.setNodeId("aaaaaaaa");
 
         NodeSettleStatisBase nodeSettleStatisBase1 = new NodeSettleStatisBase();
         nodeSettleStatisBase1.setSettleEpochRound(new BigInteger("1"));
@@ -123,7 +120,7 @@ public class CommonUtilTest {
         nodeSettleStatis.getNodeSettleStatisQueue().offer(nodeSettleStatisBase7);
         nodeSettleStatis.getNodeSettleStatisQueue().offer(nodeSettleStatisBase8);
 
-        log.error("============{}", nodeSettleStatis.computeGenBlocksRate(BigInteger.valueOf(8)));
+        log.error("============{}", nodeSettleStatis.computeGenBlocksRate("testNodeId", BigInteger.valueOf(8)));
     }
 
     @Test
@@ -137,4 +134,53 @@ public class CommonUtilTest {
         log.info("============{}", percent.toPlainString());
     }
 
+
+    @Test
+    public void testScanAgentSpeedCalculate() {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime date1 = LocalDateTime.parse("2023-03-22 06:49:50", inputFormatter);
+        LocalDateTime date2 = LocalDateTime.parse("2023-03-22 08:19:56", inputFormatter);
+        long seconds = Duration.between(date1, date2).getSeconds();
+
+        long total = 426651;
+
+        System.out.println("aaaa::::::" + (total / seconds));
+    }
+
+    @Test
+    public void testFmisSpeedCalculate() {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime date1 = LocalDateTime.parse("2023-03-30 07:10:29", inputFormatter);
+        LocalDateTime date2 = LocalDateTime.parse("2023-03-30 07:27:40", inputFormatter);
+        long seconds = Duration.between(date1, date2).getSeconds();
+
+        long total = 56807475-56767224;
+
+        System.out.println(total / seconds);
+    }
+
+    @Test
+    public void testHashNodeId(){
+        String nodeId = "0xd2d670c64375d958ae15030d2e7979a369a1142a8981f41cb6aa31727c90a6af79ea7b8d07284736eec4c690e501d5e638a7dc87a646b0245631afc84f1d0c1f";
+        log.debug("hashCode：{}" , nodeId.hashCode());
+        String hash = DigestUtils.md5Hex(nodeId);
+        log.info("md5：{}", hash);
+
+        nodeId = "0xd2d670c64375d958ae15030d2e7979a369a1142a8981f41cb6aa31727c90a6af79ea7b8d07284736eec4c690e501d5e638a7dc87a646b0245631afc84f1d1c1f";
+        log.debug("hashCode：{}" , nodeId.hashCode());
+        hash = DigestUtils.sha256Hex(nodeId);
+        log.info("sha256Hex：{}", hash);
+
+        hash = DigestUtils.md5Hex(nodeId);
+        log.info("md5Hex：{}", hash);
+    }
+
+    @Test
+    public void testErcTypeEnum() {
+        System.out.println("AAA:"+ ErcTypeEnum.getErcTypeEnum("erc20"));
+
+        System.out.println("BBBB:"+ErcTypeEnum.valueOf("erc20"));
+    }
 }

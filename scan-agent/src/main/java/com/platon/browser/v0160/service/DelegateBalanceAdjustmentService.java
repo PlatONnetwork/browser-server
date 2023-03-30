@@ -186,7 +186,7 @@ public class DelegateBalanceAdjustmentService {
                 // db存在，则存放到updateDBlist，走db的更新方式
                 updateDBlist.add(recoveredDelegationAmount);
                 BigDecimal newHaveReward = addressInfo.getHaveReward().add(recoveredDelegationAmount.getRecoveredDelegationAmount());
-                log.info("调账---更新地址表成功：地址已领取的委托奖励字段新值[{}]=已领取的委托奖励字段旧值[{}]+已领取委托奖励[{}]", newHaveReward, addressInfo.getHaveReward(), recoveredDelegationAmount.getRecoveredDelegationAmount());
+                log.debug("调账---更新地址表成功：地址已领取的委托奖励字段新值[{}]=已领取的委托奖励字段旧值[{}]+已领取委托奖励[{}]", newHaveReward, addressInfo.getHaveReward(), recoveredDelegationAmount.getRecoveredDelegationAmount());
             }
         }
         return updateDBlist;

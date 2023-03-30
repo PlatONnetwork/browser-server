@@ -73,7 +73,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released, 
+    delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released,
     is_history, `sequence`, cur_delegation_block_num, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.DelegationExample" resultMap="BaseResultMap">
@@ -91,7 +91,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.DelegationKey" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from delegation
     where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
@@ -111,13 +111,13 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Delegation">
-    insert into delegation (delegate_addr, staking_block_num, node_id, 
-      delegate_hes, delegate_locked, delegate_released, 
-      is_history, `sequence`, cur_delegation_block_num, 
+    insert into delegation (delegate_addr, staking_block_num, node_id,
+      delegate_hes, delegate_locked, delegate_released,
+      is_history, `sequence`, cur_delegation_block_num,
       create_time, update_time)
-    values (#{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, 
-      #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, #{delegateReleased,jdbcType=DECIMAL}, 
-      #{isHistory,jdbcType=INTEGER}, #{sequence,jdbcType=BIGINT}, #{curDelegationBlockNum,jdbcType=BIGINT}, 
+    values (#{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR},
+      #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, #{delegateReleased,jdbcType=DECIMAL},
+      #{isHistory,jdbcType=INTEGER}, #{sequence,jdbcType=BIGINT}, #{curDelegationBlockNum,jdbcType=BIGINT},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Delegation">
@@ -310,14 +310,14 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into delegation
-    (delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released, 
+    (delegate_addr, staking_block_num, node_id, delegate_hes, delegate_locked, delegate_released,
       is_history, `sequence`, cur_delegation_block_num, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
-        #{item.nodeId,jdbcType=VARCHAR}, #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
-        #{item.delegateReleased,jdbcType=DECIMAL}, #{item.isHistory,jdbcType=INTEGER}, 
-        #{item.sequence,jdbcType=BIGINT}, #{item.curDelegationBlockNum,jdbcType=BIGINT}, 
+      (#{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT},
+        #{item.nodeId,jdbcType=VARCHAR}, #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL},
+        #{item.delegateReleased,jdbcType=DECIMAL}, #{item.isHistory,jdbcType=INTEGER},
+        #{item.sequence,jdbcType=BIGINT}, #{item.curDelegationBlockNum,jdbcType=BIGINT},
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>

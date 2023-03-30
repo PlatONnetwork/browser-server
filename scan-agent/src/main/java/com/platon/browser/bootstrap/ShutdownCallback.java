@@ -12,10 +12,10 @@ public class ShutdownCallback implements Callback {
     private boolean isDone;
     private long endBlockNum;
     public void call(long handledBlockNum){
-        log.info("区块({})同步完成!",handledBlockNum);
+        log.debug("区块({})同步完成!",handledBlockNum);
         if(handledBlockNum==endBlockNum) {
             isDone=true;
-            log.info("所有区块同步完成!");
+            log.debug("所有区块同步完成!");
         }
     }
 

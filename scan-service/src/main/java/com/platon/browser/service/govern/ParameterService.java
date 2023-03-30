@@ -48,7 +48,7 @@ public class ParameterService {
      * 使用debug_economic_config接口返回的数据初始化配置表，只有从第一个块开始同步时需要调用
      */
     public void initConfigTable() throws Exception {
-        log.info("治理参数初始化...");
+        log.debug("治理参数初始化...");
         configMapper.deleteByExample(null);
         // 调用提案合约只是为了取得完整的可治理参数列表，至于此时的值是不是链第0块时的值，是不能确定的，所以需要
         // 使用debugEconomicConfig接口获取回来的最初始的值进行替代
@@ -250,7 +250,7 @@ public class ParameterService {
                         config.setStaleValue(initValue);
                         config.setValue(initValue);
                         configMapper.insertSelective(config);
-                        log.info("新增的治理参数[{}]", config.getName());
+                        log.debug("新增的治理参数[{}]", config.getName());
                     }
                 }
             } catch (Exception e) {

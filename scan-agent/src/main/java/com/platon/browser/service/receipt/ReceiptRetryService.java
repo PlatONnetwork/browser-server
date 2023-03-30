@@ -6,6 +6,7 @@ import com.platon.browser.bean.RpcParam;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -27,15 +28,17 @@ public class ReceiptRetryService {
 
     /**
      * 带有重试功能的根据区块号获取区块内所有交易的回执信息
-     *
+     * @Backoff注解中的参数说明：
+     * value：隔多少毫秒后重试，默认为1000L，我们设置为3000L；
+     * delay：和value一样，但是默认为0；
+     * multiplier（指定延迟倍数）默认为0，表示固定暂停1秒后进行重试，如果把multiplier设置为1.5，则第一次重试为2秒，第二次为3秒，第三次为4.5秒。
      * @param blockNumber
      * @return 交易回扏信息
      * @throws
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 2000L, multiplier = 1))
     public ReceiptResult getReceipt(Long blockNumber) {
         long startTime = System.currentTimeMillis();
-
         try {
             log.debug("获取回执:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), blockNumber);
             RpcParam param = new RpcParam();

@@ -28,7 +28,7 @@ public class NodeSettleStatis {
     /**
      * 节点id
      */
-    private String nodeId;
+    //private String nodeId;
 
     /**
      * 已统计的块高
@@ -58,7 +58,7 @@ public class NodeSettleStatis {
                 Long blockNum = jsonObject.getLong("blockNum", 0L);
                 JSONArray jsonArray = jsonObject.getJSONArray("nodeSettleStatisQueue");
                 List<NodeSettleStatisBase> list = jsonArray.toList(NodeSettleStatisBase.class);
-                nodeSettleStatis.setNodeId(nodeId);
+                //nodeSettleStatis.setNodeId(nodeId);
                 nodeSettleStatis.setBlockNum(blockNum);
                 nodeSettleStatis.getNodeSettleStatisQueue().addAll(list);
                 return nodeSettleStatis;
@@ -80,7 +80,7 @@ public class NodeSettleStatis {
      * @return java.math.BigDecimal
      * @date 2021/6/1
      */
-    public String computeGenBlocksRate(BigInteger curSettleEpochRound) {
+    public String computeGenBlocksRate(String nodeId, BigInteger curSettleEpochRound) {
         try {
             // 8个结算周期不一定是连续的
             if (this.getNodeSettleStatisQueue().size() > 0) {
@@ -105,8 +105,8 @@ public class NodeSettleStatis {
                             .multiply(BigDecimal.valueOf(100))
                             .setScale(6, RoundingMode.HALF_UP)
                             .stripTrailingZeros();
-                    log.debug("节点[{}]在第[{}]结算周期计算最近[{}]结算周期({})的出块率为[{}%]=[{}]/([{}]*10)", this.getNodeId(), curSettleEpochRound, CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, last.stream().map(v -> v.getSettleEpochRound()).collect(Collectors.toList()), percent.toPlainString(), molecular, blockNumElected.getSum());
-                    return percent.toPlainString() + "%";
+                    log.debug("节点[{}]在第[{}]结算周期计算最近[{}]结算周期({})的出块率为[{}%]=[{}]/([{}]*10)", nodeId, curSettleEpochRound, CommonConstant.BLOCK_RATE_SETTLE_EPOCH_NUM, last.stream().map(v -> v.getSettleEpochRound()).collect(Collectors.toList()), percent.toPlainString(), molecular, blockNumElected.getSum());
+                   return percent.toPlainString() + "%";
                 } else {
                     return "0%";
                 }
@@ -114,10 +114,8 @@ public class NodeSettleStatis {
                 return "0%";
             }
         } catch (Exception e) {
-            log.error(StrUtil.format("节点[{}]计算24小时出块率异常", this.getNodeId()), e);
+            log.error("节点[{}]计算24小时出块率异常", nodeId, e);
             return "0%";
         }
     }
-
-
 }

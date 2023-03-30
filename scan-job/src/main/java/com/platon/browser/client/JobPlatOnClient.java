@@ -49,7 +49,7 @@ public class JobPlatOnClient {
         try {
             EconomicConfig ec = retryableClient.getWeb3jWrapper().getWeb3j().getEconomicConfig().send().getEconomicConfig();
             String msg = JSON.toJSONString(ec, true);
-            log.info("链上配置:{}", msg);
+            log.debug("链上配置:{}", msg);
             return ec;
         } catch (Exception e) {
             retryableClient.updateCurrentWeb3jWrapper();

@@ -151,4 +151,38 @@
             update token set holder = #{item.holder} where address = #{item.address}
         </foreach>
     </update>
+
+
+    <resultMap id="TokenBaseResultMap" type="com.platon.browser.dao.entity.Token" extends="com.platon.browser.dao.mapper.TokenMapper.BaseResultMap"/>
+
+    <select id="listNotDestroyedToUpdateTotalSupply" resultMap="TokenBaseResultMap">
+        select *
+        from token
+        where contract_destroy_block = 0 and (is_support_erc20 = true or is_support_erc721_enumeration = true)
+        order by address
+        limit #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+
+    <update id="updateErc20TokenHolderCount">
+        update token t1
+        inner join (
+            SELECT token_address, count(1) as count
+            FROM `token_holder`
+            WHERE balance > 0
+            GROUP BY token_address
+        ) t2
+        on t1.address = t2.token_address
+        set t1.holder = t2.count
+    </update>
+    <update id="updateErc1155TokenHolderCount">
+        update token t1
+        inner join (
+            SELECT token_address, count(1) as count
+            FROM `token_1155_holder`
+            WHERE balance > 0
+            GROUP BY token_address
+        ) t2
+        on t1.address = t2.token_address
+        set t1.holder = t2.count
+    </update>
 </mapper>

@@ -36,7 +36,7 @@ public class ErcCache {
      * @date 2021/4/19
      */
     public void init() {
-        log.info("初始化token地址到缓存");
+        log.debug("初始化token地址到缓存");
         List<Token> tokens = tokenMapper.selectByExample(null);
         tokens.forEach(token -> {
             ErcToken et = new ErcToken();

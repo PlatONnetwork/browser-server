@@ -1,6 +1,5 @@
 package com.platon.browser.bootstrap.service;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.cache.AddressCache;
@@ -8,8 +7,15 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
@@ -25,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -76,7 +83,7 @@ public class InitializationService {
     private ProposalCache proposalCache;
 
     @Resource
-    private GasEstimateLogMapper gasEstimateLogMapper;
+    private CustomGasEstimateMapper customGasEstimateMapper;
 
     @Resource
     private GasEstimateEventPublisher gasEstimateEventPublisher;
@@ -120,7 +127,7 @@ public class InitializationService {
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public InitializationResult init(String traceId) throws BlockNumberException {
-        log.info("进入应用初始化子流程");
+        log.debug("进入应用初始化子流程");
         proposalCache.init();
         ercCache.init();
         // 初始化ES
@@ -150,7 +157,7 @@ public class InitializationService {
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
             addressMapper.deleteByExample(null);
-            log.info("删除节点表、质押表、地址表数据");
+            log.debug("删除节点表、质押表、地址表数据");
             // 初始化内置节点
             List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
@@ -197,15 +204,26 @@ public class InitializationService {
         epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
 
         // 检查gas price估算数据表
-        GasEstimateLogExample condition = new GasEstimateLogExample();
+        // lvxiaoyi: 这个是为了升级算出每个node_id的hashCode。这个hashCode在更新gas_estimate是作为where条件代替node_id，可以节省大量数据传输
+        List<GasEstimate> gasEstimateList = customGasEstimateMapper.listHashCodeEmpty();
+        if(!CollectionUtils.isEmpty(gasEstimateList)){
+            gasEstimateList.forEach( e->{
+                e.setNodeIdHashCode(e.getNodeId().hashCode());
+            });
+            customGasEstimateMapper.updateHashCodeEmpty(gasEstimateList);
+        }
+        /*GasEstimateLogExample condition = new GasEstimateLogExample();
         condition.setOrderByClause("seq asc");
         List<GasEstimateLog> gasEstimateLogs = gasEstimateLogMapper.selectByExample(condition);
         gasEstimateLogs.forEach(e -> {
             List<GasEstimate> estimates = JSON.parseArray(e.getJson(), GasEstimate.class);
             if (estimates != null && !estimates.isEmpty()) {
+                estimates.forEach( e2->{
+                    e2.setNodeIdHashCode(e2.getNodeId().hashCode());
+                });
                 gasEstimateEventPublisher.publish(e.getSeq(), estimates, traceId);
             }
-        });
+        });*/
 
         return initialResult;
     }

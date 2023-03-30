@@ -1,7 +1,7 @@
 #日志配置
 logging:
   file:
-    name: ./logs/${app.id}.log
+    name: ./logs/scan-agent.log
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | trace-id[%X{trace-id}] | %logger{50}[%L] | %msg%n"
@@ -15,3 +15,7 @@ logging:
       max-history: 7
       # 是否在应用启动时进行归档管理
       clean-history-on-start: true
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}

@@ -44,6 +44,7 @@ public class GasEstimateKey {
     public enum Column {
         addr("addr", "addr", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
+        nodeIdHashCode("node_id_hash_code", "nodeIdHashCode", "INTEGER", false),
         sbn("sbn", "sbn", "BIGINT", false),
         epoch("epoch", "epoch", "BIGINT", false);
 

@@ -69,7 +69,7 @@ public class OnElectionAnalyzer {
                 List<String> slashNodeIdList = new ArrayList<>();
                 // 统一节点ID格式： 0x开头
                 slashList.forEach(n -> slashNodeIdList.add(HexUtil.prefix(n.getNodeId())));
-                log.info("特殊节点查询出来的低出块节点：{}", slashNodeIdList);
+                log.debug("特殊节点查询出来的低出块节点：{}", slashNodeIdList);
                 // 查询节点
                 StakingExample stakingExample = new StakingExample();
                 List<Integer> status = new ArrayList<>();
@@ -84,7 +84,7 @@ public class OnElectionAnalyzer {
                     BigInteger curSettleEpoch = EpochUtil.getEpoch(BigInteger.valueOf(block.getNum()), chainConfig.getSettlePeriodBlockCount());
                     List<NodeOpt> exceptionNodeOpts = slash(event, block, curSettleEpoch.intValue(), slashStakingList);
                     nodeOpts.addAll(exceptionNodeOpts);
-                    log.info("块高[{}]结算周期[{}]共识周期[{}]被处罚节点列表为：{}",
+                    log.debug("块高[{}]结算周期[{}]共识周期[{}]被处罚节点列表为：{}",
                              block.getNum(),
                              event.getEpochMessage().getSettleEpochRound(),
                              event.getEpochMessage().getConsensusEpochRound(),
@@ -167,7 +167,7 @@ public class OnElectionAnalyzer {
                     election.setUnStakeFreezeDuration(unStakeFreezeDuration.intValue());
                     election.setUnStakeEndBlock(unStakeEndBlock);
                     exitingNodes.add(customStaking);
-                    log.info("块高[{}]结算周期[{}]共识周期[{}]，节点[{}]扣除处罚金额后【犹豫+锁定】质押金小于质押门槛，节点置为退出中",
+                    log.debug("块高[{}]结算周期[{}]共识周期[{}]，节点[{}]扣除处罚金额后【犹豫+锁定】质押金小于质押门槛，节点置为退出中",
                              event.getBlock().getNum(),
                              event.getEpochMessage().getSettleEpochRound(),
                              event.getEpochMessage().getConsensusEpochRound(),

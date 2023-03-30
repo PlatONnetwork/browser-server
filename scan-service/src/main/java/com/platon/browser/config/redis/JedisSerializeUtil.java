@@ -46,6 +46,6 @@
 //
 //	public static void main(String[] args) {
 //		Object str = "tobytes";
-//		log.info("{}",JedisSerializeUtil.deSeialize(JedisSerializeUtil.serialize(str)));
+//		log.debug("{}",JedisSerializeUtil.deSeialize(JedisSerializeUtil.serialize(str)));
 //	}
 //}

@@ -5,7 +5,7 @@
     insert into tx_erc_1155_bak
     ( `seq`, `contract`, `hash`,`from`,`from_type`,`to`,`to_type`, `token_id`,`value`,`bn`,`b_time`,`tx_fee`)
     values
-    <foreach collection="set" item="item" separator=",">
+    <foreach collection="list" item="item" separator=",">
       (#{item.seq},
       #{item.contract},
       #{item.hash},

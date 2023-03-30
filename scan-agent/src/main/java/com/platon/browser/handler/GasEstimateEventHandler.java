@@ -4,7 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.GasEstimateEvent;
-import com.platon.browser.dao.custommapper.EpochBusinessMapper;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.utils.CommonUtil;
@@ -19,6 +19,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 区块事件处理器
+ * @deprecated
+ * 下面的方法中，会保证Gas_Estimate表写成功，也不会再写Gas_Estimate_log表，因此和GasEstimateEvent相关的代码都可以去掉
+ * com.platon.browser.analyzer.epoch.OnSettleAnalyzer#analyze(com.platon.browser.bean.CollectionEvent, com.platon.browser.elasticsearch.dto.Block)
  */
 @Slf4j
 @Component
@@ -26,9 +29,9 @@ public class GasEstimateEventHandler implements EventHandler<GasEstimateEvent> {
 
     @Resource
     private GasEstimateLogMapper gasEstimateLogMapper;
-
     @Resource
-    private EpochBusinessMapper epochBusinessMapper;
+    private CustomGasEstimateMapper customGasEstimateMapper;
+
 
     private Long prevSeq = 0L;
 
@@ -76,7 +79,7 @@ public class GasEstimateEventHandler implements EventHandler<GasEstimateEvent> {
             }
             List<GasEstimate> estimateList = event.getEstimateList();
             if (estimateList != null && !estimateList.isEmpty()) {
-                epochBusinessMapper.updateGasEstimate(estimateList);
+                customGasEstimateMapper.increaseEpoch(estimateList);
             }
             // es入库完成后删除mysql中的日志记录
             gasEstimateLogMapper.deleteByPrimaryKey(event.getSeq());

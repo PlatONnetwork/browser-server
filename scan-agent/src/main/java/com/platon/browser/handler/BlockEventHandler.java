@@ -74,7 +74,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
                 log.error("重试次数[{}],该区块[{}]重复处理，可能会引起数据重复统计", retryCount.get(), rawBlock.getNumber());
             }
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            log.info("当前区块[{}]有[{}]笔交易", rawBlock.getNumber(), CommonUtil.ofNullable(() -> rawBlock.getTransactions().size()).orElse(0));
+            log.debug("当前区块[{}]有[{}]笔交易", rawBlock.getNumber(), CommonUtil.ofNullable(() -> rawBlock.getTransactions().size()).orElse(0));
             // 分析区块
             CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
             block.setReward(event.getEpochMessage().getBlockReward().toString());

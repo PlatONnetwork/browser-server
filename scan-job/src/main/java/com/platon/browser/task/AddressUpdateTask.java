@@ -6,13 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
-import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.PointLogMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.TaskUtil;
@@ -21,11 +19,10 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 
@@ -51,9 +48,6 @@ import java.util.stream.Collectors;
 public class AddressUpdateTask {
 
     @Resource
-    private StatisticBusinessMapper statisticBusinessMapper;
-
-    @Resource
     private AddressMapper addressMapper;
 
     @Resource
@@ -68,11 +62,12 @@ public class AddressUpdateTask {
     /**
      * 用于地址表更新
      */
-    private AtomicLong addressStart = new AtomicLong(0L);
+    //private AtomicLong addressStart = new AtomicLong(0L);
 
     /**
      * 地址表信息补充
      * 每5秒执行一次
+     * 2023/03/29, lvxiaoyi, 改成用SQL来统计并更新地址的质押情况，委托情况
      *
      * @param :
      * @return: void
@@ -80,7 +75,24 @@ public class AddressUpdateTask {
      */
     @XxlJob("addressUpdateJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void addressUpdate() {
+    public void updateStakingDelegationStats() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+
+        log.debug(">>>>开始执行:统计账户的质押/委托信息");
+        StopWatch watch = new StopWatch();
+        watch.start();
+
+
+        addressMapper.updateStakingDelegationStats();
+        watch.stop();
+        log.debug("结束执行:统计账户的质押/委托信息，耗时统计：{}ms", watch.getLastTaskTimeMillis());
+    }
+
+
+    /*public void addressUpdate() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -93,7 +105,7 @@ public class AddressUpdateTask {
             log.error("地址表信息补充异常", e);
             throw e;
         }
-    }
+    }*/
 
     /**
      * 执行任务
@@ -102,7 +114,7 @@ public class AddressUpdateTask {
      * @param size  执行的批次
      * @return
      */
-    protected void batchUpdate(int start, int size) {
+    /*protected void batchUpdate(int start, int size) {
         //查询待补充的地址
         AddressExample addressExample = new AddressExample();
         addressExample.setOrderByClause("create_time limit " + start + "," + size);
@@ -190,7 +202,7 @@ public class AddressUpdateTask {
         if (!updateAddressList.isEmpty()) {
             statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
         }
-    }
+    }*/
 
     /**
      * 更新地址交易数
@@ -202,7 +214,7 @@ public class AddressUpdateTask {
      */
     @XxlJob("updateAddressQtyJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void updateQty() throws Exception {
+    public void updateTxQty() throws Exception {
         try {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);

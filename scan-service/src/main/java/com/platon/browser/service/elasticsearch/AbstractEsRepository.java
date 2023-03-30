@@ -40,6 +40,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: Chendongming
@@ -206,7 +207,7 @@ public abstract class AbstractEsRepository {
      */
     public boolean initIndex() throws IOException {
         if (this.existsIndex()) {
-            log.info("索引[{}]已存在", getIndexName());
+            log.debug("索引[{}]已存在", getIndexName());
             return true;
         }
         Map<String, Object> setting = new HashMap();
@@ -217,7 +218,7 @@ public abstract class AbstractEsRepository {
         // 副本每个主碎片的数量
         setting.put("number_of_replicas", 1);
         this.createIndex(setting, null);
-        log.info("索引[{}]创建完成", getIndexName());
+        log.debug("索引[{}]创建完成", getIndexName());
         return true;
     }
 
@@ -332,13 +333,8 @@ public abstract class AbstractEsRepository {
         }
         searchRequest.source(searchSourceBuilder);
         SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-        ESResult<T> esResult = new ESResult<>();
-        SearchHits hits = response.getHits();
-        esResult.setTotal(hits.getTotalHits().value);
-        List<T> list = new ArrayList<>();
-        Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
-        esResult.setRsData(list);
 
+        ESResult<T> esResult = processSearchResponse(response, clazz);
         log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
         return esResult;
@@ -385,6 +381,13 @@ public abstract class AbstractEsRepository {
         searchRequest.source(searchSourceBuilder);
         log.debug("get rs" + searchSourceBuilder.toString());
         SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        ESResult<T> esResult = processSearchResponse(response, clazz);
+        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
+        return esResult;
+    }
+
+
+    private <T> ESResult<T> processSearchResponse( SearchResponse response, Class<T> clazz){
         ESResult<T> esResult = new ESResult<>();
         SearchHits hits = response.getHits();
         esResult.setTotal(hits.getTotalHits().value);
@@ -392,7 +395,6 @@ public abstract class AbstractEsRepository {
         Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
         esResult.setRsData(list);
 
-        log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
 
         return esResult;
     }
@@ -436,20 +438,21 @@ public abstract class AbstractEsRepository {
             ir.source(JSON.toJSONString(doc.getValue()), XContentType.JSON);
             br.add(ir);
         }
+        boolean bulkException = false;
+        BulkResponse response = null;
+        do {
         try {
-            BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
-            log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-            log.debug("bulkAdd:{}", JSON.toJSONString(response));
+                response = client.bulk(br, RequestOptions.DEFAULT);
         } catch (Exception e) {
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                }catch (Exception ex){
+                    log.error("ES批量入库异常异常后等待重试出错", ex);
+                }
             log.error("ES批量增加或更新异常", e);
-            if (e instanceof RuntimeException && e.getMessage().contains("Request cannot be executed; I/O reactor status: STOPPED")) {
-                client = (RestHighLevelClient) springUtils.resetSpring("restHighLevelClient");
-                BulkResponse response = client.bulk(br, RequestOptions.DEFAULT);
-                log.debug(CONSUME_TIME_TIPS, System.currentTimeMillis() - startTime);
-                log.debug("bulkAdd:{}", JSON.toJSONString(response));
+                bulkException = true;
             }
-            throw e;
-        }
+        } while (bulkException || response.hasFailures()); //bulkException==true时，即使response==null也不会抛出NullPointerException)
 
     }
 

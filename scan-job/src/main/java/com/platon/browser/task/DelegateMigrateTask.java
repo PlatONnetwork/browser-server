@@ -51,6 +51,7 @@ public class DelegateMigrateTask {
         try {
             DelegationExample delegationExample = new DelegationExample();
             delegationExample.createCriteria().andIsHistoryEqualTo(CustomDelegation.YesNoEnum.YES.getCode());
+            delegationExample.setOrderByClause("staking_block_num limit 200"); //每次迁移200条退出的委托记录
             List<Delegation> delegationList = delegationMapper.selectByExample(delegationExample);
             if (delegationList.isEmpty()) return;
             Set<Delegation> delegationSet = new HashSet<>(delegationList);

@@ -94,6 +94,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
 
             GasEstimate estimate = new GasEstimate();
             estimate.setNodeId(reward.getNodeId());
+            estimate.setNodeIdHashCode(reward.getNodeId().hashCode());
             estimate.setSbn(reward.getStakingNum().longValue());
             estimate.setAddr(tx.getFrom());
             estimate.setEpoch(0L);
@@ -117,7 +118,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         updateAddressHaveReward(businessParam);
 
         // 直接入库到mysql数据库
-        customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
+        customGasEstimateMapper.resetEpoch(estimates);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         return delegationReward;

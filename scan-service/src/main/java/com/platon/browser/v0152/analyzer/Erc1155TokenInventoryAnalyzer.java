@@ -89,11 +89,11 @@ public class Erc1155TokenInventoryAnalyzer {
 
             if (CollUtil.isNotEmpty(insertOrUpdate)) {
                 customToken1155InventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate, Token1155Inventory.Column.values());
-                log.info("当前交易[{}]添加erc1155库存[{}]笔成功", txHash, insertOrUpdate.size());
+                log.debug("当前交易[{}]添加erc1155库存[{}]笔成功", txHash, insertOrUpdate.size());
             }
             if (CollUtil.isNotEmpty(delToken1155InventoryKey)) {
                 customToken1155InventoryMapper.burnAndDelTokenInventory(delToken1155InventoryKey);
-                log.info("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delToken1155InventoryKey.size());
+                log.debug("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delToken1155InventoryKey.size());
             }
         }
     }

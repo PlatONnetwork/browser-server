@@ -1,12 +1,7 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.browser.bean.CommonConstant;
-import com.platon.browser.service.statistic.StatisticService;
-import com.platon.browser.utils.ChainVersionUtil;
-import com.platon.browser.v0160.service.DelegateBalanceAdjustmentService;
-import com.platon.contracts.ppos.dto.resp.GovernParam;
-import com.platon.contracts.ppos.dto.resp.TallyResult;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
@@ -14,11 +9,10 @@ import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.v0150.V0150Config;
+import com.platon.browser.dao.custommapper.NewBlockMapper;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
-import com.platon.browser.dao.custommapper.NewBlockMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.param.epoch.NewBlock;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -26,10 +20,17 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.proposal.ProposalService;
+import com.platon.browser.service.statistic.StatisticService;
+import com.platon.browser.utils.ChainVersionUtil;
+import com.platon.browser.v0150.V0150Config;
 import com.platon.browser.v0150.bean.AdjustParam;
 import com.platon.browser.v0150.service.StakingDelegateBalanceAdjustmentService;
+import com.platon.browser.v0160.service.DelegateBalanceAdjustmentService;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -82,6 +83,7 @@ public class OnNewBlockAnalyzer {
     @Resource
     private DelegateBalanceAdjustmentService delegateBalanceAdjustmentService;
 
+    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(CollectionEvent event, Block block) throws NoSuchBeanException {
 
         long startTime = System.currentTimeMillis();
@@ -97,7 +99,7 @@ public class OnNewBlockAnalyzer {
                                     .build();
 
         newBlockMapper.newBlock(newBlock);
-        log.info("块高[{}]节点[{}]的手续费为[{}]出块奖励为[{}]",
+        log.debug("块高[{}]节点[{}]的手续费为[{}]出块奖励为[{}]",
                  event.getBlock().getNum(),
                  newBlock.getNodeId(),
                  newBlock.getFeeRewardValue(),
