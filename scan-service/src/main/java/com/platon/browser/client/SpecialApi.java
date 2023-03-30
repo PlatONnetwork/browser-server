@@ -17,6 +17,7 @@ import com.platon.contracts.ppos.dto.common.ErrorCode;
 import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.contracts.ppos.utils.EncoderUtils;
 import com.platon.protocol.Web3j;
+import com.platon.protocol.core.DefaultBlockParameter;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.core.RemoteCall;
 import com.platon.protocol.core.Request;
@@ -102,10 +103,22 @@ public class SpecialApi {
      * @throws Exception
      */
     private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to) throws ContractInvokeException {
+        return this.rpc(web3j, function, from, to, DefaultBlockParameterName.LATEST);
+    }
+
+    private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to, Long blockNumber) throws ContractInvokeException {
+        DefaultBlockParameter blockParameter = DefaultBlockParameterName.LATEST;
+        if(blockNumber!=null){
+            blockParameter = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
+        }
+        return this.rpc(web3j, function, from, to, blockParameter);
+    }
+
+    private CallResponse<String> rpc(Web3j web3j, Function function, String from, String to, DefaultBlockParameter blockParameter) throws ContractInvokeException {
         CallResponse<String> br;
         try {
             br = new RemoteCall<>(() -> {
-                PlatonCall ethCall = web3j.platonCall(Transaction.createEthCallTransaction(from, to, EncoderUtils.functionEncoder(function)), DefaultBlockParameterName.LATEST).send();
+                PlatonCall ethCall = web3j.platonCall(Transaction.createEthCallTransaction(from, to, EncoderUtils.functionEncoder(function)), blockParameter).send();
                 if (ethCall.hasError()) {
                     throw new ContractInvokeException(ethCall.getError().getMessage());
                 }
@@ -245,20 +258,35 @@ public class SpecialApi {
     }
 
     /**
-     * 根据账户地址获取锁仓余额
-     *
+     * 根据账户地址获取锁仓余额（单位：von）
+     *  此方法是复用的：
+     *  1. 可以查询地址的锁仓未释放金额： RestrictingBalance.lockBalance; //EOA的锁仓未释放余额
+     *  2. 也可以查询地址的余额： RestrictingBalance.freeBalance; //EOA帐号余额
+     *  1.锁仓未释放金额
+     *  2.地址余额
      * @param addresses
      * @return
      * @throws Exception
      */
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
+        return this.getRestrictingBalance(web3j, addresses, DefaultBlockParameterName.LATEST);
+    }
+    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses, Long blockNumber) throws ContractInvokeException, BlankResponseException {
+        DefaultBlockParameter blockParameter = DefaultBlockParameterName.LATEST;
+        if(blockNumber!=null){
+            blockParameter = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
+        }
+        return this.getRestrictingBalance(web3j, addresses, blockParameter);
+    }
+    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses, DefaultBlockParameter blockParameter) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(GET_RESTRICTING_BALANCE_FUNC_TYPE, Collections.singletonList(new Utf8String(addresses)));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
+        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), blockParameter);
         if (br == null || br.getData() == null) {
             throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!", addresses));
         }
         if (br.isStatusOk()) {
             String data = br.getData();
+            log.debug("查询锁仓余额特殊节点返回：{}", data);
             if (data == null) {
                 throw new BlankResponseException(BLANK_RES);
             }
@@ -283,7 +311,7 @@ public class SpecialApi {
             throw new BlankResponseException(String.format("查询历史周期信息出错【blockNumber:%s)】,返回为空!", blockNumber));
         }
 
-        log.info("总发行量 特殊节点 req = {}  resp = {}", blockNumber, cn.hutool.json.JSONUtil.toJsonStr(br));
+        log.debug("总发行量 特殊节点 req = {}  resp = {}", blockNumber, cn.hutool.json.JSONUtil.toJsonStr(br));
 
         if (br.isStatusOk()) {
             String data = br.getData();

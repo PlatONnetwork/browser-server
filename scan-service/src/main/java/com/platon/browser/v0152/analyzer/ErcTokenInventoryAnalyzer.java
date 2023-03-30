@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -95,11 +94,11 @@ public class ErcTokenInventoryAnalyzer {
             });
             if (CollUtil.isNotEmpty(insertOrUpdate)) {
                 customTokenInventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenInventory.Column.values());
-                log.info("当前交易[{}]添加erc721库存[{}]笔成功", txHash, insertOrUpdate.size());
+                log.debug("当前交易[{}]添加erc721库存[{}]笔成功", txHash, insertOrUpdate.size());
             }
             if (CollUtil.isNotEmpty(delTokenInventory)) {
                 customTokenInventoryMapper.burnAndDelTokenInventory(delTokenInventory);
-                log.info("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delTokenInventory.size());
+                log.debug("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delTokenInventory.size());
             }
         }
     }

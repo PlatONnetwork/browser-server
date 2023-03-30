@@ -8,7 +8,6 @@ import java.util.Date;
 public class Node {
 
     private String nodeId;
-
     private Integer statSlashMultiQty;
 
     private Integer statSlashLowQty;

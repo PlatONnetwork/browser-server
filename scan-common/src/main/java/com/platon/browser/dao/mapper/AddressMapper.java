@@ -2,8 +2,9 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface AddressMapper {
     long countByExample(AddressExample example);
@@ -51,4 +52,9 @@ public interface AddressMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int batchInsertSelective(@Param("list") List<Address> list, @Param("selective") Address.Column ... selective);
+
+    /**
+     * 统计账户地址的质押金额信息、委托金额、委托节点数量等信息
+     */
+    void updateStakingDelegationStats();
 }

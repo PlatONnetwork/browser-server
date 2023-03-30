@@ -191,7 +191,7 @@ public class ErcDetectService {
     public boolean isSupportErc721Metadata(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a75b5e139f00000000000000000000000000000000000000000000000000000000");
@@ -201,7 +201,7 @@ public class ErcDetectService {
     public boolean isSupportErc721Metadata(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress, blockNumber)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a75b5e139f00000000000000000000000000000000000000000000000000000000", blockNumber);
@@ -211,7 +211,7 @@ public class ErcDetectService {
     public boolean isSupportErc721Enumerable(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a7780e9d6300000000000000000000000000000000000000000000000000000000");
@@ -221,7 +221,7 @@ public class ErcDetectService {
     public boolean isSupportErc721Enumerable(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress, blockNumber)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a7780e9d6300000000000000000000000000000000000000000000000000000000", blockNumber);
@@ -238,7 +238,7 @@ public class ErcDetectService {
     private boolean isSupportErc721(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a780ac58cd00000000000000000000000000000000000000000000000000000000");
@@ -256,7 +256,7 @@ public class ErcDetectService {
     private boolean isSupportErc721(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress, blockNumber)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a780ac58cd00000000000000000000000000000000000000000000000000000000", blockNumber);
@@ -273,7 +273,7 @@ public class ErcDetectService {
     private boolean isSupportErc1155(String contractAddress) throws PlatonCallTimeoutException {
         // 支持erc1155，则必定要支持erc165
         if (!isSupportErc165(contractAddress)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a7d9b67a2600000000000000000000000000000000000000000000000000000000");
@@ -291,7 +291,7 @@ public class ErcDetectService {
     private boolean isSupportErc1155(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         // 支持erc1155，则必定要支持erc165
         if (!isSupportErc165(contractAddress, blockNumber)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a7d9b67a2600000000000000000000000000000000000000000000000000000000", blockNumber);
@@ -301,7 +301,7 @@ public class ErcDetectService {
     public Boolean isSupportErc1155Metadata(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         // 支持erc1155，则必定要支持erc165
         if (!isSupportErc165(contractAddress, blockNumber)) {
-            log.info("该合约[{}]不支持erc165", contractAddress);
+            log.debug("该合约[{}]不支持erc165", contractAddress);
             return false;
         }
         String result = detectInputData(contractAddress, "0x01ffc9a70e89341c00000000000000000000000000000000000000000000000000000000", blockNumber);
@@ -402,7 +402,7 @@ public class ErcDetectService {
             boolean isErc721 = isSupportErc721(contractAddress);
             if (isErc721) {
                 // 取ERC721合约信息
-                log.info("该合约[{}]是721合约", contractAddress);
+                log.debug("该合约[{}]是721合约", contractAddress);
                 return getErc721ContractId(contractAddress);
             }
 
@@ -410,12 +410,12 @@ public class ErcDetectService {
             boolean isErc1155 = isSupportErc1155(contractAddress);
             if (isErc1155) {
                 // 取ERC721合约信息
-                log.info("该合约[{}]是1155合约", contractAddress);
+                log.debug("该合约[{}]是1155合约", contractAddress);
                 return getErc1155ContractId(contractAddress);
             }
 
             // 不是ERC721，则检测是否是ERC20
-            log.info("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
+            log.debug("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
             contractId = getErc20ContractId(contractAddress);
             if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
                 // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
@@ -440,7 +440,7 @@ public class ErcDetectService {
             boolean isErc721 = isSupportErc721(contractAddress, blockNumber);
             if (isErc721) {
                 // 取ERC721合约信息
-                log.info("该合约[{}]是721合约", contractAddress);
+                log.debug("该合约[{}]是721合约", contractAddress);
                 return getErc721ContractId(contractAddress, blockNumber);
             }
 
@@ -448,12 +448,12 @@ public class ErcDetectService {
 
             if (isErc1155) {
                 // 取ERC1155合约信息
-                log.info("该合约[{}]是1155合约", contractAddress);
+                log.debug("该合约[{}]是1155合约", contractAddress);
                 return getErc1155ContractId(contractAddress, blockNumber);
             }
 
             // 不是ERC721，则检测是否是ERC20
-            log.info("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
+            log.debug("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
             contractId = getErc20ContractId(contractAddress, blockNumber);
             if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
                 // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型

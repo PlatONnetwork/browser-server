@@ -233,7 +233,7 @@ public class NetworkStatUpdateTask {
                                                  .subtract(delegationValue.getFree())
                                                  .subtract(incentivePoolValue.getFree())
                                                  .subtract(foundationValue.getFree());
-        log.info("流通量[{}]=本增发周期总发行量[{}]-锁仓未到期的金额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];当前块高[{}]结算周期总块数[{}]",
+        log.debug("流通量[{}]=本增发周期总发行量[{}]-锁仓未到期的金额[{}]-实时委托奖励池合约余额[{}]-实时激励池余额[{}]-实时所有基金会账户余额[{}];当前块高[{}]结算周期总块数[{}]",
                  circulationValue.toPlainString(),
                  networkStat.getIssueValue().toPlainString(),
                  rpNotExpiredValue.toPlainString(),

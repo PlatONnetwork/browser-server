@@ -24,35 +24,7 @@ dependencies {
     testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'
 }
 
-sonarqube {
-    properties {
-        property "sonar.exclusions", "src/main/java/**/dao/param**,**/*Mapper.java," +
-                "**/*Application.java,**/NodeUpdateTask.java,**/NetworkStatUpdateTask.java," +
-                "**/ProposalInfoTask.java,**/AddressUpdateTask.java,**/EpochMessage.java," +
-                "**/NetworkStatCache.java,**/ShutdownCallback.java,**/AccountService.java," +
-                "**/OnSettleConverter.java,**/PersistenceEvent.java,**/AddressTypeEnum.java," +
-                "**/ConfigChange.java,**/TxAnalyseResult.java,**/DelegateExitResult.java," +
-                "**/CalculateUtils.java,**/PersistenceEventHandler.java,**/DelegateRewardClaimConverter.java," +
-                "**/EsDelegateRewardService.java,**/ERC20Client.java,**/TransferEventConverter.java,"+
-                "**/StakingDelegateBalanceAdjustmentServiceTest2.java"
 
-    }
-}
-
-test {
-    //   include '**/Test*.class'
-    // 忽略指定的测试用例
-    exclude '/**/ProposalContractTest.class'
-    exclude '/**/RestrictingPlanContractTest.class'
-    exclude '/**/SlashContractTest.class'
-    exclude '/**/TransactionSender.class'
-    exclude '/**/CustomNodeMapperTest.class'
-    exclude '/**/StakingContractTest.class'
-    exclude '/**/WASMUploadTest.class'
-    exclude '/**/WASMDestructTest.class'
-    exclude '/**/SuicideAndSelfdestructTest.class'
-    exclude '/**/HumanStandardTokenTest.class'
-    exclude '/**/proxyppos/*Test.class'
-    exclude '/**/proxyppos/**/*Test.class'
-    exclude '/**/StakingDelegateBalanceAdjustmentServiceTest2.class'
+tasks.named('test') {
+    useJUnitPlatform()
 }

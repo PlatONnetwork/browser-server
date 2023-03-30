@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.contract.Erc1155Contract;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
@@ -66,16 +65,17 @@ public class ErcServiceImpl {
      * @return java.math.BigInteger
      * @date 2021/1/18
      */
-    public BigInteger getTotalSupply(String contractAddress) {
+    public BigInteger getTotalSupply(String contractAddress, ErcTypeEnum ercTypeEnum, BigInteger currentBlockNumber) {
         BigInteger totalSupply = null;
         try {
-            ErcContractId ercContractId = ercDetectService.getContractId(contractAddress);
-            ErcContract ercContract = getErcContract(contractAddress, ercContractId.getTypeEnum());
+            // lvxiaoyi, 2023/03/29，获取token的totalSupply，无需ErcContractId。
+            // ErcContractId ercContractId = ercDetectService.getContractId(contractAddress);
+            ErcContract ercContract = getErcContract(contractAddress, ercTypeEnum, currentBlockNumber);
             if (ObjectUtil.isNotNull(ercContract)) {
                 totalSupply = ercContract.totalSupply().send();
             }
         } catch (Exception e) {
-            log.warn(StrFormatter.format("获取供应总量异常,contractAddress：{}", contractAddress), e);
+            log.warn(StrFormatter.format("从特殊节点获取供应总量异常,contractAddress：{},块高:{}", contractAddress, currentBlockNumber), e);
         }
         return totalSupply;
     }

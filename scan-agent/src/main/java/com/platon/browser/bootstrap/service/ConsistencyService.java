@@ -125,7 +125,7 @@ public class ConsistencyService {
         syncErc721Tx(esErc721TxRepository, syncData);
         syncErc1155Tx(esErc1155TxRepository, syncData);
         syncDataToESAndRedis(syncData);
-        log.info("MYSQL/ES/REDIS中的数据同步完成!");
+        log.debug("MYSQL/ES/REDIS中的数据同步完成!");
     }
 
     /**
@@ -156,9 +156,9 @@ public class ConsistencyService {
                 CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
                 syncData.getBlockSet().add(block);
             }
-            log.info("MYSQL/ES/REDIS块高数据同步区间:[{},{}]", esBlockNum, mysqlBlockNum);
+            log.debug("MYSQL/ES/REDIS块高数据同步区间:[{},{}]", esBlockNum, mysqlBlockNum);
         } else {
-            log.info("MySQL没有块高数据需要同步");
+            log.debug("MySQL没有块高数据需要同步");
         }
     }
 
@@ -189,9 +189,9 @@ public class ConsistencyService {
                     BeanUtil.copyProperties(txBak, transaction);
                     syncData.getTxBakSet().add(transaction);
                 }
-                log.info("MYSQL/ES/REDIS交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+                log.debug("MYSQL/ES/REDIS交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
             } else {
-                log.info("MySQL没有交易数据需要同步");
+                log.debug("MySQL没有交易数据需要同步");
             }
         } catch (Exception e) {
             log.error("同步交易数据异常", e);
@@ -226,9 +226,9 @@ public class ConsistencyService {
                     BeanUtil.copyProperties(txDelegationRewardBak, delegationReward);
                     syncData.getDelegationRewardBakSet().add(delegationReward);
                 }
-                log.info("MYSQL/ES/REDIS领取奖励交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+                log.debug("MYSQL/ES/REDIS领取奖励交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
             } else {
-                log.info("MySQL没有领取奖励交易数据需要同步");
+                log.debug("MySQL没有领取奖励交易数据需要同步");
             }
         } catch (Exception e) {
             log.error("MySQL同步领取奖励交易数据异常", e);
@@ -263,9 +263,9 @@ public class ConsistencyService {
                     BeanUtil.copyProperties(txErc20Bak, ercTx);
                     syncData.getErc20BakSet().add(ercTx);
                 }
-                log.info("MYSQL/ES/REDIS erc20交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+                log.debug("MYSQL/ES/REDIS erc20交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
             } else {
-                log.info("MySQL没有erc20交易数据需要同步");
+                log.debug("MySQL没有erc20交易数据需要同步");
             }
         } catch (Exception e) {
             log.error("MySQL同步erc20交易数据异常", e);
@@ -300,9 +300,9 @@ public class ConsistencyService {
                     BeanUtil.copyProperties(txErc721Bak, ercTx);
                     syncData.getErc20BakSet().add(ercTx);
                 }
-                log.info("MYSQL/ES/REDIS erc721交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+                log.debug("MYSQL/ES/REDIS erc721交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
             } else {
-                log.info("MySQL没有erc721交易数据需要同步");
+                log.debug("MySQL没有erc721交易数据需要同步");
             }
         } catch (Exception e) {
             log.error("MySQL同步erc721交易数据异常", e);
@@ -337,9 +337,9 @@ public class ConsistencyService {
                     BeanUtil.copyProperties(txErc1155Bak, ercTx);
                     syncData.getErc1155BakSet().add(ercTx);
                 }
-                log.info("MYSQL/ES/REDIS erc1155交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+                log.debug("MYSQL/ES/REDIS erc1155交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
             } else {
-                log.info("MySQL没有erc1155交易数据需要同步");
+                log.debug("MySQL没有erc1155交易数据需要同步");
             }
         } catch (Exception e) {
             log.error("MySQL同步erc1155交易数据异常", e);

@@ -291,7 +291,7 @@ subprojects {
     check.dependsOn jacocoTestReport
 
     dependencies {
-        testCompile "junit:junit:$junitVersion"
+        //testCompile "junit:junit:$junitVersion"
         testCompile "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "com.alibaba:fastjson:$fastJsonVersion"

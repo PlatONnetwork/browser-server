@@ -2,8 +2,9 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface NetworkStatMapper {
     long countByExample(NetworkStatExample example);
@@ -16,7 +17,6 @@ public interface NetworkStatMapper {
 
     int insertSelective(NetworkStat record);
 
-    List<NetworkStat> selectByExampleWithBLOBs(NetworkStatExample example);
 
     List<NetworkStat> selectByExample(NetworkStatExample example);
 
@@ -24,13 +24,9 @@ public interface NetworkStatMapper {
 
     int updateByExampleSelective(@Param("record") NetworkStat record, @Param("example") NetworkStatExample example);
 
-    int updateByExampleWithBLOBs(@Param("record") NetworkStat record, @Param("example") NetworkStatExample example);
-
     int updateByExample(@Param("record") NetworkStat record, @Param("example") NetworkStatExample example);
 
     int updateByPrimaryKeySelective(NetworkStat record);
-
-    int updateByPrimaryKeyWithBLOBs(NetworkStat record);
 
     int updateByPrimaryKey(NetworkStat record);
 

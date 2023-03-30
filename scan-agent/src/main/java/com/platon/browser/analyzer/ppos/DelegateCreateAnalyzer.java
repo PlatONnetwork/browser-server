@@ -1,9 +1,9 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
+import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.param.ppos.DelegateCreate;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateCreateParam;
@@ -65,12 +65,12 @@ public class DelegateCreateAnalyzer extends PPOSAnalyzer<DelegateCreate> {
         List<GasEstimate> estimates = new ArrayList<>();
         GasEstimate estimate = new GasEstimate();
         estimate.setNodeId(txParam.getNodeId());
+        estimate.setNodeIdHashCode(txParam.getNodeId().hashCode());
         estimate.setSbn(txParam.getStakingBlockNum().longValue());
         estimate.setAddr(tx.getFrom());
         estimate.setEpoch(0L);
         estimates.add(estimate);
-        customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
-
+        customGasEstimateMapper.batchInsertOrResetEpoch(estimates);
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         return businessParam;
     }

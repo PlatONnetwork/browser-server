@@ -44,10 +44,10 @@ public class BatchSizeAdjustTask {
             long chainBlockNumber = platOnClient.getLatestBlockNumber().longValue();
             long appBlockNumber = persistenceEventHandler.getMaxBlockNumber();
             if (chainBlockNumber - appBlockNumber < taskConfig.getGapForAdjust()) {
-                log.info("---------------已追上链,调整批量大小为{}---------------", taskConfig.getEsRedisCatchupBatchSize());
+                log.debug("---------------已追上链,调整批量大小为{}---------------", taskConfig.getEsRedisCatchupBatchSize());
                 disruptorConfig.setPersistenceBatchSize(taskConfig.getEsRedisCatchupBatchSize());
             } else {
-                log.info("---------------未追上链,调整批量大小为{}---------------", taskConfig.getEsRedisNotCatchupBatchSize());
+                log.debug("---------------未追上链,调整批量大小为{}---------------", taskConfig.getEsRedisNotCatchupBatchSize());
                 disruptorConfig.setPersistenceBatchSize(taskConfig.getEsRedisNotCatchupBatchSize());
             }
         } catch (Exception e) {

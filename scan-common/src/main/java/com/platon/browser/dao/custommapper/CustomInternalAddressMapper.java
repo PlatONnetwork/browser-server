@@ -31,4 +31,24 @@ public interface CustomInternalAddressMapper {
      */
     Page<InternalAddress> selectListByExample(InternalAddressExample example);
 
+    /**
+     * 返回参与计算的基金会地址
+     * @return
+     */
+    List<String> listCalculableFoundationAddress();
+
+    /**
+     * 查询内部地址列表，固定按address排列
+     * @param internalAddressType
+     * @param offset
+     * @param pageSize
+     * @return
+     */
+    List<InternalAddress> listInternalAddress(@Param("internalAddressType") int internalAddressType, @Param("offset") int offset, @Param("pageSize") int pageSize);
+
+    /**
+     * 更新余额和锁仓金额
+     * @param values
+     */
+    void updateBalanceAndRestrictingBalance(Collection<InternalAddress> values);
 }

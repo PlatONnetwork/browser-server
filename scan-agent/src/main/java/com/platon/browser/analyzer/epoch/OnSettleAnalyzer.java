@@ -4,13 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.custommapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Settle;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -22,7 +20,6 @@ import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -43,15 +40,12 @@ public class OnSettleAnalyzer {
     private StakingMapper stakingMapper;
 
     @Resource
-    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
-
-    @Resource
-    private GasEstimateLogMapper gasEstimateLogMapper;
+    private CustomGasEstimateMapper customGasEstimateMapper;
 
     @Resource
     private RestrictingMinimumReleaseParamService restrictingMinimumReleaseParamService;
 
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+
     public List<NodeOpt> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
         // 操作日志列表
@@ -166,24 +160,25 @@ public class OnSettleAnalyzer {
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k, v) -> {
             GasEstimate ge = new GasEstimate();
-            ge.setNodeId(v.getNodeId());
+            //ge.setNodeId(v.getNodeId());
+            ge.setNodeIdHashCode(v.getNodeId().hashCode());
             ge.setSbn(v.getStakingBlockNum().longValue());
             gasEstimates.add(ge);
         });
 
         // 1、把周期数需要自增1的节点质押先入mysql数据库
-        Long seq = block.getNum() * 10000;
+        /*Long seq = block.getNum() * 10000;
         List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
         GasEstimateLog gasEstimateLog = new GasEstimateLog();
         gasEstimateLog.setSeq(seq);
         gasEstimateLog.setJson(JSON.toJSONString(gasEstimates));
-        gasEstimateLogs.add(gasEstimateLog);
-        customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
+        gasEstimateLogs.add(gasEstimateLog);*/
+        //customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
 
         if (CollUtil.isNotEmpty(gasEstimates)) {
-            epochBusinessMapper.updateGasEstimate(gasEstimates);
+            customGasEstimateMapper.increaseEpoch(gasEstimates);
         }
-        gasEstimateLogMapper.deleteByPrimaryKey(seq);
+        //gasEstimateLogMapper.deleteByPrimaryKey(seq);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
@@ -217,7 +212,7 @@ public class OnSettleAnalyzer {
                 updateStaking.setStakingRewardValue(stakingRewardValue);
                 updateStakingList.add(updateStaking);
                 // MySQL数据库会四舍五入取整
-                log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
+                log.debug("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
                          blockNum,
                          epoch,
                          staking.getNodeId(),

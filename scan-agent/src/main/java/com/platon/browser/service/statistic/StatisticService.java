@@ -94,7 +94,7 @@ public class StatisticService {
                     NodeSettleStatis nodeSettleStatis;
                     if (StrUtil.isEmpty(info)) {
                         nodeSettleStatis = new NodeSettleStatis();
-                        nodeSettleStatis.setNodeId(node.getNodeId());
+                        //nodeSettleStatis.setNodeId(node.getNodeId());
                         nodeSettleStatis.setBlockNum(0L);
                         NodeSettleStatisBase nodeSettleStatisBase = new NodeSettleStatisBase();
                         nodeSettleStatisBase.setSettleEpochRound(event.getEpochMessage().getSettleEpochRound());
@@ -120,7 +120,7 @@ public class StatisticService {
                 if (CollUtil.isNotEmpty(updateNodeList)) {
                     int res = customNodeMapper.updateNodeSettleStatis(updateNodeList);
                     if (res > 0) {
-                        log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功",
+                        log.debug("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功",
                                  updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()),
                                  event.getEpochMessage().getConsensusEpochRound(),
                                  event.getEpochMessage().getCurrentBlockNumber());
@@ -211,7 +211,7 @@ public class StatisticService {
             NodeSettleStatis nodeSettleStatis;
             if (StrUtil.isEmpty(info)) {
                 nodeSettleStatis = new NodeSettleStatis();
-                nodeSettleStatis.setNodeId(nodeItem.getNodeId());
+                //nodeSettleStatis.setNodeId(nodeItem.getNodeId());
                 nodeSettleStatis.setBlockNum(event.getEpochMessage().getCurrentBlockNumber().longValue());
                 NodeSettleStatisBase nodeSettleStatisBase = new NodeSettleStatisBase();
                 nodeSettleStatisBase.setSettleEpochRound(event.getEpochMessage().getSettleEpochRound());

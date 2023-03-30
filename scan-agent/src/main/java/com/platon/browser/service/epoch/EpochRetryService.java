@@ -254,7 +254,7 @@ public class EpochRetryService {
     private BigDecimal handleStakeReward(BigInteger preSettleEpochLastBlockNumber, BigInteger preEpoch, BigDecimal preStakingReward) throws Exception {
         List<Node> lastNodes = specialApi.getHistoryVerifierList(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
         BigDecimal stakeReward = preStakingReward.divide(BigDecimal.valueOf(lastNodes.size()), 0, BigDecimal.ROUND_DOWN);
-        log.info("块高[{}]第[{}]个结算周期，质押奖励[{}]=总质押奖励[{}]/验证人数量[{}]", preSettleEpochLastBlockNumber, preEpoch, stakeReward.toPlainString(), preStakingReward.toPlainString(), lastNodes.size());
+        log.debug("块高[{}]第[{}]个结算周期，质押奖励[{}]=总质押奖励[{}]/验证人数量[{}]", preSettleEpochLastBlockNumber, preEpoch, stakeReward.toPlainString(), preStakingReward.toPlainString(), lastNodes.size());
         return stakeReward;
     }
 

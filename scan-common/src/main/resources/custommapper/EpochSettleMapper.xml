@@ -88,9 +88,4 @@
         </foreach>
     </update>
 
-    <update id="updateGasEstimate">
-        <foreach collection="list" item="item" separator=";">
-            update `gas_estimate` set `epoch` = `epoch`+1 where `node_id`= #{item.nodeId} and `sbn`=#{item.sbn}
-        </foreach>
-    </update>
-</mapper>
+ </mapper>

@@ -1,11 +1,9 @@
 package com.platon.browser.bean;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 import com.platon.browser.dao.entity.NetworkStat;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.math.BigDecimal;
 
 /**
  * @description: 网络统计类
@@ -18,9 +16,9 @@ public class CollectionNetworkStat extends NetworkStat {
 
     public static CollectionNetworkStat newInstance() {
         CollectionNetworkStat stat = new CollectionNetworkStat();
-        Date date = new Date();
-        stat.setCreateTime(date);
-        stat.setUpdateTime(date);
+        //Date date = new Date();
+        //stat.setCreateTime(date);
+        //stat.setUpdateTime(date);
         stat.setAddIssueBegin(0L);
         stat.setAddIssueEnd(0L);
         stat.setAddressQty(0);

@@ -10,6 +10,7 @@ import com.platon.protocol.websocket.WebSocketService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -103,7 +104,14 @@ public class RetryableClient {
         return rewardContract;
     }
 
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    /**
+     * @Backoff注解中的参数说明：
+     * value：隔多少毫秒后重试，默认为1000L，我们设置为3000L；
+     * delay：和value一样，但是默认为0；
+     * multiplier（指定延迟倍数）默认为0，表示固定暂停1秒后进行重试，如果把multiplier设置为1.5，则第一次重试为2秒，第二次为3秒，第三次为4.5秒。
+     * @throws ConfigLoadingException
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 2000L, multiplier = 1))
     public void init() throws ConfigLoadingException {
         WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
@@ -176,7 +184,7 @@ public class RetryableClient {
                         currentWeb3jWrapper = wrapper;
                     }
                 } catch (Exception e2) {
-                    log.info("候选Web3j实例({})无效！", wrapper.getAddress());
+                    log.debug("候选Web3j实例({})无效！", wrapper.getAddress());
                 }
             }
             if (preWeb3j == null || preWeb3j != currentWeb3jWrapper) {
@@ -184,9 +192,9 @@ public class RetryableClient {
                 updateContract();
             }
             if (maxBlockNumber == -1) {
-                log.info("当前所有候选Web3j实例均无法连通!");
+                log.debug("当前所有候选Web3j实例均无法连通!");
                 if (protocol == Web3jProtocolEnum.WS) {
-                    log.info("重新初始化websocket连接!");
+                    log.debug("重新初始化websocket连接!");
                     try {
                         init();
                     } catch (ConfigLoadingException e) {

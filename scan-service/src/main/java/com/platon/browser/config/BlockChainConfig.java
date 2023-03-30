@@ -61,7 +61,7 @@ public class BlockChainConfig {
             }
             salt = salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
-            log.info("salt:{}", salt);
+            log.debug("salt:{}", salt);
         } catch (IOException | ConfigLoadingException e) {
             log.error("加载解密文件出错", e);
             System.exit(1);

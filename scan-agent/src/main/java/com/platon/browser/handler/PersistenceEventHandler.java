@@ -3,7 +3,6 @@ package com.platon.browser.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.bean.PersistenceEvent;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.DisruptorConfig;
@@ -88,7 +87,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     private void exec(PersistenceEvent event, long sequence, boolean endOfBatch) throws Exception {
         try {
-            log.info("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
+            log.debug("当前区块[{}]有[{}]笔交易,有[{}]笔节点操作,有[{}]笔委托奖励",
                      event.getBlock().getNum(),
                      CommonUtil.ofNullable(() -> event.getTransactions().size()).orElse(0),
                      CommonUtil.ofNullable(() -> event.getNodeOpts().size()).orElse(0),
@@ -121,7 +120,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 return;
             } else {
                 blockNums = blockStage.stream().map(Block::getNum).sorted().collect(Collectors.toList());
-                log.info("相关区块[{}]达到入库标准", JSONUtil.toJsonStr(blockNums));
+                log.debug("相关区块[{}]达到入库标准", JSONUtil.toJsonStr(blockNums));
             }
 
             statisticsLog();
@@ -164,7 +163,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                     IntSummaryStatistics transferTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getTransferTxList().size()));
                     IntSummaryStatistics pposTxSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getPposTxList().size()));
                     IntSummaryStatistics virtualTransactionSize = transactions.stream().collect(Collectors.summarizingInt(transaction -> transaction.getVirtualTransactions().size()));
-                    log.info("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],erc1155交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
+                    log.debug("准备入库redis和ES:当前块高为[{}],交易数为[{}],erc20交易数为[{}],erc721交易数为[{}],erc1155交易数为[{}],内部转账交易数为[{}],PPOS调用交易数为[{}],虚拟交易数为[{}]",
                              blockNum,
                              CommonUtil.ofNullable(() -> transactions.size()).orElse(0),
                              erc20Size.getSum(),

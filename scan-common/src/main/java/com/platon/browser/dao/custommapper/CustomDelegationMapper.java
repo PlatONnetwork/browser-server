@@ -4,9 +4,6 @@ import com.github.pagehelper.Page;
 import com.platon.browser.bean.CustomDelegation;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
-
-import com.platon.browser.bean.RecoveredDelegationAmount;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -21,8 +18,4 @@ public interface CustomDelegationMapper {
 
     Page<DelegationAddress> selectAddressByAddr(@Param("delegateAddr") String delegateAddr);
 
-    /**
-     * 批量更新
-     */
-    int batchUpdateByDelegationKey(@Param("list") List<RecoveredDelegationAmount> list);
 }

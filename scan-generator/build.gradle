@@ -37,7 +37,7 @@ repositories {
 dependencies {
     compile mybatisGeneratorCore
     compile itfswMybatisGeneratorPlugin
-    testCompile 'junit:junit:4.12'
+    //testCompile 'junit:junit:4.12'
 }
 
 def defaultEncoding = 'UTF-8'

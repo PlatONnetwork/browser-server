@@ -32,9 +32,7 @@
     <result column="erc721_tx_qty" jdbcType="INTEGER" property="erc721TxQty" />
     <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty" />
     <result column="year_num" jdbcType="INTEGER" property="yearNum" />
-  </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.NetworkStat">
-    <result column="issue_rates" jdbcType="LONGVARCHAR" property="issueRates" />
+    <result column="issue_rates" jdbcType="VARCHAR" property="issueRates" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -95,31 +93,13 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
-    turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
-    proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin, 
-    add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time, 
-    erc1155_tx_qty, erc721_tx_qty, erc20_tx_qty, year_num
+    id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value,
+    turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty,
+    proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, add_issue_begin,
+    add_issue_end, next_settle, node_opt_seq, create_time, update_time, avg_pack_time,
+    erc1155_tx_qty, erc721_tx_qty, erc20_tx_qty, year_num, issue_rates
   </sql>
-  <sql id="Blob_Column_List">
-    issue_rates
-  </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.NetworkStatExample" resultMap="ResultMapWithBLOBs">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from network_stat
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-  </select>
+
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NetworkStatExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -134,11 +114,9 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select 
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from network_stat
     where id = #{id,jdbcType=INTEGER}
   </select>
@@ -153,27 +131,27 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.NetworkStat">
-    insert into network_stat (id, cur_number, cur_block_hash, 
-      node_id, node_name, tx_qty, 
-      cur_tps, max_tps, issue_value, 
-      turn_value, available_staking, staking_delegation_value, 
-      staking_value, doing_proposal_qty, proposal_qty, 
-      address_qty, block_reward, staking_reward, 
-      settle_staking_reward, add_issue_begin, add_issue_end, 
-      next_settle, node_opt_seq, create_time, 
+    insert into network_stat (id, cur_number, cur_block_hash,
+      node_id, node_name, tx_qty,
+      cur_tps, max_tps, issue_value,
+      turn_value, available_staking, staking_delegation_value,
+      staking_value, doing_proposal_qty, proposal_qty,
+      address_qty, block_reward, staking_reward,
+      settle_staking_reward, add_issue_begin, add_issue_end,
+      next_settle, node_opt_seq, create_time,
       update_time, avg_pack_time, erc1155_tx_qty, erc721_tx_qty,
       erc20_tx_qty, year_num, issue_rates
       )
-    values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
-      #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, 
-      #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, 
-      #{turnValue,jdbcType=DECIMAL}, #{availableStaking,jdbcType=DECIMAL}, #{stakingDelegationValue,jdbcType=DECIMAL}, 
-      #{stakingValue,jdbcType=DECIMAL}, #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
-      #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, 
-      #{settleStakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
-      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+    values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR},
+      #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER},
+      #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL},
+      #{turnValue,jdbcType=DECIMAL}, #{availableStaking,jdbcType=DECIMAL}, #{stakingDelegationValue,jdbcType=DECIMAL},
+      #{stakingValue,jdbcType=DECIMAL}, #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER},
+      #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL},
+      #{settleStakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT},
+      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP},
       #{updateTime,jdbcType=TIMESTAMP}, #{avgPackTime,jdbcType=BIGINT}, #{erc1155TxQty,jdbcType=INTEGER}, #{erc721TxQty,jdbcType=INTEGER},
-      #{erc20TxQty,jdbcType=INTEGER}, #{yearNum,jdbcType=INTEGER}, #{issueRates,jdbcType=LONGVARCHAR}
+      #{erc20TxQty,jdbcType=INTEGER}, #{yearNum,jdbcType=INTEGER}, #{issueRates,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
@@ -365,7 +343,7 @@
         #{yearNum,jdbcType=INTEGER},
       </if>
       <if test="issueRates != null">
-        #{issueRates,jdbcType=LONGVARCHAR},
+        #{issueRates,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -447,12 +425,6 @@
       <if test="record.nodeOptSeq != null">
         node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
       </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="record.avgPackTime != null">
         avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
       </if>
@@ -469,50 +441,14 @@
         year_num = #{record.yearNum,jdbcType=INTEGER},
       </if>
       <if test="record.issueRates != null">
-        issue_rates = #{record.issueRates,jdbcType=LONGVARCHAR},
+        issue_rates = #{record.issueRates,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByExampleWithBLOBs" parameterType="map">
-    update network_stat
-    set id = #{record.id,jdbcType=INTEGER},
-      cur_number = #{record.curNumber,jdbcType=BIGINT},
-      cur_block_hash = #{record.curBlockHash,jdbcType=VARCHAR},
-      node_id = #{record.nodeId,jdbcType=VARCHAR},
-      node_name = #{record.nodeName,jdbcType=VARCHAR},
-      tx_qty = #{record.txQty,jdbcType=INTEGER},
-      cur_tps = #{record.curTps,jdbcType=INTEGER},
-      max_tps = #{record.maxTps,jdbcType=INTEGER},
-      issue_value = #{record.issueValue,jdbcType=DECIMAL},
-      turn_value = #{record.turnValue,jdbcType=DECIMAL},
-      available_staking = #{record.availableStaking,jdbcType=DECIMAL},
-      staking_delegation_value = #{record.stakingDelegationValue,jdbcType=DECIMAL},
-      staking_value = #{record.stakingValue,jdbcType=DECIMAL},
-      doing_proposal_qty = #{record.doingProposalQty,jdbcType=INTEGER},
-      proposal_qty = #{record.proposalQty,jdbcType=INTEGER},
-      address_qty = #{record.addressQty,jdbcType=INTEGER},
-      block_reward = #{record.blockReward,jdbcType=DECIMAL},
-      staking_reward = #{record.stakingReward,jdbcType=DECIMAL},
-      settle_staking_reward = #{record.settleStakingReward,jdbcType=DECIMAL},
-      add_issue_begin = #{record.addIssueBegin,jdbcType=BIGINT},
-      add_issue_end = #{record.addIssueEnd,jdbcType=BIGINT},
-      next_settle = #{record.nextSettle,jdbcType=BIGINT},
-      node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
-      erc1155_tx_qty = #{record.erc1155TxQty,jdbcType=INTEGER},
-      erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
-      erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
-      year_num = #{record.yearNum,jdbcType=INTEGER},
-      issue_rates = #{record.issueRates,jdbcType=LONGVARCHAR}
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
+
   <update id="updateByExample" parameterType="map">
     update network_stat
     set id = #{record.id,jdbcType=INTEGER},
@@ -538,13 +474,12 @@
       add_issue_end = #{record.addIssueEnd,jdbcType=BIGINT},
       next_settle = #{record.nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{record.avgPackTime,jdbcType=BIGINT},
       erc1155_tx_qty = #{record.erc1155TxQty,jdbcType=INTEGER},
       erc721_tx_qty = #{record.erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{record.erc20TxQty,jdbcType=INTEGER},
-      year_num = #{record.yearNum,jdbcType=INTEGER}
+      year_num = #{record.yearNum,jdbcType=INTEGER},
+      issue_rates = #{record.issueRates,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -618,12 +553,6 @@
       <if test="nodeOptSeq != null">
         node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
       </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="avgPackTime != null">
         avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
       </if>
@@ -640,45 +569,12 @@
         year_num = #{yearNum,jdbcType=INTEGER},
       </if>
       <if test="issueRates != null">
-        issue_rates = #{issueRates,jdbcType=LONGVARCHAR},
+        issue_rates = #{issueRates,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.NetworkStat">
-    update network_stat
-    set cur_number = #{curNumber,jdbcType=BIGINT},
-      cur_block_hash = #{curBlockHash,jdbcType=VARCHAR},
-      node_id = #{nodeId,jdbcType=VARCHAR},
-      node_name = #{nodeName,jdbcType=VARCHAR},
-      tx_qty = #{txQty,jdbcType=INTEGER},
-      cur_tps = #{curTps,jdbcType=INTEGER},
-      max_tps = #{maxTps,jdbcType=INTEGER},
-      issue_value = #{issueValue,jdbcType=DECIMAL},
-      turn_value = #{turnValue,jdbcType=DECIMAL},
-      available_staking = #{availableStaking,jdbcType=DECIMAL},
-      staking_delegation_value = #{stakingDelegationValue,jdbcType=DECIMAL},
-      staking_value = #{stakingValue,jdbcType=DECIMAL},
-      doing_proposal_qty = #{doingProposalQty,jdbcType=INTEGER},
-      proposal_qty = #{proposalQty,jdbcType=INTEGER},
-      address_qty = #{addressQty,jdbcType=INTEGER},
-      block_reward = #{blockReward,jdbcType=DECIMAL},
-      staking_reward = #{stakingReward,jdbcType=DECIMAL},
-      settle_staking_reward = #{settleStakingReward,jdbcType=DECIMAL},
-      add_issue_begin = #{addIssueBegin,jdbcType=BIGINT},
-      add_issue_end = #{addIssueEnd,jdbcType=BIGINT},
-      next_settle = #{nextSettle,jdbcType=BIGINT},
-      node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
-      erc1155_tx_qty = #{erc1155TxQty,jdbcType=INTEGER},
-      erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
-      erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
-      year_num = #{yearNum,jdbcType=INTEGER},
-      issue_rates = #{issueRates,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.NetworkStat">
     update network_stat
     set cur_number = #{curNumber,jdbcType=BIGINT},
@@ -703,12 +599,11 @@
       add_issue_end = #{addIssueEnd,jdbcType=BIGINT},
       next_settle = #{nextSettle,jdbcType=BIGINT},
       node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       avg_pack_time = #{avgPackTime,jdbcType=BIGINT},
       erc721_tx_qty = #{erc721TxQty,jdbcType=INTEGER},
       erc20_tx_qty = #{erc20TxQty,jdbcType=INTEGER},
-      year_num = #{yearNum,jdbcType=INTEGER}
+      year_num = #{yearNum,jdbcType=INTEGER},
+      issue_rates = #{issueRates,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -718,25 +613,25 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into network_stat
-    (id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
-      turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty, 
-      proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward, 
-      add_issue_begin, add_issue_end, next_settle, node_opt_seq, create_time, update_time, 
+    (id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value,
+      turn_value, available_staking, staking_delegation_value, staking_value, doing_proposal_qty,
+      proposal_qty, address_qty, block_reward, staking_reward, settle_staking_reward,
+      add_issue_begin, add_issue_end, next_settle, node_opt_seq, create_time, update_time,
       avg_pack_time, erc1155_tx_qty, erc721_tx_qty, erc20_tx_qty, year_num, issue_rates)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
-        #{item.nodeId,jdbcType=VARCHAR}, #{item.nodeName,jdbcType=VARCHAR}, #{item.txQty,jdbcType=INTEGER}, 
-        #{item.curTps,jdbcType=INTEGER}, #{item.maxTps,jdbcType=INTEGER}, #{item.issueValue,jdbcType=DECIMAL}, 
-        #{item.turnValue,jdbcType=DECIMAL}, #{item.availableStaking,jdbcType=DECIMAL}, 
-        #{item.stakingDelegationValue,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL}, 
-        #{item.doingProposalQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, 
-        #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL}, 
-        #{item.settleStakingReward,jdbcType=DECIMAL}, #{item.addIssueBegin,jdbcType=BIGINT}, 
-        #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT}, 
+      (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR},
+        #{item.nodeId,jdbcType=VARCHAR}, #{item.nodeName,jdbcType=VARCHAR}, #{item.txQty,jdbcType=INTEGER},
+        #{item.curTps,jdbcType=INTEGER}, #{item.maxTps,jdbcType=INTEGER}, #{item.issueValue,jdbcType=DECIMAL},
+        #{item.turnValue,jdbcType=DECIMAL}, #{item.availableStaking,jdbcType=DECIMAL},
+        #{item.stakingDelegationValue,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL},
+        #{item.doingProposalQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER},
+        #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL},
+        #{item.settleStakingReward,jdbcType=DECIMAL}, #{item.addIssueBegin,jdbcType=BIGINT},
+        #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT},
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.avgPackTime,jdbcType=BIGINT},
         #{item.erc1155TxQty,jdbcType=INTEGER}, #{item.erc721TxQty,jdbcType=INTEGER}, #{item.erc20TxQty,jdbcType=INTEGER}, #{item.yearNum,jdbcType=INTEGER},
-        #{item.issueRates,jdbcType=LONGVARCHAR})
+        #{item.issueRates,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -845,7 +740,7 @@
           #{item.yearNum,jdbcType=INTEGER}
         </if>
         <if test="'issue_rates'.toString() == column.value">
-          #{item.issueRates,jdbcType=LONGVARCHAR}
+          #{item.issueRates,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

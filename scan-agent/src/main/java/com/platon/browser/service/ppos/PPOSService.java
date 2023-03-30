@@ -1,22 +1,11 @@
 package com.platon.browser.service.ppos;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.platon.browser.analyzer.ppos.*;
-import org.springframework.stereotype.Service;
-
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.DelegateExitResult;
 import com.platon.browser.bean.TxAnalyseResult;
-import com.platon.browser.analyzer.ppos.RestrictingCreateAnalyzer;
-import com.platon.browser.analyzer.ppos.ReportAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeCreateAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeExitAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeIncreaseAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeModifyAnalyzer;
+import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -24,10 +13,12 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: ppos服务
@@ -169,7 +160,7 @@ public class PPOSService {
      */
     private void analyzePPosTx(CollectionEvent event, Transaction tx, TxAnalyseResult tar) {
         try {
-            log.info("解析真实交易[{}]类型为enum:[{}] code:[{}] desc:[{}]", tx.getHash(), tx.getTypeEnum(), tx.getTypeEnum().getCode(), tx.getTypeEnum().getDesc());
+            log.debug("解析真实交易[{}]类型为enum:[{}] code:[{}] desc:[{}]", tx.getHash(), tx.getTypeEnum(), tx.getTypeEnum().getCode(), tx.getTypeEnum().getDesc());
             // 调用交易分析引擎分析交易，以补充相关数据
             NodeOpt nodeOpt = null;
             DelegationReward delegationReward = null;

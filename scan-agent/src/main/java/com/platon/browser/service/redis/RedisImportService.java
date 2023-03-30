@@ -191,18 +191,18 @@ public class RedisImportService {
             if (redisKeyEnum.compareTo(RedisKeyEnum.Block) == 0) {
                 if (CollUtil.isNotEmpty(data)) {
                     LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
-                    log.info("redis批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
+                    log.debug("redis批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
                 } else {
-                    log.info("redis批量入库成功统计:区块[{}]-[{}]", 0, 0);
+                    log.debug("redis批量入库成功统计:区块[{}]-[{}]", 0, 0);
                 }
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Transaction) == 0) {
-                log.info("redis批量入库成功统计:交易数[{}]", data.size());
+                log.debug("redis批量入库成功统计:交易数[{}]", data.size());
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Erc20Tx) == 0) {
-                log.info("redis批量入库成功统计:erc20交易数[{}]", data.size());
+                log.debug("redis批量入库成功统计:erc20交易数[{}]", data.size());
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Erc721Tx) == 0) {
-                log.info("redis批量入库成功统计:erc721交易数[{}]", data.size());
+                log.debug("redis批量入库成功统计:erc721交易数[{}]", data.size());
             } else if (redisKeyEnum.compareTo(RedisKeyEnum.Erc1155Tx) == 0) {
-                log.info("redis批量入库成功统计:erc1155交易数[{}]", data.size());
+                log.debug("redis批量入库成功统计:erc1155交易数[{}]", data.size());
             }
         } catch (Exception e) {
             log.error("redis批量入库统计异常", e);

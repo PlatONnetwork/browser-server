@@ -108,7 +108,7 @@ public class TransactionAnalyzer {
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public CollectionTransaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         CollectionTransaction result = CollectionTransaction.newInstance().updateWithBlock(collectionBlock).updateWithRawTransaction(rawTransaction);
-        log.info("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());
+        log.debug("当前区块[{}]交易[{}]解析开始...", collectionBlock.getNum(), result.getHash());
         // 使用地址缓存初始化普通合约缓存信息
         initGeneralContractCache();
 
@@ -119,7 +119,7 @@ public class TransactionAnalyzer {
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             receipt.getContractCreated().forEach(contract -> {
                 // solidity 类型 erc20 或 721 token检测及入口
-                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                ErcToken ercToken = ercTokenAnalyzer.resolveNewToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
                 // solidity or wasm
                 TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
                 // 内存中更新地址类型
@@ -136,7 +136,7 @@ public class TransactionAnalyzer {
                     contractTypeEnum = ContractTypeEnum.EVM;
                 }
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
-                log.info("当前交易[{}]合约地址[{}]的合约类型为[{}]", result.getHash(), contract.getAddress(), contractTypeEnum);
+                log.debug("当前交易[{}]合约地址[{}]的合约类型为[{}]", result.getHash(), contract.getAddress(), contractTypeEnum);
                 if (!AddressUtil.isAddrZero(contract.getAddress())) {
                     // 补充address
                     addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
@@ -151,7 +151,7 @@ public class TransactionAnalyzer {
         if (InnerContractAddrEnum.getAddresses().contains(result.getTo()) && StringUtils.isNotBlank(inputWithoutPrefix)) {
             // 如果to地址是内置合约地址，则解码交易输入
             TransactionUtil.resolveInnerContractInvokeTxComplementInfo(result, receipt.getLogs(), ci);
-            log.info("当前交易[{}]为内置合约,from[{}],to[{}],解码交易输入", result.getHash(), result.getFrom(), result.getTo());
+            log.debug("当前交易[{}]为内置合约,from[{}],to[{}],解码交易输入", result.getHash(), result.getFrom(), result.getTo());
         } else {
             // to地址为空 或者 contractAddress有值时代表交易为创建合约
             if (StringUtils.isBlank(result.getTo())) {
@@ -162,7 +162,7 @@ public class TransactionAnalyzer {
                                                                              log,
                                                                              GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(receipt.getContractAddress()));
                 result.setTo(receipt.getContractAddress());
-                log.info("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
+                log.debug("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
                          result.getHash(),
                          result.getFrom(),
                          result.getTo(),
@@ -187,7 +187,7 @@ public class TransactionAnalyzer {
                         // 把成功的虚拟交易挂到当前普通合约交易上
                         result.setVirtualTransactions(successVirtualTransactions);
                     }
-                    log.info("当前交易[{}]为普通合约调用,from[{}],to[{}],type为[{}],toType[{}],虚拟交易数为[{}]",
+                    log.debug("当前交易[{}]为普通合约调用,from[{}],to[{}],type为[{}],toType[{}],虚拟交易数为[{}]",
                              result.getHash(),
                              result.getFrom(),
                              result.getTo(),
@@ -199,7 +199,7 @@ public class TransactionAnalyzer {
                     if (value.compareTo(BigInteger.ZERO) >= 0) {
                         // 如果输入为空且value大于0，则是普通转账
                         TransactionUtil.resolveGeneralTransferTxComplementInfo(result, ci, addressCache);
-                        log.info("当前交易[{}]为普通转账,from[{}],to[{}],转账金额为[{}]", result.getHash(), result.getFrom(), result.getTo(), value);
+                        log.debug("当前交易[{}]为普通转账,from[{}],to[{}],转账金额为[{}]", result.getHash(), result.getFrom(), result.getTo(), value);
                     }
                 }
             }
@@ -232,6 +232,9 @@ public class TransactionAnalyzer {
               .setContractType(ci.getContractType())
               .setBin(ci.getBinCode())
               .setMethod(ci.getMethod());
+        //
+        // 重要：
+        // 解析token交易，得到token的holder，以及holder的持有余额，交易次数等，把这些信息都写入token_holder表
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 累加总交易数
@@ -283,7 +286,7 @@ public class TransactionAnalyzer {
         }
         // 累加当前交易的手续费到当前区块的txFee
         String txFee = collectionBlock.decimalTxFee().add(result.decimalCost()).toString();
-        log.info("当前区块[{}]交易[{}]:区块累计手续费[{}]=累计手续费[{}]+交易成本[{}](gas燃料[{}] * gas价格[{}])",
+        log.debug("当前区块[{}]交易[{}]:区块累计手续费[{}]=累计手续费[{}]+交易成本[{}](gas燃料[{}] * gas价格[{}])",
                  collectionBlock.getNum(),
                  result.getHash(),
                  txFee,
@@ -326,6 +329,8 @@ public class TransactionAnalyzer {
                 token.setIsSupportErc721(true);
                 token.setIsSupportErc721Enumeration(true);
                 token.setIsSupportErc721Metadata(true);
+                token.setIsSupportErc1155(false);
+                token.setIsSupportErc1155Metadata(false);
                 token.setTokenTxQty(0);
                 token.setHolder(0);
                 token.setContractDestroyBlock(0L);

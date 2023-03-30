@@ -22,7 +22,7 @@ public interface CustomRpPlanMapper {
     BigDecimal sumAmountByAddressAndBlockNumber(@Param("address") String address, @Param("blockNumber") Long blockNumber);
 
     /**
-     * 锁仓未到期的金额
+     * 锁仓未到期的金额（单位：von）
      *
      * @param settlePeriodBlockCount: 每个结算周期区块总数
      * @param curBlockNumber:         当前块高

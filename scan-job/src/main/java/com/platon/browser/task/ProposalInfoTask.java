@@ -14,10 +14,7 @@ import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
 import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -29,7 +26,8 @@ import java.util.List;
  * @date: 2021/11/30
  */
 @Slf4j
-@Component
+//@Component
+@Deprecated
 public class ProposalInfoTask {
 
     @Resource
@@ -52,8 +50,8 @@ public class ProposalInfoTask {
      * @return: void
      * @date: 2021/12/15
      */
-    @XxlJob("proposalInfoJobHandler")
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+    //@XxlJob("proposalInfoJobHandler")
+    //@Transactional(rollbackFor = {Exception.class, Error.class})
     public void proposalInfo() {
         try {
             if (AppStatusUtil.isRunning()) start();
@@ -98,7 +96,7 @@ public class ProposalInfoTask {
                  * 当同步区块号小于结束区块且相应的取消提案未成功时候则跳过更新状态，防止追块时候提案提前结束造成数据错误
                  */
                 ProposalExample pe = new ProposalExample();
-                proposalExample.createCriteria().andCanceledPipIdEqualTo(proposal.getHash());
+                proposalExample.createCriteria().andCanceledPipIdEqualTo(proposal.getPipId());
                 proposalExample.createCriteria().andStatusEqualTo(CustomProposal.StatusEnum.PASS.getCode());
                 List<Proposal> ppsList = proposalMapper.selectByExample(pe);
                 if (networkStat.get(0).getCurNumber() < proposal.getEndVotingBlock() && ppsList.size() == 0) {
@@ -119,7 +117,7 @@ public class ProposalInfoTask {
                 log.error("提案投票信息更新出错", e);
             }
         }
-        customProposalMapper.updateProposalInfoList(proposals);
+        //customProposalMapper.updateProposalInfoList(proposals);
         XxlJobHelper.handleSuccess("提案投票信息更新成功");
     }
 

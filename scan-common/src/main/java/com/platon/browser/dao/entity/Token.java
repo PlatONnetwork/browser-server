@@ -41,6 +41,10 @@ public class Token {
 
     private Long contractDestroyBlock;
 
+    // lvxiaoyi: 2023/03/29，这个字段愿意是：销毁的合约，在更新每个持有者的余额后，就更新此字段。
+    // 由于现在token的余额是scan-agent实时维护的，参考：com.platon.browser.v0152.analyzer.ErcTokenHolderAnalyzer.analyze
+    // 因此不再需要一个任务专门在合约被销毁去更新每个持有者的余额，因此此字段不再表示此意思。
+    // 而是表示：在合约销毁，已经做过最后一次totalSupply的更新
     private Boolean contractDestroyUpdate;
 
     public String getAddress() {

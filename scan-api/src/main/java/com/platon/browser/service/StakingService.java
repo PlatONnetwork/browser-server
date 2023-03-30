@@ -206,7 +206,7 @@ public class StakingService {
                 String nodeSettleStatisInfo = staking.getNodeSettleStatisInfo();
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
                 BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
-                aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+                aliveStakingListResp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(staking.getNodeId(), settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
             }
@@ -309,7 +309,7 @@ public class StakingService {
                 NodeSettleStatis nodeSettleStatis = NodeSettleStatis.jsonToBean(nodeSettleStatisInfo);
                 NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
                 BigInteger settleEpochRound = EpochUtil.getEpoch(BigInteger.valueOf(networkStatRedis.getCurNumber()), blockChainConfig.getSettlePeriodBlockCount());
-                resp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(settleEpochRound));
+                resp.setGenBlocksRate(nodeSettleStatis.computeGenBlocksRate(stakingNode.getNodeId(), settleEpochRound));
             } catch (Exception e) {
                 logger.error("获取节点24小时出块率异常", e);
             }

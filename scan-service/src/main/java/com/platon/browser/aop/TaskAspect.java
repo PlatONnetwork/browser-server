@@ -47,7 +47,7 @@ public class TaskAspect {
         String className = signature.getDeclaringTypeName();
         String methodName = signature.getName();
         if (taskLog.contains(className)) {
-            log.info("定时任务:类名[{}]---方法[{}]开始...", className, methodName);
+            log.debug("定时任务:类名[{}]---方法[{}]开始...", className, methodName);
         }
     }
 
@@ -57,7 +57,7 @@ public class TaskAspect {
         String className = signature.getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
         if (taskLog.contains(className)) {
-            log.info("定时任务:类名[{}]---方法[{}]结束...", className, methodName);
+            log.debug("定时任务:类名[{}]---方法[{}]结束...", className, methodName);
         }
         CommonUtil.removeTraceId();
     }

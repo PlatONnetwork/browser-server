@@ -2,7 +2,10 @@ package com.platon.browser.service.elasticsearch;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -207,18 +210,18 @@ public class EsImportService {
             if (eSKeyEnum.compareTo(ESKeyEnum.Block) == 0) {
                 if (CollUtil.isNotEmpty(data)) {
                     LongSummaryStatistics blockSum = ((Set<Block>) data).stream().collect(Collectors.summarizingLong(Block::getNum));
-                    log.info("ES批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
+                    log.debug("ES批量入库成功统计:区块[{}]-[{}]", blockSum.getMin(), blockSum.getMax());
                 } else {
-                    log.info("ES批量入库成功统计:区块[{}]-[{}]", 0, 0);
+                    log.debug("ES批量入库成功统计:区块[{}]-[{}]", 0, 0);
                 }
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Transaction) == 0) {
-                log.info("ES批量入库成功统计:交易数[{}]", data.size());
+                log.debug("ES批量入库成功统计:交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc20Tx) == 0) {
-                log.info("ES批量入库成功统计:erc20交易数[{}]", data.size());
+                log.debug("ES批量入库成功统计:erc20交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc721Tx) == 0) {
-                log.info("ES批量入库成功统计:erc721交易数[{}]", data.size());
+                log.debug("ES批量入库成功统计:erc721交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc1155Tx) == 0) {
-                log.info("ES批量入库成功统计:erc1155交易数[{}]", data.size());
+                log.debug("ES批量入库成功统计:erc1155交易数[{}]", data.size());
             }
         } catch (Exception e) {
             log.error("ES批量入库成功统计打印异常", e);

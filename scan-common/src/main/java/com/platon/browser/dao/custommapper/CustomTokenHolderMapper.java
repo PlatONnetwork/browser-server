@@ -14,8 +14,6 @@ public interface CustomTokenHolderMapper {
 
     Page<CustomTokenHolder> selectERC721Holder(@Param("tokenAddress") String tokenAddress);
 
-    Page<CustomTokenHolder> selectERC1155Holder(@Param("tokenAddress") String tokenAddress);
-
     /**
      * 查询erc721令牌数量
      *
@@ -38,6 +36,15 @@ public interface CustomTokenHolderMapper {
      */
     int batchUpdate(@Param("list") List<TokenHolder> list);
 
+
+    /**
+     * 批量改变token持有者余额，交易次数
+     * 参数中，TokenHolder.increment保存的是变动量，如果是增加余额，此值为正数；如果是减少余额，此值为负数。
+     * 这样，在sql中的逻辑，可以统一为：新余额 = 原余额+变动量
+     * @param list
+     * @return
+     */
+    int batchChange(@Param("list") List<TokenHolder> list);
     /**
      * 查询token对应的持有人的数量
      *
