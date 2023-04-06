@@ -22,6 +22,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -120,15 +121,23 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     private void exec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         // 确保event是原始副本，重试机制每一次使用的都是copyEvent
+        log.info("开始分析CollectionEvent，块高：{}", event.getBlock().getNum());
+
+        StopWatch watch = new StopWatch("分析CollectionEvent");
+        watch.start("复制CollectionEvent");
         CollectionEvent copyEvent = copyCollectionEvent(event);
+
+        watch.stop();
         try {
             Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
             List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
             for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
+                watch.start("分析Transaction");
                 //
                 // 重要：
                 // 解析区块中的交易，特别是token交易，按token类型分别解析出交易信息，放入各自类型的列表中；并把token的holder，以及holder持有token的余额，交易次数等信息，保存到本地db中
                 CollectionTransaction transaction = transactionAnalyzer.analyze(copyEvent.getBlock(), tr, receiptMap.get(tr.getHash()));
+                watch.stop();
                 // 把解析好的交易添加到当前区块的交易列表
                 copyEvent.getBlock().getTransactions().add(transaction);
                 copyEvent.getTransactions().add(transaction);
@@ -138,14 +147,19 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 copyEvent.getBlock().setErc1155TxQty(copyEvent.getBlock().getErc1155TxQty() + transaction.getErc1155TxList().size());
             }
 
+            watch.start("排序Transaction");
             List<Transaction> transactions = copyEvent.getTransactions();
             // 确保交易从小到大的索引顺序
             transactions.sort(Comparator.comparing(Transaction::getIndex));
-
+            watch.stop();
             // 根据区块号解析出业务参数
+            watch.start("分析NodeOpt");
             List<NodeOpt> nodeOpts1 = blockService.analyze(copyEvent);
             // 根据交易解析出业务参数
+            watch.stop();
+            watch.start("分析ppos");
             TxAnalyseResult txAnalyseResult = pposService.analyze(copyEvent);
+            watch.stop();
             // 汇总操作记录
             if (CollUtil.isNotEmpty(txAnalyseResult.getNodeOptList())) {
                 nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
@@ -159,32 +173,49 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             this.getErcTx(transactions, erc20List, erc721List, erc1155List);
             if (CollUtil.isNotEmpty(transactions)) {
                 // 依赖于数据库的自增id
+                watch.start("入库TxBak");
                 customTxBakMapper.batchInsertOrUpdateSelective(transactions);
+                watch.stop();
             }
 
             if (CollUtil.isNotEmpty(erc20List)) {
+                watch.start("入库Tx20Bak");
                 customTx20BakMapper.batchInsert(erc20List);
+                watch.stop();
             }
             if (CollUtil.isNotEmpty(erc721List)) {
+                watch.start("入库Tx721Bak");
                 customTx721BakMapper.batchInsert(erc721List);
+                watch.stop();
             }
             if (CollUtil.isNotEmpty(erc1155List)) {
+                watch.start("入库Tx1155Bak");
                 customTx1155BakMapper.batchInsert(erc1155List);
+                watch.stop();
             }
             List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
             // 委托奖励交易入库
             if (CollUtil.isNotEmpty(delegationRewardList)) {
+                watch.start("入库TxDelegation");
                 customTxDelegationRewardBakMapper.batchInsert(delegationRewardList);
+                watch.stop();
             }
             // 操作日志入库mysql，再由定时任务同步到es，因为缓存无法实现自增id，所以不再由环形队列入库，不再删除操作日志表
             if (CollUtil.isNotEmpty(nodeOpts1)) {
                 // 依赖于数据库的自增id
+                watch.start("入库nodeOpts");
                 customNOptBakMapper.batchInsertOrUpdateSelective(nodeOpts1);
+                watch.stop();
             }
             // 统计业务参数，以MySQL数据库块高为准，所以必须保证块高是最后入库
+            watch.start("统计业务参数");
             statisticService.analyze(copyEvent);
+            watch.stop();
             // TODO 此分割线以上代码异常重试属于正常逻辑，如果是以下代码发生异常，可能区块相关交易已经发送到ComplementEventHandler进行处理，则该区块会被重复处理多次
+            watch.start("发布complementEvent");
             complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, delegationRewardList, event.getTraceId());
+            watch.stop();
+            log.info("结束分析CollectionEvent，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);

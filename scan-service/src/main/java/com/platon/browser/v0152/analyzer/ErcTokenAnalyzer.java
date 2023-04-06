@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -86,6 +87,8 @@ public class ErcTokenAnalyzer {
             token.setTotalSupply(CommonUtil.ofNullable(() -> contractId.getTotalSupply().toPlainString()).orElse("0"));
             token.setTypeEnum(contractId.getTypeEnum());
             token.setType(contractId.getTypeEnum().name().toLowerCase());
+            token.setCreatedBlockNumber(blockNumber.longValue());
+
             switch (contractId.getTypeEnum()) {
                 case ERC20:
                     token.setIsSupportErc20(true);
@@ -294,7 +297,7 @@ public class ErcTokenAnalyzer {
      * @date 2021/4/15
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
+    public void resolveTokenTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
         try {
             // 过滤交易回执日志，地址不能为空且在token缓存里的
             List<Log> tokenLogs = receipt.getLogs()
@@ -308,6 +311,9 @@ public class ErcTokenAnalyzer {
                 return;
             }
 
+            log.info("开始分析区块的token交易，块高：{}", collectionBlock.getNum());
+            StopWatch watch = new StopWatch("分析区块token交易");
+
             tokenLogs.forEach(tokenLog -> {
                 ErcToken token = ercCache.tokenCache.get(tokenLog.getAddress());
                 if (ObjectUtil.isNotNull(token)) {
@@ -320,46 +326,68 @@ public class ErcTokenAnalyzer {
                     List<ErcContract.ErcTxEvent> eventList;
                     switch (typeEnum) {
                         case ERC20:
+                            watch.start("获取ERC20合约的事件列表");
                             eventList = ercDetectService.getErc20TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
                             List<ErcContract.ErcTxEvent> erc20TxEventList = eventList.stream().filter(v -> ObjectUtil.equal(v.getLog(), tokenLog)).collect(Collectors.toList());
                             if (erc20TxEventList.size() > 1) {
                                 log.error("当前交易[{}]erc20交易回执日志解析异常{}", tx.getHash(), tokenLog);
                                 break;
                             }
+                            watch.stop();
+                            watch.start("获取ERC20合约的的交易");
                             txList = resolveErcTxFromEvent(token, tx, erc20TxEventList, collectionBlock.getSeq().incrementAndGet());
                             tx.getErc20TxList().addAll(txList);
+                            watch.stop();
                             //
                             // 更新token持有者余额，以及持有者交易次数
                             //todo: 可以考虑在返回后，统一处理tx.getErc20TxList() 、 getErc721TxList、getErc1155TxList
+                            watch.start("分析ERC20合约交易");
                             ercTokenHolderAnalyzer.analyze(txList);
+                            watch.stop();
                             break;
                         case ERC721:
+                            watch.start("获取ERC721合约的事件列表");
                             eventList = ercDetectService.getErc721TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
                             List<ErcContract.ErcTxEvent> erc721TxEventList = eventList.stream().filter(v -> v.getLog().equals(tokenLog)).collect(Collectors.toList());
                             if (erc721TxEventList.size() > 1) {
                                 log.error("当前交易[{}]erc721交易回执日志解析异常{}", tx.getHash(), tokenLog);
                                 break;
                             }
+                            watch.stop();
+                            watch.start("获取ERC721合约的的交易");
                             txList = resolveErcTxFromEvent(token, tx, erc721TxEventList, collectionBlock.getSeq().incrementAndGet());
+                            watch.stop();
                             tx.getErc721TxList().addAll(txList);
                             //
                             // 更新NFT的信息
+                            watch.start("分析ERC721合约库存");
                             ercTokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
+                            watch.stop();
                             //
                             // 更新token持有者余额，以及持有者交易次数
+                            watch.start("分析ERC721合约交易");
                             ercTokenHolderAnalyzer.analyze(txList);
+                            watch.stop();
                             break;
                         case ERC1155:
+                            watch.start("获取ERC1155合约的事件列表");
                             eventList = ercDetectService.getErc1155TxEvents(transactionReceipt, BigInteger.valueOf(collectionBlock.getNum()));
                             List<ErcContract.ErcTxEvent> erc1155TxEventList = eventList.stream().filter(v -> v.getLog().equals(tokenLog)).collect(Collectors.toList());
+                            watch.stop();
+                            watch.start("获取ERC1155合约的的交易");
                             txList = resolveErc1155TxFromEvent(token, tx, erc1155TxEventList, collectionBlock.getSeq());
                             tx.getErc1155TxList().addAll(txList);
+                            watch.stop();
                             //
                             // 更新NFT的信息
+                            watch.start("分析ERC1155合约库存");
                             erc1155TokenInventoryAnalyzer.analyze(tx.getHash(), txList, BigInteger.valueOf(collectionBlock.getNum()));
+                            watch.stop();
                             //
                             // 更新token持有者余额，以及持有者交易次数
+                            watch.start("分析ERC721合约交易");
                             ercToken1155HolderAnalyzer.analyze(txList);
+                            watch.stop();
                             break;
                         default:
                             break;
@@ -384,13 +412,16 @@ public class ErcTokenAnalyzer {
             // 针对销毁的合约处理
             if (tx.getType() == com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode()) {
                 //lvixaoyi:合约被销毁后，需要最后查询一次它的totalSupply(),可以在这里做，也可以在scan-job的ErcTokenUpdateTask里做(目前是这里做)
+                watch.start("处理合约销毁");
                 Token token = new Token();
                 token.setAddress(tx.getTo());
                 token.setContractDestroyBlock(collectionBlock.getNum());
                 tokenMapper.updateByPrimaryKeySelective(token);
+                watch.stop();
                 log.debug("合约[{}]在区块[{}]已销毁", receipt.getContractAddress(), collectionBlock.getNum());
             }
 
+            log.info("结束分析区块的token交易，块高：{}，耗时统计：{}", collectionBlock.getNum(), watch.prettyPrint());
         } catch (Exception e) {
             log.error(StrUtil.format("当前交易[{}]解析ERC交易异常", tx.getHash()), e);
         }

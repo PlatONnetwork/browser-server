@@ -26,6 +26,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 共识
@@ -74,29 +76,27 @@ public class OnConsensusAnalyzer {
         // 取出双签参数缓存中的所有被举报节点ID列表
         SlashExample slashExample = new SlashExample();
         slashExample.createCriteria().andIsHandleEqualTo(false);
-        List<Slash> reportedNodeIdList = slashMapper.selectByExampleWithBLOBs(slashExample);
+
+        List<Slash> notHandledSlash = slashMapper.selectByExampleWithBLOBs(slashExample);
         // 如果被举报节点不在下一轮共识周期中，则可对其执行安全的处罚操作
-        List<String> notInNextConsNodeIdList = new ArrayList<>();
-        reportedNodeIdList.forEach(slash -> {
-            if (!nextConsNodeIdList.contains(slash.getNodeId())) notInNextConsNodeIdList.add(slash.getNodeId());
-        });
+
+        Set<String> notInNextConsNodeIdSet = notHandledSlash.stream().map(Slash::getNodeId).collect(Collectors.toSet());
 
         List<NodeOpt> nodeOpts = new ArrayList<>();
-        if (!notInNextConsNodeIdList.isEmpty()) {
-            // 以数据库中的数据为准，进行处罚
-            List<Staking> slashList = slashBusinessMapper.getException(notInNextConsNodeIdList);
-            if (!slashList.isEmpty()) {
-                slashList.forEach(slashNode -> {
-                    SlashExample slashNodeIdExample = new SlashExample();
-                    slashNodeIdExample.createCriteria().andNodeIdEqualTo(slashNode.getNodeId()).andIsHandleEqualTo(false);
-                    List<Slash> reportList = slashMapper.selectByExampleWithBLOBs(slashNodeIdExample);
-                    reportList.forEach(report -> {
-                        NodeOpt nodeOpt = slashNode(report, block);
+        if (!notInNextConsNodeIdSet.isEmpty()) { //不在下一轮共识周期中的被举报节点
+            // 以数据库中staking表中的数据为准，进行双签处罚
+            Set<String> doubleSignedNodeIdSet = slashBusinessMapper.filterNodeIdThoseDoubleSigned(new ArrayList<>(notInNextConsNodeIdSet));
+            if (!doubleSignedNodeIdSet.isEmpty()) {
+                notHandledSlash.forEach(slash -> {
+                    if(doubleSignedNodeIdSet.contains(slash.getNodeId())){
+                        NodeOpt nodeOpt = slashNode(slash, block);
                         nodeOpts.add(nodeOpt);
-                    });
-                    //对提案数据进行处罚
-                    proposalParameterService.setSlashParameters(slashNode.getNodeId());
+                    }
                 });
+
+                //对提案数据进行处罚
+                //如果此节点投票过，则需要撤销起投票
+                proposalParameterService.discardOptionForVotingProposal(new ArrayList<>(notInNextConsNodeIdSet));
             }
         }
 

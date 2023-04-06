@@ -13,6 +13,7 @@
         <result column="holder" jdbcType="INTEGER" property="holder"/>
         <result column="web_site" jdbcType="VARCHAR" property="webSite"/>
         <result column="details" jdbcType="VARCHAR" property="details"/>
+        <result column="created_block_number" jdbcType="BIGINT" property="createdBlockNumber"/>
     </resultMap>
     <resultMap id="DetailResultMap" type="com.platon.browser.bean.CustomTokenDetail" extends="BaseResultMap">
         <result column="contract_create" jdbcType="VARCHAR" property="creator"/>
@@ -23,7 +24,7 @@
     </resultMap>
     <select id="selectListByType" parameterType="java.lang.String" resultMap="BaseResultMap">
         select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
-        t.holder,te.web_site,te.details
+        t.holder, t.created_block_number, te.web_site,te.details
         from token t left join token_expand te on t.address = te.address
         where 1=1
         AND te.is_show_in_scan = 1
@@ -34,7 +35,7 @@
     </select>
     <select id="selectDetailByAddress" parameterType="java.lang.String" resultMap="DetailResultMap">
         select t.address,t.type,t.name,t.symbol,t.total_supply,t.decimal,t.create_time,t.token_tx_qty,
-        t.holder,te.web_site,te.details,a.contract_create,a.contract_createHash,a.contract_bin,
+        t.holder, t.created_block_number, te.web_site,te.details,a.contract_create,a.contract_createHash,a.contract_bin,
         CASE WHEN a.`contract_destroy_hash` IS NOT NULL AND a.`contract_destroy_hash`!='' THEN 1 ELSE 0 END is_contract_destroy,
         a.tx_qty
         from token t left join token_expand te on t.address = te.address
@@ -110,6 +111,9 @@
                 </if>
                 <if test="'contract_destroy_update'.toString() == column.value">
                     #{item.contractDestroyUpdate,jdbcType=BIT}
+                </if>
+                <if test="'created_block_number'.toString() == column.value">
+                    #{item.createdBlockNumber,jdbcType=BIGINT}
                 </if>
             </foreach>
             )

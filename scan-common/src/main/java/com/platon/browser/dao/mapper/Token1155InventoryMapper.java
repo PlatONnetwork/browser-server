@@ -1,6 +1,7 @@
 package com.platon.browser.dao.mapper;
 
 import com.github.pagehelper.Page;
+import com.platon.browser.dao.entity.NftObject;
 import com.platon.browser.dao.entity.Token1155Inventory;
 import com.platon.browser.dao.entity.Token1155InventoryExample;
 import com.platon.browser.dao.entity.Token1155InventoryWithBLOBs;
@@ -61,5 +62,7 @@ public interface Token1155InventoryMapper {
      * @param pageSize
      * @return
      */
-    List<Token1155InventoryWithBLOBs> listValidTokenInventoryToRefresh(@Param("offset")int offset, @Param("pageSize")int pageSize);
+    List<NftObject> listValidTokenInventoryWithEmptyImage(@Param("offset")int offset, @Param("pageSize")int pageSize);
+
+    List<NftObject> listValidTokenInventoryWithEmptyUrl(int offset, int batchSize);
 }

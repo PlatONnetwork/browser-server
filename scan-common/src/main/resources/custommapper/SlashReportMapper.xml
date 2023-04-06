@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.SlashBusinessMapper">
-	<update id="setException">
+	<update id="slashByDoubleSigned">
 		/*把节点设置为双签异常*/
 		/*2、更新质押*/
 		update `staking` set `exception_status` = 3
@@ -11,10 +11,9 @@
 		where `node_id`=#{nodeId} and `staking_block_num`=#{stakingBlockNum};
 	</update>
 
-	<select id="getException" resultType="com.platon.browser.dao.entity.Staking">
+	<select id="filterNodeIdThoseDoubleSigned" resultType="string">
 		/*查询双签异常节点*/
-		select  `node_id` as nodeId,
-		`staking_block_num` as stakingBlockNum
+		select  `node_id` as nodeId
 		from staking
 		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
 		and `exception_status` = 3;

@@ -1,12 +1,12 @@
 package com.platon.browser.service.proposal;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.bean.CustomProposal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +16,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,10 +47,10 @@ public class ProposalParameterServiceTest extends AgentTestBase {
 
     @Test
     public void test() throws Exception {
-    	
+
     	when(voteMapper.selectByExample(any())).thenReturn(Collections.emptyList());
-    	target.setSlashParameters("0x1");
-    	
+    	target.discardOptionForVotingProposal(Arrays.asList("0x1"));
+
     	List<Vote> votes = new ArrayList<Vote>();
     	Vote vote = new Vote();
     	vote.setNodeId("0x1");
@@ -62,9 +63,9 @@ public class ProposalParameterServiceTest extends AgentTestBase {
     	proposal.setHash("0x");
     	proposal.setStatus(CustomProposal.StatusEnum.CANCEL.getCode());
     	when(proposalMapper.selectByPrimaryKey(any())).thenReturn(proposal);
-    	target.setSlashParameters("0x1");
+    	target.discardOptionForVotingProposal(Arrays.asList("0x1"));
     	proposal.setStatus(CustomProposal.StatusEnum.VOTING.getCode());
     	when(proposalMapper.selectByPrimaryKey(any())).thenReturn(proposal);
-    	target.setSlashParameters("0x1");
+    	target.discardOptionForVotingProposal(Arrays.asList("0x1"));
     }
 }

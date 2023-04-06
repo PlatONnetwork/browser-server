@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
 import com.platon.browser.bean.RestrictingBalance;
-import com.platon.browser.client.JobPlatOnClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.entity.InternalAddress;
@@ -32,8 +32,8 @@ public class BalanceUpdateTask {
     @Resource
     private SpecialApi specialApi;
 
-    @Resource(name = "jobPlatOnClient")
-    private JobPlatOnClient platOnClient;
+    @Resource
+    private PlatOnClient platOnClient;
 
     @Resource
     private NetworkStatMapper networkStatMapper;

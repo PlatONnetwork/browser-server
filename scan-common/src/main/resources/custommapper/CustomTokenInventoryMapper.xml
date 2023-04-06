@@ -114,10 +114,10 @@
                     retry_num = #{item.retryNum,jdbcType=INTEGER},
                 </if>
                 <if test="item.description != null">
-                    description = #{item.description,jdbcType=LONGVARCHAR},
+                    description = #{item.description,jdbcType=VARCHAR},
                 </if>
             </set>
-            where token_address = #{item.tokenAddress,jdbcType=VARCHAR} and token_id = #{item.tokenId,jdbcType=VARCHAR}
+            where  id = #{item.tokenInventoryId,jdbcType=BIGINT}
         </foreach>
     </update>
 
@@ -125,4 +125,11 @@
         SELECT MAX(id) AS maxId
         FROM token_inventory
     </select>
+
+
+    <update id="batchUpdateTokenUrl">
+        <foreach collection="list" item="item" separator=";">
+            update token_inventory set token_url =  #{item.tokenUrl,jdbcType=VARCHAR} where id = #{item.tokenInventoryId,jdbcType=BIGINT}
+        </foreach>
+    </update>
 </mapper>
