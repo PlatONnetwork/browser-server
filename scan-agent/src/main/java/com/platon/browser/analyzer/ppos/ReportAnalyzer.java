@@ -81,7 +81,7 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         // 举报成功，先把节点设置为异常，后续处罚操作在共识周期切换时执行
         List<String> nodeIdList = new ArrayList<>();
         nodeIdList.add(txParam.getVerify());
-        slashBusinessMapper.setException(txParam.getVerify(), txParam.getStakingBlockNum().longValue());
+        slashBusinessMapper.slashByDoubleSigned(txParam.getVerify(), txParam.getStakingBlockNum().longValue());
 
         // 更新解质押到账需要经过的结算周期数
         BigInteger unStakeFreezeDuration = stakeEpochService.getUnStakeFreeDuration();

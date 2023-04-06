@@ -1,7 +1,7 @@
 # 这个端口，配合com.platon.browser.AgentApplication的@ServletComponentScan注解
-# 可以让scan-agent启动后，可以通过http://ip:90010来访问druid的内置监控服务
+# 可以让scan-agent启动后，可以通过http://ip:8890来访问druid的内置监控服务
 server:
-  port: 90010
+  port:
 
 #日志配置
 logging:

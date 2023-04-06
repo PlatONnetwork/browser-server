@@ -1,23 +1,23 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.JobPlatOnClient;
+import com.platon.browser.client.PlatOnClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-@Component
+//2023/03/31 lvxiaoyi 此任务不需要了,PlatOnClient有回调函数更新可用web3jWrapper
+@Deprecated
+//@Component
 @Slf4j
 public class Web3jUpdateTask {
 
     @Resource
-    private JobPlatOnClient jobPlatOnClient;
+    private PlatOnClient platOnClient;
 
-    @Scheduled(cron = "0/10 * * * * ?")
+    //@Scheduled(cron = "0/10 * * * * ?")
     public void cron() {
         try {
-            jobPlatOnClient.updateCurrentWeb3jWrapper();
+            platOnClient.updateCurrentWeb3jWrapper();
         } catch (Exception e) {
             log.error("detect exception:{}", e);
         }

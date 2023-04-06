@@ -1,8 +1,8 @@
 package com.platon.browser.dao.custommapper;
 
-import com.github.pagehelper.Page;
 import com.platon.browser.bean.CustomTokenInventory;
 import com.platon.browser.bean.Erc721ContractDestroyBalanceVO;
+import com.platon.browser.dao.entity.NftObject;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryKey;
 import com.platon.browser.dao.entity.TokenInventoryWithBLOBs;
@@ -20,8 +20,9 @@ public interface CustomTokenInventoryMapper {
 
     List<Erc721ContractDestroyBalanceVO> findErc721ContractDestroyBalance(@Param("tokenAddress") String tokenAddress);
 
-    void batchUpdateTokenInfo(@Param("list") List<TokenInventoryWithBLOBs> list);
+    void batchUpdateTokenInfo(@Param("list") List<com.platon.browser.dao.entity.NftObject> list);
 
     long findMaxId();
 
+    void batchUpdateTokenUrl(List<NftObject> nftList);
 }

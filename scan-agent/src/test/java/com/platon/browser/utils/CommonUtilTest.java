@@ -3,6 +3,7 @@ package com.platon.browser.utils;
 import cn.hutool.core.date.DateUtil;
 import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.bean.NodeSettleStatisBase;
+import com.platon.browser.dao.entity.NftObject;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ErcTypeEnum;
@@ -19,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -152,14 +155,46 @@ public class CommonUtilTest {
     public void testFmisSpeedCalculate() {
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        LocalDateTime date1 = LocalDateTime.parse("2023-03-30 07:10:29", inputFormatter);
-        LocalDateTime date2 = LocalDateTime.parse("2023-03-30 07:27:40", inputFormatter);
+        LocalDateTime date1 = LocalDateTime.parse("2023-04-06 03:58:48", inputFormatter);
+        LocalDateTime date2 = LocalDateTime.parse("2023-04-06 06:09:56", inputFormatter);
         long seconds = Duration.between(date1, date2).getSeconds();
 
-        long total = 56807475-56767224;
+        long total = 20668195-19805028;
 
         System.out.println(total / seconds);
     }
+
+
+    @Test
+    public void testParallelStream() {
+
+        NftObject obj1 = new NftObject();
+        obj1.setTokenAddress("0x01");
+        obj1.setTokenId(1L);
+        NftObject obj2 = new NftObject();
+        obj1.setTokenAddress("0x02");
+        obj1.setTokenId(2L);
+        List<NftObject> nftList = new ArrayList<>();
+        nftList.add(obj1);
+        nftList.add(obj2);
+
+        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+
+        CountDownLatch countDownLatch = new CountDownLatch(nftList.size());
+        forkJoinPool.submit(() -> {
+            nftList.parallelStream().forEach(nft -> {
+                // 重试次数+1
+                nft.setRetryNum(nft.getRetryNum() + 1);
+                nft.setImage("nft01_image");
+                nft.setDescription("nft01_desc");
+                nft.setName("nfg01_name");
+                nft.setDecimal(18);
+                countDownLatch.countDown();
+            });
+        });
+
+    }
+
 
     @Test
     public void testHashNodeId(){

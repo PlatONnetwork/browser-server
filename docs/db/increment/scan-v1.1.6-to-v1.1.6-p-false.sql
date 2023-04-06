@@ -280,8 +280,9 @@ ALTER TABLE `token`
     MODIFY COLUMN `is_support_erc1155_metadata`   tinyint         NOT NULL DEFAULT 0 COMMENT '是否支持erc1155 metadata接口： 0-不支持 1-支持',
     MODIFY COLUMN `token_tx_qty`                  int             NOT NULL DEFAULT 0 COMMENT 'token对应的交易数',
     MODIFY COLUMN `holder`                        int             NOT NULL DEFAULT 0 COMMENT 'token对应的持有人的数量',
-    MODIFY COLUMN `contract_destroy_block`        bigint          DEFAULT NULL COMMENT '合约的销毁块高',
-    MODIFY COLUMN `contract_destroy_update`       tinyint         NOT NULL DEFAULT 0 COMMENT '销毁的合约是否已更新，1为是，0为否，默认是0';
+    MODIFY COLUMN `contract_destroy_block`        bigint          DEFAULT 0 COMMENT '合约的销毁块高',
+    MODIFY COLUMN `contract_destroy_update`       tinyint         NOT NULL DEFAULT 0 COMMENT '销毁的合约是否已更新，1为是，0为否，默认是0',
+    ADD COLUMN `created_block_number`             bigint          DEFAULT 0 COMMENT '合约创建块高' AFTER `contract_destroy_update`;
 
 ALTER TABLE `token_holder`
     MODIFY COLUMN `token_address` char(42)    NOT NULL COMMENT '合约地址',
@@ -424,6 +425,18 @@ ALTER TABLE `tx_erc_1155_bak`
     MODIFY COLUMN `value`       decimal(64, 0) NOT NULL COMMENT '交易value',
     MODIFY COLUMN `tx_fee`      decimal(32, 0) DEFAULT 0 COMMENT '手续费';
 
--- 把node_settle_statis_info多余的参数去掉
+-- 把node_settle_statis_info多余的参数node_id去掉
 UPDATE node set `node_settle_statis_info` = CONCAT(SUBSTRING_INDEX(node_settle_statis_info, ',"nodeId":"', 1), "}")  WHERE `node_settle_statis_info` REGEXP ',"nodeId":".+"';
 
+-- token增加字段created_block_number后，需要补上数据
+UPDATE token
+    INNER JOIN (
+        select t.address, tx_bak.num
+        from tx_bak
+                 inner join (
+            select token.address, address.contract_createHash
+            from address
+                     inner join token on address.address = token.address
+        ) t on tx_bak.hash = t.contract_createHash
+    ) tt ON token.address = tt.address
+SET token.created_block_number = tt.num;

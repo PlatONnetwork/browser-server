@@ -16,6 +16,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -56,7 +57,8 @@ public class StatisticService {
      * @return
      */
     public void analyze(CollectionEvent event) throws Exception {
-        long startTime = System.currentTimeMillis();
+        log.info("开始统计业务参数，块高：{}", event.getBlock().getNum());
+        StopWatch watch = new StopWatch("统计业务参数");
         Block block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
         // 地址统计
@@ -70,10 +72,15 @@ public class StatisticService {
         }
         // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行地址入库操作
         if (CollUtil.isNotEmpty(addressList)) {
+            watch.start("Address统计分析");
             this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
+            watch.stop();
         }
+        watch.start("NetworkStatus统计分析");
         this.statisticsNetworkAnalyzer.analyze(event, block, epochMessage);
-        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        watch.stop();
+
+        log.info("结束统计业务参数，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
     }
 
     /**

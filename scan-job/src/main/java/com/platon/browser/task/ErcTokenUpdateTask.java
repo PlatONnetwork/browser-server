@@ -1,6 +1,5 @@
 package com.platon.browser.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -84,9 +84,15 @@ public class ErcTokenUpdateTask {
     private static final int TOKEN_BATCH_SIZE = 10;
 
     private static final ExecutorService TOKEN_UPDATE_POOL = Executors.newFixedThreadPool(TOKEN_BATCH_SIZE);
+
+    private static final ExecutorService tokenUrlExecutor = Executors.newFixedThreadPool(4);
+
+    private static final ExecutorService tokenInfoExecutor = Executors.newFixedThreadPool(4);
+
     /**
      * 全量更新token的总供应量
      * 每5分钟更新
+     * token_holder持有的token数量，有agnet在解析token交易时实时更新，参考:com.platon.browser.v0152.analyzer.ErcTokenHolderAnalyzer#analyze(java.util.List)
      *
      * 根据：表token中所有记录，
      * 通过：rpc查询每个token的totalSupply，
@@ -114,7 +120,7 @@ public class ErcTokenUpdateTask {
 
 
     /**
-     * 全量更新token库存信息
+     * 更新token库存信息
      * 每天凌晨1点执行一次
      *
      * 参考：
@@ -139,6 +145,33 @@ public class ErcTokenUpdateTask {
         updateToken1155Inventory();
         watch.stop();
         log.debug("结束执行:全量更新token库存信息，耗时统计:{}", watch.prettyPrint());
+    }
+
+    /**
+     * 全量更新token的url信息
+     * 每天凌晨1点执行一次
+     *
+     * 参考：
+     * ERC721（Token721_Inventory表）, ERC1155（Token1155_Inventory表）中的保存NFT的信息
+     * 原来，在com.platon.browser.v0152.analyzer.ErcTokenInventoryAnalyzer#analyze(java.lang.String, java.util.List, java.math.BigInteger)中补齐token URL，影响scan-agent性能
+     * 现移动到job中批量处理
+     *
+     * @param
+     * @return void
+     * @date 2021/4/17
+     */
+    @XxlJob("updateTokenUrlJobHandler")
+    public void updateTokenUrlJobHandler() {
+        log.debug(">>>>开始执行:更新token的URL");
+        StopWatch watch = new StopWatch("更新token的URL");
+        watch.start("更新ERC721的URL");
+        updateToken721InventoryUrl();
+        watch.stop();
+
+        watch.start("更新ERC1155的URL");
+        updateToken1155InventoryUrl();
+        watch.stop();
+        log.debug("结束执行:更新token的URL，耗时统计:{}", watch.prettyPrint());
     }
 
     /**
@@ -212,8 +245,7 @@ public class ErcTokenUpdateTask {
                 TOKEN_UPDATE_POOL.submit(() -> {
                     try {
                         // 查询总供应量
-                        BigInteger totalSupply = ercServiceImpl.getTotalSupply(token.getAddress(), ErcTypeEnum.getErcTypeEnum(token.getType()), finalCurrentBlockNumber);
-                        totalSupply = totalSupply == null ? BigInteger.ZERO : totalSupply;
+                        BigInteger totalSupply = ercServiceImpl.getTotalSupply(ErcTypeEnum.getErcTypeEnum(token.getType()), token.getAddress(), finalCurrentBlockNumber);
                         if (ObjectUtil.isNull(token.getTotalSupply()) || !token.getTotalSupply().equalsIgnoreCase(totalSupply.toString())) {
                             TaskUtil.console("token[{}]的总供应量有变动需要更新旧值[{}]新值[{}]", token.getAddress(), token.getTotalSupply(), totalSupply);
                             // 有变动添加到更新列表中
@@ -239,9 +271,105 @@ public class ErcTokenUpdateTask {
         XxlJobHelper.log("全量更新token的总供应量成功");
     }
 
+    /**
+     * 更新token库存信息(url)
+     */
+    private void updateToken721InventoryUrl() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+
+        // 分页更新token库存相关信息
+        int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        int pageNo = 1;
+
+        int recordCount = 0;
+        do {
+            int offset = (pageNo-1) * batchSize;
+            //查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
+            List<com.platon.browser.dao.entity.NftObject> nftList = token721InventoryMapper.listValidTokenInventoryWithEmptyUrl(offset, batchSize);
+            recordCount = nftList.size();
+
+            if (recordCount > 0) {
+                CountDownLatch countDownLatch = new CountDownLatch(nftList.size());
+
+                tokenUrlExecutor.submit(()->{
+                    nftList.parallelStream().forEach(nft -> {
+                        try {
+                            String tokenURI = ercServiceImpl.getTokenURI(ErcTypeEnum.getErcTypeEnum(nft.getTokenType()), nft.getTokenAddress(), BigInteger.valueOf(nft.getTokenId()), BigInteger.valueOf(nft.getCreatedBlockNumber()));
+                            nft.setTokenUrl(tokenURI);
+                        } catch (Exception e) {
+                            log.error("获取tokenUri异常，tokenType:{}, tokenAddress:{}, tokenId:{}", nft.getTokenType(), nft.getTokenAddress(), (nft.getTokenId()));
+                        }
+                        countDownLatch.countDown();
+                    });
+                });
+
+                try {
+                    countDownLatch.await(60, TimeUnit.SECONDS);
+                    customToken721InventoryMapper.batchUpdateTokenUrl(nftList);
+                    XxlJobHelper.log("补齐NFT-721的URL：{}", JSONUtil.toJsonStr(nftList));
+
+                } catch (Exception e) {
+                    log.error("补齐NFT-721的URL任务异常", e);
+                }
+            }
+            pageNo++;
+
+        } while (recordCount !=0 && recordCount < batchSize);
+    }
 
     /**
-     * 更新token库存信息
+     * 更新token库存信息(url)
+     */
+    private void updateToken1155InventoryUrl() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+
+        // 分页更新token库存相关信息
+        int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
+        int pageNo = 1;
+
+        int recordCount = 0;
+        do {
+            int offset = (pageNo-1) * batchSize;
+            //查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
+            List<com.platon.browser.dao.entity.NftObject> nftList = token1155InventoryMapper.listValidTokenInventoryWithEmptyUrl(offset, batchSize);
+            recordCount = nftList.size();
+
+            if (recordCount > 0) {
+                CountDownLatch countDownLatch = new CountDownLatch(nftList.size());
+                tokenUrlExecutor.submit(()->{
+                    nftList.parallelStream().forEach(nft -> {
+                        try {
+                            String tokenURI = ercServiceImpl.getTokenURI(ErcTypeEnum.getErcTypeEnum(nft.getTokenType()), nft.getTokenAddress(), BigInteger.valueOf(nft.getTokenId()), BigInteger.valueOf(nft.getCreatedBlockNumber()));
+                            nft.setTokenUrl(tokenURI);
+                        } catch (Exception e) {
+                            log.error("获取tokenUri异常，tokenType:{}, tokenAddress:{}, tokenId:{}", nft.getTokenType(), nft.getTokenAddress(), (nft.getTokenId()));
+                        }
+                        countDownLatch.countDown();
+                    });
+                });
+
+                try {
+                    countDownLatch.await(60, TimeUnit.SECONDS);
+                    customToken1155InventoryMapper.batchUpdateTokenUrl(nftList);
+                    XxlJobHelper.log("补齐NFT-721的URL：{}", JSONUtil.toJsonStr(nftList));
+
+                } catch (Exception e) {
+                    log.error("补齐NFT-1155的URL任务异常", e);
+                }
+            }
+            pageNo++;
+        } while (recordCount !=0 && recordCount < batchSize);
+    }
+
+    /**
+     * 更新token库存信息（imageUrl,description,name)
+     * 根据URL取获取imageUrl,description,name信息
      *
      * @param :
      * @return: void
@@ -257,48 +385,59 @@ public class ErcTokenUpdateTask {
         int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
         int pageNo = 1;
 
-        List<TokenInventoryWithBLOBs> nftList = null;
+        int recordCount = 0;
         do {
             int offset = (pageNo-1) * batchSize;
             //查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
-            nftList = token721InventoryMapper.listValidTokenInventoryToRefresh(offset, batchSize);
-            pageNo++;
+            List<com.platon.browser.dao.entity.NftObject> nftList = token721InventoryMapper.listValidTokenInventoryWithEmptyImage(offset, batchSize);
+            recordCount = nftList.size();
 
-            if (CollUtil.isNotEmpty(nftList)) {
-                nftList.forEach(inventory -> {
-                    // 重试次数+1
-                    inventory.setRetryNum(inventory.getRetryNum() + 1);
-                    if (inventory.getTokenUrl().startsWith("ipfs://")){
-                        String tokenUrl = inventory.getTokenUrl().replace("ipfs://", "https://ipfs.io/ipfs/");
-                        inventory.setTokenUrl(tokenUrl);
-                    }
-                    Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                    try (Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute()) {
-                        if (response.code() == 200 && response.body() !=null) {
-                            String resp = response.body().string();
-                            TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);
-                            inventory.setImage(newTi.getImage());
-                            inventory.setDescription(newTi.getDescription());
-                            inventory.setName(newTi.getName());
-
-                            log.debug("NFT(ERC_721)有属性更新,token[{}]", JSONUtil.toJsonStr(inventory));
-                        } else {
-                            log.warn("NFT(ERC_721)属性查询http响应状态码异常:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(inventory));
+            if (recordCount > 0) {
+                CountDownLatch countDownLatch = new CountDownLatch(nftList.size());
+                tokenInfoExecutor.submit(() -> {
+                    nftList.parallelStream().forEach(nft -> {
+                        // 重试次数+1
+                        nft.setRetryNum(nft.getRetryNum() + 1);
+                        if (nft.getTokenUrl().startsWith("ipfs://")) {
+                            String tokenUrl = nft.getTokenUrl().replace("ipfs://", "https://ipfs.io/ipfs/");
+                            nft.setTokenUrl(tokenUrl);
                         }
-                    } catch (Exception e) {
-                        log.warn(StrUtil.format("NFT(ERC_721)属性查询异常,token:{}", JSONUtil.toJsonStr(inventory)), e);
-                    }
+                        Request request = new Request.Builder().url(nft.getTokenUrl()).build();
+                        try (Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute()) {
+                            if (response.code() == 200 && response.body() != null) {
+                                String resp = response.body().string();
+                                TokenInventoryWithBLOBs newTi = JSONUtil.toBean(resp, TokenInventoryWithBLOBs.class);
+                                nft.setImage(newTi.getImage());
+                                nft.setDescription(newTi.getDescription());
+                                nft.setName(newTi.getName());
+
+                                log.debug("NFT(ERC_721)有属性更新,token[{}]", JSONUtil.toJsonStr(nft));
+                            } else {
+                                log.warn("NFT(ERC_721)属性查询http响应状态码异常:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(nft));
+                            }
+                        } catch (Exception e) {
+                            log.warn(StrUtil.format("NFT(ERC_721)属性查询异常,token:{}", JSONUtil.toJsonStr(nft)), e);
+                        }
+                        countDownLatch.countDown();
+                    });
                 });
 
-                customToken721InventoryMapper.batchUpdateTokenInfo(nftList);
-                XxlJobHelper.log("NFT(ERC_721)属性更新：{}", JSONUtil.toJsonStr(nftList));
+                try {
+                    countDownLatch.await(60, TimeUnit.SECONDS);
+                    customToken721InventoryMapper.batchUpdateTokenInfo(nftList);
+                    XxlJobHelper.log("NFT(ERC_721)属性更新：{}", JSONUtil.toJsonStr(nftList));
+
+                } catch (Exception e) {
+                    log.error("NFT(ERC_721)属性更新异常", e);
+                }
             }
-        } while (CollUtil.isNotEmpty(nftList) && nftList.size() < batchSize);
+            pageNo++;
+        } while (recordCount !=0 && recordCount < batchSize);
     }
 
     /**
      * 更新token库存信息
-     *
+     * 根据token_url补齐name,image,description,decimal
      * @param :
      * @return: void
      * @date: 2022/9/21
@@ -308,47 +447,60 @@ public class ErcTokenUpdateTask {
         if (!AppStatusUtil.isRunning()) {
             return;
         }
+
         // 分页更新token库存相关信息
         int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 100);
         int pageNo = 1;
 
-        List<Token1155InventoryWithBLOBs> nftList = null;
+        int recordCount = 0;
         do {
             int offset = (pageNo-1) * batchSize;
             //查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
-            nftList = token1155InventoryMapper.listValidTokenInventoryToRefresh(offset, batchSize);
-            pageNo++;
-            if (CollUtil.isNotEmpty(nftList)) {
-                nftList.forEach(inventory -> {
-                    // 重试次数+1
-                    inventory.setRetryNum(inventory.getRetryNum() + 1);
-                    if (inventory.getTokenUrl().startsWith("ipfs://")){
-                        String tokenUrl = inventory.getTokenUrl().replace("ipfs://", "https://ipfs.io/ipfs/");
-                        inventory.setTokenUrl(tokenUrl);
-                    }
-                    Request request = new Request.Builder().url(inventory.getTokenUrl()).build();
-                    try (Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute()) {
-                        if (response.code() == 200 && response.body() !=null) {
-                            String resp = response.body().string();
-                            Token1155InventoryWithBLOBs newTi = JSONUtil.toBean(resp, Token1155InventoryWithBLOBs.class);
-                            inventory.setImage(newTi.getImage());
-                            inventory.setDescription(newTi.getDescription());
-                            inventory.setName(newTi.getName());
-                            inventory.setDecimal(newTi.getDecimal());
+            List<com.platon.browser.dao.entity.NftObject> nftList = token1155InventoryMapper.listValidTokenInventoryWithEmptyImage(offset, batchSize);
+            recordCount = nftList.size();
 
-                            log.debug("NFT(ERC_1155)有属性更新,token[{}]", JSONUtil.toJsonStr(inventory));
-                        } else {
-                            log.warn("NFT(ERC_1155)属性查询http响应状态码异常:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(inventory));
-                        }
-                    } catch (Exception e) {
-                        log.warn(StrUtil.format("NFT(ERC_1155)属性查询异常,token:{}", JSONUtil.toJsonStr(inventory)), e);
-                    }
-                });
+            if (recordCount > 0) {
+                 CountDownLatch countDownLatch = new CountDownLatch(nftList.size());
+                tokenInfoExecutor.submit(() -> {
+                    nftList.parallelStream().forEach(nft -> {
+                                // 重试次数+1
+                                nft.setRetryNum(nft.getRetryNum() + 1);
+                                if (nft.getTokenUrl().startsWith("ipfs://")) {
+                                    String tokenUrl = nft.getTokenUrl().replace("ipfs://", "https://ipfs.io/ipfs/");
+                                    nft.setTokenUrl(tokenUrl);
+                                }
+                                Request request = new Request.Builder().url(nft.getTokenUrl()).build();
+                                try (Response response = CustomHttpClient.getOkHttpClient().newCall(request).execute()) {
+                                    if (response.code() == 200 && response.body() != null) {
+                                        String resp = response.body().string();
+                                        Token1155InventoryWithBLOBs newTi = JSONUtil.toBean(resp, Token1155InventoryWithBLOBs.class);
+                                        nft.setImage(newTi.getImage());
+                                        nft.setDescription(newTi.getDescription());
+                                        nft.setName(newTi.getName());
+                                        nft.setDecimal(newTi.getDecimal());
 
-                customToken1155InventoryMapper.batchInsertOrUpdateSelective(nftList);
-                XxlJobHelper.log("NFT(ERC_1155)属性更新：{}", JSONUtil.toJsonStr(nftList));
+                                        log.debug("NFT(ERC_1155)有属性更新,token[{}]", JSONUtil.toJsonStr(nft));
+                                    } else {
+                                        log.warn("NFT(ERC_1155)属性查询http响应状态码异常:{},http消息:{},token:{}", response.code(), response.message(), JSONUtil.toJsonStr(nft));
+                                    }
+                                } catch (Exception e) {
+                                    log.warn(StrUtil.format("NFT(ERC_1155)属性查询异常,token:{}", JSONUtil.toJsonStr(nft)), e);
+                                }
+                                countDownLatch.countDown();
+                            });
+                        });
+
+                try {
+                    countDownLatch.await(60, TimeUnit.SECONDS);
+                      customToken1155InventoryMapper.batchUpdateTokenInfo(nftList);
+                    XxlJobHelper.log("NFT(ERC_1155)属性更新：{}", JSONUtil.toJsonStr(nftList));
+
+                } catch (Exception e) {
+                    log.error("NFT(ERC_1155)属性更新异常", e);
+                }
             }
-        } while (CollUtil.isNotEmpty(nftList) && nftList.size() < batchSize);
+            pageNo++;
+        } while (recordCount !=0 && recordCount < batchSize);
     }
 
     /**

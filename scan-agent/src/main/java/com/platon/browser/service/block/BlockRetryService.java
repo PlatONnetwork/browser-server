@@ -41,7 +41,7 @@ public class BlockRetryService {
             log.debug("获取区块:{}({})", Thread.currentThread().getStackTrace()[1].getMethodName(), blockNumber);
             DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
             PlatonBlock block = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBlockByNumber(dp, true).send();
-            log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+             log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
             return block;
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
