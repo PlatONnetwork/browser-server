@@ -80,8 +80,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
 
             this.clear();
             this.blocks.add(block);
-            this.transactions.addAll(block.getTransactions());
-            block.setTransactions(null);
+            this.transactions.addAll(block.getDtoTransactions());
+            block.setDtoTransactions(null);
 
             Long txMaxId = 0L;
             if (!this.transactions.isEmpty()) {

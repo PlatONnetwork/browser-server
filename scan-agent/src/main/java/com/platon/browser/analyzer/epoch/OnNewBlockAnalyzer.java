@@ -30,7 +30,6 @@ import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -83,11 +82,16 @@ public class OnNewBlockAnalyzer {
     @Resource
     private DelegateBalanceAdjustmentService delegateBalanceAdjustmentService;
 
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+    /**
+     *  2023/04/07 lvixaoyi
+     *  注意：此方法过程，没有影响输入参数的值
+     * @param event
+     * @param block
+     * @throws NoSuchBeanException
+     */
     public void analyze(CollectionEvent event, Block block) throws NoSuchBeanException {
 
         long startTime = System.currentTimeMillis();
-
         networkStatCache.getNetworkStat().setCurNumber(event.getBlock().getNum());
         networkStatCache.getNetworkStat().setCurBlockHash(event.getBlock().getHash());
         NewBlock newBlock = NewBlock.builder()

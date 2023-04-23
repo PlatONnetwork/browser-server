@@ -1,13 +1,11 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.ApiTestBase;
-import com.platon.browser.BrowserApiApplication;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,13 +27,13 @@ public class StakingControllerTest  extends ApiTestBase  {
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build(); //初始化MockMvc对象
     }
-    
+
     @Test
     public void stakingListNew() throws Exception{
         this.mockMvc.perform(MockMvcRequestBuilders.post("/staking/statistic")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk()).andDo(print());
     }
-    
+
     @Test
     public void aliveStakingList() throws Exception{
     	String requestBody = "{\"key\":\"aa\",\"queryStatus\":\"all\"}";
@@ -43,7 +41,7 @@ public class StakingControllerTest  extends ApiTestBase  {
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
-    
+
     @Test
     public void historyStakingList() throws Exception{
     	String requestBody = "{\"key\":\"aa\"}";
@@ -51,7 +49,7 @@ public class StakingControllerTest  extends ApiTestBase  {
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
-    
+
     @Test
     public void stakingDetails() throws Exception{
     	String requestBody = "{\"nodeId\":\"0x53242dec8799f3f4f8882b109e1a3ebb4aa8c2082d000937d5876365414150c5337aa3d3d41ead1ac873f4e0b19cb9238d2995598207e8d571f0bd5dd843cdf3\"}";

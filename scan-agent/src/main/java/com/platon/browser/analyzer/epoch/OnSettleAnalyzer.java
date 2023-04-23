@@ -2,7 +2,10 @@ package com.platon.browser.analyzer.epoch;
 
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.*;
+import com.platon.browser.bean.AnnualizedRateInfo;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
@@ -46,6 +49,12 @@ public class OnSettleAnalyzer {
     private RestrictingMinimumReleaseParamService restrictingMinimumReleaseParamService;
 
 
+    /**
+     * 输入参数没有被修改
+     * @param event
+     * @param block
+     * @return
+     */
     public List<NodeOpt> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
         // 操作日志列表
@@ -74,9 +83,9 @@ public class OnSettleAnalyzer {
                               .build();
 
         List<Integer> statusList = new ArrayList<>();
-        statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
-        statusList.add(CustomStaking.StatusEnum.EXITING.getCode());
-        statusList.add(CustomStaking.StatusEnum.LOCKED.getCode());
+        statusList.add(Staking.StatusEnum.CANDIDATE.getCode());
+        statusList.add(Staking.StatusEnum.EXITING.getCode());
+        statusList.add(Staking.StatusEnum.LOCKED.getCode());
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria().andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
@@ -88,26 +97,26 @@ public class OnSettleAnalyzer {
             staking.setStakingHes(BigDecimal.ZERO);
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
-            if (staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
+            if (staking.getStatus() == Staking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
                     event.getBlock().getNum() >= staking.getUnStakeEndBlock() // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 staking.setStakingReduction(BigDecimal.ZERO);
-                staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+                staking.setStatus(Staking.StatusEnum.EXITED.getCode());
                 staking.setLowRateSlashCount(0);
                 exitedNodeIds.add(staking.getNodeId());
             }
 
             //锁定中记录状态设置（状态为已锁定中且已经经过指定的结算周期数，则把状态置为候选中）
-            if (staking.getStatus() == CustomStaking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
+            if (staking.getStatus() == Staking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
                     (staking.getZeroProduceFreezeEpoch() + staking.getZeroProduceFreezeDuration()) < settle.getSettingEpoch()
                 // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 // 低出块处罚次数置0
                 staking.setLowRateSlashCount(0);
                 // 异常状态
-                staking.setExceptionStatus(CustomStaking.ExceptionStatusEnum.NORMAL.getCode());
+                staking.setExceptionStatus(Staking.ExceptionStatusEnum.NORMAL.getCode());
                 // 从已锁定状态恢复到候选中状态
-                staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+                staking.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
                 recoverLog(staking, settle.getSettingEpoch(), block, nodeOpts);
             }
 
@@ -119,9 +128,9 @@ public class OnSettleAnalyzer {
 
             //当前质押是下轮结算周期验证人
             if (settle.getCurVerifierSet().contains(staking.getNodeId())) {
-                staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
+                staking.setIsSettle(Staking.YesNoEnum.YES.getCode());
             } else {
-                staking.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
+                staking.setIsSettle(Staking.YesNoEnum.NO.getCode());
             }
 
             // 设置当前质押的总委托奖励，从节点上取出来的委托总奖励就是当前质押获取的总委托奖励

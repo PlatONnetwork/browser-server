@@ -1,11 +1,9 @@
 package com.platon.browser.analyzer.ppos;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.DelegateExitResult;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
@@ -54,7 +52,7 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
     private DelegationMapper delegationMapper;
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private CustomGasEstimateMapper customGasEstimateMapper;
@@ -132,7 +130,7 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
          */
         boolean isCandidate = true; // 对应节点是否候选中
 
-        if (staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() || staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+        if (staking.getStatus() == Staking.StatusEnum.EXITING.getCode() || staking.getStatus() == Staking.StatusEnum.EXITED.getCode()) {
             // 节点是[退出中|已退出]
             businessParam.setCodeNodeIsLeave(true);
             isCandidate = false;
@@ -283,7 +281,8 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
      * @date: 2021/12/2
      */
     private void updateAddressHaveReward(DelegateExit businessParam) {
-        Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getTxFrom());
+        // 2023/04/14 lvxiaoyi 所有交易（包括PPOS虚拟交易）的相关地址，都已经在缓存中
+        /*Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getTxFrom());
         if (ObjectUtil.isNull(addressInfo)) {
             // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
             Address address = addressCache.createDefaultAddress(businessParam.getTxFrom());
@@ -292,6 +291,11 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
         } else {
             customAddressMapper.updateAddressHaveReward(businessParam.getTxFrom(), businessParam.getDelegateReward());
         }
+         customAddressMapper.updateAddressHaveReward(businessParam.getTxFrom(), businessParam.getDelegateReward());
+        */
+        //2023/04/14 lvxiaoyi, 最后统一处理，参考：com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer
+        newAddressCache.addRewardClaimAddressToBlockCtx(businessParam.getTxFrom(), businessParam.getDelegateReward());
+
     }
 
 }

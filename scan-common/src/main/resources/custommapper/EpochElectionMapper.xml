@@ -28,7 +28,7 @@
 		and `exception_status` = 2
 		and `status` = 1;
 	</select>
-	<update id="slashNode" parameterType="com.platon.browser.dao.param.epoch.Election">
+	<update id="slashNodeForZeroProduce" parameterType="com.platon.browser.dao.param.epoch.Election">
 		/*处理低出块率被锁定的节点*/
 		<foreach collection="lockedNodeList" item="item">
 			/*1、更新质押*/

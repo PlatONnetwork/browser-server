@@ -2,10 +2,10 @@ package com.platon.browser.proxyppos.delegate;
 
 import com.platon.abi.solidity.datatypes.BytesType;
 import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.abi.solidity.datatypes.generated.Uint64;
 import com.platon.contracts.ppos.abi.Function;
 import com.platon.contracts.ppos.dto.common.FunctionType;
 import com.platon.contracts.ppos.utils.EncoderUtils;
-import com.platon.abi.solidity.datatypes.generated.Uint64;
 import com.platon.utils.Convert;
 import com.platon.utils.Numeric;
 import org.bouncycastle.util.encoders.Hex;

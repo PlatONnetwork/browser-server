@@ -1,14 +1,14 @@
 package com.platon.browser.request.newtransaction;
 
+import com.platon.browser.request.PageReq;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import com.platon.browser.request.PageReq;
 
 /**
  * 地址交易列表请求对象
  *  @file TransactionListByAddressRequest.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -29,5 +29,5 @@ public class TransactionListByAddressRequest extends PageReq{
 	public void setTxType(String txType) {
 		this.txType = txType;
 	}
-    
+
 }

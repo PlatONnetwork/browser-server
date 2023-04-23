@@ -4,17 +4,12 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.TxAnalyseResult;
-import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.custommapper.CustomNOptBakMapper;
-import com.platon.browser.dao.custommapper.CustomTxBakMapper;
 import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.ppos.PPOSService;
-import com.platon.browser.service.statistic.StatisticService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 
@@ -44,12 +38,6 @@ public class CollectionEventHandlerTest extends AgentTestBase {
     private BlockService blockService;
 
     @Mock
-    private StatisticService statisticService;
-
-    @Mock
-    private ComplementEventPublisher complementEventPublisher;
-
-    @Mock
     private NetworkStatCache networkStatCache;
 
     @Mock
@@ -58,18 +46,9 @@ public class CollectionEventHandlerTest extends AgentTestBase {
     @Mock
     private TxBakMapper txBakMapper;
 
-    @Mock
-    private CustomTxBakMapper customTxBakMapper;
-
-    @Mock
-    private CustomNOptBakMapper customNOptBakMapper;
-
     @InjectMocks
     @Spy
     private CollectionEventHandler target;
-
-    @Mock
-    private AddressCache addressCache;
 
     @Before
     public void setup() throws Exception {
@@ -92,7 +71,7 @@ public class CollectionEventHandlerTest extends AgentTestBase {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
-        event.setTransactions(new ArrayList<>(transactionList));
+        event.getBlock().setDtoTransactions(new ArrayList<>(transactionList));
 //        when(customTxBakMapper.batchInsertOrUpdateSelective(any(), any())).thenReturn(100);
         target.onEvent(event, 33, false);
         verify(target, times(1)).onEvent(any(), anyLong(), anyBoolean());

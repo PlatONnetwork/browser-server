@@ -1,10 +1,10 @@
 package com.platon.browser.decoder.ppos;
 
+import com.platon.browser.param.ProposalTextParam;
+import com.platon.browser.param.TxParam;
 import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.utils.Numeric;
-import com.platon.browser.param.ProposalTextParam;
-import com.platon.browser.param.TxParam;
 
 /**
  * @description: 创建验证人交易输入参数解码器

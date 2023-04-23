@@ -18,7 +18,7 @@
 		where `node_id` in <foreach open="(" collection="list" item="nodeId"  separator="," close=")"> #{nodeId} </foreach>
 		and `exception_status` = 3;
 	</select>
-	<update id="slashNode" parameterType="com.platon.browser.dao.entity.Slash">
+	<update id="slashNodeForDoubleSigned" parameterType="com.platon.browser.dao.entity.Slash">
 	/*1、更新委托*/
 	update `delegation` set
 		`delegate_released` = `delegate_released` + `delegate_hes` + `delegate_locked`,

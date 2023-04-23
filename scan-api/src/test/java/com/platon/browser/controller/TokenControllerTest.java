@@ -2,7 +2,6 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestBase;
-import com.platon.browser.request.PageReq;
 import com.platon.browser.request.token.QueryTokenDetailReq;
 import com.platon.browser.request.token.QueryTokenListReq;
 import org.junit.Before;

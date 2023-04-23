@@ -32,6 +32,7 @@ ALTER TABLE `delegation`
     MODIFY COLUMN `is_history`              tinyint         NOT NULL DEFAULT 2 COMMENT '是否为历史:\r\n1是,\r\n2否';
 
 ALTER TABLE `gas_estimate`
+    COMMENT '委托用户未领取委托奖励持续的epoch数量'
     MODIFY COLUMN `addr`            varchar(42)     NOT NULL COMMENT '委托交易地址',
     MODIFY COLUMN `node_id`         char(130)       NOT NULL COMMENT '委托的质押节点id',
     MODIFY COLUMN `sbn`             bigint          NOT NULL COMMENT '委托的质押节点的质押块高',
@@ -440,3 +441,73 @@ UPDATE token
         ) t on tx_bak.hash = t.contract_createHash
     ) tt ON token.address = tt.address
 SET token.created_block_number = tt.num;
+
+-- tx_bak记录增加后，修改address的交易数量
+DROP TRIGGER IF EXISTS trigger_tx_bak_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_tx_bak_insert AFTER INSERT
+    ON tx_bak FOR EACH ROW
+BEGIN
+    update `address`
+    set
+        tx_qty = tx_qty + 1,
+        transfer_qty = case when NEW.`type` = 0 then transfer_qty + 1 else transfer_qty end,
+        staking_qty = case when NEW.`type` in (13,14,15,16,26) then staking_qty + 1 else staking_qty end,
+        delegate_qty = case when NEW.`type` in (17,19,28) then delegate_qty + 1 else delegate_qty end,
+        proposal_qty = case when NEW.`type` in (20,21,22,23,24,25) then proposal_qty + 1 else proposal_qty end
+    where `address` = NEW.`from` OR address = NEW.`to`;
+END||
+DELIMITER ;
+
+-- tx_erc_20_bak记录增加后，修改address的erc_20交易数量
+DROP TRIGGER IF EXISTS trigger_tx_erc_20_bak_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_tx_erc_20_bak_insert AFTER INSERT
+    ON tx_erc_20_bak FOR EACH ROW
+BEGIN
+    update `token`
+    set token_tx_qty = token_tx_qty + 1
+    where `address` = NEW.`contract`;
+
+    update `address`
+    set erc20_tx_qty = erc20_tx_qty + 1
+    where `address` = NEW.`from` OR address = NEW.`to`;
+
+END||
+DELIMITER ;
+
+
+-- tx_erc_721_bak记录增加后，修改address的erc_20交易数量
+DROP TRIGGER IF EXISTS trigger_tx_erc_721_bak_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_tx_erc_721_bak_insert AFTER INSERT
+    ON tx_erc_721_bak FOR EACH ROW
+BEGIN
+    update `token`
+    set token_tx_qty = token_tx_qty + 1
+    where `address` = NEW.`contract`;
+
+    update `address`
+    set erc721_tx_qty = erc721_tx_qty + 1
+    where `address` = NEW.`from` OR address = NEW.`to`;
+
+END||
+DELIMITER ;
+
+
+-- tx_erc_1155_bak记录增加后，修改address的erc_20交易数量
+DROP TRIGGER IF EXISTS trigger_tx_erc_1155_bak_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_tx_erc_1155_bak_insert AFTER INSERT
+    ON tx_erc_1155_bak FOR EACH ROW
+BEGIN
+    update `token`
+    set token_tx_qty = token_tx_qty + 1
+    where `address` = NEW.`contract`;
+
+    update `address`
+    set erc1155_tx_qty = erc1155_tx_qty + 1
+    where `address` = NEW.`from` OR address = NEW.`to`;
+
+END||
+DELIMITER ;

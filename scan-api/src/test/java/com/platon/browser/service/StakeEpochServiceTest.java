@@ -3,27 +3,24 @@ package com.platon.browser.service;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.ApiTestMockBase;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.DelegationAddress;
 import com.platon.browser.bean.DelegationStaking;
-import com.platon.browser.bean.StakingBO;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.custommapper.CustomDelegationMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomStakingMapper;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.request.staking.*;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.staking.DelegationListByAddressResp;
 import com.platon.browser.response.staking.DelegationListByStakingResp;
-import com.platon.browser.response.staking.StakingStatisticNewResp;
+import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +29,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -112,7 +108,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setStatSlashLowQty(3);
         staking.setStatSlashMultiQty(3);
         staking.setStatDelegateReleased(BigDecimal.ONE);
-        staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
+        staking.setStatus(Staking.StatusEnum.EXITING.getCode());
         staking.setIsConsensus(2);
         staking.setIsSettle(2);
         staking.setDeleAnnualizedRate(9.3);
@@ -142,7 +138,7 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         staking.setStakingHes(BigDecimal.ONE);
         staking.setStakingLocked(BigDecimal.ONE);
         staking.setWebSite("www.cdm.com");
-        staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        staking.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
         this.target.stakingDetails(stakingDetailsReq);
 
         StakingOptRecordListReq stakingOptRecordListReq = new StakingOptRecordListReq();
@@ -176,17 +172,6 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
         this.target.stakingOptRecordList(stakingOptRecordListReq);
 
         assertTrue(true);
-    }
-
-    @Test
-    public void testStakingStatisticNew() {
-        StakingBO bo =new StakingBO();
-        bo.setStakingDenominator(BigDecimal.ONE);
-        bo.setTotalStakingValue(BigDecimal.ONE);
-        when(commonService.getTotalStakingValueAndStakingDenominator(any())).thenReturn(bo);
-        when(this.customStakingMapper.selectCountByActive()).thenReturn(10);
-        StakingStatisticNewResp resp = this.target.stakingStatisticNew();
-        assertNotNull(resp);
     }
 
     @Test

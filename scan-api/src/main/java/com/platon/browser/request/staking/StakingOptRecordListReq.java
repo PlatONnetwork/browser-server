@@ -1,14 +1,14 @@
 package com.platon.browser.request.staking;
 
+import com.platon.browser.request.PageReq;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import com.platon.browser.request.PageReq;
 
 /**
  * 验证人操作列表请求对象
  *  @file StakingOptRecordListReq.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -24,5 +24,5 @@ public class StakingOptRecordListReq extends PageReq{
 	public void setNodeId(String nodeId) {
 		this.nodeId = nodeId;
 	}
-	
+
 }

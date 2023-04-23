@@ -2,10 +2,10 @@ package com.platon.browser.service;
 
 
 import com.platon.browser.ApiTestMockBase;
+import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.bean.CustomProposal;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.request.proposal.ProposalDetailRequest;
 import org.junit.Before;
@@ -31,7 +31,7 @@ public class ProposalServiceTest extends ApiTestMockBase {
     private ProposalMapper proposalMapper;
     @Spy
     private ProposalInfoService target;
-    
+
     @Before
 	public void setup() {
         ReflectionTestUtils.setField(target,"i18n",i18n);
@@ -41,7 +41,7 @@ public class ProposalServiceTest extends ApiTestMockBase {
         ReflectionTestUtils.setField(target,"ESBlockRepository", ESBlockRepository);
         ReflectionTestUtils.setField(target,"networkParams",networkParams);
     }
-    
+
     @Test
     public void test() throws IOException {
         ProposalDetailRequest req = new ProposalDetailRequest();
@@ -69,7 +69,7 @@ public class ProposalServiceTest extends ApiTestMockBase {
 
         proposal.setType(CustomProposal.TypeEnum.UPGRADE.getCode());
         target.get(req);
-        
+
         proposal.setEndVotingBlock(34L);
         proposal.setType(CustomProposal.TypeEnum.UPGRADE.getCode());
         target.get(req);
@@ -77,7 +77,7 @@ public class ProposalServiceTest extends ApiTestMockBase {
         proposal.setType(CustomProposal.TypeEnum.PARAMETER.getCode());
         proposal.setName("stakeThreshold");
         target.get(req);
-        
+
         proposal.setType(CustomProposal.TypeEnum.PARAMETER.getCode());
         proposal.setName("slashFractionDuplicateSign");
         target.get(req);
@@ -87,7 +87,7 @@ public class ProposalServiceTest extends ApiTestMockBase {
 
         assertTrue(true);
     }
-    
+
     @Test
     public void testList() throws IOException {
     	PageReq pageReq = new PageReq();
@@ -113,10 +113,10 @@ public class ProposalServiceTest extends ApiTestMockBase {
     	target.list(pageReq);
     	assertTrue(true);
     }
-    
+
     @Test
     public void testQueryByProposal() {
-    	
-    	
+
+
     }
 }

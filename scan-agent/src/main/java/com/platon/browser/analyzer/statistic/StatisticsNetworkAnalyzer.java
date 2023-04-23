@@ -64,7 +64,7 @@ public class StatisticsNetworkAnalyzer {
         long startTime = System.currentTimeMillis();
         log.debug("区块入库统计：区块[{}],交易数[{}],共识周期轮数[{}],结算周期轮数[{}],增发周期轮数[{}]",
                   block.getNum(),
-                  event.getTransactions().size(),
+                  event.getBlock().getDtoTransactions().size(),
                   epochMessage.getConsensusEpochRound(),
                   epochMessage.getSettleEpochRound(),
                   epochMessage.getIssueEpochRound());

@@ -180,7 +180,7 @@ public class ErcTokenUpdateTask {
      * 销毁的合约，需要更新一次最后的余额，以便scan还能从scan的db中查询到token的有关信息。
      * 这个任务不再需要，而是有com.platon.browser.v0152.analyzer.ErcTokenHolderAnalyzer#analyze(java.util.List)来实时维护token的每个账户余额
      * 但是由此带来的一个缺陷是：不再支持创建合约时就铸币，但是没有发射transfer事件的非标准合约。现象就是db中，会出现balanace<0的情况，对此现象的解释：
-     * 创建合约时就铸币，因为没有transfer事件，所以scan没有记录到minter和余额；然后minter转账token到其他人，因为minter需要减持，所以造成负数
+     * 创建合约时就铸币，因为没有transfer事件，所以scan没有记录到初始的minter和余额；然后minter需要转账token到其他人后，因为minter的余额需要减少，所以造成负数
      *
      */
     //@XxlJob("contractDestroyUpdateBalanceJobHandler")

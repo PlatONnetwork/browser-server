@@ -2,24 +2,20 @@ package com.platon.browser.bootstrap.service;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bean.CollectionNetworkStat;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.cache.NodeCache;
-import com.platon.browser.cache.ProposalCache;
-import com.platon.browser.publisher.GasEstimateEventPublisher;
-import com.platon.browser.service.elasticsearch.*;
-import com.platon.browser.service.epoch.EpochRetryService;
+import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.*;
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.GasEstimateLogMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.CommonUtil;
-import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.contracts.ppos.dto.resp.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -56,29 +51,12 @@ public class InitializationServiceTest extends AgentTestBase {
     @Mock
     private NodeMapper nodeMapper;
 
-    @Mock
-    private StakingMapper stakingMapper;
 
     @Mock
     private NetworkStatMapper networkStatMapper;
 
     @Mock
-    private AddressMapper addressMapper;
-
-    @Mock
-    private NodeCache nodeCache;
-
-    @Mock
-    private NetworkStatCache networkStatCache;
-
-    @Mock
-    private AddressCache addressCache;
-
-    @Mock
     private ProposalMapper proposalMapper;
-
-    @Mock
-    private ProposalCache proposalCache;
 
     @Mock
     private ParameterService parameterService;
@@ -86,8 +64,6 @@ public class InitializationServiceTest extends AgentTestBase {
     @Mock
     private GasEstimateLogMapper gasEstimateLogMapper;
 
-    @Mock
-    private GasEstimateEventPublisher gasEstimateEventPublisher;
 
     @Mock
     private StakeEpochService stakeEpochService;
@@ -96,32 +72,6 @@ public class InitializationServiceTest extends AgentTestBase {
     @Spy
     private InitializationService target;
 
-    @Mock
-    private ErcCache ercCache;
-
-    @Mock
-    private TokenMapper tokenMapper;
-
-    @Mock
-    private EsBlockRepository ESBlockRepository;
-
-    @Mock
-    private EsTransactionRepository ESTransactionRepository;
-
-    @Mock
-    private EsDelegationRewardRepository ESDelegationRewardRepository;
-
-    @Mock
-    private EsNodeOptRepository ESNodeOptRepository;
-
-    @Mock
-    private EsErc20TxRepository esErc20TxRepository;
-
-    @Mock
-    private EsErc721TxRepository esErc721TxRepository;
-
-    @Mock
-    private EsTransferTxRepository esTransferTxRepository;
 
     @Before
     public void setup() throws Exception {
@@ -132,7 +82,7 @@ public class InitializationServiceTest extends AgentTestBase {
         node.setStakingBlockNum(BigInteger.valueOf(7988));
         Node node2 = candidateList.get(1);
         node2.setNodeName(null);
-        CustomStaking staking = stakingList.get(0);
+        Staking staking = stakingList.get(0);
         staking.setNodeId(node.getNodeId());
         staking.setNodeName("node-name");
 

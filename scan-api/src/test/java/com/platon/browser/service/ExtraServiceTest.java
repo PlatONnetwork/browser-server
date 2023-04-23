@@ -13,13 +13,12 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExtraServiceTest extends ApiTestMockBase {
@@ -148,5 +147,5 @@ public class ExtraServiceTest extends ApiTestMockBase {
 		QueryConfigResp queryConfigResp = target.queryConfig();
 		assertNotNull(queryConfigResp);
 	}
-	
+
 }

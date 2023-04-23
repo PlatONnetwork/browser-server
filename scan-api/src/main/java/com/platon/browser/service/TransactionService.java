@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.keybase.KeyBaseUserInfo;
 import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
@@ -468,7 +467,7 @@ public class TransactionService {
                             if (staking != null) {
                                 resp.setRedeemLocked(staking.getStakingReduction());
                                 // 只有已退出，则金额才会退回到账户
-                                if (staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+                                if (staking.getStatus() == Staking.StatusEnum.EXITED.getCode()) {
                                     resp.setRedeemStatus(RedeemStatusEnum.EXITED.getCode());
                                 } else {
                                     resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());

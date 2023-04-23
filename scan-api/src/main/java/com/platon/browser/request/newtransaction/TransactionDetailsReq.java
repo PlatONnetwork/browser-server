@@ -1,16 +1,15 @@
 package com.platon.browser.request.newtransaction;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
+import com.platon.browser.utils.HexUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import com.platon.browser.utils.HexUtil;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * 交易详情请求对象
  *  @file TransactionDetailsReq.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -27,5 +26,5 @@ public class TransactionDetailsReq{
 		if(StringUtils.isBlank(txHash)) return;
 		this.txHash = HexUtil.prefix(txHash.toLowerCase());
 	}
-    
+
 }

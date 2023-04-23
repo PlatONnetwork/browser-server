@@ -1,11 +1,10 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.CollectionTransaction;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.NodeItem;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
-import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.dao.custommapper.ProposalBusinessMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -61,9 +60,9 @@ public class ProposalVoteConverterTest extends AgentTestBase {
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         Transaction tx = new Transaction();
-        for (CollectionTransaction collectionTransaction : transactionList) {
-            if (collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.PROPOSAL_VOTE)) {
-                tx = collectionTransaction;
+        for (com.platon.browser.elasticsearch.dto.Transaction  dtoTransaction : transactionList) {
+            if (dtoTransaction.getTypeEnum().equals(Transaction.TypeEnum.PROPOSAL_VOTE)) {
+                tx = dtoTransaction;
             }
         }
         tx.setStatus(Transaction.StatusEnum.FAILURE.getCode());

@@ -1,5 +1,6 @@
 package com.platon.browser.v0152.bean;
 
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import lombok.Data;
 
 @Data
@@ -14,4 +15,19 @@ public class ErcTxInfo {
     private String value;               // 交易value
     private Integer toType;             // 接收方类型
     private Integer fromType;           // 发送方类型
+
+    public static ErcTxInfo convertFromErcTx(ErcTx ercTx){
+        ErcTxInfo ercTxInfo = new ErcTxInfo();
+        ercTxInfo.setName(ercTx.getName());
+        ercTxInfo.setSymbol(ercTx.getSymbol());
+        ercTxInfo.setDecimal(ercTx.getDecimal());
+        ercTxInfo.setContract(ercTx.getContract());
+        ercTxInfo.setFrom(ercTx.getFrom());
+        ercTxInfo.setTo(ercTx.getTo());
+        ercTxInfo.setTokenId(ercTx.getTokenId());
+        ercTxInfo.setValue(ercTx.getValue());
+        ercTxInfo.setToType(ercTx.getToType());
+        ercTxInfo.setFromType(ercTx.getFromType());
+        return ercTxInfo;
+    }
 }

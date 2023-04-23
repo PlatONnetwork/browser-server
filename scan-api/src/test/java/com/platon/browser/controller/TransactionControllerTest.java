@@ -2,14 +2,12 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestBase;
-import com.platon.browser.BrowserApiApplication;
 import com.platon.browser.request.PageReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;

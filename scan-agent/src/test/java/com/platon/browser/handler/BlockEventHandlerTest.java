@@ -1,23 +1,17 @@
 package com.platon.browser.handler;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.BlockAnalyzer;
 import com.platon.browser.bean.BlockEvent;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.ReceiptResult;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.publisher.CollectionEventPublisher;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
@@ -31,18 +25,6 @@ import java.util.concurrent.ExecutionException;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockEventHandlerTest extends AgentTestBase {
-
-    @Mock
-    private CollectionEventPublisher collectionEventPublisher;
-
-    @Mock
-    private PlatOnClient platOnClient;
-
-    @Mock
-    private AddressCache addressCache;
-
-    @Spy
-    private BlockAnalyzer blockAnalyzer;
 
     @InjectMocks
     private BlockEventHandler target;

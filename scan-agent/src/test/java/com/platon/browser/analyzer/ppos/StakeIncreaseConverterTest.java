@@ -1,11 +1,10 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.CollectionTransaction;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.NodeItem;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
-import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
@@ -53,12 +52,12 @@ public class StakeIncreaseConverterTest extends AgentTestBase {
 
     @Test
     public void convert(){
-        CollectionTransaction collectionTransaction = null;
-        for(CollectionTransaction transaction : transactionList){
+        com.platon.browser.elasticsearch.dto.Transaction  dtoTransaction = null;
+        for(com.platon.browser.elasticsearch.dto.Transaction  transaction : transactionList){
             if(transaction.getTypeEnum().equals(Transaction.TypeEnum.STAKE_INCREASE))
-                collectionTransaction = transaction;
+                dtoTransaction = transaction;
         }
 
-        target.analyze(collectionEvent,collectionTransaction);
+        target.analyze(collectionEvent, dtoTransaction);
     }
 }

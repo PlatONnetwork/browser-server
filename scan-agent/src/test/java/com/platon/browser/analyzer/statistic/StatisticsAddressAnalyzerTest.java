@@ -4,10 +4,10 @@ import com.platon.browser.AgentTestBase;
 import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
-import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ContractTypeEnum;
 import org.junit.Before;
@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -30,13 +29,12 @@ import static org.mockito.Mockito.when;
 public class StatisticsAddressAnalyzerTest extends AgentTestBase {
 
     @Mock
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
     @Mock
     private StatisticBusinessMapper statisticBusinessMapper;
     @Mock
     private AddressMapper addressMapper;
-    @Mock
-    private RedisTemplate redisTemplate;
+
     @InjectMocks
     @Spy
     private StatisticsAddressAnalyzer target;
@@ -44,7 +42,9 @@ public class StatisticsAddressAnalyzerTest extends AgentTestBase {
     private CustomAddressMapper customAddressMapper;
     @Before
     public void setup() throws Exception {
-        when(this.addressCache.getAll()).thenReturn(new ArrayList<>(this.addressList));
+        when(this.newAddressCache.listNewAddressInBlockCtx()).thenReturn(new ArrayList<>(this.addressList));
+        when(this.newAddressCache.listRewardClaimAddressInBlockCtx()).thenReturn(new ArrayList<>(this.addressList));
+        when(this.newAddressCache.listSuicidedAddressInBlockCtx()).thenReturn(new ArrayList<>(this.addressList));
         when(this.addressMapper.selectByExampleWithBLOBs(any())).thenReturn(new ArrayList<>(this.addressList));
         when(customAddressMapper.batchUpdateAddressInfo(any())).thenReturn(1);
     }
@@ -60,11 +60,11 @@ public class StatisticsAddressAnalyzerTest extends AgentTestBase {
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
-        collectionEvent.setTransactions(new ArrayList<>(this.transactionList));
+        collectionEvent.getBlock().setDtoTransactions(new ArrayList<>(this.transactionList));
         TransactionAnalyzer.setGeneralContractAddressCache(this.addressList.get(0).getAddress(), ContractTypeEnum.EVM);
         TransactionAnalyzer.setGeneralContractAddressCache(this.addressList.get(1).getAddress(), ContractTypeEnum.WASM);
         TransactionAnalyzer.setGeneralContractAddressCache(this.addressList.get(2).getAddress(), ContractTypeEnum.ERC20_EVM);
-        this.transactionList.get(0).setBin("0x");
+       // this.transactionList.get(0).setBin("0x");
         this.target.analyze(collectionEvent, block, epochMessage);
     }
 

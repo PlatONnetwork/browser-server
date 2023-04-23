@@ -1,11 +1,14 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.*;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.bean.NodeItem;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.SlashBusinessMapper;
 import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -80,14 +83,14 @@ public class ReportConverterTest extends AgentTestBase {
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
         Transaction tx = new Transaction();
-        for (CollectionTransaction collectionTransaction : transactionList) {
-            if (collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.REPORT)) {
-                tx = collectionTransaction;
+        for (com.platon.browser.elasticsearch.dto.Transaction  dtoTransaction : transactionList) {
+            if (dtoTransaction.getTypeEnum().equals(Transaction.TypeEnum.REPORT)) {
+                tx = dtoTransaction;
             }
         }
         Node node = new Node();
         node.setStakingLocked(BigDecimal.TEN);
-        node.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        node.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
         when(nodeMapper.selectByPrimaryKey(any())).thenReturn(node);
         target.analyze(collectionEvent, tx);
         node.setStakingLocked(BigDecimal.ZERO);

@@ -2,7 +2,6 @@ package com.platon.browser.config.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.platon.browser.config.json.CustomLowLatSerializer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

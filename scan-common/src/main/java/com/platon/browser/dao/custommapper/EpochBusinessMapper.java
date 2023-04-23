@@ -34,7 +34,7 @@ public interface EpochBusinessMapper {
      * 新选举周期数据变更（结算&共识周期往前推20个块）
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    void slashNode(BusinessParam param);
+    void slashNodeForZeroProduce(BusinessParam param);
 
     /**
      * 新共识周期数据变更

@@ -1,5 +1,7 @@
 package com.platon.browser.utils;
 
+import com.platon.browser.config.EsClusterConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,20 +10,16 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.stereotype.Component;
 
-import com.platon.browser.config.EsClusterConfig;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Component
 public class SpringUtils implements BeanPostProcessor  {
-	
+
 	@Autowired
 	private EsClusterConfig esClusterConfig;
-	
+
 	@Autowired
     private DefaultListableBeanFactory defaultListableBeanFactory;
-	
+
 	public Object resetSpring(String targetName) {
 		defaultListableBeanFactory.setAllowBeanDefinitionOverriding(true);
 		boolean containsBean = defaultListableBeanFactory.containsBean(targetName);

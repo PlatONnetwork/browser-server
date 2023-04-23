@@ -2,7 +2,6 @@ package com.platon.browser.analyzer.epoch;
 
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.custommapper.SlashBusinessMapper;
@@ -59,6 +58,12 @@ public class OnConsensusAnalyzer {
     @Resource
     private SlashMapper slashMapper;
 
+    /**
+     * 输入参数没有被修改
+     * @param event
+     * @param block
+     * @return
+     */
     public Optional<List<NodeOpt>> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
 
@@ -77,19 +82,19 @@ public class OnConsensusAnalyzer {
         SlashExample slashExample = new SlashExample();
         slashExample.createCriteria().andIsHandleEqualTo(false);
 
-        List<Slash> notHandledSlash = slashMapper.selectByExampleWithBLOBs(slashExample);
+        List<Slash> notHandledDoubleSignedSlash = slashMapper.selectByExampleWithBLOBs(slashExample);
         // 如果被举报节点不在下一轮共识周期中，则可对其执行安全的处罚操作
 
-        Set<String> notInNextConsNodeIdSet = notHandledSlash.stream().map(Slash::getNodeId).collect(Collectors.toSet());
+        Set<String> notInNextConsNodeIdSet = notHandledDoubleSignedSlash.stream().map(Slash::getNodeId).collect(Collectors.toSet());
 
         List<NodeOpt> nodeOpts = new ArrayList<>();
         if (!notInNextConsNodeIdSet.isEmpty()) { //不在下一轮共识周期中的被举报节点
             // 以数据库中staking表中的数据为准，进行双签处罚
             Set<String> doubleSignedNodeIdSet = slashBusinessMapper.filterNodeIdThoseDoubleSigned(new ArrayList<>(notInNextConsNodeIdSet));
             if (!doubleSignedNodeIdSet.isEmpty()) {
-                notHandledSlash.forEach(slash -> {
+                notHandledDoubleSignedSlash.forEach(slash -> {
                     if(doubleSignedNodeIdSet.contains(slash.getNodeId())){
-                        NodeOpt nodeOpt = slashNode(slash, block);
+                        NodeOpt nodeOpt = slashNodeForDoubleSigned(slash, block);
                         nodeOpts.add(nodeOpt);
                     }
                 });
@@ -108,14 +113,15 @@ public class OnConsensusAnalyzer {
     }
 
     /**
-     * 惩罚节点
+     * 双签惩罚节点
      *
      * @param businessParam:
      * @param block:
      * @return: com.platon.browser.elasticsearch.dto.NodeOpt
      * @date: 2021/12/2
+     * 输入参数没有被修改
      */
-    private NodeOpt slashNode(Slash businessParam, Block block) {
+    private NodeOpt slashNodeForDoubleSigned(Slash businessParam, Block block) {
         /**
          * 处理双签处罚
          * 重要！！！！！！： 一旦节点被双签处罚，节点所有金额都会变成待赎回状态
@@ -144,7 +150,7 @@ public class OnConsensusAnalyzer {
          * 如果节点状态为退出中则需要reduction进行扣减
          * 因为处于退出中状态的节点所有钱都在赎回中状态
          */
-        if (staking.getStatus().intValue() == StatusEnum.EXITING.getCode()) {
+        if (staking.getStatus().intValue() == Staking.StatusEnum.EXITING.getCode()) {
             codeRemainRedeemAmount = staking.getStakingReduction().subtract(codeSlashValue);
         }
         if (codeRemainRedeemAmount.compareTo(BigDecimal.ZERO) >= 0) {
@@ -162,7 +168,7 @@ public class OnConsensusAnalyzer {
         businessParam.setCodeRewardValue(codeRewardValue);
         businessParam.setCodeRemainRedeemAmount(codeRemainRedeemAmount);
         businessParam.setCodeSlashValue(codeSlashValue);
-        slashBusinessMapper.slashNode(businessParam);
+        slashBusinessMapper.slashNodeForDoubleSigned(businessParam);
         //操作描述:6【PERCENT|AMOUNT】
         String desc = NodeOpt.TypeEnum.MULTI_SIGN.getTpl().replace("PERCENT", chainConfig.getDuplicateSignSlashRate().toString()).replace("AMOUNT", codeSlashValue.toString());
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();

@@ -70,7 +70,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
 
     private void exec(BlockEvent event, long sequence, boolean endOfBatch) throws InterruptedException, ExecutionException, BlankResponseException, BeanCreateOrUpdateException, ContractInvokeException {
         try {
-            log.info("开始分析BlockEvent");
+            log.debug("开始分析BlockEvent");
 
             StopWatch watch = new StopWatch("分析BlockEvent");
 
@@ -93,9 +93,9 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             watch.start("发布collectionEven");
 
             // TODO 此分割线以上代码异常重试属于正常逻辑，如果是以下代码发生异常，可能区块已经发送到CollectionEventHandler进行处理，则该区块会被重复处理多次
-            collectionEventPublisher.publish(block, block.getTransactions(), event.getEpochMessage(), event.getTraceId());
+            collectionEventPublisher.publish(block, event.getEpochMessage(), event.getTraceId());
             watch.stop();
-            log.info("结束分析BlockEvent，区块：{}, 耗时统计：{}", rawBlock.getNumber(), watch.prettyPrint());
+            log.debug("结束分析BlockEvent，区块：{}, 耗时统计：{}", rawBlock.getNumber(), watch.prettyPrint());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);

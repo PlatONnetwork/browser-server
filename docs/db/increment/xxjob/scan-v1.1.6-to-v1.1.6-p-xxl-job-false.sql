@@ -10,6 +10,8 @@ DELETE FROM `xxl_job_info` WHERE  executor_handler = 'incrementUpdateTokenInvent
 DELETE FROM `xxl_job_info` WHERE  executor_handler = 'contractDestroyUpdateBalanceJobHandler';
 DELETE FROM `xxl_job_info` WHERE  executor_handler = 'proposalDetailUpdateJobHandler';
 DELETE FROM `xxl_job_info` WHERE  executor_handler = 'proposalInfoJobHandler';
+DELETE FROM `xxl_job_info` WHERE  executor_handler = 'updateAddressQtyJobHandler';
+DELETE FROM `xxl_job_info` WHERE  executor_handler = 'updateTokenQtyJobHandler';
 
 UPDATE `xxl_job_info` SET `schedule_conf` = '0 */10 * * * ?' where job_group =2 and executor_handler = 'totalUpdateTokenInventoryJobHandler';
 

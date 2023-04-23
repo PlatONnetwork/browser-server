@@ -211,9 +211,13 @@ public class AddressUpdateTask {
      * @param :
      * @return: void
      * @date: 2021/12/6
+     *
+     * 2023/04/06, lvxiaoyi: 改成用trigger来更新地址的交易数
+     * @deprecated
      */
-    @XxlJob("updateAddressQtyJobHandler")
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+    //@XxlJob("updateAddressQtyJobHandler")
+    //@Transactional(rollbackFor = {Exception.class, Error.class})
+    @Deprecated
     public void updateTxQty() throws Exception {
         try {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);

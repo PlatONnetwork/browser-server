@@ -2,9 +2,7 @@ package com.platon.browser.utils;
 
 import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.constant.Browser;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;

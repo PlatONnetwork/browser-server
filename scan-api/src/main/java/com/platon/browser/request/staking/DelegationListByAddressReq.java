@@ -1,14 +1,14 @@
 package com.platon.browser.request.staking;
 
+import com.platon.browser.request.PageReq;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import com.platon.browser.request.PageReq;
 
 /**
  *  地址查询委托请求对象
  *  @file DelegationListByAddressReq.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -24,5 +24,5 @@ public class DelegationListByAddressReq extends PageReq{
 	public void setAddress(String address) {
 		this.address = address;
 	}
-    
+
 }

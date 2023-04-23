@@ -1,9 +1,9 @@
 package com.platon.browser.decoder.ppos;
 
-import com.platon.rlp.solidity.RlpList;
-import com.platon.rlp.solidity.RlpString;
 import com.platon.browser.param.StakeExitParam;
 import com.platon.browser.param.TxParam;
+import com.platon.rlp.solidity.RlpList;
+import com.platon.rlp.solidity.RlpString;
 
 /**
  * @description: 创建验证人交易输入参数解码器

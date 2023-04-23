@@ -4,15 +4,15 @@
 
 package com.platon.browser.request;
 
-import javax.validation.constraints.NotNull;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 	分页对象
  *  @file PageReq.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -71,5 +71,5 @@ public class PageReq {
 	public void setPager(Page pager) {
 		this.pager = pager;
 	}
-    
+
 }

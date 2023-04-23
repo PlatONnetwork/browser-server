@@ -73,13 +73,13 @@ public class TpsCalcCache {
             cacheMap.putIfAbsent(TpsCalcCache.startTime, 0);
         }
         if (now <= startTime + 10) {
-            txQty += block.getTransactions().size();
+            txQty += block.getDtoTransactions().size();
             cacheMap.put(startTime, txQty);
         } else {
             tps = BigDecimal.valueOf(txQty).divide(BigDecimal.TEN, 0, RoundingMode.CEILING).intValue();
             startTime = startTime + 10;
             cacheMap.clear();
-            cacheMap.put(startTime, block.getTransactions().size());
+            cacheMap.put(startTime, block.getDtoTransactions().size());
         }
 
         Integer maxTxQty = maxCacheMap.get(maxTime);
@@ -89,16 +89,16 @@ public class TpsCalcCache {
             maxCacheMap.putIfAbsent(maxTime, 0);
         }
         if (TpsCalcCache.maxTime.longValue() == now.longValue()) {
-            maxTxQty += block.getTransactions().size();
+            maxTxQty += block.getDtoTransactions().size();
             maxCacheMap.put(maxTime, maxTxQty);
         } else {
             maxTps = maxTxQty.intValue();
             if (maxTps == 0) {
-                maxTps = block.getTransactions().size();
+                maxTps = block.getDtoTransactions().size();
             }
             maxCacheMap.clear();
             maxTime = now;
-            maxCacheMap.put(maxTime, block.getTransactions().size());
+            maxCacheMap.put(maxTime, block.getDtoTransactions().size());
         }
     }
 

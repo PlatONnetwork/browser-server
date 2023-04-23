@@ -2,6 +2,8 @@ package com.platon.browser.proxyppos.slash;
 
 import com.platon.abi.solidity.datatypes.Utf8String;
 import com.platon.abi.solidity.datatypes.generated.Uint32;
+import com.platon.browser.proxyppos.ProxyContract;
+import com.platon.browser.proxyppos.TestBase;
 import com.platon.contracts.ppos.abi.Function;
 import com.platon.contracts.ppos.dto.common.DuplicateSignType;
 import com.platon.contracts.ppos.dto.common.FunctionType;
@@ -12,8 +14,6 @@ import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.http.HttpService;
 import com.platon.tx.RawTransactionManager;
 import com.platon.tx.TransactionManager;
-import com.platon.browser.proxyppos.ProxyContract;
-import com.platon.browser.proxyppos.TestBase;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;

@@ -1,18 +1,13 @@
 package com.platon.browser.service.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.ppos.*;
-import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.analyzer.ppos.DelegateExitAnalyzer;
+import com.platon.browser.analyzer.ppos.DelegateRewardClaimAnalyzer;
+import com.platon.browser.analyzer.ppos.ProposalParameterAnalyzer;
+import com.platon.browser.analyzer.ppos.StakeCreateAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.DelegateExitResult;
-import com.platon.browser.analyzer.ppos.RestrictingCreateAnalyzer;
-import com.platon.browser.analyzer.ppos.ReportAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeCreateAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeExitAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeIncreaseAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeModifyAnalyzer;
+import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -39,37 +34,12 @@ public class PPOSServiceTest extends AgentTestBase {
     @Mock
     private StakeCreateAnalyzer stakeCreateAnalyzer;
     @Mock
-    private StakeModifyAnalyzer stakeModifyAnalyzer;
-    @Mock
-    private StakeIncreaseAnalyzer stakeIncreaseAnalyzer;
-    @Mock
-    private StakeExitAnalyzer stakeExitAnalyzer;
-    @Mock
-    private ReportAnalyzer reportAnalyzer;
-    @Mock
-    private DelegateCreateAnalyzer delegateCreateAnalyzer;
-    @Mock
     private DelegateExitAnalyzer delegateExitAnalyzer;
-    @Mock
-    private ProposalTextAnalyzer proposalTextAnalyzer;
-    @Mock
-    private ProposalUpgradeAnalyzer proposalUpgradeAnalyzer;
-    @Mock
-    private ProposalCancelAnalyzer proposalCancelAnalyzer;
-    @Mock
-    private ProposalVoteAnalyzer proposalVoteAnalyzer;
-    @Mock
-    private VersionDeclareAnalyzer proposalVersionAnalyzer;
+
     @Mock
     private ProposalParameterAnalyzer proposalParameterAnalyzer;
     @Mock
-    private RestrictingCreateAnalyzer restrictingCreateAnalyzer;
-    @Mock
     private DelegateRewardClaimAnalyzer delegateRewardClaimAnalyzer;
-    @Mock
-    private NetworkStatCache networkStatCache;
-    @Mock
-    private AddressCache addressCache;
     @InjectMocks
     @Spy
     private PPOSService target;
@@ -83,7 +53,7 @@ public class PPOSServiceTest extends AgentTestBase {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
-        event.setTransactions(new ArrayList <>(transactionList));
+        event.getBlock().setDtoTransactions(new ArrayList <>(transactionList));
         Transaction tx = transactionList.get(0);
 
         tx.setStatus(Transaction.StatusEnum.SUCCESS.getCode());

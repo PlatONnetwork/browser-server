@@ -5,9 +5,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.RecoveredDelegationAmount;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
@@ -43,10 +42,8 @@ public class DelegateBalanceAdjustmentService {
 
     @Resource
     private CustomAddressMapper customAddressMapper;
-
     @Resource
-    private AddressCache addressCache;
-
+    private NewAddressCache newAddressCache;
     /**
      * 调账
      *
@@ -176,7 +173,9 @@ public class DelegateBalanceAdjustmentService {
     private List<RecoveredDelegationAmount> updateAddressCache(List<RecoveredDelegationAmount> list) {
         List<RecoveredDelegationAmount> updateDBlist = CollUtil.newArrayList();
         for (RecoveredDelegationAmount recoveredDelegationAmount : list) {
-            Address addressInfo = addressMapper.selectByPrimaryKey(recoveredDelegationAmount.getDelegateAddr());
+            newAddressCache.addRewardClaimAddressToBlockCtx(recoveredDelegationAmount.getDelegateAddr(), recoveredDelegationAmount.getRecoveredDelegationAmount());
+
+            /*Address addressInfo = addressMapper.selectByPrimaryKey(recoveredDelegationAmount.getDelegateAddr());
             if (ObjectUtil.isNull(addressInfo)) {
                 // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
                 Address address = addressCache.createDefaultAddress(recoveredDelegationAmount.getDelegateAddr());
@@ -187,7 +186,7 @@ public class DelegateBalanceAdjustmentService {
                 updateDBlist.add(recoveredDelegationAmount);
                 BigDecimal newHaveReward = addressInfo.getHaveReward().add(recoveredDelegationAmount.getRecoveredDelegationAmount());
                 log.debug("调账---更新地址表成功：地址已领取的委托奖励字段新值[{}]=已领取的委托奖励字段旧值[{}]+已领取委托奖励[{}]", newHaveReward, addressInfo.getHaveReward(), recoveredDelegationAmount.getRecoveredDelegationAmount());
-            }
+            }*/
         }
         return updateDBlist;
     }

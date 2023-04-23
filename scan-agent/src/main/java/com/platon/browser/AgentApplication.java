@@ -21,7 +21,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -43,7 +42,7 @@ import java.util.concurrent.CompletableFuture;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@ServletComponentScan
+// @ServletComponentScan
 @ComponentScan(basePackages = {"com.platon.browser.**"})
 @MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper", "com.platon.browser.v0150.dao", "com.platon.browser.v0151.dao"})
 public class AgentApplication implements ApplicationRunner {

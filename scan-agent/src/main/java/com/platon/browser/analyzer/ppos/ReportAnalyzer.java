@@ -1,11 +1,11 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.SlashBusinessMapper;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Slash;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.param.ppos.Report;
@@ -107,7 +107,7 @@ public class ReportAnalyzer extends PPOSAnalyzer<NodeOpt> {
         /**
          * 只有第一次候选中惩罚的时候才需要更新质押锁定周期数
          */
-        if (staking != null && staking.getStatus().intValue() == CustomStaking.StatusEnum.CANDIDATE.getCode()) {
+        if (staking != null && staking.getStatus().intValue() == Staking.StatusEnum.CANDIDATE.getCode()) {
             //更新节点提取质押需要经过的周期数
             slashBusinessMapper.updateUnStakeFreezeDuration(businessParam);
         }

@@ -1,13 +1,11 @@
 package com.platon.browser.analyzer.ppos;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.param.ppos.DelegateRewardClaim;
@@ -37,7 +35,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
     private DelegateBusinessMapper delegateBusinessMapper;
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private CustomGasEstimateMapper customGasEstimateMapper;
@@ -50,6 +48,7 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
 
     /**
      * 领取奖励
+     * 2023/04/07 lvixaoyi  入参Transaction tx会被设置txInfo值
      *
      * @param event
      * @param tx
@@ -136,7 +135,8 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
         for (Reward reward : businessParam.getRewardList()) {
             totalAmount = totalAmount.add(reward.getReward());
         }
-        Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getAddress());
+        //2023/04/14 lvxiaoyi 所有交易（包括PPOS虚拟交易）的相关地址，都已经在缓存中
+        /*Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getAddress());
         if (ObjectUtil.isNull(addressInfo)) {
             // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
             Address address = addressCache.createDefaultAddress(businessParam.getAddress());
@@ -144,7 +144,10 @@ public class DelegateRewardClaimAnalyzer extends PPOSAnalyzer<DelegationReward> 
             addressMapper.insertSelective(address);
         } else {
             customAddressMapper.updateAddressHaveReward(businessParam.getAddress(), totalAmount);
-        }
+        }*/
+
+        //2023/04/14 lvxiaoyi, 最后统一处理，参考：com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer
+        newAddressCache.addRewardClaimAddressToBlockCtx(businessParam.getAddress(), totalAmount);
     }
 
 }

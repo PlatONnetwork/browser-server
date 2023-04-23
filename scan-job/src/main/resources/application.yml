@@ -1,7 +1,3 @@
-# 这个端口，配合com.platon.browser.JobApplication的@ServletComponentScan注解
-# 可以让scan-job启动后，可以通过http://ip:8891来访问druid的内置监控服务
-server:
-  port: 8891
 #日志配置
 logging:
   file:

@@ -1,18 +1,18 @@
 package com.platon.browser.service.epoch;
 
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.bean.EpochInfo;
+import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialApi;
+import com.platon.browser.client.Web3jWrapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.exception.CandidateException;
 import com.platon.contracts.ppos.NodeContract;
 import com.platon.contracts.ppos.dto.CallResponse;
 import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.RemoteCall;
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.EpochInfo;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.SpecialApi;
-import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.exception.CandidateException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
