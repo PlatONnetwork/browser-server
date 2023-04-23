@@ -2,30 +2,18 @@ package com.platon.browser;//package com.platon.browser;
 
 
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.enums.AppStatus;
-import com.platon.browser.utils.AppStatusUtil;
-import com.platon.browser.dao.param.ppos.DelegateCreate;
-import com.platon.browser.dao.param.ppos.DelegateExit;
-import com.platon.browser.dao.param.epoch.Consensus;
-import com.platon.browser.dao.param.epoch.Election;
-import com.platon.browser.dao.param.epoch.NewBlock;
-import com.platon.browser.dao.param.ppos.ProposalText;
-import com.platon.browser.dao.param.ppos.ProposalUpgrade;
-import com.platon.browser.dao.param.ppos.ProposalVote;
-import com.platon.browser.dao.param.ppos.RestrictingCreate;
-import com.platon.browser.dao.param.ppos.RestrictingItem;
-import com.platon.browser.dao.param.ppos.Report;
-import com.platon.browser.dao.param.ppos.StakeCreate;
-import com.platon.browser.dao.param.ppos.StakeExit;
-import com.platon.browser.dao.param.ppos.StakeIncrease;
-import com.platon.browser.dao.param.ppos.StakeModify;
-import com.platon.browser.dao.param.statistic.AddressStatChange;
-import com.platon.browser.dao.param.statistic.AddressStatItem;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.param.epoch.Consensus;
+import com.platon.browser.dao.param.epoch.Election;
+import com.platon.browser.dao.param.epoch.NewBlock;
+import com.platon.browser.dao.param.ppos.*;
+import com.platon.browser.dao.param.statistic.AddressStatChange;
+import com.platon.browser.dao.param.statistic.AddressStatItem;
+import com.platon.browser.enums.AppStatus;
+import com.platon.browser.utils.AppStatusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -42,8 +30,6 @@ public class AgentTestBase extends AgentTestData {
     protected StakingMapper stakingMapper;
     @Autowired
     protected PlatOnClient platOnClient;
-    @Autowired
-    protected AddressCache addressCache;
 
     public static Map<Integer, BigDecimal> subsidies = new HashMap<>();
 
@@ -183,17 +169,17 @@ public class AgentTestBase extends AgentTestData {
         staking.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
         staking.setStakingBlockNum(0L);
         slashNodeList.add(staking);
-        
+
         staking.setNodeId("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
         staking.setStakingBlockNum(0L);
         slashNodeList.add(staking);
-        
+
         Election election = Election.builder()
                 .settingEpoch(3)
                 .lockedNodeList(slashNodeList).build();
         return election;
     }
-    
+
     public List<String> electionQuerySlashNodeParam () {
         List <String> slashNodeList = new ArrayList <>();
         slashNodeList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");

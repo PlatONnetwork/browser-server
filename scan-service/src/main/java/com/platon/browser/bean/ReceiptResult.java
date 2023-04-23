@@ -1,7 +1,7 @@
 package com.platon.browser.bean;
 
-import com.platon.protocol.core.Response;
 import com.platon.browser.utils.HexUtil;
+import com.platon.protocol.core.Response;
 import lombok.Data;
 
 import java.util.List;

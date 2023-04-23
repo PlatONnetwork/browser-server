@@ -1,10 +1,9 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.NodeItem;
+import com.platon.browser.cache.NodeCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
@@ -50,13 +49,13 @@ public class VersionDeclareConverterTest extends AgentTestBase {
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         Transaction tx = new Transaction();
-        for(CollectionTransaction collectionTransaction : transactionList){
-            if(collectionTransaction.getTypeEnum().equals(Transaction.TypeEnum.VERSION_DECLARE)){
-                tx = collectionTransaction;
+        for(com.platon.browser.elasticsearch.dto.Transaction  dtoTransaction : transactionList){
+            if(dtoTransaction.getTypeEnum().equals(Transaction.TypeEnum.VERSION_DECLARE)){
+                tx = dtoTransaction;
             }
         }
         target.analyze(collectionEvent,tx);
     }
-	
+
 
 }

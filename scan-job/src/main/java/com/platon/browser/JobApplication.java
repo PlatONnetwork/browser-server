@@ -13,7 +13,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -30,7 +29,7 @@ import java.util.Properties;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@ServletComponentScan
+// @ServletComponentScan
 @MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper"})
 public class JobApplication implements ApplicationRunner {
 

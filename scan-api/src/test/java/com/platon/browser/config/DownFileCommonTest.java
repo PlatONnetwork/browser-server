@@ -1,15 +1,14 @@
 package com.platon.browser.config;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class DownFileCommonTest {
@@ -24,6 +23,6 @@ public class DownFileCommonTest {
 		} catch (Exception e) {
 			assertEquals(e.getMessage(), null);
 		}
-		
+
 	}
 }

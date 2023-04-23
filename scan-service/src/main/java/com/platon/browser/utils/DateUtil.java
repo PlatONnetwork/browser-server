@@ -1,12 +1,11 @@
 package com.platon.browser.utils;
 
+import com.platon.browser.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.platon.browser.exception.BusinessException;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -19,7 +18,7 @@ import java.util.TimeZone;
 
 /**
  * 时间处理工具类
- * 
+ *
  * @file DateUtil.java
  * @description
  * @author zhangrj
@@ -28,14 +27,14 @@ import java.util.TimeZone;
 @Service
 public class DateUtil {
 	private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
-	
+
 	private static final String DATE_PATTERN = "EEE MMM dd yyyy HH:mm:ss";
 
 	private static String LOCAL_LANG;
-	
+
 	/**
 	 * 获取年的第一天
-	 * 
+	 *
 	 * @method getYearFirstDate
 	 * @param date
 	 * @return
@@ -71,7 +70,7 @@ public class DateUtil {
 	public void setLocalLANG(String localLANG) {
 		LOCAL_LANG = localLANG;
 	}
-	
+
 	/**
      * 时区转换
      * @param time 时间字符串
@@ -96,25 +95,25 @@ public class DateUtil {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT" + targetTimeZone));
         return simpleDateFormat.format(date);
     }
-    
+
     public static String timeZoneTransfer(Date time, String nowTimeZone, String targetTimeZone) {
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     	String timeStr = simpleDateFormat.format(time);
     	return DateUtil.timeZoneTransfer(timeStr, DATE_PATTERN, nowTimeZone, targetTimeZone);
     }
-    
+
     public static String timeZoneTransfer(Date time, String pattern, String nowTimeZone, String targetTimeZone) {
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
     	String timeStr = simpleDateFormat.format(time);
     	return DateUtil.timeZoneTransfer(timeStr, pattern, nowTimeZone, targetTimeZone);
     }
-    
+
     public static String timeZoneTransferUTC(Date time, String pattern) {
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
     	String timeStr = simpleDateFormat.format(time);
     	return DateUtil.timeZoneTransfer(timeStr, pattern, "0", "+8");
     }
-    
+
 
 	public static Date covertTime(Date date) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

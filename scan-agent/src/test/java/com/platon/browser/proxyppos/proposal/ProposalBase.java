@@ -1,5 +1,7 @@
 package com.platon.browser.proxyppos.proposal;
 
+import com.platon.browser.proxyppos.ProxyContract;
+import com.platon.browser.proxyppos.TestBase;
 import com.platon.contracts.ppos.abi.Function;
 import com.platon.contracts.ppos.dto.resp.Proposal;
 import com.platon.contracts.ppos.utils.EncoderUtils;
@@ -10,8 +12,6 @@ import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.http.HttpService;
 import com.platon.tx.RawTransactionManager;
 import com.platon.tx.TransactionManager;
-import com.platon.browser.proxyppos.ProxyContract;
-import com.platon.browser.proxyppos.TestBase;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;

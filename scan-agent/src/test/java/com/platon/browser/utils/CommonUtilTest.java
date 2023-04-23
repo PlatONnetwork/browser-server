@@ -1,6 +1,7 @@
 package com.platon.browser.utils;
 
 import cn.hutool.core.date.DateUtil;
+import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.bean.NodeSettleStatisBase;
 import com.platon.browser.dao.entity.NftObject;
@@ -155,11 +156,11 @@ public class CommonUtilTest {
     public void testFmisSpeedCalculate() {
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        LocalDateTime date1 = LocalDateTime.parse("2023-04-06 03:58:48", inputFormatter);
-        LocalDateTime date2 = LocalDateTime.parse("2023-04-06 06:09:56", inputFormatter);
+        LocalDateTime date1 = LocalDateTime.parse("2023-04-18 09:29:37", inputFormatter);
+        LocalDateTime date2 = LocalDateTime.parse("2023-04-18 10:15:56", inputFormatter);
         long seconds = Duration.between(date1, date2).getSeconds();
 
-        long total = 20668195-19805028;
+        long total = 58297818-58051589;
 
         System.out.println(total / seconds);
     }
@@ -194,6 +195,21 @@ public class CommonUtilTest {
         });
 
     }
+
+    @Test
+    public void testBit(){
+        CustomAddress address =  CustomAddress.createNewAccountAddress("abcd");
+
+        address.setOption(CustomAddress.Option.NEW);
+        address.setOption(CustomAddress.Option.REWARD_CLAIM);
+        address.setOption(CustomAddress.Option.SUICIDED);
+        address.setOption(CustomAddress.Option.REWARD_CLAIM);
+
+        System.out.println("isNew: " + address.hasOption(CustomAddress.Option.NEW));
+        System.out.println("isReward: " + address.hasOption(CustomAddress.Option.REWARD_CLAIM));
+        System.out.println("isSuicided: " + address.hasOption(CustomAddress.Option.SUICIDED));
+    }
+
 
 
     @Test

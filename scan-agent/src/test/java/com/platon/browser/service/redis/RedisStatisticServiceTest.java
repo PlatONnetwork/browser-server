@@ -15,9 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.Set;
 

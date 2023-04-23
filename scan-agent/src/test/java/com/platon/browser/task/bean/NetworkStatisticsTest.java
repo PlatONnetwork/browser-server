@@ -1,6 +1,5 @@
 package com.platon.browser.task.bean;
 
-import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
 import org.junit.Test;
 import org.junit.runner.RunWith;

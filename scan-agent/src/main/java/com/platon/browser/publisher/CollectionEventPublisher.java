@@ -7,14 +7,12 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.handler.CollectionEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 区块搜集事件发布者
@@ -26,9 +24,8 @@ public class CollectionEventPublisher extends AbstractPublisher<CollectionEvent>
     private static final EventTranslatorVararg<CollectionEvent>
             TRANSLATOR = (event, sequence, args) -> {
         event.setBlock((Block) args[0]);
-        event.setTransactions((List<Transaction>) args[1]);
-        event.setEpochMessage((EpochMessage) args[2]);
-        event.setTraceId((String) args[3]);
+        event.setEpochMessage((EpochMessage) args[1]);
+        event.setTraceId((String) args[2]);
     };
 
     @Override
@@ -50,8 +47,8 @@ public class CollectionEventPublisher extends AbstractPublisher<CollectionEvent>
         register(CollectionEventPublisher.class.getSimpleName(), this);
     }
 
-    public void publish(Block block, List<Transaction> transactions, EpochMessage epochMessage, String traceId) {
-        ringBuffer.publishEvent(TRANSLATOR, block, transactions, epochMessage, traceId);
+    public void publish(Block block, EpochMessage epochMessage, String traceId) {
+        ringBuffer.publishEvent(TRANSLATOR, block, epochMessage, traceId);
     }
 
 }

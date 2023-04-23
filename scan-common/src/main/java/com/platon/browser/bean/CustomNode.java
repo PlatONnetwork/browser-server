@@ -1,6 +1,7 @@
 package com.platon.browser.bean;
 
 import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -49,10 +50,10 @@ public class CustomNode extends Node {
          setDetails("");
          setJoinTime(new Date());
          setLeaveTime(null);
-         setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
-         setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
-         setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
-         setIsInit(CustomStaking.YesNoEnum.NO.getCode());
+         setStatus(Staking.StatusEnum.CANDIDATE.getCode());
+         setIsConsensus(Staking.YesNoEnum.NO.getCode());
+         setIsSettle(Staking.YesNoEnum.NO.getCode());
+         setIsInit(Staking.YesNoEnum.NO.getCode());
          setStatDelegateValue(BigDecimal.ZERO);
          setStatDelegateReleased(BigDecimal.ZERO);
          setStatValidAddrs(0);
@@ -64,7 +65,7 @@ public class CustomNode extends Node {
          setStatSlashMultiQty(0);
      }
 
-    public CustomNode updateWithCustomStaking(CustomStaking staking) {
+    public CustomNode updateWithStaking(Staking staking) {
         BeanUtils.copyProperties(staking,this);
         return this;
     }

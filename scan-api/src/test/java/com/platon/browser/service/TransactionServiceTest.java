@@ -2,14 +2,12 @@ package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestMockBase;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.cache.TransactionCacheDto;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.config.RedisKeyConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
@@ -37,7 +35,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -131,10 +128,10 @@ public class TransactionServiceTest extends ApiTestMockBase {
         transaction.setInfo("{\"amount\":5000000000000000000000000,\"nodeId\":\"0x4cc7be9ec01466fc4f14365f6700da36f3eb157473047f32bded7b1c0c00955979a07a8914895f7ee59af9cb1e6b638aa57c91a918f7a84633a92074f286b208\",\"nodeName\":\"sansan33\",\"stakingBlockNum\":50767,\"withdrawBlockNum\":50767}");
         Staking staking = new Staking();
         staking.setStakingReduction(BigDecimal.ONE);
-        staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
+        staking.setStatus(Staking.StatusEnum.EXITING.getCode());
         when(this.stakingMapper.selectByPrimaryKey(any())).thenReturn(staking);
         this.target.transactionDetails(req);
-        staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+        staking.setStatus(Staking.StatusEnum.EXITED.getCode());
         this.target.transactionDetails(req);
 
         transaction.setType(Transaction.TypeEnum.PROPOSAL_TEXT.getCode());

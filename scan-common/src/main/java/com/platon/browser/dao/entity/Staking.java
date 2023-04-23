@@ -1,9 +1,13 @@
 package com.platon.browser.dao.entity;
 
+import com.platon.browser.utils.ChainVersionUtil;
+import com.platon.browser.utils.HexUtil;
+import com.platon.contracts.ppos.dto.resp.Node;
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.math.BigInteger;
+import java.util.*;
 
 public class Staking extends StakingKey {
     private Integer stakingTxIndex;
@@ -99,6 +103,8 @@ public class Staking extends StakingKey {
     private Integer lowRateSlashCount;
 
     private String annualizedRateInfo;
+
+    private BigDecimal slashAmount;
 
     public Integer getStakingTxIndex() {
         return stakingTxIndex;
@@ -474,6 +480,173 @@ public class Staking extends StakingKey {
 
     public void setAnnualizedRateInfo(String annualizedRateInfo) {
         this.annualizedRateInfo = annualizedRateInfo == null ? null : annualizedRateInfo.trim();
+    }
+
+    public BigDecimal getSlashAmount() {
+        return slashAmount;
+    }
+
+    public void setSlashAmount(BigDecimal slashAmount) {
+        this.slashAmount = slashAmount;
+    }
+
+
+    /**
+     * 使用节点信息更新质押信息
+     * @param verifier
+     */
+    public void updateWithVerifier(com.platon.contracts.ppos.dto.resp.Node verifier){
+        // 质押区块高度
+        if(verifier.getStakingBlockNum()!=null) this.setStakingBlockNum(verifier.getStakingBlockNum().longValue());
+        // 质押节点地址
+        this.setNodeId(HexUtil.prefix(verifier.getNodeId()));
+        // 发起质押交易的索引
+        if(verifier.getStakingTxIndex()!=null) this.setStakingTxIndex(verifier.getStakingTxIndex().intValue());
+        // 发起质押的账户地址
+        this.setStakingAddr(verifier.getStakingAddress());
+        // 第三方社交软件关联id
+        this.setExternalId(verifier.getExternalId());
+        // 收益地址
+        this.setBenefitAddr(verifier.getBenifitAddress());
+//        // 节点状态 1：候选中 2：退出中 3：已退出
+        if(verifier.getStatus()!=null) this.setStatus(verifier.getStatus().intValue());
+//        // 节点名称(质押节点名称)
+        this.setNodeName(StringUtils.isBlank(verifier.getNodeName())?this.getNodeName():verifier.getNodeName());
+        // 节点的第三方主页
+        this.setWebSite(verifier.getWebsite());
+        this.setDetails(verifier.getDetails());
+
+        // 程序版本号
+        BigInteger programVersion=verifier.getProgramVersion();
+        BigInteger bigVersion = ChainVersionUtil.toBigVersion(programVersion);
+        this.setProgramVersion(programVersion.toString());
+        this.setBigVersion(bigVersion.toString());
+    }
+
+    /**
+     * 使用节点信息更新质押信息
+     * @param candidate
+     */
+    public void updateWithCandidate(Node candidate){
+        // 设置节点名称
+        String nodeName = candidate.getNodeName();
+        if(StringUtils.isNotBlank(nodeName)) setNodeName(nodeName);
+        // 设置程序版本号
+        String programVersion=candidate.getProgramVersion().toString();
+        if(StringUtils.isNotBlank(programVersion)){
+            setProgramVersion(programVersion);
+            BigInteger bigVersion = ChainVersionUtil.toBigVersion(candidate.getProgramVersion());
+            setBigVersion(bigVersion.toString());
+        }
+        // 设置外部ID
+        String externalId = candidate.getExternalId();
+        if(StringUtils.isNotBlank(externalId)) setExternalId(externalId);
+        // 设置收益地址
+        String benefitAddr = candidate.getBenifitAddress();
+        if(StringUtils.isNotBlank(benefitAddr)) setBenefitAddr(benefitAddr);
+        // 设置详情
+        String details = candidate.getDetails();
+        if(StringUtils.isNotBlank(details)) setDetails(details);
+        // 设置官网
+        String website = candidate.getWebsite();
+        if(StringUtils.isNotBlank(website)) setWebSite(website);
+        // 设置质押金额
+        if(candidate.getShares()!=null&&candidate.getShares().compareTo(BigInteger.ZERO)>0){
+            setStakingLocked(new BigDecimal(candidate.getShares()));
+        }
+    }
+
+    /**
+     * 质押状态类型枚举类：
+     *  1.候选中
+     *  2.退出中
+     *  3.已退出
+     */
+    public enum StatusEnum{
+        CANDIDATE(1, "候选中"),
+        EXITING(2, "退出中"),
+        EXITED(3, "已退出"),
+        LOCKED(4, "已锁定"),
+        ;
+        private int code;
+        private String desc;
+        StatusEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static final Map<Integer, Staking.StatusEnum> ENUMS = new HashMap<>();
+        static {
+            Arrays.asList(Staking.StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static Staking.StatusEnum getEnum(Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains(Staking.StatusEnum en){return ENUMS.containsValue(en);}
+    }
+    /**
+     * 质押节点——是否共识周期验证人类型/是否结算周期验证人类型枚举类：
+     *  1.是
+     *  2.否
+     */
+    public enum YesNoEnum{
+        YES(1, "是"),
+        NO(2, "否")
+        ;
+        private int code;
+        private String desc;
+        YesNoEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static final Map<Integer, Staking.YesNoEnum> ENUMS = new HashMap<>();
+        static {Arrays.asList(Staking.YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static Staking.YesNoEnum getEnum(Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains(Staking.YesNoEnum en){return ENUMS.containsValue(en);}
+    }
+
+    public enum ExceptionStatusEnum {
+        NORMAL(1, "正常"),
+        LOW_RATE(2, "低出块异常"),
+        MULTI_SIGN(3, "双签异常"),
+        LOW_RATE_SLASHED(4, "因低出块率被惩罚"),
+        MULTI_SIGN_SLASHED(5, "因双签被处罚");
+
+        private int code;
+        private String desc;
+
+        ExceptionStatusEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
+
+    @Override
+    public boolean equals ( Object o ) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StakingKey that = (StakingKey) o;
+        return Objects.equals(this.getStakingBlockNum(), that.getStakingBlockNum()) &&
+                Objects.equals(this.getNodeId(), that.getNodeId());
+    }
+
+    @Override
+    public int hashCode () {
+        return Objects.hash(this.getStakingBlockNum(), this.getNodeId());
     }
 
     /**

@@ -1,14 +1,14 @@
 package com.platon.browser.service.proposal;
 
+import com.platon.browser.AgentTestBase;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialApi;
+import com.platon.browser.client.Web3jWrapper;
 import com.platon.contracts.ppos.ProposalContract;
 import com.platon.contracts.ppos.dto.CallResponse;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.RemoteCall;
-import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.SpecialApi;
-import com.platon.browser.client.Web3jWrapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

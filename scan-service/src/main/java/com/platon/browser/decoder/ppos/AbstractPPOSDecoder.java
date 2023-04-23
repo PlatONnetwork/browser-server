@@ -1,15 +1,13 @@
 package com.platon.browser.decoder.ppos;
 
 import com.platon.bech32.Bech32;
+import com.platon.browser.param.RestrictingCreateParam;
 import com.platon.parameters.NetworkParameters;
 import com.platon.rlp.solidity.RlpDecoder;
 import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.rlp.solidity.RlpType;
 import com.platon.utils.Numeric;
-import com.platon.browser.param.RestrictingCreateParam;
-import com.platon.browser.param.TxParam;
-import com.platon.browser.utils.NetworkParams;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -36,7 +34,7 @@ public abstract class AbstractPPOSDecoder {
         RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
         return Numeric.toHexString(stringsListString.getBytes());
     }
-    
+
     static String addressResolver(RlpString rlpString) {
         RlpList stringsList = RlpDecoder.decode(rlpString.getBytes());
         if (stringsList.getValues().isEmpty()) return null;

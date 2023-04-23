@@ -3,9 +3,9 @@ package com.platon.browser.publisher;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.config.DisruptorConfig;
-import com.platon.browser.handler.PersistenceEventHandler;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.handler.PersistenceEventHandler;
 import com.platon.browser.utils.CommonUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.platon.browser.service.elasticsearch.bean;
 
-import com.platon.browser.service.elasticsearch.bean.ESSortDto;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

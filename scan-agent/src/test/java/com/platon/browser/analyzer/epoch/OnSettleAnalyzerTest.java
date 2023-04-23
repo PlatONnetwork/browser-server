@@ -1,15 +1,15 @@
 package com.platon.browser.analyzer.epoch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.mapper.GasEstimateLogMapper;
-import com.platon.browser.publisher.GasEstimateEventPublisher;
-import com.platon.browser.dao.custommapper.EpochBusinessMapper;
+import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
+import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.publisher.GasEstimateEventPublisher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

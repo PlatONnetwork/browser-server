@@ -1,17 +1,20 @@
 package com.platon.browser.handler;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.TransactionAnalyzer;
-import com.platon.browser.bean.*;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.Receipt;
+import com.platon.browser.bean.TxAnalyseResult;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.*;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
 import com.platon.browser.service.ppos.PPOSService;
@@ -30,7 +33,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * 区块事件处理器
@@ -61,7 +63,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private CustomTxBakMapper customTxBakMapper;
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private NodeCache nodeCache;
@@ -121,49 +123,62 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     private void exec(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         // 确保event是原始副本，重试机制每一次使用的都是copyEvent
-        log.info("开始分析CollectionEvent，块高：{}", event.getBlock().getNum());
+        event.getBlock().setErc20TxQty(0);
+        event.getBlock().setErc721TxQty(0);
+        event.getBlock().setErc1155TxQty(0);
+        event.getBlock().getDtoTransactions().clear();
+
+        newAddressCache.clearBlockRelatedAddressCache();
+
+        log.debug("开始分析CollectionEvent，块高：{}", event.getBlock().getNum());
 
         StopWatch watch = new StopWatch("分析CollectionEvent");
-        watch.start("复制CollectionEvent");
-        CollectionEvent copyEvent = copyCollectionEvent(event);
-
-        watch.stop();
         try {
-            Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
-            List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
-            for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
+            Map<String, Receipt> receiptMap = event.getBlock().getReceiptMap();
+            List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = event.getBlock().getOriginTransactions();
+            for (com.platon.protocol.core.methods.response.Transaction rawTx : rawTransactions) {
                 watch.start("分析Transaction");
                 //
                 // 重要：
                 // 解析区块中的交易，特别是token交易，按token类型分别解析出交易信息，放入各自类型的列表中；并把token的holder，以及holder持有token的余额，交易次数等信息，保存到本地db中
-                CollectionTransaction transaction = transactionAnalyzer.analyze(copyEvent.getBlock(), tr, receiptMap.get(tr.getHash()));
+                com.platon.browser.elasticsearch.dto.Transaction dtoTransaction = transactionAnalyzer.analyze(event.getBlock(), rawTx, receiptMap.get(rawTx.getHash()));
                 watch.stop();
                 // 把解析好的交易添加到当前区块的交易列表
-                copyEvent.getBlock().getTransactions().add(transaction);
-                copyEvent.getTransactions().add(transaction);
+                event.getBlock().getDtoTransactions().add(dtoTransaction);
                 // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
-                copyEvent.getBlock().setErc20TxQty(copyEvent.getBlock().getErc20TxQty() + transaction.getErc20TxList().size());
-                copyEvent.getBlock().setErc721TxQty(copyEvent.getBlock().getErc721TxQty() + transaction.getErc721TxList().size());
-                copyEvent.getBlock().setErc1155TxQty(copyEvent.getBlock().getErc1155TxQty() + transaction.getErc1155TxList().size());
+                event.getBlock().setErc20TxQty(event.getBlock().getErc20TxQty() + dtoTransaction.getErc20TxList().size());
+                event.getBlock().setErc721TxQty(event.getBlock().getErc721TxQty() + dtoTransaction.getErc721TxList().size());
+                event.getBlock().setErc1155TxQty(event.getBlock().getErc1155TxQty() + dtoTransaction.getErc1155TxList().size());
             }
 
             watch.start("排序Transaction");
-            List<Transaction> transactions = copyEvent.getTransactions();
+            List<com.platon.browser.elasticsearch.dto.Transaction> transactions = event.getBlock().getDtoTransactions();
             // 确保交易从小到大的索引顺序
-            transactions.sort(Comparator.comparing(Transaction::getIndex));
+            transactions.sort(Comparator.comparing(com.platon.browser.elasticsearch.dto.Transaction::getIndex));
             watch.stop();
             // 根据区块号解析出业务参数
             watch.start("分析NodeOpt");
-            List<NodeOpt> nodeOpts1 = blockService.analyze(copyEvent);
+            //2023/04/07 lvixaoyi  没有影响输入参数的值
+            List<NodeOpt> nodeOpts1 = blockService.analyze(event);
             // 根据交易解析出业务参数
             watch.stop();
             watch.start("分析ppos");
-            TxAnalyseResult txAnalyseResult = pposService.analyze(copyEvent);
+            //2023/04/07 lvixaoyi  入参event.transactions中的每个对象会被设置seq, txInfo值，并且会设置addressCache
+            //但是这些对如此的改变，即使是重复执行，也没有关系，都是重置操作（没有增量操作）
+            TxAnalyseResult txAnalyseResult = pposService.analyze(event);
             watch.stop();
             // 汇总操作记录
             if (CollUtil.isNotEmpty(txAnalyseResult.getNodeOptList())) {
                 nodeOpts1.addAll(txAnalyseResult.getNodeOptList());
             }
+
+            // 统计业务参数，以MySQL数据库块高为准，所以必须保证块高是最后入库
+            // 2023/04/07, lvxiaoyi     保证新地址入库在前，其相关的交易入库在后，这样，tx_bak的trigger才能正确更新新地址的交易数量。
+            // 2023/04/07 lvixaoyi  没有影响输入参数的值
+            watch.start("统计业务参数");
+            statisticService.analyze(event);
+            watch.stop();
+
             // 这里把解析出的所有数据详情保存到本地DB。
             // 这样即使后续ES入库失败，只需要重启agent，有com.platon.browser.bootstrap.service.ConsistencyService来完成ES重新入库，而不需要再从链上同步
             // 交易入库mysql，因为缓存无法实现自增id，不再删除操作日志表
@@ -207,28 +222,28 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 customNOptBakMapper.batchInsertOrUpdateSelective(nodeOpts1);
                 watch.stop();
             }
-            // 统计业务参数，以MySQL数据库块高为准，所以必须保证块高是最后入库
-            watch.start("统计业务参数");
-            statisticService.analyze(copyEvent);
-            watch.stop();
+
             // TODO 此分割线以上代码异常重试属于正常逻辑，如果是以下代码发生异常，可能区块相关交易已经发送到ComplementEventHandler进行处理，则该区块会被重复处理多次
             watch.start("发布complementEvent");
-            complementEventPublisher.publish(copyEvent.getBlock(), transactions, nodeOpts1, delegationRewardList, event.getTraceId());
+            complementEventPublisher.publish(event.getBlock(), (List<Transaction>)transactions, nodeOpts1, delegationRewardList, event.getTraceId());
             watch.stop();
-            log.info("结束分析CollectionEvent，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
+            log.debug("结束分析CollectionEvent，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);
         } catch (Exception e) {
-            log.error(StrUtil.format("区块[{}]解析交易异常", copyEvent.getBlock().getNum()), e);
+            log.error(StrUtil.format("区块[{}]解析交易异常", event.getBlock().getNum()), e);
             throw e;
-        } finally {
+        }
+        /*
+        2023/04/12 lvxiaoyi, 进入时清理缓存，参考：com.platon.browser.cache.NewAddressCache.clearBlockRelatedAddressCache
+        finally {
             // 当前事务不管是正常处理结束或异常结束，都需要重置地址缓存，防止代码中任何地方出问题后，缓存中留存脏数据
             // 因为地址缓存是当前事务处理的增量缓存，在 StatisticsAddressAnalyzer 进行数据合并入库时：
             // 1、如果出现异常，由于事务保证，当前事务统计的地址数据不会入库mysql，此时应该清空增量缓存，等待下次重试时重新生成缓存
             // 2、如果正常结束，当前事务统计的地址数据会入库mysql，此时应该清空增量缓存
             addressCache.cleanAll();
-        }
+        }*/
     }
 
     /**
@@ -239,7 +254,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
      * @return: com.platon.browser.bean.CollectionEvent
      * @date: 2021/11/22
      */
-    private CollectionEvent copyCollectionEvent(CollectionEvent event) {
+    /*private CollectionEvent copyCollectionEvent(CollectionEvent event) {
         CollectionEvent copyEvent = new CollectionEvent();
         Block block = new Block();
         BeanUtil.copyProperties(event.getBlock(), block);
@@ -258,7 +273,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             log.warn("重试次数[{}],节点重新初始化，该区块[{}]交易列表{}重复处理", retryCount.get(), event.getBlock().getNum(), JSONUtil.toJsonStr(txHashList));
         }
         return copyEvent;
-    }
+    }*/
 
     /**
      * 初始化节点缓存
@@ -293,7 +308,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     }*/
 
 
-    private void getErcTx(List<Transaction> transactions, List<ErcTx> erc20List, List<ErcTx> erc721List, List<ErcTx>erc1155List){
+    private void getErcTx(List<com.platon.browser.elasticsearch.dto.Transaction> transactions, List<ErcTx> erc20List, List<ErcTx> erc721List, List<ErcTx>erc1155List){
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc20TxList())) {
                 erc20List.addAll(transaction.getErc20TxList());

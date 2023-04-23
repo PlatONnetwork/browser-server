@@ -1,7 +1,6 @@
 package com.platon.browser.config;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -12,7 +11,7 @@ import java.util.concurrent.Executors;
 /**
  *    使用线程池运行定时任务，定线程池数目
  *  @file ScheduleConfig.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */

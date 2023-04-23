@@ -2,10 +2,6 @@ package com.platon.browser.bean;
 
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.utils.ClassUtil;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

@@ -1,15 +1,12 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
+import com.platon.browser.bean.NodeItem;
+import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -53,13 +50,4 @@ public class DelegateCreateAnalyzerTest extends AgentTestBase {
         when(nodeCache.getNode(anyString())).thenReturn(nodeItem);
     }
 
-    @Test
-    public void convert() throws Exception {
-        CollectionTransaction tx = null;
-        for (CollectionTransaction collectionTransaction : transactionList) {
-            if(collectionTransaction.getTypeEnum()== Transaction.TypeEnum.DELEGATE_CREATE)
-                tx=collectionTransaction;
-        }
-        target.analyze(collectionEvent,tx);
-    }
 }

@@ -1,11 +1,11 @@
 package com.platon.browser.response.address;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.bean.LockDelegate;
 import com.platon.browser.config.json.CustomLatSerializer;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 查询地址的返回的对象

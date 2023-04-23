@@ -72,6 +72,13 @@ public class ErcDetectService {
     }
 
 
+    /**
+     *
+     * @param ercTypeEnum
+     * @param contractAddress
+     * @param blockNumber
+     * @return 如果不符合ERC标准，则返回null
+     */
     public ErcContract getErcContract(ErcTypeEnum ercTypeEnum, String contractAddress, BigInteger blockNumber) {
         ErcContract ercContract = ercContractCache.getIfPresent(contractAddress);
         if(ercContract==null) {
@@ -270,6 +277,13 @@ public class ErcDetectService {
         return contractId;
     }
 
+    /**
+     *
+     * @param contractAddress
+     * @param blockNumber
+     * @return 如果不符合ERC标准，则返回null
+     * @throws PlatonCallTimeoutException
+     */
     @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = CommonConstant.reTryNum)
     public ErcContractId getContractId(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         ErcTypeEnum ercType = ErcTypeEnum.ERC20;
@@ -283,17 +297,21 @@ public class ErcDetectService {
 
             ErcContract ercContract = getErcContract(ercType, contractAddress, blockNumber);
             if(ercContract==null){
-                throw new BusinessException("cannot find the Contract on the Chain");
+                return null;
+                //throw new BusinessException("cannot find the Contract on the Chain");
             }
             ErcContractId contractId = resolveContractId(ercContract);
+
 
             if (ercType == ErcTypeEnum.ERC20) {
                 if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
                     // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
-                    contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+                    //contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+                    return null;
                 }
             }
 
+            contractId.setTypeEnum(ercType);
             return contractId;
 
         } catch (PlatonCallTimeoutException e) {
@@ -318,18 +336,33 @@ public class ErcDetectService {
         return null;
     }
 
-    public List<ErcContract.ErcTxEvent> getErc20TxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
-        ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+    public List<ErcContract.ErcTxEvent> getErc20TransferTxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
+        //ErcContract ercContract = Erc20Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+        ErcContract ercContract = getErcContract(ErcTypeEnum.ERC20, receipt.getContractAddress(), blockNumber);
+        if (ercContract==null){
+            log.error("can not load ERC20 contract：{} at blockNumber: {}", receipt.getContractAddress(), blockNumber);
+            throw new RuntimeException("can not load ERC20 contract");
+        }
         return ercContract.getTxEvents(receipt);
     }
 
-    public List<ErcContract.ErcTxEvent> getErc721TxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
-        ErcContract ercContract = Erc721Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+    public List<ErcContract.ErcTxEvent> getErc721TransferTxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
+        //ErcContract ercContract = Erc721Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+        ErcContract ercContract = getErcContract(ErcTypeEnum.ERC721, receipt.getContractAddress(), blockNumber);
+        if (ercContract==null){
+            log.error("can not load ERC721 contract：{} at blockNumber: {}", receipt.getContractAddress(), blockNumber);
+            throw new RuntimeException("can not load ERC721 contract");
+        }
         return ercContract.getTxEvents(receipt);
     }
 
-    public List<ErcContract.ErcTxEvent> getErc1155TxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
-        ErcContract ercContract = Erc1155Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+    public List<ErcContract.ErcTxEvent> getErc1155TransferTxEvents(TransactionReceipt receipt, BigInteger blockNumber) {
+        //ErcContract ercContract = Erc1155Contract.load(receipt.getContractAddress(), platOnClient.getWeb3jWrapper().getWeb3j(), CREDENTIALS, GAS_PROVIDER, blockNumber);
+        ErcContract ercContract = getErcContract(ErcTypeEnum.ERC1155, receipt.getContractAddress(), blockNumber);
+        if (ercContract==null){
+            log.error("can not load ERC1155 contract：{} at blockNumber: {}", receipt.getContractAddress(), blockNumber);
+            throw new RuntimeException("can not load ERC1155 contract");
+        }
         return ercContract.getTxEvents(receipt);
     }
 }

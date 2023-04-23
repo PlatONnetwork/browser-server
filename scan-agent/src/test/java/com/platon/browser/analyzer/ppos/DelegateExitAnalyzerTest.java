@@ -1,22 +1,17 @@
 package com.platon.browser.analyzer.ppos;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.custommapper.CustomAddressMapper;
-import com.platon.browser.dao.custommapper.DelegateBusinessMapper;
+import com.platon.browser.bean.CustomDelegation;
+import com.platon.browser.bean.NodeItem;
+import com.platon.browser.cache.NodeCache;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
-import com.platon.browser.dao.mapper.GasEstimateMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.bean.CustomDelegation;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -45,8 +39,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class DelegateExitAnalyzerTest extends AgentTestBase {
 
-    @Mock
-    private DelegateBusinessMapper delegateBusinessMapper;
 
     @Mock
     private CollectionEvent collectionEvent;
@@ -59,15 +51,6 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
 
     @Mock
     private BlockChainConfig chainConfig;
-
-    @Mock
-    private AddressCache addressCache;
-
-    @Mock
-    private GasEstimateMapper gasEstimateMapper;
-
-    @Mock
-    private CustomGasEstimateMapper customGasEstimateMapper;
 
     @Mock
     private StakingMapper stakingMapper;
@@ -112,10 +95,10 @@ public class DelegateExitAnalyzerTest extends AgentTestBase {
         staking.setStatus(1);
         when(this.stakingMapper.selectByExample(any())).thenReturn(Arrays.asList(staking));
 
-        CollectionTransaction tx = null;
-        for (CollectionTransaction collectionTransaction : this.transactionList) {
-            if (collectionTransaction.getTypeEnum() == Transaction.TypeEnum.DELEGATE_EXIT)
-                tx = collectionTransaction;
+        com.platon.browser.elasticsearch.dto.Transaction tx = null;
+        for (com.platon.browser.elasticsearch.dto.Transaction dtoTransaction : this.transactionList) {
+            if (dtoTransaction.getTypeEnum() == Transaction.TypeEnum.DELEGATE_EXIT)
+                tx = dtoTransaction;
         }
         this.target.analyze(this.collectionEvent, tx);
 

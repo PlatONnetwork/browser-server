@@ -24,8 +24,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -71,7 +69,7 @@ public class BlockServiceTest extends AgentTestBase {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(epochMessage);
-        event.setTransactions(new ArrayList<>(transactionList));
+        event.getBlock().setDtoTransactions(new ArrayList<>(transactionList));
 
         block.setNum(79L);
         epochMessage.setConsensusEpochRound(BigInteger.TEN);

@@ -3,8 +3,6 @@ package com.platon.browser.controller.token;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.ApiTestBase;
 import com.platon.browser.request.token.QueryTokenHolderListReq;
-import com.platon.browser.request.token.QueryTokenIdDetailReq;
-import com.platon.browser.request.token.QueryTokenIdListReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

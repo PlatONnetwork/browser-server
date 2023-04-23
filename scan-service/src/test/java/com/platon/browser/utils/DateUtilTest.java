@@ -1,6 +1,7 @@
 package com.platon.browser.utils;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -8,8 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 public class DateUtilTest {
 
@@ -56,10 +56,10 @@ public class DateUtilTest {
 		dataStr = DateUtil.timeZoneTransferUTC(date, "EEE MMM dd yyyy HH:mm:ss");
 		assertTrue("星期二 九月 10 2019 18:50:46".equals(dataStr));
 	}
-	
+
 	@Test
 	public void testConverTime(){
 		DateUtil.covertTime(new Date());
 	}
-	
+
 }

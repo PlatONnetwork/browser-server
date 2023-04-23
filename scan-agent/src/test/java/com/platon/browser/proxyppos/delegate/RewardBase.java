@@ -1,13 +1,13 @@
 package com.platon.browser.proxyppos.delegate;
 
+import com.platon.browser.proxyppos.ProxyContract;
+import com.platon.browser.proxyppos.TestBase;
 import com.platon.parameters.NetworkParameters;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.http.HttpService;
 import com.platon.tx.RawTransactionManager;
 import com.platon.tx.TransactionManager;
-import com.platon.browser.proxyppos.ProxyContract;
-import com.platon.browser.proxyppos.TestBase;
 
 import java.math.BigInteger;
 

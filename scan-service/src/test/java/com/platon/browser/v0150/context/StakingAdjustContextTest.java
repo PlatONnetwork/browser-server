@@ -1,11 +1,10 @@
 package com.platon.browser.v0150.context;
 
 import com.platon.browser.TestData;
-import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.v0150.bean.AdjustParam;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.exception.BlockNumberException;
+import com.platon.browser.v0150.bean.AdjustParam;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +30,7 @@ public class StakingAdjustContextTest extends TestData {
         node = nodeList.get(0);
         staking = stakingList.get(0);
         // 默认是候选中状态
-        staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        staking.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
     }
 
     @Test
@@ -185,7 +184,7 @@ public class StakingAdjustContextTest extends TestData {
     // ********************节点状态是退出中或已退出********************
     @Test
     public void stakingReductionEqualTest() throws BlockNumberException {
-        staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+        staking.setStatus(Staking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         staking.setStakingReduction(BigDecimal.valueOf(20));
@@ -200,7 +199,7 @@ public class StakingAdjustContextTest extends TestData {
 
     @Test
     public void stakingReductionNotEqualTest() throws BlockNumberException {
-        staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+        staking.setStatus(Staking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         staking.setStakingReduction(BigDecimal.valueOf(50));
@@ -215,7 +214,7 @@ public class StakingAdjustContextTest extends TestData {
 
     @Test
     public void stakingReductionNotEnoughTest() throws BlockNumberException {
-        staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+        staking.setStatus(Staking.StatusEnum.EXITED.getCode());
         adjustParam.setHes(BigDecimal.TEN);
         adjustParam.setLock(BigDecimal.TEN);
         staking.setStakingReduction(BigDecimal.valueOf(15));

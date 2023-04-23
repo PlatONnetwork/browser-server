@@ -4,12 +4,11 @@ import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.ComplementNodeOpt;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.custommapper.StakeBusinessMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.ppos.StakeExit;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
@@ -104,7 +103,7 @@ public class StakeExitAnalyzer extends PPOSAnalyzer<NodeOpt> {
                 .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .unStakeFreezeDuration(unStakeFreezeDuration.intValue())
                 .unStakeEndBlock(unStakeEndBlock)
-                .status(CustomStaking.StatusEnum.EXITING.getCode())
+                .status(Staking.StatusEnum.EXITING.getCode())
                 .build();
 
         // 判断当前退出质押操作是否与质押创建操作处于同一个结算周期，如果输入同一周期，则节点置为已退出

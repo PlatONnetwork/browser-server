@@ -2,8 +2,8 @@ package com.platon.browser.v0150.context;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CustomDelegation;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.Staking;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +45,7 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
         adjustParam.setStakeStatDelegateHes(staking.getStatDelegateHes());
         adjustParam.setStakeStatDelegateLocked(staking.getStatDelegateLocked());
         adjustParam.setStakeStatDelegateReleased(staking.getStatDelegateReleased());
-        if (adjustParam.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() || adjustParam.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+        if (adjustParam.getStatus() == Staking.StatusEnum.EXITING.getCode() || adjustParam.getStatus() == Staking.StatusEnum.EXITED.getCode()) {
             // 退出中或已退出的节点，从委托的delegateReleased中减掉hes和lock
             if (adjustParam.getDelegateReleased().compareTo(adjustParam.getHes().add(adjustParam.getLock())) < 0) {
                 errors.add("【错误】：委托记录[待提取金额【" + adjustParam.getDelegateReleased() + "】]小于调账参数[犹豫期【" + adjustParam.getHes() + "】+锁定期【" + adjustParam.getLock() + "】]金额【" + adjustParam.getHes()
@@ -64,7 +64,7 @@ public class DelegateAdjustContext extends AbstractAdjustContext {
 
     @Override
     void calculateAmountAndStatus() {
-        if (adjustParam.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() || adjustParam.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+        if (adjustParam.getStatus() == Staking.StatusEnum.EXITING.getCode() || adjustParam.getStatus() == Staking.StatusEnum.EXITED.getCode()) {
             // 退出中或已退出的节点
             // 1、从委托的delegateReleased中减掉hes和lock
             adjustParam.setDelegateReleased(adjustParam.getDelegateReleased().subtract(adjustParam.getHes()).subtract(adjustParam.getLock()));

@@ -2,7 +2,6 @@ package com.platon.browser.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.RedisKeyConfig;
-import com.platon.browser.dao.entity.NetworkStat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;

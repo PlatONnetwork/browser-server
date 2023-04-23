@@ -1,12 +1,11 @@
 package com.platon.browser.proxyppos;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.abi.wasm.WasmFunctionEncoder;
 import com.platon.abi.wasm.datatypes.WasmFunction;
 import com.platon.contracts.ppos.RewardContract;
 import com.platon.contracts.ppos.dto.resp.Reward;
 import com.platon.protocol.core.DefaultBlockParameterName;
-import com.platon.protocol.core.methods.request.Transaction;
-import com.platon.protocol.core.methods.response.PlatonEstimateGas;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.rlp.solidity.RlpDecoder;
 import com.platon.rlp.solidity.RlpList;
@@ -17,7 +16,6 @@ import com.platon.tx.TransactionManager;
 import com.platon.tx.Transfer;
 import com.platon.utils.Convert;
 import com.platon.utils.Numeric;
-import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 
 import java.io.IOException;

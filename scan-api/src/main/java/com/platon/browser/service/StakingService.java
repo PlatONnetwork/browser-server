@@ -6,7 +6,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomDelegation.YesNoEnum;
 import com.platon.browser.bean.*;
-import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.constant.Browser;
@@ -132,13 +131,13 @@ public class StakingService {
             case ACTIVE:
                 /** 活跃中代表即使后续同时也是结算周期验证人 */
                 status = StakingStatusEnum.CANDIDATE.getCode();
-                isSettle = CustomStaking.YesNoEnum.YES.getCode();
+                isSettle = Staking.YesNoEnum.YES.getCode();
                 exitingAsActive = true;
                 break;
             case CANDIDATE:
                 /** 查询候选人 */
                 status = StakingStatusEnum.CANDIDATE.getCode();
-                isSettle = CustomStaking.YesNoEnum.NO.getCode();
+                isSettle = Staking.YesNoEnum.NO.getCode();
                 break;
             default:
                 break;
@@ -162,11 +161,11 @@ public class StakingService {
              * 如果节点状态为退出中且为结算周期则认为在活跃中
              */
             NodeExample.Criteria criteria2 = nodeExample.createCriteria();
-            criteria2.andStatusEqualTo(CustomStaking.StatusEnum.EXITING.getCode());
+            criteria2.andStatusEqualTo(Staking.StatusEnum.EXITING.getCode());
             if (StringUtils.isNotBlank(req.getKey())) {
                 criteria2.andNodeNameLike("%" + req.getKey() + "%");
             }
-            criteria2.andIsSettleEqualTo(CustomStaking.YesNoEnum.YES.getCode());
+            criteria2.andIsSettleEqualTo(Staking.YesNoEnum.YES.getCode());
             nodeExample.or(criteria2);
         }
 
@@ -187,7 +186,7 @@ public class StakingService {
             aliveStakingListResp.setIsInit(staking.getIsInit() == 1);
             aliveStakingListResp.setStakingIcon(staking.getNodeIcon());
             if (staking.getIsRecommend() != null) {
-                aliveStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == staking.getIsRecommend());
+                aliveStakingListResp.setIsRecommend(Staking.YesNoEnum.YES.getCode() == staking.getIsRecommend());
             }
             /** 设置排行 */
             aliveStakingListResp.setRanking(i + 1);
@@ -229,8 +228,8 @@ public class StakingService {
         /** 设置只查询退出中和已退出 */
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         List<Integer> status = new ArrayList<>();
-        status.add(CustomStaking.StatusEnum.EXITING.getCode());
-        status.add(CustomStaking.StatusEnum.EXITED.getCode());
+        status.add(Staking.StatusEnum.EXITING.getCode());
+        status.add(Staking.StatusEnum.EXITED.getCode());
         RespPage<HistoryStakingListResp> respPage = new RespPage<>();
         List<HistoryStakingListResp> lists = new LinkedList<>();
         /** 根据条件和状态进行查询列表 */
@@ -241,7 +240,7 @@ public class StakingService {
         /**
          * 防止直接退出的节点出现在历史表中
          */
-        criteria.andIsSettleEqualTo(CustomStaking.YesNoEnum.NO.getCode());
+        criteria.andIsSettleEqualTo(Staking.YesNoEnum.NO.getCode());
 
         if (StringUtils.isNotBlank(req.getKey())) {
             criteria.andNodeNameLike("%" + req.getKey() + "%");
@@ -319,7 +318,7 @@ public class StakingService {
              */
             resp.setDeleRewardRed(stakingNode.getTotalDeleReward().add(stakingNode.getPreTotalDeleReward()).subtract(stakingNode.getHaveDeleReward()));
             /** 只有不是内置节点才计算年化率  */
-            if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
+            if (Staking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
                 resp.setExpectedIncome(String.valueOf(stakingNode.getAnnualizedRate()));
                 resp.setRewardValue(stakingNode.getStatFeeRewardValue().add(stakingNode.getStatBlockRewardValue()).add(stakingNode.getStatStakingRewardValue()));
                 logger.info("累计系统奖励[{}]=出块奖励统计(手续费)[{}]+出块奖励统计(激励池)[{}]+质押奖励统计(激励池)[{}]",
@@ -362,7 +361,7 @@ public class StakingService {
              * 如果判断为true则表示为查历史数据
              * 没有值则标识查询活跃账户
              */
-            if (stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()) {
+            if (stakingNode.getStatus().intValue() == Staking.StatusEnum.CANDIDATE.getCode()) {
                 // 候选中的节点设置有效委托地址数
                 resp.setDelegateQty(stakingNode.getStatValidAddrs());
                 /** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
@@ -378,7 +377,7 @@ public class StakingService {
                     resp.setTotalValue(BigDecimal.ZERO);
                     resp.setStakingValue(BigDecimal.ZERO);
                 } else {
-                    if (stakingNode.getStatus().intValue() == StatusEnum.LOCKED.getCode()) {
+                    if (stakingNode.getStatus().intValue() == Staking.StatusEnum.LOCKED.getCode()) {
                         resp.setStakingValue(stakingNode.getStakingLocked());
                     } else {
                         resp.setStakingValue(stakingNode.getStakingReduction());
@@ -592,7 +591,7 @@ public class StakingService {
         NodeExample nodeExample = new NodeExample();
         nodeExample.setOrderByClause(" leave_time desc");
         NodeExample.Criteria criteria = nodeExample.createCriteria();
-        criteria.andStatusEqualTo(StatusEnum.LOCKED.getCode());
+        criteria.andStatusEqualTo(Staking.StatusEnum.LOCKED.getCode());
 
         if (StringUtils.isNotBlank(req.getKey())) {
             criteria.andNodeNameLike("%" + req.getKey() + "%");
@@ -614,7 +613,7 @@ public class StakingService {
             lockedStakingListResp.setIsInit(node.getIsInit() == 1);
             lockedStakingListResp.setStakingIcon(node.getNodeIcon());
             if (node.getIsRecommend() != null) {
-                lockedStakingListResp.setIsRecommend(CustomStaking.YesNoEnum.YES.getCode() == node.getIsRecommend());
+                lockedStakingListResp.setIsRecommend(Staking.YesNoEnum.YES.getCode() == node.getIsRecommend());
             }
             /** 设置排行 */
             lockedStakingListResp.setRanking(i + 1);

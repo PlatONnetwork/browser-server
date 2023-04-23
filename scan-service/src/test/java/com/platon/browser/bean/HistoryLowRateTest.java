@@ -1,6 +1,5 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.bean.HistoryLowRateSlash;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

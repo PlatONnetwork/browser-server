@@ -1,3 +1,8 @@
+# 这个端口，配合com.platon.browser.AgentApplication的@ServletComponentScan注解
+# 可以让scan-agent启动后，可以通过http://ip:8890来访问druid的内置监控服务
+#server:
+#  port: 8890
+
 #1.1.4配置已经迁移到apollo，以下为完整的配置模板，不想使用apollo，可使用以下配置即可
 spring:
   application:
@@ -49,7 +54,7 @@ spring:
       # 配置DruidStatViewServlet
       stat-view-servlet:
         # 是否启用StatViewServlet（监控页面）默认值为false（考虑到安全问题默认并未启动，如需启用建议设置密码或白名单以保障安全）
-        enabled: true
+        enabled: false
         url-pattern: /druid/*
         # IP白名单(没有配置或者为空，则允许所有访问)
         # allow: 127.0.0.1,192.168.46.120
@@ -157,7 +162,7 @@ platon:
   web3j:
     #HTTP或WS 开发环境快进测试链：ws://192.168.120.151:7789,ws://192.168.120.151:7790; 开发环境现网链：ws://192.168.9.139:7789; 云环境现网链：ws://192.168.10.91:6790
     protocol: WS
-    addresses: 192.168.9.139:7789
+    addresses: 192.168.10.91:6790
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

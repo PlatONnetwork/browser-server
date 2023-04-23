@@ -1,13 +1,9 @@
 package com.platon.browser.service;
 
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.StakingBO;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -327,7 +323,7 @@ public class HomeService {
         /* 只查询活跃的节点，并倒序返回 */
         NodeExample nodeExample = new NodeExample();
         NodeExample.Criteria criteria = nodeExample.createCriteria();
-        criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
+        criteria.andStatusEqualTo(Staking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(Staking.YesNoEnum.YES.getCode());
         nodeExample.setOrderByClause(" big_version desc,total_value desc,staking_block_num asc ,staking_tx_index asc");
         List<Node> nodes = nodeMapper.selectByExample(nodeExample);
 
@@ -338,7 +334,7 @@ public class HomeService {
             stakingListResp.setIsInit(nodes.get(i).getIsInit() == 1);
             stakingListResp.setStakingIcon(nodes.get(i).getNodeIcon());
             /* 只有不是内置节点才计算年化率  */
-            if (CustomStaking.YesNoEnum.YES.getCode() != nodes.get(i).getIsInit()) {
+            if (Staking.YesNoEnum.YES.getCode() != nodes.get(i).getIsInit()) {
                 stakingListResp.setExpectedIncome(nodes.get(i).getAnnualizedRate().toString() + "%");
             } else {
                 stakingListResp.setExpectedIncome("");

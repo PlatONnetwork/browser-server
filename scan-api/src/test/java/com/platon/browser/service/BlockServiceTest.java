@@ -1,7 +1,6 @@
 package com.platon.browser.service;
 
 import com.platon.browser.ApiTestMockBase;
-import com.platon.browser.service.elasticsearch.bean.ESResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.request.PageReq;
 import com.platon.browser.request.newblock.BlockDetailNavigateReq;
@@ -11,6 +10,7 @@ import com.platon.browser.request.newblock.BlockListByNodeIdReq;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.block.BlockDetailResp;
 import com.platon.browser.response.block.BlockListResp;
+import com.platon.browser.service.elasticsearch.bean.ESResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockServiceTest extends ApiTestMockBase {
@@ -49,12 +49,12 @@ public class BlockServiceTest extends ApiTestMockBase {
 		BlockDetailsReq req = new BlockDetailsReq();
 		req.setNumber(440);
 		BlockDetailResp blockDetailResp = target.blockDetails(req);
-		
+
 		req.setNumber(0);
 		blockDetailResp = target.blockDetails(req);
 		assertNotNull(blockDetailResp);
 	}
-	
+
 	@Test
 	public void blockList() throws IOException {
 		List<Block> blocks = new ArrayList<>();
@@ -63,20 +63,20 @@ public class BlockServiceTest extends ApiTestMockBase {
 		block.setReward("10");
 		block.setTime(new Date());
 		blocks.add(block);
-		
+
 		Block block1 = new Block();
 		block1.setNum(110l);
 		block1.setReward("10");
 		block1.setTime(new Date());
 		blocks.add(block1);
 		when(statisticCacheService.getBlockCache(any(),any())).thenReturn(blocks);
-		
+
 		PageReq pageReq = new PageReq();
         RespPage<BlockListResp> pages = target.blockList(pageReq);
-        
+
         pageReq.setPageNo(10);
         target.blockList(pageReq);
-        
+
         pageReq.setPageNo(100000);
         ESResult<Object> blockEs = new ESResult<>();
         List<Object> blockList = new ArrayList<>();
@@ -88,20 +88,20 @@ public class BlockServiceTest extends ApiTestMockBase {
         target.blockList(pageReq);
         assertTrue(pages.getData().size()>=0);
 	}
-	
+
 	@Test
 	public void blockDetailNavigate() {
 		BlockDetailNavigateReq req = new BlockDetailNavigateReq();
 		req.setNumber(0l);
 		req.setDirection("next");
 		BlockDetailResp blockDetailResp = target.blockDetailNavigate(req);
-		
+
 		req.setNumber(0l);
 		req.setDirection("prev");
 		target.blockDetailNavigate(req);
 		assertNotNull(blockDetailResp);
 	}
-	
+
 	@Test
 	public void blockListByNodeId() throws IOException {
 		BlockListByNodeIdReq req = new BlockListByNodeIdReq();
@@ -113,7 +113,7 @@ public class BlockServiceTest extends ApiTestMockBase {
 		block.setReward("10");
 		block.setTime(new Date());
 		blocks.add(block);
-		
+
 		Block block1 = new Block();
 		block1.setNum(110l);
 		block1.setReward("10");
@@ -126,10 +126,10 @@ public class BlockServiceTest extends ApiTestMockBase {
         blockEs.setTotal(2l);
         when(ESBlockRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
 		RespPage<BlockListResp> pages = target.blockListByNodeId(req);
-		
+
 		assertNotNull(pages);
 	}
-	
+
 	@Test
 	public void blockListByNodeIdDownload() throws IOException {
 		ESResult<Object> blockEs = new ESResult<>();
@@ -140,7 +140,7 @@ public class BlockServiceTest extends ApiTestMockBase {
 		block.setTime(new Date());
 		block.setTxFee("10");
 		blocks.add(block);
-		
+
 		Block block1 = new Block();
 		block1.setNum(110l);
 		block1.setReward("10");
@@ -153,10 +153,10 @@ public class BlockServiceTest extends ApiTestMockBase {
         blockEs.setRsData(blockList);
         blockEs.setTotal(2l);
         when(ESBlockRepository.search(any(), any(), anyInt(),anyInt())).thenReturn(blockEs);
-        
+
         when(i18n.i(any(), any(), any())).thenReturn("test");
         BlockDownload blpBlockDownload = target.blockListByNodeIdDownload("0x", new Date().getTime(), "en_US", "+8");
-		
+
 		assertNotNull(blpBlockDownload);
 	}
 }

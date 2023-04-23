@@ -1,6 +1,5 @@
 package com.platon.browser.response.transaction;
 
-import com.platon.browser.param.TxParam;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

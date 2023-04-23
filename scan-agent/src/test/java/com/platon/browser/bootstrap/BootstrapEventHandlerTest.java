@@ -1,33 +1,20 @@
 package com.platon.browser.bootstrap;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.analyzer.BlockAnalyzer;
-import com.platon.browser.bean.CollectionBlock;
 import com.platon.browser.bean.ReceiptResult;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.TxBak;
-import com.platon.browser.dao.mapper.NOptBakMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.service.elasticsearch.EsImportService;
-import com.platon.browser.service.redis.RedisImportService;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -39,27 +26,8 @@ import static org.mockito.Mockito.when;
  **/
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BootstrapEventHandlerTest extends AgentTestBase {
-
-    @Mock
-    private EsImportService esImportService;
-
-    @Mock
-    private RedisImportService redisImportService;
-
     @Mock
     private TxBakMapper txBakMapper;
-
-    @Mock
-    private NOptBakMapper nOptBakMapper;
-
-    @Mock
-    private PlatOnClient platOnClient;
-
-    @Mock
-    private AddressCache addressCache;
-
-    @Spy
-    private BlockAnalyzer blockAnalyzer;
 
     @InjectMocks
     private BootstrapEventHandler target;

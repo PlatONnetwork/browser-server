@@ -95,11 +95,11 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
             // 去除Transaction中冗余的字段
-            if (CollUtil.isNotEmpty(transactionStage)) {
+            /*if (CollUtil.isNotEmpty(transactionStage)) {
                 for (Transaction transaction : transactionStage) {
                     transaction.setBin("");
                 }
-            }
+            }*/
             delegationRewardStage.addAll(event.getDelegationRewards());
             List<Long> blockNums = CollUtil.newArrayList();
             if (retryCount.incrementAndGet() > 1) {
@@ -111,7 +111,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             }
 
             // 把区块的交易列表属性置为null,防止把交易信息存储到区块信息中
-            event.getBlock().setTransactions(null);
+            event.getBlock().setDtoTransactions(null);
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
             if (blockStage.size() < disruptorConfig.getPersistenceBatchSize()) {

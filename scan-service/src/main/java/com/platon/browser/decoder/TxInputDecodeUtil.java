@@ -26,8 +26,8 @@ public class TxInputDecodeUtil {
             		if("0x0061736d".equals(prefix)) {
             			result.setTypeEnum(Transaction.TypeEnum.WASM_CONTRACT_CREATE);
             		}
-            	} 
-            	
+            	}
+
 //                // 非WASM合约的创建交易的txInput解码时可能会出异常，现阶段暂时把解txInput出异常的合约创建交易认为是EVM合约创建交易
 //                RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
 //                List <RlpType> rlpTypes = rlpList.getValues();
@@ -52,4 +52,9 @@ public class TxInputDecodeUtil {
         }
         return result;
     }
+    public static boolean isWASM(String txInput) {
+        return StringUtils.startsWith(txInput, "0x0061736d");
+    }
+
+
 }

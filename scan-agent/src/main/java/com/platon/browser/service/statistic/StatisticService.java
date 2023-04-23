@@ -7,10 +7,9 @@ import cn.hutool.json.JSONUtil;
 import com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer;
 import com.platon.browser.analyzer.statistic.StatisticsNetworkAnalyzer;
 import com.platon.browser.bean.*;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -20,7 +19,6 @@ import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +32,7 @@ import java.util.stream.Collectors;
 public class StatisticService {
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private StatisticsNetworkAnalyzer statisticsNetworkAnalyzer;
@@ -61,17 +59,8 @@ public class StatisticService {
         StopWatch watch = new StopWatch("统计业务参数");
         Block block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
-        // 地址统计
-        Collection<Address> addressList = this.addressCache.getAll();
-        if (block.getNum() == 0) {
-            if (CollUtil.isNotEmpty(addressList)) {
-                // 初始化内置地址，比如内置合约等
-                this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
-            }
-            return;
-        }
-        // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行地址入库操作
-        if (CollUtil.isNotEmpty(addressList)) {
+        // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行区块内交易涉及的相关地址入库操作
+        if (this.newAddressCache.hasRelatedAddressInBlockCtx()) {
             watch.start("Address统计分析");
             this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
             watch.stop();

@@ -1,12 +1,11 @@
 package com.platon.browser.exception;
 
-import static org.junit.Assert.*;
+import com.platon.browser.enums.ErrorCodeEnum;
+import org.junit.Test;
 
 import java.util.Locale;
 
-import org.junit.Test;
-
-import com.platon.browser.enums.ErrorCodeEnum;
+import static org.junit.Assert.assertTrue;
 
 
 public class BusinessExceptionTest {
@@ -72,7 +71,7 @@ public class BusinessExceptionTest {
 	@Test
 	public void testBusinessExceptionIntegerStringThrowable() {
 		try {
-			throw new BusinessException(-1,"BusinessException", 
+			throw new BusinessException(-1,"BusinessException",
 					new RuntimeException("RuntimeException"));
 		} catch (Exception e) {
 			assertTrue(e instanceof BusinessException);

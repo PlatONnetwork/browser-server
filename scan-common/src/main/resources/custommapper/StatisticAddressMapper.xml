@@ -25,28 +25,7 @@
     )
     </foreach>
 </update>
-	<insert id="batchInsert" parameterType="list">
-		insert into `address` (
-		`address`,
-		`type`,
-		`contract_name`,
-		`contract_create`,
-		`contract_createHash`,
-		`contract_destroy_hash`,
-		`contract_bin`
-		) values
-		<foreach collection="list" item="item" separator=",">
-			(
-			#{item.address},
-			#{item.type},
-			#{item.contractName},
-			#{item.contractCreate},
-			#{item.contractCreatehash},
-			#{item.contractDestroyHash},
-			#{item.contractBin}
-			)
-		</foreach>
-	</insert>
+
 
 <select id="getAddressStatisticsFromStaking"  resultType="com.platon.browser.task.bean.AddressStatistics">
 	select
@@ -74,16 +53,16 @@
 <update id="batchUpdateFromTask">
 	<foreach collection="list" item="item" index="index" separator="">
 		update `address` set
-			`staking_value` = ${item.stakingValue} , 
-			`delegate_value` = ${item.delegateValue} , 
-			`redeemed_value` = ${item.redeemedValue} , 
-			`candidate_count` = ${item.candidateCount} , 
-			`delegate_hes` = ${item.delegateHes} , 
-			`delegate_locked` = ${item.delegateLocked} , 
+			`staking_value` = ${item.stakingValue} ,
+			`delegate_value` = ${item.delegateValue} ,
+			`redeemed_value` = ${item.redeemedValue} ,
+			`candidate_count` = ${item.candidateCount} ,
+			`delegate_hes` = ${item.delegateHes} ,
+			`delegate_locked` = ${item.delegateLocked} ,
 			`delegate_released` = ${item.delegateReleased}
 		where
 			`address` = "${item.address}";
-	</foreach>      
+	</foreach>
 </update>
 
 </mapper>

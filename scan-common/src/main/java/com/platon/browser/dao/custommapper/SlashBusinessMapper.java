@@ -19,7 +19,7 @@ public interface SlashBusinessMapper {
      * 双签举报
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    void slashNode(Slash param);
+    void slashNodeForDoubleSigned(Slash param);
 
     /**
      * 新选举周期更新节点提取质押需要经过的周期数

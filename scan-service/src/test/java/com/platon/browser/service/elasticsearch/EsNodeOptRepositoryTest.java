@@ -1,7 +1,6 @@
 package com.platon.browser.service.elasticsearch;
 
 import com.platon.browser.config.EsIndexConfig;
-import com.platon.browser.service.elasticsearch.EsNodeOptRepository;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;

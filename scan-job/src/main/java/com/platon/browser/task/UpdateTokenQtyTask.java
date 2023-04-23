@@ -16,9 +16,7 @@ import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -27,8 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * 用trigger来更新address表和token
+ */
 @Slf4j
-@Component
+//@Component
+@Deprecated
 public class UpdateTokenQtyTask {
 
     @Resource
@@ -61,8 +64,11 @@ public class UpdateTokenQtyTask {
      * @param :
      * @return: void
      * @date: 2021/12/6
+     *
+     * 2023/04/06, lvxiaoyi: 用trigger来更新address表和token
+     * @deprecated
      */
-    @XxlJob("updateTokenQtyJobHandler")
+    //@XxlJob("updateTokenQtyJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateTokenQty() throws Exception {
         try {

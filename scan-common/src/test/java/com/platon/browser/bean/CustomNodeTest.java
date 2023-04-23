@@ -1,6 +1,7 @@
 package com.platon.browser.bean;
 
 import com.platon.browser.bean.CustomNode.YesNoEnum;
+import com.platon.browser.dao.entity.Staking;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -15,7 +16,7 @@ public class CustomNodeTest {
 	@Test
 	public void testCustomNode() {
 		customNode = new CustomNode();
-		customNode.updateWithCustomStaking(new CustomStaking());
+		customNode.updateWithStaking(new Staking());
 		assertNotNull(customNode);
 	}
 

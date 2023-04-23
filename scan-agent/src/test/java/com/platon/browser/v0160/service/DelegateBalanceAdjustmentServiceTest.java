@@ -1,6 +1,6 @@
 package com.platon.browser.v0160.service;
 
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
@@ -39,7 +39,7 @@ public class DelegateBalanceAdjustmentServiceTest {
     private CustomAddressMapper customAddressMapper;
 
     @Mock
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Spy
     private DelegateBalanceAdjustmentService delegateBalanceAdjustmentService;
@@ -65,8 +65,7 @@ public class DelegateBalanceAdjustmentServiceTest {
         when(addressMapper.selectByPrimaryKey(any())).thenReturn(addressInfo);
         ReflectionTestUtils.setField(delegateBalanceAdjustmentService, "customAddressMapper", customAddressMapper);
         when(customAddressMapper.batchUpdateByAddress(any())).thenReturn(1);
-        ReflectionTestUtils.setField(delegateBalanceAdjustmentService, "addressCache", addressCache);
-        when(addressCache.getAddress(any())).thenReturn(null);
+        ReflectionTestUtils.setField(delegateBalanceAdjustmentService, "newAddressCache", newAddressCache);
     }
 
     @Test

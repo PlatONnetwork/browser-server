@@ -20,14 +20,6 @@ public interface StatisticBusinessMapper {
     @Transactional(rollbackFor = {Exception.class, Error.class})
     void addressChange(List<Address> list);
 
-    /**
-     * 批量新增地址
-     *
-     * @param list:
-     * @return: int
-     * @date: 2021/12/15
-     */
-    int batchInsert(List<Address> list);
 
     /**
      * 获得网络
