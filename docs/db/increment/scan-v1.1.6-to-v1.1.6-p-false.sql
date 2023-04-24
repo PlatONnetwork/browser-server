@@ -32,7 +32,7 @@ ALTER TABLE `delegation`
     MODIFY COLUMN `is_history`              tinyint         NOT NULL DEFAULT 2 COMMENT '是否为历史:\r\n1是,\r\n2否';
 
 ALTER TABLE `gas_estimate`
-    COMMENT '委托用户未领取委托奖励持续的epoch数量'
+    COMMENT '委托用户未领取委托奖励持续的epoch数量',
     MODIFY COLUMN `addr`            varchar(42)     NOT NULL COMMENT '委托交易地址',
     MODIFY COLUMN `node_id`         char(130)       NOT NULL COMMENT '委托的质押节点id',
     MODIFY COLUMN `sbn`             bigint          NOT NULL COMMENT '委托的质押节点的质押块高',
