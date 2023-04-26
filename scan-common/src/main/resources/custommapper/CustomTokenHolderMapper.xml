@@ -120,10 +120,13 @@
 
     <update id="batchChange">
         <foreach collection="list" item="item" separator=";">
+            UPDATE token_holder
+            SET balance = balance + #{item.increment}, token_tx_qty = token_tx_qty + 1
+            WHERE token_address = #{item.tokenAddress} AND #{item.address}
+        </foreach>
+        <foreach collection="list" item="item" separator=";">
             INSERT INTO token_holder (token_address, address, balance, token_tx_qty )
             VALUES (#{item.tokenAddress}, #{item.address}, #{item.increment}, 1)
-            ON DUPLICATE KEY
-            UPDATE balance = balance + #{item.increment}, token_tx_qty = token_tx_qty + 1
         </foreach>
     </update>
 
