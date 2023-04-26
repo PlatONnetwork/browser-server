@@ -55,7 +55,7 @@ public class StatisticService {
      * @return
      */
     public void analyze(CollectionEvent event) throws Exception {
-        log.info("开始统计业务参数，块高：{}", event.getBlock().getNum());
+        log.debug("开始统计业务参数，块高：{}", event.getBlock().getNum());
         StopWatch watch = new StopWatch("统计业务参数");
         Block block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
@@ -69,7 +69,7 @@ public class StatisticService {
         this.statisticsNetworkAnalyzer.analyze(event, block, epochMessage);
         watch.stop();
 
-        log.info("结束统计业务参数，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
+        log.debug("结束统计业务参数，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
     }
 
     /**
