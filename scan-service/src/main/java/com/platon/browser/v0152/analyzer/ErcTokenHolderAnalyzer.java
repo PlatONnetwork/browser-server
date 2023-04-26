@@ -10,7 +10,6 @@ import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -45,7 +44,6 @@ public class ErcTokenHolderAnalyzer {
      * 然后这个minter转账后给其它人后，这个minter的balance会变成负数
      * 这个是因为这样的合约不是标准合约。所以如果实时维护就不能支持这样的非标准合约了。
      */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(List<ErcTx> txList) {
         List<TokenHolder> changeBalanceList = new ArrayList<>();
         txList.forEach(tx -> {
