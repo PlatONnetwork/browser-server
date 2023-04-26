@@ -22,7 +22,6 @@ import com.platon.protocol.core.methods.response.Log;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
@@ -187,6 +186,9 @@ public class ErcTokenAnalyzer {
     private List<ErcTx> resolveErcTransferTxFromEvent(Token token, com.platon.browser.elasticsearch.dto.Transaction tx, List<ErcContract.ErcTxEvent> eventList, Long seq) {
         List<ErcTx> txList = new ArrayList<>();
         eventList.forEach(event -> {
+            //event.to地址可能是新地址
+            newAddressCache.addPendingAddressToBlockCtx(event.getTo());
+            log.info("event.to:{}地址可能是新地址", event.getTo());
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
                                .seq(seq)
@@ -225,6 +227,9 @@ public class ErcTokenAnalyzer {
     private List<ErcTx> resolveErc1155TxFromEvent(Token token, com.platon.browser.elasticsearch.dto.Transaction tx, List<ErcContract.ErcTxEvent> eventList, AtomicLong seq) {
         List<ErcTx> txList = new ArrayList<>();
         eventList.forEach(event -> {
+            //event.to地址可能是新地址
+            newAddressCache.addPendingAddressToBlockCtx(event.getTo());
+            log.info("event.to:{}地址可能是新地址", event.getTo());
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
                                .seq(seq.incrementAndGet())
@@ -294,7 +299,6 @@ public class ErcTokenAnalyzer {
      * @return void
      * @date 2021/4/15
      */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void resolveTokenTransferTx(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, Receipt receipt) {
         try {
             // 过滤交易回执日志，地址不能为空且在token缓存里的
@@ -418,12 +422,13 @@ public class ErcTokenAnalyzer {
                 token.setContractDestroyBlock(collectionBlock.getNum());
                 tokenMapper.updateByPrimaryKeySelective(token);
                 watch.stop();
-                log.debug("合约[{}]在区块[{}]已销毁", receipt.getContractAddress(), collectionBlock.getNum());
+                log.debug("合约: {}在区块：{}已销毁", receipt.getContractAddress(), collectionBlock.getNum());
             }
 
             log.debug("结束分析区块的token交易，块高：{}，耗时统计：{}", collectionBlock.getNum(), watch.prettyPrint());
         } catch (Exception e) {
-            log.error(StrUtil.format("当前交易[{}]解析ERC交易异常", tx.getHash()), e);
+            log.error(String.format("当前区别：%d 的交易： %s 解析ERC交易异常", collectionBlock.getNum(), tx.getHash()), e);
+            throw e;
         }
     }
 
