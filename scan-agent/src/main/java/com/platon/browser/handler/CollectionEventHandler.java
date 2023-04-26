@@ -1,7 +1,6 @@
 package com.platon.browser.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.analyzer.TransactionAnalyzer;
 import com.platon.browser.bean.CollectionEvent;
@@ -130,7 +129,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
         newAddressCache.clearBlockRelatedAddressCache();
 
-        log.debug("开始分析CollectionEvent，块高：{}", event.getBlock().getNum());
+        log.info("开始分析CollectionEvent，块高：{}", event.getBlock().getNum());
 
         StopWatch watch = new StopWatch("分析CollectionEvent");
         try {
@@ -227,12 +226,12 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             watch.start("发布complementEvent");
             complementEventPublisher.publish(event.getBlock(), (List<Transaction>)transactions, nodeOpts1, delegationRewardList, event.getTraceId());
             watch.stop();
-            log.debug("结束分析CollectionEvent，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
+            log.info("结束分析CollectionEvent，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);
         } catch (Exception e) {
-            log.error(StrUtil.format("区块[{}]解析交易异常", event.getBlock().getNum()), e);
+            log.error(String.format("区块：%d 解析交易异常", event.getBlock().getNum()), e);
             throw e;
         }
         /*

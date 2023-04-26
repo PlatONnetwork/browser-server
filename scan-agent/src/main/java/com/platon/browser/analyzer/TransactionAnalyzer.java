@@ -27,7 +27,6 @@ import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
@@ -100,7 +99,6 @@ public class TransactionAnalyzer {
      * @return com.platon.browser.bean.CollectionTransaction
      * @date 2021/4/20
      */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
     public com.platon.browser.elasticsearch.dto.Transaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
         log.debug("开始分析区块交易，块高：{}", collectionBlock.getNum());
         StopWatch watch = new StopWatch("分析区块交易");
@@ -218,6 +216,11 @@ public class TransactionAnalyzer {
                     if (dtoTransaction.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                         // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表
                         watch.start("普通合约调用结果成功，解析token内部虚拟交易");
+                        // todo:
+                        // 2023/04/25 lvxiaoyi 每次合约调用成功后，都会rpc调用特殊节点，这个影响同步性能，参考：com.platon.browser.bean.Receipt.contractSuicided的使用，添加一个proxiedPPosTxList
+                        // 通过 platon_getTransactionByBlock 来返回内置的ppos交易。
+                        // 所谓的VirtualTx，实际上是指ppos交易，不过这些ppos交易，不是EOA账户直接调用ppos合约的，而是通过一个用户合约来调用ppos合约
+                        // proxiedPPosTxList
                         List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
                                 specialApi,
                                 platOnClient,

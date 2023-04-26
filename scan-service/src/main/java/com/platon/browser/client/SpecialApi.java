@@ -382,7 +382,7 @@ public class SpecialApi {
     }
 
     /**
-     * 根据区块号获取合约调用PPOS信息
+     * 根据区块号获取合约调用PPOS合约的交易信息
      *
      * @param blockNumber
      * @return

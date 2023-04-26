@@ -153,7 +153,7 @@ public class TransactionUtil {
     }
 
     /**
-     * 处理虚拟交易
+     * 处理用户合约调用PPOS合约的交易
      *
      * @param block
      * @param specialApi
