@@ -82,7 +82,7 @@ public class CommonService {
      */
     public BigDecimal getCirculationValue() {
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-        return CommonUtil.ofNullable(() -> networkStat.getTurnValue()).orElse(BigDecimal.ZERO);
+        return CommonUtil.ofNullable(() -> turnValueSubInit(networkStat.getTurnValue(), networkStat)).orElse(BigDecimal.ZERO);
     }
 
     /**
@@ -133,4 +133,15 @@ public class CommonService {
         return bo;
     }
 
+
+    public BigDecimal turnValueSubInit(BigDecimal turn, NetworkStat networkStat){
+        Integer yearNum = networkStat.getYearNum();
+        BigDecimal remain = BigDecimal.ZERO;
+        blockChainConfig.getFoundationSubsidies().forEach((key, value) -> {
+            if(key.compareTo(yearNum) > 0){
+                remain.add(value);
+            }
+        });
+        return turn.subtract(remain);
+    }
 }
