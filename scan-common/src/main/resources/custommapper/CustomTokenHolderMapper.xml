@@ -124,10 +124,12 @@
             SET balance = balance + #{item.increment}, token_tx_qty = token_tx_qty + 1
             WHERE token_address = #{item.tokenAddress} AND address = #{item.address}
         </foreach>
+        ;
         <foreach collection="list" item="item" separator=";">
             INSERT INTO token_holder (token_address, address, balance, token_tx_qty )
             VALUES (#{item.tokenAddress}, #{item.address}, #{item.increment}, 1)
         </foreach>
+        ;
     </update>
 
 
