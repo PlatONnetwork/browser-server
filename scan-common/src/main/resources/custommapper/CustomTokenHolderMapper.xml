@@ -126,7 +126,7 @@
         </foreach>
         ;
         <foreach collection="list" item="item" separator=";">
-            INSERT INTO token_holder (token_address, address, balance, token_tx_qty )
+            INSERT IGNORE INTO token_holder (token_address, address, balance, token_tx_qty )
             VALUES (#{item.tokenAddress}, #{item.address}, #{item.increment}, 1)
         </foreach>
         ;
