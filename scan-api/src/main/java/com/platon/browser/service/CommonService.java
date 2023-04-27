@@ -8,6 +8,7 @@ import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.utils.CommonUtil;
+import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 实现
@@ -140,7 +140,7 @@ public class CommonService {
         BigDecimal remain = BigDecimal.ZERO;
         for (Integer key: blockChainConfig.getFoundationSubsidies().keySet()){
             if(key.compareTo(yearNum) > 0){
-                remain = remain.add(blockChainConfig.getFoundationSubsidies().get(key));
+                remain = remain.add(Convert.toVon(blockChainConfig.getFoundationSubsidies().get(key), Convert.Unit.KPVON));
             }
         }
         return turn.subtract(remain);
