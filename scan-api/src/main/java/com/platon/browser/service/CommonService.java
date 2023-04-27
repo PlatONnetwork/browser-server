@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 实现
@@ -137,11 +138,11 @@ public class CommonService {
     public BigDecimal turnValueSubInit(BigDecimal turn, NetworkStat networkStat){
         Integer yearNum = networkStat.getYearNum();
         BigDecimal remain = BigDecimal.ZERO;
-        blockChainConfig.getFoundationSubsidies().forEach((key, value) -> {
+        for (Integer key: blockChainConfig.getFoundationSubsidies().keySet()){
             if(key.compareTo(yearNum) > 0){
-                remain.add(value);
+                remain = remain.add(blockChainConfig.getFoundationSubsidies().get(key));
             }
-        });
+        }
         return turn.subtract(remain);
     }
 }
