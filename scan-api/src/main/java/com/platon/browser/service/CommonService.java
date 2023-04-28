@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
 import com.platon.browser.bean.EpochInfo;
@@ -113,17 +112,25 @@ public class CommonService {
      */
     public BigDecimal getCirculationValue(Long blockNumber) {
         if (blockNumber==null) {
-            NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-              return CommonUtil.ofNullable(() -> networkStat.getTurnValue()).orElse(BigDecimal.ZERO);
+           return getCirculationValue();
         }else{
             BigDecimal issueValue = BigDecimal.ZERO;
             BigDecimal restrictingValue = BigDecimal.ZERO;
             BigDecimal inciteValue = BigDecimal.ZERO;
             BigDecimal foundationValue = BigDecimal.ZERO;
-            //计算流通量 = 总发行量 - 总锁仓 -  激励池余额 - 基金会
+            BigDecimal remainingOfFoundationInRestricting = BigDecimal.ZERO;
+
+            int chainAge = 0;
+            try {
+                chainAge = this.getYearNum(blockNumber);
+            } catch (Exception e) {
+                log.error("根据块高计算链的年龄出错", e);
+                return BigDecimal.ZERO;
+            }
+            //计算流通量 = 总发行量 - 总锁仓 -  激励池余额 - 基金会账户余额 - 基金会在锁仓合约中的剩余金额
             //总发行量
             try {
-                issueValue = getCurrentBlockIssueValue(blockNumber);
+                issueValue = getCurrentBlockIssueValue(chainAge);
             } catch (Exception e) {
                 log.error("获取取总发行量异常", e);
                 return BigDecimal.ZERO;
@@ -136,7 +143,7 @@ public class CommonService {
             //激励池余额
             inciteValue = accountService.getInciteBalance(BigInteger.valueOf(blockNumber));
 
-            // 基金会
+            // 基金会账户余额
             List<String> addressList = customInternalAddressMapper.listCalculableFoundationAddress();
             if (!CollectionUtils.isEmpty(addressList)){
                 String addressParamStr = String.join(";", addressList);
@@ -149,7 +156,11 @@ public class CommonService {
                     return BigDecimal.ZERO;
                 }
             }
-            BigDecimal circulationValue = issueValue.subtract(restrictingValue).subtract(inciteValue).subtract(foundationValue);
+
+            // 基金会在锁仓合约中的剩余金额
+            remainingOfFoundationInRestricting = this.getRemainingOfFoundationInRestricting(chainAge);
+
+            BigDecimal circulationValue = issueValue.subtract(restrictingValue).subtract(inciteValue).subtract(foundationValue).subtract(remainingOfFoundationInRestricting);
             log.debug("区块：{}上的流通量(von)：{}", blockNumber, circulationValue.toPlainString());
             return circulationValue;
         }
@@ -204,27 +215,38 @@ public class CommonService {
 
     public BigDecimal turnValueSubInit(BigDecimal turn, NetworkStat networkStat){
         Integer yearNum = networkStat.getYearNum();
-        BigDecimal remain = BigDecimal.ZERO;
-        for (Integer key: blockChainConfig.getFoundationSubsidies().keySet()){
-            if(key.compareTo(yearNum) > 0){
-                remain = remain.add(Convert.toVon(blockChainConfig.getFoundationSubsidies().get(key), Convert.Unit.KPVON));
-            }
-        }
+        BigDecimal remain = getRemainingOfFoundationInRestricting(yearNum);
         return turn.subtract(remain);
     }
 
     /**
-     * 返回当前块高的总发行量：整数（单位：von）
-     * @param blockNumber
+     * 按块高获取基金会锁仓在锁仓合约中的剩余基金。
+     * 基金会在创世块，会把一笔lat锁在锁仓合约中（注意，并非锁仓计划中），按年释放一部分，进入激励池
+     * @param chainAge
+     * @return
+     */
+    public BigDecimal getRemainingOfFoundationInRestricting(int chainAge){
+        BigDecimal remain = BigDecimal.ZERO;
+        for (Integer key: blockChainConfig.getFoundationSubsidies().keySet()){
+            if(key.compareTo(chainAge) > 0){
+                remain = remain.add(blockChainConfig.getFoundationSubsidies().get(key));
+            }
+        }
+        if (remain.compareTo(BigDecimal.ZERO) > 0 ){
+            remain = Convert.toVon(remain, Convert.Unit.KPVON);
+        }
+        return remain;
+    }
+    /**
+     * 返回当前链龄的总发行量：整数（单位：von）
+     * @param chainAge
      * @return
      * @throws Exception
      */
-    public BigDecimal getCurrentBlockIssueValue(Long blockNumber) throws Exception {
-           //  根据块高算出year
-        int yearNum = getYearNum(blockNumber);
+    public BigDecimal getCurrentBlockIssueValue(int chainAge) throws Exception {
            // 算出总发行量
-        BigDecimal issueValue = getTotalIssueValue(yearNum);
-        log.debug("当前块高：{}的总发行量(von)：{}", blockNumber, issueValue.toPlainString());
+        BigDecimal issueValue = getTotalIssueValue(chainAge);
+        log.debug("当前链龄的：{}的总发行量(von)：{}", chainAge, issueValue.toPlainString());
 
         return issueValue;
     }
@@ -238,7 +260,7 @@ public class CommonService {
      */
     private int getYearNum(Long currentNumber) throws Exception {
         // 上一结算周期最后一个块号
-        BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(Convert.toBigInteger(currentNumber), blockChainConfig.getSettlePeriodBlockCount());
+        BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(BigInteger.valueOf(currentNumber), blockChainConfig.getSettlePeriodBlockCount());
         // 从特殊接口获取
         EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
         // 第几年
