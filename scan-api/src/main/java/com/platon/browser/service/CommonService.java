@@ -8,6 +8,7 @@ import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.utils.CommonUtil;
+import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,7 @@ public class CommonService {
      */
     public BigDecimal getCirculationValue() {
         NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
-        return CommonUtil.ofNullable(() -> networkStat.getTurnValue()).orElse(BigDecimal.ZERO);
+        return CommonUtil.ofNullable(() -> turnValueSubInit(networkStat.getTurnValue(), networkStat)).orElse(BigDecimal.ZERO);
     }
 
     /**
@@ -133,4 +134,15 @@ public class CommonService {
         return bo;
     }
 
+
+    public BigDecimal turnValueSubInit(BigDecimal turn, NetworkStat networkStat){
+        Integer yearNum = networkStat.getYearNum();
+        BigDecimal remain = BigDecimal.ZERO;
+        for (Integer key: blockChainConfig.getFoundationSubsidies().keySet()){
+            if(key.compareTo(yearNum) > 0){
+                remain = remain.add(Convert.toVon(blockChainConfig.getFoundationSubsidies().get(key), Convert.Unit.KPVON));
+            }
+        }
+        return turn.subtract(remain);
+    }
 }

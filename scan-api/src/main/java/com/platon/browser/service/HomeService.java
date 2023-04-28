@@ -304,7 +304,7 @@ public class HomeService {
         chainStatisticNewResp.setBlockList(lists);
         BigDecimal issueValue = networkStatRedis.getIssueValue();
         chainStatisticNewResp.setIssueValue(issueValue.abs());
-        BigDecimal circulationValue = CommonUtil.ofNullable(() -> networkStatRedis.getTurnValue()).orElse(BigDecimal.ZERO);
+        BigDecimal circulationValue = CommonUtil.ofNullable(() -> commonService.turnValueSubInit(networkStatRedis.getTurnValue(), networkStatRedis)).orElse(BigDecimal.ZERO);
         chainStatisticNewResp.setTurnValue(circulationValue);
         StakingBO bo = commonService.getTotalStakingValueAndStakingDenominator(networkStatRedis);
         chainStatisticNewResp.setStakingDenominator(bo.getStakingDenominator());
