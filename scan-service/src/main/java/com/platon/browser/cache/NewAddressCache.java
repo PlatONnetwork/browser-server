@@ -58,7 +58,19 @@ public class NewAddressCache {
         blockRelatedAddressCache.clear();
     }
     public void addNewContractAddressToBlockCtx(CustomAddress address){
-        AllAddressTypeCache.put(address.getAddress(), AddressTypeEnum.getEnum(address.getType()));
+        AddressTypeEnum addressTypeEnum = this.getAddressType(address.getAddress());
+        if (addressTypeEnum!=null && addressTypeEnum != AddressTypeEnum.getEnum(address.getType())){
+            // todo: 2023/05/04 lvxiaoyi
+            //  在特殊节点中，会采集opCreate /opCreate2 操作码中的新建合约地址
+            //  但是这两个操作码对scan的影响不同：
+            //  opCreate操作码新建的合约地址，肯定是在scan没有出现过的
+            //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
+            //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
+            address.unsetOption(CustomAddress.Option.NEW);
+            address.setOption(CustomAddress.Option.RESET_TYPE);
+        }else{
+            this.addAddressTypeCache(address.getAddress(), AddressTypeEnum.getEnum(address.getType()));
+        }
         blockRelatedAddressCache.put(address.getAddress(), address);
     }
     public void addSuicidedAddressToBlockCtx(String address){
@@ -171,6 +183,9 @@ public class NewAddressCache {
         return blockRelatedAddressCache.values().stream().filter(customAddress -> customAddress.hasOption(CustomAddress.Option.SUICIDED)).collect(Collectors.toList());
     }
 
+    public List<Address> listResetTypeAddressInBlockCtx(){
+        return blockRelatedAddressCache.values().stream().filter(customAddress -> customAddress.hasOption(CustomAddress.Option.RESET_TYPE)).collect(Collectors.toList());
+    }
 
 
     /*public List<Address> listPendingCustomAddressInBlockCtx(){

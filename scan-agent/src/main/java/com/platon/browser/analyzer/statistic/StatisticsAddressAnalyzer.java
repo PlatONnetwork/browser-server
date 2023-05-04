@@ -64,6 +64,12 @@ public class StatisticsAddressAnalyzer {
                 addressMapper.batchInsertNewly(newAddrList);
                 log.debug("新增地址成功{}", JSONUtil.toJsonStr(newAddrList));
             }
+            //修改地址类型
+            List<Address> resetTypeAddrList = newAddressCache.listResetTypeAddressInBlockCtx();
+            if (CollUtil.isNotEmpty(resetTypeAddrList)) {
+                addressMapper.batchResetType(resetTypeAddrList);
+                log.debug("修改地址类型成功{}", JSONUtil.toJsonStr(resetTypeAddrList));
+            }
 
             //更新领取委托奖励，修改的放中间
             List<Address> rewardClaimAddrList = newAddressCache.listRewardClaimAddressInBlockCtx();

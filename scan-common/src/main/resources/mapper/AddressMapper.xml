@@ -786,5 +786,11 @@
       where `address` = #{item.address}
     </foreach>
   </update>
-
+  <update id="batchResetType">
+    <foreach collection="list" item="item" separator=";">
+      update address
+      set `type` =  #{item.type}
+      where `address` = #{item.address}
+    </foreach>
+  </update>
 </mapper>

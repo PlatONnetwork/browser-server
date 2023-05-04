@@ -115,6 +115,12 @@ public class TransactionAnalyzer {
 
 
         // 新创建合约处理
+        // todo: 2023/05/04 lvxiaoyi
+        //  在特殊节点中，会采集opCreate /opCreate2 操作码中的新建合约地址
+        //  但是这两个操作码对scan的影响不同：
+        //  opCreate操作码新建的合约地址，肯定是在scan没有出现过的
+        //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
+        //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             log.debug("新建合约的交易回执：{}", JSON.toJSONString(receipt));
             for(ContractInfo contract : receipt.getContractCreated()){
@@ -145,13 +151,14 @@ public class TransactionAnalyzer {
 
                 //合约是新建的，因此获取binCode
                 watch.start("获取新建合约的binCode");
+                // todo: 2023/05/04 lvxiaoyi 考虑在getTransactionReceipt时，随同contractCreated一起返回bincode
                 String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
                 watch.stop();
 
                 CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
                 //设置地址类型
                 relatedAddress.setType(NewAddressCache.convertContractType2AddressType(contractTypeEnum).getCode());
-                relatedAddress.setOption(CustomAddress.Option.NEW);
+                relatedAddress.setOption(CustomAddress.Option.NEW); //todo: 2023/05/04 lvxiaoyi 返回的地址并不一定都是新地址
                 relatedAddress.setContractBin(binCode);
                 relatedAddress.setContractType(contractTypeEnum);
                 relatedAddress.setContractCreate(dtoTransaction.getFrom());

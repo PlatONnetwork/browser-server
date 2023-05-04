@@ -74,7 +74,9 @@ public class CustomAddress extends Address {
         PENDING(0),
         NEW(1),
         REWARD_CLAIM(2),
-        SUICIDED(4);
+        SUICIDED(4),
+
+        RESET_TYPE(8);
 
         private int mask;
 

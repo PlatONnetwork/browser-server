@@ -64,4 +64,6 @@ public interface AddressMapper {
     void batchUpdateSuicided(List<Address> suicidedAddrList);
 
     void batchUpdateReward(List<Address> rewardClaimAddrList);
+
+    void batchResetType(List<Address> resetTypeAddrList);
 }
