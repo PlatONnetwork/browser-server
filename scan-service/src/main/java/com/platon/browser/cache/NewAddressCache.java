@@ -68,9 +68,10 @@ public class NewAddressCache {
             //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
             address.unsetOption(CustomAddress.Option.NEW);
             address.setOption(CustomAddress.Option.RESET_TYPE);
-        }else{
-            this.addAddressTypeCache(address.getAddress(), AddressTypeEnum.getEnum(address.getType()));
         }
+
+        //更新地址类型
+        this.addAddressTypeCache(address.getAddress(), AddressTypeEnum.getEnum(address.getType()));
         blockRelatedAddressCache.put(address.getAddress(), address);
     }
     public void addSuicidedAddressToBlockCtx(String address){
@@ -150,6 +151,11 @@ public class NewAddressCache {
     }
 
 
+    /**
+     *
+     * @param address 必须是个合约地址
+     * @return 返回合约细分类型，如果是EOA账户，或者输入参数是null，将返回null
+     */
     public ContractTypeEnum getContractType(String address){
         return this.convertAddressType2ContractType(this.getAddressType(address));
     }
@@ -225,7 +231,7 @@ public class NewAddressCache {
     }
 
     private ContractTypeEnum convertAddressType2ContractType(AddressTypeEnum addressTypeEnum){
-        if(addressTypeEnum==null) {
+        if(addressTypeEnum==null || addressTypeEnum == AddressTypeEnum.ACCOUNT) {
             return null;
         }
         switch (addressTypeEnum) {
@@ -240,7 +246,7 @@ public class NewAddressCache {
             case ERC1155_EVM_CONTRACT:
                 return ContractTypeEnum.ERC1155_EVM;
             default:
-                return null;
+                return ContractTypeEnum.UNKNOWN;
         }
     }
 
