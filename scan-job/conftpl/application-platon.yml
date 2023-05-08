@@ -24,6 +24,8 @@ spring:
       KeepAlive: true
       # 配置获取连接等待超时的时间
       maxWait: 60000
+      # socket超时，单位是毫秒。由于scan-agent的数据库慢查询较多，因此要设置长些。也可以在url中指定（1.2.12版本，url指定也会被druid默认的10秒覆盖）
+      socketTimeout: 60000
       # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
       timeBetweenEvictionRunsMillis: 60000
       # 配置一个连接在池中最小生存的时间，单位是毫秒
