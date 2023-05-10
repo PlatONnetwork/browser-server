@@ -45,4 +45,21 @@ public enum AddressTypeEnum {
     public static boolean contains(AddressTypeEnum en) {
         return ENUMS.containsValue(en);
     }
+
+    public ContractTypeEnum convertToContractType(){
+        switch (this) {
+            case EVM_CONTRACT:
+                return ContractTypeEnum.EVM;
+            case WASM_CONTRACT:
+                return ContractTypeEnum.WASM;
+            case ERC20_EVM_CONTRACT:
+                return ContractTypeEnum.ERC20_EVM;
+            case ERC721_EVM_CONTRACT:
+                return ContractTypeEnum.ERC721_EVM;
+            case ERC1155_EVM_CONTRACT:
+                return ContractTypeEnum.ERC1155_EVM;
+            default:
+                return ContractTypeEnum.UNKNOWN;
+        }
+    }
 }

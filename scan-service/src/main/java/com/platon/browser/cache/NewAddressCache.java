@@ -157,7 +157,7 @@ public class NewAddressCache {
      * @return 返回合约细分类型，如果是EOA账户，或者输入参数是null，将返回null
      */
     public ContractTypeEnum getContractType(String address){
-        return this.convertAddressType2ContractType(this.getAddressType(address));
+        return this.getAddressType(address)==null ? null : this.getAddressType(address).convertToContractType();
     }
 
     public void init() {
@@ -209,46 +209,6 @@ public class NewAddressCache {
         newlyAddressSet.forEach(newAddress -> blockRelatedAddressCache.get(newAddress).setOption(CustomAddress.Option.NEW));
     }*/
 
-
-
-
-    public static AddressTypeEnum convertContractType2AddressType(ContractTypeEnum contractTypeEnum){
-        if(contractTypeEnum==null || contractTypeEnum==ContractTypeEnum.UNKNOWN) {
-            return AddressTypeEnum.ACCOUNT;
-        }
-        switch (contractTypeEnum) {
-            case WASM:
-                return AddressTypeEnum.WASM_CONTRACT;
-            case ERC20_EVM:
-                return AddressTypeEnum.ERC20_EVM_CONTRACT;
-            case ERC721_EVM:
-                return AddressTypeEnum.ERC721_EVM_CONTRACT;
-            case ERC1155_EVM:
-                return AddressTypeEnum.ERC1155_EVM_CONTRACT;
-            default:
-                return AddressTypeEnum.EVM_CONTRACT;
-        }
-    }
-
-    private ContractTypeEnum convertAddressType2ContractType(AddressTypeEnum addressTypeEnum){
-        if(addressTypeEnum==null || addressTypeEnum == AddressTypeEnum.ACCOUNT) {
-            return null;
-        }
-        switch (addressTypeEnum) {
-            case EVM_CONTRACT:
-                return ContractTypeEnum.EVM;
-            case WASM_CONTRACT:
-                return ContractTypeEnum.WASM;
-            case ERC20_EVM_CONTRACT:
-                return ContractTypeEnum.ERC20_EVM;
-            case ERC721_EVM_CONTRACT:
-                return ContractTypeEnum.ERC721_EVM;
-            case ERC1155_EVM_CONTRACT:
-                return ContractTypeEnum.ERC1155_EVM;
-            default:
-                return ContractTypeEnum.UNKNOWN;
-        }
-    }
 
 
     public boolean isEvmContractAddress(String address) {

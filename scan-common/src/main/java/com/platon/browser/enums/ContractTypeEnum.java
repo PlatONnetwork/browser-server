@@ -42,4 +42,38 @@ public enum ContractTypeEnum {
     public String getDesc() {
         return this.desc;
     }
+
+    public ErcTypeEnum convertToErcType(){
+        switch (this){
+            case ERC20_EVM:
+            return ErcTypeEnum.ERC20;
+            case ERC721_EVM:
+                return ErcTypeEnum.ERC721;
+            case ERC1155_EVM:
+                return ErcTypeEnum.ERC1155;
+            default:
+                return null;
+        }
+    }
+
+    public AddressTypeEnum convertToAddressType(){
+        switch (this){
+            case INNER:
+                return AddressTypeEnum.INNER_CONTRACT;
+            case EVM:
+                return AddressTypeEnum.EVM_CONTRACT;
+            case WASM:
+                return AddressTypeEnum.WASM_CONTRACT;
+            case UNKNOWN:
+                return AddressTypeEnum.ACCOUNT;
+            case ERC20_EVM:
+                return AddressTypeEnum.ERC20_EVM_CONTRACT;
+            case ERC721_EVM:
+                return AddressTypeEnum.ERC721_EVM_CONTRACT;
+            case ERC1155_EVM:
+                return AddressTypeEnum.ERC1155_EVM_CONTRACT;
+            default:
+                return AddressTypeEnum.ACCOUNT;
+        }
+    }
 }

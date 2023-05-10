@@ -6,6 +6,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.platon.browser.bean.CommonConstant;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.decoder.TxInputDecodeUtil;
+import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.bean.ErcContractId;
@@ -26,7 +28,6 @@ import com.platon.tx.exceptions.PlatonCallTimeoutException;
 import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,25 @@ public class ErcDetectService {
     }
 
 
+    public ContractTypeEnum getContractType(String contractAddress, BigInteger blockNumber, String binHexNo0x, String txInput) {
+        try {
+            if (isSupportErc721(contractAddress, blockNumber)) {
+                return ContractTypeEnum.ERC721_EVM;
+            } else if (isSupportErc1155(contractAddress, blockNumber)) {
+                return ContractTypeEnum.ERC1155_EVM;
+            } else if (isSupportErc20(binHexNo0x)) {
+                return ContractTypeEnum.ERC20_EVM;
+            } else if (TxInputDecodeUtil.isWASM(txInput)) {
+                return ContractTypeEnum.WASM;
+            } else {
+                return ContractTypeEnum.EVM;
+            }
+        }catch (Exception e){
+            log.error("解析合约类型出错，地址：{}", contractAddress, e);
+            return ContractTypeEnum.UNKNOWN;
+        }
+    }
+
     /**
      *
      * @param ercTypeEnum
@@ -79,7 +99,7 @@ public class ErcDetectService {
      * @param blockNumber
      * @return 如果不符合ERC标准，则返回null
      */
-    public ErcContract getErcContract(ErcTypeEnum ercTypeEnum, String contractAddress, BigInteger blockNumber) {
+    public ErcContract getErcContract(ErcTypeEnum ercTypeEnum, String contractAddress, BigInteger blockNumber){
         ErcContract ercContract = ercContractCache.getIfPresent(contractAddress);
         if(ercContract==null) {
             if (ErcTypeEnum.ERC20.equals(ercTypeEnum)) {
@@ -90,7 +110,7 @@ public class ErcDetectService {
                 ercContract = Erc1155Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
             }
             if (ercContract != null) {
-                ercContractCache.put(contractAddress, ercContract);
+                 ercContractCache.put(contractAddress, ercContract);
             }
         }
         return ercContract;
@@ -194,7 +214,7 @@ public class ErcDetectService {
      * @return: boolean
      * @date: 2022/1/14
      */
-    private boolean isSupportErc721(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
+    public boolean isSupportErc721(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
         // 支持erc721，则必定要支持erc165
         if (!isSupportErc165(contractAddress, blockNumber)) {
             log.debug("该合约[{}]不支持erc165", contractAddress);
@@ -204,6 +224,13 @@ public class ErcDetectService {
         return "0x0000000000000000000000000000000000000000000000000000000000000001".equals(result);
     }
 
+    public boolean isSupportErc20(String binHex){
+        if (binHex.indexOf("06fdde03")>0 && binHex.indexOf("95d89b41")>0 && binHex.indexOf("313ce567")>0 && binHex.indexOf("18160ddd")>0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * 是否支持Erc1155合约
      *
@@ -285,42 +312,19 @@ public class ErcDetectService {
      * @throws PlatonCallTimeoutException
      */
     @Retryable(value = PlatonCallTimeoutException.class, maxAttempts = CommonConstant.reTryNum)
-    public ErcContractId getContractId(String contractAddress, BigInteger blockNumber) throws PlatonCallTimeoutException {
-        ErcTypeEnum ercType = ErcTypeEnum.ERC20;
-        try {
-            // 先检测是否支持ERC721
-            if (isSupportErc721(contractAddress, blockNumber)) {
-                ercType = ErcTypeEnum.ERC721;
-            }else if (isSupportErc1155(contractAddress, blockNumber)){
-                ercType = ErcTypeEnum.ERC1155;
-            }
-
-            ErcContract ercContract = getErcContract(ercType, contractAddress, blockNumber);
-            if(ercContract==null){
-                return null;
-                //throw new BusinessException("cannot find the Contract on the Chain");
-            }
-            ErcContractId contractId = resolveContractId(ercContract);
-
-
-            if (ercType == ErcTypeEnum.ERC20) {
-                if (StringUtils.isBlank(contractId.getName()) || StringUtils.isBlank(contractId.getSymbol()) | contractId.getDecimal() == null || contractId.getTotalSupply() == null) {
-                    // name/symbol/decimals/totalSupply 其中之一为空，则判定为未知类型
-                    //contractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
-                    return null;
-                }
-            }
-
-            contractId.setTypeEnum(ercType);
-            return contractId;
-
-        } catch (PlatonCallTimeoutException e) {
-            log.error("获取合约[{}]id超时异常", contractAddress);
-            throw e;
-        } catch (Exception e) {
-            log.error(StrUtil.format("获取合约[{}]id异常", contractAddress), e);
-            throw e;
+    public ErcContractId getErcContractId(ErcTypeEnum ercTypeEnum, String contractAddress, BigInteger blockNumber) {
+        ErcContract ercContract = getErcContract(ercTypeEnum, contractAddress, blockNumber);
+        if (ercContract ==null){
+            return null;
         }
+        ErcContractId contractId = null;
+        try {
+            contractId = resolveContractId(ercContract);
+            contractId.setTypeEnum(ercTypeEnum);
+        } catch (PlatonCallTimeoutException e) {
+            log.error("查询token属性出错", e);
+        }
+        return contractId;
     }
 
     /**

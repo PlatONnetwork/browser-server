@@ -65,4 +65,8 @@ public interface CustomAddressMapper {
      */
     int batchUpdateAddressInfo(@Param("list") List<Address> list);
 
+    /**
+     * 统计账户地址的质押金额信息、委托金额、委托节点数量等信息
+     */
+    void updateStakingDelegationStats();
 }

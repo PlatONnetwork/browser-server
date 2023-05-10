@@ -86,7 +86,7 @@ public class AddressUpdateTask {
         watch.start();
 
 
-        addressMapper.updateStakingDelegationStats();
+        customAddressMapper.updateStakingDelegationStats();
         watch.stop();
         log.debug("结束执行:统计账户的质押/委托信息，耗时统计：{}ms", watch.getLastTaskTimeMillis());
     }

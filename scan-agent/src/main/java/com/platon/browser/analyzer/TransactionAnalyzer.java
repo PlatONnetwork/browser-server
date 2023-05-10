@@ -11,7 +11,6 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
-import com.platon.browser.decoder.TxInputDecodeUtil;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -23,6 +22,7 @@ import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
 import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
+import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +53,8 @@ public class TransactionAnalyzer {
     @Resource
     private ErcTokenAnalyzer ercTokenAnalyzer;
 
+    @Resource
+    private ErcDetectService ercDetectService;
     @Resource
     private AddressMapper addressMapper;
 
@@ -123,44 +125,30 @@ public class TransactionAnalyzer {
         //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             log.debug("新建合约的交易回执：{}", JSON.toJSONString(receipt));
-            for(ContractInfo contract : receipt.getContractCreated()){
-                // solidity 类型 erc20 或 721 token检测及入口
-                watch.start("解析新建合约的具体类型");
-                Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
-                watch.stop();
-                ContractTypeEnum contractTypeEnum = ContractTypeEnum.UNKNOWN;
-                if (token != null ){
-                    switch (token.getType()){
-                        case "erc20":
-                            contractTypeEnum = ContractTypeEnum.ERC20_EVM;
-                            break;
-                        case "erc721":
-                            contractTypeEnum = ContractTypeEnum.ERC721_EVM;
-                            break;
-                        case "erc1155":
-                            contractTypeEnum = ContractTypeEnum.ERC1155_EVM;
-                            break;
-                    }
-                }else{
-                    if (TxInputDecodeUtil.isWASM(dtoTransaction.getInput())){
-                        contractTypeEnum = ContractTypeEnum.WASM;
-                    }else{
-                        contractTypeEnum = ContractTypeEnum.EVM;
-                    }
-                }
 
+            for(ContractInfo contract : receipt.getContractCreated()){
                 //合约是新建的，因此获取binCode
                 watch.start("获取新建合约的binCode");
                 // todo: 2023/05/04 lvxiaoyi 考虑在getTransactionReceipt时，随同contractCreated一起返回bincode
                 String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
                 watch.stop();
 
+                ContractTypeEnum contractType = ercDetectService.getContractType(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode,dtoTransaction.getInput());
+
+                //解析token
+                if(contractType.equals(ContractTypeEnum.ERC20_EVM) || contractType.equals(ContractTypeEnum.ERC721_EVM) || contractType.equals(ContractTypeEnum.ERC1155_EVM) ){
+                    // solidity 类型 erc20 或 721 token检测及入口
+                    watch.start("解析新建合约的具体类型");
+                    Token token = ercTokenAnalyzer.resolveNewToken(contractType.convertToErcType(), contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                    watch.stop();
+                }
+
                 CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
                 //设置地址类型
-                relatedAddress.setType(NewAddressCache.convertContractType2AddressType(contractTypeEnum).getCode());
+                relatedAddress.setType(contractType.convertToAddressType().getCode());
                 relatedAddress.setOption(CustomAddress.Option.NEW); //todo: 2023/05/04 lvxiaoyi 返回的地址并不一定都是新地址
                 relatedAddress.setContractBin(binCode);
-                relatedAddress.setContractType(contractTypeEnum);
+                relatedAddress.setContractType(contractType);
                 relatedAddress.setContractCreate(dtoTransaction.getFrom());
                 relatedAddress.setContractCreatehash(dtoTransaction.getHash());
 

@@ -143,7 +143,6 @@
 
 
     <update id="updateStakingDelegationStats">
-        EXPLAIN
         update address addr
         inner join (
             select t1.*, t2.candidateCount

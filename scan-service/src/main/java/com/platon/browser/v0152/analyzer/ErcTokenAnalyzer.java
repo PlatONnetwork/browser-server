@@ -70,11 +70,12 @@ public class ErcTokenAnalyzer {
      * @param blockNumber
      * @return 如果不是ERC标准，则返回null
      */
-    public Token resolveNewToken(String contractAddress, BigInteger blockNumber) {
-
-
+    public Token resolveNewToken(ErcTypeEnum ercTypeEum, String contractAddress, BigInteger blockNumber) {
+        if (ercTypeEum==null){
+            return null;
+        }
         try {
-            ErcContractId contractId = ercDetectService.getContractId(contractAddress, blockNumber);
+            ErcContractId contractId = ercDetectService.getErcContractId(ercTypeEum, contractAddress, blockNumber);
             if (contractId != null) {
                 Token token = new Token();
                 token.setAddress(contractAddress);
@@ -140,9 +141,10 @@ public class ErcTokenAnalyzer {
                 log.debug("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
                 return token;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.warn("合约创建,解析是否符合ERC标准时异常", e);
         }
+
         return null;
     }
 
@@ -188,7 +190,7 @@ public class ErcTokenAnalyzer {
         eventList.forEach(event -> {
             //event.to地址可能是新地址
             newAddressCache.addPendingAddressToBlockCtx(event.getTo());
-            log.info("event.to:{}地址可能是新地址", event.getTo());
+            log.debug("event.to:{}地址可能是新地址", event.getTo());
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
                                .seq(seq)
