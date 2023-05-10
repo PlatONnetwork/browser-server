@@ -26,8 +26,8 @@ public class Receipt {
     private String contractAddress;              //原始交易to为空时，新建的合约地址
     private List<ContractInfo> contractCreated;  //原始交易执行后，新建的合约地址（包括to为空时创建的合约地址）；为空传0长度列表
     private List<ContractInfo> contractSuicided; //原始交易执行后，自杀的合约地址；为空传0长度列表
-    private List<ProxyPattern> proxyPatterns;    //原始交易执行后，发现的代理合约；为空传0长度列表
-    private List<EmbedTransfer> embedTransfers;  //原始交易执行后，引起的内置LAT转账交易
+    //private List<ProxyPattern> proxyPatterns;    //原始交易执行后，发现的代理合约；为空传0长度列表
+    //private List<EmbedTransfer> embedTransfers;  //原始交易执行后，引起的内置LAT转账交易
     private List<String> topics;
 
     private int logStatus;

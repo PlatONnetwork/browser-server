@@ -15,9 +15,6 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
@@ -101,7 +98,7 @@ public class TransactionAnalyzer {
      * @return com.platon.browser.bean.CollectionTransaction
      * @date 2021/4/20
      */
-    public com.platon.browser.elasticsearch.dto.Transaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws BeanCreateOrUpdateException, ContractInvokeException, BlankResponseException {
+    public com.platon.browser.elasticsearch.dto.Transaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws Exception {
         log.debug("开始分析区块交易，块高：{}", collectionBlock.getNum());
         StopWatch watch = new StopWatch("分析区块交易");
 
@@ -132,8 +129,13 @@ public class TransactionAnalyzer {
                 // todo: 2023/05/04 lvxiaoyi 考虑在getTransactionReceipt时，随同contractCreated一起返回bincode
                 String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
                 watch.stop();
+                if(StringUtils.isBlank(binCode) || binCode.equalsIgnoreCase("0x")){
+                    log.warn("发现bin为空的新合约地址:{}", contract.getAddress());
+                    break;
+                }
 
-                ContractTypeEnum contractType = ercDetectService.getContractType(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode,dtoTransaction.getInput());
+
+                ContractTypeEnum contractType = ercDetectService.getContractType(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode, dtoTransaction.getInput());
 
                 //解析token
                 if(contractType.equals(ContractTypeEnum.ERC20_EVM) || contractType.equals(ContractTypeEnum.ERC721_EVM) || contractType.equals(ContractTypeEnum.ERC1155_EVM) ){
@@ -247,10 +249,12 @@ public class TransactionAnalyzer {
         }
 
         if (ci.getType() == null) {
-            throw new BeanCreateOrUpdateException("交易类型为空,遇到未知交易:[blockNumber=" + dtoTransaction.getNum() + ",txHash=" + dtoTransaction.getHash() + "]");
+            log.error("交易处理后，交易类型为空，块高：{} txHash:{}", dtoTransaction.getNum(), dtoTransaction.getHash());
+            throw new RuntimeException("交易处理后，交易类型为空");
         }
         if (ci.getToType() == null) {
-            throw new BeanCreateOrUpdateException("To地址为空:[blockNumber=" + dtoTransaction.getNum() + ",txHash=" + dtoTransaction.getHash() + "]");
+            log.error("交易处理后，to地址类型为空，块高：{} txHash:{}", dtoTransaction.getNum(), dtoTransaction.getHash());
+            throw new RuntimeException("交易处理后，to地址类型为空");
         }
 
         // 默认取状态字段作为交易成功与否的状态

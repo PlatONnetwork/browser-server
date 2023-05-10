@@ -59,7 +59,7 @@ public enum AddressTypeEnum {
             case ERC1155_EVM_CONTRACT:
                 return ContractTypeEnum.ERC1155_EVM;
             default:
-                return ContractTypeEnum.UNKNOWN;
+                return null;
         }
     }
 }

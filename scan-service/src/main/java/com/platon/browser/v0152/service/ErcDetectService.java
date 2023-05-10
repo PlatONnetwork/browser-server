@@ -73,22 +73,17 @@ public class ErcDetectService {
     }
 
 
-    public ContractTypeEnum getContractType(String contractAddress, BigInteger blockNumber, String binHexNo0x, String txInput) {
-        try {
-            if (isSupportErc721(contractAddress, blockNumber)) {
-                return ContractTypeEnum.ERC721_EVM;
-            } else if (isSupportErc1155(contractAddress, blockNumber)) {
-                return ContractTypeEnum.ERC1155_EVM;
-            } else if (isSupportErc20(binHexNo0x)) {
-                return ContractTypeEnum.ERC20_EVM;
-            } else if (TxInputDecodeUtil.isWASM(txInput)) {
-                return ContractTypeEnum.WASM;
-            } else {
-                return ContractTypeEnum.EVM;
-            }
-        }catch (Exception e){
-            log.error("解析合约类型出错，地址：{}", contractAddress, e);
-            return ContractTypeEnum.UNKNOWN;
+    public ContractTypeEnum getContractType(String contractAddress, BigInteger blockNumber, String binHexNo0x, String txInput) throws PlatonCallTimeoutException {
+        if (isSupportErc721(contractAddress, blockNumber)) {
+            return ContractTypeEnum.ERC721_EVM;
+        } else if (isSupportErc1155(contractAddress, blockNumber)) {
+            return ContractTypeEnum.ERC1155_EVM;
+        } else if (isSupportErc20(binHexNo0x)) {
+            return ContractTypeEnum.ERC20_EVM;
+        } else if (TxInputDecodeUtil.isWASM(txInput)) {
+            return ContractTypeEnum.WASM;
+        } else {
+            return ContractTypeEnum.EVM;
         }
     }
 

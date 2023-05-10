@@ -34,6 +34,7 @@ import com.platon.rlp.solidity.RlpType;
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -245,20 +246,15 @@ public class TransactionUtil {
     /**
      * 内置合约调用交易,解析补充信息
      */
-    public static void resolveInnerContractInvokeTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction tx, List<Log> logs, ComplementInfo ci) throws BeanCreateOrUpdateException {
-        PPOSTxDecodeResult decodedResult;
-        try {
-            // 解析交易的输入及交易回执log信息
-            decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logs);
-            ci.setType(decodedResult.getTypeEnum().getCode());
-            ci.setInfo(decodedResult.getParam().toJSONString());
-            ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
-            ci.setContractType(ContractTypeEnum.INNER.getCode());
-            ci.setMethod(null);
-            ci.setBinCode(null);
-        } catch (Exception e) {
-            throw new BeanCreateOrUpdateException("交易[hash:" + tx.getHash() + "]的参数解析出错:" + e.getMessage());
-        }
+    public static void resolveInnerContractInvokeTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction tx, List<Log> logs, ComplementInfo ci) {
+        // 解析交易的输入及交易回执log信息
+        PPOSTxDecodeResult decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logs);
+        ci.setType(decodedResult.getTypeEnum().getCode());
+        ci.setInfo(decodedResult.getParam().toJSONString());
+        ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
+        ci.setContractType(ContractTypeEnum.INNER.getCode());
+        ci.setMethod(null);
+        ci.setBinCode(null);
     }
 
     /**
@@ -269,16 +265,9 @@ public class TransactionUtil {
      * @return
      * @throws BeanCreateOrUpdateException
      */
-    public static String getContractBinCode(com.platon.browser.elasticsearch.dto.Transaction tx, PlatOnClient platOnClient, String contractAddress) throws BeanCreateOrUpdateException {
-        try {
-            PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j().platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(tx.getNum()))).send();
-            return platonGetCode.getCode();
-        } catch (Exception e) {
-            platOnClient.updateCurrentWeb3jWrapper();
-            String error = "获取合约代码出错[" + contractAddress + "]:" + e.getMessage();
-            log.error("{}", error);
-            throw new BeanCreateOrUpdateException(error);
-        }
+    public static String getContractBinCode(com.platon.browser.elasticsearch.dto.Transaction tx, PlatOnClient platOnClient, String contractAddress) throws IOException {
+        PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j().platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(tx.getNum()))).send();
+        return platonGetCode.getCode();
     }
 
     public static String getContractBinCode( PlatOnClient platOnClient, String contractAddress, Long blockNumber) throws BeanCreateOrUpdateException {
@@ -304,7 +293,7 @@ public class TransactionUtil {
      * @return void
      * @date 2021/4/20
      */
-    public static void resolveGeneralContractCreateTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction result, String contractAddress, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum) throws BeanCreateOrUpdateException {
+    public static void resolveGeneralContractCreateTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction result, String contractAddress, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum) {
         ci.setInfo("");
         //String binCode = "0x00";
         //ci.setBinCode(binCode);
@@ -382,7 +371,7 @@ public class TransactionUtil {
      * @return void
      * @date 2021/4/20
      */
-    public static void resolveGeneralContractInvokeTxComplementInfo(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum) throws BeanCreateOrUpdateException {
+    public static void resolveGeneralContractInvokeTxComplementInfo(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum) {
         ci.setInfo("");
         // 2023/04/12 lvxiaoyi: 合约调用，不需要查询binCode，合约的bincCode只需要在合约创建时调用一次即可。如果合约销毁，则在receipt中有被销毁的地址列表
 
